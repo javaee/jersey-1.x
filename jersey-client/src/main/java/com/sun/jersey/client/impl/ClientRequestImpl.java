@@ -110,9 +110,13 @@ public final class ClientRequestImpl extends ClientRequest implements ClientRequ
     }
 
     public MultivaluedMap<String, Object> getMetadata() {
-        return metadata;
+        return getHeaders();
     }
     
+    public MultivaluedMap<String, Object> getHeaders() {
+        return metadata;
+    }
+
     public ClientRequestAdapter getAdapter() {
         return adapter;
     }

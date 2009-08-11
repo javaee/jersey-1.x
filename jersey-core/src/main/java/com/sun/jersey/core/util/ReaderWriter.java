@@ -76,7 +76,7 @@ public final class ReaderWriter {
     /**
      * The default buffer size for arrays of byte and character.
      */
-    public static final int DEFAULT_BUFFER_SIZE = 4096;
+    public static final int DEFAULT_BUFFER_SIZE = 8192;
     
     /**
      * The buffer size for arrays of byte and character.

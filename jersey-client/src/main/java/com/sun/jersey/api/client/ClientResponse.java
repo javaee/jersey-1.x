@@ -434,12 +434,22 @@ public class ClientResponse {
     }
 
     /**
-     * 
+     * Checks if there is an entity available.
+     *
      * @return true if there is an entity present in the response.
      */
     public boolean hasEntity() {
         try {
-            return entity.available() > 0;
+            if (entity.available() > 0) {
+                return true;
+            } else if (entity.markSupported()) {
+                entity.mark(1);
+                int i = entity.read();
+                entity.reset();
+                return i != -1;
+            } else {
+                return false;
+            }
         } catch (IOException ex) {
             throw new ClientHandlerException(ex);
         }

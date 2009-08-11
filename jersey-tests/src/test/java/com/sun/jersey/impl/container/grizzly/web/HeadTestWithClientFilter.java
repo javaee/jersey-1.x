@@ -34,86 +34,23 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.container.grizzly.web;
 
 import com.sun.jersey.api.client.Client;
-import javax.ws.rs.Path;
-import com.sun.jersey.api.client.WebResource;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpMethodTest extends AbstractGrizzlyWebContainerTester {
-    @Path("/test")
-    public static class HttpMethodResource {
-        @GET
-        public String get() {
-            return "GET";
-        }
-               
-        @POST
-        public String post(String entity) {
-            return entity;
-        }
-        
-        @PUT
-        public String put(String entity) {
-            return entity;
-        }
-        
-        @DELETE
-        public String delete() {
-            return "DELETE";
-        }    
-    }
-        
-    public HttpMethodTest(String testName) {
+public class HeadTestWithClientFilter extends HeadTest {
+    public HeadTestWithClientFilter(String testName) {
         super(testName);
     }
     
     protected Client createClient() {
-        return Client.create();
-    }
-
-    public void testGet() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("GET", r.get(String.class));
-    }
-    
-    public void testPost() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("POST", r.post(String.class, "POST"));
-    }    
-    
-    public void testPut() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("PUT", r.post(String.class, "PUT"));
-    }
-    
-    public void testDelete() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("DELETE", r.delete(String.class));
-    }
-    
-    public void testAll() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("GET", r.get(String.class));
-
-        assertEquals("POST", r.post(String.class, "POST"));
-        
-        assertEquals("PUT", r.post(String.class, "PUT"));
-        
-        assertEquals("DELETE", r.delete(String.class));
+        Client c = Client.create();
+        c.addFilter(new LoggingFilter());
+        return c;
     }
 }

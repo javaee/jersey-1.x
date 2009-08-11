@@ -38,6 +38,7 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
+import com.sun.jersey.core.util.ReaderWriter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -94,7 +95,7 @@ public final class FileProvider extends AbstractMessageReaderWriterProvider<File
             MediaType mediaType, 
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
-        InputStream in = new BufferedInputStream(new FileInputStream(t));
+        InputStream in = new BufferedInputStream(new FileInputStream(t), ReaderWriter.BUFFER_SIZE);
         try {
             writeTo(in, entityStream);
         } finally {

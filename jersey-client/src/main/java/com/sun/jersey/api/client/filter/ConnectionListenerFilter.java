@@ -41,6 +41,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientRequestAdapter;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.UnmodifiableMultivaluedMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -295,14 +296,19 @@ class ClientRequestContainer extends ClientRequest {
         throw new UnsupportedOperationException("Not supported.");
     }
 
+    @Override
+    public MultivaluedMap<String, Object> getMetadata() {
+        return getHeaders();
+    }
+
     /**
      * changing anything in returned multivalued map has to be forbidden
      *
      */
     @Override
-    public MultivaluedMap<String, Object> getMetadata() {
-        if (request.getMetadata() != null) {
-            return request.getMetadata(); // :-/ TODO (Collections.unmodifiableMultivaluedMap)
+    public MultivaluedMap<String, Object> getHeaders() {
+        if (request.getHeaders() != null) {
+            return new UnmodifiableMultivaluedMap(request.getHeaders());
         } else {
             return null;
         }

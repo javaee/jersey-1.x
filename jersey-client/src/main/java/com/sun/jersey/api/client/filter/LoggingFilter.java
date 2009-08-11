@@ -50,6 +50,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -58,6 +59,9 @@ import javax.ws.rs.core.MultivaluedMap;
  * @author Paul.Sandoz@Sun.Com
  */
 public class LoggingFilter extends ClientFilter {
+
+    private static final Logger LOGGER = Logger.getLogger(LoggingFilter.class.getName());
+
     private static final String NOTIFICATION_PREFIX = "* ";
     
     private static final String REQUEST_PREFIX = "> ";
@@ -65,95 +69,155 @@ public class LoggingFilter extends ClientFilter {
     private static final String RESPONSE_PREFIX = "< ";
     
     private final class Adapter extends AbstractClientRequestAdapter {
-        Adapter(ClientRequestAdapter cra) {
+        private final StringBuilder b;
+
+        Adapter(ClientRequestAdapter cra, StringBuilder b) {
             super(cra);
+            this.b = b;
         }
 
         public OutputStream adapt(ClientRequest request, OutputStream out) throws IOException {
-            return new LoggingOutputStream(getAdapter().adapt(request, out));
+            return new LoggingOutputStream(getAdapter().adapt(request, out), b);
         }
         
     }
 
     private final class LoggingOutputStream extends OutputStream {
-        private boolean init = false;
-        private OutputStream out;
+        private final OutputStream out;
+        
+        private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+        private final StringBuilder b;
 
-        LoggingOutputStream(OutputStream out) {
+        LoggingOutputStream(OutputStream out, StringBuilder b) {
             this.out = out;
+            this.b = b;
         }
         
         @Override
         public void write(byte[] b)  throws IOException {
-            init();
-            loggingStream.write(b);
+            baos.write(b);
             out.write(b);
         }
     
         @Override
         public void write(byte[] b, int off, int len)  throws IOException {
-            init();
-            loggingStream.write(b, off, len);
+            baos.write(b, off, len);
             out.write(b, off, len);
         }
 
         @Override
         public void write(int b) throws IOException {
-            init();
-            loggingStream.write(b);
+            baos.write(b);
             out.write(b);
         }
 
         @Override
         public void close() throws IOException {
-            finish();
+            printEntity(b, baos.toByteArray());
+            log(b);
             out.close();
-        }
-        
-        private final void init() {
-            if (init == false) {
-                init = true;
-            }
-        }
-        
-        private final void finish() {
-            if (init) {
-                loggingStream.println();
-                init = false;
-            }            
         }
     }
 
     private final PrintStream loggingStream;
 
+    private final Logger logger;
+
     private long _id = 0;
-    
+
+    /**
+     * Create a logging filter logging the request and response to
+     * a default JDK logger, named as the fully qualified class name of this
+     * class.
+     */
     public LoggingFilter() {
-        this(System.out);
-    }
-    
-    public LoggingFilter(PrintStream loggingStream) {
-        this.loggingStream = loggingStream;
+        this(LOGGER);
     }
 
-    private PrintStream prefixId(long id) {
-        loggingStream.append(Long.toString(id)).append(" ");
-        return loggingStream;
+    /**
+     * Create a logging filter logging the request and response to
+     * a JDK logger.
+     * 
+     * @param logger the logger to log requests and responses.
+     */
+    public LoggingFilter(Logger logger) {
+        this.loggingStream = null;
+        this.logger = logger;
+    }
+
+    /**
+     * Create a logging filter logging the request and response to
+     * print stream.
+     *
+     * @param loggingStream the print stream to log requests and responses.
+     */
+    public LoggingFilter(PrintStream loggingStream) {
+        this.loggingStream = loggingStream;
+        this.logger = null;
+    }
+
+    private void log(StringBuilder b) {
+        if (logger != null) {
+            logger.info(b.toString());
+        } else {
+            loggingStream.print(b);
+        }
+    }
+
+    private StringBuilder prefixId(StringBuilder b, long id) {
+        b.append(Long.toString(id)).append(" ");
+        return b;
     }
 
     @Override
     public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
         long id = ++this._id;
 
-        printRequestLine(id, request);
-        printRequestHeaders(id, request.getMetadata());
-            
-        request.setAdapter(new Adapter(request.getAdapter()));
-        
+        logRequest(id, request);
+
         ClientResponse response = getNext().handle(request);
 
-        printResponseLine(id, response);
-        printResponseHeaders(id, response.getMetadata());
+        logResponse(id, response);
+
+        return response;
+    }
+
+    private void logRequest(long id, ClientRequest request) {
+        StringBuilder b = new StringBuilder();
+        
+        printRequestLine(b, id, request);
+        printRequestHeaders(b, id, request.getHeaders());
+
+        if (request.getEntity() != null) {
+            request.setAdapter(new Adapter(request.getAdapter(), b));
+        } else {
+            log(b);
+        }
+    }
+
+    private void printRequestLine(StringBuilder b, long id, ClientRequest request) {
+        prefixId(b, id).append(NOTIFICATION_PREFIX).append("Client out-bound request").append("\n");
+        prefixId(b, id).append(REQUEST_PREFIX).append(request.getMethod()).append(" ").
+                append(request.getURI().toASCIIString()).append("\n");
+    }
+
+    private void printRequestHeaders(StringBuilder b, long id, MultivaluedMap<String, Object> headers) {
+        for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
+            String header = e.getKey();
+            for (Object value : e.getValue()) {
+                prefixId(b, id).append(REQUEST_PREFIX).append(header).append(": ").
+                        append(ClientRequest.getHeaderValue(value)).append("\n");
+            }
+        }
+        prefixId(b, id).append(REQUEST_PREFIX).append("\n");
+    }
+
+    private void logResponse(long id, ClientResponse response) {
+        StringBuilder b = new StringBuilder();
+
+        printResponseLine(b, id, response);
+        printResponseHeaders(b, id, response.getHeaders());
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         InputStream in = response.getEntityInputStream();
@@ -161,53 +225,36 @@ public class LoggingFilter extends ClientFilter {
             ReaderWriter.writeTo(in, out);
 
             byte[] requestEntity = out.toByteArray();
-            printResponseEntity(requestEntity);
+            printEntity(b, requestEntity);
             response.setEntityInputStream(new ByteArrayInputStream(requestEntity));
         } catch (IOException ex) {
             throw new ClientHandlerException(ex);
         }
-        prefixId(id).append(NOTIFICATION_PREFIX).
-                append("In-bound response").println();
+        log(b);
+    }
 
-        return response;
+    private void printResponseLine(StringBuilder b, long id, ClientResponse response) {
+        prefixId(b, id).append(NOTIFICATION_PREFIX).
+                append("Client in-bound response").append("\n");
+        prefixId(b, id).append(RESPONSE_PREFIX).
+                append(Integer.toString(response.getStatus())).
+                append("\n");
     }
     
-    private void printRequestLine(long id, ClientRequest request) {
-        prefixId(id).append(NOTIFICATION_PREFIX).append("Out-bound request").println();
-        prefixId(id).append(REQUEST_PREFIX).append(request.getMethod()).append(" ").
-                append(request.getURI().toASCIIString()).println();
-    }
-    
-    private void printRequestHeaders(long id, MultivaluedMap<String, Object> headers) {
-        for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
-            String header = e.getKey();
-            for (Object value : e.getValue()) {
-                prefixId(id).append(REQUEST_PREFIX).append(header).append(": ").
-                        append(ClientRequest.getHeaderValue(value)).println();                
-            }
-        }
-        prefixId(id).println("> ");
-    }
-    
-    private void printResponseLine(long id, ClientResponse response) {
-        prefixId(id).append(RESPONSE_PREFIX).append(Integer.toString(response.getStatus())).println();
-    }
-    
-    private void printResponseHeaders(long id, MultivaluedMap<String, String> headers) {
+    private void printResponseHeaders(StringBuilder b, long id, MultivaluedMap<String, String> headers) {
         for (Map.Entry<String, List<String>> e : headers.entrySet()) {
             String header = e.getKey();
             for (String value : e.getValue()) {
-                prefixId(id).append(RESPONSE_PREFIX).append(header).append(": ").
-                        append(value).println();                
+                prefixId(b, id).append(RESPONSE_PREFIX).append(header).append(": ").
+                        append(value).append("\n");
             }
         }
-        prefixId(id).println(RESPONSE_PREFIX);
+        prefixId(b, id).append(RESPONSE_PREFIX).append("\n");
     }
 
-    private void printResponseEntity(byte[] responseEntity) throws IOException {
-        if (responseEntity.length == 0)
+    private void printEntity(StringBuilder b, byte[] entity) throws IOException {
+        if (entity.length == 0)
             return;
-        loggingStream.write(responseEntity);
-        loggingStream.println();        
+        b.append(new String(entity)).append("\n");
     }   
 }

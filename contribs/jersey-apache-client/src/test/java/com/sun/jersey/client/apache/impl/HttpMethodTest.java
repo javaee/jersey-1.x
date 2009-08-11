@@ -95,16 +95,24 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         super(testName);
     }
 
+    protected ApacheHttpClient createClient() {
+        return ApacheHttpClient.create();
+    }
+
+    protected ApacheHttpClient createClient(ApacheHttpClientConfig cc) {
+        return ApacheHttpClient.create(cc);
+    }
+
     public void testHead() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
         ClientResponse cr = r.head();
         assertFalse(cr.hasEntity());
     }
 
     public void testOptions() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
         ClientResponse cr = r.options(ClientResponse.class);
         assertTrue(cr.hasEntity());
         cr.close();
@@ -112,7 +120,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testGet() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));
 
         ClientResponse cr = r.get(ClientResponse.class);
@@ -122,7 +130,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testPost() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
         assertEquals("POST", r.post(String.class, "POST"));
 
         ClientResponse cr = r.post(ClientResponse.class, "POST");
@@ -138,9 +146,9 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
         DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
         config.getProperties().put(ApacheHttpClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE, 1024);
-        ApacheHttpClient c = ApacheHttpClient.create(config);
+        ApacheHttpClient c = createClient(config);
 
-        WebResource r = c.resource(getUri().path("test").build());
+        WebResource r = c.resource(getUri().path("test").build());        
         assertEquals("POST", r.post(String.class, "POST"));
 
         ClientResponse cr = r.post(ClientResponse.class, "POST");
@@ -150,7 +158,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testPostVoid() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
 
         // This test will lock up if ClientResponse is not closed by WebResource.
         // TODO need a better way to detect this.
@@ -161,7 +169,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testPostNoProduce() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
         assertEquals(204, r.path("noproduce").post(ClientResponse.class, "POST").getStatus());
 
         ClientResponse cr = r.path("noproduce").post(ClientResponse.class, "POST");
@@ -171,7 +179,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testPostNoConsumeProduce() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
         assertEquals(204, r.path("noconsumeproduce").post(ClientResponse.class).getStatus());
 
         ClientResponse cr = r.path("noconsumeproduce").post(ClientResponse.class, "POST");
@@ -181,7 +189,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testPut() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
         assertEquals("PUT", r.put(String.class, "PUT"));
 
         ClientResponse cr = r.put(ClientResponse.class, "PUT");
@@ -191,7 +199,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testDelete() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class));
 
         ClientResponse cr = r.delete(ClientResponse.class);
@@ -201,7 +209,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testAll() {
         startServer(HttpMethodResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
 
         assertEquals("GET", r.get(String.class));
 
@@ -233,7 +241,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testPostError() {
         startServer(ErrorResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test").build());
+        WebResource r = createClient().resource(getUri().path("test").build());
 
         // This test will lock up if ClientResponse is not closed by WebResource.
         // TODO need a better way to detect this.
@@ -247,7 +255,7 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testPostErrorWithEntity() {
         startServer(ErrorResource.class);
-        WebResource r = ApacheHttpClient.create().resource(getUri().path("test/entity").build());
+        WebResource r = createClient().resource(getUri().path("test/entity").build());
 
         // This test will lock up if ClientResponse is not closed by WebResource.
         // TODO need a better way to detect this.

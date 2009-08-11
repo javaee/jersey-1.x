@@ -139,7 +139,15 @@ public abstract class ClientRequest {
      * 
      * @return the HTTP headers of the request.
      */
+    @Deprecated
     public abstract MultivaluedMap<String, Object> getMetadata();
+
+    /**
+     * Get the HTTP headers of the request.
+     *
+     * @return the HTTP headers of the request.
+     */
+    public abstract MultivaluedMap<String, Object> getHeaders();
 
     /**
      * Get the client request adapter.

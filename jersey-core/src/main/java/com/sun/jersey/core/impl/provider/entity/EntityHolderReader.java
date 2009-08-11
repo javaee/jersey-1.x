@@ -38,6 +38,7 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.EntityHolder;
+import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -94,7 +95,7 @@ public final class EntityHolderReader implements MessageBodyReader<Object> {
             InputStream entityStream) throws IOException {
 
         if (!entityStream.markSupported()) {
-            entityStream = new BufferedInputStream(entityStream);
+            entityStream = new BufferedInputStream(entityStream, ReaderWriter.BUFFER_SIZE);
         }
         entityStream.mark(1);
         if (entityStream.read() == -1) {

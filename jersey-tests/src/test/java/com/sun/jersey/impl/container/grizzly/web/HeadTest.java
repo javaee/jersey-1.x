@@ -74,11 +74,15 @@ public class HeadTest extends AbstractGrizzlyWebContainerTester {
             return new ByteArrayInputStream("GET".getBytes());
         }               
     }
-        
+
+    protected Client createClient() {
+        return Client.create();
+    }
+
     public void testHead() throws Exception {
         startServer(Resource.class);
         
-        WebResource r = Client.create().resource(getUri().path("/").build());
+        WebResource r = createClient().resource(getUri().path("/").build());
         
         ClientResponse cr = r.path("string").accept("text/plain").head();
         assertEquals(200, cr.getStatus());

@@ -1,4 +1,8 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 242
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=242
+  Client and server logging now uses a JDK logger to log requests and
+  responses.
 - Code to copy a from an input stream or reader to an output stream or writer
   has been consolidated. In addition functions that require the use of byte
   or character arrays will use a default size for the array but this can

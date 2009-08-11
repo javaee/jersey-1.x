@@ -48,11 +48,14 @@ import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.DefaultCredentialsProvider;
 import com.sun.jersey.core.header.InBoundHeaders;
 
+import com.sun.jersey.core.util.ReaderWriter;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -247,7 +250,10 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         try {
             client.executeMethod(getHostConfiguration(client, props), method, getHttpState(props));
 
-            return new HttpClientResponse(method);
+            return new ClientResponse(method.getStatusCode(),
+                    getInBoundHeaders(method),
+                    new HttpClientResponseInputStream(method),
+                    getMessageBodyWorkers());
         } catch (Exception e) {
             method.releaseConnection();
             throw new ClientHandlerException(e);
@@ -361,10 +367,8 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
         private final HttpMethod method;
 
-        HttpClientResponseInputStream(HttpMethod method)
-                throws IOException {
-            super((method.getResponseBodyAsStream() != null)
-                ? method.getResponseBodyAsStream() : new ByteArrayInputStream(new byte[0]));
+        HttpClientResponseInputStream(HttpMethod method) throws IOException {
+            super(getInputStream(method));
             this.method = method;
         }
 
@@ -376,27 +380,15 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         }
     }
 
-    private final class HttpClientResponse extends ClientResponse {
+    private static InputStream getInputStream(HttpMethod method) throws IOException {
+        InputStream i = method.getResponseBodyAsStream();
 
-        private final HttpMethod method;
-
-        HttpClientResponse(HttpMethod method) throws IOException {
-            super(method.getStatusCode(), getInBoundHeaders(method),
-                    new HttpClientResponseInputStream(method), getMessageBodyWorkers());
-            this.method = method;
-        }
-
-        @Override
-        public boolean hasEntity() {
-            if (method instanceof HeadMethod) {
-                return false;
-            }
-
-            try {
-                return method.getResponseBodyAsStream() != null;
-            } catch (IOException ex) {
-                throw new ClientHandlerException(ex);
-            }
+        if (i == null) {
+            return new ByteArrayInputStream(new byte[0]);
+        } else if (i.markSupported()) {
+            return i;
+        } else {
+            return new BufferedInputStream(i, ReaderWriter.BUFFER_SIZE);
         }
     }
 }

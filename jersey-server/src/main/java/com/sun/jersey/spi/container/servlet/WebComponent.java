@@ -47,6 +47,7 @@ import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
@@ -61,7 +62,6 @@ import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
-import com.sun.jersey.spi.service.ServiceConfigurationError;
 import com.sun.jersey.spi.service.ServiceFinder;
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -738,7 +738,7 @@ public class WebComponent implements ContainerListener {
     private boolean isEntityPresent(ContainerRequest cr) throws IOException {
         InputStream in = cr.getEntityInputStream();
         if (!in.markSupported()) {
-            in = new BufferedInputStream(in);
+            in = new BufferedInputStream(in, ReaderWriter.BUFFER_SIZE);
             cr.setEntityInputStream(in);
         }
 

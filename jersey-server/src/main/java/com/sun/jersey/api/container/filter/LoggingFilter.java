@@ -115,14 +115,20 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 
     private long id = 0;
 
+    /**
+     * Create a logging filter logging the request and response to
+     * a default JDK logger, named as the fully qualified class name of this
+     * class.
+     */
     public LoggingFilter() {
         this(LOGGER);
     }
 
     /**
-     * Create a logging filter with a specified logger.
+     * Create a logging filter logging the request and response to
+     * a JDK logger.
      *
-     * @param logger the logger to log the requests and responses.
+     * @param logger the logger to log requests and responses.
      */
     public LoggingFilter(Logger logger) {
         this.logger = logger;
@@ -168,7 +174,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
     }
     
     private void printRequestLine(StringBuilder b, ContainerRequest request) {
-        prefixId(b).append(NOTIFICATION_PREFIX).append("In-bound request received").append('\n');
+        prefixId(b).append(NOTIFICATION_PREFIX).append("Server in-bound request").append('\n');
         prefixId(b).append(REQUEST_PREFIX).append(request.getMethod()).append(" ").
                 append(request.getRequestUri().toASCIIString()).append('\n');
     }
@@ -242,7 +248,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
     
     private void printResponseLine(StringBuilder b, ContainerResponse response) {
         prefixId(b).append(NOTIFICATION_PREFIX).
-            append("Out-bound response sent").append('\n');
+            append("Server out-bound response").append('\n');
         prefixId(b).append(RESPONSE_PREFIX).append(Integer.toString(response.getStatus())).append('\n');
     }
     
