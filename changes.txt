@@ -1,4 +1,8 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 338
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=338
+  Ensure correct array element separator (',') is used also
+  in case an array is recognized based on configuration option.
 - Fixed issue 242
   https://jersey.dev.java.net/issues/show_bug.cgi?id=242
   Client and server logging now uses a JDK logger to log requests and
