@@ -84,8 +84,8 @@ class LiftTemplateProcessor(resourceConfig: ResourceConfig) extends TemplateProc
         }
       }
 
-      case _ => {
-        throw new ContainerException("No template found for " + resolvedPath);
+      case other => {
+        throw new ContainerException("No template found for " + resolvedPath + " got '" + other + "'");
       }
     }
   }
