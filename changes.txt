@@ -1,4 +1,9 @@
 release 1.1.2-ea (2009-09)
+- Code to copy a from an input stream or reader to an output stream or writer
+  has been consolidated. In addition functions that require the use of byte
+  or character arrays will use a default size for the array but this can
+  be overridden if required (for performance reasons). See:
+    com.sun.jersey.core.util.ReaderWriter
 - Cleaned up the throwing of exceptions by message body readers and writers.
   If a known checked, or documented runtime, exception is thrown when
   reading then a WebApplcationException is thrown with the cause. If the

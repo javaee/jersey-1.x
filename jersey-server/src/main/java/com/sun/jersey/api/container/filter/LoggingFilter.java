@@ -39,6 +39,7 @@ package com.sun.jersey.api.container.filter;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -151,10 +152,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             InputStream in = request.getEntityInputStream();
             try {
-                int read;
-                final byte[] data = new byte[2048];
-                while ((read = in.read(data)) != -1)
-                    out.write(data, 0, read);
+                ReaderWriter.writeTo(in, out);
 
                 byte[] requestEntity = out.toByteArray();
                 printEntity(b, requestEntity);

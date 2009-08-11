@@ -214,11 +214,14 @@ public abstract class TerminatingClientHandler implements ClientHandler {
          */
         public void writeRequestEntity(OutputStream out) throws IOException {
             out = cr.getAdapter().adapt(cr, out);
-            bw.writeTo(entity, entity.getClass(), entityType,
-                    EMPTY_ANNOTATIONS, mediaType, cr.getMetadata(),
-                    out);
-            out.flush();
-            out.close();
+            try {
+                bw.writeTo(entity, entity.getClass(), entityType,
+                        EMPTY_ANNOTATIONS, mediaType, cr.getMetadata(),
+                        out);
+                out.flush();
+            } finally {
+                out.close();
+            }
         }
     }
 
@@ -316,9 +319,12 @@ public abstract class TerminatingClientHandler implements ClientHandler {
         listener.onRequestEntitySize(size);
 
         final OutputStream out = ro.getAdapter().adapt(ro, listener.onGetOutputStream());
-        bw.writeTo(entity, entityClass, entityType,
-                EMPTY_ANNOTATIONS, mediaType, metadata, out);
-        out.flush();
-        out.close();
+        try {
+            bw.writeTo(entity, entityClass, entityType,
+                    EMPTY_ANNOTATIONS, mediaType, metadata, out);
+            out.flush();
+        } finally {
+            out.close();
+        }
     }
 }

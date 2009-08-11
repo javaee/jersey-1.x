@@ -41,6 +41,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientRequestAdapter;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.util.ReaderWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -157,10 +158,7 @@ public class LoggingFilter extends ClientFilter {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         InputStream in = response.getEntityInputStream();
         try {
-            int read;
-            final byte[] data = new byte[2048];
-            while ((read = in.read(data)) != -1)
-                out.write(data, 0, read);
+            ReaderWriter.writeTo(in, out);
 
             byte[] requestEntity = out.toByteArray();
             printResponseEntity(requestEntity);

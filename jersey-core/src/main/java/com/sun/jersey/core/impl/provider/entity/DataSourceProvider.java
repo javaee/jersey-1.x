@@ -38,6 +38,7 @@
 package com.sun.jersey.core.impl.provider.entity;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
+import com.sun.jersey.core.util.ReaderWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -89,10 +90,7 @@ public class DataSourceProvider extends AbstractMessageReaderWriterProvider<Data
 
         public ByteArrayDataSource(InputStream is, String type) throws IOException {
             DSByteArrayOutputStream os = new DSByteArrayOutputStream();
-            byte[] buf = new byte[8192];
-            int len;
-            while ((len = is.read(buf)) > 0)
-                os.write(buf, 0, len);
+            ReaderWriter.writeTo(is, os);
             this.data = os.getBuf();
             this.len = os.getCount();
 

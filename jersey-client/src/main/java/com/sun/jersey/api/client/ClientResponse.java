@@ -38,6 +38,7 @@ package com.sun.jersey.api.client;
 
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.provider.CompletableReader;
+import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -543,12 +544,8 @@ public class ClientResponse {
             return;
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] b = new byte[4096];
-        int l;
         try {
-            while ((l = entity.read(b)) != -1) {
-                baos.write(b, 0, l);
-            }
+            ReaderWriter.writeTo(entity, baos);
         } catch(IOException ex) {
             throw new ClientHandlerException(ex);
         } finally {

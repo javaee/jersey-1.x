@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,33 +35,69 @@
  * holder.
  */
 
-package com.sun.jersey.core.provider;
+package com.sun.jersey.core.util;
 
-import com.sun.jersey.core.util.ReaderWriter;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import javax.ws.rs.core.MediaType;
 
 /**
+ * A utlity class for reading and writing using byte and character streams.
+ * <p>
+ * If a byte or character array is utilized then the size of the array
+ * is by default the value of {@link #DEFAULT_BUFFER_SIZE}. This value can
+ * be set using the system property {@link #BUFFER_SIZE_SYSTEM_PROPERTY}.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractMessageReaderWriterProvider<T> implements 
-        MessageBodyReader<T>, MessageBodyWriter<T> {
-
+public final class ReaderWriter {
     /**
      * The UTF-8 Charset.
      */
-    public static final Charset UTF8 = ReaderWriter.UTF8;
-                  
+    public static final Charset UTF8 = Charset.forName("UTF-8");
+
+    /**
+     * The system property to set the default buffer size for arrays
+     * of byte and character.
+     * <p>
+     * If the property value is not a positive integer then the default buffer
+     * size declared by {@link #DEFAULT_BUFFER_SIZE} will be utilized.
+     */
+    public static final String BUFFER_SIZE_SYSTEM_PROPERTY =
+            "com.sun.jersey.core.util.ReaderWriter.BufferSize";
+
+    /**
+     * The default buffer size for arrays of byte and character.
+     */
+    public static final int DEFAULT_BUFFER_SIZE = 4096;
+    
+    /**
+     * The buffer size for arrays of byte and character.
+     */
+    public static final int BUFFER_SIZE = getBufferSize();
+
+
+    private static int getBufferSize() {
+        String v = System.getProperty(
+                BUFFER_SIZE_SYSTEM_PROPERTY,
+                Integer.toString(DEFAULT_BUFFER_SIZE));
+        try {
+            int i = Integer.valueOf(v);
+            if (i <= 0)
+                throw new NumberFormatException();
+            return i;
+        } catch (NumberFormatException ex) {
+            return DEFAULT_BUFFER_SIZE;
+        }
+    }
+
     /**
      * Reader bytes from an input stream and write then to an output stream.
      *
@@ -70,9 +106,12 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
      * @throws IOException if there is an error reading or writing bytes.
      */
     public static final void writeTo(InputStream in, OutputStream out) throws IOException {
-        ReaderWriter.writeTo(in, out);
+        int read;
+        final byte[] data = new byte[BUFFER_SIZE];
+        while ((read = in.read(data)) != -1)
+            out.write(data, 0, read);
     }
-    
+
     /**
      * Reader characters from an input stream and write then to an output stream.
      *
@@ -81,9 +120,12 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
      * @throws IOException if there is an error reading or writing characters.
      */
     public static final void writeTo(Reader in, Writer out) throws IOException {
-        ReaderWriter.writeTo(in, out);
+        int read;
+        final char[] data = new char[BUFFER_SIZE];
+        while ((read = in.read(data)) != -1)
+            out.write(data, 0, read);
     }
-    
+
     /**
      * Get the character set from a media type.
      * <p>
@@ -94,23 +136,10 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
      * @return the character set.
      */
     public static final Charset getCharset(MediaType m) {
-        return ReaderWriter.getCharset(m);
+        String name = (m == null) ? null : m.getParameters().get("charset");
+        return (name == null) ? UTF8 : Charset.forName(name);
     }
 
-    /**
-     * Get the character set from a media type.
-     * <p>
-     * The character set is obtained from the media type parameter "charset".
-     * If the parameter is not present the {@link #UTF8} charset is utilized.
-     *
-     * @param m the media type.
-     * @return the character set.
-     */
-    public static final String readFromAsString(InputStream in, 
-            MediaType type) throws IOException {
-        return ReaderWriter.readFromAsString(in, type);
-    }
-    
     /**
      * Read the bytes of an input stream and convert to a string.
      *
@@ -120,14 +149,32 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
      * @return the string.
      * @throws IOException if there is an error reading from the input stream.
      */
-    public static final void writeToAsString(String s, OutputStream out, 
+    public static final String readFromAsString(InputStream in,
             MediaType type) throws IOException {
-        ReaderWriter.writeToAsString(s, out, type);
+        Reader reader = new InputStreamReader(in, getCharset(type));
+        StringBuilder sb = new StringBuilder();
+        char[] c = new char[BUFFER_SIZE];
+        int l;
+        while ((l = reader.read(c)) != -1) {
+            sb.append(c, 0, l);
+        }
+        return sb.toString();
     }
-    
-    // MessageBodyWriter
-    
-    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return -1;
+
+    /**
+     * Convert a string to bytes and write those bytes to an output stream.
+     *
+     * @param s the string to convert to bytes.
+     * @param out the output stream to write to.
+     * @param type the media type that determines the character set defining
+     *        how to decode bytes to characters.
+     * @throws IOException
+     */
+    public static final void writeToAsString(String s, OutputStream out,
+            MediaType type) throws IOException {
+        Writer osw = new BufferedWriter(new OutputStreamWriter(out,
+                getCharset(type)));
+        osw.write(s);
+        osw.flush();
     }
 }

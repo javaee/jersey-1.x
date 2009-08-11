@@ -49,6 +49,7 @@ import com.sun.jersey.core.header.MatchingEntityTag;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.server.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.ByteArrayInputStream;
@@ -452,10 +453,7 @@ public class ContainerRequest implements HttpRequestContext {
                 // Buffer input
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 try {
-                    int read;
-                    final byte[] data = new byte[2048];
-                    while ((read = in.read(data)) != -1)
-                        baos.write(data, 0, read);
+                    ReaderWriter.writeTo(in, baos);
                 } catch (IOException e) {
                     throw new IllegalArgumentException(e);
                 }
