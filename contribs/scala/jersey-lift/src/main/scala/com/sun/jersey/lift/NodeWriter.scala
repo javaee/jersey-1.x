@@ -6,6 +6,7 @@ import _root_.java.lang.reflect.Type
 
 import _root_.net.liftweb.http.{S, LiftServlet}
 import _root_.net.liftweb.util.{Full, Box, Log}
+import _root_.net.liftweb.http.provider.servlet.HTTPRequestServlet
 
 import javax.servlet.ServletContext
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
@@ -50,7 +51,7 @@ class NodeWriter extends MessageBodyWriter[NodeSeq] {
           ResourceBean.set(request, it)
         }
       }
-      val nodes = S.render(template, request)
+      val nodes = S.render(template, new HTTPRequestServlet(request))
       val text = nodes.toString();
       out.write(text.getBytes());
     }

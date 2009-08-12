@@ -52,7 +52,10 @@
 
   <properties>
     <jetty.version>6.1.19</jetty.version>
-    <lift.version>1.1-M3</lift.version>
+    <lift.version>1.1-M4</lift.version>
+    <!--
+  -->
+  <lift.version>1.1-SNAPSHOT</lift.version>
     <scala.version>2.7.5</scala.version>
   </properties>
 

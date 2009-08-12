@@ -6,6 +6,7 @@ import _root_.java.util.Enumeration
 
 import _root_.net.liftweb.http.{S, LiftServlet, TemplateFinder}
 import _root_.net.liftweb.util.{Full, Box, Log}
+import _root_.net.liftweb.http.provider.servlet.HTTPRequestServlet
 
 import javax.ws.rs.Produces
 //import org.apache.log4j.Logger
@@ -75,7 +76,7 @@ class LiftTemplateProcessor(resourceConfig: ResourceConfig) extends TemplateProc
     template match {
       case Full(nodes) => {
         if (request != null) {
-          val transformedNodes = S.render(nodes, request)
+          val transformedNodes = S.render(nodes, new HTTPRequestServlet(request))
           val text = transformedNodes.toString()
           out.write(text.getBytes())
         }
