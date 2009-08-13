@@ -42,26 +42,26 @@ class LiftTemplateProcessor(resourceConfig: ResourceConfig) extends TemplateProc
 
   def resolve(path: String): String = {
     if (servletContext == null)
-      return null;
+      return null
 
     try {
-      if (servletContext.getResource(path) != null) {
-        return path;
-      }
-
-      if (!path.endsWith(".html")) {
-        val htmlpath = path + ".html";
-        if (servletContext.getResource(htmlpath) != null) {
-          //Log.debug(() => "Found HTML template " + htmlpath)
-          return htmlpath;
+      // TODO this code actually results in looking up the resource twice
+      // once here first then again Lift land 
+      // I wonder if there's a better way to do this just once?
+      if (servletContext.getResource(path) == null) {
+        if (servletContext.getResource(path + ".html") == null &&
+            servletContext.getResource(path + ".xhtml") == null) {
+          return null
         }
       }
+      //Log.debug(() => "Found HTML template " + htmlpath)
+      return path
     } catch {
       case e: MalformedURLException =>
       // TODO log
     }
     //Log.debug(() => "No Lift template found for " + path)
-    null;
+    null
   }
 
   def writeTo(resolvedPath: String, model: AnyRef, out: OutputStream): Unit = {
@@ -70,9 +70,14 @@ class LiftTemplateProcessor(resourceConfig: ResourceConfig) extends TemplateProc
     // Commit the status and headers to the HttpServletResponse
     out.flush()
 
-    val resource = servletContext.getResource(resolvedPath)
-
-    val template: Box[NodeSeq] = TemplateFinder.findAnyTemplate(List.fromArray(resolvedPath.split("/")))
+    val aPath = if (resolvedPath.startsWith("/")) 
+      resolvedPath.substring(1)
+    else
+      resolvedPath
+    val paths = List.fromArray(aPath.split("/"))
+    // Log.debug(() => "About to search for Lift resource " + paths)
+    
+    val template: Box[NodeSeq] = TemplateFinder.findAnyTemplate(paths)
     template match {
       case Full(nodes) => {
         if (request != null) {
