@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.client;
 
-import com.sun.jersey.api.client.AsyncListener;
+import com.sun.jersey.api.client.async.AsyncListener;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.impl.container.grizzly.*;
 import com.sun.jersey.api.client.Client;
@@ -169,7 +169,14 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
             }
         });
 
-        f.get();
+        boolean caught = false;
+        try {
+            f.get();
+        } catch (ExecutionException ex) {
+            caught = ex.getCause() instanceof UniformInterfaceException;
+        }
+        assertTrue(caught);
+
         assertEquals(1, l.size());
         assertEquals("404", l.get(0));
     }
