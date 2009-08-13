@@ -513,20 +513,22 @@ public class ClientResponse {
             throw new UniformInterfaceException(this);
         }
 
+        MediaType mediaType = getType();
+        if (mediaType == null) {
+            mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+        }
+
+        final MessageBodyReader<T> br = workers.getMessageBodyReader(
+                c, type,
+                EMPTY_ANNOTATIONS, mediaType);
+        if (br == null) {
+            close();
+            throw new ClientHandlerException(
+                    "A message body reader for Java type, " + c +
+                    ", and MIME media type, " + mediaType + ", was not found");
+        }
+        
         try {
-            MediaType mediaType = getType();
-            if (mediaType == null) {
-                mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
-            }
-            
-            final MessageBodyReader<T> br = workers.getMessageBodyReader(
-                    c, type,
-                    EMPTY_ANNOTATIONS, mediaType);
-            if (br == null) {
-                throw new ClientHandlerException(
-                        "A message body reader for Java type, " + c +
-                        ", and MIME media type, " + mediaType + ", was not found");
-            }
             T t = br.readFrom(c, type, EMPTY_ANNOTATIONS, mediaType, headers, entity);
             if (br instanceof CompletableReader) {
                 t = ((CompletableReader<T>)br).complete(t);

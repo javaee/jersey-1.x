@@ -39,7 +39,11 @@ package com.sun.jersey.api.client;
 
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.Filterable;
+import com.sun.jersey.api.client.async.AsyncClientHandler;
+import com.sun.jersey.api.client.async.ClientResponseListener;
+import com.sun.jersey.api.client.async.IAsyncListener;
 import com.sun.jersey.client.impl.ClientRequestImpl;
+import com.sun.jersey.client.impl.async.FutureClientResponseListener;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -47,6 +51,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -69,9 +75,12 @@ import javax.ws.rs.core.UriBuilder;
  * @author Paul.Sandoz@Sun.Com
  * @see com.sun.jersey.api.client
  */
-public class AsyncWebResource extends Filterable implements 
+public class AsyncWebResource extends Filterable implements
+        AsyncClientHandler,
         RequestBuilder<AsyncWebResource.Builder>,
         AsyncUniformInterface {    
+    private static final Logger LOGGER = Logger.getLogger(AsyncWebResource.class.getName());
+
     private final URI u;
 
     /* package */ AsyncWebResource(ClientHandler c, URI u) {
@@ -644,92 +653,172 @@ public class AsyncWebResource extends Filterable implements
     }
     
     
-    private <T> Future<T> handle(final Class<T> c, final ClientRequest ro) {
-        FutureTask<T> ft = new FutureTask<T>(new Callable<T>() {
-            public T call() throws Exception {
-                ClientResponse r = getHeadHandler().handle(ro);
-
-                if (c == ClientResponse.class) return c.cast(r);
-
-                if (r.getStatus() < 300) return r.getEntity(c);
-
-                throw new UniformInterfaceException(r,
-                        ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
+    private <T> Future<T> handle(final Class<T> c, final ClientRequest request) {
+        final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
+            public void onError(Throwable t) {
+                setException(t);
             }
-        });
-        new Thread(ft).start();
-        return ft;
-    }
-    
-    private <T> Future<T> handle(final GenericType<T> gt, final ClientRequest ro) {
-        FutureTask<T> ft = new FutureTask<T>(new Callable<T>() {
-            public T call() throws Exception {
-                ClientResponse r = getHeadHandler().handle(ro);
 
-                if (gt.getRawClass() == ClientResponse.class) gt.getRawClass().cast(r);
-
-                if (r.getStatus() < 300) return r.getEntity(gt);
-
-                throw new UniformInterfaceException(r,
-                        ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
-            }
-        });
-        new Thread(ft).start();
-        return ft;
-    }
-    
-    private <T> Future<?> handle(final IAsyncListener<T> l, final ClientRequest ro) {
-        FutureTask<?> ft = new FutureTask(new Callable() {
-            public Object call() throws Exception {
-
-                T t = null;
+            public void onResponse(ClientResponse response) {
                 try {
-                    t = get();
-                } catch(Exception e) {
-                    // TODO what about exceptions thrown
-                    l.onError(e);
-                    return null;
+                    set(get(response));
+                } catch (Throwable t) {
+                    setException(t);
+                }
+            }
+
+            private T get(ClientResponse response) {
+                if (c == ClientResponse.class) return c.cast(response);
+
+                if (response.getStatus() < 300) return response.getEntity(c);
+
+                throw new UniformInterfaceException(response,
+                        request.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
+            }
+        };
+
+        ftw.setCancelableFuture(handle(request, ftw));
+
+        return ftw;
+    }
+
+    private <T> Future<T> handle(final GenericType<T> gt, final ClientRequest request) {
+        final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
+            public void onError(Throwable t) {
+                setException(t);
+            }
+
+            public void onResponse(ClientResponse response) {
+                try {
+                    set(get(response));
+                } catch (Throwable t) {
+                    setException(t);
+                }
+            }
+
+            private T get(ClientResponse response) {
+                if (gt.getRawClass() == ClientResponse.class) return gt.getRawClass().cast(response);
+
+                if (response.getStatus() < 300) return response.getEntity(gt);
+
+                throw new UniformInterfaceException(response,
+                        request.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
+            }
+        };
+
+        ftw.setCancelableFuture(handle(request, ftw));
+
+        return ftw;
+    }
+    
+    private <T> Future<T> handle(final IAsyncListener<T> l, final ClientRequest request) {
+        final FutureClientResponseListener<T> ftw = new FutureClientResponseListener() {
+            public void onError(Throwable t) {
+                try {
+                    l.onError(t);
+                } catch (Throwable _t) {
+                    LOGGER.log(Level.SEVERE,
+                            "Throwable caught on call to IAsyncListener.onResponse",
+                            t);
+                } finally {
+                    setException(t);
+                }
+            }
+
+            public void onResponse(ClientResponse response) {
+                T o = null;
+                try {
+                    o = get(response);
+                } catch (Throwable t) {
+                    onError(t);
+                    return;
                 }
 
-                // TODO what about exceptions thrown
-                l.onResponse(t);
-                return null;
+                try {
+                    l.onResponse(o);
+                } catch (Throwable t) {
+                    LOGGER.log(Level.SEVERE,
+                            "Throwable caught on call to IAsyncListener.onResponse",
+                            t);
+                } finally {
+                    set(o);
+                }
             }
 
-            private T get() {
-                final ClientResponse r = getHeadHandler().handle(ro);
-
-                if (l.getType() == ClientResponse.class) return l.getType().cast(r);
-
-                if (r.getStatus() < 300) {
+            private T get(ClientResponse response) {
+                if (response.getStatus() < 300) {
                     if (l.getGenericType() == null) {
-                        return r.getEntity(l.getType());
+                        return response.getEntity(l.getType());
                     } else {
-                        return r.getEntity(l.getGenericType());
+                        return response.getEntity(l.getGenericType());
                     }
                 }
-                throw new UniformInterfaceException(r,
-                        ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
+                throw new UniformInterfaceException(response,
+                        request.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
+            }
+        };
+
+        ftw.setCancelableFuture(handle(request, ftw));
+
+        return ftw;
+    }
+
+    private Future<?> voidHandle(final ClientRequest request) {
+        final FutureClientResponseListener<?> ftw = new FutureClientResponseListener() {
+            public void onError(Throwable t) {
+                setException(t);
+            }
+
+            public void onResponse(ClientResponse response) {
+                try {
+                    if (response.getStatus() >= 300)
+                        throw new UniformInterfaceException(response,
+                            request.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
+                    response.close();
+                    set(null);
+                } catch (Throwable t) {
+                    setException(t);
+                }
+            }
+        };
+
+        ftw.setCancelableFuture(handle(request, ftw));
+
+        return ftw;
+    }
+
+    // AsyncClientHandler
+    
+    public Future<?> handle(final ClientRequest request, final ClientResponseListener l) {
+        FutureTask<?> ft = new FutureTask(new Callable() {
+            public ClientResponse call() throws Exception {
+                ClientResponse response = null;
+                try {
+                    response = getHeadHandler().handle(request);
+                } catch(Exception ex) {
+                    try {
+                        l.onError(ex);
+                    } catch (Throwable t) {
+                        LOGGER.log(Level.SEVERE,
+                                "Throwable caught on call to ClientResponseListener.onError",
+                                t);
+                    } finally {
+                        throw ex;
+                    }
+                }
+
+                try {
+                    l.onResponse(response);
+                } catch (Throwable t) {
+                    LOGGER.log(Level.SEVERE,
+                            "Throwable caught on call to ClientResponseListener.onResponse", 
+                            t);
+                } finally {
+                    return response;
+                }
             }
         });
         new Thread(ft).start();
         return ft;
-    }
-
-    private Future<?> voidHandle(final ClientRequest ro) {
-        FutureTask<?> ft = new FutureTask<Object>(new Callable<Object>() {
-            public Object call() throws Exception {
-                ClientResponse r = getHeadHandler().handle(ro);
-
-                if (r.getStatus() >= 300) 
-                    throw new UniformInterfaceException(r,
-                            ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
-
-                r.close();
-                return null;
-            }
-        });
-        new Thread(ft).start();
-        return ft;        
     }
 }

@@ -37,7 +37,7 @@
 
 package com.sun.jersey.api.client;
 
-import com.sun.jersey.api.client.*;
+import com.sun.jersey.api.client.async.IAsyncListener;
 import java.util.concurrent.Future;
 
 /**
