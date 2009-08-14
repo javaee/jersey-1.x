@@ -53,7 +53,7 @@ import com.sun.jersey.api.client.GenericType;
  * <blockquote><pre>
  *     AsyncWebResource r = ..
  *     Future&lt;String&gt; f = r.get(new TypeListener&lt;String&gt;(String.class) {
- *         public void onComplete(Future&lt;String&gt; f) {
+ *         public void onComplete(Future&lt;String&gt; f) throws InterruptedException {
  *             try {
  *                 String s = f.get();
  *             } catch (ExecutionException ex) {

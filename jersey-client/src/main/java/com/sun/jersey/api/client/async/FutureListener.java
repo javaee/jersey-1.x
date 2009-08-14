@@ -63,9 +63,12 @@ public interface FutureListener<T> {
      * future terminated with a cancellation.
      *
      * @param f the completed Future. Invocation of {@link Future#isDone() }
-     *        will return true. Invocation of {@link Future#get() } and
-     *        {@link Future#get(long, java.util.concurrent.TimeUnit) } will not
-     *        result in the throwing of an {@link InterruptedException}.
+     *        will return true. Since the future is complete invocation of
+     *        {@link Future#get() } and {@link Future#get(long, java.util.concurrent.TimeUnit) }
+     *        will not result in the throwing of an {@link InterruptedException}.
+     * @throws InterruptedException this exception is declared so that the
+     *         developer does not need to catch it when invoking
+     *         <code>Future.get</code>.
      */
     void onComplete(Future<T> f) throws InterruptedException;
 }
