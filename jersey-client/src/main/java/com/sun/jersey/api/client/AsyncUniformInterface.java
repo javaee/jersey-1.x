@@ -37,7 +37,7 @@
 
 package com.sun.jersey.api.client;
 
-import com.sun.jersey.api.client.async.IAsyncListener;
+import com.sun.jersey.api.client.async.ITypeListener;
 import java.util.concurrent.Future;
 
 /**
@@ -76,12 +76,9 @@ public interface AsyncUniformInterface {
      * Invoke the HEAD method.
      * 
      * @param l the listener to receive asynchronous callbacks.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    Future<?> head(IAsyncListener<ClientResponse> l);
+    Future<ClientResponse> head(ITypeListener<ClientResponse> l);
     
     
     /**
@@ -116,12 +113,9 @@ public interface AsyncUniformInterface {
      *
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> options(IAsyncListener<T> l);
+    <T> Future<T> options(ITypeListener<T> l);
 
     /**
      * Invoke the GET method.
@@ -154,12 +148,9 @@ public interface AsyncUniformInterface {
      * 
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> get(IAsyncListener<T> l);
+    <T> Future<T> get(ITypeListener<T> l);
     
     /**
      * Invoke the PUT method with no request entity or response.
@@ -219,12 +210,9 @@ public interface AsyncUniformInterface {
      *
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> put(IAsyncListener<T> l);
+    <T> Future<T> put(ITypeListener<T> l);
 
     /**
      * Invoke the PUT method with a request entity that returns a response.
@@ -260,12 +248,9 @@ public interface AsyncUniformInterface {
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
      * @param requestEntity the request entity.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> put(IAsyncListener<T> l, Object requestEntity);
+    <T> Future<T> put(ITypeListener<T> l, Object requestEntity);
 
     /**
      * Invoke the POST method with no request entity or response.
@@ -325,12 +310,9 @@ public interface AsyncUniformInterface {
      *
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> post(IAsyncListener<T> l);
+    <T> Future<T> post(ITypeListener<T> l);
 
     /**
      * Invoke the POST method with a request entity that returns a response.
@@ -366,12 +348,9 @@ public interface AsyncUniformInterface {
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
      * @param requestEntity the request entity.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> post(IAsyncListener<T> l, Object requestEntity);
+    <T> Future<T> post(ITypeListener<T> l, Object requestEntity);
             
     
     /**
@@ -432,12 +411,9 @@ public interface AsyncUniformInterface {
      *
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> delete(IAsyncListener<T> l);
+    <T> Future<T> delete(ITypeListener<T> l);
 
     /**
      * Invoke the DELETE method with a request entity that returns a response.
@@ -473,12 +449,9 @@ public interface AsyncUniformInterface {
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
      * @param requestEntity the request entity.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> delete(IAsyncListener<T> l, Object requestEntity);
+    <T> Future<T> delete(ITypeListener<T> l, Object requestEntity);
 
     
     /**
@@ -544,12 +517,9 @@ public interface AsyncUniformInterface {
      * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param l the listener to receive asynchronous callbacks.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> method(String method, IAsyncListener<T> l);
+    <T> Future<T> method(String method, ITypeListener<T> l);
 
     /**
      * Invoke a HTTP method with a request entity that returns a response.
@@ -588,10 +558,7 @@ public interface AsyncUniformInterface {
      * @param method the HTTP method.
      * @param l the listener to receive asynchronous callbacks.
      * @param requestEntity the request entity.
-     * @return A Future object that may be used to check the status of the
-     *         request invocation. This object must not be used to try to
-     *         obtain the results of the request, a null value will be returned
-     *         from the call to {@link Future#get() }.
+     * @return a future that will passed to the listener on completion.
      */
-    <T> Future<?> method(String method, IAsyncListener<T> l, Object requestEntity);
+    <T> Future<T> method(String method, ITypeListener<T> l, Object requestEntity);
 }

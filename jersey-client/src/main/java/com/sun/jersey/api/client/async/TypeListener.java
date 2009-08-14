@@ -36,53 +36,78 @@
  */
 package com.sun.jersey.api.client.async;
 
-import com.sun.jersey.api.client.*;
+import com.sun.jersey.api.client.AsyncUniformInterface;
+import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.GenericType;
 
 /**
  * A listener to be implemented by clients that wish to receive callback
  * notification of the completion of requests invoked asynchronously.
  * <p>
- * Developers may wish to extend from the class {@link AsyncListener} rather
- * than implement this interface directly.
+ * This listener is a helper class providing implementions for the methods
+ * {@link ITypeListener#getType() } and {@link ITypeListener#getGenericType() }.
+ * <p>
+ * Instances of this class may be passed to appropriate methods on
+ * {@link AsyncWebResource} (or more specifically methods on 
+ * {@link AsyncUniformInterface}). For example,
+ * <blockquote><pre>
+ *     AsyncWebResource r = ..
+ *     Future&lt;String&gt; f = r.get(new TypeListener&lt;String&gt;(String.class) {
+ *         public void onComplete(Future&lt;String&gt; f) {
+ *             try {
+ *                 String s = f.get();
+ *             } catch (ExecutionException ex) {
+ *                 // Do error processing
+ *                 if (t instanceof UniformInterfaceException) {
+ *                     // Request/response error
+ *                 } else
+ *                     // Error making request e.g. timeout
+ *                 }
  *
- * @see AsyncListener.
+ *             }
+ *         }
+ *     });
+ * </pre></blockquote>
+ *
  * @param <T> the type of the response.
  */
-public interface IAsyncListener<T> {
+public abstract class TypeListener<T> implements ITypeListener<T> {
+
+    private final Class<T> type;
+
+    private final GenericType<T> genericType;
+
+    // TODO
+//    public TypeListener() {
+//        // determine type or genericType from reflection
+//    }
 
     /**
-     * Get the class of the instance to receive for
-     * {@link #onResponse(java.lang.Object)  }.
-     * 
-     * @return the class of the response.
-     */
-    Class<T> getType();
-
-    /**
-     * Get the generic type declaring the Java type of the instance to
-     * receive for {@link #onResponse(java.lang.Object)  }.
-     * 
-     * @return the generic type of the response. If null then the method
-     *         {@link #getType() } must not return null. Otherwise, if not null,
-     *         the type information declared by the generic type takes
-     *         precedence over the value returned by {@link #getType() }.
-     */
-    GenericType<T> getGenericType();
-
-    /**
-     * Called when an error occurs.
+     * Construct a new listener defining the class of the response to receive.
      *
-     * @param t the exeception indicating the error. May be an instance of
-     *        {@link UniformInterfaceException} if the status of the HTTP 
-     *        response is greater than or equal to 300 and <code>T</code> is 
-     *        not the type {@link ClientResponse}.
+     * @param type the class of the response.
      */
-    void onError(Throwable t);
+    public TypeListener(Class<T> type) {
+        this.type = type;
+        this.genericType = null;
+    }
 
     /**
-     * Called when a response is received.
-     * 
-     * @param t the response.
+     * Construct a new listener defining the generic type of the response to
+     * receive.
+     *
+     * @param genericType the generic type of the response.
      */
-    void onResponse(T t);
+    public TypeListener(GenericType<T> genericType) {
+        this.type = genericType.getRawClass();
+        this.genericType = genericType;
+    }
+
+    public Class<T> getType() {
+        return type;
+    }
+
+    public GenericType<T> getGenericType() {
+        return genericType;
+    }
 }

@@ -36,77 +36,37 @@
  */
 package com.sun.jersey.api.client.async;
 
-import com.sun.jersey.api.client.AsyncUniformInterface;
-import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
+
 
 /**
  * A listener to be implemented by clients that wish to receive callback
  * notification of the completion of requests invoked asynchronously.
  * <p>
- * This listener is a helper class providing implementions for the methods
- * {@link IAsyncListener#getType() } and {@link IAsyncListener#getGenericType() }.
- * <p>
- * Instances of this class may be passed to appropriate methods on
- * {@link AsyncWebResource} (or more specifically methods on 
- * {@link AsyncUniformInterface}). For example,
- * <blockquote><pre>
- *     AsyncWebResource r = ..
- *     Future&lt;?&gt; f = r.get(new AsyncListener&lt;String&gt;(String.class) {
- *         public void onError(Throwable t) {
- *             // Do error processing
- *             if (t instanceof UniformInterfaceException) {
- *                 // Request/response error
- *             } else {
- *                 // Error making request e.g. timeout
- *             }
- *         }
+ * Developers may wish to extend from the class {@link TypeListener} rather
+ * than implement this interface directly.
  *
- *         public void onResponse(String t) {
- *             // Process response entity as a String instance
- *         }
- *     });
- * </pre></blockquote>
- *
+ * @see TypeListener
  * @param <T> the type of the response.
  */
-public abstract class AsyncListener<T> implements IAsyncListener<T> {
-
-    private final Class<T> type;
-
-    private final GenericType<T> genericType;
-
-    // TODO
-//    public AsyncListener() {
-//        // determine type or genericType from reflection
-//    }
+public interface ITypeListener<T> extends FutureListener<T> {
 
     /**
-     * Construct a new listener defining the class of the response to receive.
-     *
-     * @param type the class of the response.
+     * Get the class of the instance to receive for
+     * {@link #onComplete(java.util.concurrent.Future) }.
+     * 
+     * @return the class of the response.
      */
-    public AsyncListener(Class<T> type) {
-        this.type = type;
-        this.genericType = null;
-    }
+    Class<T> getType();
 
     /**
-     * Construct a new listener defining the generic type of the response to
-     * receive.
-     *
-     * @param genericType the generic type of the response.
+     * Get the generic type declaring the Java type of the instance to
+     * receive for {@link #onComplete(java.util.concurrent.Future) }.
+     * 
+     * @return the generic type of the response. If null then the method
+     *         {@link #getType() } must not return null. Otherwise, if not null,
+     *         the type information declared by the generic type takes
+     *         precedence over the value returned by {@link #getType() }.
      */
-    public AsyncListener(GenericType<T> genericType) {
-        this.type = genericType.getRawClass();
-        this.genericType = genericType;
-    }
-
-    public Class<T> getType() {
-        return type;
-    }
-
-    public GenericType<T> getGenericType() {
-        return genericType;
-    }
+    GenericType<T> getGenericType();
 }

@@ -37,18 +37,27 @@
 package com.sun.jersey.api.client.async;
 
 import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
 import java.util.concurrent.Future;
 
 /**
+ * An asynchronous client handler for invoking asynchronous client requests.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface AsyncClientHandler {
+
     /**
-     * 
-     * @param r
-     * @param l
-     * @return
+     * Invoke an asynchronous client request. This method returns without
+     * waiting for the client response.
+     *
+     * @param r the client request.
+     * @param l the future listener to receive a completed Future with the
+     *        client response.
+     * @return the future that will be passed to the future listener
+     *         when the future is complete. This instance may be used to wait
+     *         until the future completes and obtain the client response
+     *         state, or cancel the request.
      */
-    Future<?> handle(ClientRequest r, ClientResponseListener l);
+    Future<ClientResponse> handle(ClientRequest r, FutureListener<ClientResponse> l);
 }

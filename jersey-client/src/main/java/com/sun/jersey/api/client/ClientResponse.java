@@ -395,7 +395,7 @@ public class ClientResponse {
      *         using the method {@link #setStatus(int)} and there is no
      *         mapping between the the integer value and the Response.Status
      *         enumeration value.
-     * @deprecated use {@link #getClientResponseStatus()
+     * @deprecated use {@link #getClientResponseStatus() }
      */
     @Deprecated
     public Response.Status getResponseStatus() {
@@ -406,7 +406,7 @@ public class ClientResponse {
      * Set the status code.
      * 
      * @param status the status code.
-     * @deprecated see {@link #setStatus(javax.ws.rs.core.Response.StatusType) 
+     * @deprecated see {@link #setStatus(javax.ws.rs.core.Response.StatusType) }
      */
     @Deprecated
     public void setResponseStatus(Response.StatusType status) {

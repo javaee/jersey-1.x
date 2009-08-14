@@ -37,14 +37,15 @@
 
 package com.sun.jersey.impl.client;
 
-import com.sun.jersey.api.client.async.AsyncListener;
+import com.sun.jersey.api.client.async.TypeListener;
 import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.impl.container.grizzly.*;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.impl.container.grizzly.AbstractGrizzlyServerTester;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -84,7 +85,17 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
             sleep();
             return "DELETE";
         }    
-        
+
+        @Path("wait")
+        @GET
+        public String getWait() throws InterruptedException {
+            sleep();
+            sleep();
+            sleep();
+            sleep();
+            return "GET";
+        }
+
         private void sleep() {
             try {
                 Thread.sleep(1000);
@@ -93,24 +104,28 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         }
     }
 
-    class StringListener extends AsyncListener<String> {
+    class StringListener extends TypeListener<String> {
         final List<String> l = new ArrayList<String>();
+        final CountDownLatch cdl = new CountDownLatch(1);
 
         StringListener() {
             super(String.class);
         }
 
-        public void onError(Throwable t) {
-            throw new UnsupportedOperationException();
-        }
-
-        public void onResponse(String t) {
-            l.add(t);
-        }
-
-        public void check(String s) {
+        public void check(String s) throws InterruptedException {
+            cdl.await();
             assertEquals(1, l.size());
             assertEquals(s, l.get(0));
+        }
+
+        public void onComplete(Future<String> f) throws InterruptedException {
+            try {
+                l.add(f.get());
+            } catch (ExecutionException ex) {
+                throw new IllegalStateException();
+            } finally {
+                cdl.countDown();
+            }
         }
     }
 
@@ -145,7 +160,7 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         StringListener l = new StringListener();
         Future<?> f = r.get(l);
 
-        f.get();
+        assertEquals("GET", f.get());
         l.check("GET");
     }
 
@@ -154,18 +169,20 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
 
         AsyncWebResource r = Client.create().asyncResource(getUri().path("404").build());
 
+        final CountDownLatch cdl = new CountDownLatch(1);
         final List<String> l = new ArrayList<String>();
-        Future<?> f = r.get(new AsyncListener<String>(String.class) {
-            public void onError(Throwable t) {
-                if (t instanceof UniformInterfaceException) {
-                    UniformInterfaceException uie = (UniformInterfaceException)t;
+        Future<?> f = r.get(new TypeListener<String>(String.class) {
+            public void onComplete(Future<String> t) throws InterruptedException {
+                try {
+                    l.add(t.get());
+                } catch (ExecutionException ex) {
+                    if (ex.getCause() instanceof UniformInterfaceException) {
+                        UniformInterfaceException uie = (UniformInterfaceException)ex.getCause();
 
-                    l.add("" + uie.getResponse().getStatus());
+                        l.add("" + uie.getResponse().getStatus());
+                    }
+                    cdl.countDown();
                 }
-            }
-
-            public void onResponse(String t) {
-                l.add(t);
             }
         });
 
@@ -177,6 +194,7 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         }
         assertTrue(caught);
 
+        cdl.await();
         assertEquals(1, l.size());
         assertEquals("404", l.get(0));
     }
@@ -195,7 +213,7 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         StringListener l = new StringListener();
         Future<?> f = r.post(l, "POST");
 
-        f.get();
+        assertEquals("POST", f.get());
         l.check("POST");
     }
 
@@ -214,7 +232,7 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         StringListener l = new StringListener();
         Future<?> f = r.put(l, "PUT");
 
-        f.get();
+        assertEquals("PUT", f.get());
         l.check("PUT");
     }
 
@@ -232,7 +250,7 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         StringListener l = new StringListener();
         Future<?> f = r.delete(l);
 
-        f.get();
+        assertEquals("DELETE", f.get());
         l.check("DELETE");
     }
 
@@ -272,24 +290,26 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
 
         final CountDownLatch cdl = new CountDownLatch(4);
         final List<String> l = Collections.synchronizedList(new ArrayList<String>());
-        AsyncListener<String> al = new AsyncListener<String>(String.class) {
+        TypeListener<String> al = new TypeListener<String>(String.class) {
 
-            public void onError(Throwable t) {
-                throw new UnsupportedOperationException();
-            }
-
-            public void onResponse(String t) {
-                l.add(t);
-                cdl.countDown();
+            public void onComplete(Future<String> t) throws InterruptedException {
+                try {
+                    l.add(t.get());
+                    cdl.countDown();
+                } catch (ExecutionException ex) {
+                    throw new IllegalStateException();
+                }
             }
 
         };
 
-        r.get(al);
-        r.post(al, "POST");
-        r.put(al, "PUT");
-        r.delete(al);
-        
+        List<Future<String>> lf = new ArrayList<Future<String>>();
+
+        lf.add(r.get(al));
+        lf.add(r.post(al, "POST"));
+        lf.add(r.put(al, "PUT"));
+        lf.add(r.delete(al));
+
         cdl.await();
 
         assertEquals(4, l.size());
@@ -297,6 +317,41 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertTrue(l.contains("POST"));
         assertTrue(l.contains("PUT"));
         assertTrue(l.contains("DELETE"));
+
+        assertEquals("GET", lf.get(0).get());
+        assertEquals("POST", lf.get(1).get());
+        assertEquals("PUT", lf.get(2).get());
+        assertEquals("DELETE", lf.get(3).get());
+    }
+
+    public void testCancelListener() throws Exception {
+        startServer(HttpMethodResource.class);
+
+        AsyncWebResource r = Client.create().asyncResource(getUri().path("wait").build());
+
+        final CountDownLatch cdl = new CountDownLatch(1);
+
+        final List<Boolean> l = new ArrayList<Boolean>(1);
+        Future<?> f = r.get(new TypeListener<String>(String.class) {
+            public void onComplete(Future<String> t) throws InterruptedException {
+                try {
+                    t.get();
+                } catch (CancellationException ex) {
+                    l.add(true);
+                } catch (ExecutionException ex) {
+                    throw new IllegalStateException();
+                } finally {
+                    cdl.countDown();
+                }
+            }
+        });
+
+        f.cancel(true);
+        assertTrue(f.isCancelled());
+
+        cdl.await();
+        assertEquals(1, l.size());
+        assertTrue(l.get(0));
     }
 
 }

@@ -36,25 +36,36 @@
  */
 package com.sun.jersey.api.client.async;
 
-import com.sun.jersey.api.client.ClientResponse;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
- * A client response listener to receive asynchronous error or response events.
+ * A future listener to receive an event when a Future has reached the
+ * completed termination state of normal termination, an exception
+ * or cancellation.
  * 
+ * @param <T> the type held by the future.
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ClientResponseListener {
-    /**
-     *
-     * @param t
-     * @return
-     */
-    void onError(Throwable t);
+public interface FutureListener<T> {
 
     /**
-     * 
-     * @param cr
-     * @return
+     * Invoked when a Future has reached the completed termination state.
+     * <p>
+     * The catching of a {@link ExecutionException} when
+     * <code>Future.get</code> is invoked may be utilized to determine if the
+     * future terminated with an exception. The exception can be obtained
+     * by invoking {@link ExecutionException#getCause() }.
+     * <p>
+     * The catching of a {@link CancellationException} when 
+     * <code>Future.get</code> is invoked may be utilized to determine if the
+     * future terminated with a cancellation.
+     *
+     * @param f the completed Future. Invocation of {@link Future#isDone() }
+     *        will return true. Invocation of {@link Future#get() } and
+     *        {@link Future#get(long, java.util.concurrent.TimeUnit) } will not
+     *        result in the throwing of an {@link InterruptedException}.
      */
-    void onResponse(ClientResponse response);
+    void onComplete(Future<T> f) throws InterruptedException;
 }

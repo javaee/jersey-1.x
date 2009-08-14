@@ -64,7 +64,8 @@ public abstract class TerminatingClientHandler implements ClientHandler {
     /**
      * A lister for listensing to events when writing a request entity.
      * <p>
-     * The listener is registered when invoking the {@link TerminatingClientHandler#writeRequestEntity(com.sun.jersey.api.client.ClientRequest, com.sun.jersey.api.client.WriteRequestEntityListener) }
+     * The listener is registered when invoking the 
+     * {@link TerminatingClientHandler#writeRequestEntity(com.sun.jersey.api.client.ClientRequest, com.sun.jersey.api.client.TerminatingClientHandler.RequestEntityWriterListener) }
      * method.
      *
      * @author Paul.Sandoz@Sun.Com
@@ -256,9 +257,9 @@ public abstract class TerminatingClientHandler implements ClientHandler {
     /**
      * Write a request entity using an appropriate message body writer.
      * <p>
-     * The method {@link WriteRequestEntityListener#onRequestEntitySize(long) } will be invoked
+     * The method {@link RequestEntityWriterListener#onRequestEntitySize(long) } will be invoked
      * with the size of the request entity to be serialized.
-     * The method {@link WriteRequestEntityListener#onGetOutputStream() } will be invoked
+     * The method {@link RequestEntityWriterListener#onGetOutputStream() } will be invoked
      * when the output stream is required to write the request entity.
      * 
      * @param ro the client request containing the request entity. If the

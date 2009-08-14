@@ -37,8 +37,10 @@
 package com.sun.jersey.client.impl.async;
 
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.async.ClientResponseListener;
+import com.sun.jersey.api.client.async.FutureListener;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
@@ -47,25 +49,33 @@ import java.util.concurrent.FutureTask;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class FutureClientResponseListener<T> extends FutureTask<T> 
-        implements ClientResponseListener {
+        implements FutureListener<ClientResponse> {
+    
     private static final Callable NO_OP_CALLABLE = new Callable() {
         public Object call() throws Exception {
             throw new IllegalStateException();
         }
     };
 
+    private Future<ClientResponse> f;
+
     public FutureClientResponseListener() {
         super(NO_OP_CALLABLE);
     }
 
-    private Future<?> f;
-
-    public void setCancelableFuture(Future<?> f) {
+    public void setCancelableFuture(Future<ClientResponse> f) {
         this.f = f;
     }
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
+        if (f.isCancelled()) {
+            if (!super.isCancelled()) {
+                super.cancel(true);
+            }
+            return false;
+        }
+        
         boolean cancelled = f.cancel(mayInterruptIfRunning);
         if (cancelled) {
             super.cancel(true);
@@ -73,4 +83,33 @@ public abstract class FutureClientResponseListener<T> extends FutureTask<T>
 
         return cancelled;
     }
+
+    @Override
+    public boolean isCancelled() {
+        if (f.isCancelled()) {
+            if (!super.isCancelled()) {
+                super.cancel(true);
+            }
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    // FutureListener
+
+    public void onComplete(Future<ClientResponse> response) {
+        try {
+            set(get(response.get()));
+        } catch (CancellationException ex) {
+            super.cancel(true);
+        } catch (ExecutionException ex) {
+            setException(ex.getCause());
+        } catch (Throwable t) {
+            setException(t);
+        }
+    }
+
+    protected abstract T get(ClientResponse response);
+
 }

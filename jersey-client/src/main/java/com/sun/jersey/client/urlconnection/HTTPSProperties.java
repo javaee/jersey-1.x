@@ -36,6 +36,8 @@
  */
 package com.sun.jersey.client.urlconnection;
 
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientRequest;
 import java.security.NoSuchAlgorithmException;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;

@@ -40,8 +40,8 @@ package com.sun.jersey.api.client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.async.AsyncClientHandler;
-import com.sun.jersey.api.client.async.ClientResponseListener;
-import com.sun.jersey.api.client.async.IAsyncListener;
+import com.sun.jersey.api.client.async.FutureListener;
+import com.sun.jersey.api.client.async.ITypeListener;
 import com.sun.jersey.client.impl.ClientRequestImpl;
 import com.sun.jersey.client.impl.async.FutureClientResponseListener;
 import java.net.URI;
@@ -65,7 +65,7 @@ import javax.ws.rs.core.UriBuilder;
  * <p>
  * An AsyncWebResource instance is obtained from the {@link Client}.
  * <p>
- * The Web resource implements the {@link UniformInterface} to invoke the HTTP 
+ * The Web resource implements the {@link AsyncUniformInterface} to invoke the HTTP
  * method on the Web resource. A client request may be built before invocation
  * on the uniform interface.
  * <p>
@@ -179,7 +179,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(ClientResponse.class, new ClientRequestImpl(getURI(), "HEAD"));
     }
         
-    public Future<?> head(IAsyncListener<ClientResponse> l) {
+    public Future<ClientResponse> head(ITypeListener<ClientResponse> l) {
         return handle(l, new ClientRequestImpl(getURI(), "HEAD"));
     }
 
@@ -191,7 +191,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
 
-    public <T> Future<?> options(IAsyncListener<T> l) {
+    public <T> Future<T> options(ITypeListener<T> l) {
         return handle(l, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
 
@@ -203,7 +203,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), "GET"));
     }
 
-    public <T> Future<?> get(IAsyncListener<T> l) {
+    public <T> Future<T> get(ITypeListener<T> l) {
         return handle(l, new ClientRequestImpl(getURI(), "GET"));
     }
 
@@ -223,7 +223,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), "PUT"));
     }
 
-    public <T> Future<?> put(IAsyncListener<T> l) {
+    public <T> Future<T> put(ITypeListener<T> l) {
         return handle(l, new ClientRequestImpl(getURI(), "PUT"));
     }
 
@@ -235,7 +235,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
 
-    public <T> Future<?> put(IAsyncListener<T> l, Object requestEntity) {
+    public <T> Future<T> put(ITypeListener<T> l, Object requestEntity) {
         return handle(l, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
 
@@ -255,7 +255,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), "POST"));
     }
 
-    public <T> Future<?> post(IAsyncListener<T> l) {
+    public <T> Future<T> post(ITypeListener<T> l) {
         return handle(l, new ClientRequestImpl(getURI(), "POST"));
     }
 
@@ -267,7 +267,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
 
-    public <T> Future<?> post(IAsyncListener<T> l, Object requestEntity) {
+    public <T> Future<T> post(ITypeListener<T> l, Object requestEntity) {
         return handle(l, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
 
@@ -287,7 +287,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), "DELETE"));    
     }
 
-    public <T> Future<?> delete(IAsyncListener<T> l) {
+    public <T> Future<T> delete(ITypeListener<T> l) {
         return handle(l, new ClientRequestImpl(getURI(), "DELETE"));
     }
 
@@ -299,7 +299,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
 
-    public <T> Future<?> delete(IAsyncListener<T> l, Object requestEntity) {
+    public <T> Future<T> delete(ITypeListener<T> l, Object requestEntity) {
         return handle(l, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
 
@@ -319,7 +319,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), method));            
     }
 
-    public <T> Future<?> method(String method, IAsyncListener<T> l) {
+    public <T> Future<T> method(String method, ITypeListener<T> l) {
         return handle(l, new ClientRequestImpl(getURI(), method));
     }
 
@@ -331,7 +331,7 @@ public class AsyncWebResource extends Filterable implements
         return handle(gt, new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
-    public <T> Future<?> method(String method, IAsyncListener<T> l, Object requestEntity) {
+    public <T> Future<T> method(String method, ITypeListener<T> l, Object requestEntity) {
         return handle(l, new ClientRequestImpl(getURI(), method, requestEntity));
     }
 
@@ -495,7 +495,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(ClientResponse.class, build("HEAD"));
         }
         
-        public Future<?> head(IAsyncListener<ClientResponse> l) {
+        public Future<ClientResponse> head(ITypeListener<ClientResponse> l) {
             return handle(l, build("HEAD"));
         }
 
@@ -507,7 +507,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build("OPTIONS"));
         }
 
-        public <T> Future<?> options(IAsyncListener<T> l) {
+        public <T> Future<T> options(ITypeListener<T> l) {
             return handle(l, build("OPTIONS"));
         }
 
@@ -519,7 +519,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build("GET"));
         }
 
-        public <T> Future<?> get(IAsyncListener<T> l) {
+        public <T> Future<T> get(ITypeListener<T> l) {
             return handle(l, build("GET"));
         }
 
@@ -539,7 +539,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build("PUT"));
         }
 
-        public <T> Future<?> put(IAsyncListener<T> l) {
+        public <T> Future<T> put(ITypeListener<T> l) {
             return handle(l, build("PUT"));
         }
 
@@ -551,7 +551,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build("PUT", requestEntity));
         }
 
-        public <T> Future<?> put(IAsyncListener<T> l, Object requestEntity) {
+        public <T> Future<T> put(ITypeListener<T> l, Object requestEntity) {
             return handle(l, build("PUT", requestEntity));
         }
 
@@ -571,7 +571,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build("POST"));
         }
 
-        public <T> Future<?> post(IAsyncListener<T> l) {
+        public <T> Future<T> post(ITypeListener<T> l) {
             return handle(l, build("POST"));
         }
 
@@ -583,7 +583,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build("POST", requestEntity));
         }
 
-        public <T> Future<?> post(IAsyncListener<T> l, Object requestEntity) {
+        public <T> Future<T> post(ITypeListener<T> l, Object requestEntity) {
             return handle(l, build("POST", requestEntity));
         }
 
@@ -603,7 +603,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build("DELETE"));
         }
 
-        public <T> Future<?> delete(IAsyncListener<T> l) {
+        public <T> Future<T> delete(ITypeListener<T> l) {
             return handle(l, build("DELETE"));
         }
 
@@ -615,7 +615,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build("DELETE", requestEntity));
         }
 
-        public <T> Future<?> delete(IAsyncListener<T> l, Object requestEntity) {
+        public <T> Future<T> delete(ITypeListener<T> l, Object requestEntity) {
             return handle(l, build("DELETE", requestEntity));
         }
 
@@ -635,7 +635,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build(method));
         }
 
-        public <T> Future<?> method(String method, IAsyncListener<T> l) {
+        public <T> Future<T> method(String method, ITypeListener<T> l) {
             return handle(l, build(method));
         }
 
@@ -647,7 +647,7 @@ public class AsyncWebResource extends Filterable implements
             return handle(gt, build(method, requestEntity));
         }
 
-        public <T> Future<?> method(String method, IAsyncListener<T> l, Object requestEntity) {
+        public <T> Future<T> method(String method, ITypeListener<T> l, Object requestEntity) {
             return handle(l, build(method, requestEntity));
         }
     }
@@ -655,19 +655,7 @@ public class AsyncWebResource extends Filterable implements
     
     private <T> Future<T> handle(final Class<T> c, final ClientRequest request) {
         final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
-            public void onError(Throwable t) {
-                setException(t);
-            }
-
-            public void onResponse(ClientResponse response) {
-                try {
-                    set(get(response));
-                } catch (Throwable t) {
-                    setException(t);
-                }
-            }
-
-            private T get(ClientResponse response) {
+            protected T get(ClientResponse response) {
                 if (c == ClientResponse.class) return c.cast(response);
 
                 if (response.getStatus() < 300) return response.getEntity(c);
@@ -684,19 +672,7 @@ public class AsyncWebResource extends Filterable implements
 
     private <T> Future<T> handle(final GenericType<T> gt, final ClientRequest request) {
         final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
-            public void onError(Throwable t) {
-                setException(t);
-            }
-
-            public void onResponse(ClientResponse response) {
-                try {
-                    set(get(response));
-                } catch (Throwable t) {
-                    setException(t);
-                }
-            }
-
-            private T get(ClientResponse response) {
+            protected T get(ClientResponse response) {
                 if (gt.getRawClass() == ClientResponse.class) return gt.getRawClass().cast(response);
 
                 if (response.getStatus() < 300) return response.getEntity(gt);
@@ -711,41 +687,20 @@ public class AsyncWebResource extends Filterable implements
         return ftw;
     }
     
-    private <T> Future<T> handle(final IAsyncListener<T> l, final ClientRequest request) {
-        final FutureClientResponseListener<T> ftw = new FutureClientResponseListener() {
-            public void onError(Throwable t) {
+    private <T> Future<T> handle(final ITypeListener<T> l, final ClientRequest request) {
+        final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
+            @Override
+            protected void done() {
                 try {
-                    l.onError(t);
-                } catch (Throwable _t) {
+                    l.onComplete(this);
+                } catch (Throwable t) {
                     LOGGER.log(Level.SEVERE,
-                            "Throwable caught on call to IAsyncListener.onResponse",
+                            "Throwable caught on call to IAsyncListener.onComplete",
                             t);
-                } finally {
-                    setException(t);
                 }
             }
 
-            public void onResponse(ClientResponse response) {
-                T o = null;
-                try {
-                    o = get(response);
-                } catch (Throwable t) {
-                    onError(t);
-                    return;
-                }
-
-                try {
-                    l.onResponse(o);
-                } catch (Throwable t) {
-                    LOGGER.log(Level.SEVERE,
-                            "Throwable caught on call to IAsyncListener.onResponse",
-                            t);
-                } finally {
-                    set(o);
-                }
-            }
-
-            private T get(ClientResponse response) {
+            protected T get(ClientResponse response) {
                 if (response.getStatus() < 300) {
                     if (l.getGenericType() == null) {
                         return response.getEntity(l.getType());
@@ -765,20 +720,12 @@ public class AsyncWebResource extends Filterable implements
 
     private Future<?> voidHandle(final ClientRequest request) {
         final FutureClientResponseListener<?> ftw = new FutureClientResponseListener() {
-            public void onError(Throwable t) {
-                setException(t);
-            }
-
-            public void onResponse(ClientResponse response) {
-                try {
-                    if (response.getStatus() >= 300)
-                        throw new UniformInterfaceException(response,
-                            request.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
-                    response.close();
-                    set(null);
-                } catch (Throwable t) {
-                    setException(t);
-                }
+            protected Object get(ClientResponse response) {
+                if (response.getStatus() >= 300)
+                    throw new UniformInterfaceException(response,
+                        request.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
+                response.close();
+                return null;
             }
         };
 
@@ -789,35 +736,25 @@ public class AsyncWebResource extends Filterable implements
 
     // AsyncClientHandler
     
-    public Future<?> handle(final ClientRequest request, final ClientResponseListener l) {
-        FutureTask<?> ft = new FutureTask(new Callable() {
-            public ClientResponse call() throws Exception {
-                ClientResponse response = null;
+    public Future<ClientResponse> handle(final ClientRequest request, final FutureListener<ClientResponse> l) {
+        Callable c = new Callable() {
+            public Object call() throws Exception {
+                return getHeadHandler().handle(request);
+            }
+        };
+        FutureTask<ClientResponse> ft = new FutureTask<ClientResponse>(c) {
+            @Override
+            protected void done() {
                 try {
-                    response = getHeadHandler().handle(request);
-                } catch(Exception ex) {
-                    try {
-                        l.onError(ex);
-                    } catch (Throwable t) {
-                        LOGGER.log(Level.SEVERE,
-                                "Throwable caught on call to ClientResponseListener.onError",
-                                t);
-                    } finally {
-                        throw ex;
-                    }
-                }
-
-                try {
-                    l.onResponse(response);
+                    l.onComplete(this);
                 } catch (Throwable t) {
                     LOGGER.log(Level.SEVERE,
-                            "Throwable caught on call to ClientResponseListener.onResponse", 
+                            "Throwable caught on call to ClientResponseListener.onComplete",
                             t);
-                } finally {
-                    return response;
                 }
             }
-        });
+        };
+
         new Thread(ft).start();
         return ft;
     }
