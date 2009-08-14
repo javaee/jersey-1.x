@@ -54,10 +54,8 @@ public interface AsyncClientHandler {
      * @param r the client request.
      * @param l the future listener to receive a completed Future with the
      *        client response.
-     * @return the future that will be passed to the future listener
-     *         when the future is complete. This instance may be used to wait
-     *         until the future completes and obtain the client response
-     *         state, or cancel the request.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     Future<ClientResponse> handle(ClientRequest r, FutureListener<ClientResponse> l);
 }

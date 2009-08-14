@@ -76,7 +76,8 @@ public interface AsyncUniformInterface {
      * Invoke the HEAD method.
      * 
      * @param l the listener to receive asynchronous callbacks.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     Future<ClientResponse> head(ITypeListener<ClientResponse> l);
     
@@ -113,7 +114,8 @@ public interface AsyncUniformInterface {
      *
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> options(ITypeListener<T> l);
 
@@ -148,7 +150,8 @@ public interface AsyncUniformInterface {
      * 
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> get(ITypeListener<T> l);
     
@@ -210,7 +213,8 @@ public interface AsyncUniformInterface {
      *
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> put(ITypeListener<T> l);
 
@@ -248,7 +252,8 @@ public interface AsyncUniformInterface {
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
      * @param requestEntity the request entity.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> put(ITypeListener<T> l, Object requestEntity);
 
@@ -310,7 +315,8 @@ public interface AsyncUniformInterface {
      *
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> post(ITypeListener<T> l);
 
@@ -348,7 +354,8 @@ public interface AsyncUniformInterface {
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
      * @param requestEntity the request entity.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> post(ITypeListener<T> l, Object requestEntity);
             
@@ -411,7 +418,8 @@ public interface AsyncUniformInterface {
      *
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> delete(ITypeListener<T> l);
 
@@ -449,7 +457,8 @@ public interface AsyncUniformInterface {
      * @param <T> the type of the response.
      * @param l the listener to receive asynchronous callbacks.
      * @param requestEntity the request entity.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> delete(ITypeListener<T> l, Object requestEntity);
 
@@ -517,7 +526,8 @@ public interface AsyncUniformInterface {
      * @param <T> the type of the response.
      * @param method the HTTP method.
      * @param l the listener to receive asynchronous callbacks.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> method(String method, ITypeListener<T> l);
 
@@ -558,7 +568,8 @@ public interface AsyncUniformInterface {
      * @param method the HTTP method.
      * @param l the listener to receive asynchronous callbacks.
      * @param requestEntity the request entity.
-     * @return a future that will passed to the listener on completion.
+     * @return a future that may be used to wait until the future completes and
+     *         obtain the client response state, or cancel the request.
      */
     <T> Future<T> method(String method, ITypeListener<T> l, Object requestEntity);
 }
