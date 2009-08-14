@@ -695,7 +695,7 @@ public class AsyncWebResource extends Filterable implements
                     l.onComplete(this);
                 } catch (Throwable t) {
                     LOGGER.log(Level.SEVERE,
-                            "Throwable caught on call to IAsyncListener.onComplete",
+                            "Throwable caught on call to ITypeListener.onComplete",
                             t);
                 }
             }
