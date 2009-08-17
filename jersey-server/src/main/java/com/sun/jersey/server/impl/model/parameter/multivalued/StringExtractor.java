@@ -57,6 +57,14 @@ final class StringExtractor implements MultivaluedParameterExtractor {
         this.defaultValue = defaultValue;
     }
 
+    public String getName() {
+        return parameter;
+    }
+
+    public String getDefaultStringValue() {
+        return defaultValue;
+    }
+
     public Object extract(MultivaluedMap<String, String> parameters) {
         String value = parameters.getFirst(parameter);
         return (value != null) ? value : defaultValue;

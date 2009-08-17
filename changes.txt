@@ -1,4 +1,11 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 350
+  Errors when processing a parameter, annotated with an @*Param annotation,
+  will result in an instance of ParamException (that extends WebApplicaton)
+  being thrown concrete instance of which reflect the particular parameter
+  involved.
+  See com.sun.jersey.api.ParamException and inheriting classes for
+  more details.
 - Fixed issue 338
   https://jersey.dev.java.net/issues/show_bug.cgi?id=338
   Ensure correct array element separator (',') is used also

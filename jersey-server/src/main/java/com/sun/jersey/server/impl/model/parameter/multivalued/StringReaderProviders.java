@@ -66,10 +66,8 @@ public class StringReaderProviders {
                 if (target instanceof WebApplicationException) {
                     throw (WebApplicationException)target;
                 } else {
-                    throw new ContainerException(target);
+                    throw new ExtractorContainerException(target);
                 }
-            } catch (RuntimeException ex) {
-                throw new ContainerException(ex);
             } catch (Exception ex) {
                 throw new ContainerException(ex);
             }
@@ -155,7 +153,7 @@ public class StringReaderProviders {
                     try {
                         return HttpDateFormat.readDate(value);
                     } catch (ParseException ex) {
-                        throw new ContainerException(ex);
+                        throw new ExtractorContainerException(ex);
                     }
                 }
             };

@@ -37,7 +37,9 @@
 
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.spi.StringReader;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -48,22 +50,38 @@ final class StringReaderExtractor
         implements MultivaluedParameterExtractor {
     private final StringReader sr;
     private final String parameter;
-    private final String defaultValueString;
+    private final String defaultStringValue;
 
-    public StringReaderExtractor(StringReader sr, String parameter, String defaultValueString) {
+    public StringReaderExtractor(StringReader sr, String parameter, String defaultStringValue) {
         this.sr = sr;
         this.parameter = parameter;
-        this.defaultValueString = defaultValueString;
-        Object defaultValue = (defaultValueString != null) ?
-            sr.fromString(defaultValueString) : null;
+        this.defaultStringValue = defaultStringValue;
+        Object defaultValue = (defaultStringValue != null) ?
+            sr.fromString(defaultStringValue) : null;
+    }
+
+    public String getName() {
+        return parameter;
+    }
+
+    public String getDefaultStringValue() {
+        return defaultStringValue;
     }
 
     public Object extract(MultivaluedMap<String, String> parameters) {
         String v = parameters.getFirst(parameter);
         if (v != null) {
-            return sr.fromString(v);
-        } else if (defaultValueString != null) {
-            return sr.fromString(defaultValueString);
+            try {
+                return sr.fromString(v);
+            } catch (WebApplicationException ex) {
+                throw ex;
+            } catch (ContainerException ex) {
+                throw ex;
+            } catch (Exception ex) {
+                throw new ExtractorContainerException(ex);
+            }
+        } else if (defaultStringValue != null) {
+            return sr.fromString(defaultStringValue);
         }
 
         return null;

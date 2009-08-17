@@ -55,13 +55,21 @@ abstract class CollectionStringReaderExtractor<V extends Collection>
 
     final StringReader sr;
     final String parameter;
-    final String defaultValueString;
+    final String defaultStringValue;
 
-    protected CollectionStringReaderExtractor(StringReader sr, String parameter, String defaultValueString) {
+    protected CollectionStringReaderExtractor(StringReader sr, String parameter, String defaultStringValue) {
         this.sr = sr;
         this.parameter = parameter;
-        this.defaultValueString = defaultValueString;
-        Object defaultValue = (defaultValueString != null) ? sr.fromString(defaultValueString) : null;
+        this.defaultStringValue = defaultStringValue;
+        Object defaultValue = (defaultStringValue != null) ? sr.fromString(defaultStringValue) : null;
+    }
+
+    public String getName() {
+        return parameter;
+    }
+
+    public String getDefaultStringValue() {
+        return defaultStringValue;
     }
 
     @SuppressWarnings("unchecked")
@@ -74,10 +82,10 @@ abstract class CollectionStringReaderExtractor<V extends Collection>
             }
 
             return valueList;
-        } else if (defaultValueString != null) {
+        } else if (defaultStringValue != null) {
             V valueList = getInstance();
             // TODO do we need to clone the default value
-            valueList.add(sr.fromString(defaultValueString));
+            valueList.add(sr.fromString(defaultStringValue));
             return valueList;
         }
 

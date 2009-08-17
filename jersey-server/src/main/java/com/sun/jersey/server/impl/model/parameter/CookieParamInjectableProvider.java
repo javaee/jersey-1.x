@@ -37,16 +37,16 @@
 
 package com.sun.jersey.server.impl.model.parameter;
 
-import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.ParamException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.server.impl.model.parameter.multivalued.ExtractorContainerException;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.inject.Injectable;
 import javax.ws.rs.CookieParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 
 
@@ -66,8 +66,9 @@ public final class CookieParamInjectableProvider extends BaseParamInjectableProv
         public Object getValue(HttpContext context) {
             try {
                 return extractor.extract(context.getRequest().getCookieNameValueMap());
-            } catch (ContainerException e) {
-                throw new WebApplicationException(e.getCause(), 400);
+            } catch (ExtractorContainerException e) {
+                throw new ParamException.CookieParamException(e.getCause(),
+                        extractor.getName(), extractor.getDefaultStringValue());
             }
         }
     }

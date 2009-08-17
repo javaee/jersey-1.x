@@ -60,6 +60,14 @@ abstract class CollectionStringExtractor<V extends Collection<String>>
         this.defaultValue = defaultValue;
     }
 
+    public String getName() {
+        return parameter;
+    }
+
+    public String getDefaultStringValue() {
+        return defaultValue;
+    }
+
     public Object extract(MultivaluedMap<String, String> parameters) {
         List<String> stringList = parameters.get(parameter);
         if (stringList != null) {

@@ -37,7 +37,7 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
-import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.ParamException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -45,6 +45,7 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
+import com.sun.jersey.server.impl.model.parameter.multivalued.ExtractorContainerException;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
@@ -54,7 +55,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -158,8 +158,9 @@ public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider
                     context.getProperties().get(FORM_PROPERTY);
             try {
                 return extractor.extract(form);
-            } catch (ContainerException e) {
-                throw new WebApplicationException(e.getCause(), 400);
+            } catch (ExtractorContainerException e) {
+                throw new ParamException.FormParamException(e.getCause(),
+                        extractor.getName(), extractor.getDefaultStringValue());
             }
         }
     }

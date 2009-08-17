@@ -34,72 +34,32 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
 import com.sun.jersey.api.container.ContainerException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
+ * A runtime exception that contains a cause, a checked or runtime exception,
+ * that may be passed to the cause of a {@link WebApplicationException}.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-final class PrimitiveValueOfExtractor 
-        implements MultivaluedParameterExtractor {
-    final Method valueOf;
-    final String parameter;
-    final String defaultStringValue;
-    final Object defaultValue;
-    final Object defaultDefaultValue;
+public class ExtractorContainerException extends ContainerException {
 
-    public PrimitiveValueOfExtractor(Method valueOf, String parameter, 
-            String defaultStringValue, Object defaultDefaultValue)
-            throws IllegalAccessException, InvocationTargetException {
-        this.valueOf = valueOf;
-        this.parameter = parameter;
-        this.defaultStringValue = defaultStringValue;
-        this.defaultValue = (defaultStringValue != null) ?
-            getValue(defaultStringValue) : null;
-        this.defaultDefaultValue = defaultDefaultValue;
+    public ExtractorContainerException() {
+        super();
     }
 
-    public String getName() {
-        return parameter;
+    public ExtractorContainerException(String message) {
+        super(message);
     }
 
-    public String getDefaultStringValue() {
-        return defaultStringValue;
-    }
-    
-    private Object getValue(String v) {
-        try {
-            return valueOf.invoke(null, v);
-        } catch (InvocationTargetException ex) {
-            Throwable target = ex.getTargetException();
-            if (target instanceof WebApplicationException) {
-                throw (WebApplicationException)target;
-            } else {
-                throw new ExtractorContainerException(target);
-            }
-        } catch (RuntimeException ex) {
-            throw new ContainerException(ex);
-        } catch (Exception ex) {
-            throw new ContainerException(ex);
-        }
+    public ExtractorContainerException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    public Object extract(MultivaluedMap<String, String> parameters) {
-        String v = parameters.getFirst(parameter);
-        if (v != null) {
-            return getValue(v);
-        } else if (defaultValue != null) {
-            // TODO do we need to clone the default value
-            return defaultValue;
-        }
-
-        return defaultDefaultValue;
+    public ExtractorContainerException(Throwable cause) {
+        super(cause);
     }
 }

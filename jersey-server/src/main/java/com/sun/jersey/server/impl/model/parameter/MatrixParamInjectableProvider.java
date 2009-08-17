@@ -37,17 +37,17 @@
 
 package com.sun.jersey.server.impl.model.parameter;
 
-import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.ParamException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.server.impl.model.parameter.multivalued.ExtractorContainerException;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.inject.Injectable;
 import java.util.List;
 import javax.ws.rs.MatrixParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.PathSegment;
 
 
@@ -71,8 +71,9 @@ public final class MatrixParamInjectableProvider extends BaseParamInjectableProv
             PathSegment p = l.get(l.size() - 1);
             try {
                 return extractor.extract(p.getMatrixParameters());
-            } catch (ContainerException e) {
-                throw new WebApplicationException(e.getCause(), 404);
+            } catch (ExtractorContainerException e) {
+                throw new ParamException.MatrixParamException(e.getCause(),
+                        extractor.getName(), extractor.getDefaultStringValue());
             }
         }
     }

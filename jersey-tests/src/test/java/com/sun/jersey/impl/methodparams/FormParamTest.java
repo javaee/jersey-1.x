@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.impl.methodparams;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.FormDataContentDisposition;
@@ -332,6 +333,20 @@ public class FormParamTest extends AbstractResourceTester {
 
         JAXBBean b = r.post(JAXBBean.class, form);
         assertEquals("a", b.value);
+    }
+
+    public void testFormParamJAXBError() {
+        initiateWebApplication(FormResourceJAXB.class);
+
+        WebResource r = resource("/", false);
+
+        Form form = new Form();
+        form.add("a", "<x><value>a</value></jaxbBean>");
+        form.add("b", "<x><value>b1</value></jaxbBean>");
+        form.add("b", "<x><value>b2</value></jaxbBean>");
+
+        ClientResponse cr = r.post(ClientResponse.class, form);
+        assertEquals(400, cr.getStatus());
     }
 
     @Path("/")

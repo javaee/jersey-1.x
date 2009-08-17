@@ -44,5 +44,10 @@ import javax.ws.rs.core.MultivaluedMap;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface MultivaluedParameterExtractor {
+
+    String getName();
+
+    String getDefaultStringValue();
+    
     Object extract(MultivaluedMap<String, String> parameters);
 }

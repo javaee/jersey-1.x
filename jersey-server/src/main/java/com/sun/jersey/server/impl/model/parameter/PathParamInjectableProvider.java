@@ -37,11 +37,12 @@
 
 package com.sun.jersey.server.impl.model.parameter;
 
-import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.ParamException.PathParamException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.server.impl.model.parameter.multivalued.ExtractorContainerException;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.inject.Injectable;
@@ -49,7 +50,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.PathSegment;
 
 
@@ -72,8 +72,9 @@ public final class PathParamInjectableProvider extends BaseParamInjectableProvid
         public Object getValue(HttpContext context) {
             try {
                 return extractor.extract(context.getUriInfo().getPathParameters(decode));
-            } catch (ContainerException e) {
-                throw new WebApplicationException(e.getCause(), 404);
+            } catch (ExtractorContainerException e) {
+                throw new PathParamException.PathParamException(e.getCause(),
+                        extractor.getName(), extractor.getDefaultStringValue());
             }
         }
     }

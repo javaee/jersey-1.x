@@ -40,6 +40,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.spi.StringReader;
 import com.sun.jersey.spi.StringReaderProvider;
+import com.sun.jersey.spi.inject.Injectable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -49,12 +50,14 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+import org.xml.sax.InputSource;
 
 /**
  *
@@ -71,14 +74,11 @@ public class JAXBStringReaderProviders {
 
     private final ContextResolver<Unmarshaller> unmarshaller;
 
-    private final ContextResolver<Marshaller> marshaller;
-
     public JAXBStringReaderProviders(Providers ps) {
         this.ps = ps;
 
         this.context = ps.getContextResolver(JAXBContext.class, null);
         this.unmarshaller = ps.getContextResolver(Unmarshaller.class, null);
-        this.marshaller = ps.getContextResolver(Marshaller.class, null);
     }
 
     protected final Unmarshaller getUnmarshaller(Class type) throws JAXBException {
@@ -116,30 +116,39 @@ public class JAXBStringReaderProviders {
 
     public static class RootElementProvider extends JAXBStringReaderProviders implements StringReaderProvider {
 
-        public RootElementProvider(@Context Providers ps) {
+        // Delay construction of factory
+        private final Injectable<SAXParserFactory> spf;
+
+        public RootElementProvider(@Context Injectable<SAXParserFactory> spf, @Context Providers ps) {
             super(ps);
+            this.spf = spf;
         }
 
         public StringReader getStringReader(final Class type, Type genericType, Annotation[] annotations) {
-            boolean supported = (type.getAnnotation(XmlRootElement.class) != null ||
+            final boolean supported = (type.getAnnotation(XmlRootElement.class) != null ||
                     type.getAnnotation(XmlType.class) != null);
             if (!supported) {
                 return null;
             }
 
             return new StringReader() {
-
                 public Object fromString(String value) {
                     try {
-                        Unmarshaller u = getUnmarshaller(type);
+                        final SAXSource source = new SAXSource(
+                                spf.getValue().newSAXParser().getXMLReader(),
+                                new InputSource(new java.io.StringReader(value)));
+
+                        final Unmarshaller u = getUnmarshaller(type);
                         if (type.isAnnotationPresent(XmlRootElement.class)) {
-                            return u.unmarshal(new java.io.StringReader(value));
+                            return u.unmarshal(source);
                         } else {
-                            return u.unmarshal(new StreamSource(new java.io.StringReader(value)), type).getValue();
+                            return u.unmarshal(source, type).getValue();
                         }
                     } catch (UnmarshalException ex) {
-                        throw new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
+                        throw new ExtractorContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
                     } catch (JAXBException ex) {
+                        throw new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
+                    } catch (Exception ex) {
                         throw new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
                     }
                 }
