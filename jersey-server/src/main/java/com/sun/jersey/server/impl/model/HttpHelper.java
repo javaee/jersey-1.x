@@ -82,7 +82,11 @@ public final class HttpHelper {
      *         returned.
      */
     public static MediaType getContentType(String contentTypeString) {
-        return (contentTypeString != null) ? MediaType.valueOf(contentTypeString) : null;
+        try {
+            return (contentTypeString != null) ? MediaType.valueOf(contentTypeString) : null;
+        } catch(IllegalArgumentException e) {
+            throw clientError("Bad Content-Type header value: '" + contentTypeString + "'", e);
+        }
     }
     
     /**
@@ -121,7 +125,7 @@ public final class HttpHelper {
         try {
             return new LanguageTag(language).getAsLocale();
         } catch (java.text.ParseException e) {
-            throw clientError("Bad Content-Language field: " + language, e);
+            throw clientError("Bad Content-Language header value: '" + language + "'", e);
         }
     }
 
@@ -133,7 +137,7 @@ public final class HttpHelper {
         try {
             return HttpHeaderReader.readMatchingEntityTag(ifMatch);
         } catch (java.text.ParseException e) {
-            throw clientError("The HTTP header field \"If-Match\" with value " + ifMatch + " could not be parsed.", e);
+            throw clientError("Bad If-Match header value: '" + ifMatch + "'", e);
         }
     }
 
@@ -145,7 +149,7 @@ public final class HttpHelper {
         try {
             return HttpHeaderReader.readMatchingEntityTag(ifNoneMatch);
         } catch (java.text.ParseException e) {
-            throw clientError("The HTTP header field \"If-None-Match\" with value " + ifNoneMatch + " could not be parsed.", e);
+            throw clientError("Bad If-None-Match header value: '" + ifNoneMatch + "'", e);
         }
     }
 
@@ -199,7 +203,7 @@ public final class HttpHelper {
         try {
             return HttpHeaderReader.readAcceptLanguage(acceptLanguage);
         } catch (java.text.ParseException e) {
-            throw clientError("Bad Accept-Language field: " + acceptLanguage, e);
+            throw clientError("Bad Accept-Language header value: '" + acceptLanguage + "'", e);
         }
     }
     
@@ -218,7 +222,7 @@ public final class HttpHelper {
             }
             return HttpHeaderReader.readAcceptToken(acceptCharset);
         } catch (java.text.ParseException e) {
-            throw clientError("Bad Accept-Charset field: " + acceptCharset, e);
+            throw clientError("Bad Accept-Charset header value: '" + acceptCharset + "'", e);
         }
     }
     
@@ -237,12 +241,12 @@ public final class HttpHelper {
             }
             return HttpHeaderReader.readAcceptToken(acceptEncoding);
         } catch (java.text.ParseException e) {
-            throw clientError("Bad Accept-Encoding field: " + acceptEncoding, e);
+            throw clientError("Bad Accept-Encoding header value: '" + acceptEncoding + "'", e);
         }
     }
     
     private static WebApplicationException clientError(String message, Exception e) {        
-        return new WebApplicationException(e, Response.status(400).
+        return new WebApplicationException(e, Response.status(Response.Status.BAD_REQUEST).
                 entity(message).type("text/plain").build());
     }
     

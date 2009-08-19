@@ -42,6 +42,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
@@ -52,14 +53,14 @@ import javax.ws.rs.core.Response;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ContentTypeOverrideTest extends AbstractResourceTester {
+public class ContentTypeTest extends AbstractResourceTester {
     
-    public ContentTypeOverrideTest(String testName) {
+    public ContentTypeTest(String testName) {
         super(testName);
     }
         
     @Path("/")
-    public static class WebResourceOverride {
+    public static class OverrideResource {
         @Context HttpContext context;
         
         @Produces({"application/foo", "application/bar"})
@@ -70,12 +71,30 @@ public class ContentTypeOverrideTest extends AbstractResourceTester {
     }
     
     public void testOverridden() {
-        initiateWebApplication(WebResourceOverride.class);
+        initiateWebApplication(OverrideResource.class);
         WebResource r = resource("/");
         
-        ClientResponse response = r.accept("application/foo", "application/bar").
+        ClientResponse cr = r.accept("application/foo", "application/bar").
                 get(ClientResponse.class);
 
-        assertEquals(MediaType.valueOf("application/foo"), response.getType());
+        assertEquals(MediaType.valueOf("application/foo"), cr.getType());
+    }
+
+    @Path("/")
+    public static class EmptyContentTypeResource {
+
+        @POST
+        public void post() {
+        }
+    }
+
+    public void testEmptyContentType() {
+        initiateWebApplication(EmptyContentTypeResource.class);
+        WebResource r = resource("/", false);
+
+        ClientResponse cr = r.
+                header("Content-Type", "").
+                post(ClientResponse.class);
+        assertEquals(400, cr.getStatus());
     }
 }

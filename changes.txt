@@ -1,5 +1,15 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 343
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=343
+  The ResourceConfig property
+    PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS
+  additional supports a Java type that is a String whose value is a Class name.
+- Fixed issue 332
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=332
+  If an Content-Type header is recieved with an empty value a 400 
+  response is returned.
 - Fixed issue 350
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=350
   Errors when processing a parameter, annotated with an @*Param annotation,
   will result in an instance of ParamException (that extends WebApplicaton)
   being thrown concrete instance of which reflect the particular parameter

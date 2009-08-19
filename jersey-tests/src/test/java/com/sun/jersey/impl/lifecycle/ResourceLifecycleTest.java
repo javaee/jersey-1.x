@@ -38,12 +38,13 @@
 package com.sun.jersey.impl.lifecycle;
 
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
-import com.sun.jersey.impl.resource.*;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.server.impl.resource.SingletonFactory;
 import com.sun.jersey.spi.resource.PerRequest;
 import com.sun.jersey.spi.resource.Singleton;
 import java.util.HashSet;
@@ -129,7 +130,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         _test();
     }
     
-    public void testOverrideDefault() {
+    public void testOverrideDefaultWithPerRequest() {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
                 PerRequestFactory.class);
@@ -138,6 +139,24 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         _test();
     }
     
+    public void testOverrideDefaultWithSingleton() {
+        ResourceConfig c = getResourceConfig();
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
+                SingletonFactory.class);
+
+        initiateWebApplication(c);
+        _test(true);
+    }
+
+    public void testOverrideDefaultWithSingletonClassName() {
+        ResourceConfig c = getResourceConfig();
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
+                SingletonFactory.class.getName());
+
+        initiateWebApplication(c);
+        _test(true);
+    }
+
     public void testNullResourceProviderProperty() {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
@@ -150,7 +169,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     public void testBadTypeResourceProviderProperty() {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
-                "VALUE");
+                1);
 
         boolean caught = false;
         try {
@@ -161,6 +180,21 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         assertTrue(caught);
     }
     
+    public void testBadClassNameResourceProviderProperty() {
+        ResourceConfig c = getResourceConfig();
+        c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
+                "VALUE");
+
+        boolean caught = false;
+        try {
+            initiateWebApplication(c);
+        } catch (ContainerException e) {
+            assertEquals(ClassNotFoundException.class, e.getCause().getClass());
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+
     public void testBadClassResourceProviderProperty() {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
@@ -176,6 +210,10 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     }
     
     private void _test() {
+        _test(false);
+    }
+    
+    private void _test(boolean isDefaultSingleton) {
         WebResource r = resource("/foo");        
         assertEquals("1", r.get(String.class));
         assertEquals("2", r.get(String.class));
@@ -186,10 +224,16 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));
         
-        r = resource("/baz");        
-        assertEquals("1", r.get(String.class));
-        assertEquals("1", r.get(String.class));
-        assertEquals("1", r.get(String.class));
+        r = resource("/baz");
+        if (isDefaultSingleton) {
+            assertEquals("1", r.get(String.class));
+            assertEquals("2", r.get(String.class));
+            assertEquals("3", r.get(String.class));
+        } else {
+            assertEquals("1", r.get(String.class));
+            assertEquals("1", r.get(String.class));
+            assertEquals("1", r.get(String.class));
+        }
     }
     
     @Path("foo")

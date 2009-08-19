@@ -63,13 +63,9 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
 
     private final ServerInjectableProviderContext sipc;
 
-    private final HttpContext threadLocalHc;
-
     public SingletonFactory(
-            @Context ServerInjectableProviderContext sipc,
-            @Context HttpContext threadLocalHc) {
+            @Context ServerInjectableProviderContext sipc) {
         this.sipc = sipc;
-        this.threadLocalHc = threadLocalHc;
     }
 
     public ResourceComponentProvider getComponentProvider(Class c) {

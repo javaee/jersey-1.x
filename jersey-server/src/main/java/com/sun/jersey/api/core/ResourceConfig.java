@@ -142,7 +142,8 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * If set the default resource component provider factory for the
      * life-cycle of resource classes.
      * <p>
-     * The type of this property must be a Java class that implementations
+     * The type of this property must be a Class or a String that is a Class name,
+     * and the Class must a sub-class of
      * {@link com.sun.jersey.server.spi.component.ResourceComponentProviderFactory}.
      * <p>
      * If not set the default resource component provider factory will be the 

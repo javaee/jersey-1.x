@@ -39,12 +39,14 @@ package com.sun.jersey.server.impl.component;
 import com.sun.jersey.server.spi.component.*;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ComponentConstructor;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -55,9 +57,12 @@ public class ResourceFactory {
 
     private final InjectableProviderContext ipc;
 
+    private final Map<Class, ResourceComponentProviderFactory> factories;
+    
     public ResourceFactory(ResourceConfig config, InjectableProviderContext ipc) {
         this.config = config;
         this.ipc = ipc;
+        this.factories = new HashMap<Class, ResourceComponentProviderFactory>();
     }
 
     public InjectableProviderContext getInjectableProviderContext() {
@@ -92,22 +97,43 @@ public class ResourceFactory {
             if (v == null) {
                 // Use default provider if none specified
                 providerFactoryClass = PerRequestFactory.class;
-            } else if (v instanceof Class) {
-                Class<?> _c = (Class<?>)v;
-                if (ResourceComponentProviderFactory.class.isAssignableFrom(_c)) {
-                    providerFactoryClass = _c.asSubclass(ResourceComponentProviderFactory.class);
-                } else {
-                    throw new IllegalArgumentException("Property value for "
-                            + ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS
-                            + " of type " + v.getClass() + " not of a subclass of " + ResourceComponentProviderFactory.class);
+            } else if (v instanceof String) {
+                try {
+                    providerFactoryClass = getSubclass(ReflectionHelper.classForNameWithException((String)v));
+                } catch (ClassNotFoundException ex) {
+                    throw new ContainerException(ex);
                 }
+            } else if (v instanceof Class) {
+                providerFactoryClass = getSubclass((Class)v);
             } else {
                 throw new IllegalArgumentException("Property value for "
                         + ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS
-                        + " of type " + v.getClass() + " not of a subclass of " + ResourceComponentProviderFactory.class);
+                        + " of type Class or String");
             }
         }
 
+        ResourceComponentProviderFactory rcpf = factories.get(providerFactoryClass);
+        if (rcpf == null) {
+            rcpf = getInstance(providerFactoryClass);
+            factories.put(providerFactoryClass, rcpf);
+        }
+
+        return rcpf;
+    }
+
+    private Class<? extends ResourceComponentProviderFactory> getSubclass(Class<?> c) {
+        if (ResourceComponentProviderFactory.class.isAssignableFrom(c)) {
+            return c.asSubclass(ResourceComponentProviderFactory.class);
+        } else {
+            throw new IllegalArgumentException("Property value for "
+                    + ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS
+                    + " of type " + c + " not of a subclass of " + ResourceComponentProviderFactory.class);
+        }
+
+    }
+
+    private ResourceComponentProviderFactory getInstance(
+            Class<? extends ResourceComponentProviderFactory> providerFactoryClass) {
         try {
             ComponentInjector<ResourceComponentProviderFactory> ci =
                     new ComponentInjector(ipc, providerFactoryClass);
@@ -116,13 +142,7 @@ public class ResourceFactory {
                     new ComponentConstructor(ipc, providerFactoryClass, ci);
 
             return cc.getInstance();
-        } catch (IllegalArgumentException ex) {
-            throw new ContainerException("Unable to create resource component provider", ex);
-        } catch (InvocationTargetException ex) {
-            throw new ContainerException("Unable to create resource component provider", ex);
-        } catch (IllegalAccessException ex) {
-            throw new ContainerException("Unable to create resource component provider", ex);
-        } catch (InstantiationException ex) {
+        } catch (Exception ex) {
             throw new ContainerException("Unable to create resource component provider", ex);
         }
     }
