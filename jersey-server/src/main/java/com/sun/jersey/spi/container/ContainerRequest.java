@@ -188,7 +188,7 @@ public class ContainerRequest implements HttpRequestContext {
      * Get the mutable properties.
      * <p>
      * Care should be taken not to clear the properties or remove properties
-     * that are unkown otherwise unspecified behaviour may result.
+     * that are unknown otherwise unspecified behaviour may result.
      *
      * @return the properties.
      */
