@@ -401,7 +401,7 @@ public class JSONConfiguration {
      * Returns JSON array names property
      * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
      * @return collection of array names
-     * @see Builder#arrays(java.lang.String[]) 
+     * @see MappedBuilder#arrays(java.lang.String[])
      */
     public Collection<String> getArrays() {
         return (arrays != null) ? Collections.unmodifiableCollection(arrays) : null;
@@ -411,7 +411,7 @@ public class JSONConfiguration {
      * Returns names of attributes, which will be handled as elements
      * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
      * @return attribute as element names collection
-     * @see Builder#attributeAsElement(java.lang.String[])
+     * @see MappedBuilder#attributeAsElement(java.lang.String[])
      */
     public Collection<String> getAttributeAsElements() {
         return (attrsAsElems != null) ? Collections.unmodifiableCollection(attrsAsElems) : null;
@@ -421,7 +421,7 @@ public class JSONConfiguration {
      * Returns a map for XML to JSON namespace mapping
      * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
      * @return a map for XML to JSON namespace mapping
-     * @see Builder#xml2JsonNs(java.util.Map)
+     * @see MappedBuilder#xml2JsonNs(java.util.Map)
      */
     public Map<String, String> getXml2JsonNs() {
         return (jsonXml2JsonNs != null) ? Collections.unmodifiableMap(jsonXml2JsonNs) : null;
@@ -431,7 +431,7 @@ public class JSONConfiguration {
      * Returns names of JSON objects, which will be serialized out as non-strings, i.e. without delimiting their values with double quotes
      * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
      * @return name of non-string JSON objects
-     * @see Builder#nonStrings(java.lang.String[])
+     * @see MappedBuilder#nonStrings(java.lang.String[])
      */
     public Collection<String> getNonStrings() {
         return (nonStrings != null) ? Collections.unmodifiableCollection(nonStrings) : null;
@@ -442,7 +442,7 @@ public class JSONConfiguration {
      * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} 
      * and {@link Notation#NATURAL} notations.
      * @return true, if root element has to be stripped off
-     * @see Builder#rootUnwrapping(boolean) 
+     * @see MappedBuilder#rootUnwrapping(boolean)
      */
     public boolean isRootUnwrapping() {
         return rootUnwrapping;
@@ -452,7 +452,7 @@ public class JSONConfiguration {
      * Says if the JSON names corresponding to XML attributes should use a '@' prefix.
      * This property is valid for the {@link JSONConfiguration.Notation#NATURAL} notation only.
      * @return true, if prefixes are added
-     * @see Builder#prefixAtNaturalAttributesAdding(boolean)
+     * @see NaturalBuilder#usePrefixesAtNaturalAttributes()
      */
     public boolean isUsingPrefixesAtNaturalAttributes() {
         return usePrefixAtNaturalAttributes;
@@ -463,7 +463,7 @@ public class JSONConfiguration {
      * and indentation so that it is easy to read for people.
      * This property is valid for the {@link JSONConfiguration.Notation#NATURAL} notation only.
      * @return true, if formatting is applied on the output JSON
-     * @see Builder#humanReadableFormatting(boolean)
+     * @see NaturalBuilder#humanReadableFormatting(boolean)
      */
     public boolean isHumanReadableFormatting() {
         return humanReadableFormating;

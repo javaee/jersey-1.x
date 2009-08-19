@@ -56,7 +56,7 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 /**
- * An implementation of {@link Response.ResponseBuilder}.
+ * An implementation of {@link ResponseBuilder}.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

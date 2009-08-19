@@ -279,7 +279,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     /**
      * Constructs a new instance with a custom set of properties.
      * If no (now deprecated) JSON related properties are specified,
-     * the {@link JSONConfiguration.DEFAULT} is used as {@link JSONConfiguration}
+     * the {@link JSONConfiguration#DEFAULT} is used as {@link JSONConfiguration}
      *
      * @param config {@link JSONConfiguration}, can not be null
      * @param classesToBeBound list of java classes to be recognized by the

@@ -50,7 +50,7 @@ import java.lang.reflect.Type;
  * 
  * @param <T> The Java type.
  * @see javax.ws.rs.ext.Provider
- * @see com.sun.jersey.server.spi.StringReaderWorkers
+ * @see com.sun.jersey.spi.StringReaderWorkers
  * @author Paul.Sandoz@Sun.Com
  */
 public interface StringReaderProvider<T> {

@@ -125,7 +125,7 @@
  * Then, the produced JSON would become: <code>{"name":"Howard","number":3}</code>
  * and <code>{"titles":["Title1"]}</code> respectively for the URI paths
  * <code>beans/one</code> and <code>beans/two</code>. Please note, that you do not need
- * to configure this in much detail. Using {@link com.sun.jersey.api.json.JSONConfiguration.Notation.NATURAL} notation
+ * to configure this in much detail. Using {@link com.sun.jersey.api.json.JSONConfiguration.Notation#NATURAL} notation
  * means that Jersey JSON processor will autamatically take care about numbers, booleans and arrays. This notation
  * will probably become the default one for Jersey in one of the future releases.
  *

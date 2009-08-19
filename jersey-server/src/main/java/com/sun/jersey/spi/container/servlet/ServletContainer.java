@@ -305,7 +305,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * <p>
      * This implementaton returns an instance of {@link ClasspathResourceConfig}
      * that scans in files and directories as declared by the
-     * {@link ClasspathResourceConfig.PROPERTY_CLASSPATH} if present, otherwise
+     * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
      * <p>
      * An inheriting class may override this method to supply a different
@@ -469,7 +469,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * <p>
      * This implementaton returns an instance of {@link ClasspathResourceConfig}
      * that scans in files and directories as declared by the
-     * {@link ClasspathResourceConfig.PROPERTY_CLASSPATH} if present, otherwise
+     * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
      * <p>
      * An inheriting class may override this method to supply a different
@@ -636,7 +636,7 @@ public class ServletContainer extends HttpServlet implements Filter {
 
     /**
      * @return the {@link Pattern} compiled from a regular expression that is
-     * the property value of {@link #PROPERTY_STATIC_CONTENT_REGEX}.
+     * the property value of {@link #PROPERTY_WEB_PAGE_CONTENT_REGEX}.
      * A <code>null</code> value will be returned if the property is not present
      * is or an empty String.
      */
@@ -711,7 +711,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * method.
      * <p>
      * If the servlet path matches the regular expression declared by the
-     * property {@link #PROPERTY_STATIC_CONTENT_REGEX} then the request
+     * property {@link #PROPERTY_WEB_PAGE_CONTENT_REGEX} then the request
      * is forwarded to the next filter in the filter chain so that the
      * underlying servlet engine can process the request otherwise Jersey
      * will process the request.

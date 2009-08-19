@@ -45,7 +45,7 @@ import javax.ws.rs.core.Variant;
 import javax.ws.rs.core.Variant.VariantListBuilder;
 
 /**
- * An implementation of {@link Variant.VariantListBuilder}.
+ * An implementation of {@link VariantListBuilder}.
  *
  * @author Paul.Sandoz@Sun.Com
  */

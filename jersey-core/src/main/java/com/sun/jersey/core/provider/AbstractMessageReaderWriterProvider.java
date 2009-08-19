@@ -98,20 +98,6 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
     }
 
     /**
-     * Get the character set from a media type.
-     * <p>
-     * The character set is obtained from the media type parameter "charset".
-     * If the parameter is not present the {@link #UTF8} charset is utilized.
-     *
-     * @param m the media type.
-     * @return the character set.
-     */
-    public static final String readFromAsString(InputStream in, 
-            MediaType type) throws IOException {
-        return ReaderWriter.readFromAsString(in, type);
-    }
-    
-    /**
      * Read the bytes of an input stream and convert to a string.
      *
      * @param in the input stream to read from.
@@ -119,6 +105,20 @@ public abstract class AbstractMessageReaderWriterProvider<T> implements
      *        how to decode bytes to charaters.
      * @return the string.
      * @throws IOException if there is an error reading from the input stream.
+     */
+    public static final String readFromAsString(InputStream in, 
+            MediaType type) throws IOException {
+        return ReaderWriter.readFromAsString(in, type);
+    }
+    
+    /**
+     * Convert a string to bytes and write those bytes to an output stream.
+     *
+     * @param s the string to convert to bytes.
+     * @param out the output stream to write to.
+     * @param type the media type that determines the character set defining
+     *        how to decode bytes to characters.
+     * @throws IOException
      */
     public static final void writeToAsString(String s, OutputStream out, 
             MediaType type) throws IOException {

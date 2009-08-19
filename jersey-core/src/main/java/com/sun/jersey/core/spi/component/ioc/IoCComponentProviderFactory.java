@@ -38,6 +38,7 @@ package com.sun.jersey.core.spi.component.ioc;
 
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentProviderFactory;
+import java.lang.reflect.Field;
 
 /**
  * An IoC component provider factory. An implementaton of such a class may be

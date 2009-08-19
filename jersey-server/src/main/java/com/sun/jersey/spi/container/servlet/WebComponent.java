@@ -499,7 +499,7 @@ public class WebComponent implements ContainerListener {
      * <p>
      * This implementaton returns an instance of {@link ClasspathResourceConfig}
      * that scans in files and directories as declared by the
-     * {@link ClasspathResourceConfig.PROPERTY_CLASSPATH} if present, otherwise
+     * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
      * <p>
      * An inheriting class may override this method to supply a different

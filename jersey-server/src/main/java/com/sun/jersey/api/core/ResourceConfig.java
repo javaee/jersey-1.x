@@ -224,8 +224,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             "com.sun.jersey.spi.container.ResourceFilters";
 
     /**
-     * If set the wadl generator configuration that provides that {@link WadlGenerator}
-     * to be used by the {@link com.sun.jersey.server.impl.wadl.WadlFactory}.
+     * If set the wadl generator configuration that provides a {@link WadlGenerator}.
      * <p>
      * The type of this property must be a subclass or an instance of a subclass of
      * {@link com.sun.jersey.api.wadl.config.WadlGeneratorConfig}.

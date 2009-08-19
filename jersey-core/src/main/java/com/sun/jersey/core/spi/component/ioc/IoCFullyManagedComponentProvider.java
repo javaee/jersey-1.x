@@ -50,7 +50,7 @@ package com.sun.jersey.core.spi.component.ioc;
  * interception.
  *
  * @author Paul.Sandoz@Sun.Com
- * @See IoCComponentProcessorFactory
+ * @see IoCComponentProcessorFactory
  */
 public interface IoCFullyManagedComponentProvider extends IoCComponentProvider {
 }

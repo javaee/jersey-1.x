@@ -48,7 +48,7 @@ import java.io.OutputStream;
  * {@link TemplateContext} and has associated with it a {@link TemplateProcessor}
  * that is capable of processing the template, referenced by the template name,
  * that is a fully qualified name as produced from
- * {@link TemplateProcessor#resolve(java.lang.String).
+ * {@link TemplateProcessor#resolve(java.lang.String)}.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
