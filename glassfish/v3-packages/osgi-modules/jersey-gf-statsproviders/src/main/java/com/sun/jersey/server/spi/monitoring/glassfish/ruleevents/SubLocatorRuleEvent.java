@@ -37,6 +37,7 @@
 
 package com.sun.jersey.server.spi.monitoring.glassfish.ruleevents;
 
+import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.server.spi.monitoring.glassfish.ApplicationStatsProvider;
 import java.util.List;
 
@@ -56,14 +57,23 @@ public class SubLocatorRuleEvent extends AbstractRuleEvent {
 
     @Override
     public void process(ApplicationStatsProvider appStatsProvider) {
+        int size = eventList.size();
+
         if(this.getPath().equals("")) {
-
-            int size = eventList.size();
-
             for (int i = 0; i < size; i++) {
                 if ((eventList.get(i) == this) && (size > (i + 1))) {
                     appStatsProvider.resourceClassHit(eventList.get(i + 1).getClazz().getClass().getName());
                     break;
+                }
+            }
+        } else {
+            for (int i = 0; i < size; i++) {
+                if ((eventList.get(i) == this) && (size > (i + 2))) {
+                    if(eventList.get(i + 2).getRuleName().equals(HttpMethodRule.class.getSimpleName())) {
+                        appStatsProvider.resourceClassHit(eventList.get(i + 2).getClazz().getClass().getName());
+
+                        break;
+                    }
                 }
             }
         }
