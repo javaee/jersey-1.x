@@ -1,4 +1,10 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 250
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=250
+  Updated the JavaDoc of HttpContext.getProperties and
+  ContainerResponse.getProperties to state:
+     * Care should be taken not to clear the properties or remove properties
+     * that are unkown otherwise unspecified behaviour may result.
 - Fixed issue 343
   https://jersey.dev.java.net/issues/show_bug.cgi?id=343
   The ResourceConfig property
