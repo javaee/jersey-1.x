@@ -41,7 +41,10 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.HashMap;
@@ -52,6 +55,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
@@ -159,7 +163,29 @@ public class CharsetTest extends AbstractTypeTester {
         _test(CONTENT, StringResource.class);
     }
 
-   
+
+    @Path("/")
+    public static class FormMultivaluedMapResource extends CharsetResource<MultivaluedMap<String, String>> { }
+
+    public void testFormMultivaluedMapRepresentation() {
+        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
+
+        map.add("name", "\u00A9 CONTENT \u00FF \u2200 \u22FF");
+        map.add("name", "Š š †");
+        _test(map, FormMultivaluedMapResource.class, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+    }
+
+    @Path("/")
+    public static class FormResource extends CharsetResource<Form> { }
+
+    public void testRepresentation() {
+        Form map = new Form();
+
+        map.add("name", "\u00A9 CONTENT \u00FF \u2200 \u22FF");
+        map.add("name", "Š š †");
+        _test(map, FormResource.class, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+    }
+
     @Path("/")
     public static class JSONObjectResource extends CharsetResource<JSONObject> {}
 
@@ -255,6 +281,7 @@ public class CharsetTest extends AbstractTypeTester {
         initiateWebApplication(resource);
 
         WebResource r = resource("/");
+        r.addFilter(new LoggingFilter());
         for (String charset : CHARSETS) {
             Map<String, String> p = new HashMap<String, String>();
             p.put("charset", charset);

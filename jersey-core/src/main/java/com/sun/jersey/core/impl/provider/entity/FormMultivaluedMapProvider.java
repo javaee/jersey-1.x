@@ -37,7 +37,6 @@
 
 package com.sun.jersey.core.impl.provider.entity;
 
-import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,11 +44,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -62,7 +56,7 @@ import javax.ws.rs.core.MultivaluedMap;
 @Produces("application/x-www-form-urlencoded")
 @Consumes("application/x-www-form-urlencoded")
 public final class FormMultivaluedMapProvider extends 
-        AbstractMessageReaderWriterProvider<MultivaluedMap<String, String>> {
+        BaseFormProvider<MultivaluedMap<String, String>> {
     
     private final Type mapType;
     
@@ -84,22 +78,7 @@ public final class FormMultivaluedMapProvider extends
             MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
-        String encoded = readFromAsString(entityStream, mediaType);
-    
-        MultivaluedMap<String, String> map = new MultivaluedMapImpl();
-        StringTokenizer tokenizer = new StringTokenizer(encoded, "&");
-        String token;
-        while (tokenizer.hasMoreTokens()) {
-            token = tokenizer.nextToken();
-            int idx = token.indexOf('=');
-            if (idx < 0) {
-                map.add(URLDecoder.decode(token, "UTF-8"), null);
-            } else if (idx > 0) {
-                map.add(URLDecoder.decode(token.substring(0, idx), "UTF-8"), 
-                        URLDecoder.decode(token.substring(idx+1), "UTF-8"));
-            }
-        }
-        return map;
+        return readFrom(new MultivaluedMapImpl(), mediaType, entityStream);
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -114,19 +93,6 @@ public final class FormMultivaluedMapProvider extends
             MediaType mediaType, 
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, List<String>> e : t.entrySet()) {
-            for (String value : e.getValue()) {
-                if (sb.length() > 0)
-                    sb.append('&');
-                sb.append(URLEncoder.encode(e.getKey(), "UTF-8"));
-                if (value != null) {
-                    sb.append('=');
-                    sb.append(URLEncoder.encode(value, "UTF-8"));
-                }
-            }
-        }
-                
-        writeToAsString(sb.toString(), entityStream, mediaType);
+        writeTo(t, mediaType, entityStream);
     }    
 }

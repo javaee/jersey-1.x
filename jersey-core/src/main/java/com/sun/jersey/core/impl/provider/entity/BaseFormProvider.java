@@ -37,14 +37,16 @@
 
 package com.sun.jersey.core.impl.provider.entity;
 
-import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
+import com.sun.jersey.core.util.ReaderWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -52,36 +54,49 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Produces({"application/x-www-form-urlencoded", "*/*"})
-@Consumes({"application/x-www-form-urlencoded", "*/*"})
-public final class FormProvider extends BaseFormProvider<Form> {
+public abstract class BaseFormProvider<T extends MultivaluedMap<String, String>> extends AbstractMessageReaderWriterProvider<T> {
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return type == Form.class;
-    }
-    
-    public Form readFrom(
-            Class<Form> type, 
-            Type genericType, 
-            Annotation annotations[],
-            MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, 
+    public T readFrom(T map,
+            MediaType mediaType,
             InputStream entityStream) throws IOException {
-        return readFrom(new Form(), mediaType, entityStream);
+        final String encoded = readFromAsString(entityStream, mediaType);
+
+        final String charsetName = ReaderWriter.getCharset(mediaType).name();
+
+        final StringTokenizer tokenizer = new StringTokenizer(encoded, "&");
+        String token;
+        while (tokenizer.hasMoreTokens()) {
+            token = tokenizer.nextToken();
+            int idx = token.indexOf('=');
+            if (idx < 0) {
+                map.add(URLDecoder.decode(token, charsetName), null);
+            } else if (idx > 0) {
+                map.add(URLDecoder.decode(token.substring(0, idx), charsetName),
+                        URLDecoder.decode(token.substring(idx+1), charsetName));
+            }
+        }
+        return map;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return type == Form.class;
-    }
-    
     public void writeTo(
-            Form t,
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
+            T t,
             MediaType mediaType, 
-            MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
-        writeTo(t, mediaType, entityStream);
+        final String charsetName = ReaderWriter.getCharset(mediaType).name();
+        
+        final StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, List<String>> e : t.entrySet()) {
+            for (String value : e.getValue()) {
+                if (sb.length() > 0)
+                    sb.append('&');
+                sb.append(URLEncoder.encode(e.getKey(), charsetName));
+                if (value != null) {
+                    sb.append('=');
+                    sb.append(URLEncoder.encode(value, charsetName));
+                }
+            }
+        }
+                
+        writeToAsString(sb.toString(), entityStream, mediaType);
     }    
 }
