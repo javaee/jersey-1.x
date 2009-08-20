@@ -183,5 +183,8 @@ public class GlobalStatsProvider {
         for(AbstractRuleEvent ruleEvent : ruleEvents.get()) {
             ruleEvent.process(currentApplicationStatProvider.get());
         }
+
+        // clean ruleEvents list
+        ruleEvents.get().clear();
     }
 }
