@@ -36,8 +36,7 @@
  */
 package com.sun.jersey.server.impl.ejb;
 
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.api.core.ResourceConfig;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +51,7 @@ public final class EJBComponentProviderFactoryInitilizer {
     private static final Logger LOGGER = Logger.getLogger(
             EJBComponentProviderFactoryInitilizer.class.getName());
 
-    public static IoCComponentProviderFactory getComponentProviderFactory() {
+    public static void initialize(ResourceConfig rc) {
         try {
             Object interceptorBinder = new InitialContext().
                     lookup("java:org.glassfish.ejb.container.interceptor_binding_spi");
@@ -61,7 +60,7 @@ public final class EJBComponentProviderFactoryInitilizer {
             // the name
             if (interceptorBinder == null) {
                 LOGGER.config("The EJB interceptor binding API is not available. JAX-RS EJB support is disabled.");
-                return null;
+                return;
             }
             
             Method interceptorBinderMethod = interceptorBinder.getClass().
@@ -73,22 +72,19 @@ public final class EJBComponentProviderFactoryInitilizer {
                 interceptorBinderMethod.invoke(interceptorBinder, interceptor);
             } catch (Exception ex) {
                 LOGGER.log(Level.SEVERE, "Error when configuring to use the EJB interceptor binding API. JAX-RS EJB support is disabled.", ex);
-                return null;
+                return;
             }
 
-            return new EJBComponentProviderFactory(interceptor);
+            rc.getSingletons().add(new EJBComponentProviderFactory(interceptor));
+            rc.getClasses().add(EJBExceptionMapper.class);
         } catch (NamingException ex) {
             LOGGER.log(Level.CONFIG, "The EJB interceptor binding API is not available. JAX-RS EJB support is disabled.", ex);
-            return null;
         } catch (NoSuchMethodException ex) {
             LOGGER.log(Level.SEVERE, "The EJB interceptor binding API does not conform to what is expected. JAX-RS EJB support is disabled.", ex);
-            return null;
         } catch (SecurityException ex) {
             LOGGER.log(Level.SEVERE, "Security issue when configuring to use the EJB interceptor binding API. JAX-RS EJB support is disabled.", ex);
-            return null;
         } catch (LinkageError ex) {
             LOGGER.log(Level.SEVERE, "Linkage error when configuring to use the EJB interceptor binding API. JAX-RS EJB support is disabled.", ex);
-            return null;
         }
     }
 }

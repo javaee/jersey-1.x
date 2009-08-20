@@ -34,20 +34,38 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.server.impl.ejb;
 
-import com.sun.jersey.api.container.MappableContainerException;
-import javax.ejb.ApplicationException;
+import javax.ejb.EJBException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Providers;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ApplicationException
-public final class EJBMappableException extends MappableContainerException {
-    
-    public EJBMappableException(Throwable ex) {
-        super(ex);
+public class EJBExceptionMapper implements ExceptionMapper<EJBException> {
+
+    private final Providers providers;
+
+    public EJBExceptionMapper(@Context Providers providers) {
+        this.providers = providers;
+    }
+
+    public Response toResponse(EJBException exception) {
+        final Exception cause = exception.getCausedByException();
+        if (cause != null) {
+            final ExceptionMapper mapper = providers.getExceptionMapper(cause.getClass());
+            if (mapper != null) {
+                return mapper.toResponse(cause);
+            } else if (cause instanceof WebApplicationException) {
+                return ((WebApplicationException)cause).getResponse();
+            }
+        }
+
+        return Response.serverError().build();
     }
 }

@@ -63,7 +63,10 @@ public class ExceptionMapperFactory {
 
     private Set<ExceptionMapperType> emts = new HashSet<ExceptionMapperType>();
     
-    public ExceptionMapperFactory(ProviderServices providerServices) {
+    public ExceptionMapperFactory() {
+    }
+
+    public void init(ProviderServices providerServices) {
         for (ExceptionMapper em : providerServices.getProviders(ExceptionMapper.class)) {
             Class<? extends Throwable> c = getExceptionType(em.getClass());
             if (c != null) {
@@ -71,7 +74,7 @@ public class ExceptionMapperFactory {
             }
         }
     }
-    
+
     public ExceptionMapper find(Class<? extends Throwable> c) {
         int distance = Integer.MAX_VALUE;
         ExceptionMapper selectedEm = null;

@@ -431,10 +431,7 @@ public class WebComponent implements ContainerListener {
 
         rc.getClasses().add(JSPTemplateProcessor.class);
 
-        final IoCComponentProviderFactory ejb =
-                EJBComponentProviderFactoryInitilizer.getComponentProviderFactory();
-        if (ejb != null)
-            rc.getSingletons().add(ejb);
+        EJBComponentProviderFactoryInitilizer.initialize(rc);
 
         // glassfish v3 monitoring
         for(GlassfishMonitoringProvider monitoring : ServiceFinder.find(GlassfishMonitoringProvider.class)) {

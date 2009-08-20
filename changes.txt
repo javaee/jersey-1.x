@@ -1,4 +1,8 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 354
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=354
+  Runtime exceptions thrown from Singleton or Stateless Session Beans,
+  such as WebApplicationException, will be mapped appropraitely.
 - Fixed issue 353
   https://jersey.dev.java.net/issues/show_bug.cgi?id=353
   Form reading/writing will use the charset declared in the charset parameter

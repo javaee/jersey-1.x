@@ -567,7 +567,7 @@ public final class WebApplicationImpl implements WebApplication {
                 TemplateContext.class, templateContext));
 
         // Obtain all the exception mappers
-        this.exceptionFactory = new ExceptionMapperFactory(providerServices);
+        this.exceptionFactory = new ExceptionMapperFactory();
         
         // Obtain all resource method dispatchers
         this.dispatcherFactory = new ResourceMethodDispatcherFactory(providerServices);
@@ -604,6 +604,9 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
                 Providers.class, p));
+
+        // Initiate the exception mappers
+        exceptionFactory.init(providerServices);
         
         // Initiate message body readers/writers
         bodyFactory.init();
