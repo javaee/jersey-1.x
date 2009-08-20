@@ -17,8 +17,9 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- *
- * @author paulsandoz
+ * The test container factory implementation responsible for creating a light-weight
+ * Grizzly server instance.
+ * @author Paul.Sandoz@Sun.COM
  */
 public class GrizzlyTestContainerFactory implements TestContainerFactory {
 
@@ -26,6 +27,12 @@ public class GrizzlyTestContainerFactory implements TestContainerFactory {
         return LowLevelAppDescriptor.class;
     }
 
+    /**
+     * Creates an instance of {@link GrizzlyTestContainer}
+     * @param Base URI of the application
+     * @param An instance of {@link AppDescriptor}
+     * @return An instance of {@link GrizzlyTestContainer}
+     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
         if (!(ad instanceof LowLevelAppDescriptor))
             throw new IllegalArgumentException(
@@ -34,6 +41,10 @@ public class GrizzlyTestContainerFactory implements TestContainerFactory {
         return new GrizzlyTestContainer(baseUri, (LowLevelAppDescriptor)ad);
     }
 
+    /**
+     * This class has methods for instantiating, starting and stopping the light-weight
+     * Grizzly server.
+     */
     private static class GrizzlyTestContainer implements TestContainer {
         private static final Logger LOGGER =
                 Logger.getLogger(GrizzlyTestContainer.class.getName());
@@ -42,6 +53,11 @@ public class GrizzlyTestContainerFactory implements TestContainerFactory {
 
         final URI baseUri;
 
+        /**
+         * Creates an instance of {@link GrizzlyTestContainer}
+         * @param Base URI of the application
+         * @param An instance of {@link LowLevelAppDescriptor}
+         */
         GrizzlyTestContainer(URI baseUri, LowLevelAppDescriptor ad) {
             this.baseUri = UriBuilder.fromUri(baseUri).path(ad.getContextPath()).build();
             
@@ -55,14 +71,25 @@ public class GrizzlyTestContainerFactory implements TestContainerFactory {
             }
         }
 
+        /**
+         * Creates a {@link Client} instance
+         * @return A {@link Client} instance
+         */
         public Client getClient() {
             return null;
         }
 
+        /**
+         * Returns the base URI of the application
+         * @return Application base URI
+         */
         public URI getBaseUri() {
             return baseUri;
         }
-        
+
+        /**
+         * Starts the test container
+         */
         public void start() {
             try {
                 LOGGER.info("Starting low level grizzly container");
@@ -74,6 +101,9 @@ public class GrizzlyTestContainerFactory implements TestContainerFactory {
             }
         }
 
+        /**
+         * Stops the test container
+         */
         public void stop() {
             if (selectorThread.isRunning()) {
                 LOGGER.info("Stopping low level grizzly container");
@@ -81,6 +111,14 @@ public class GrizzlyTestContainerFactory implements TestContainerFactory {
             }
         }
 
+        /**
+         * Creates an instance of {@link SelectorThread}
+         * @param The application base URI
+         * @param An instance of {@link Adapter}
+         * @return A {@link SelectorThread} instance
+         * @throws IOException
+         * @throws IllegalArgumentException
+         */
         public static SelectorThread create(URI u, Adapter adapter)
                 throws IOException, IllegalArgumentException {
             if (u == null)

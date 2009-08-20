@@ -60,8 +60,9 @@ import org.glassfish.embed.ScatteredArchive;
 import org.glassfish.embed.Server;
 
 /**
- *
- * @author naresh
+ * The test container factory implementation responsible for creating an
+ * EmbeddedGlassFish instance.
+ * @author Srinivas.Bhimisetty@Sun.COM
  */
 public class EmbeddedGlassFishTestContainerFactory implements TestContainerFactory {
 
@@ -69,6 +70,12 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
         return WebAppDescriptor.class;
     }
 
+    /**
+     * Creates an instance of {@link EmbeddedGlassFishTestContainer}
+     * @param Base URI of the application
+     * @param An instance of {@link AppDescriptor}
+     * @return An instance of {@link EmbeddedGlassFishTestContainer}
+     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
         if (!(ad instanceof WebAppDescriptor))
             throw new IllegalArgumentException(
@@ -77,6 +84,9 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
         return new EmbeddedGlassFishTestContainer(baseUri, (WebAppDescriptor)ad);
     }
 
+    /**
+     * This class has methods for instantiating , starting and stopping EmbeddedGlassFish.
+     */
     private static class EmbeddedGlassFishTestContainer implements TestContainer {
         
         private static final Logger LOGGER =
@@ -102,6 +112,11 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
 
         final String TARGET_CLASSES_PATH = "target/classes";
 
+        /**
+         * Creates an instance of {@link EmbeddedGlassFishTestContainer}
+         * @param Base URI of the application
+         * @param An instance of {@link AppDescriptor}
+         */
         private EmbeddedGlassFishTestContainer(URI baseUri, WebAppDescriptor ad) {
             this.baseUri = UriBuilder.fromUri(baseUri)
                     .path(ad.getContextPath())
@@ -114,14 +129,25 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             createArchive();
         }
 
+        /**
+         * Returns the Client instance.
+         * @return {@link Client} instance.
+         */
         public Client getClient() {
             return null;
         }
 
+        /**
+         * Returns the base URI of the application
+         * @return Base URI of the application.
+         */
         public URI getBaseUri() {
             return this.baseUri;
         }
 
+        /**
+         * Starts the EmbeddedGlassFish instance
+         */
         public void start() {
             LOGGER.info("Starting the EmbeddedGlassFish instance...");
             try {
@@ -132,6 +158,9 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             }             
         }
 
+        /**
+         * Stops the EmbeddedGlassFish instance
+         */
         public void stop() {
             LOGGER.info("Stopping the EmbeddedGlassFish instance...");
             try {
@@ -142,6 +171,9 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             }             
         }
 
+        /**
+         * Instantiates EmbeddedGlassFish
+         */
         private void instantiateServer() {
             embeddedInfo = new EmbeddedInfo();
             embeddedInfo.setLogging(false);
@@ -159,6 +191,10 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             }             
         }
 
+        /**
+         * Checks is web.xml exists or not, if not generates one on the fly.
+         * @return Whether web.xml is generated on the fly.
+         */
         private boolean webXmlGeneratedOnTheFly() {
             if( !webXmlExists() ) {
                 File webXmlDir = new File(TARGET_WEBAPP_PATH + "/" + WEB_INF_PATH);
@@ -190,6 +226,9 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             return webXml.exists();
         }
 
+        /**
+         * Creates an archive of the application for deployment.
+         */
         private void createArchive() {
             // create an archive of the deployment descriptor and test classes
             if ( !webXmlGeneratedOnTheFly() ) {

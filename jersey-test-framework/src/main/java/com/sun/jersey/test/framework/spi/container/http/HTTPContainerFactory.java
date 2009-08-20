@@ -47,15 +47,14 @@ import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
-import java.io.IOException;
 import java.net.URI;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- *
- * @author naresh
+ * The test container factory implementation responsible for creating a HTTPServer
+ * instance.
+ * @author Srinivas.Bhimisetty@Sun.COM
  */
 public class HTTPContainerFactory implements TestContainerFactory {
 
@@ -63,6 +62,12 @@ public class HTTPContainerFactory implements TestContainerFactory {
         return LowLevelAppDescriptor.class;
     }
 
+    /**
+     * Creates an instance of the HTTPServer test container
+     * @param Base URI of the application
+     * @param An instance of {@link LowLevelAppDescriptor}
+     * @return An instance of {@link TestContainer}
+     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
 
         if (!(ad instanceof LowLevelAppDescriptor))
@@ -72,6 +77,10 @@ public class HTTPContainerFactory implements TestContainerFactory {
         return new HTTPTestContainer(baseUri, (LowLevelAppDescriptor)ad);
     }
 
+    /**
+     * The class provides methods for starting/stopping the HTTPServer test container,
+     * and running tests on the HTTPTestContainer.
+     */
     private static class HTTPTestContainer implements TestContainer {
 
         private static final Logger LOGGER =
@@ -85,6 +94,11 @@ public class HTTPContainerFactory implements TestContainerFactory {
 
         final HttpServer httpServer;
 
+        /**
+         * Creates an instance of the HTTPTestContainer
+         * @param Base URI of the application
+         * @param A {@link LowLevelAppDescriptor} instance
+         */
         HTTPTestContainer(URI baseUri, LowLevelAppDescriptor ad) {
             this.baseUri = UriBuilder.fromUri(baseUri).path(ad.getContextPath()).build();
             LOGGER.info("Creating low level http container configured at the base URI "
@@ -100,19 +114,33 @@ public class HTTPContainerFactory implements TestContainerFactory {
 
         }
 
+        /**
+         * Creates a Client instance
+         * @return An instance of {@link Client}
+         */
         public Client getClient() {
             return null;
         }
 
+        /**
+         * Returns base URI of the application
+         * @return Base URI of the application
+         */
         public URI getBaseUri() {
             return baseUri;
         }
 
+        /**
+         * Starts the HTTPServer test container.
+         */
         public void start() {
             LOGGER.info("Starting low level HTTPServer container");
             httpServer.start();
         }
 
+        /**
+         * Stops the HTTPServer test container.
+         */
         public void stop() {
             LOGGER.info("Stopping low level HTTPServer container");
             httpServer.stop(0);

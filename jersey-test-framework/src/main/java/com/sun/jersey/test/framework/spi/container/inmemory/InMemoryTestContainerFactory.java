@@ -54,8 +54,9 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- *
- * @author naresh
+ * The test container factory implementation responsible for creating an In-memory
+ * container.
+ * @author Srinivas.Bhimisetty@Sun.COM
  */
 public class InMemoryTestContainerFactory implements TestContainerFactory {
 
@@ -63,6 +64,12 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
         return LowLevelAppDescriptor.class;
     }
 
+    /**
+     * Creates an instance of the In-memory or In-process test container.
+     * @param The baseUri of the application
+     * @param An instance of {@link AppDescriptor}
+     * @return An instance of {@link InMemoryTestContainer}
+     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
         if (!(ad instanceof LowLevelAppDescriptor))
             throw new IllegalArgumentException(
@@ -71,6 +78,10 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
         return new InMemoryTestContainer(baseUri, (LowLevelAppDescriptor)ad);
     }
 
+    /**
+     * The class defines methods for starting/stopping an in-memory test container,
+     * and for running tests on the container.
+     */
     private static class InMemoryTestContainer implements TestContainer {
 
         private static final Logger LOGGER =
@@ -82,6 +93,11 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
 
         final WebApplication webApp;
 
+        /**
+         * Creates an instance of {@link InMemoryTestContainer}
+         * @param Base URI of the application
+         * @param An instance of {@link LowLevelAppDescriptor}
+         */
         private InMemoryTestContainer(URI baseUri, LowLevelAppDescriptor ad) {
             this.baseUri = UriBuilder.fromUri(baseUri).build();
 
@@ -96,6 +112,10 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
             this.webApp = initiateWebApplication(resourceConfig);
         }
 
+        /**
+         * Creates a Client instance
+         * @return A {@link Client} instance
+         */
         public Client getClient() {
             ClientConfig clientConfig = null;
             Set<Object> providerSingletons = resourceConfig.getProviderSingletons();
@@ -114,10 +134,17 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
             return client;
         }
 
+        /**
+         * Returns base URI of the application
+         * @return Base URI of the application
+         */
         public URI getBaseUri() {
             return baseUri;
         }
 
+        /**
+         * Starts the in-memory test container
+         */
         public void start() {
             if (!webApp.isInitiated()) {
                 LOGGER.info("Starting low level InMemory test container");
@@ -126,6 +153,9 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
             }
         }
 
+        /**
+         * Stops the in-memory test container
+         */
         public void stop() {
             if (webApp.isInitiated()) {
                 LOGGER.info("Stopping low level InMemory test container");
