@@ -38,7 +38,6 @@
 package com.sun.jersey.server.spi.monitoring.glassfish.ruleevents;
 
 import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
-import com.sun.jersey.server.impl.uri.rules.TerminatingRule;
 import com.sun.jersey.server.spi.monitoring.glassfish.ApplicationStatsProvider;
 import java.util.List;
 
@@ -65,7 +64,18 @@ public class ResourceClassRuleEvent extends AbstractRuleEvent {
 
         for(int i = 0; i < size; i++) {
             if((eventList.get(i) == this) && (size > (i + 1))) {
+                // path is consumed, so no need for rightHandPathRule
                 if(eventList.get(i + 1).getRuleName().equals(HttpMethodRule.class.getSimpleName())) {
+                    appStatsProvider.resourceClassHit(this.getClazz().getClass().getName());
+
+                    break;
+                }
+            }
+
+            if((eventList.get(i) == this) && (size > (i + 2))) {
+                // path is not consumed; sequence of calls can look like
+                // ResourceClassRule; RightHandPathRule; HttpMethodRule
+                if(eventList.get(i + 2).getRuleName().equals(HttpMethodRule.class.getSimpleName())) {
                     appStatsProvider.resourceClassHit(this.getClazz().getClass().getName());
 
                     break;
