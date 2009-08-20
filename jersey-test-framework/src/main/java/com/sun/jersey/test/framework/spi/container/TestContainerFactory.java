@@ -4,8 +4,8 @@ import com.sun.jersey.test.framework.AppDescriptor;
 import java.net.URI;
 
 /**
- *
- * @author paulsandoz
+ * An interface which defines methods for creating instances of {@link TestContainer}.
+ * @author Paul.Sandoz@Sun.COM
  */
 public interface TestContainerFactory  {
     /**

@@ -1,8 +1,9 @@
 package com.sun.jersey.test.framework.spi.container;
 
 /**
- *
- * @author paulsandoz
+ * An exception class which defines exceptions thrown by the {@link TestContainerFactory}
+ * or {@link TestContainer}.
+ * @author Paul.Sandoz@Sun.COM
  */
 public class TestContainerException extends RuntimeException {
     /**

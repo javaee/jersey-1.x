@@ -4,8 +4,9 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 /**
+ * An abstract class which allows the definition of {@link ClientConfig}.
  *
- * @author paulsandoz
+ * @author Paul.Sandoz@Sun.COM
  */
 public abstract class AppDescriptor {
     
@@ -27,6 +28,10 @@ public abstract class AppDescriptor {
         this.cc = b.cc;
     }
 
+    /**
+     * Returns an instance of {@link ClientConfig}
+     * @return An instance of {@link ClientConfig}
+     */
     public ClientConfig getClientConfig() {
         return cc;
     }

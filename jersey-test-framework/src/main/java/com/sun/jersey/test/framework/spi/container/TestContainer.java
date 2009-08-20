@@ -4,8 +4,8 @@ import com.sun.jersey.api.client.Client;
 import java.net.URI;
 
 /**
- *
- * @author paulsandoz
+ * An interface which defines the methods for starting and stopping a test container.
+ * @author Paul.Sandoz@Sun.COM
  */
 public interface TestContainer {
 
@@ -19,7 +19,7 @@ public interface TestContainer {
 
     /**
      * 
-     * @return
+     * @return The application BASE URI
      */
     URI getBaseUri();
     
