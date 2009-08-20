@@ -39,11 +39,6 @@
 package com.sun.jersey.server.spi.monitoring.glassfish;
 
 import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.glassfish.external.probe.provider.PluginPoint;
-import org.glassfish.external.probe.provider.StatsProviderManager;
-
 
 /**
  *
@@ -57,13 +52,8 @@ public class GlassfishMonitoringServiceProvider implements GlassfishMonitoringPr
 
 
     private static synchronized void start() {
-        if(!StatsProviderManager.hasListeners(MONITORING_PROBE_REQUEST_START)) {
-
-            GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
-            StatsProviderManager.register(MONITORING_CONFIG_ELEMENT, PluginPoint.SERVER, "/jersey/global", gsp);
-
-            Logger.getLogger(LOGGER_JERSEY_MONITORING).log(Level.INFO, "GlobalStatsProvider registered");
-        }
+        GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();
+        gsp.register();
     }
 
     @Override

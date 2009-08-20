@@ -76,6 +76,8 @@ public class GlobalStatsProvider {
     private Map<String, ApplicationStatsProvider> applicationStatsProviders;
     private static GlobalStatsProvider INSTANCE = null;
 
+    private boolean registered = false;
+
     private ThreadLocal<List<AbstractRuleEvent>> ruleEvents = new ThreadLocal<List<AbstractRuleEvent>>() {
         @Override
         protected List<AbstractRuleEvent> initialValue() {
@@ -98,6 +100,16 @@ public class GlobalStatsProvider {
         return INSTANCE;
     }
 
+    /**
+     * checks whether GlobalStatsProvider is registered
+     */
+    public synchronized void register() {
+        if(!registered) {
+            StatsProviderManager.register(GlassfishMonitoringServiceProvider.MONITORING_CONFIG_ELEMENT, PluginPoint.SERVER, "/jersey/global", this);
+            Logger.getLogger(GlassfishMonitoringServiceProvider.LOGGER_JERSEY_MONITORING).log(Level.INFO, "GlobalStatsProvider registered");
+            registered = true;
+        }
+    }
 
     @ManagedAttribute(id="applicationlist")
     public Set<String> getApplications() {
