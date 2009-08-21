@@ -411,14 +411,13 @@ web containers like GlassFish, Tomcat, etc. One interesting feature
 of this framework is that it takes care of the instantiation*,
 deployment* and testing of your web services. The test class just
 needs to extend the class com.sun.jersey.test.framework.JerseyTest.</P>
-<P>For more information on this framework please go through this blog
-entry on <A HREF="http://blogs.sun.com/naresh/entry/jersey_test_framework_makes_it">Jersey
-Test Framework</A>. 
-</P>
-<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/test/framework/jersey-test-framework/1.1.2-ea-SNAPSHOT/jersey-test-framework-1.1.2-ea-SNAPSHOT.pom">jersey-test-framework</A>
+<P>Starting with Jersey version 1.1.2-ea, some major changes 
+have been made in the framework, to provide better pluggability of more container 
+types to the framework.</P>
+<P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/1.1.2-ea-SNAPSHOT/jersey-test-framework-1.1.2-ea-SNAPSHOT.pom">jersey-test-framework</A>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
-    &lt;groupId&gt;com.sun.jersey.test.framework&lt;/groupId&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-test-framework&lt;/artifactId&gt;
     &lt;version&gt;1.1.2-ea-SNAPSHOT&lt;/version&gt;
     &lt;scope&gt;test&lt;/scope&gt;
@@ -428,8 +427,33 @@ deploying on external containers. But it is planned to be supported
 in the coming versions. To test a service with an external container
 like GlassFish, create a war file using <B>mvn clean package
 -Dmaven.test.skip=true</B>, deploy it on the container, and then to
-run the tests use the command: <B>mvn test -Dcontainer.type=External
+run the tests use the command: <B>mvn test -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory
 -DJERSEY_HTTP_PORT=</B>&lt;HTTP_PORT&gt;. 
 </P>
+<BR>
+<P>PS: If you are using a version of Jersey older than 1.1.2-ea, please go through the blog
+entry on <A HREF="http://blogs.sun.com/naresh/entry/jersey_test_framework_makes_it">Jersey
+Test Framework</A> for detailed instructions on how to use the framework in your application. 
+Also, observe that the maven dependency groupId for the <I>jersey-test-framework</i> has changed 
+from <I>com.sun.jersey.test.framework</I> to <I>com.sun.jersey</I>.
+</P>
+<P> One more major change is - the way the test container on which the tests are run is specified.
+In the earlier versions, we used the system property <I>container.type</I> to specify the container 
+on which to run the tests, starting with 1.1.2-ea it is required that the test container factory be 
+specified instead of the container type itself. The test container factory is the fully qualified class name
+of the factory class which creates a test container instance. 
+<BR><BR> The framework comes with the following container factory implementations for the test containers:
+<UL>
+	<LI>com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory - for the HTTPServer</LI>
+	<LI>com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory - for the In-memory or in-process test container</LI>
+	<LI>com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory - for the light-weight Grizzly server</LI>
+	<LI>com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory - for the Grizzly Web Server</LI>
+	<LI>com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory - for EmbeddedGlassFish</LI>
+	<LI>com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory - for any external server like GlassFish, Tomcat, etc.</LI>
+</UL>
+<BR> If you want to run your tests with the Grizzly Web Server, it could be specified as follows:
+<PRE STYLE="margin-left: 0.79in">mvn test -Dtest.containerFactory = com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory
+</PRE>
+
 </BODY>
 </HTML>
