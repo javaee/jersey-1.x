@@ -6,37 +6,87 @@ import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory;
+import com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory;
 import java.net.URI;
-import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 import org.junit.After;
 import org.junit.Before;
 
 /**
- * The JerseyTest class provides the infrastructure to initialise, instantiate and start
- * a test container, and deploy and/or run tests on the container.
- * The application test classes just have to extend this class, and call one of its
- * constructors which takes care of instantiating the test environment.
- * The JerseyTest class is built using the JUnit 4.x framework.
- * <p>Currently the framework provides support for the following container types:
- * <ul>
- *  <li>Lightweight Grizzly</li>
- *  <li>In Memory Container</li>
- *  <li>HTTPServer</li>
- *  <li>EmbeddedGlassFish</li>
- *  <li>Grizzly Web Container</li>
- *  <li>External Container*</li>
- * </ul>
+ * An abstract JUnit 4.x-based unit test class for testing JAX-RS and 
+ * Jersey-based applications.
  * <p>
- * &nbsp;&nbsp;&nbsp;&nbsp;Note: Currently the framework doesn't take care of starting
- * the external container types, but it does allow running tests against an external
- * container like GlassFish or Tomcat, if the application is deployed (explicitly) in the
- * container.
+ * At construction this class will obtain a test container factory, of type
+ * {@link TestContainerFactory}, and use that to obtain a configured test
+ * container, of type {@link TestContainer}.
+ * <p>
+ * Before a test method, in an extending class, is run the 
+ * {@link TestContainer#start() } method is invoked. After the test method has
+ * run the {@link TestContainer#stop() } method is invoked.
+ * The test method can invoke the {@link #resource() } to obtain a
+ * {@link WebResource} from which requests may be sent to and responses recieved
+ * from the Web application under test.
+ * <p>
+ * If a test container factory is not explictly declared using the appropriate
+ * constructor (see {@link #JerseyTest(TestContainerFactory) }) then a default
+ * test container factory will be obtained as follows.
+ * If the system property {@literal test.containerFactory} is set and the
+ * value is a fully qualified class name of a class that extends from
+ * {@link TestContainerFactory} then the default test container factory will
+ * be an instance of that class. The exception {@link TestContainerException}
+ * will be thrown if the class cannot be loaded or instantiated.
+ * If the system property {@literal test.containerFactory} is not set then
+ * the default test container factory will be an instance of 
+ * {@link com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory}.
+ * The exception {@link TestContainerException} will be thrown if this class 
+ * cannot be loaded or instantiated.
+ * <p>
+ * The test container is configured from an application descriptor, of type
+ * {@link AppDescriptor}. The exception {@link TestContainerException}
+ * will be thrown if the test container cannot support the application 
+ * descriptor.
+ * An application descriptor is built from an application descriptor builder.
+ * Two application descriptor builders are provided:
+ * <ol>
+ *  <li>A low-level builder, of type {@link LowLevelAppDescriptor.Builder},
+ *      compatible with low-level test containers that do not support Servlets.</li>
+ *  <li>A web-based builder, of type {@link WebAppDescriptor.Builder},
+ *      compatible with web-based test containers that support Servlets.</li>
+ * </ol>
+ * An application descriptor of type {@link WebAppDescriptor} may be
+ * transformed to an application descriptor of type {@link LowLevelAppDescriptor}
+ * if the state of the former is compatible with a low-level description.
+ * <p>
+ * The following low-level test container factories are provided:
+ * <ul>
+ *  <li>{@link GrizzlyTestContainerFactory} for testing with the low-level 
+ *      Grizzly HTTP container.</li>
+ *  <li>{@link HTTPContainerFactory} for testing with the Light Weight HTTP
+ *      server distributed with Java SE 6.</li>
+ *  <li>{@link InMemoryTestContainerFactory} for testing in memory without
+ *      using underlying HTTP client and server side functionality
+ *      to send requests and receive responses.</li>
+ * </ul>
+ * The following Web-based test container factories are provided:
+ * <ul>
+ *  <li>{@link GrizzlyWebTestContainerFactory} for testing with the Grizzly
+ *      Web container and Servlet support.</li>
+ *  <li>{@link EmbeddedGlassFishTestContainerFactory} for testing with
+ *      embedded GlassFish.</li>
+ *  <li>{@link ExternalTestContainerFactory} for testing when the Web
+ *      application is independently deployed in a separate JVM to that of the
+ *      tests. For example, the application may be deployed to the
+ *      Glassfish v2 or v3 application server.</li>
+ * </ul>
+ * 
  * @author Paul.Sandoz@Sun.COM, Srinivas.Bhimisetty@Sun.COM
  */
-public class JerseyTest {
-
-    private static final Logger LOGGER = Logger.getLogger(JerseyTest.class.getName());
+public abstract class JerseyTest {
 
     /**
      * Holds the default test container factory class to be used for running the
@@ -62,21 +112,28 @@ public class JerseyTest {
     private final Client client;
 
     /**
-     * The no argument constructor.
-     * The test class has to provide an implementaion for the {@link #configure()} method,
-     * in order to use this variant of the constructor.
+     * An extending class must implement the {@link #configure()} method to 
+     * provide an application descriptor.
+     *
+     * @throws TestContainerException if the default test container factory
+     *         cannot be obtained, or the application descriptor is not
+     *         supported by the test container factory.
      */
-    public JerseyTest() {
+    public JerseyTest() throws TestContainerException {
         AppDescriptor ad = configure();
         this.tc = getContainer(ad, getTestContainerFactory());
         this.client = getClient(tc, ad);
     }
 
     /**
-     * This variant of the constructor takes as parameter an instance of the test
-     * container factory. The test class has to provide an implementation of the
-     * {@link #configure()} method.
-     * @param testContainerFactory
+     * Contruct a new instance with a test container factory.
+     * <p>
+     * An extending class must implement the {@link #configure()} method to 
+     * provide an application descriptor.
+     *
+     * @param testContainerFactory the test container factory to use for testing.
+     * @throws TestContainerException if the application descriptor is not
+     *         supported by the test container factory.
      */
     public JerseyTest(TestContainerFactory testContainerFactory) {
         setTestContainerFactory(testContainerFactory);
@@ -86,10 +143,19 @@ public class JerseyTest {
     }
 
     /**
-     * The test class has to provide an implementation for this method.
-     * It is used to build an instance of {@link AppDescriptor} which describes
-     * the class of containers with which the tests would be run.
-     * @return An instance of {@link AppDescriptor}
+     * Return an application descriptor that defines how the test container
+     * is configured.
+     * <p>
+     * If a constructor is utilized that does not supply an application
+     * descriptor then this method must be overriden to return an application
+     * descriptor, otherwise an {@link UnsupportedOperationException} exception
+     * will be thrown.
+     * <p>
+     * If a constructor is utilized that does supply an application descriptor
+     * then this method does not require to be overridden and will not be
+     * invoked.
+     *
+     * @return the application descriptor.
      */
     protected AppDescriptor configure() {
         throw new UnsupportedOperationException(
@@ -97,43 +163,71 @@ public class JerseyTest {
     }
 
     /**
-     * This variant of the constructor takes an <link>AppDescriptor</link> instance
-     * as argument and creates an instance of the test container.
-     * @param An instance of {@link AppDescriptor}
+     * Construct a new instance with an application descriptor that defines
+     * how the test container is configured.
+     *
+     * @param ad an application descriptor describing how to configure the 
+     *        test container.
+     * @throws TestContainerException if the default test container factory
+     *         cannot be obtained, or the application descriptor is not
+     *         supported by the test container factory.
      */
-    public JerseyTest(AppDescriptor ad) {
+    public JerseyTest(AppDescriptor ad) throws TestContainerException {
         this.tc = getContainer(ad, getTestContainerFactory());
         this.client = getClient(tc, ad);
     }
 
     /**
-     * This variant of the constructor takes as argument, an array or a comma separated
-     * list of package names which contain resource classes. It builds an instance of
-     * {@link WebAppDescriptor} and passes it to the
-     * {@link #JerseyTest(com.sun.jersey.test.framework.AppDescriptor)} constructor.
-     * @param A string containing the fully qualified root resource package name or
-     * an array of fully qualified package names delimited by a semi-colon.
+     * Construct a new instance with an array or a colon separated
+     * list of package names which contain resource and provider classes.
+     * <p>
+     * This contructor builds an instance of {@link WebAppDescriptor} passing
+     * the package names to the constructor.
+     * 
+     * @param packages array or a colon separated list of package names which
+     *        contain resource and provider classes.
+     * @throws TestContainerException if the default test container factory
+     *         cannot be obtained, or the built application descriptor is not
+     *         supported by the test container factory.
      */
-    public JerseyTest(String... packages) {
+    public JerseyTest(String... packages) throws TestContainerException {
         this(new WebAppDescriptor.Builder(packages).build());
     }
 
     /**
-     * Sets the test container factory to the passed {@link TestContainerFactory}
-     * instance.
-     * @param An instance of {@link TestContainerFactory}.
+     * Sets the test container factory to to be used for testing.
+     * 
+     * @param testContainerFactory the test container factory to to be used for
+     *        testing.
      */
     protected void setTestContainerFactory(TestContainerFactory testContainerFactory) {
         this.testContainerFactory = testContainerFactory;
     }
 
     /**
-     * Returns the test container factory instance.
-     * <p>When overridden by a test class it sets the default test container factory
-     * for the application.
-     * @return An instance of {@link TestContainerFactory}
+     * Get the test container factory.
+     * <p>
+     * If the test container factory has not been explicit set with 
+     * {@link #setTestContainerFactory(TestContainerFactory) } then
+     * the default test container factory will be obtained.
+     * <p>
+     * If the system property {@literal test.containerFactory} is set and the
+     * value is a fully qualified class name of a class that extends from
+     * {@link TestContainerFactory} then the default test container factory will
+     * be an instance of that class. The exception {@link TestContainerException}
+     * will be thrown if the class cannot be loaded or instantiated.
+     * If the system property {@literal test.containerFactory} is not set then
+     * the default test container factory will be an instance of
+     * {@link com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory}.
+     * The exception {@link TestContainerException} will be thrown if this class
+     * cannot be loaded or instantiated.
+     *
+     *
+     * @return the test container factory.
+     * @throws TestContainerException if the default test container factory
+     *         cannot be obtained.
      */
-    protected TestContainerFactory getTestContainerFactory() {
+    protected TestContainerFactory getTestContainerFactory() throws TestContainerException {
         if (testContainerFactory == null)
             testContainerFactory = getDefaultTestContainerFactory();
 
@@ -141,26 +235,28 @@ public class JerseyTest {
     }
 
     /**
-     * Creates an instance of {@link WebResource} pointing to the application's base
-     * URI.
-     * @return An instance of {@link WebResource}
+     * Create a web resource whose URI refers to the base URI the Web
+     * application is deployed at.
+     *
+     * @return the created web resource
      */
     public WebResource resource() {
         return client.resource(tc.getBaseUri());
     }
 
     /**
-     * Returns an instance of {@link Client}.
-     * @return An instance of {@link Client}
+     * Get the client that is configured for this test.
+     *
+     * @return the configured client.
      */
     public Client client() {
         return client;
     }
 
     /**
-     * This {@code @Before} annotated method calls the {@link TestContainer}
-     * instance's {@code start()} method. The method gets called before executing
-     * each test method.
+     * Set up the test by invoking {@link TestContainer#start() } on
+     * the test container obtained from the test container factory.
+     *
      * @throws Exception
      */
     @Before
@@ -169,8 +265,9 @@ public class JerseyTest {
     }
 
     /**
-     * This {@code @After} annotated method calls the {@link TestContainer} instance's
-     * {@code stop()} method. The method gets called after executing each test method.
+     * Tear down the test by invoking {@link TestContainer#stop() } on
+     * the test container obtained from the test container factory.
+     *
      * @throws Exception
      */
     @After
@@ -196,7 +293,7 @@ public class JerseyTest {
                 ad.getClass() == WebAppDescriptor.class) {
             ad = LowLevelAppDescriptor.transform((WebAppDescriptor)ad);
         } else if (adType != ad.getClass()) {
-            throw new TestContainerException("The applcation descriptor type, " +
+            throw new TestContainerException("The application descriptor type, " +
                     ad.getClass() +
                     ", is not supported by the test container factory, " + tcf);
         }

@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright 1997-2008 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
+ * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,49 +34,46 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-package com.sun.jersey.test.framework;
-
 /**
- * The utility constants which hold references to different containers.
- * @author Naresh (Srinivas.Bhimisetty@Sun.Com)
- */
-public interface TestConstants {
+ * Provides support for testing JAX-RS and Jersey-based applications.
+ * <p>
+ * The {@link com.sun.jersey.test.framework.JerseyTest} class may be extended 
+ * to define the testing configuration and functionality. For example, the
+ * following class is configured to use the low-level Grizzly test container
+ * factory, {@link com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory},
+ * and test that a simple resource, <code>TestResource</code> returns the
+ * expected results for a GET request.
+ * <blockquote><pre>
+public class SimpleGrizzlyTest extends JerseyTest {
 
-    /**
-     * Reference to embedded glassfish.
-     */
-    public static final String EMBEDDED_GF_V3 = "EmbeddedGF";
+    &#64;Path("root")
+    public static class TestResource {
+        &#64;GET
+        public String get() {
+            return "GET";
+        }
+    }
 
-    /**
-     * Reference to the Grizzly web server.
-     */
-    public static final String GRIZZLY_WEB_CONTAINER = "GrizzlyWeb";
+    public GrizzlyClassesTest() {
+        super(new LowLevelAppDescriptor.Builder(TestResource.class).
+                contextPath("context").
+                build());
+    }
 
-    /**
-     * Reference to the Grizzly server.
-     */
-    public static final String GRIZZLY_CONTAINER = "Grizzly";
+    &#64;Override
+    protected TestContainerFactory getTestContainerFactory() {
+        return new GrizzlyTestContainerFactory();
+    }
 
-    /**
-     * Reference to the Http Server.
-     */
-    public static final String HTTP_SERVER = "HTTPServer";
+    &#64;Test
+    public void testGet() {
+        WebResource r = resource().path("root");
 
-    /**
-     * Reference the regular GlassFish v2.
-     */
-    public static final String GF_V2 = "GFv2";
-
-    /**
-     * Reference to the regular Glassfish v3.
-     */
-    public static final String GF_V3 = "GFv3";
-
-    /**
-     * The port at which HTTP listener is to be configured, if the
-     * value is not set as an environment variable.
-     */
-    public static final int JERSEY_HTTP_PORT = 9998;
-    
+        String s = r.get(String.class);
+        Assert.assertEquals("GET", s);
+    }
 }
+ * </blockquote></pre>
+ * 
+ */
+package com.sun.jersey.test.framework;
