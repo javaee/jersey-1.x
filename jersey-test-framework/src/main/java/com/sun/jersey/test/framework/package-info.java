@@ -44,7 +44,7 @@
  * and test that a simple resource, <code>TestResource</code> returns the
  * expected results for a GET request.
  * <blockquote><pre>
-public class SimpleGrizzlyTest extends JerseyTest {
+public class SimpleLowLevelGrizzlyTest extends JerseyTest {
 
     &#64;Path("root")
     public static class TestResource {
@@ -54,7 +54,7 @@ public class SimpleGrizzlyTest extends JerseyTest {
         }
     }
 
-    public GrizzlyClassesTest() {
+    public SimpleLowLevelGrizzlyTest() {
         super(new LowLevelAppDescriptor.Builder(TestResource.class).
                 contextPath("context").
                 build());
