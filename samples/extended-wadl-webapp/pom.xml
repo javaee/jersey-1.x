@@ -127,7 +127,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.test.framework</groupId>
+            <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-test-framework</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
