@@ -67,6 +67,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
+import com.sun.jersey.api.container.filter.UriConnegFilter;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -637,6 +638,24 @@ public final class WebApplicationImpl implements WebApplication {
 
         // Intiate filters
         filterFactory = new FilterFactory(providerServices, resourceConfig);
+        if (!resourceConfig.getMediaTypeMappings().isEmpty() ||
+                !resourceConfig.getLanguageMappings().isEmpty()) {
+            boolean present = false;
+            for (ContainerRequestFilter f : filterFactory.getRequestFilters()) {
+                present |= f instanceof UriConnegFilter;
+            }
+
+            if (!present) {
+                filterFactory.getRequestFilters().add(new UriConnegFilter(
+                        resourceConfig.getMediaTypeMappings(),
+                        resourceConfig.getLanguageMappings()));
+            } else {
+                LOGGER.warning("The media type and language mappings " +
+                        "declared in the ResourceConfig are ignored because " +
+                        "there is an instance of " + UriConnegFilter.class.getName() +
+                        "present in the list of request filters.");
+            }
+        }
 
         // Inject on all components
         cpFactory.injectOnAllComponents();
@@ -700,13 +719,6 @@ public final class WebApplicationImpl implements WebApplication {
 
             if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS)) {
                 path = stripMatrixParams(path);
-            }
-
-            // TODO convert to filter
-            // If there are URI conneg extensions for media and language
-            if (!resourceConfig.getMediaTypeMappings().isEmpty() ||
-                    !resourceConfig.getLanguageMappings().isEmpty()) {
-                uriConneg(path, request);
             }
 
             if (!rootsRule.accept(path, null, localContext)) {
@@ -980,59 +992,6 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         return sb;
-    }
-
-    /**
-     * 
-     */
-    private void uriConneg(StringBuilder path, ContainerRequest request) {
-        int si = path.lastIndexOf("/");
-        // Path ends in slash
-        if (si == path.length() - 1) {
-            // Find the next slash
-            si = path.lastIndexOf("/", si - 1);
-        }
-        // If no slash that set to start of path
-        if (si == -1) {
-            si = 0;
-        }
-
-        MediaType accept = null;
-        for (Map.Entry<String, MediaType> e : resourceConfig.getMediaTypeMappings().entrySet()) {
-            int i = path.indexOf(e.getKey(), si);
-            if (i > 0 && (path.charAt(i - 1) == '.')) {
-                int lengthWithExt = i + e.getKey().length();
-                if (lengthWithExt == path.length()) {
-                    accept = e.getValue();
-                    path.delete(i - 1, lengthWithExt);
-                } else {
-                    char charAfterExt = path.charAt(lengthWithExt);
-                    if (('/' == charAfterExt) || ('.' == charAfterExt)) { 
-                        accept = e.getValue();
-                        path.delete(i - 1, lengthWithExt);
-                    }
-                }
-            }
-        }
-        if (accept != null) {
-            // TODO do not modify request headers
-            MultivaluedMap<String, String> h = request.getRequestHeaders();
-            h.putSingle("Accept", accept.toString());
-        }
-
-        String acceptLanguage = null;
-        for (Map.Entry<String, String> e : resourceConfig.getLanguageMappings().entrySet()) {
-            int i = path.indexOf(e.getKey(), si);
-            if (i > 0 && path.charAt(i - 1) == '.') {
-                acceptLanguage = e.getValue();
-                path.delete(i - 1, i + e.getKey().length());
-            }
-        }
-        if (acceptLanguage != null) {
-            // TODO do not modify request headers
-            MultivaluedMap<String, String> h = request.getRequestHeaders();
-            h.putSingle("Accept-Language", acceptLanguage);
-        }
     }
 
     @SuppressWarnings("unchecked")

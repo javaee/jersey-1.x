@@ -1,4 +1,12 @@
 release 1.1.2-ea (2009-09)
+- Fixed issue 355
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=355
+  URI conneg works for the case of when a suffix say "nt" is present
+  in the path and is not preceded by a '.', for example "/ontology.nl
+  URI conneg is now a container request filter, see:
+  com.sun.jersey.api.container.filter.UriConnegFilter
+  Developers may extend this filters and register it rather than utilizing the
+  ResourceConfig.getMediaTypeMappings and ResourceConfig.getLanguageMappings.
 - Fixed issue 354
   https://jersey.dev.java.net/issues/show_bug.cgi?id=354
   Runtime exceptions thrown from Singleton or Stateless Session Beans,

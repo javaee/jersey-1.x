@@ -38,10 +38,16 @@
 package com.sun.jersey.impl.uri.conneg;
 
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.filter.UriConnegFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
@@ -98,6 +104,18 @@ public class UriConnegMediaTypeTest extends AbstractResourceTester {
         _test("/", "abc");
     }    
     
+    public void testSingleSegmentWithFilter() throws IOException {
+        _initWithFilter(SingleSegment.class, false);
+
+        _test("/", "abc");
+    }
+
+    public void testSingleSegmentWithFilterOverrideResourceConfig() throws IOException {
+        _initWithFilter(SingleSegment.class, true);
+
+        _test("/", "abc");
+    }
+
     @Path("/abc/")
     public static class SingleSegmentSlash extends Base {
     }
@@ -140,6 +158,16 @@ public class UriConnegMediaTypeTest extends AbstractResourceTester {
         _test("/xyz", "abc", ".xml");
     }    
     
+    @Path("/foo_bar_foot")
+    public static class PathWithSuffixSegment extends Base {
+    }
+
+    public void testXXXSegment() throws IOException {
+        _init(PathWithSuffixSegment.class);
+
+        _test("/", "foo_bar_foot");
+    }
+
     @Path("/")
     public static class SubResourceMethods {
         @Path("abc")
@@ -178,6 +206,25 @@ public class UriConnegMediaTypeTest extends AbstractResourceTester {
         initiateWebApplication(rc);        
     }
     
+    private void _initWithFilter(Class<?> r, boolean useMappings) {
+        ResourceConfig rc = new DefaultResourceConfig(r);
+
+        Map<String, MediaType> m = new HashMap<String, MediaType>();
+        m.put("foo", MediaType.valueOf("application/foo"));
+        m.put("bar", MediaType.valueOf("application/bar"));
+        m.put("foot", MediaType.valueOf("application/foot"));
+
+        ContainerRequestFilter f = new UriConnegFilter(m) {};
+        List<ContainerRequestFilter> lf = Collections.singletonList(f);
+        rc.getProperties().put(rc.PROPERTY_CONTAINER_REQUEST_FILTERS, lf);
+
+        if (useMappings) {
+            rc.getMediaTypeMappings().putAll(m);
+        }
+
+        initiateWebApplication(rc);
+    }
+
     private void _test(String base) {
         _test(base, "", "");
     }
