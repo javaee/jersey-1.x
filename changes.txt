@@ -1,4 +1,6 @@
-release 1.1.2-ea (2009-09)
+release 1.1.3-ea (2009-09)
+
+release 1.1.2-ea (2009-08-25)
 - Fixed issue 355
   https://jersey.dev.java.net/issues/show_bug.cgi?id=355
   URI conneg works for the case of when a suffix say "nt" is present
