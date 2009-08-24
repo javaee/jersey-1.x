@@ -79,19 +79,19 @@ public class HMAC_SHA1 implements OAuthSignatureMethod {
             throw new IllegalStateException(nsae);
         }
 
-        // null secrets are interpreted as blank per OAuth specification
         StringBuffer buf = new StringBuffer();
-        String secret = secrets.getConsumerSecret();
 
+        // null secrets are interpreted as blank per OAuth specification
+        String secret = secrets.getConsumerSecret();
         if (secret != null) {
-            buf.append(secret);
+            buf.append(URLCodec.encode(secret));
         }
 
         buf.append('&');
-        secret = secrets.getTokenSecret();
 
-        if (secret != null ) {
-            buf.append(secret);
+        secret = secrets.getTokenSecret();
+        if (secret != null) {
+            buf.append(URLCodec.encode(secret));
         }
 
         byte[] key;
