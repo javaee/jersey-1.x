@@ -38,9 +38,11 @@
  * Provides support for testing JAX-RS and Jersey-based applications.
  * <p>
  * The {@link com.sun.jersey.test.framework.JerseyTest} class may be extended 
- * to define the testing configuration and functionality. For example, the
- * following class is configured to use the low-level Grizzly test container
- * factory, {@link com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory},
+ * to define the testing configuration and functionality.
+ * <p>
+ * For example, the following class is configured to use the low-level Grizzly
+ * test container factory,
+ * {@link com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory},
  * and test that a simple resource, <code>TestResource</code> returns the
  * expected results for a GET request.
  * <blockquote><pre>
@@ -74,6 +76,43 @@ public class SimpleLowLevelGrizzlyTest extends JerseyTest {
     }
 }
  * </blockquote></pre>
- * 
+ * <p>
+ * The following tests the same functionality using the Web-based Grizzly
+ * test container factory,
+ * {@link com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory}.
+ * <blockquote><pre>
+package foo;
+
+public class WebBasedTest extends JerseyTest {
+
+    &#64;Path("root")
+    public static class TestResource {
+        &#64;GET
+        public String get() {
+            return "GET";
+        }
+    }
+
+    public WebBasedTest() {
+        super(new WebAppDescriptor.Builder("foo").
+                contextPath("context").
+                build());
+    }
+
+    &#64;Test
+    public void testGet() {
+        WebResource r = resource().path("root");
+
+        String s = r.get(String.class);
+        Assert.assertEquals("GET", s);
+    }
+}
+ * </blockquote></pre>
+ * The above test is actually not specific to any Web-based test container 
+ * factory and will work for all provided test container factories, however the
+ * default factory will be the
+ * {@link com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory}.
+ * See the documentation on {@link com.sun.jersey.test.framework.JerseyTest} for
+ * more details on how to set the default test container factory.
  */
 package com.sun.jersey.test.framework;

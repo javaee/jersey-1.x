@@ -45,8 +45,11 @@ import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- * The test container factory implementation responsible for running tests on an
- * external container.
+ * A Web-based test container factory for creating test container instances 
+ * when the Web application is independently deployed in a separate JVM to that
+ * of the tests. For example, the application may be deployed to the
+ * Glassfish v2 or v3 application server.
+ * 
  * @author Srinivas.Bhimisetty@Sun.COM
  */
 public class ExternalTestContainerFactory implements TestContainerFactory {
@@ -55,12 +58,6 @@ public class ExternalTestContainerFactory implements TestContainerFactory {
         return WebAppDescriptor.class;
     }
 
-    /**
-     * Creates an instance of {@link ExternalTestContainer}
-     * @param Base URI of the application
-     * @param An instance of {@link WebAppDescriptor}
-     * @return An instance of {@link ExternalTestContainer}
-     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
         if (!(ad instanceof WebAppDescriptor))
             throw new IllegalArgumentException(
@@ -93,16 +90,10 @@ public class ExternalTestContainerFactory implements TestContainerFactory {
             return baseUri;
         }
 
-        /**
-         * An empty implementation which does nothing
-         */
         public void start() {
             // do nothing
         }
 
-        /**
-         * An empty implementation which does nothing
-         */
         public void stop() {
             // do nothing
         }

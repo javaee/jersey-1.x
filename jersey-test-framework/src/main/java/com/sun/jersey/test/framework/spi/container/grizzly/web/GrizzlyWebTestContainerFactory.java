@@ -52,8 +52,9 @@ import javax.servlet.Servlet;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- * The test container factory implementation responsible for creating a Grizzly Web
- * Server instance.
+ * A Web-based test container factory for creating test container instances
+ * using Grizzly.
+ *
  * @author Srinivas.Bhimisetty@Sun.COM
  */
 public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
@@ -62,12 +63,6 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
         return WebAppDescriptor.class;
     }
 
-    /**
-     * Creates an instance of {@link GrizzlyWebTestContainer}
-     * @param Base URI of the application
-     * @param An instance of {@link AppDescriptor}
-     * @return An instance of {@link GrizzlyWebTestContainer}
-     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
         if (!(ad instanceof WebAppDescriptor))
             throw new IllegalArgumentException(
@@ -128,25 +123,14 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         }
 
-        /**
-         * Returns a {@link Client} instance
-         * @return An instance of {@link Client}
-         */
         public Client getClient() {
             return null;
         }
 
-        /**
-         * Returns base URI of the application
-         * @return Base URI
-         */
         public URI getBaseUri() {
             return baseUri;
         }
 
-        /**
-         * Starts the Grizzly Web Server.
-         */
         public void start() {
             LOGGER.info("Starting the Grizzly Web Container...");
             
@@ -158,9 +142,6 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
              
         }
 
-        /**
-         * Stops the Grizzly Web Server
-         */
         public void stop() {
             LOGGER.info("Stopping the Grizzly Web Container...");
             webServer.stop();

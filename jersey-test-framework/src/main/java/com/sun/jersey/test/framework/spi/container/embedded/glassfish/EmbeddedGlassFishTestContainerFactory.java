@@ -60,8 +60,9 @@ import org.glassfish.embed.ScatteredArchive;
 import org.glassfish.embed.Server;
 
 /**
- * The test container factory implementation responsible for creating an
- * EmbeddedGlassFish instance.
+ * A Web-based test container factory for creating test container instances 
+ * using Embedded GlassFish.
+ *
  * @author Srinivas.Bhimisetty@Sun.COM
  */
 public class EmbeddedGlassFishTestContainerFactory implements TestContainerFactory {
@@ -70,12 +71,6 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
         return WebAppDescriptor.class;
     }
 
-    /**
-     * Creates an instance of {@link EmbeddedGlassFishTestContainer}
-     * @param Base URI of the application
-     * @param An instance of {@link AppDescriptor}
-     * @return An instance of {@link EmbeddedGlassFishTestContainer}
-     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
         if (!(ad instanceof WebAppDescriptor))
             throw new IllegalArgumentException(
@@ -129,25 +124,14 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             createArchive();
         }
 
-        /**
-         * Returns the Client instance.
-         * @return {@link Client} instance.
-         */
         public Client getClient() {
             return null;
         }
 
-        /**
-         * Returns the base URI of the application
-         * @return Base URI of the application.
-         */
         public URI getBaseUri() {
             return this.baseUri;
         }
 
-        /**
-         * Starts the EmbeddedGlassFish instance
-         */
         public void start() {
             LOGGER.info("Starting the EmbeddedGlassFish instance...");
             try {
@@ -158,9 +142,6 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             }             
         }
 
-        /**
-         * Stops the EmbeddedGlassFish instance
-         */
         public void stop() {
             LOGGER.info("Stopping the EmbeddedGlassFish instance...");
             try {

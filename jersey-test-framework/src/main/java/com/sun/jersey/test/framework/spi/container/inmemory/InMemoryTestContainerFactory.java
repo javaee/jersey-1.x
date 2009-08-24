@@ -54,8 +54,10 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- * The test container factory implementation responsible for creating an In-memory
- * container.
+ * A low-level test container factory for creating test container instances
+ * when testing in memory without using underlying HTTP client and server side
+ * functionality to send requests and receive responses.
+ *
  * @author Srinivas.Bhimisetty@Sun.COM
  */
 public class InMemoryTestContainerFactory implements TestContainerFactory {
@@ -64,12 +66,6 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
         return LowLevelAppDescriptor.class;
     }
 
-    /**
-     * Creates an instance of the In-memory or In-process test container.
-     * @param The baseUri of the application
-     * @param An instance of {@link AppDescriptor}
-     * @return An instance of {@link InMemoryTestContainer}
-     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
         if (!(ad instanceof LowLevelAppDescriptor))
             throw new IllegalArgumentException(
@@ -112,10 +108,6 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
             this.webApp = initiateWebApplication(resourceConfig);
         }
 
-        /**
-         * Creates a Client instance
-         * @return A {@link Client} instance
-         */
         public Client getClient() {
             ClientConfig clientConfig = null;
             Set<Object> providerSingletons = resourceConfig.getProviderSingletons();
@@ -134,17 +126,10 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
             return client;
         }
 
-        /**
-         * Returns base URI of the application
-         * @return Base URI of the application
-         */
         public URI getBaseUri() {
             return baseUri;
         }
 
-        /**
-         * Starts the in-memory test container
-         */
         public void start() {
             if (!webApp.isInitiated()) {
                 LOGGER.info("Starting low level InMemory test container");
@@ -153,9 +138,6 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
             }
         }
 
-        /**
-         * Stops the in-memory test container
-         */
         public void stop() {
             if (webApp.isInitiated()) {
                 LOGGER.info("Stopping low level InMemory test container");

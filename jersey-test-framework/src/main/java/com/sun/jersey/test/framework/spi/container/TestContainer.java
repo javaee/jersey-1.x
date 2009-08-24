@@ -4,13 +4,14 @@ import com.sun.jersey.api.client.Client;
 import java.net.URI;
 
 /**
- * An interface which defines the methods for starting and stopping a test container.
+ * A test container.
+ * 
  * @author Paul.Sandoz@Sun.COM
  */
 public interface TestContainer {
 
     /**
-     * Obtain a Client specific to the test container.
+     * Get a client specific to the test container.
      *
      * @return a client specific to the test container, otherwise null if there
      *         is no specific client required.
@@ -18,8 +19,9 @@ public interface TestContainer {
     Client getClient();
 
     /**
+     * Get the base URI of the application.
      * 
-     * @return The application BASE URI
+     * @return the base URI of the application.
      */
     URI getBaseUri();
     

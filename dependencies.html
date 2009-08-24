@@ -5,7 +5,7 @@
 	<TITLE>Dependencies</TITLE>
 	<META NAME="GENERATOR" CONTENT="StarOffice 9  (Unix)">
 	<META NAME="CREATED" CONTENT="0;0">
-	<META NAME="CHANGED" CONTENT="20090714;10201800">
+	<META NAME="CHANGED" CONTENT="20090824;14171500">
 	<META NAME="Info 1" CONTENT="">
 	<META NAME="Info 2" CONTENT="">
 	<META NAME="Info 3" CONTENT="">
@@ -208,12 +208,11 @@ module.</P>
 <A HREF="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</A>,
 <A HREF="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</A></BLOCKQUOTE>
 <P>Maven developers, using Java SE 5, that are consuming or producing
-<FONT FACE="Courier New, monospace">T[]</FONT>,
-<FONT FACE="Courier New, monospace">List&lt;T&gt;</FONT> or
-<FONT FACE="Courier New, monospace">Collection&lt;T&gt;</FONT> where
-<FONT FACE="Courier New, monospace">T</FONT> is a JAXB bean require a
-dependency on a StAX implementation, such as Woodstox version 3.2.1
-or greater using the following dependency:</P>
+<FONT FACE="Courier New, monospace">T[]</FONT>, <FONT FACE="Courier New, monospace">List&lt;T&gt;</FONT>
+or <FONT FACE="Courier New, monospace">Collection&lt;T&gt;</FONT>
+where <FONT FACE="Courier New, monospace">T</FONT> is a JAXB bean
+require a dependency on a StAX implementation, such as Woodstox
+version 3.2.1 or greater using the following dependency:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
     &lt;groupId&gt;woodstox&lt;/groupId&gt;
     &lt;artifactId&gt;wstx-asl&lt;/artifactId&gt;
@@ -404,16 +403,17 @@ repository to the pom:</P>
 <BR><BR>
 </P>
 <H2>Jersey Test Framework</H2>
+<P><SPAN STYLE="background: #ffff00">NOTE that breaking changes have
+occurred between 1.1.1-ea and 1.1.2-ea. See the end of this section
+for details.</SPAN></P>
 <P>Jersey Test Framework allows you to test your RESTful Web Services
 on a wide range of containers. It supports light-weight containers
-like GrizzlyWeb, EmbeddedGlassFish, HTTPServer, and also the regualr
-web containers like GlassFish, Tomcat, etc. One interesting feature
-of this framework is that it takes care of the instantiation*,
-deployment* and testing of your web services. The test class just
-needs to extend the class com.sun.jersey.test.framework.JerseyTest.</P>
-<P>Starting with Jersey version 1.1.2-ea, some major changes 
-have been made in the framework, to provide better pluggability of more container 
-types to the framework.</P>
+such as Grizzly, Embedded GlassFish, and the Light Weight HTTP Server
+in addition to regular web containers such as GlassFish and Tomcat.
+Developers may plug in their own containers.</P>
+<P>A developer may write tests using the Junit 4.x framework can
+extend from the abstract <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.1.2-ea-SNAPSHOT/jersey-test-framework/com/sun/jersey/test/framework/JerseyTest.html">JerseyTest</A>
+class.</P>
 <P>Maven developers require a dependency on the <A HREF="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/1.1.2-ea-SNAPSHOT/jersey-test-framework-1.1.2-ea-SNAPSHOT.pom">jersey-test-framework</A>
 module. The following dependency needs to be added to the pom:</P>
 <PRE STYLE="margin-left: 0.79in">&lt;dependency&gt;
@@ -422,38 +422,54 @@ module. The following dependency needs to be added to the pom:</P>
     &lt;version&gt;1.1.2-ea-SNAPSHOT&lt;/version&gt;
     &lt;scope&gt;test&lt;/scope&gt;
 &lt;/dependency&gt;</PRE><P>
-Note: The framework currently doesn't support instantiating and
-deploying on external containers. But it is planned to be supported
-in the coming versions. To test a service with an external container
-like GlassFish, create a war file using <B>mvn clean package
--Dmaven.test.skip=true</B>, deploy it on the container, and then to
-run the tests use the command: <B>mvn test -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory
--DJERSEY_HTTP_PORT=</B>&lt;HTTP_PORT&gt;. 
+When utilizing an embedded container this framework can manage
+deployment and testing of your web services. However, the framework
+currently doesn't support instantiating and deploying on external
+containers. 
 </P>
-<BR>
-<P>PS: If you are using a version of Jersey older than 1.1.2-ea, please go through the blog
-entry on <A HREF="http://blogs.sun.com/naresh/entry/jersey_test_framework_makes_it">Jersey
-Test Framework</A> for detailed instructions on how to use the framework in your application. 
-Also, observe that the maven dependency groupId for the <I>jersey-test-framework</i> has changed 
-from <I>com.sun.jersey.test.framework</I> to <I>com.sun.jersey</I>.
-</P>
-<P> One more major change is - the way the test container on which the tests are run is specified.
-In the earlier versions, we used the system property <I>container.type</I> to specify the container 
-on which to run the tests, starting with 1.1.2-ea it is required that the test container factory be 
-specified instead of the container type itself. The test container factory is the fully qualified class name
-of the factory class which creates a test container instance. 
-<BR><BR> The framework comes with the following container factory implementations for the test containers:
+<P><SPAN STYLE="font-weight: normal">The test framework provides the
+following test container factories:</SPAN></P>
 <UL>
-	<LI>com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory - for the HTTPServer</LI>
-	<LI>com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory - for the In-memory or in-process test container</LI>
-	<LI>com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory - for the light-weight Grizzly server</LI>
-	<LI>com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory - for the Grizzly Web Server</LI>
-	<LI>com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory - for EmbeddedGlassFish</LI>
-	<LI>com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory - for any external server like GlassFish, Tomcat, etc.</LI>
+	<LI><P STYLE="margin-bottom: 0in">com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory<BR>For
+	testing with the Light Weight HTTP server.</P>
+	<LI><P STYLE="margin-bottom: 0in">com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory<BR>For
+	testing in memory without using HTTP.</P>
+	<LI><P STYLE="margin-bottom: 0in">com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory<BR>For
+	testing with low-level Grizzly.</P>
+	<LI><P STYLE="margin-bottom: 0in">com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory<BR>For
+	testing with Web-based Grizzly.</P>
+	<LI><P STYLE="margin-bottom: 0in">com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory<BR>For
+	testing with embedded GlassFish v3. 
+	</P>
+	<LI><P>com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory<BR>For
+	testing with application deployed externally, for example to
+	GlassFish or Tomcat. 
+	</P>
 </UL>
-<BR> If you want to run your tests with the Grizzly Web Server, it could be specified as follows:
-<PRE STYLE="margin-left: 0.79in">mvn test -Dtest.containerFactory = com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory
-</PRE>
-
+<P><SPAN STYLE="font-weight: normal">The system property
+</SPAN><SPAN STYLE="font-weight: normal"><FONT FACE="Courier New, monospace">test.containerFactory</FONT></SPAN><SPAN STYLE="font-weight: normal">
+is utilized to declare the default test container factory that shall
+be used for testing, the value of which is the fully qualified class
+name of a test container factory class. If the property is not
+declared then the GrizzlyWebTestContainerFactory is utilized as
+default test container factory.</SPAN></P>
+<P>To test a maven-based web project with an external container such
+as GlassFish, create the war file then deploy as follows (assuming
+that the pom file is set up for deployment):</P>
+<PRE STYLE="margin-left: 0.79in">mvn clean package -Dmaven.test.skip=true
+</PRE><P STYLE="font-weight: normal">
+Then execute the tests as follows:</P>
+<PRE STYLE="margin-left: 0.79in">mvn test -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -DJERSEY_HTTP_PORT=&lt;HTTP_PORT&gt;
+</PRE><P>
+<SPAN STYLE="background: #ffff00">Breaking changes from 1.1.1-ea to
+1.1.2-ea</SPAN></P>
+<P>The maven project groupId has changed from
+“com.sun.jersey.test.framework” to “com.sun.jersey”.</P>
+<P>The extending of Jersey unit test and configuration has changed.
+See <A HREF="https://jersey.dev.java.net/nonav/apidocs/1.1.2-ea-SNAPSHOT/jersey-test-framework/com/sun/jersey/test/framework/package-summary.html">here</A>
+for an example.</P>
+<P>See the blog entry on <A HREF="http://blogs.sun.com/naresh/entry/jersey_test_framework_makes_it">Jersey
+Test Framework</A> for detailed instructions on how to use 1.1.1-ea
+version of the framework in your application.</P>
 </BODY>
 </HTML>

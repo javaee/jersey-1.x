@@ -52,8 +52,9 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- * The test container factory implementation responsible for creating a HTTPServer
- * instance.
+ * A low-level test container factory for creating test container instances
+ * using the Light Weight HTTP server.
+ *
  * @author Srinivas.Bhimisetty@Sun.COM
  */
 public class HTTPContainerFactory implements TestContainerFactory {
@@ -62,12 +63,6 @@ public class HTTPContainerFactory implements TestContainerFactory {
         return LowLevelAppDescriptor.class;
     }
 
-    /**
-     * Creates an instance of the HTTPServer test container
-     * @param Base URI of the application
-     * @param An instance of {@link LowLevelAppDescriptor}
-     * @return An instance of {@link TestContainer}
-     */
     public TestContainer create(URI baseUri, AppDescriptor ad) {
 
         if (!(ad instanceof LowLevelAppDescriptor))
@@ -114,33 +109,19 @@ public class HTTPContainerFactory implements TestContainerFactory {
 
         }
 
-        /**
-         * Creates a Client instance
-         * @return An instance of {@link Client}
-         */
         public Client getClient() {
             return null;
         }
 
-        /**
-         * Returns base URI of the application
-         * @return Base URI of the application
-         */
         public URI getBaseUri() {
             return baseUri;
         }
 
-        /**
-         * Starts the HTTPServer test container.
-         */
         public void start() {
             LOGGER.info("Starting low level HTTPServer container");
             httpServer.start();
         }
 
-        /**
-         * Stops the HTTPServer test container.
-         */
         public void stop() {
             LOGGER.info("Stopping low level HTTPServer container");
             httpServer.stop(0);

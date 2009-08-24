@@ -2,6 +2,9 @@ package com.sun.jersey.test.framework;
 
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.Filter;
@@ -9,23 +12,51 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServlet;
 
 /**
- *  This class provides the necessary APIs for defining an application, so that
- * it could be deployed and tested on containers like Grizzly Web Server, Embedded
- * GlassFish, etc..
- * <p> It follows the Builder design pattern.
+ * A Web-based application descriptor.
+ * <p>
+ * An instance of this class is created by creating an instance of
+ * {@link Builder}, invoking methods to add/modify state, and finally invoking 
+ * the {@link Builder#build() } method.
+ * <p>
+ * This application descriptor is compatible with web-based test containers
+ * that support Servlets. The following Web-based test container
+ * factories are provided:
+ * <ul>
+ *  <li>{@link GrizzlyWebTestContainerFactory} for testing with the Grizzly
+ *      Web container and Servlet support.</li>
+ *  <li>{@link EmbeddedGlassFishTestContainerFactory} for testing with
+ *      embedded GlassFish.</li>
+ *  <li>{@link ExternalTestContainerFactory} for testing when the Web
+ *      application is independently deployed in a separate JVM to that of the
+ *      tests. For example, the application may be deployed to the
+ *      Glassfish v2 or v3 application server.</li>
+ * </ul>
+ * 
  * @author Paul.Sandoz@Sun.COM
  */
 public class WebAppDescriptor extends AppDescriptor {
 
     /**
-     * The Builder class for building an instance of {@link WebAppDescriptor}.
+     * The builder for building a Web-based application descriptor.
+     * <p>
+     * If properties of the builder are not modified default values be utilized.
+     * The default value for initialization and context parameters is an
+     * empty map.
+     * The default value for the context and servlet path is an empty string.
+     * The default value for the servlet class is the class
+     * {@link ServletContainer}.
+     * The default value for the filter class and the servlet context listener
+     * class is <code>null</code>.
+     * <p>
+     * After the {@link #build() } has been invoked the state of the builder
+     * will be reset to the default values.
      */
     public static class Builder
-            extends AppDescriptorBuilder<Builder> {
+            extends AppDescriptorBuilder<Builder, WebAppDescriptor> {
 
-        protected final Map<String, String> initParams;
+        protected Map<String, String> initParams;
 
-        protected final Map<String, String> contextParams;
+        protected Map<String, String> contextParams;
 
         protected Class<? extends HttpServlet> servletClass = ServletContainer.class;
 
@@ -38,35 +69,46 @@ public class WebAppDescriptor extends AppDescriptor {
         protected String servletPath = "";
 
         /**
-         * Create an instance of the {@link Builder} from a map of application init-params.
-         * @param A map of initParams, with the parameter name and value as key-value pair.
+         * Create a builder.
+         *
          */
-        public Builder(Map<String, String> initParams) {
-            if (initParams == null)
-                throw new IllegalArgumentException("The initialization parameters must not be null");
-            
-            this.initParams = initParams;
-            this.contextParams = new HashMap<String, String>();
+        public Builder() {
         }
 
         /**
-         * Create an instance of the {@link Builder} from an init-param name and value.
-         * @param Init-param name
-         * @param Initi-param value.
+         * Create a builder with initialization parameters.
+         *
+         * @param initParams a map of intialization parameters. The parameters
+         *        will be copied.
+         * @throws IllegalArgumentException if <code>initParams</code> is null.
+         */
+        public Builder(Map<String, String> initParams) throws IllegalArgumentException {
+            if (initParams == null)
+                throw new IllegalArgumentException("The initialization parameters must not be null");
+
+            this.initParams = new HashMap<String, String>();
+            this.initParams.putAll(initParams);
+        }
+
+        /**
+         * Create a builder with one initialization parameter.
+         *
+         * @param name the parameter name.
+         * @param value the parameter value.
          */
         public Builder(String name, String value) {
-            this.initParams = new HashMap<String, String>();
-            this.contextParams = new HashMap<String, String>();
-
             initParam(name, value);
         }
 
         /**
-         * Create an instance of the {@link Builder} from a fully qualified root resource
-         * package name or an array of package names.
-         * @param Root resource package name or an array of package names
+         * Create a builder with one or more package names where
+         * root resource and provider classes reside.
+         *
+         * @param packages one or more package names where
+         *        root resource and provider classes reside.
+         * @throws IllegalArgumentException if <code>packages</code> is null.
          */
-        public Builder(String... packages) {
+        public Builder(String... packages) throws IllegalArgumentException {
             if (packages == null)
                 throw new IllegalArgumentException("The packages must not be null");
 
@@ -76,43 +118,52 @@ public class WebAppDescriptor extends AppDescriptor {
                 sb.append(packageName);
             }
 
-            this.initParams = new HashMap<String, String>();
-            this.initParams.put(PackagesResourceConfig.PROPERTY_PACKAGES,
+            initParam(PackagesResourceConfig.PROPERTY_PACKAGES,
                     sb.toString());
-
-            this.contextParams = new HashMap<String, String>();
         }
 
         /**
-         * Sets an init-param with the passed name and value.
-         * @param Name of the init-param
-         * @param Value of the init-param
-         * @return The {@link Builder} instance.
+         * Add an initialization parameter.
+         *
+         * @param name the parameter name.
+         * @param value the parameter value.
+         * @return this builder.
          */
         public Builder initParam(String name, String value) {
+            if (this.initParams == null)
+                this.initParams = new HashMap<String, String>();
             this.initParams.put(name, value);
 
             return this;
         }
 
         /**
-         * Sets a context-param with the passed name and value.
-         * @param Name of the context-param
-         * @param Value of the context-param
-         * @return The {@link Builder} instance
+         * Add a context parameter.
+         *
+         * @param name the parameter name.
+         * @param value the parameter value.
+         * @return this builder.
          */
         public Builder contextParam(String name, String value) {
+            if (this.contextParams == null)
+                this.contextParams = new HashMap<String, String>();
             this.contextParams.put(name, value);
 
             return this;
         }
 
         /**
-         * Sets the servlet-class.
-         * @param The servlet class of the resource application
-         * @return The {@link Builder} instance
+         * Set the servlet class.
+         * <p>
+         * If the filter class was previously set then the filter class is set
+         * to <code>null</code>.
+         *
+         * @param servletClass the servlet class to serve the application.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>servletClass</code> is null.
          */
-        public Builder servletClass(Class<? extends HttpServlet> servletClass) {
+        public Builder servletClass(Class<? extends HttpServlet> servletClass)
+                throws IllegalArgumentException {
             if (servletClass == null)
                 throw new IllegalArgumentException("The servlet class must not be null");
 
@@ -122,11 +173,17 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
-         * Sets the filter-class.
-         * @param The filter class of the resource application
-         * @return The {@link Builder} instance
+         * Set the filter class.
+         * <p>
+         * If the servlet class was previously set then the servlet class is set
+         * to <code>null</code>.
+         *
+         * @param filterClass the filter class to serve the application.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>filterClass</code> is null.
          */
-        public Builder filterClass(Class<? extends Filter> filterClass) {
+        public Builder filterClass(Class<? extends Filter> filterClass)
+                throws IllegalArgumentException {
             if (filterClass == null)
                 throw new IllegalArgumentException("The filter class must not be null");
 
@@ -136,9 +193,11 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
-         * Sets the application context-path.
-         * @param The context-path of the application
-         * @return The {@link Builder} instance
+         * Set the context path.
+         * 
+         * @param contextPath the context path to the application.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>contextPath</code> is null.
          */
         public Builder contextPath(String contextPath) {
             if (contextPath == null)
@@ -149,9 +208,11 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
-         * Sets the servlet-path
-         * @param The servlet-path of the application
-         * @return The {@link Builder} instance
+         * Set the servlet path.
+         *
+         * @param servletPath the context path to the application.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>servletPath</code> is null.
          */
         public Builder servletPath(String servletPath) {
             if (servletPath == null)
@@ -162,9 +223,11 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
-         * Sets the {@link ServletContextListener} class
-         * @param The ServletContextListener class to set
-         * @return The {@link Builder} instance
+         * Set the servlet context listener.
+         *
+         * @param contextListenerClass the servlet context listener class.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>contextListenerClass</code> is null.
          */
         public Builder contextListenerClass(Class<? extends ServletContextListener> contextListenerClass) {
             if (contextListenerClass == null)
@@ -175,12 +238,28 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
-         * Builds an instance of {@link WebAppDescriptor} from the parameters set
-         * using the various methods of the {@link Builder} instance.
-         * @return An instance of {@link WebAppDescriptor}
+         * Build the Web-based application descriptor.
+         * .
+         * @return the Web-based application descriptor.
          */
         public WebAppDescriptor build() {
-            return new WebAppDescriptor(this);
+            WebAppDescriptor wd = new WebAppDescriptor(this);
+            reset();
+
+            return wd;
+        }
+
+        @Override
+        protected void reset() {
+            super.reset();
+            
+            this.initParams = null;
+            this.contextParams = null;
+            this.servletClass = ServletContainer.class;
+            this.filterClass = null;
+            this.contextListenerClass = null;
+            this.contextPath = "";
+            this.servletPath = "";
         }
     }
 
@@ -206,65 +285,82 @@ public class WebAppDescriptor extends AppDescriptor {
     private WebAppDescriptor(Builder b) {
         super(b);
 
-        this.initParams = b.initParams;
+        this.initParams = (b.initParams == null)
+            ? new HashMap<String, String>()
+            : b.initParams;
+        this.contextParams = (b.contextParams == null)
+            ? new HashMap<String, String>()
+            : b.contextParams;
         this.servletClass = b.servletClass;
         this.filterClass = b.filterClass;
         this.contextPath = b.contextPath;
         this.servletPath = b.servletPath;
-        this.contextParams = b.contextParams;
         this.contextListenerClass = b.contextListenerClass;
     }
 
     /**
-     * Returns the map of application init-params.
-     * @return A map with the various init-param names and values as key-value pairs.
+     * Get the initialization parameters.
+     *
+     * @return the initialization parameters.
      */
     public Map<String, String> getInitParams() {
         return initParams;
     }
 
     /**
-     * Returns the application servlet-class
-     * @return The servlet-class
+     * Get the context parameters.
+     * 
+     * @return the context parameters.
+     */
+    public Map<String, String> getContextParams() {
+        return contextParams;
+    }
+
+    /**
+     * Get the servlet class.
+     * 
+     * @return the servlet class. If <code>null</code> then the filter
+     *         class will not be <code>null</code>.
      */
     public Class<? extends HttpServlet> getServletClass() {
         return servletClass;
     }
 
     /**
-     * Returns the application filter-class
-     * @return The filter-class
+     * Get the filter class.
+     *
+     * @return the filter class. If <code>null</code> then the servlet
+     *         class will not be <code>null</code>.
      */
     public Class<? extends Filter> getFilterClass() {
         return filterClass;
     }
 
     /**
-     * Returns the application context-path
-     * @return The context-path
+     * Get the context path.
+     * 
+     * @return the context path.
      */
     public String getContextPath() {
         return contextPath;
     }
 
     /**
-     * Returns the application servlet-path
-     * @return The servlet-path
+     * Get the servlet path.
+     *
+     * @return the servlet path.
      */
     public String getServletPath() {
         return servletPath;
     }
 
     /**
-     * Returns the application's configured {@link ServletContextListener} class.
-     * @return The ServletContextListerner class.
+     * Get the servlet context listener class.
+     *
+     * @return the servlet context listener class, or <code>null</code>
+     *         if the class is not set.
      */
     public Class<? extends ServletContextListener> getContextListenerClass() {
         return contextListenerClass;
     }
-
-    public Map<String, String> getContextParams() {
-        return contextParams;
-    }
-
 }
