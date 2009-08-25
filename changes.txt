@@ -1,4 +1,6 @@
 release 1.1.3-ea (2009-09)
+- OAuth signature library now correctly percent encodes characters when
+  generating a secret.
 - Fixed issue 356
   https://jersey.dev.java.net/issues/show_bug.cgi?id=356
   Clarified JavaDoc for com.sun.jersey.core.header.MatchingEntityTag to
