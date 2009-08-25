@@ -181,6 +181,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <excludePackageNames>com.sun.jersey.test.framework.impl</excludePackageNames>
+                    <notimestamp>true</notimestamp>
                 </configuration>
                 <executions>
                     <execution>
