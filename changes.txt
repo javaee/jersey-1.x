@@ -1,4 +1,9 @@
 release 1.1.3-ea (2009-09)
+- Fixed issue 356
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=356
+  Clarified JavaDoc for com.sun.jersey.core.header.MatchingEntityTag to
+  state that instance of this type or the super type cannot be used to
+  produce headers of the form "If-Match: *" or "If-None-Match: *".
 - Fixed issue 357
   https://jersey.dev.java.net/issues/show_bug.cgi?id=357
   Clarifed JavaDoc for client API the response must be closed to ensure that

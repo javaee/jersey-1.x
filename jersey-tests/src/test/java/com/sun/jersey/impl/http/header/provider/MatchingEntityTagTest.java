@@ -75,8 +75,7 @@ public class MatchingEntityTagTest extends TestCase {
         String header = "*";
         Set<MatchingEntityTag> s = HttpHeaderReader.readMatchingEntityTag(header);
 
-        assertEquals(1, s.size());
-
-        assertTrue(s.contains(new EntityTag("*")));
+        assertEquals(0, s.size());
+        assertTrue(MatchingEntityTag.ANY_MATCH == s);
     }
 }

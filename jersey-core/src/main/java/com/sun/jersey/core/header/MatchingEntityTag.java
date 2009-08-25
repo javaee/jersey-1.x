@@ -46,12 +46,21 @@ import javax.ws.rs.core.EntityTag;
 
 /**
  * A matching entity tag.
+ * <p>
+ * Note that this type and it's super type cannot be used to create request
+ * header values for <code>If-Match</code> and <code>If-None-Match</code>
+ * of the form <code>If-Match: *</code> or <code>If-None-Match: *</code> as
+ * <code>*</code> is not a valid entity tag.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class MatchingEntityTag extends EntityTag {
 
-    public static Set<MatchingEntityTag> ANY_MATCH = Collections.singleton(new MatchingEntityTag("*"));
+    /**
+     * An empty set that corresponds to <code>If-Match: *</code> or
+     * <code>If-None-Match: *</code>.
+     */
+    public static final Set<MatchingEntityTag> ANY_MATCH = Collections.emptySet();
 
     public MatchingEntityTag(String value) {
         super(value, false);
