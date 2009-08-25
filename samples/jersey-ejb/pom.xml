@@ -72,7 +72,7 @@
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.ejb</artifactId>
-            <version>3.0-Preview-SNAPSHOT</version>
+            <version>3.0-b59</version>
             <scope>provided</scope>
         </dependency>
 

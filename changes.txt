@@ -1,4 +1,15 @@
 release 1.1.3-ea (2009-09)
+- Fixed issue 336
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=336
+  A class that extends of Application or ResourceConfig referenced in the web.xml
+  is now instantated as a component.
+  If the class has a constructor that takes a single parameter of the
+  type Map then the class is instantiated with that constructor and an instance
+  of Map that contains all the initialization parameters is passed as the
+  parameter. Otherwise, the class is instantiated as a singleton component
+  managed by the runtime, and injection may be performed (the artifacts that
+  may be injected are limited to injectable providers registered when
+  the servlet or filter is configured).
 - OAuth signature library now correctly percent encodes characters when
   generating a secret.
 - Fixed issue 356

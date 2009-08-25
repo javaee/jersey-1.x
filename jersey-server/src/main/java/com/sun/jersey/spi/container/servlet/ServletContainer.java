@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
@@ -90,8 +91,10 @@ import javax.ws.rs.core.UriBuilder;
  * If the concrete class has a constructor that takes a single parameter of the 
  * type Map then the class is instantiated with that constructor and an instance 
  * of Map that contains all the initialization parameters is passed as the 
- * parameter. Otherwise the default contructor is used to instantate the class.
- * 
+ * parameter. Otherwise, the class is instantiated as a singleton component
+ * managed by the runtime, and injection may be performed (the artifacts that
+ * may be injected are limited to injectable providers registered when
+ * the servlet or filter is configured).
  * <p>
  * If the initialization parameter
  * "com.sun.jersey.config.property.resourceConfigClass" or
@@ -225,6 +228,14 @@ public class ServletContainer extends HttpServlet implements Filter {
     private transient Pattern staticContentPattern;
 
     private class InternalWebComponent extends WebComponent {
+
+        InternalWebComponent() {
+        }
+
+        InternalWebComponent(Application app) {
+            super(app);
+        }
+        
         @Override
         protected WebApplication create() {
             return ServletContainer.this.create();
@@ -247,6 +258,20 @@ public class ServletContainer extends HttpServlet implements Filter {
                 WebConfig wc) throws ServletException  {
             return ServletContainer.this.getDefaultResourceConfig(props, wc);
         }
+    }
+
+    private transient final Application app;
+
+    public ServletContainer() {
+        this.app = null;
+    }
+
+    public ServletContainer(Class<? extends Application> appClass) {
+        this.app = new DeferredResourceConfig(appClass);
+    }
+
+    public ServletContainer(Application app) {
+        this.app = app;
     }
 
     // GenericServlet
@@ -277,7 +302,9 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @throws javax.servlet.ServletException
      */
     protected void init(WebConfig webConfig) throws ServletException {
-        webComponent = new InternalWebComponent();
+        webComponent = (app == null)
+                ? new InternalWebComponent()
+                : new InternalWebComponent(app);
         webComponent.init(webConfig);
     }
 

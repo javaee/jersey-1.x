@@ -420,7 +420,7 @@ public final class WebApplicationImpl implements WebApplication {
         initiate(resourceConfig, null);
     }
     
-    public void initiate(ResourceConfig rc, IoCComponentProviderFactory _provider) {
+    public void initiate(final ResourceConfig rc, final IoCComponentProviderFactory _provider) {
         if (rc == null) {
             throw new IllegalArgumentException("ResourceConfig instance MUST NOT be null");
         }
@@ -448,8 +448,6 @@ public final class WebApplicationImpl implements WebApplication {
         } else {
             this.resourceConfig = rc;
         }
-        // Validate the resource config
-        this.resourceConfig.validate();
 
         this.provider = _provider;
 
@@ -555,6 +553,16 @@ public final class WebApplicationImpl implements WebApplication {
                 ResourceContext.class, resourceContext));
         
         injectableFactory.configure(providerServices);
+
+        // Create application-declared Application instance as a component
+        if (rc instanceof DeferredResourceConfig) {
+            DeferredResourceConfig drc = (DeferredResourceConfig)rc;
+            resourceConfig.add(drc.getApplication(cpFactory));
+        }
+
+        // Validate the resource config
+        this.resourceConfig.validate();
+
         
         // Obtain all context resolvers
         final ContextResolverFactory crf = new ContextResolverFactory(

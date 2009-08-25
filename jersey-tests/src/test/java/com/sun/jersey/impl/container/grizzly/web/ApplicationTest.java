@@ -46,11 +46,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -155,8 +157,22 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
     public static class OverridePropertyApp extends DefaultResourceConfig {
         public OverridePropertyApp() {
             getClasses().add(ResourceOverride.class);
+            getSingletons().add(new ResourceSingleton());
+            getExplicitRootResources().put("/explicit", new ResourceSingleton());
+
+            getMediaTypeMappings().put("xml", MediaType.APPLICATION_XML_TYPE);
+            getLanguageMappings().put("en", "en");
+
             getProperties().put("property", "override");
             getFeatures().put("overridefeature", false);
+        }
+    }
+
+    @Path("/singleton")
+    public static class ResourceSingleton {
+        @GET
+        public String get() {
+            return "GET";
         }
     }
 
@@ -166,13 +182,24 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
         @GET
         @Produces("text/plain")
         public String get(@Context ResourceConfig rc) {
+
+            assertEquals(ResourceSingleton.class, 
+                    rc.getSingletons().iterator().next().getClass());
+            assertEquals(ResourceSingleton.class,
+                    rc.getExplicitRootResources().get("/explicit").getClass());
+
+            assertEquals(MediaType.APPLICATION_XML_TYPE,
+                    rc.getMediaTypeMappings().get("xml"));
+            assertEquals("en",
+                    rc.getLanguageMappings().get("en"));
+
             assertFalse(rc.getFeature("overridefeature"));
             assertTrue(rc.getFeature("feature"));
             return rc.getProperty("property").toString();
         }
     }
 
-    public void tesOverrideProperty() {
+    public void testOverrideProperty() {
         Map<String, String> initParams = new HashMap<String, String>();
         initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS, OverridePropertyApp.class.getName());
         initParams.put("property", "test");
@@ -185,5 +212,37 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
                 path("/").build());
 
         assertEquals("override", r.get(String.class));
+    }
+
+    public static class InjectApp extends DefaultResourceConfig {
+        public InjectApp(@Context ServletContext sc) {
+            getClasses().add(ResourceInject.class);
+
+            assertNotNull(sc);
+            getProperties().put("z", sc.getInitParameter("x"));
+        }
+    }
+
+    @Path("/")
+    public static class ResourceInject {
+
+        @GET
+        @Produces("text/plain")
+        public String get(@Context ResourceConfig rc) {
+            return rc.getProperty("z").toString();
+        }
+    }
+
+    public void testInject() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS, InjectApp.class.getName());
+        initParams.put("x", "y");
+
+        startServer(initParams);
+
+        WebResource r = Client.create().resource(getUri().
+                path("/").build());
+
+        assertEquals("y", r.get(String.class));
     }
 }

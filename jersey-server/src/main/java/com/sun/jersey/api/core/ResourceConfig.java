@@ -545,4 +545,35 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             }
         }
     }
+
+    /**
+     * Add the state of an {@link Application} to this instance.
+     *
+     * @param app the application.
+     */
+    public void add(Application app) {
+        addAllFirst(getClasses(), app.getClasses());
+        addAllFirst(getSingletons(), app.getSingletons());
+        
+        if (app instanceof ResourceConfig) {
+            ResourceConfig rc = (ResourceConfig)app;
+
+            getExplicitRootResources().putAll(rc.getExplicitRootResources());
+            
+            getLanguageMappings().putAll(rc.getLanguageMappings());
+            getMediaTypeMappings().putAll(rc.getMediaTypeMappings());
+
+            getFeatures().putAll(rc.getFeatures());
+            getProperties().putAll(rc.getProperties());
+        }
+    }
+
+    private <T> void addAllFirst(Set<T> a, Set<T> b) {
+        Set<T> x = new LinkedHashSet<T>();
+        x.addAll(b);
+        x.addAll(a);
+ 
+        a.clear();
+        a.addAll(x);
+    }
 }

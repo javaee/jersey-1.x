@@ -48,6 +48,7 @@ import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.util.ReaderWriter;
+import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
@@ -147,6 +148,20 @@ public class WebComponent implements ContainerListener {
 
     private WebApplication application;
 
+    public WebComponent() {
+    }
+
+    public WebComponent(Application app) {
+        if (app == null)
+            throw new IllegalArgumentException();
+        
+        if (app instanceof ResourceConfig) {
+            resourceConfig = (ResourceConfig)app;
+        } else {
+            resourceConfig = new ApplicationAdapter(app);
+        }
+    }
+
     /**
      * Get the Web configuration.
      *
@@ -177,7 +192,8 @@ public class WebComponent implements ContainerListener {
 
         context = config.getServletContext();
 
-        resourceConfig = createResourceConfig(config);
+        if (resourceConfig == null)
+            resourceConfig = createResourceConfig(config);
 
         load();
 
@@ -591,21 +607,12 @@ public class WebComponent implements ContainerListener {
                     throw new ServletException(e);
                 }
 
-                try {
-                    return (ResourceConfig)resourceConfigClass.newInstance();
-                } catch(Exception e) {
-                    throw new ServletException(e);
-                }
+                return new DeferredResourceConfig(resourceConfigClass);
             } else if (Application.class.isAssignableFrom(resourceConfigClass)) {
-                try {
-                    return new ApplicationAdapter(
-                            (Application)resourceConfigClass.newInstance());
-                } catch(Exception e) {
-                    throw new ServletException(e);
-                }
+                return new DeferredResourceConfig(resourceConfigClass);
             } else {
                 String message = "Resource configuration class, " + resourceConfigClassName +
-                        ", is not a super class of " + ResourceConfig.class;
+                        ", is not a super class of " + Application.class;
                 throw new ServletException(message);
             }
         } catch (ClassNotFoundException e) {
