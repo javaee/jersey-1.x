@@ -77,5 +77,36 @@
  * {@link javax.ws.rs.ext.MessageBodyWriter}. For registration of such support
  * for new Java types see
  * {@link com.sun.jersey.api.client.config.ClientConfig}.
+ * <p>
+ * A type of {@link com.sun.jersey.api.client.ClientResponse} declared
+ * for the response entity may be used to obtain the status, headers and
+ * response entity.
+ * <p>
+ * If any type, other than {@link com.sun.jersey.api.client.ClientResponse},
+ * is declared and the response status is greater than or equal to 300 then a
+ * {@link com.sun.jersey.api.client.UniformInterfaceException} exception
+ * will be thrown, from which the 
+ * {@link com.sun.jersey.api.client.ClientResponse} instance can be
+ * accessed.
+ * <p>
+ * In the following cases it is necessary to close the response, when response
+ * processing has completed, to ensure that underlying resources are
+ * correctly released.
+ * <p>
+ * If a response entity is declared of the type
+ * {@link com.sun.jersey.api.client.ClientResponse}
+ * or of a type that is assignable to {@link java.io.Closeable}
+ * (such as {@link java.io.InputStream}) then the response must be either: 
+ * 1) closed by invoking the method
+ * {@link com.sun.jersey.api.client.ClientResponse#close() } or
+ * {@link java.io.Closeable#close}; or 2) all bytes of response entity must be
+ * read.
+ * <p>
+ * If a {@link com.sun.jersey.api.client.UniformInterfaceException} is
+ * thrown then by default the response entity is automatically buffered and
+ * the underlying resources are correctly released. See the following property
+ * for more details:
+ * {@link com.sun.jersey.api.client.config.ClientConfig#PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION}.
+ *
  */
 package com.sun.jersey.api.client;

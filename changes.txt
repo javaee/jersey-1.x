@@ -1,4 +1,8 @@
 release 1.1.3-ea (2009-09)
+- Fixed issue 357
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=357
+  Clarifed JavaDoc for client API the response must be closed to ensure that
+  underlying resources are correctly released.
 
 release 1.1.2-ea (2009-08-25)
 - Fixed issue 355
