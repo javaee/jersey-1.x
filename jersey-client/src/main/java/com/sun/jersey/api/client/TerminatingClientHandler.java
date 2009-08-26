@@ -158,25 +158,9 @@ public abstract class TerminatingClientHandler implements ClientHandler {
             }
             final Class entityClass = entity.getClass();
 
-
-            MultivaluedMap<String, Object> metadata = cr.getMetadata();
-            final Object mediaTypeHeader = metadata.getFirst("Content-Type");
-            if (mediaTypeHeader instanceof MediaType) {
-                this.mediaType = (MediaType)mediaTypeHeader;
-            } else {
-                if (mediaTypeHeader != null) {
-                    this.mediaType = MediaType.valueOf(mediaTypeHeader.toString());
-                } else {
-                    // Content-Type is not present choose a default type
-                    List<MediaType> mediaTypes = workers.getMessageBodyWriterMediaTypes(
-                            entityClass, entityType, EMPTY_ANNOTATIONS);
-                    this.mediaType = mediaTypes.get(0);
-                    if (this.mediaType.isWildcardType() || this.mediaType.isWildcardSubtype())
-                        this.mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
-
-                    metadata.putSingle("Content-Type", this.mediaType);
-                }
-            }
+            final MultivaluedMap<String, Object> headers = cr.getHeaders();
+            this.mediaType = TerminatingClientHandler.this.
+                    getMediaType(entityClass, entityType, headers);
 
             this.bw = workers.getMessageBodyWriter(
                     entityClass, entityType,
@@ -284,26 +268,8 @@ public abstract class TerminatingClientHandler implements ClientHandler {
         final Class entityClass = entity.getClass();
 
 
-        MultivaluedMap<String, Object> metadata = ro.getMetadata();
-        MediaType mediaType = null;
-        final Object mediaTypeHeader = metadata.getFirst("Content-Type");
-        if (mediaTypeHeader instanceof MediaType) {
-            mediaType = (MediaType)mediaTypeHeader;
-        } else {
-            if (mediaTypeHeader != null) {
-                mediaType = MediaType.valueOf(mediaTypeHeader.toString());
-            } else {
-                // Content-Type is not present choose a default type
-                List<MediaType> mediaTypes = workers.getMessageBodyWriterMediaTypes(
-                        entityClass, entityType, EMPTY_ANNOTATIONS);
-                mediaType = mediaTypes.get(0);
-                if (mediaType.isWildcardType() || mediaType.isWildcardSubtype())
-                    mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
-                
-                metadata.putSingle("Content-Type", mediaType);
-            }
-        }
-
+        final MultivaluedMap<String, Object> headers = ro.getHeaders();
+        final MediaType mediaType = getMediaType(entityClass, entityType, headers);
 
         final MessageBodyWriter bw = workers.getMessageBodyWriter(
                 entityClass, entityType,
@@ -322,10 +288,40 @@ public abstract class TerminatingClientHandler implements ClientHandler {
         final OutputStream out = ro.getAdapter().adapt(ro, listener.onGetOutputStream());
         try {
             bw.writeTo(entity, entityClass, entityType,
-                    EMPTY_ANNOTATIONS, mediaType, metadata, out);
+                    EMPTY_ANNOTATIONS, mediaType, headers, out);
             out.flush();
         } finally {
             out.close();
         }
     }
+
+
+    private MediaType getMediaType(Class entityClass, Type entityType,
+            MultivaluedMap<String, Object> headers) {
+        final Object mediaTypeHeader = headers.getFirst("Content-Type");
+        if (mediaTypeHeader instanceof MediaType) {
+            return (MediaType)mediaTypeHeader;
+        } else if (mediaTypeHeader != null) {
+            return MediaType.valueOf(mediaTypeHeader.toString());
+        } else {
+            // Content-Type is not present choose a default type
+            final List<MediaType> mediaTypes = workers.getMessageBodyWriterMediaTypes(
+                    entityClass, entityType, EMPTY_ANNOTATIONS);
+            final MediaType mediaType = getMediaType(mediaTypes);
+            headers.putSingle("Content-Type", mediaType);
+            return mediaType;
+        }
+    }
+
+    private MediaType getMediaType(List<MediaType> mediaTypes) {
+        if (mediaTypes.isEmpty()) {
+            return MediaType.APPLICATION_OCTET_STREAM_TYPE;
+        } else {
+            MediaType mediaType = mediaTypes.get(0);
+            if (mediaType.isWildcardType() || mediaType.isWildcardSubtype())
+                mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
+            return mediaType;
+        }
+    }
+
 }

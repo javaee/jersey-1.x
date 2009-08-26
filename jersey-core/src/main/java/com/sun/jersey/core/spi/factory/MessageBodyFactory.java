@@ -264,7 +264,6 @@ public class MessageBodyFactory implements MessageBodyWorkers {
         return null;
     }
     
-    @SuppressWarnings("unchecked")
     public <T> List<MediaType> getMessageBodyWriterMediaTypes(Class<T> c, Type t,
             Annotation[] as) {
         List<MediaType> mtl = new ArrayList<MediaType>();
@@ -278,7 +277,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
         return mtl;
     }
 
-	public <T> MediaType getMessageBodyWriterMediaType(Class<T> c, Type t,
+    public <T> MediaType getMessageBodyWriterMediaType(Class<T> c, Type t,
 			Annotation[] as, List<MediaType> acceptableMediaTypes) {
         for (MediaType acceptable : acceptableMediaTypes) {
             for (MessageBodyWriterPair mbwp : writerListProviders) {
