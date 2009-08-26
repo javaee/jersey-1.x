@@ -1,6 +1,6 @@
 release 1.1.3-ea (2009-09)
-- Fixed issue 336
-  https://jersey.dev.java.net/issues/show_bug.cgi?id=336
+- Fixed issue 359
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=359
   The client API should use the default media type "application/octet-stream"
   if a default media type cannot be obtained for a request entity of Java type.
 - Fixed issue 336
