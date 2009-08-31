@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 import java.util.logging.Logger;
+import javax.servlet.Filter;
 import javax.servlet.Servlet;
 import javax.ws.rs.core.UriBuilder;
 
@@ -163,9 +164,20 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
                 throw new TestContainerException(ex);
             }
             sa.setServletInstance(servletInstance);
-
+            
             if ( !contextListenerClassName.equals("") ) {
                 sa.addServletListener(contextListenerClassName);
+            }
+
+            // Filter support
+            if ( filterClass!=null ) {
+                try {
+                    sa.addFilter((Filter) filterClass.newInstance(), "jerseyfilter", null);
+                } catch (InstantiationException ex) {
+                    throw new TestContainerException(ex);
+                } catch (IllegalAccessException ex) {
+                    throw new TestContainerException(ex);
+                }
             }
             
             for(String contextParamName : contextParams.keySet()) {

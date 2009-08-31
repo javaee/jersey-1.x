@@ -154,9 +154,6 @@ public class WebAppDescriptor extends AppDescriptor {
 
         /**
          * Set the servlet class.
-         * <p>
-         * If the filter class was previously set then the filter class is set
-         * to <code>null</code>.
          *
          * @param servletClass the servlet class to serve the application.
          * @return this builder.
@@ -168,15 +165,11 @@ public class WebAppDescriptor extends AppDescriptor {
                 throw new IllegalArgumentException("The servlet class must not be null");
 
             this.servletClass = servletClass;
-            this.filterClass = null;
             return this;
         }
 
         /**
          * Set the filter class.
-         * <p>
-         * If the servlet class was previously set then the servlet class is set
-         * to <code>null</code>.
          *
          * @param filterClass the filter class to serve the application.
          * @return this builder.
@@ -188,7 +181,6 @@ public class WebAppDescriptor extends AppDescriptor {
                 throw new IllegalArgumentException("The filter class must not be null");
 
             this.filterClass = filterClass;
-            this.servletClass = null;
             return this;
         }
 
