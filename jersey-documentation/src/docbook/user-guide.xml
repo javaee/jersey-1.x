@@ -21,6 +21,7 @@ More content to come soon...
         </para>
     </preface>
   
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="getting-started.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="OverviewOfJAX-RS.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="json.xml" />
 
