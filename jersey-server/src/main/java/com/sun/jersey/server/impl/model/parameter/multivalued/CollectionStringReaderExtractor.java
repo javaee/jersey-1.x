@@ -74,22 +74,21 @@ abstract class CollectionStringReaderExtractor<V extends Collection>
 
     @SuppressWarnings("unchecked")
     public Object extract(MultivaluedMap<String, String> parameters) {
-        List<String> stringList = parameters.get(parameter);
+        final List<String> stringList = parameters.get(parameter);
         if (stringList != null) {
-            V valueList = getInstance();
+            final V valueList = getInstance();
             for (String v : stringList) {
-                valueList.add(sr.fromString(v));
+                valueList.add((v.length() == 0) ? null : sr.fromString(v));
             }
 
             return valueList;
         } else if (defaultStringValue != null) {
-            V valueList = getInstance();
-            // TODO do we need to clone the default value
+            final V valueList = getInstance();
             valueList.add(sr.fromString(defaultStringValue));
             return valueList;
+        } else {
+            return getInstance();
         }
-
-        return getInstance();
     }
 
     protected abstract V getInstance();

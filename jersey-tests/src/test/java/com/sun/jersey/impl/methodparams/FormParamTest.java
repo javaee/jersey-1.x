@@ -48,6 +48,7 @@ import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -145,6 +146,96 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
+    public class FormParamTypes
+    {
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String createSubscription(
+                @FormParam("int") int i,
+                @FormParam("float") float f,
+                @FormParam("decimal") BigDecimal d
+                ) {
+            return "" + i + " " + f + " " + d;
+        }
+    }
+
+    public void testFormParamTypes() {
+        initiateWebApplication(FormParamTypes.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        form.add("int", "1");
+        form.add("float", "3.14");
+        form.add("decimal", "3.14");
+
+        String s = r.post(String.class, form);
+        assertEquals("1 3.14 3.14", s);
+    }
+
+    @Path("/")
+    public class FormDefaultValueParamTypes
+    {
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String createSubscription(
+                @DefaultValue("1") @FormParam("int") int i,
+                @DefaultValue("3.14") @FormParam("float") float f,
+                @DefaultValue("3.14") @FormParam("decimal") BigDecimal d
+                ) {
+            return "" + i + " " + f + " " + d;
+        }
+    }
+
+    public void testFormDefaultValueParamTypes() {
+        initiateWebApplication(FormDefaultValueParamTypes.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        
+        String s = r.post(String.class, form);
+        assertEquals("1 3.14 3.14", s);
+    }
+
+
+    public static class TrimmedString {
+       private final String string;
+
+       public TrimmedString(String string) {
+          this.string = string.trim();
+       }
+
+       @Override
+       public String toString() {
+          return string;
+       }
+    }
+
+    @Path("/")
+    public class FormConstructorValueParamTypes
+    {
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String createSubscription(
+                @DefaultValue("") @FormParam("trim") TrimmedString s) {
+            return s.toString();
+        }
+    }
+
+    public void testFormConstructorValueParamTypes() {
+        initiateWebApplication(FormConstructorValueParamTypes.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+
+        String s = r.post(String.class, form);
+        assertEquals("", s);
+    }
+
+
+    @Path("/")
     public class MultipartFormResourceX {
         @POST
         @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
@@ -235,6 +326,7 @@ public class FormParamTest extends AbstractResourceTester {
             return "" + i + " " + f + " " + d;
         }
     }
+
 
     public void testMultipartFormListSubscription() throws Exception {
         initiateWebApplication(MultipartFormParamTypes.class);

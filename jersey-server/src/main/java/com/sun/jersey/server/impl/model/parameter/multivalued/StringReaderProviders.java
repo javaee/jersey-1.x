@@ -84,15 +84,6 @@ public class StringReaderProviders {
                 return null;
 
             return new AbstractStringReader() {
-                @Override
-                public Object fromString(String value) {
-                    if (value.length() == 0)
-                        return null;
-                    
-                    return super.fromString(value);
-                }
-
-                @Override
                 protected Object _fromString(String value) throws Exception {
                     return constructor.newInstance(value);
                 }
@@ -148,7 +139,6 @@ public class StringReaderProviders {
                 return null;
             
             return new StringReader() {
-
                 public Object fromString(String value) {
                     try {
                         return HttpDateFormat.readDate(value);
