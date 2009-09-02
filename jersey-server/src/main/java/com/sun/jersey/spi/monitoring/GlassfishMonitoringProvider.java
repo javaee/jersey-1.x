@@ -38,11 +38,15 @@
 package com.sun.jersey.spi.monitoring;
 
 /**
- *
+ * A GlassFish monitoring provider to register Jersey-based monitoring.
+ * 
  * @author pavel.bucek@sun.com
  */
-
 public interface GlassfishMonitoringProvider {
+    /**
+     * Register Jersey-based monitoring with the GlassFish monitoring
+     * framework.
+     */
     public void register();
 }
 

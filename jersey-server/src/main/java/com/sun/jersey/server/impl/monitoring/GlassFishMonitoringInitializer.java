@@ -34,58 +34,30 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.server.impl.application;
+package com.sun.jersey.server.impl.monitoring;
 
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.core.spi.component.ComponentProvider;
-import com.sun.jersey.core.spi.component.ProviderFactory;
-import java.util.Collections;
-import java.util.Set;
+import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
+import com.sun.jersey.spi.service.ServiceConfigurationError;
+import com.sun.jersey.spi.service.ServiceFinder;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Application;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class DeferredResourceConfig extends DefaultResourceConfig {
-
+public class GlassFishMonitoringInitializer {
     private static final Logger LOGGER =
-            Logger.getLogger(DeferredResourceConfig.class.getName());
+            Logger.getLogger(GlassFishMonitoringInitializer.class.getName());
 
-    private final Class<? extends Application> appClass;
-
-    private final Set<Class<?>> defaultClasses;
-    
-    public DeferredResourceConfig(Class<? extends Application> appClass) {
-        this(appClass, Collections.<Class<?>>emptySet());
-    }
-
-    public DeferredResourceConfig(Class<? extends Application> appClass, 
-            Set<Class<?>> defaultClasses) {
-        this.appClass = appClass;
-        this.defaultClasses = defaultClasses;
-    }
-
-    public Application getApplication(ProviderFactory pf) {
-        ComponentProvider cp = pf.getComponentProvider(appClass);
-        if (cp == null) {
-            throw new ContainerException("");
-        }
-        Application app = (Application)cp.getInstance();
-        
-        if (app.getClasses().isEmpty() && app.getSingletons().isEmpty()) {
-            LOGGER.info("Instantiating the Application class, named " +
-                    appClass.getName() +
-                    ". The following root resource and provider classes are registered: " + defaultClasses);
-            DefaultResourceConfig drc = new DefaultResourceConfig(defaultClasses);
-            drc.add(app);
-            return drc;
-        } else {
-            LOGGER.info("Instantiating the Application class, named " +
-                    appClass.getName());
-            return app;
+    public static void initialize() {
+        try {
+            for(GlassfishMonitoringProvider monitoring : ServiceFinder.find(GlassfishMonitoringProvider.class)) {
+                monitoring.register();
+            }
+        } catch (ServiceConfigurationError ex) {
+            LOGGER.log(Level.SEVERE, "GlassFish Jersey monitoring could not be enabled. " +
+                    "Processing will continue but montoring is disabled.", ex);
         }
     }
 }

@@ -458,7 +458,9 @@ public class ServletContainer extends HttpServlet implements Filter {
      */
     @Override
     public void destroy() {
-        webComponent.destroy();
+        if (webComponent != null) {
+            webComponent.destroy();
+        }
     }
 
     

@@ -84,6 +84,11 @@ import javax.ws.rs.core.MediaType;
     }
     
     @Override
+    public Map<String, Object> getExplicitRootResources() {
+        return rc.getExplicitRootResources();
+    }
+
+    @Override
     public Map<String, Boolean> getFeatures() {
         return rc.getFeatures();
     }

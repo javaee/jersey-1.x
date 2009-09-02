@@ -46,13 +46,13 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
+import com.sun.jersey.server.impl.monitoring.GlassFishMonitoringInitializer;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
@@ -62,8 +62,6 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
-import com.sun.jersey.spi.service.ServiceFinder;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -449,10 +447,7 @@ public class WebComponent implements ContainerListener {
 
         EJBComponentProviderFactoryInitilizer.initialize(rc);
 
-        // glassfish v3 monitoring
-        for(GlassfishMonitoringProvider monitoring : ServiceFinder.find(GlassfishMonitoringProvider.class)) {
-            monitoring.register();
-        }
+        GlassFishMonitoringInitializer.initialize();
     }
 
     /**
