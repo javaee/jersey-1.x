@@ -156,14 +156,16 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             webServer = new GrizzlyWebServer(baseUri.getPort());
             ServletAdapter sa = new ServletAdapter();
             Servlet servletInstance;
-            try {
-                servletInstance = (Servlet) servletClass.newInstance();
-            } catch (InstantiationException ex) {
-                throw new TestContainerException(ex);
-            } catch (IllegalAccessException ex) {
-                throw new TestContainerException(ex);
+            if( servletClass != null) {
+                try {
+                    servletInstance = (Servlet) servletClass.newInstance();
+                } catch (InstantiationException ex) {
+                    throw new TestContainerException(ex);
+                } catch (IllegalAccessException ex) {
+                    throw new TestContainerException(ex);
+                }
+                sa.setServletInstance(servletInstance);
             }
-            sa.setServletInstance(servletInstance);
             
             if ( !contextListenerClassName.equals("") ) {
                 sa.addServletListener(contextListenerClassName);
@@ -172,10 +174,10 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             // Filter support
             if ( filterClass!=null ) {
                 try {
-                    sa.addFilter((Filter) filterClass.newInstance(), "jerseyfilter", null);
-                } catch (InstantiationException ex) {
+                    sa.addFilter((Filter) filterClass.newInstance(), "jerseyfilter", initParams);                    
+                } catch (InstantiationException ex) {                    
                     throw new TestContainerException(ex);
-                } catch (IllegalAccessException ex) {
+                } catch (IllegalAccessException ex) {                    
                     throw new TestContainerException(ex);
                 }
             }
