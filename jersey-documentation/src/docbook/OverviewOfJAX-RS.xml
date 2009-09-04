@@ -542,8 +542,8 @@ public String get(@Context UriInfo ui) {
 <title>Obtaining general map of header parameters</title>
 <programlisting  linenumbering="numbered">@GET
 public String get(@Context HttpHeaders hh) {
-    MultivaluedMap&lt;String, String&gt; headerParams = ui.getRequestHeaders();
-    Map&lt;String, Cookie&gt; pathParams = ui.getCookies();
+    MultivaluedMap&lt;String, String&gt; headerParams = hh.getRequestHeaders();
+    Map&lt;String, Cookie&gt; pathParams = hh.getCookies();
 }</programlisting></example></para>
 
     <para>In general <ulink
