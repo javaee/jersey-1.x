@@ -40,14 +40,12 @@ package com.sun.jersey.server.impl.model.method.dispatch;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -85,7 +83,7 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
             
             if (Parameter.Source.ENTITY == parameter.getSource()) {
                 hasEntity = true;
-                is.add(processEntityParameter(method,
+                is.add(processEntityParameter(
                         parameter,
                         method.getMethod().getParameterAnnotations()[i],
                         requireNoEntityParameter));
@@ -109,7 +107,7 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
             // Otherwise create the entity injectable
             for (int i = 0; i < is.size(); i++) {
                 if (is.get(i) == null) {
-                    Injectable ij = processEntityParameter(method,
+                    Injectable ij = processEntityParameter(
                         method.getParameters().get(i),
                         method.getMethod().getParameterAnnotations()[i],
                         requireNoEntityParameter);
@@ -141,7 +139,6 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
     }
         
     private Injectable processEntityParameter(
-            AbstractResourceMethod method,
             Parameter parameter,
             Annotation[] annotations,
             boolean requireNoEntityParameter) {
@@ -150,16 +147,7 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
             return null;
         }
 
-        if (parameter.getParameterType() instanceof TypeVariable) {
-            ReflectionHelper.ClassTypePair ct = ReflectionHelper.resolveTypeVariable(
-                    method.getDeclaringResource().getResourceClass(),
-                    method.getMethod().getDeclaringClass(),
-                    (TypeVariable)parameter.getParameterType());
-
-            return (ct != null) ? new EntityInjectable(ct.c, ct.t, annotations) : null;
-        } else {
-            return new EntityInjectable(parameter.getParameterClass(),
-                    parameter.getParameterType(), annotations);
-        }
+        return new EntityInjectable(parameter.getParameterClass(),
+                parameter.getParameterType(), annotations);
     }
 }

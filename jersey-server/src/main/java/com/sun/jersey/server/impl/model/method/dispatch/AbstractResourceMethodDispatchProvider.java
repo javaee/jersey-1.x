@@ -75,7 +75,7 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         boolean requireReturnOfRepresentation =
                 "GET".equals(abstractResourceMethod.getHttpMethod());
 
-        Class<?> returnType = abstractResourceMethod.getMethod().getReturnType();
+        Class<?> returnType = abstractResourceMethod.getReturnType();
         if (Response.class.isAssignableFrom(returnType)) {
             return new ResponseOutInvoker(abstractResourceMethod, pp);
         } else if (returnType != void.class) {
@@ -146,7 +146,7 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         TypeOutInvoker(AbstractResourceMethod abstractResourceMethod,
                 InjectableValuesProvider pp) {
             super(abstractResourceMethod, pp);
-            this.t = abstractResourceMethod.getMethod().getGenericReturnType();
+            this.t = abstractResourceMethod.getGenericReturnType();
         }
 
         public void _dispatch(Object resource, HttpContext context)

@@ -38,6 +38,7 @@ package com.sun.jersey.api.model;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
@@ -47,27 +48,45 @@ import javax.ws.rs.core.MediaType;
  */
 public class AbstractResourceMethod extends AbstractMethod 
         implements Parameterized, AbstractModelComponent {
+    private String httpMethod;
     private List<MediaType> consumeMimeList;
     private List<MediaType> produceMimeList;
-    private boolean isProducesDeclared;    
     private List<Parameter> parameters;
-    private String httpMethod;
+    private Class returnType;
+    private Type genericReturnType;
+    private boolean isProducesDeclared;
 
-    public AbstractResourceMethod(AbstractResource resource, 
-            Method method, String httpMethod,
+    public AbstractResourceMethod(
+            AbstractResource resource,
+            Method method,
+            Class returnType,
+            Type genericReturnType,
+            String httpMethod,
             Annotation[] annotations) {
         super(resource, method, annotations);
 
         this.httpMethod = httpMethod.toUpperCase();
         this.consumeMimeList = new ArrayList<MediaType>();
         this.produceMimeList = new ArrayList<MediaType>();
+        this.returnType = returnType;
+        this.genericReturnType = genericReturnType;
         this.parameters = new ArrayList<Parameter>();
+
+
     }
 
     public AbstractResource getDeclaringResource() {
         return getResource();
     }
-    
+
+    public Class getReturnType() {
+        return returnType;
+    }
+
+    public Type getGenericReturnType() {
+        return genericReturnType;
+    }
+
     public List<MediaType> getSupportedInputTypes() {
         return consumeMimeList;
     }

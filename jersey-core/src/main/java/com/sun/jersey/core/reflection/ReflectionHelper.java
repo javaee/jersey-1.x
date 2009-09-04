@@ -402,11 +402,11 @@ public class ReflectionHelper {
          */
         public final Type t;
         
-        private ClassTypePair(Class c) {
+        public ClassTypePair(Class c) {
             this(c, c);
         }
         
-        private ClassTypePair(Class c, Type t) {
+        public ClassTypePair(Class c, Type t) {
             this.c = c;
             this.t = t;
         }

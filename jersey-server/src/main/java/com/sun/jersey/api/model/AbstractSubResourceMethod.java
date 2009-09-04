@@ -38,6 +38,7 @@ package com.sun.jersey.api.model;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 
 /**
  *
@@ -47,10 +48,15 @@ public class AbstractSubResourceMethod extends AbstractResourceMethod implements
 
     private PathValue uriPath;
 
-    public AbstractSubResourceMethod(AbstractResource resource,
-            Method method, PathValue uriPath, String httpMethod,
+    public AbstractSubResourceMethod(
+            AbstractResource resource,
+            Method method,
+            Class returnType,
+            Type genericReturnType,
+            PathValue uriPath,
+            String httpMethod,
             Annotation[] annotations) {
-        super(resource, method, httpMethod, annotations);
+        super(resource, method, returnType, genericReturnType, httpMethod, annotations);
         this.uriPath = uriPath;
     }
 

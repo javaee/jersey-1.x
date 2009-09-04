@@ -57,6 +57,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -171,7 +172,12 @@ public class IntrospectionModeller {
             for (Constructor ctor : ctorArray) {
                 final AbstractResourceConstructor aCtor = 
                         new AbstractResourceConstructor(ctor);
-                processParameters(aCtor, ctor, isEncoded);
+                processParameters(
+                        resource.getResourceClass(),
+                        ctor.getDeclaringClass(),
+                        aCtor,
+                        ctor,
+                        isEncoded);
                 resource.getConstructors().add(aCtor);
             }
         }
@@ -187,7 +193,10 @@ public class IntrospectionModeller {
         while (c != Object.class) {
              for (final Field f : c.getDeclaredFields()) {
                     final AbstractField af = new AbstractField(f);
-                    Parameter p = createParameter(f.toString(), 1, isEncoded, 
+                    Parameter p = createParameter(
+                            resource.getResourceClass(),
+                            f.getDeclaringClass(),
+                            isEncoded,
                             f.getType(),
                             f.getGenericType(),
                             f.getAnnotations());
@@ -236,7 +245,10 @@ public class IntrospectionModeller {
                 nameStartsWith("set")) {
             
             final AbstractSetterMethod asm = new AbstractSetterMethod(resource, m.getMethod(), m.getAnnotations());
-            Parameter p = createParameter(m.toString(), 1, isEncoded, 
+            Parameter p = createParameter(
+                    resource.getResourceClass(),
+                    m.getMethod().getDeclaringClass(),
+                    isEncoded,
                     m.getParameterTypes()[0],
                     m.getGenericParameterTypes()[0],
                     m.getAnnotations());
@@ -255,18 +267,43 @@ public class IntrospectionModeller {
             Produces classScopeProducesAnnotation) {
         for (AnnotatedMethod m : methodList.hasMetaAnnotation(HttpMethod.class).
                 hasNotAnnotation(Path.class)) {
+
+            final ReflectionHelper.ClassTypePair ct = getGenericReturnType(resource.getResourceClass(), m.getMethod());
             final AbstractResourceMethod resourceMethod = new AbstractResourceMethod(
                     resource,
-                    m.getMethod(), 
+                    m.getMethod(),
+                    ct.c, ct.t,
                     m.getMetaMethodAnnotations(HttpMethod.class).get(0).value(),
                     m.getAnnotations());
 
             addConsumes(m, resourceMethod, classScopeConsumesAnnotation);
             addProduces(m, resourceMethod, classScopeProducesAnnotation);
-            processParameters(resourceMethod, m, isEncoded);
+            processParameters(
+                    resourceMethod.getResource().getResourceClass(),
+                    resourceMethod.getMethod().getDeclaringClass(),
+                    resourceMethod, m, isEncoded);
 
             resource.getResourceMethods().add(resourceMethod);
         }
+    }
+
+    private static ReflectionHelper.ClassTypePair getGenericReturnType(
+            Class concreteClass,
+            Method m) {
+        final Type t = m.getGenericReturnType();
+        if (t instanceof TypeVariable) {
+            ReflectionHelper.ClassTypePair ct = ReflectionHelper.resolveTypeVariable(
+                    concreteClass,
+                    m.getDeclaringClass(),
+                    (TypeVariable)t);
+
+            if (ct != null) {
+                return ct;
+            }
+        }
+
+        ReflectionHelper.ClassTypePair ct = new ReflectionHelper.ClassTypePair(m.getReturnType(), t);
+        return ct;
     }
     
     private static final void workOutSubResourceMethodsList(
@@ -284,31 +321,39 @@ public class IntrospectionModeller {
             final boolean emptySegmentCase =  "/".equals(pv.getValue()) || "".equals(pv.getValue());
             
             if (!emptySegmentCase) {
-
+                final ReflectionHelper.ClassTypePair ct = getGenericReturnType(resource.getResourceClass(), m.getMethod());
                 final AbstractSubResourceMethod abstractSubResourceMethod = new AbstractSubResourceMethod(
                         resource,
                         m.getMethod(),
+                        ct.c, ct.t,
                         pv,
                         m.getMetaMethodAnnotations(HttpMethod.class).get(0).value(),
                         m.getAnnotations());
 
                 addConsumes(m, abstractSubResourceMethod, classScopeConsumesAnnotation);
                 addProduces(m, abstractSubResourceMethod, classScopeProducesAnnotation);
-                processParameters(abstractSubResourceMethod, m, isEncoded);
+                processParameters(
+                        abstractSubResourceMethod.getResource().getResourceClass(),
+                        abstractSubResourceMethod.getMethod().getDeclaringClass(),
+                        abstractSubResourceMethod, m, isEncoded);
 
                 resource.getSubResourceMethods().add(abstractSubResourceMethod);
 
             } else { // treat the sub-resource method as a resource method
-                
+                final ReflectionHelper.ClassTypePair ct = getGenericReturnType(resource.getResourceClass(), m.getMethod());
                 final AbstractResourceMethod abstractResourceMethod = new AbstractResourceMethod(
                         resource,
                         m.getMethod(),
+                        ct.c, ct.t,
                         m.getMetaMethodAnnotations(HttpMethod.class).get(0).value(),
                         m.getAnnotations());
 
                 addConsumes(m, abstractResourceMethod, classScopeConsumesAnnotation);
                 addProduces(m, abstractResourceMethod, classScopeProducesAnnotation);
-                processParameters(abstractResourceMethod, m, isEncoded);
+                processParameters(
+                        abstractResourceMethod.getResource().getResourceClass(),
+                        abstractResourceMethod.getMethod().getDeclaringClass(),
+                        abstractResourceMethod, m, isEncoded);
 
                 resource.getResourceMethods().add(abstractResourceMethod);
             }
@@ -330,13 +375,18 @@ public class IntrospectionModeller {
                         mPathAnnotation.value()),
                     m.getAnnotations());
 
-            processParameters(subResourceLocator, m, isEncoded);
+            processParameters(
+                    subResourceLocator.getResource().getResourceClass(),
+                    subResourceLocator.getMethod().getDeclaringClass(),
+                    subResourceLocator, m, isEncoded);
 
             resource.getSubResourceLocators().add(subResourceLocator);
         }
     }
 
     private static final void processParameters(
+            Class concreteClass,
+            Class declaringClass,
             Parameterized parametrized, 
             Constructor ctor, 
             boolean isEncoded) {
@@ -351,7 +401,7 @@ public class IntrospectionModeller {
         }
 
         processParameters(
-                ctor.toString(),
+                concreteClass, declaringClass,
                 parametrized,
                 ((null != ctor.getAnnotation(Encoded.class)) || isEncoded),
                 parameterTypes,
@@ -360,11 +410,13 @@ public class IntrospectionModeller {
     }
 
     private static final void processParameters(
+            Class concreteClass,
+            Class declaringClass,
             Parameterized parametrized, 
             AnnotatedMethod method, 
             boolean isEncoded) {
         processParameters(
-                method.toString(),
+                concreteClass, declaringClass,
                 parametrized,
                 ((null != method.getAnnotation(Encoded.class)) || isEncoded),
                 method.getParameterTypes(), 
@@ -373,7 +425,8 @@ public class IntrospectionModeller {
     }
 
     private static final void processParameters(
-            String nameForLogging,
+            Class concreteClass,
+            Class declaringClass,
             Parameterized parametrized,
             boolean isEncoded,
             Class[] parameterTypes,
@@ -382,8 +435,7 @@ public class IntrospectionModeller {
 
         for (int i = 0; i < parameterTypes.length; i++) {
             Parameter parameter = createParameter(
-                    nameForLogging, 
-                    i + 1,
+                    concreteClass, declaringClass,
                     isEncoded, parameterTypes[i], 
                     genericParameterTypes[i], 
                     parameterAnnotations[i]);
@@ -473,8 +525,8 @@ public class IntrospectionModeller {
 
     @SuppressWarnings("unchecked")
     private static final Parameter createParameter(
-            String nameForLogging, 
-            int order,
+            Class concreteClass,
+            Class declaringClass,
             boolean isEncoded, 
             Class<?> paramClass, 
             Type paramType, 
@@ -517,8 +569,23 @@ public class IntrospectionModeller {
             paramSource = Parameter.Source.ENTITY;
         }
 
-        return new Parameter(annotations, paramAnnotation, paramSource, paramName, paramType, 
-                paramClass, paramEncoded, paramDefault);
+        if (paramType instanceof TypeVariable) {
+            ReflectionHelper.ClassTypePair ct = ReflectionHelper.resolveTypeVariable(
+                    concreteClass,
+                    declaringClass,
+                    (TypeVariable)paramType);
+
+            if (ct != null) {
+                paramType = ct.t;
+                paramClass = ct.c;
+            }
+        }
+
+        return new Parameter(
+                annotations, paramAnnotation,
+                paramSource,
+                paramName, paramType, paramClass,
+                paramEncoded, paramDefault);
     }
 
     private static final String getValue(Annotation a) {
