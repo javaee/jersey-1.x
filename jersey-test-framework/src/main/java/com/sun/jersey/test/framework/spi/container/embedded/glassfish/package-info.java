@@ -35,6 +35,6 @@
  * holder.
  */
 /**
- * Provides Web-based support for testing with external application deployments.
+ * Provides Web-based support for testing with Embedded GlassFish.
  */
 package com.sun.jersey.test.framework.spi.container.embedded.glassfish;
