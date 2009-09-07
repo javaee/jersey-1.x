@@ -45,6 +45,9 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
@@ -740,6 +743,124 @@ public class BasicValidatorTest extends TestCase {
         assertEquals(1, validator.getIssueList().size());
     }
 
+
+
+    public static class TypeVariableResource<T, V> {
+        @QueryParam("v") V fieldV;
+
+        V methodV;
+
+        @QueryParam("v")
+        public void set(V methodV) {
+            this.methodV = methodV;
+        }
+
+        @GET
+        public String get(@QueryParam("v") V getV) {
+            return getV.toString() + fieldV.toString() + methodV.toString();
+        }
+
+        @POST
+        public T post(T t) {
+            return t;
+        }
+
+        @Path("sub")
+        @POST
+        public T postSub(T t) {
+            return t;
+        }
+    }
+
+    public void testTypeVariableResource() throws Exception {
+        System.out.println("---\n");
+        AbstractResource ar = IntrospectionModeller.createResource(TypeVariableResource.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.fatalIssuesFound());
+        assertEquals(7, validator.getIssueList().size());
+    }
+
+    public static class ParameterizedTypeResource<T, V> {
+        @QueryParam("v") Collection<V> fieldV;
+
+        List<List<V>> methodV;
+
+        @QueryParam("v")
+        public void set(List<List<V>> methodV) {
+            this.methodV = methodV;
+        }
+
+        @GET
+        public String get(@QueryParam("v") Map<String, List<V>> getV) {
+            return "";
+        }
+
+        @POST
+        public Collection<T> post(Collection<T> t) {
+            return t;
+        }
+
+        @Path("sub")
+        @POST
+        public Collection<T> postSub(Collection<T> t) {
+            return t;
+        }
+    }
+
+    public static class ConcreteParameterizedTypeResource extends ParameterizedTypeResource<String, String> {
+    }
+
+    public void testParameterizedTypeResource() throws Exception {
+        System.out.println("---\n");
+        AbstractResource ar = IntrospectionModeller.createResource(ConcreteParameterizedTypeResource.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.fatalIssuesFound());
+        assertEquals(7, validator.getIssueList().size());
+    }
+
+    public static class GenericArrayResource<T, V> {
+        @QueryParam("v") V[] fieldV;
+
+        V[] methodV;
+
+        @QueryParam("v")
+        public void set(V[] methodV) {
+            this.methodV = methodV;
+        }
+
+        @GET
+        public String get(@QueryParam("v") V[] getV) {
+            return "";
+        }
+
+        @POST
+        public T[] post(T[] t) {
+            return t;
+        }
+
+        @Path("sub")
+        @POST
+        public T[] postSub(T[] t) {
+            return t;
+        }
+    }
+
+    public static class ConcreteGenericArrayResource extends GenericArrayResource<String, String> {
+    }
+
+    public void testGenericArrayResource() throws Exception {
+        System.out.println("---\n");
+        AbstractResource ar = IntrospectionModeller.createResource(ConcreteGenericArrayResource.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.fatalIssuesFound());
+        assertEquals(7, validator.getIssueList().size());
+    }
 
     // TODO: test multiple root resources with the same uriTempl (in WebApplicationImpl.processRootResources ?)
 

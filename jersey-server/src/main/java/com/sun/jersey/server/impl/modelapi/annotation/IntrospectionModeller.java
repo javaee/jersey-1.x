@@ -192,6 +192,7 @@ public class IntrospectionModeller {
         
         while (c != Object.class) {
              for (final Field f : c.getDeclaredFields()) {
+                if (f.getDeclaredAnnotations().length > 0) {
                     final AbstractField af = new AbstractField(f);
                     Parameter p = createParameter(
                             resource.getResourceClass(),
@@ -204,6 +205,7 @@ public class IntrospectionModeller {
                         af.getParameters().add(p);
                         resource.getFields().add(af);
                     }
+                }
              }
              c = c.getSuperclass();
         }

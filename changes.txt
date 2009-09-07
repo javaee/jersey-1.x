@@ -2,6 +2,9 @@ release 1.1.3-ea (2009-11)
 - Support the resolving of a type variable, T say, to a concrete type for
   all parameters (field, method parameters, method setters) and
   return types of resource methods.
+  Log warnings if T cannot be resolved to a concreate type, or if a
+  parameterized type, Collection<T> say, cannot be resolved because such
+  a type cannot be created dynamically.
 - Added support for Servlet 3.0 deployment with JAX-RS 1.1-ea.
 - Fixed issue 363
   https://jersey.dev.java.net/issues/show_bug.cgi?id=363

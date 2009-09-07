@@ -211,6 +211,7 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
     public List<AbstractModelComponent> getComponents() {
         List<AbstractModelComponent> components = new LinkedList<AbstractModelComponent>();
         components.addAll(getConstructors());
+        components.addAll(getFields());
         components.addAll(getSetterMethods());
         components.addAll(getResourceMethods());
         components.addAll(getSubResourceMethods());

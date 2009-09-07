@@ -46,13 +46,17 @@ import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.api.model.Parameterized;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.impl.ImplMessages;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -184,16 +188,6 @@ public class BasicValidator extends AbstractModelValidator {
             }
         });
 
-        // check setters for ambiguities
-        for (AbstractSetterMethod asm : resource.getSetterMethods()) {
-            checkParameter(asm, asm.getMethod().toString(), "1", asm.getMethod().getDeclaredAnnotations());
-        }
-
-        // check fields for ambiguities
-        for (AbstractField af : resource.getFields()) {
-            checkParameter(af, af.getField().toString(), af.getField().getName(), af.getField().getDeclaredAnnotations());
-        }
-
         checkNonPublicMethods(resource);
     }
 
@@ -237,13 +231,17 @@ public class BasicValidator extends AbstractModelValidator {
     }
 
     public void visitAbstractField(AbstractField field) {
+        final Field f = field.getField();
+        checkParameter(field.getParameters().get(0), f, f.toGenericString(), f.getName());
     }
 
     public void visitAbstractSetterMethod(AbstractSetterMethod setterMethod) {
+        final Method m = setterMethod.getMethod();
+        checkParameter(setterMethod.getParameters().get(0), m, m.toGenericString(), "1");
     }
 
     public void visitAbstractResourceMethod(AbstractResourceMethod method) {
-        checkParameters(method.getMethod());
+        checkParameters(method, method.getMethod());
         // ensure GET returns non-void value
         if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()) && (void.class == method.getMethod().getReturnType()))) {
             issueList.add(new ResourceModelIssue(
@@ -278,6 +276,14 @@ public class BasicValidator extends AbstractModelValidator {
                     ImplMessages.MULTIPLE_HTTP_METHOD_DESIGNATORS(method.getMethod(), httpAnnotList.toString()),
                     true));
         }
+
+        final Type t = method.getGenericReturnType();
+        if (!isConcreteType(t)) {
+            issueList.add(new ResourceModelIssue(
+                    method.getMethod(),
+                    "Return type " + t + " of method " + method.getMethod().toGenericString() + " is not resolvable to a concrete type",
+                    false));
+        }
     }
 
     public void visitAbstractSubResourceMethod(AbstractSubResourceMethod method) {
@@ -293,7 +299,7 @@ public class BasicValidator extends AbstractModelValidator {
     }
 
     public void visitAbstractSubResourceLocator(AbstractSubResourceLocator locator) {
-        checkParameters(locator.getMethod());
+        checkParameters(locator, locator.getMethod());
         if (void.class == locator.getMethod().getReturnType()) {
             issueList.add(new ResourceModelIssue(
                     locator,
@@ -329,28 +335,54 @@ public class BasicValidator extends AbstractModelValidator {
         return Collections.unmodifiableSet(set);
     }
 
-    private void checkParameter(Object source, String nameForLogging, String paramNameForLogging, Annotation[] pa) {
-            int annotCount = 0;
-            for (Annotation a : pa) {
-                if (ParamAnnotationSET.contains(a.annotationType())) {
-                    annotCount++;
-                    if (annotCount > 1) {
-                        issueList.add(new ResourceModelIssue(
-                                source,
-                                ImplMessages.AMBIGUOUS_PARAMETER(nameForLogging, paramNameForLogging),
-                                false));
-                        break;
-                    }
+    private void checkParameter(Parameter p, Object source, String nameForLogging, String paramNameForLogging) {
+        int annotCount = 0;
+        for (Annotation a : p.getAnnotations()) {
+            if (ParamAnnotationSET.contains(a.annotationType())) {
+                annotCount++;
+                if (annotCount > 1) {
+                    issueList.add(new ResourceModelIssue(
+                            source,
+                            ImplMessages.AMBIGUOUS_PARAMETER(nameForLogging, paramNameForLogging),
+                            false));
+                    break;
                 }
             }
+        }
+
+        final Type t = p.getParameterType();
+        if (!isConcreteType(t)) {
+            issueList.add(new ResourceModelIssue(
+                    source,
+                    "Parameter " + paramNameForLogging + " of type " + t + " from " + nameForLogging + " is not resolvable to a concrete type",
+                    false));
+        }
     }
 
-    private void checkParameters(Method m) {
-        Annotation[][] pas = m.getParameterAnnotations();
+    private boolean isConcreteType(Type t) {
+        if (t instanceof ParameterizedType) {
+            return isConcreteParameterizedType((ParameterizedType)t);
+        } else if (!(t instanceof Class)) {
+            // GenericArrayType, WildcardType, TypeVariable
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean isConcreteParameterizedType(ParameterizedType pt) {
+        boolean isConcrete = true;
+        for (Type t : pt.getActualTypeArguments()) {
+            isConcrete &= isConcreteType(t);
+        }
+
+        return isConcrete;
+    }
+
+    private void checkParameters(Parameterized pl, Method m) {
         int paramCount = 0;
-        for (Annotation[] pa : pas) {
-            paramCount++;
-            checkParameter(m, m.toString(), Integer.toString(paramCount), pa);
+        for (Parameter p : pl.getParameters()) {
+            checkParameter(p, m, m.toGenericString(), Integer.toString(++paramCount));
         }
     }
 
