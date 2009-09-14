@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,60 +35,61 @@
  * holder.
  */
 
+package com.sun.jersey.json.impl.writer;
 
-package com.sun.jersey.json.impl;
-
-import java.util.LinkedList;
-import java.util.List;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+import javax.xml.stream.XMLStreamException;
+import junit.framework.TestCase;
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonGenerator;
 
 /**
  *
  * @author japod
  */
-@XmlRootElement(name = "item2")
-public class TwoListsWrapperBean {
-    public List<String> property1, property2;
-    
-    public static Object createTestInstance() {
-        TwoListsWrapperBean instance = new TwoListsWrapperBean();
-        instance.property1 = new LinkedList<String>();
-        instance.property1.add("a1");
-        instance.property1.add("a1");
-        instance.property2 = new LinkedList<String>();
-        instance.property2.add("b1");
-        return instance;
+public class Stax2JacksonWriterMultipleCharactersEventTest extends TestCase {
+
+  
+    public Stax2JacksonWriterMultipleCharactersEventTest(String testName) {
+        super(testName);
+    }
+
+
+    public void testMultipleCharactersWithinSimpleTagEvent() throws Exception {
+        Map<String, Object> props = new HashMap<String, Object>();
+
+        JsonFactory factory = new JsonFactory();
+        Writer osWriter = new OutputStreamWriter(System.out);
+        JsonGenerator g;
+
+        g = factory.createJsonGenerator(osWriter);
+        final Stax2JacksonWriter s2jWriter = new Stax2JacksonWriter(g);
+
+        try {
+            s2jWriter.writeStartDocument();
+            s2jWriter.writeStartElement("simpleTag");
+            s2jWriter.writeCharacters("text1\n");
+            s2jWriter.writeCharacters("text2\n");
+            s2jWriter.writeEndElement();
+            s2jWriter.writeEndDocument();
+        } catch (XMLStreamException e) {
+            fail();
+        } finally {
+            g.flush();
+            System.out.println("");
+        }
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final TwoListsWrapperBean other = (TwoListsWrapperBean) obj;
-        if (this.property1 != other.property1 && (this.property1 == null || !this.property1.equals(other.property1))) {
-            return false;
-        }
-        if (this.property2 != other.property2 && (this.property2 == null || !this.property2.equals(other.property2))) {
-            return false;
-        }
-        return true;
+    protected void setUp() throws Exception {
+        super.setUp();
     }
 
     @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 59 * hash + (this.property1 != null ? this.property1.hashCode() : 0);
-        hash = 59 * hash + (this.property2 != null ? this.property2.hashCode() : 0);
-        return hash;
+    protected void tearDown() throws Exception {
+        super.tearDown();
     }
-
-    @Override
-    public String toString() {
-        return String.format("{twoListsWrapperBean:{property1:%s, property2:%s}}", property1, property2);
-    }
-
 }

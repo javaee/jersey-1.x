@@ -122,7 +122,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
 
     final static String XML_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 
-    JsonGenerator generator;
+    JacksonStringMergingGenerator generator;
     final List<ProcessingInfo> processingStack = new ArrayList<ProcessingInfo>();
     boolean writingAttr = false;
 
@@ -144,7 +144,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
 
     public Stax2JacksonWriter(JsonGenerator generator, JSONConfiguration config) {
         this.attrsWithPrefix = config.isUsingPrefixesAtNaturalAttributes();
-        this.generator = generator;
+        this.generator = JacksonStringMergingGenerator.createGenerator(generator);
     }
 
     public void writeStartElement(String localName) throws XMLStreamException {
@@ -421,13 +421,16 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
     private void writeCharacters(String text, boolean forceString) throws XMLStreamException {
         try {
             ProcessingInfo currentPI = peek(processingStack);
-            ProcessingInfo parentPI = peek2nd(processingStack);
             if (currentPI.startObjectWritten && !currentPI.afterFN) {
                 generator.writeFieldName("$");
             }
             currentPI.afterFN = false;
             if (forceString || !nonStringTypes.contains(currentPI.t)) {
-                generator.writeString(text);
+                if (!currentPI.isArray) {
+                    generator.writeStringToMerge(text);
+                } else {
+                    generator.writeString(text);
+                }
             } else {
                 if ((boolean.class == currentPI.t) || (Boolean.class == currentPI.t)) {
                     generator.writeBoolean(Boolean.parseBoolean(text));
