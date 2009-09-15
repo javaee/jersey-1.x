@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/j2ee/web-app_2_5.xsd">
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
@@ -18,10 +18,10 @@
         <env-entry-name>injectedResource</env-entry-name>
         <env-entry-type>java.lang.Integer</env-entry-type>
         <env-entry-value>15</env-entry-value>
-        <injection-target>
+<!--        <injection-target>
             <injection-target-class>com.sun.jersey.samples.managedbeans.resources.ManagedBeanResource</injection-target-class>
             <injection-target-name>injectedResource</injection-target-name>
         </injection-target>
-    </env-entry>
+-->    </env-entry>
     
 </web-app>

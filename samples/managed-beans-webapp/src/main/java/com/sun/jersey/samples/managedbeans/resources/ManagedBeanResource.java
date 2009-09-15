@@ -23,15 +23,17 @@
 package com.sun.jersey.samples.managedbeans.resources;
 
 import javax.annotation.Resource;
+import javax.annotation.ManagedBean;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 
 // The Java class will be hosted at the URI path "/managedbean"
 @Path("/managedbean")
+@ManagedBean
 public class ManagedBeanResource {
 
-    @Resource int injectedResource = 50;
+    @Resource(name="injectedResource") int injectedResource = 50;
 
     @GET 
     @Produces("text/plain")
