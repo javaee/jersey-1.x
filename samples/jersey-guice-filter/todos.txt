@@ -1,0 +1,15 @@
+1) Create a README.html file which describes the following elements of the sample:
+
+       a) Explain web.xml and GuiceServletConfig
+
+       b) Create resource class, @Path("bound/perrequest"), using guice @RequestScoped
+
+       c) Inject URI info and a query parameter
+
+       d) Create singleton component and inject into resource at construction
+
+2) Add the sample to the modules of jersey-samples (once the README is done)
+
+3) Also, check that it works properly with other container types like EmbeddedGF, External GlassFish, etc.
+
+4) Remove the overriding of test container in the test class.
