@@ -46,8 +46,7 @@ import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
  */
 public class GlassfishMonitoringServiceProvider implements GlassfishMonitoringProvider {
 
-    public static final String MONITORING_CONFIG_ELEMENT = "web-container";
-    public static final String MONITORING_PROBE_REQUEST_START = "glassfish:jersey:server:requestStart";
+    public static final String MONITORING_CONFIG_ELEMENT = "jersey";
     public static final String LOGGER_JERSEY_MONITORING = "Jersey-Monitoring";
 
 
