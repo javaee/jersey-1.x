@@ -46,9 +46,7 @@ import com.sun.jersey.spi.monitoring.GlassfishMonitoringProvider;
  */
 public class GlassfishMonitoringServiceProvider implements GlassfishMonitoringProvider {
 
-    public static final String MONITORING_CONFIG_ELEMENT = "jersey";
     public static final String LOGGER_JERSEY_MONITORING = "Jersey-Monitoring";
-
 
     private static synchronized void start() {
         GlobalStatsProvider gsp = GlobalStatsProvider.getInstance();

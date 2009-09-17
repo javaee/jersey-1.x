@@ -55,6 +55,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.glassfish.api.monitoring.ContainerMonitoring;
 import org.glassfish.external.probe.provider.PluginPoint;
 import org.glassfish.external.probe.provider.StatsProviderManager;
 import org.glassfish.external.probe.provider.annotations.ProbeListener;
@@ -105,7 +106,7 @@ public class GlobalStatsProvider {
      */
     public synchronized void register() {
         if(!registered) {
-            StatsProviderManager.register(GlassfishMonitoringServiceProvider.MONITORING_CONFIG_ELEMENT, PluginPoint.SERVER, "/jersey/global", this);
+            StatsProviderManager.register(ContainerMonitoring.JERSEY, PluginPoint.SERVER, "/jersey/global", this);
             Logger.getLogger(GlassfishMonitoringServiceProvider.LOGGER_JERSEY_MONITORING).log(Level.INFO, "GlobalStatsProvider registered");
             registered = true;
         }
@@ -138,7 +139,7 @@ public class GlobalStatsProvider {
             //        appName + "/jersey/resources", applicationStatsProvider);
 
             // workaround for ^^^
-            StatsProviderManager.register(GlassfishMonitoringServiceProvider.MONITORING_CONFIG_ELEMENT,
+            StatsProviderManager.register(ContainerMonitoring.JERSEY,
                     PluginPoint.SERVER, "applications/" + applicationName + "/jersey/resources",
                     applicationStatsProvider);
 
