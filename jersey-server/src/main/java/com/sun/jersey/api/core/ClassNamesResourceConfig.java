@@ -50,7 +50,7 @@ public class ClassNamesResourceConfig extends DefaultResourceConfig {
 
     /**
      * The property value MUST be an instance String or String[]. Each String
-     * instance represents one or more package names that MUST be separated by ';'.
+     * instance represents one or more class names that MUST be separated by ';'.
      */
     public static final String PROPERTY_CLASSNAMES = "com.sun.jersey.config.property.classnames";
 
