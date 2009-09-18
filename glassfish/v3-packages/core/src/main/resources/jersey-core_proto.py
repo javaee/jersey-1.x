@@ -1,6 +1,6 @@
 pkg = {
     "name"          : "jersey",
-    "version"       : "1.1.2,0-0.1",
+    "version"       : "1.1.3,0-0.1",
     "attributes"    : { "pkg.summary" : "Jersey Core, RESTful Web services for GlassFish",
                         "pkg.description" : 
 "Jersey core runtime libraries including some 3rd party dependencies. \
@@ -18,5 +18,5 @@ pkg = {
                   "pkg:/glassfish-nucleus@3.0" : {"type" : "require" }
                   ,"pkg:/metro@1.4" : {"type" : "require" }
                 },
-    "licenses" : { "LICENSE.txt" : { "license" : "CDDL+GPL" }}
+    "licenses" : { "LICENSE.txt" : { "license" : "CDDL+GPL" }, "third-party-license-readme.txt" : { "license" : "Apache2" }}
 }
