@@ -60,6 +60,7 @@ import org.glassfish.external.probe.provider.PluginPoint;
 import org.glassfish.external.probe.provider.StatsProviderManager;
 import org.glassfish.external.probe.provider.annotations.ProbeListener;
 import org.glassfish.external.probe.provider.annotations.ProbeParam;
+import org.glassfish.gmbal.AMXMetadata;
 import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.internal.api.Globals;
@@ -70,6 +71,7 @@ import org.jvnet.hk2.component.Habitat;
  * @author pavel.bucek@sun.com
  */
 
+@AMXMetadata(type="jersey-global-mon", group="monitoring")
 @ManagedObject
 public class GlobalStatsProvider {
 
@@ -111,7 +113,7 @@ public class GlobalStatsProvider {
             registered = true;
         }
     }
-
+    
     @ManagedAttribute(id="applicationlist")
     public Set<String> getApplications() {
         return applications;
@@ -169,7 +171,7 @@ public class GlobalStatsProvider {
         return null;
     }
 
-
+    
     @ProbeListener("glassfish:jersey:server:ruleAccept")
     public void ruleAccept(
             @ProbeParam("ruleName") String ruleName,

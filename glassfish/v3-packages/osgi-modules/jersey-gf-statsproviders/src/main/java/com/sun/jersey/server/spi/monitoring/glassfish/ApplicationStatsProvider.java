@@ -39,6 +39,7 @@ package com.sun.jersey.server.spi.monitoring.glassfish;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.glassfish.gmbal.AMXMetadata;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
 
@@ -46,6 +47,8 @@ import org.glassfish.gmbal.ManagedObject;
  *
  * @author pavel.bucek@sun.com
  */
+
+@AMXMetadata(type="jersey-application-mon", group="monitoring")
 @ManagedObject
 public class ApplicationStatsProvider {
 
