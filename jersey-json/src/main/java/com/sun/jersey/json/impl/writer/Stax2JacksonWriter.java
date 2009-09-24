@@ -413,8 +413,14 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         try {
             generator.writeStartObject();
         } catch (IOException ex) {
-            Logger.getLogger(Stax2JacksonWriter.class.getName()).log(Level.SEVERE, null, ex);
-            throw new XMLStreamException(ex);
+            //JRA-18973: Log Socket exceptions that can happen quite often when browsers close connections pre-maturely at DEBUG level.
+            // Also don't need to throw the exception further up but just swallow it here.
+            if (ex instanceof java.net.SocketTimeoutException || ex instanceof java.net.SocketException) {
+                Logger.getLogger(Stax2JacksonWriter.class.getName()).log(Level.FINE, "Socket excption", ex);
+            } else {
+                Logger.getLogger(Stax2JacksonWriter.class.getName()).log(Level.SEVERE, "IO exception", ex);
+                throw new XMLStreamException(ex);
+            }
         }
     }
 
