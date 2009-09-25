@@ -46,7 +46,6 @@ import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
-import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentConstructor;
 import com.sun.jersey.server.spi.component.ResourceComponentDestructor;

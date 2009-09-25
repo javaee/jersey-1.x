@@ -36,7 +36,6 @@
  */
 package com.sun.jersey.server.impl.managedbeans;
 
-import com.sun.jersey.server.impl.ejb.*;
 import com.sun.jersey.api.core.ResourceConfig;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
