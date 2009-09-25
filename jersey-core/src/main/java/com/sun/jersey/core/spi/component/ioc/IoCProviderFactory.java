@@ -36,13 +36,16 @@
  */
 package com.sun.jersey.core.spi.component.ioc;
 
+import com.sun.jersey.core.spi.component.ComponentDestructor;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentProvider;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
 
 /**
  * An extension of {@link ProviderFactory} that defers to an
@@ -91,7 +94,7 @@ public class IoCProviderFactory extends ProviderFactory {
         if (icp instanceof IoCManagedComponentProvider) {
             IoCManagedComponentProvider imcp = (IoCManagedComponentProvider)icp;
             if (imcp.getScope() == ComponentScope.Singleton) {
-                return new SingletonWrapper(getInjectableProviderContext(), imcp, c);
+                return new ManagedSingleton(getInjectableProviderContext(), imcp, c);
             } else {
                 throw new RuntimeException("The scope of the component " + c + " must be a singleton");
             }
@@ -100,7 +103,7 @@ public class IoCProviderFactory extends ProviderFactory {
             return new FullyManagedSingleton(ifmcp.getInstance());
         } else if (icp instanceof IoCInstantiatedComponentProvider) {
             IoCInstantiatedComponentProvider iicp = (IoCInstantiatedComponentProvider)icp;
-            return new SingletonWrapper(getInjectableProviderContext(), iicp, c);
+            return new InstantiatedSingleton(getInjectableProviderContext(), iicp, c);
         } else if (icp instanceof IoCProxiedComponentProvider) {
             IoCProxiedComponentProvider ipcp = (IoCProxiedComponentProvider)icp;
             ComponentProvider cp = super._getComponentProvider(c);
@@ -113,10 +116,53 @@ public class IoCProviderFactory extends ProviderFactory {
         throw new UnsupportedOperationException();
     }
 
-    private static class SingletonWrapper implements ComponentProvider {
+    private static class InstantiatedSingleton implements ComponentProvider, Destroyable {
         private final Object o;
 
-        SingletonWrapper(InjectableProviderContext ipc, 
+        private final IoCDestroyable destroyable;
+        
+        private final ComponentDestructor cd;
+
+        InstantiatedSingleton(InjectableProviderContext ipc,
+                IoCInstantiatedComponentProvider iicp,
+                Class c) {
+            this.destroyable = (iicp instanceof IoCDestroyable)
+                    ? (IoCDestroyable) iicp : null;
+            
+            this.cd = (destroyable == null) ? new ComponentDestructor(c) : null;
+
+            ComponentInjector ci = new ComponentInjector(
+                    ipc,
+                    c);
+            o = iicp.getInstance();
+            ci.inject(iicp.getInjectableInstance(o));
+        }
+
+        public Object getInstance() {
+            return o;
+        }
+
+        public void destroy() {
+            if (destroyable != null) {
+                destroyable.destroy(o);
+            } else {
+                try {
+                    cd.destroy(o);
+                } catch (IllegalAccessException ex) {
+                    LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+                } catch (IllegalArgumentException ex) {
+                    LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+                } catch (InvocationTargetException ex) {
+                    LOGGER.log(Level.SEVERE, "Unable to destroy resource", ex);
+                }
+            }
+        }
+    }
+
+    private static class ManagedSingleton implements ComponentProvider {
+        private final Object o;
+
+        ManagedSingleton(InjectableProviderContext ipc,
                 IoCInstantiatedComponentProvider iicp,
                 Class c) {
             ComponentInjector rci = new ComponentInjector(
@@ -143,22 +189,33 @@ public class IoCProviderFactory extends ProviderFactory {
         }
     }
 
-    private static class ProxiedSingletonWrapper implements ComponentProvider {
-        private final Object o;
+    private static class ProxiedSingletonWrapper implements ComponentProvider, Destroyable {
+        private final Destroyable destroyable;
+
+        private final Object proxy;
 
         ProxiedSingletonWrapper(IoCProxiedComponentProvider ipcp,
                 ComponentProvider cp,
                 Class c) {
 
-            Object _o = cp.getInstance();
-            this.o = ipcp.proxy(_o);
-            if (!this.o.getClass().isAssignableFrom(_o.getClass()))
-                throw new IllegalStateException("Proxied object class " + this.o.getClass() +
-                        " is not assignable from object class " + _o.getClass());
+            this.destroyable = (cp instanceof Destroyable)
+                    ? (Destroyable) cp : null;
+            
+            Object o = cp.getInstance();
+            this.proxy = ipcp.proxy(o);
+            if (!this.proxy.getClass().isAssignableFrom(o.getClass()))
+                throw new IllegalStateException("Proxied object class " + this.proxy.getClass() +
+                        " is not assignable from object class " + o.getClass());
         }
 
         public Object getInstance() {
-            return o;
+            return proxy;
+        }
+
+        public void destroy() {
+            if (destroyable != null) {
+                destroyable.destroy();
+            }
         }
     }
  }

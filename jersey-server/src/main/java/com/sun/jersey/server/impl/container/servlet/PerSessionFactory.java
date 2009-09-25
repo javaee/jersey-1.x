@@ -45,6 +45,7 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentConstructor;
@@ -94,35 +95,38 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
         throw new IllegalStateException();
     }
 
-    private static class SessionMap extends HashMap<String, Object>
+    private static class ProviderObjectPair {
+        private final AbstractPerSession s;
+        private final Object o;
+
+        public ProviderObjectPair(AbstractPerSession s, Object o) {
+            this.s = s;
+            this.o = o;
+        }
+    }
+    
+    private static class SessionMap extends HashMap<String, ProviderObjectPair>
             implements HttpSessionBindingListener {
 
         public void valueBound(HttpSessionBindingEvent hsbe) {
         }
 
         public void valueUnbound(HttpSessionBindingEvent hsbe) {
-            for (Object o : values()) {
-                try {
-                    AbstractResource ar = IntrospectionModeller.createResource(o.getClass());
-                    ResourceComponentDestructor rcd = new ResourceComponentDestructor(ar);
-                    rcd.destroy(o);
-                } catch (IllegalAccessException ex) {
-                    throw new ContainerException("Unable to destroy resource", ex);
-                } catch (InvocationTargetException ex) {
-                    throw new ContainerException("Unable to destroy resource", ex);
-                } catch (RuntimeException ex) {
-                    throw new ContainerException("Unable to destroy resource", ex);
-                }
+            for (ProviderObjectPair x : values()) {
+                x.s.destroy(x.o);
             }
         }
     }
 
-    private abstract class AbstractPerSesson implements ResourceComponentProvider {
+    private abstract class AbstractPerSession implements ResourceComponentProvider {
         private static final String SCOPE_PER_SESSION = "com.sun.jersey.scope.PerSession";
+
+        private ResourceComponentDestructor rcd;
 
         private Class c;
         
         public void init(AbstractResource abstractResource) {
+            this.rcd = new ResourceComponentDestructor(abstractResource);
             this.c = abstractResource.getResourceClass();
         }
 
@@ -139,12 +143,12 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
                     sm = new SessionMap();
                     hs.setAttribute(SCOPE_PER_SESSION, sm);
                 }
-                Object o = sm.get(c.getName());
-                if (o != null)
-                    return o;
+                ProviderObjectPair x = sm.get(c.getName());
+                if (x != null)
+                    return x.o;
 
-                o = _getInstance(hc);
-                sm.put(c.getName(), o);
+                Object o = _getInstance(hc);
+                sm.put(c.getName(), new ProviderObjectPair(this, o));
                 return o;
             }
         }
@@ -153,9 +157,21 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
 
         public final void destroy() {
         }
+
+        public void destroy(Object o) {
+            try {
+                rcd.destroy(o);
+            } catch (IllegalAccessException ex) {
+                throw new ContainerException("Unable to destroy resource", ex);
+            } catch (InvocationTargetException ex) {
+                throw new ContainerException("Unable to destroy resource", ex);
+            } catch (RuntimeException ex) {
+                throw new ContainerException("Unable to destroy resource", ex);
+            }
+        }
     }
 
-    private final class PerSesson extends AbstractPerSesson {
+    private final class PerSesson extends AbstractPerSession {
         private ResourceComponentConstructor rcc;
 
         @Override
@@ -186,13 +202,17 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
         }
     }
 
-    private final class PerSessonInstantiated extends AbstractPerSesson {
+    private final class PerSessonInstantiated extends AbstractPerSession {
         private final IoCInstantiatedComponentProvider iicp;
 
+        private final IoCDestroyable destroyable;
+        
         private ResourceComponentInjector rci;
 
         PerSessonInstantiated(IoCInstantiatedComponentProvider iicp) {
             this.iicp = iicp;
+            this.destroyable = (iicp instanceof IoCDestroyable)
+                    ? (IoCDestroyable) iicp : null;
         }
 
         @Override
@@ -210,9 +230,18 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
             rci.inject(hc, iicp.getInjectableInstance(o));
             return o;
         }
+
+        @Override
+        public void destroy(Object o) {
+            if (destroyable != null) {
+                destroyable.destroy(o);
+            } else {
+                super.destroy(o);
+            }
+        }
     }
 
-    private final class PerSessonProxied extends AbstractPerSesson {
+    private final class PerSessonProxied extends AbstractPerSession {
         private final IoCProxiedComponentProvider ipcp;
 
         private ResourceComponentConstructor rcc;

@@ -50,6 +50,7 @@ import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
 import com.sun.jersey.server.spi.component.ResourceComponentDestructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -139,7 +140,7 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
         
         protected abstract Object _getInstance(HttpContext hc);
 
-        private void destroy(Object o) {
+        public void destroy(Object o) {
             try {
                 rcd.destroy(o);
             } catch (IllegalAccessException ex) {
@@ -186,10 +187,14 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
     private final class PerRequestInstantiated extends AbstractPerRequest {
         private final IoCInstantiatedComponentProvider iicp;
 
+        private final IoCDestroyable destroyable;
+        
         private ResourceComponentInjector rci;
 
         PerRequestInstantiated(IoCInstantiatedComponentProvider iicp) {
             this.iicp = iicp;
+            this.destroyable = (iicp instanceof IoCDestroyable)
+                    ? (IoCDestroyable) iicp : null;
         }
 
         @Override
@@ -205,6 +210,15 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
             Object o = iicp.getInstance();
             rci.inject(hc, iicp.getInjectableInstance(o));
             return o;
+        }
+
+        @Override
+        public void destroy(Object o) {
+            if (destroyable != null) {
+                destroyable.destroy(o);
+            } else {
+                super.destroy(o);
+            }
         }
     }
 

@@ -54,9 +54,13 @@ import java.util.logging.Logger;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ProviderFactory implements ComponentProviderFactory<ComponentProvider> {
-    private static final Logger LOGGER = Logger.getLogger(ProviderFactory.class.getName());
+    protected static final Logger LOGGER = Logger.getLogger(ProviderFactory.class.getName());
 
-    private static final class SingletonComponentProvider implements ComponentProvider {
+    protected interface Destroyable {
+        void destroy();
+    }
+
+    private static final class SingletonComponentProvider implements ComponentProvider, Destroyable {
         private final Object o;
 
         private final ComponentDestructor cd;
@@ -207,9 +211,9 @@ public class ProviderFactory implements ComponentProviderFactory<ComponentProvid
      */
     public void destroy() {
         for (ComponentProvider cp : cache.values()) {
-            if (cp instanceof SingletonComponentProvider) {
-                SingletonComponentProvider scp = (SingletonComponentProvider)cp;
-                scp.destroy();
+            if (cp instanceof Destroyable) {
+                Destroyable d = (Destroyable)cp;
+                d.destroy();
             }
         }
     }

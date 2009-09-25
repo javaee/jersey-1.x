@@ -42,6 +42,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
@@ -98,7 +99,7 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
             return resource;
         }
 
-        public final void destroy() {
+        public void destroy() {
             try {
                 rcd.destroy(resource);
             } catch (IllegalAccessException ex) {
@@ -136,8 +137,12 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
     private class SingletonInstantiated extends AbstractSingleton {
         private final IoCInstantiatedComponentProvider iicp;
         
+        private final IoCDestroyable destroyable;
+
         SingletonInstantiated(IoCInstantiatedComponentProvider iicp) {
             this.iicp = iicp;
+            this.destroyable = (iicp instanceof IoCDestroyable)
+                    ? (IoCDestroyable) iicp : null;
         }
 
         @Override
@@ -151,6 +156,15 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
 
             resource = iicp.getInstance();
             rci.inject(null, iicp.getInjectableInstance(resource));
+        }
+
+        @Override
+        public void destroy() {
+            if (destroyable != null) {
+                destroyable.destroy(resource);
+            } else {
+                super.destroy();
+            }
         }
     }
 
