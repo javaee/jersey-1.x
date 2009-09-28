@@ -47,18 +47,17 @@
     <packaging>war</packaging>
     <profiles>
         <profile>
-            <id>jdk-1.5</id>
+            <id>test</id>
+        </profile>
+        <profile>
+            <id>skip-test</id>
             <activation>
-                <jdk>1.5</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1.12</version>
-                </dependency>
-            </dependencies>
-        </profile>       
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
     </profiles>
     <dependencies>
         <dependency>
@@ -68,16 +67,16 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.ejb</artifactId>
+            <version>3.0-b59</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-test-framework</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
-            <version>6.0-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
@@ -87,8 +86,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.5</source>
+                    <target>1.5</target>
                 </configuration>
             </plugin>
             <!-- Run the application using "mvn glassfish:run" -->
@@ -100,22 +99,22 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
                 <executions>
-                	<execution>
-                		<id>update-gf-deps</id>
+                    <execution>
+                        <id>update-gf-deps</id>
                         <phase>package</phase> <!-- append to the packaging phase. -->
                         <goals>
                             <goal>transform</goal> <!-- goals == mojos -->
                         </goals>
-                 		<configuration>
-                			<xslFile>src/main/xslt/gf.xsl</xslFile>
-                			<srcDir>.</srcDir>
-                			<srcIncludes>pom.xml</srcIncludes>
-                			<destDir>target/gf-pom-file</destDir>
-                		</configuration>
-                	</execution>
+                        <configuration>
+                            <xslFile>src/main/xslt/gf.xsl</xslFile>
+                            <srcDir>.</srcDir>
+                            <srcIncludes>pom.xml</srcIncludes>
+                            <destDir>target/gf-pom-file</destDir>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
-             <plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
