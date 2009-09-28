@@ -51,6 +51,7 @@ import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
+import com.sun.jersey.server.impl.managedbeans.ManagedBeanComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
 import com.sun.jersey.server.impl.monitoring.GlassFishMonitoringInitializer;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
@@ -447,6 +448,8 @@ public class WebComponent implements ContainerListener {
 
         EJBComponentProviderFactoryInitilizer.initialize(rc);
 
+        ManagedBeanComponentProviderFactoryInitilizer.initialize(rc);
+        
         GlassFishMonitoringInitializer.initialize();
     }
 

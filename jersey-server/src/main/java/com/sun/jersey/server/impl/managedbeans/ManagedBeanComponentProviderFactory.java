@@ -79,6 +79,9 @@ final class ManagedBeanComponentProviderFactory implements
         if (!isManagedBean(c))
             return null;
 
+        LOGGER.info("Binding the Managed bean class " + c.getName() +
+                " to ManagedBeanComponentProvider");
+
         return new ManagedBeanComponentProvider(c);
     }
 
