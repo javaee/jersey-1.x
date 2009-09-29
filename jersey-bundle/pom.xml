@@ -252,7 +252,7 @@
             <plugin> <!-- want to compile META-INF/services registry from individual modules -->
                 <groupId>com.sun.istack</groupId>
                 <artifactId>maven-istack-commons-plugin</artifactId>
-                <version>0.1-SNAPSHOT</version>
+                <version>0.1</version>
                 <executions>
                     <execution>
                         <goals>
