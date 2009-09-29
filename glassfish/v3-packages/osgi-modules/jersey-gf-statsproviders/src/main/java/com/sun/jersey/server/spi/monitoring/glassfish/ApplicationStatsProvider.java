@@ -39,6 +39,7 @@ package com.sun.jersey.server.spi.monitoring.glassfish;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.glassfish.external.statistics.annotations.Reset;
 import org.glassfish.gmbal.AMXMetadata;
 import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
@@ -52,8 +53,8 @@ import org.glassfish.gmbal.ManagedObject;
 @ManagedObject
 public class ApplicationStatsProvider {
 
-    private final Map<String, Long> rootResourceClassCounter;
-    private final Map<String, Long> resourceClassCounter;
+    private Map<String, Long> rootResourceClassCounter;
+    private Map<String, Long> resourceClassCounter;
 
     @ManagedAttribute(id="rootresourceclasshitcount-description")
     public String getRootResourceClassHitCountDesc() {
@@ -102,6 +103,15 @@ public class ApplicationStatsProvider {
         return resourceClassCounter;
     }
 
+    @Reset
+    public void reset() {
+        rootResourceClassHitCountStartTime = new java.util.Date().getTime();
+        rootResourceClassHitCountLastSampleTime = 0;
+        rootResourceClassCounter = new HashMap<String, Long>();
+        resourceClassHitCountStartTime = rootResourceClassHitCountStartTime;
+        resourceClassHitCountLastSampleTime = 0;
+        resourceClassCounter = new HashMap<String, Long>();
+    }
 
     public ApplicationStatsProvider() {
         rootResourceClassCounter = new HashMap<String, Long>();

@@ -60,6 +60,7 @@ import org.glassfish.external.probe.provider.PluginPoint;
 import org.glassfish.external.probe.provider.StatsProviderManager;
 import org.glassfish.external.probe.provider.annotations.ProbeListener;
 import org.glassfish.external.probe.provider.annotations.ProbeParam;
+import org.glassfish.external.statistics.annotations.Reset;
 import org.glassfish.gmbal.AMXMetadata;
 import org.glassfish.gmbal.ManagedObject;
 import org.glassfish.gmbal.ManagedAttribute;
@@ -117,6 +118,11 @@ public class GlobalStatsProvider {
     @ManagedAttribute(id="applicationlist")
     public Set<String> getApplications() {
         return applications;
+    }
+
+    @Reset
+    public void reset() {
+        applications = new HashSet<String>();
     }
 
     @ProbeListener("glassfish:jersey:server:requestStart")
