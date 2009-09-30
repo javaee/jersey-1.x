@@ -57,7 +57,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
@@ -75,6 +74,7 @@ import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
+import com.sun.jersey.api.core.ResourceConfigurator;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
@@ -559,6 +559,10 @@ public final class WebApplicationImpl implements WebApplication {
             DeferredResourceConfig drc = (DeferredResourceConfig)rc;
             resourceConfig.add(drc.getApplication(cpFactory));
         }
+
+        //Pipelined, decentralized configuration
+        for(ResourceConfigurator configurator : providerServices.getProviders(ResourceConfigurator.class))
+            configurator.configure(this.resourceConfig);
 
         // Validate the resource config
         this.resourceConfig.validate();

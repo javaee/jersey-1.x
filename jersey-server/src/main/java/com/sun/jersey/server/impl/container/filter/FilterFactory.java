@@ -175,15 +175,30 @@ public final class FilterFactory {
     private <T> List<T> getFilters(Class<T> c, List<?> l) {
         List<T> f = new LinkedList<T>();
         for (Object o : l) {
-            if (!c.isInstance(o)) {
-                LOGGER.severe("The filter, " + 
-                        o.getClass().getName() + 
-                        " MUST be an instance of " + 
-                        c.getName() + 
+            if (o instanceof String) {
+                f.addAll(providerServices.getInstances(c,
+                        DefaultResourceConfig.getElements(new String[] {(String)o})));
+            } else if (o instanceof String[]) {
+                f.addAll(providerServices.getInstances(c,
+                        DefaultResourceConfig.getElements((String[])o)));
+            } else if (c.isInstance(o)) {
+                f.add(c.cast(o));
+            } else if (o instanceof Class) {
+                Class fc = (Class)o;
+                if (c.isAssignableFrom(fc)) {
+                    f.addAll(providerServices.getInstances(c, new Class[] {fc}));
+                } else {
+                    LOGGER.severe("The filter, of type" +
+                            o.getClass().getName() +
+                            ", MUST be of the type Class<? extends" + c.getName() + ">" +
+                            ". The filter is ignored.");
+                }
+            } else {
+                LOGGER.severe("The filter, of type" +
+                        o.getClass().getName() +
+                        ", MUST be of the type String, String[], Class<? extends " + c.getName() + ">, or an instance of " + c.getName() +
                         ". The filter is ignored.");
-                continue;
-            }
-            f.add(c.cast(o));
+            }            
         }
         providerServices.getComponentProviderFactory().injectOnProviderInstances(f);
         return f;

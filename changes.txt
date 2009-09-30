@@ -1,4 +1,12 @@
 release 1.1.3-ea (2009-11)
+- Support configuration of ResourceConfig using the provider interface
+  com.sun.jersey.api.core.ResourceConfigurator.
+  One or more ResourceConfigurator providers may be registered and the
+  configure method will be called which may update the state of the
+  ResourceConfig instance passed as a parameter.
+- Support programmatic modification of the declaration of filters. See the
+  following methods on ResourceConfig: getContainerRequestFilters,
+  getContainerResponseFilters and getResourceFilterFactories.
 - Support the resolving of a type variable, T say, to a concrete type for
   all parameters (field, method parameters, method setters) and
   return types of resource methods.

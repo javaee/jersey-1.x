@@ -45,10 +45,12 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -170,10 +172,12 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * <p>
      * The instance may be a String[] or String that contains one or more fully 
      * qualified class name of a request filter class separeted by ';'.
-     * Otherwise the instance may be List&lt;ContainerRequestFilter&gt;.
+     * Otherwise the instance may be List containing instances of String,
+     * String[], Class&lt;? extends ContainerRequestFilter;&gt; or instances
+     * of ContainerRequestFilter.
      * <p>
-     * If a String[] or String of fully qualified class names then each
-     * class is instantiated as a singleton. Thus, if there is more than one
+     * If a String[] or String of fully qualified class names or a Class then
+     * each class is instantiated as a singleton. Thus, if there is more than one
      * class registered for this property or the same class is also registered for
      * the {@link #PROPERTY_CONTAINER_RESPONSE_FILTERS} property then only
      * one instance will be instatiated.
@@ -189,12 +193,14 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * a response each response filter is applied, in order, from the first to
      * the last entry in the list.
      * <p>
-     * The instance may be a String[] or String that contains one or more fully 
-     * qualified class name of a response filter class separeted by ';'.
-     * Otherwise the instance may be List&lt;ContainerResponseFilter&gt;.
+     * The instance may be a String[] or String that contains one or more fully
+     * qualified class name of a request filter class separeted by ';'.
+     * Otherwise the instance may be List containing instances of String,
+     * String[], Class&lt;? extends ContainerResponseFilter;&gt; or instances
+     * of ContainerResponseFilter.
      * <p>
-     * If a String[] or String of fully qualified class names then each
-     * class is instantiated as a singleton. Thus, if there is more than one
+     * If a String[] or String of fully qualified class names or a Class then
+     * each class is instantiated as a singleton. Thus, if there is more than one
      * class registered for this property or the same class is also registered for
      * the {@link #PROPERTY_CONTAINER_REQUEST_FILTERS} property then only
      * one instance will be instatiated.
@@ -212,10 +218,12 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * <p>
      * The instance may be a String[] or String that contains one or more fully
      * qualified class name of a response filter class separeted by ';'.
-     * Otherwise the instance may be List&lt;ResourceFilterFactory&gt;.
+     * Otherwise the instance may be List containing instances of String,
+     * String[], Class&lt;? extends ResourceFilterFactory;&gt; or instances
+     * of ResourceFilterFactory.
      * <p>
-     * If a String[] or String of fully qualified class names then each
-     * class is instantiated as a singleton. Thus, if there is more than one
+     * If a String[] or String of fully qualified class names or a Class then
+     * each class is instantiated as a singleton. Thus, if there is more than one
      * class registered for this property one instance will be instatiated.
      * 
      * @see com.sun.jersey.api.container.filter
@@ -508,6 +516,64 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             return false;
         
         return c.isAnnotationPresent(Provider.class);
+    }
+
+    /**
+     * Get the list of container request filters.
+     * <p>
+     * This list may be modified to add or remove filter elements.
+     * See {@link #PROPERTY_CONTAINER_REQUEST_FILTERS} for the valid elements
+     * of the list.
+     *
+     * @return the list of container request filters.
+     *         An empty list will be returned if no filters are present.
+     */
+    public List<?> getContainerRequestFilters() {
+        return getFilterList(PROPERTY_CONTAINER_REQUEST_FILTERS);
+    }
+
+    /**
+     * Get the list of container response filters.
+     * <p>
+     * This list may be modified to add or remove filter elements.
+     * See {@link #PROPERTY_CONTAINER_RESPONSE_FILTERS} for the valid elements
+     * of the list.
+     *
+     * @return the list of container response filters.
+     *         An empty list will be returned if no filters are present.
+     */
+    public List<?> getContainerResponseFilters() {
+        return getFilterList(PROPERTY_CONTAINER_RESPONSE_FILTERS);
+    }
+
+    /**
+     * Get the list of resource filter factories.
+     * <p>
+     * This list may be modified to add or remove filter elements.
+     * See {@link #PROPERTY_RESOURCE_FILTER_FACTORIES} for the valid elements
+     * of the list.
+     *
+     * @return the list of resource filter factories.
+     *         An empty list will be returned if no filters are present.
+     */
+    public List<?> getResourceFilterFactories() {
+        return getFilterList(PROPERTY_RESOURCE_FILTER_FACTORIES);
+    }
+
+    private List<?> getFilterList(String propertyName) {
+        final Object o = getProperty(propertyName);
+        if (o == null) {
+            final List l = new ArrayList();
+            getProperties().put(propertyName, l);
+            return l;
+        } else if (o instanceof List) {
+            return (List)o;
+        } else {
+            final List l = new ArrayList();
+            l.add(o);
+            getProperties().put(propertyName, l);
+            return l;
+        }
     }
 
     /**

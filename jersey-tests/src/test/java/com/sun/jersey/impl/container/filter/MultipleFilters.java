@@ -45,6 +45,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.GET;
@@ -60,7 +61,7 @@ import javax.ws.rs.ext.ExceptionMapper;
  * @author Paul.Sandoz@Sun.Com
  */
 public class MultipleFilters extends AbstractResourceTester {
-    
+
     @Path("/")
     public static class Resource {
         @GET
@@ -110,7 +111,53 @@ public class MultipleFilters extends AbstractResourceTester {
         }        
     }
     
-    public void testWithInstance() {
+    public void testResourceConfig() {
+        ResourceConfig rc = new DefaultResourceConfig();
+
+        assertTrue(rc.getContainerRequestFilters().isEmpty());
+        assertTrue(rc.getContainerResponseFilters().isEmpty());
+        assertTrue(rc.getResourceFilterFactories().isEmpty());
+
+        assertTrue(rc.getProperty(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS) instanceof List);
+        assertTrue(rc.getProperty(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS) instanceof List);
+        assertTrue(rc.getProperty(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES) instanceof List);
+
+        rc = new DefaultResourceConfig();
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, "request");
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, "response");
+        rc.getProperties().put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES, "resource");
+
+        assertEquals("request", rc.getContainerRequestFilters().get(0));
+        assertEquals("response", rc.getContainerResponseFilters().get(0));
+        assertEquals("resource", rc.getResourceFilterFactories().get(0));
+
+    }
+
+    public void testWithString() {
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                FilterOne.class.getName() + ";" + FilterTwo.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                FilterOne.class.getName() + ";" + FilterTwo.class.getName());
+        initiateWebApplication(rc);
+        _test();
+    }
+
+    public void testWithStringArray() {
+        String[] fs = new String[2];
+        fs[0] = FilterOne.class.getName();
+        fs[1] = FilterTwo.class.getName();
+
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                fs);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                fs);
+        initiateWebApplication(rc);
+        _test();
+    }
+
+    public void testWithListInstance() {
         ResourceConfig rc = new DefaultResourceConfig(Resource.class);
         
         FilterOne f1 = new FilterOne();
@@ -123,16 +170,58 @@ public class MultipleFilters extends AbstractResourceTester {
         _test();
     }
     
-    public void testWithString() {
+    public void testWithListClass() {
         ResourceConfig rc = new DefaultResourceConfig(Resource.class);
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
-                FilterOne.class.getName() + ";" + FilterTwo.class.getName());
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, 
-                FilterOne.class.getName() + ";" + FilterTwo.class.getName());
+
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(FilterOne.class, FilterTwo.class));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(FilterOne.class, FilterTwo.class));
         initiateWebApplication(rc);
         _test();
     }
-    
+
+    public void testWithListString() {
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(FilterOne.class.getName(), FilterTwo.class.getName()));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(FilterOne.class.getName(), FilterTwo.class.getName()));
+        initiateWebApplication(rc);
+        _test();
+    }
+
+    public void testWithListStringArray() {
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(new String[] {FilterOne.class.getName(), FilterTwo.class.getName()}));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(new String[] {FilterOne.class.getName(), FilterTwo.class.getName()}));
+        initiateWebApplication(rc);
+        _test();
+    }
+
+    public void testWithListMxied() {
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+
+        List reql = new ArrayList();
+        reql.add(FilterOne.class);
+        reql.add(new FilterTwo());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                reql);
+
+        List resl = new ArrayList();
+        resl.add(new String[] { FilterOne.class.getName() } );
+        resl.add(FilterTwo.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                Arrays.asList(FilterOne.class, FilterTwo.class));
+
+        initiateWebApplication(rc);
+        _test();
+    }
+
     public void testWithResourceWebApplicationException() {
         ResourceConfig rc = new DefaultResourceConfig(ResourceWebApplicationException.class);
 
