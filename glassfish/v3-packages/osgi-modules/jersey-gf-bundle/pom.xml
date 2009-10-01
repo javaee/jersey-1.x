@@ -108,7 +108,7 @@
                       <unzip src="${project.build.directory}/osgified.jar" dest="${jar.messing.directory}"/> 
                       <manifest file="${jar.messing.directory}/META-INF/MANIFEST.MF" mode="update">
                           <attribute name="probe-provider-xml-file-names" value="gfprobe-provider.xml"/>
-                          <attribute name="DynamicImport-Package" value="org.glassfish.flashlight.provider"/>
+                          <attribute name="DynamicImport-Package" value="*"/>
                       </manifest>
                       <copy file="src/main/resources/gfprobe-provider.xml" todir="${jar.messing.directory}"/>
                       <jar destfile="${project.build.directory}/osgified.jar" basedir="${jar.messing.directory}" manifest="${jar.messing.directory}/META-INF/MANIFEST.MF"/>
