@@ -18,7 +18,7 @@ document.</para>
 <para>Maven developers require a dependency on 
 
 <itemizedlist>
-  <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.1.3-ea-SNAPSHOT/jersey-server-1.1.3-ea-SNAPSHOT.pom">jersey-server</ulink> module, </listitem>
+  <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.pom">jersey-server</ulink> module, </listitem>
    <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.pom">grizzly-servlet-webserver</ulink> module </listitem>
    <listitem>and optionally for WADL support if using Java SE 5 the <ulink url="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</ulink> module</listitem>
  </itemizedlist>
@@ -53,8 +53,8 @@ And the following repositories need to be added to the pom:
 Non-maven developers require:
 <itemizedlist>
 <listitem><ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.jar">grizzly-servlet-webserver.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.1.3-ea-SNAPSHOT/jersey-server-1.1.3-ea-SNAPSHOT.jar">jersey-server.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.1.3-ea-SNAPSHOT/jersey-core-1.1.3-ea-SNAPSHOT.jar">jersey-core.jar</ulink>,</listitem>
+<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.jar">jersey-server.jar</ulink>,</listitem>
+<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/&version;/jersey-core-&version;.jar">jersey-core.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</ulink>,</listitem>
 <listitem><ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</ulink></listitem>
 </itemizedlist></para>
@@ -171,12 +171,12 @@ in your favourite browser.</para>
 </section>
 
 <section>
-<title id="getting.started.created">Here's one I created earlier</title>
-<para>The example code presented above is shipped as the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/1.1.3-ea-SNAPSHOT/helloworld-1.1.3-ea-SNAPSHOT-project.zip">HelloWorld</ulink>
+<title id="getting.started.created">Here's one Paul created earlier</title>
+<para>The example code presented above is shipped as the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/&version;/helloworld-&version;-project.zip">HelloWorld</ulink>
 sample in the Java.Net maven repository.</para>
 <para>For developers wishing to get started by deploying a Web
 application an equivalent sample, as a Web application, is shipped as
-the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-webapp/1.1.3-ea-SNAPSHOT/helloworld-webapp-1.1.3-ea-SNAPSHOT-project.zip">HelloWorld-WebApp</ulink>
+the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-webapp/&version;/helloworld-webapp-&version;-project.zip">HelloWorld-WebApp</ulink>
 sample.</para>
 </section>
   

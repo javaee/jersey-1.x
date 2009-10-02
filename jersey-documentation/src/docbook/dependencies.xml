@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
+<!ENTITY % ents SYSTEM "jersey.ent" >
+%ents;
+]>
+<chapter>
+
+<title>Dependencies</title>
+
+<para>Jersey is built, assembled and installed using Maven. Jersey is
+deployed to the Java.Net maven repository at the following location:
+<ulink url="http://download.java.net/maven/2/com/sun/jersey">http://download.java.net/maven/2/</ulink>
+The Jersey modules can be browsed at the following location:
+<ulink url="http://download.java.net/maven/2/com/sun/jersey">http://download.java.net/maven/2/com/sun/jersey/</ulink>
+Jars, Jar sources, Jar JavaDoc and samples are all available on the java.net maven repository.
+</para>
+
+<para>
+A zip file containing all maven-based samples can be obtained
+<ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-samples/1.1.3-ea-SNAPSHOT/jersey-samples-1.1.3-ea-SNAPSHOT-project.zip">here</ulink>.
+Individual zip files for each sample may be found by browsing the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/">samples</ulink> directory. 
+</para>
+
+<para>An application depending on Jersey requires that it in turn
+includes the set of jars that Jersey depends on. Jersey has a
+pluggable component architecture so the set of jars required to be
+include in the class path can be different for each application. 
+</para>
+
+<para>Developers using maven are likely to find it easier to include and
+manage dependencies of their applications than developers using ant
+or other build technologies. This document will explain to both maven
+and non-maven developers how to depend on Jersey for their
+application. Ant developers are likely to find the <ulink url="http://maven.apache.org/ant-tasks.html">Ant
+Tasks for Maven</ulink> very useful. For the convenience of non-maven developers the following are provided:
+<itemizedlist>
+	<listitem><para>A <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-archive/1.1.3-ea-SNAPSHOT/jersey-archive-1.1.3-ea-SNAPSHOT.zip">zip of Jersey</ulink> containing the Jersey jars, core dependencies (it does
+	not provide dependencies for third party jars beyond the those for
+	JSON support) and JavaDoc.</para></listitem>
+	<listitem><para>A <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.1.3-ea-SNAPSHOT/jersey-bundle-1.1.3-ea-SNAPSHOT.jar">jersey bundle jar</ulink> to avoid the dependency management of
+	multiple jersey-based jars.</para></listitem>
+</itemizedlist>
+</para>
+
+<para>Jersey's runtime dependences are categorized into the following:
+<itemizedlist>
+	<listitem><para>Core server. The minimum set of dependences that Jersey
+	requires for the server.</para></listitem>
+	<listitem><para>Core client. The minimum set of dependences that Jersey
+	requires for the client.</para></listitem>
+	<listitem><para>Container. The set of container dependences. Each container
+	provider has it's own set of dependences.</para></listitem>
+	<listitem><para>Entity. The set of entity dependencies. Each entity provider
+	has it's own set of dependences.</para></listitem>
+	<listitem><para>Tools. The set of dependencies required for runtime tooling.</para></listitem>
+	<listitem><para>Spring. The set of dependencies required for Spring.</para></listitem>
+	<listitem><para>Guice. The set of dependencies required for Guice.</para></listitem>
+</itemizedlist>
+</para>
+
+<para>All dependences in this documented are referenced by hyper-links</para>
+
+<section>
+<title>Core server</title>
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.1.3-ea-SNAPSHOT/jersey-server-1.1.3-ea-SNAPSHOT.pom">jersey-server</ulink>
+module. The following dependency needs to be added to the pom:
+<programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-server&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+And the following repositories need to be added to the pom:
+<programlisting  linenumbering="numbered">&lt;repository&gt;
+    &lt;id&gt;maven2-repository.dev.java.net&lt;/id&gt;
+    &lt;name&gt;Java.net Repository for Maven&lt;/name&gt;
+    &lt;url&gt;http://download.java.net/maven/2/&lt;/url&gt;
+    &lt;layout&gt;default&lt;/layout&gt;
+&lt;/repository&gt; 
+&lt;repository&gt;
+    &lt;id&gt;maven-repository.dev.java.net&lt;/id&gt;
+    &lt;name&gt;Java.net Maven 1 Repository (legacy)&lt;/name&gt;
+    &lt;url&gt;http://download.java.net/maven/1&lt;/url&gt;
+    &lt;layout&gt;legacy&lt;/layout&gt;
+&lt;/repository&gt;</programlisting>
+</para>
+
+<para>
+Non-maven developers require: 
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.1.3-ea-SNAPSHOT/jersey-server-1.1.3-ea-SNAPSHOT.jar">jersey-server.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.1.3-ea-SNAPSHOT/jersey-core-1.1.3-ea-SNAPSHOT.jar">jersey-core.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar">jsr311-api.jar</ulink>,</listitem>
+	<listitem><ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</ulink></listitem>
+</itemizedlist>
+or, if using the jersey-bundle:
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.1.3-ea-SNAPSHOT/jersey-bundle-1.1.3-ea-SNAPSHOT.jar">jersey-bundle.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar">jsr311-api.jar</ulink>,</listitem>
+	<listitem><ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</ulink></listitem>
+</itemizedlist>
+For Ant developers the <ulink url="http://maven.apache.org/ant-tasks.html">Ant Tasks for Maven</ulink> may be used to add the following to the ant document such that the dependencies 
+do not need to be downloaded explicitly:
+<programlisting  linenumbering="numbered">&lt;artifact:dependencies pathId=&quot;dependency.classpath&quot;&gt;
+  &lt;dependency groupId=&quot;com.sun.jersey&quot; 
+              artifactId=&quot;jersey-server&quot;
+              version=&quot;1.1.3-ea-SNAPSHOT&quot;/&gt;
+  &lt;artifact:remoteRepository id=&quot;maven2-repository.dev.java.net&quot;
+                             url=&quot;http://download.java.net/maven/2/&quot; /&gt;
+  &lt;artifact:remoteRepository id=&quot;maven-repository.dev.java.net&quot;
+                             url=&quot;http://download.java.net/maven/1&quot; 
+                             layout=&quot;legacy&quot; /&gt;
+&lt;/artifact:dependencies&gt;</programlisting>
+The path id “dependency.classpath” may then be referenced as the classpath to be used for compiling or executing. Specifically the <ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</ulink> dependency is required when either of the following <ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/jersey/com/sun/jersey/api/core/ResourceConfig.html">com.sun.jersey.api.core.ResourceConfig</ulink> implementations are utilized: 
+<itemizedlist>
+	<listitem><ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html">com.sun.jersey.api.core.ClasspathResourceConfig</ulink>; or</listitem>
+	<listitem><ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/jersey/com/sun/jersey/api/core/PackagesResourceConfig.html">com.sun.jersey.api.core.PackagesResourceConfig</ulink></listitem>
+</itemizedlist>
+</para>
+<para>By default Jersey will utilize the <ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html">ClasspathResourceConfig</ulink>
+if an alternative is not specified. If an alternative is specified
+that does not depend on the asm.jar then it is no longer necessary to
+include the asm.jar in the minimum set of required jars.
+</para>
+
+</section>
+
+<section>
+<title>Core client</title>
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-client/1.1.3-ea-SNAPSHOT/jersey-client-1.1.3-ea-SNAPSHOT.pom">jersey-client</ulink>
+module. The following dependency needs to be added to the pom:
+<programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-client&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+Non-maven developers require: 
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-client/1.1.3-ea-SNAPSHOT/jersey-client-1.1.3-ea-SNAPSHOT.jar">jersey-client.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.1.3-ea-SNAPSHOT/jersey-core-1.1.3-ea-SNAPSHOT.jar">jersey-core.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar">jsr311-api.jar</ulink></listitem>
+</itemizedlist>
+or, if using the jersey-bundle:
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.1.3-ea-SNAPSHOT/jersey-bundle-1.1.3-ea-SNAPSHOT.jar">jersey-bundle.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar">jsr311-api.jar</ulink></listitem>
+</itemizedlist>
+</para>
+
+<para>The use of client with the Apache HTTP client to make HTTP request
+and receive HTTP responses requires a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-apache-client/1.1.3-ea-SNAPSHOT/jersey-apache-client-1.1.3-ea-SNAPSHOT.pom">jersey-apache-client</ulink> module. The following dependency needs to be added to the pom: <programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-apache-client&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+</section>
+
+<section>
+<title>Container</title>
+<section>
+<title>Grizzly HTTP Web server</title>
+
+<para>Maven developers, deploying an application using the Grizzly HTTP Web server, require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.pom">grizzly-servlet-webserver</ulink> module.</para>
+
+<para>Non-maven developers require:
+<ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.jar">grizzly-servlet-webserver.jar</ulink>
+</para>
+</section>
+
+<section>
+<title>Simple HTTP Web server</title>
+<para>Maven developers, deploying an application using the Simple HTTP Web server, require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-simple/1.1.3-ea-SNAPSHOT/jersey-simple-1.1.3-ea-SNAPSHOT.pom">jersey-simple</ulink>
+module.
+</para>
+</section>
+
+<section>
+<title>Light weight HTTP server</title>
+<para>Maven developers, using Java SE 5 and
+deploying an application using the light weight HTTP server, require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/net/httpserver/http/20070405/http-20070405.pom">http</ulink> module.
+</para>
+
+<para>Non-maven developers require: <ulink url="http://download.java.net/maven/2/com/sun/net/httpserver/http/20070405/http-20070405.jar">http.jar</ulink>
+</para>
+
+<para>Deploying an application using the light weight HTTP server with Java SE 6 requires no additional dependences.
+</para>
+</section>
+
+<section>
+<title>Servlet</title>
+<para>Deploying an application on a servlet container requires a deployment dependency with that container.
+</para>
+
+<para>See the Java documentation <ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/jersey/com/sun/jersey/spi/container/servlet/package-summary.html">here</ulink> on how to configure the servlet container.
+</para>
+
+<para>Using servlet: <code>com.sun.jersey.spi.container.servlet.ServletContainer</code> requires no additional dependences.
+</para>
+
+<para>Maven developers using servlet: <code>com.sun.jersey.server.impl.container.servlet.ServletAdaptor</code> in a non-EE 5 servlet require a dependency on the <ulink url="http://download.java.net/maven/1/javax.persistence/poms/persistence-api-1.0.2.pom">persistence-api</ulink>
+module.</para>
+
+<para>Non-Maven developers require: <ulink url="http://download.java.net/maven/1/javax.persistence/jars/persistence-api-1.0.2.jar">persistence-api.jar</ulink>
+</para>
+</section>
+</section>
+
+<section>
+<title>Entity</title>
+<section>
+<title>JAXB</title>
+<para>XML serialization support of Java types that are JAXB beans
+requires a dependency on the JAXB reference implementation version
+2.x or higher (see later for specific version constraints with respect to JSON support). Deploying an application for XML serialization support using JAXB with Java SE 6 requires no additional dependences, since Java SE 6 ships with JAXB 2.x support.
+</para>
+<para>Maven developers, using Java SE 5, require a dependency on the <ulink url="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.12.pom">jaxb-impl</ulink> module.
+</para>
+<para>Non-maven developers require:
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.12.jar">jaxb-impl.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</ulink></listitem>
+</itemizedlist>
+</para>
+<para>Maven developers, using Java SE 5, that are consuming or producing <code>T[]</code>, <code>List&lt;T&gt;</code> or <code>Collection&lt;T&gt;</code> where <code>T</code> is a JAXB bean require a dependency on a StAX implementation, such as Woodstox version 3.2.1 or greater using the following dependency:
+<programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;woodstox&lt;/groupId&gt;
+    &lt;artifactId&gt;wstx-asl&lt;/artifactId&gt;
+    &lt;version&gt;3.2.1&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+Non-maven developers require:
+<ulink url="http://repo1.maven.org/maven2/woodstox/wstx-asl/3.2.1/wstx-asl-3.2.1.jar">wstx-asl-3.2.1.jar</ulink>
+</para>
+<para>Maven developers, using JSON serialization support of JAXB beans when using the MIME media type <code>application/json</code> require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.1.3-ea-SNAPSHOT/jersey-json-1.1.3-ea-SNAPSHOT.pom">jersey-json</ulink> module (no explicit dependency on jaxb-impl is required). This module depends on the JAXB reference implementation version 2.1.12 or greater, and such a version is required when enabling support for the JAXB natural JSON convention. For all other supported JSON conventions any JAXB 2.x version may be utilized. The following dependency needs to be added to the pom:
+<programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting></para>
+<para>
+Non-maven developers require:
+<itemizedlist>
+	<listitem><ulink url="http://repository.codehaus.org/org/codehaus/jackson/jackson-core-asl/1.1.1/jackson-core-asl-1.1.1.jar">jackson-core-asl.jar</ulink>,</listitem>
+	<listitem><ulink url="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar">jettison.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.12.jar">jaxb-impl.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</ulink></listitem>
+</itemizedlist>
+and additionally, if not depending on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.1.3-ea-SNAPSHOT/jersey-bundle-1.1.3-ea-SNAPSHOT.jar">jersey-bundle.jar</ulink>,
+non-maven developers require: <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.1.3-ea-SNAPSHOT/jersey-json-1.1.3-ea-SNAPSHOT.jar">jersey-json.jar</ulink>
+</para>
+<para>
+Maven developers, using Fast Infoset serialization support of JAXB beans with using the MIME media type <code>application/fastinfoset</code>
+require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/1.1.3-ea-SNAPSHOT/jersey-fastinfoset-1.1.3-ea-SNAPSHOT.pom">jersey-fastinfoset</ulink> module (no dependency on jaxb-impl is required). The following dependency needs to be added to the pom:
+<programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-fastinfoset&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+
+<para>
+Non-maven developers require:
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/1/com.sun.xml.fastinfoset/jars/FastInfoset-1.2.2.jar">FastInfoset.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.12.jar">jaxb-impl.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</ulink></listitem>
+</itemizedlist>
+
+and additionally, if not depending on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.1.3-ea-SNAPSHOT/jersey-bundle-1.1.3-ea-SNAPSHOT.jar">jersey-bundle.jar</ulink>, non-maven developers require: <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/1.1.3-ea-SNAPSHOT/jersey-fastinfoset-1.1.3-ea-SNAPSHOT.jar">jersey-fastinfoset.jar</ulink>
+</para>
+</section>
+
+<section>
+<title>Atom</title>
+<para>The use of the Java types <code>org.apache.abdera.model.{Categories, Entry, Feed, Service}</code> requires a dependency on Apache Abdera.
+</para>
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-atom-abdera/1.1.3-ea-SNAPSHOT/jersey-atom-abdera-1.1.3-ea-SNAPSHOT.pom">jersey-atom-abdera</ulink> module. The following dependency needs to be added to the pom:
+<programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-atom-abdera&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+The use of the Java types <code>com.sun.syndication.feed.atom.Entry</code>
+and <code>com.sun.syndication.feed.atom.Feed</code> requires a dependency on ROME version 0.9 or higher.
+</para>
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/1.1.3-ea-SNAPSHOT/jersey-atom-1.1.3-ea-SNAPSHOT.pom">jersey-atom</ulink> module. The following dependency needs to be added to the pom:
+<programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-atom&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+Non-maven developers require:
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/1/rome/jars/rome-0.9.jar">rome.jar</ulink>,</listitem>
+	<listitem><ulink url="http://repo1.maven.org/maven2/jdom/jdom/1.0/jdom-1.0.jar">jdom.jar</ulink></listitem>
+</itemizedlist>
+ and additionally, if not depending on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.1.3-ea-SNAPSHOT/jersey-bundle-1.1.3-ea-SNAPSHOT.jar">jersey-bundle.jar</ulink>, non-maven developers require: <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/1.1.3-ea-SNAPSHOT/jersey-atom-1.1.3-ea-SNAPSHOT.jar">jersey-atom.jar</ulink>
+ </para>
+ </section>
+ 
+ <section>
+<title>JSON</title>
+<para>The use of the Java types <code>org.codehaus.jettison.json.JSONObject</code> and <code>org.codehaus.jettison.json.JSONArray</code> requires Jettison version 1.0 or higher.
+</para>
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.1.3-ea-SNAPSHOT/jersey-json-1.1.3-ea-SNAPSHOT.pom">jersey-json</ulink> module. The following dependency needs to be added to the pom:
+<programlisting  linenumbering="numbered">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+Non-maven developers require:
+<ulink url="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar">jettison.jar</ulink> and additionally, if not depending on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/1.1.3-ea-SNAPSHOT/jersey-bundle-1.1.3-ea-SNAPSHOT.jar">jersey-bundle.jar</ulink>,
+non-maven developers require: <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/1.1.3-ea-SNAPSHOT/jersey-json-1.1.3-ea-SNAPSHOT.jar">jersey-json.jar</ulink>
+</para>
+</section>
+
+<section>
+<title>Mail and MIME multipart</title>
+<para>The use of the Java type <code>javax.mail.internet.MimeMultipart</code> with Java SE 5 or 6 requires Java Mail version 1.4 or higher.
+</para>
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/1/javax.mail/poms/mail-1.4.pom">java-mail</ulink>
+module.
+</para>
+<para>Non-maven developers require:
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.mail/jars/mail-1.4.jar">mail.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</ulink></listitem>
+</itemizedlist>
+</para>
+<para>The use of the Java type <code>javax.mail.internet.MimeMultipart</code> with Java EE 5 requires no additional dependencies.</para>
+<para>Jersey ships with a high-level MIME multipart API. Maven developers requires a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/1.1.3-ea-SNAPSHOT/jersey-multipart-1.1.3-ea-SNAPSHOT.pom">jersey-multipart</ulink> module. The following dependency needs to be added to the pom:
+<programlisting linenumbering="true">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-multipart&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+Non-maven developers require:
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/2/org/jvnet/mimepull/1.3/mimepull-1.3.jar">mimepull.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/1.1.3-ea-SNAPSHOT/jersey-multipart-1.1.3-ea-SNAPSHOT.jar">jersey-multipart.jar</ulink></listitem>
+</itemizedlist>
+</para>
+</section>
+
+<section>
+<title>Activation</title>
+<para>The use of the Java type <code>javax.activation.DataSource</code> with Java SE 5 requires Java Activation 1.1 or higher.</para>
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/1/javax.activation/poms/activation-1.1.pom">activation</ulink> module.</para>
+<para>Non-maven developers require: <ulink url="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</ulink>
+</para>
+<para>The use of the Java type <code>javax.activation.DataSource</code> with Java SE 6 and Java EE 5 requires no additional dependencies.
+</para>
+</section>
+</section>
+
+<section>
+<title>Tools</title>
+<para>By default WADL for resource classes is generated dynamically at
+runtime. WADL support requires a dependency on the JAXB reference
+implementation version 2.x or higher. Deploying an application for
+WADL support with Java SE 6 requires no additional dependences, since
+Java SE 6 ships with JAXB 2.x support.</para>
+<para>Maven developers, using Java SE 5, require a dependency on the
+<ulink url="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.12.pom">jaxb-impl</ulink>
+module.</para>
+<para>Non-maven developers require:
+<itemizedlist>
+	<listitem><ulink url="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.12.jar">jaxb-impl.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</ulink>,</listitem>
+	<listitem><ulink url="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</ulink></listitem>
+</itemizedlist>
+</para>
+<para>If the above dependencies are not present then WADL generation is disabled and a warning will be logged.</para>
+<para>The WADL ant task requires the same set of dependences as those for runtime WADL support.
+</para>
+</section>
+
+<section>
+<title>Spring</title>
+<para>Maven developers, using Spring 2.0.x or Spring 2.5.x, require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-spring/1.1.3-ea-SNAPSHOT/jersey-spring-1.1.3-ea-SNAPSHOT.pom">jersey-spring</ulink> module. The following dependency needs to be added to the pom:
+<programlisting linenumbering="true">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-spring&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+See the Java documentation <ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/contribs/jersey-spring/com/sun/jersey/spi/spring/container/servlet/package-summary.html">here</ulink>
+on how to integrate Jersey-based Web applications with Spring.
+</para>
+</section>
+
+<section>
+<title>Guice</title>
+<para>Maven developers, using Guice 2.0, require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-guice/1.1.3-ea-SNAPSHOT/jersey-guice-1.1.3-ea-SNAPSHOT.pom">jersey-guice</ulink> module. The following dependency needs to be added to the pom:
+<programlisting linenumbering="true">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-guice&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+See the Java documentation <ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/contribs/jersey-guice/com/sun/jersey/guice/spi/container/servlet/package-summary.html">here</ulink> on how to integrate Jersey-based Web applications with Guice.
+</para>
+<para>Guice support depends on the Guice artifacts distributed with <ulink url="http://code.google.com/p/guiceyfruit/">GuiceyFruit</ulink> a set of extensions on top of Guice 2.0, such as support for Java EE artifacts like <code>@PostConstruct</code>/<code>@PreDestroy</code>,
+<code>@Resource</code> and <code>@PersistenceContext</code>. To avail of GuiceyFruit features add the following dependency and repository to the pom:
+<programlisting linenumbering="true">&lt;dependency&gt;
+    &lt;groupId&gt;org.guiceyfruit&lt;/groupId&gt;
+    &lt;artifactId&gt;guiceyfruit&lt;/artifactId&gt;
+    &lt;version&gt;2.0-beta-6&lt;/version&gt;
+&lt;/dependency&gt;
+...
+&lt;repository&gt;
+    &lt;id&gt;guice-maven&lt;/id&gt;
+    &lt;name&gt;guice maven&lt;/name&gt;
+    &lt;url&gt;<ulink url="http://guiceyfruit.googlecode.com/svn/repo/releases">http://guiceyfruit.googlecode.com/svn/repo/releases</ulink>&lt;/url&gt;
+&lt;/repository&gt;</programlisting>
+</para>
+</section>
+
+<section>
+<title>Jersey Test Framework</title>
+<para><emphasis>NOTE that breaking changes have occurred between 1.1.1-ea and 1.1.2-ea. See the end of this section for details.</emphasis>
+</para>
+<para>Jersey Test Framework allows you to test your RESTful Web Services on a wide range of containers. It supports light-weight containers such as Grizzly, Embedded GlassFish, and the Light Weight HTTP Server in addition to regular web containers such as GlassFish and Tomcat. Developers may plug in their own containers.
+</para>
+<para>A developer may write tests using the Junit 4.x framework can extend from the abstract <ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/jersey-test-framework/com/sun/jersey/test/framework/JerseyTest.html">JerseyTest</ulink> class.
+</para>
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/1.1.3-ea-SNAPSHOT/jersey-test-framework-1.1.3-ea-SNAPSHOT.pom">jersey-test-framework</ulink> module. The following dependency needs to be added to the pom:
+<programlisting linenumbering="true">&lt;dependency&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-test-framework&lt;/artifactId&gt;
+    &lt;version&gt;1.1.3-ea-SNAPSHOT&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;</programlisting>
+</para>
+<para>
+When utilizing an embedded container this framework can manage deployment and testing of your web services. However, the framework currently doesn't support instantiating and deploying on external containers. 
+</para>
+<para>The test framework provides the
+following test container factories:
+<itemizedlist>
+	<listitem><code>com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory</code> for testing with the Light Weight HTTP server.</listitem>
+	<listitem><code>com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory</code> for testing in memory without using HTTP.</listitem>
+	<listitem><code>com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory</code> for testing with low-level Grizzly.</listitem>
+	<listitem><code>com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory</code> for testing with Web-based Grizzly.</listitem>
+	<listitem><code>com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory</code> for testing with embedded GlassFish v3</listitem>
+	<listitem><code>com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory</code> for testing with application deployed externally, for example to
+	GlassFish or Tomcat. 
+	</listitem>
+</itemizedlist>
+</para>
+<para>The system property <code>test.containerFactory</code> is utilized to declare the default test container factory that shall be used for testing, the value of which is the fully qualified class name of a test container factory class. If the property is not declared then the GrizzlyWebTestContainerFactory is utilized as default test container factory.
+</para>
+<para>To test a maven-based web project with an external container such as GlassFish, create the war file then deploy as follows (assuming that the pom file is set up for deployment):
+<programlisting linenumbering="true">mvn clean package -Dmaven.test.skip=true
+</programlisting>
+Then execute the tests as follows:
+<programlisting linenumbering="true">mvn test \ -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory \
+-DJERSEY_HTTP_PORT=&lt;HTTP_PORT&gt;
+</programlisting>
+</para>
+<para><emphasis>Breaking changes from 1.1.1-ea to 1.1.2-ea</emphasis>
+</para>
+<para>The maven project groupId has changed from <code>com.sun.jersey.test.framework</code> to <code>com.sun.jersey</code>
+</para>
+<para>The extending of Jersey unit test and configuration has changed. See <ulink url="https://jersey.dev.java.net/nonav/apidocs/1.1.3-ea-SNAPSHOT/jersey-test-framework/com/sun/jersey/test/framework/package-summary.html">here</ulink> for an example.
+</para>
+<para>See the blog entry on <ulink url="http://blogs.sun.com/naresh/entry/jersey_test_framework_makes_it">Jersey Test Framework</ulink> for detailed instructions on how to use 1.1.1-ea version of the framework in your application.
+</para>
+</section>
+</chapter>
