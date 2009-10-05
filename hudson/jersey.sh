@@ -8,8 +8,7 @@ java -version
 
 # mvn dependency:resolve
 # clean install will test as well
-# disabling tests only temporarily in order to build faster on hudson for this time, the tests have already passed, now need to deploy
-#JERSEY_HTTP_SLEEP=2000 JERSEY_HTTP_STOPSEC=2 mvn -e clean install
+JERSEY_HTTP_SLEEP=2000 JERSEY_HTTP_STOPSEC=2 mvn -e clean install
 # jersey-bundle needs to be tested as well
 # JERSEY_HTTP_SLEEP=2000 JERSEY_HTTP_STOPSEC=2 mvn -e clean test -Pbundle-dependency
 # 3 attempts to deploy:
