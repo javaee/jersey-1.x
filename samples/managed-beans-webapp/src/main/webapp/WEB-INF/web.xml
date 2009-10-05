@@ -17,11 +17,6 @@
     <env-entry>
         <env-entry-name>injectedResource</env-entry-name>
         <env-entry-type>java.lang.Integer</env-entry-type>
-        <env-entry-value>15</env-entry-value>
-<!--        <injection-target>
-            <injection-target-class>com.sun.jersey.samples.managedbeans.resources.ManagedBeanResource</injection-target-class>
-            <injection-target-name>injectedResource</injection-target-name>
-        </injection-target>
--->    </env-entry>
-    
+        <env-entry-value>1</env-entry-value>
+    </env-entry>
 </web-app>

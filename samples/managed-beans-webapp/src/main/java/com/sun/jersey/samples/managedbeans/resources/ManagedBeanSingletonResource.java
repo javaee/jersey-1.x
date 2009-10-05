@@ -38,6 +38,8 @@
 package com.sun.jersey.samples.managedbeans.resources;
 
 import com.sun.jersey.spi.resource.Singleton;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.Resource;
 import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
@@ -53,29 +55,29 @@ import javax.ws.rs.core.UriInfo;
 @ManagedBean
 public class ManagedBeanSingletonResource {
 
-    @Resource(name="injectedResource") int injectedResource = 50;
+    @Resource(name="injectedResource") int injectedResource = 0;
 
     @Context UriInfo ui;
     
     public ManagedBeanSingletonResource() {
-        System.out.println("In constructor " + this);
+        Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In constructor " + this);
     }
 
     @PostConstruct
     public void postConstruct() {
-        System.out.println("In post construct " + this);
+        Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In post construct " + this);
     }
 
     @PreDestroy
     public void preDestroy() {
-        System.out.println("In pre destroy");
+        Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In pre destroy " + this);
     }
 
     @GET 
     @Produces("text/plain")
     public String getMessage() {
-        System.out.println("In getMessage " + this + " " + ui);
+        Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In getMessage " + this + " " + ui);
 
-        return "Injected resource value: " + Integer.toString(injectedResource);
+        return Integer.toString(injectedResource++);
     }
 }

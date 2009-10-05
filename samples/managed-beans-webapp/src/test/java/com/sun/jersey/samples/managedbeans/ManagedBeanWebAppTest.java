@@ -41,8 +41,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
@@ -60,12 +60,28 @@ public class ManagedBeanWebAppTest extends JerseyTest {
      * Test that the expected response is sent back.
      * @throws java.lang.Exception
      */
-//    @Test
-//    public void testHelloWorld() throws Exception {
-//        WebResource webResource = resource();
-//        String responseMsg = webResource.path("managedbean").get(String.class);
-//        Assert.assertEquals("Injected resource value: 50", responseMsg);
-//    }
+    @Test
+    public void testPerRequestResource() throws Exception {
+        WebResource webResource = resource();
+        String responseMsg = webResource.path("managedbean/per-request").get(String.class);
+        assertEquals("1", responseMsg);
+
+        responseMsg = webResource.path("managedbean/per-request").get(String.class);
+        assertEquals("1", responseMsg);
+    }
+
+    @Test
+    public void testSingletonResource() throws Exception {
+        WebResource webResource = resource();
+        String responseMsg = webResource.path("managedbean/singleton").get(String.class);
+        assertEquals("1", responseMsg);
+
+        responseMsg = webResource.path("managedbean/singleton").get(String.class);
+        assertEquals("2", responseMsg);
+
+        responseMsg = webResource.path("managedbean/singleton").get(String.class);
+        assertEquals("3", responseMsg);
+    }
 
     @Test
     public void testApplicationWadl() {
@@ -73,7 +89,7 @@ public class ManagedBeanWebAppTest extends JerseyTest {
         String serviceWadl = webResource.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
 
-        Assert.assertTrue(serviceWadl.length() > 0);
+        assertTrue(serviceWadl.length() > 0);
     }    
 
 }
