@@ -59,10 +59,14 @@
         <module>groovy</module>
         <module>helloworld</module>
         <module>helloworld-webapp</module>
+        <module>https-clientserver-grizzly</module>
+        <module>https-server-glassfish</module>
         <module>jmaki-backend</module>
         <module>jaxb</module>
+        <module>jersey-ejb</module>
         <module>json-from-jaxb</module>
         <module>jsonp</module>
+        <module>managed-beans-webapp</module>
         <module>mandel</module>
         <module>optimistic-concurrency</module>
         <module>scala-helloworld-webapp</module>
@@ -72,9 +76,6 @@
         <module>sparklines</module>
         <module>spring-annotations</module>
         <module>storage-service</module>
-        <module>https-clientserver-grizzly</module>
-        <module>https-server-glassfish</module>
-        <module>jersey-ejb</module>
     </modules>
     <build>
         <plugins>
