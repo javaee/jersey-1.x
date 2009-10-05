@@ -58,7 +58,6 @@
                 <executions>
                     <execution>
                         <id>copy</id>
-                        <phase>generate-sources</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
@@ -95,32 +94,37 @@
                 </executions>
             </plugin>
             <plugin>
-              <artifactId>maven-antrun-plugin</artifactId>
-              <executions>
-                <execution>
-                  <phase>package</phase>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>*</Export-Package>
+                        <Import-Package>*</Import-Package>
+                        <DynamicImport-Package>org.glassfish.flashlight.provider</DynamicImport-Package>
+                    </instructions>
+                    <unpackBundle>true</unpackBundle>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>osgi-bundle</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <version>2.2</version>
               <configuration>
-                    <tasks> <!-- download bnd tool, and create osgified jar file using it -->
-                      <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.249/bnd-0.0.249.jar" dest="${project.build.directory}/bnd.jar"/>
-                      <java jar="${project.build.directory}/bnd.jar" fork="true">
-                        <arg line="wrap -output ${project.build.directory}/osgified.jar -classpath ${osgi.deps.directory}/asm-all-repackaged.jar,${osgi.deps.directory}/jackson-core-asl.jar ${osgi.src.directory}/jersey-bundle.jar"/>
-                      </java>
-                      <unzip src="${project.build.directory}/osgified.jar" dest="${jar.messing.directory}"/> 
-                      <manifest file="${jar.messing.directory}/META-INF/MANIFEST.MF" mode="update">
-                          <attribute name="probe-provider-xml-file-names" value="gfprobe-provider.xml"/>
-                          <attribute name="DynamicImport-Package" value="*"/>
-                      </manifest>
-                      <copy file="src/main/resources/gfprobe-provider.xml" todir="${jar.messing.directory}"/>
-                      <jar destfile="${project.build.directory}/osgified.jar" basedir="${jar.messing.directory}" manifest="${jar.messing.directory}/META-INF/MANIFEST.MF"/>
-                      <move file="${project.build.directory}/osgified.jar" tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
-                      <delete file="${project.build.directory}/bnd.jar"/>
-                    </tasks>
+                <archive>
+                  <manifestEntries>
+                    <probe-provider-xml-file-names>gfprobe-provider.xml</probe-provider-xml-file-names>
+                  </manifestEntries>
+                </archive>
               </configuration>
-                  <goals>
-                    <goal>run</goal>
-                  </goals>
-                </execution>
-              </executions>
             </plugin>
         </plugins>
     </build>
@@ -144,7 +148,6 @@
     <properties>
         <osgi.deps.directory>${project.build.directory}/osgi.deps</osgi.deps.directory>
         <osgi.src.directory>${project.build.directory}/osgi.src</osgi.src.directory>
-        <jar.messing.directory>${project.build.directory}/jar.messing</jar.messing.directory>
     </properties>
     <repositories>
       <repository>
