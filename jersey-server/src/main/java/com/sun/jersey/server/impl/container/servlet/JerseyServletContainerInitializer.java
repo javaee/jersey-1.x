@@ -40,6 +40,7 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +110,9 @@ public class JerseyServletContainerInitializer implements ServletContainerInitia
             Logger.getLogger(JerseyServletContainerInitializer.class.getName());
 
     public void onStartup(Set<Class<?>> classes, ServletContext sc) {
-        final int nOfRegisterations = sc.getServletRegistrations().size();
+        if (classes == null) {
+          classes = Collections.<Class<?>>emptySet();
+        }        final int nOfRegisterations = sc.getServletRegistrations().size();
         for (Class<? extends Application> a : getApplicationClasses(classes)) {
             final ServletRegistration appReg = sc.getServletRegistration(a.getName());
             if (appReg != null) {
