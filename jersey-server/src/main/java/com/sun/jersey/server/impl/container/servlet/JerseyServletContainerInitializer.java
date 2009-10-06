@@ -111,8 +111,9 @@ public class JerseyServletContainerInitializer implements ServletContainerInitia
 
     public void onStartup(Set<Class<?>> classes, ServletContext sc) {
         if (classes == null) {
-          classes = Collections.<Class<?>>emptySet();
-        }        final int nOfRegisterations = sc.getServletRegistrations().size();
+            classes = Collections.<Class<?>>emptySet();
+        }
+        final int nOfRegisterations = sc.getServletRegistrations().size();
         for (Class<? extends Application> a : getApplicationClasses(classes)) {
             final ServletRegistration appReg = sc.getServletRegistration(a.getName());
             if (appReg != null) {
