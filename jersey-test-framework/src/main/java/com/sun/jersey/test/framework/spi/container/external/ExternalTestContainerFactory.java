@@ -49,6 +49,9 @@ import javax.ws.rs.core.UriBuilder;
  * when the Web application is independently deployed in a separate JVM to that
  * of the tests. For example, the application may be deployed to the
  * Glassfish v2 or v3 application server.
+ * <P>
+ * If you would like to run your tests on a staging server, just set the machine's
+ * IP address or fully-qualified domain name to the System Property <I>JERSEY_HOST_NAME</I>.
  * 
  * @author Srinivas.Bhimisetty@Sun.COM
  */
@@ -63,7 +66,16 @@ public class ExternalTestContainerFactory implements TestContainerFactory {
             throw new IllegalArgumentException(
                     "The application descriptor must be an instance of WebAppDescriptor");
 
-        return new ExternalTestContainer(baseUri, (WebAppDescriptor)ad);
+        return new ExternalTestContainer(getBaseURI(baseUri), (WebAppDescriptor)ad);
+    }
+
+    private URI getBaseURI(URI baseUri) {
+        String stagingHostName = System.getProperty("JERSEY_HOST_NAME");
+        if (stagingHostName != null) {
+            return UriBuilder.fromUri(baseUri)
+                .host(stagingHostName).build();
+        }
+        return baseUri;
     }
 
     /**

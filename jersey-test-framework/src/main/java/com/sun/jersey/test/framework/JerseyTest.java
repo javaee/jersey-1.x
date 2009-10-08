@@ -284,7 +284,7 @@ public abstract class JerseyTest {
      * @param An instance of {@link TestContainerFactory}
      * @return An instance of {@link TestContainer}
      */
-    private static TestContainer getContainer(AppDescriptor ad, TestContainerFactory tcf) {
+    private TestContainer getContainer(AppDescriptor ad, TestContainerFactory tcf) {
         if (ad == null)
             throw new IllegalArgumentException("The application descriptor cannot be null");
 
@@ -416,7 +416,7 @@ public abstract class JerseyTest {
      * Returns the base URI of the application.
      * @return The base URI of the application
      */
-    private static URI getBaseURI() {
+    protected URI getBaseURI() {
         return UriBuilder.fromUri("http://localhost/")
                 .port(getPort(9998)).build();
     }
@@ -426,7 +426,7 @@ public abstract class JerseyTest {
      * @param defaultPort
      * @return The HTTP port of the URI
      */
-    private static int getPort(int defaultPort) {
+    protected int getPort(int defaultPort) {
         String port = System.getProperty("JERSEY_HTTP_PORT");
         if (null != port) {
             try {
