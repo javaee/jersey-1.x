@@ -1,6 +1,6 @@
 release 1.1.5 (2010)
 
-release 1.1.4-ea (2009-11)
+release 1.1.4 (2009-11)
 - Fixed issue 383
   https://jersey.dev.java.net/issues/show_bug.cgi?id=383
   Singleton instances added to the set of singletons of the Application/
