@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.servlet</artifactId>
-            <version>3.0-b59</version>
+            <version>3.0-b66</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -95,9 +95,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.annotation</artifactId>
-            <version>3.0-b59</version>
+            <groupId>org.jboss.webbeans</groupId>
+            <artifactId>webbeans-osgi-bundle</artifactId>
+            <version>1.0.0.PREVIEW4.SP1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -124,7 +124,7 @@
             <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
-     </dependencies>
+    </dependencies>
     <build>
         <resources>
             <resource>
@@ -173,14 +173,14 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>  
+        </plugins>
     </build>
 
     <repositories>
         <repository>
             <id>glassfish-repository</id>
-            <name>Java.net Repository for Glassfish</name>
-            <url>http://download.java.net/maven/glassfish</url>
+            <name>Repository for Glassfish</name>
+            <url>http://maven.glassfish.org/content/groups/glassfish</url>
         </repository>
     </repositories>
 </project>

@@ -77,8 +77,10 @@ public class SpringServlet extends ServletContainer {
      * <p>
      * The parameter name is the String "contextConfigLocation".
      * <p>
-     * A parameter value is a reference to a spring configuration file declaring
-     * bean definitions.
+     * A parameter value is a reference to one more spring configuration files
+     * separated by commas, semicolons or whitespace.
+     *
+     * distinct locations separated by commas, semicolons or whitespace
      * <p>
      * If this parameter is absent then the default application context
      * configuration is utilized.
@@ -102,7 +104,7 @@ public class SpringServlet extends ServletContainer {
     }
 
     private ConfigurableApplicationContext getContext() {
-        final String contextConfigLocation = getWebConfig().getInitParameter("contextConfigLocation");
+        final String contextConfigLocation = getWebConfig().getInitParameter(CONTEXT_CONFIG_LOCATION);
         if (contextConfigLocation == null) {
             LOGGER.info("Using default applicationContext");
             return getDefaultContext();
@@ -116,7 +118,7 @@ public class SpringServlet extends ServletContainer {
         final ConfigurableWebApplicationContext ctx = new XmlWebApplicationContext();
         ctx.setParent(getDefaultContext());
         ctx.setServletContext(getServletContext());
-        ctx.setConfigLocations(new String[]{contextConfigLocation});
+        ctx.setConfigLocation(contextConfigLocation);
 
         ctx.refresh();
         return ctx;

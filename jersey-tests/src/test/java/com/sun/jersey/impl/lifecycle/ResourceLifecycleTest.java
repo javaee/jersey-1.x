@@ -37,13 +37,14 @@
 
 package com.sun.jersey.impl.lifecycle;
 
-import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.ResourceContext;
+import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.server.impl.resource.SingletonFactory;
 import com.sun.jersey.spi.resource.PerRequest;
 import com.sun.jersey.spi.resource.Singleton;
@@ -51,6 +52,7 @@ import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 
 /**
  *
@@ -129,16 +131,16 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         initiateWebApplication(getResourceConfig());
         _test();
     }
-    
+
     public void testOverrideDefaultWithPerRequest() {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
                 PerRequestFactory.class);
-        
+
         initiateWebApplication(c);
         _test();
     }
-    
+
     public void testOverrideDefaultWithSingleton() {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
@@ -161,11 +163,11 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
                 null);
-        
+
         initiateWebApplication(c);
         _test();
     }
-    
+
     public void testBadTypeResourceProviderProperty() {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
@@ -179,7 +181,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         }
         assertTrue(caught);
     }
-    
+
     public void testBadClassNameResourceProviderProperty() {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
@@ -199,7 +201,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         ResourceConfig c = getResourceConfig();
         c.getProperties().put(ResourceConfig.PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS,
                 String.class);
-        
+
         boolean caught = false;
         try {
             initiateWebApplication(c);
@@ -208,22 +210,22 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         }
         assertTrue(caught);
     }
-    
+
     private void _test() {
         _test(false);
     }
-    
+
     private void _test(boolean isDefaultSingleton) {
-        WebResource r = resource("/foo");        
+        WebResource r = resource("/foo");
         assertEquals("1", r.get(String.class));
         assertEquals("2", r.get(String.class));
         assertEquals("3", r.get(String.class));
-        
-        r = resource("/bar");        
+
+        r = resource("/bar");
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));
         assertEquals("1", r.get(String.class));
-        
+
         r = resource("/baz");
         if (isDefaultSingleton) {
             assertEquals("1", r.get(String.class));
@@ -241,13 +243,16 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
         
         private int count;
         
-        public TestFooBeanSingleton() {
+        public TestFooBeanSingleton(String junk) {
+            assertNotNull(junk);
             this.count = 0;
         }
         
         @GET
-        public String doGet() {
+        public String doGet(@Context ResourceContext rc) {
             count++;
+            TestFooBeanSingleton that = rc.getResource(TestFooBeanSingleton.class);
+            assertEquals(this, that);
             return Integer.toString(count);
         }
         
@@ -255,7 +260,7 @@ public class ResourceLifecycleTest extends AbstractResourceTester {
     
     public void testSingleton() {
         ResourceConfig c = new DefaultResourceConfig();
-        c.getSingletons().add(new TestFooBeanSingleton());        
+        c.getSingletons().add(new TestFooBeanSingleton("junk"));
         initiateWebApplication(c);
         
         WebResource r = resource("/foo");        

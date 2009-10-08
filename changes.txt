@@ -1,6 +1,19 @@
 release 1.1.5 (2010)
 
 release 1.1.4-ea (2009-11)
+- Fixed issue 383
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=383
+  Singleton instances added to the set of singletons of the Application/
+  ResourceConfig are not longer errornousaly instantiated by the runtime.
+  The singleton reference is also available from the
+  ResourceContent.getResource.
+- Fixed issue 381
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=381
+  Multiple child spring configuration fails may be declared as a value
+  of the property SpringServlet.CONTEXT_CONFIG_LOCATION.
+- Modified the Jersey test framework such that it is possible to override
+  JerseyTest. The external test container supports the system property
+  JERSEY_HOST_NAME to declare the host name for the base URI.
 
 release 1.1.3-ea (2009-10-06)
 - Support configuration of ResourceConfig using the provider interface

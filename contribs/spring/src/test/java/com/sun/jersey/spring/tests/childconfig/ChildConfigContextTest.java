@@ -72,6 +72,15 @@ public class ChildConfigContextTest extends AbstractTest {
         }
     }
 
+    @Path("child2")
+    public static class ChildConfig2Resource {
+
+        @GET
+        public String get() {
+            return "child2";
+        }
+    }
+
     @Test
     public void testApplicationConfig() {
         start();
@@ -100,4 +109,24 @@ public class ChildConfigContextTest extends AbstractTest {
         r = resource("child");
         Assert.assertEquals("child", r.get(String.class));
     }
+
+    @Test
+    public void testChildConfig2() {
+        String clientConfig = "classpath:" + this.getClass().getName().replace(".", "/") + "-client-config.xml";
+        clientConfig += " classpath:" + this.getClass().getName().replace(".", "/") + "-client-config2.xml";
+
+        Map<String, String> m = new HashMap<String, String>();
+        m.put(SpringServlet.CONTEXT_CONFIG_LOCATION, clientConfig);
+        start(m);
+
+        WebResource r = resource("app");
+        Assert.assertEquals("app", r.get(String.class));
+
+        r = resource("child");
+        Assert.assertEquals("child", r.get(String.class));
+
+        r = resource("child2");
+        Assert.assertEquals("child2", r.get(String.class));
+    }
+
 }

@@ -354,10 +354,20 @@ public final class WebApplicationImpl implements WebApplication {
     private ResourceClass getResourceClass(AbstractResource ar) {
         if (metaClassMap.containsKey(ar.getResourceClass()))
             return metaClassMap.get(ar.getResourceClass());
-        
+
         ResourceClass rc = newResourceClass(ar);
         metaClassMap.put(ar.getResourceClass(), rc);
         rc.init(rcpFactory);
+        return rc;
+    }
+
+    private ResourceClass getResourceClass(AbstractResource ar, Object resource) {
+        if (metaClassMap.containsKey(ar.getResourceClass()))
+            return metaClassMap.get(ar.getResourceClass());
+
+        ResourceClass rc = newResourceClass(ar);
+        metaClassMap.put(ar.getResourceClass(), rc);
+        rc.init(resource);
         return rc;
     }
 
@@ -871,7 +881,7 @@ public final class WebApplicationImpl implements WebApplication {
             PathPattern p = new PathPattern(t);
 
             // Configure meta-data
-            getResourceClass(ar);
+            getResourceClass(ar, o);
 
             rulesMap.put(p, new RightHandPathRule(
                         resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),

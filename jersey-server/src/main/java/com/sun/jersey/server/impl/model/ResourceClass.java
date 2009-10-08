@@ -37,6 +37,7 @@
 
 package com.sun.jersey.server.impl.model;
 
+import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractImplicitViewMethod;
 import com.sun.jersey.api.model.AbstractResource;
@@ -197,11 +198,29 @@ public final class ResourceClass {
         
     public void init(ResourceFactory rcpFactory) {
         this.rcProvider = rcpFactory.getComponentProvider(resource.getResourceClass());
-        this.rcProvider.init(resource);
+        rcProvider.init(resource);
+    }
+
+    public void init(final Object resource) {
+        this.rcProvider = new ResourceComponentProvider() {
+            public void init(AbstractResource abstractResource) {
+            }
+
+            public Object getInstance(HttpContext hc) {
+                return getInstance();
+            }
+
+            public void destroy() {
+            }
+
+            public Object getInstance() {
+                return resource;
+            }
+        };
     }
 
     public void destroy() {
-        this.rcProvider.destroy();
+        rcProvider.destroy();
     }
 
     public UriRules<UriRule> getRules() {
