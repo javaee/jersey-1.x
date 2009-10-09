@@ -8,24 +8,50 @@
       <p>This example demonstrates how to develop RESTful web service with a Servlet 2.5 container.</p>
       
       <h2>Contents</h2>
-      <p>The example consists of just one Java class:</p>
+      <p>The example consists of two java classes:</p>
       <dl>
-          <dt><code>com.sun.jersey.samples.managedbeans.resources.ManagedBeanResource</code></dt>
-          <dd>A resource class that produces a textual response to an HTTP GET.</dd>
+          <dt><code>com.sun.jersey.samples.managedbeans.resources.ManagedBeanPerRequestResource</code></dt>
+          <dt><code>com.sun.jersey.samples.managedbeans.resources.ManagedBeanSingletonResource</code></dt>
       </dl>
     <p>The mapping of the URI path space is presented in the following table:</p>
 	<table border="1">
-	<tr>
-	<th>URI path</th>
-	<th>Resource class</th>
-	<th>HTTP methods</th>
-	</tr>
-	<tr>
-	<td>/managedbean</td>
-	<td>HelloWorldResource</td>
-	<td>GET</td>
-	</tr>
-	</table>
+    <tr>
+      <th>URI path</th>
+      <th>Resource class</th>
+      <th>HTTP method</th>
+      <th>Description</th>
+    </tr>
+    <tr>
+      <td>/managed-beans-war/managedbean/per-request</td>
+      <td>ManagedBeanPerRequestResource</td>
+      <td>GET</td>
+      <td>Returns injected value and increments it</td>
+    </tr>
+    <tr>
+      <td>/managed-beans-war/managedbean/singleton</td>
+      <td>ManagedBeanSingletonResource</td>
+      <td>GET</td>
+      <td>Returns injected value and increments it</td>
+    </tr>
+        </table>
+
+    <p>The starting point of the application is the main <code>index.html</code>
+page. The application consists only from two resources
+and main page provides links to them. The output is just single integer value which
+is injected to the Managed Bean from web.xml file:
+
+<pre>
+    &lt;env-entry&gt;
+        &lt;env-entry-name&gt;injectedResource&lt;/env-entry-name&gt;
+        &lt;env-entry-type&gt;java.lang.Integer&lt;/env-entry-type&gt;
+        &lt;env-entry-value&gt;<b>1</b>&lt;/env-entry-value&gt;
+    &lt;/env-entry&gt;
+</pre>
+
+As you can see, injected value is "1" and this is exactly what you get when you
+hit per-request resource. Singleton returns "1" too, but only once - every  hit
+increases value of stored variable (so you can see that is really singleton).
+</p>
 
       <h2>Running the Example</h2>
       <p>If you are working with Jersey GlassFish update center module installed into your existing GlassFish instance, 
@@ -34,5 +60,6 @@ you will need to follow instructions at <a href="../../README.html">the module R
       <p> run 
       <blockquote><code>mvn glassfish:run</code><p></blockquote>
       <p>From a web browser, visit:</p>
-      <blockquote><code><a href="http://localhost:8080/managed-beans-webapp/managedbean">http://localhost:8080/managed-beans-webapp/managedbean</a></code></blockquote>
+      <blockquote><code><a href="http://localhost:8080/managed-beans-webapp/managedbean/per-request">http://localhost:8080/managed-beans-webapp/managedbean/per-request</a></code></blockquote>
+      <blockquote><code><a href="http://localhost:8080/managed-beans-webapp/managedbean/singleton">http://localhost:8080/managed-beans-webapp/managedbean/singleton</a></code></blockquote>
  </body></html>
