@@ -1,11 +1,13 @@
 package com.sun.jersey.test.framework;
 
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
+import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory;
 import com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory;
+import java.util.Map;
 
 /**
  * A low-level application descriptor.
@@ -166,13 +168,37 @@ public class LowLevelAppDescriptor extends AppDescriptor {
     /**
      * Transform a Web-based application descriptor into a low-level
      * application descriptor.
-     * 
+     *
      * @param wad the Web-based application descriptor.
      * @return the low-level application descriptor.
      */
     public static LowLevelAppDescriptor transform(WebAppDescriptor wad) {
         // TODO need to check contraints on wad
-        String packages = wad.getInitParams().get(PackagesResourceConfig.PROPERTY_PACKAGES);
-        return new LowLevelAppDescriptor.Builder(packages).build();
+        if (wad.getInitParams().get(PackagesResourceConfig.PROPERTY_PACKAGES) != null) {
+            String packages = wad.getInitParams().get(PackagesResourceConfig.PROPERTY_PACKAGES);
+            PackagesResourceConfig packagesResourceConfig = new PackagesResourceConfig(packages);
+            populateResourceConfigFeatures(packagesResourceConfig, wad.getInitParams());
+            return new LowLevelAppDescriptor.Builder(packagesResourceConfig).build();
+        } else if (wad.getInitParams().get(ClassNamesResourceConfig.PROPERTY_CLASSNAMES) != null) {
+            String classes = wad.getInitParams().get(ClassNamesResourceConfig.PROPERTY_CLASSNAMES);
+            ClassNamesResourceConfig classNamesResourceConfig = new ClassNamesResourceConfig(classes);
+            populateResourceConfigFeatures(classNamesResourceConfig, wad.getInitParams());
+            return new LowLevelAppDescriptor.Builder(classNamesResourceConfig).build();
+        } else if (wad.getInitParams().get(ClasspathResourceConfig.PROPERTY_CLASSPATH) != null) {
+            String classpath = wad.getInitParams().get(ClasspathResourceConfig.PROPERTY_CLASSPATH);
+            ClasspathResourceConfig classpathResourceConfig = new ClasspathResourceConfig(classpath.split(";"));
+            populateResourceConfigFeatures(classpathResourceConfig, wad.getInitParams());
+            return new LowLevelAppDescriptor.Builder(classpathResourceConfig).build();
+        }
+        return null;
+    }
+
+    private static void populateResourceConfigFeatures(ResourceConfig rc, Map<String, String> initParams) {
+        for(String initParam : initParams.keySet()) {
+            if (initParams.get(initParam).equalsIgnoreCase("true") ||
+                    initParams.get(initParam).equalsIgnoreCase("false")) {
+                rc.getFeatures().put(initParam, new Boolean(initParams.get(initParam)));
+            }
+        }
     }
 }
