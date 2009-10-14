@@ -171,7 +171,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     public void testGetWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
         WebResource r = resource("/application.wadl");
-        
+
         File tmpFile = r.get(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
@@ -216,11 +216,11 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("//wadl:resource[@path='{id}/verbose']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
         assertEquals(val,"xs:int");
     }
-    
+
     public void testOptionsResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
         WebResource r = resource("/widgets");
-        
+
         // test WidgetsResource
         File tmpFile = r.options(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
@@ -266,7 +266,7 @@ public class WadlResourceTest extends AbstractResourceTester {
 
         // test ExtraResource
         r = resource("/foo");
-        
+
         tmpFile = r.options(File.class);
         b = bf.newDocumentBuilder();
         d = b.parse(tmpFile);
@@ -284,11 +284,11 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("count(//wadl:resource[@path='foo']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"1");
     }
-    
+
     public void testOptionsLocatorWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
         WebResource r = resource("/widgets/3/verbose");
-        
+
         // test WidgetsResource
         File tmpFile = r.accept(MediaTypes.WADL).options(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
@@ -306,18 +306,18 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check total number of resources is 1 (no ExtraResource details included)
         val = (String)xp.evaluate("count(//wadl:resource)", d, XPathConstants.STRING);
         assertEquals(val,"1");
-        // check only once resource with path 
+        // check only once resource with path
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/3/verbose'])", d, XPathConstants.STRING);
         assertEquals(val,"1");
         // check 1 methods
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/3/verbose']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"1");
     }
-    
+
     public void testOptionsSubResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
         WebResource r = resource("/widgets/3");
-        
+
         // test WidgetsResource
         File tmpFile = r.accept(MediaTypes.WADL).options(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
@@ -373,7 +373,7 @@ public class WadlResourceTest extends AbstractResourceTester {
     public void testRecursive() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(RootResource.class);
         WebResource r = resource("/root/loc");
-        
+
         // test WidgetsResource
         File tmpFile = r.accept(MediaTypes.WADL).options(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
@@ -390,9 +390,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check only one resource with for 'root/loc'
         val = (String)xp.evaluate("count(//wadl:resource[@path='root/loc'])", d, XPathConstants.STRING);
         assertEquals(val,"1");
-        
+
         r = resource("/root/loc/loc");
-        
+
         // test WidgetsResource
         tmpFile = r.accept(MediaTypes.WADL).options(File.class);
         bf = DocumentBuilderFactory.newInstance();
@@ -409,12 +409,54 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check only one resource with for 'root/loc'
         val = (String)xp.evaluate("count(//wadl:resource[@path='root/loc/loc'])", d, XPathConstants.STRING);
         assertEquals(val,"1");
-        
+
     }
-    
+
+    @Path("root1")
+    public static class RootResource1 {
+        @Path("loc")
+        public SubResource getSub() {
+            return new SubResource();
+        }
+    }
+
+    @Path("root2")
+    public static class RootResource2 {
+        @Path("loc")
+        public SubResource getSub() {
+            return new SubResource();
+        }
+    }
+
+    public void testRecursive2() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        initiateWebApplication(RootResource1.class, RootResource2.class);
+        WebResource r = resource("/application.wadl");
+
+        File tmpFile = r.get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
+        String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
+        assertEquals(val,BASE_URI.toString());
+        // check only one resource with for 'root/loc'
+        val = (String)xp.evaluate("count(//wadl:resource[@path='loc'])", d, XPathConstants.STRING);
+        assertEquals("4", val);
+        // check for method with id of hello
+        val = (String)xp.evaluate("count(//wadl:resource[@path='loc']/wadl:method[@id='hello'])", d, XPathConstants.STRING);
+        assertEquals("2", val);
+    }
+
+
     @Path("form")
     public static class FormResource {
-        
+
         @POST
         @Consumes( "multipart/form-data" )
         public void post(
@@ -424,13 +466,13 @@ public class WadlResourceTest extends AbstractResourceTester {
                 @FormParam( "c" ) FormDataContentDisposition cdc,
                 Form form ) {
         }
-        
+
     }
-    
+
     public void testFormParam() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(FormResource.class);
         WebResource r = resource("/application.wadl");
-        
+
         File tmpFile = r.get(File.class);
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
@@ -441,39 +483,39 @@ public class WadlResourceTest extends AbstractResourceTester {
         printSource(new DOMSource(d));
         XPath xp = XPathFactory.newInstance().newXPath();
         xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
-        
+
         final String requestPath = "//wadl:resource[@path='form']/wadl:method[@name='POST']/wadl:request";
         final String representationPath = requestPath + "/wadl:representation";
 
         // check number of request params is zero
         int count = ( (Double)xp.evaluate("count(" + requestPath + "/wadl:param)", d, XPathConstants.NUMBER) ).intValue();
         assertEquals( 0, count );
-        
+
         // check number of request representations is one
         count = ( (Double)xp.evaluate("count(" + representationPath + ")", d, XPathConstants.NUMBER) ).intValue();
         assertEquals( 1, count );
-        
+
         // check number of request representation params is three
         count = ( (Double)xp.evaluate("count(" + representationPath + "/wadl:param)", d, XPathConstants.NUMBER) ).intValue();
         assertEquals( 3, count );
-        
+
         // check the style of the request representation param is 'query'
         String val = (String)xp.evaluate( representationPath + "/wadl:param[@name='a']/@style", d, XPathConstants.STRING);
         assertEquals( "query", val );
         val = (String)xp.evaluate( representationPath + "/wadl:param[@name='b']/@style", d, XPathConstants.STRING);
         assertEquals( "query", val );
-        
+
     }
-    
+
     private static class NSResolver implements NamespaceContext {
         private String prefix;
         private String nsURI;
-        
+
         public NSResolver(String prefix, String nsURI) {
             this.prefix = prefix;
             this.nsURI = nsURI;
         }
-        
+
         public String getNamespaceURI(String prefix) {
              if (prefix.equals(this.prefix))
                  return this.nsURI;

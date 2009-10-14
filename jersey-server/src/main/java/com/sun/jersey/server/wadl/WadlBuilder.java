@@ -64,6 +64,7 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+import java.util.Collections;
 
 /**
  * This class implements the algorithm how the wadl is built for one or more
@@ -95,11 +96,10 @@ public class WadlBuilder {
     public Application generate(Set<AbstractResource> resources ) {
         Application wadlApplication = _wadlGenerator.createApplication();
         Resources wadlResources = _wadlGenerator.createResources();
-        Set<Class<?>> visitedClasses = new HashSet<Class<?>>();
         
         // for each resource
         for (AbstractResource r: resources) {
-            Resource wadlResource = generateResource(r, null, visitedClasses);
+            Resource wadlResource = generateResource(r, null);
             wadlResources.getResource().add(wadlResource);
         }
         wadlApplication.setResources(wadlResources);
@@ -116,8 +116,7 @@ public class WadlBuilder {
     public Application generate(AbstractResource resource) {
         Application wadlApplication = _wadlGenerator.createApplication();
         Resources wadlResources = _wadlGenerator.createResources();
-        Set<Class<?>> visitedClasses = new HashSet<Class<?>>();
-        Resource wadlResource = generateResource(resource, null, visitedClasses);
+        Resource wadlResource = generateResource(resource, null);
         wadlResources.getResource().add(wadlResource);
         wadlApplication.setResources(wadlResources);
         
@@ -251,15 +250,21 @@ public class WadlBuilder {
         return wadlParam;
     }
 
+    private Resource generateResource(AbstractResource r, String path) {
+        return generateResource(r, path, Collections.<Class<?>>emptySet());
+    }
+    
     private Resource generateResource(AbstractResource r, String path, Set<Class<?>> visitedClasses) {
         Resource wadlResource = _wadlGenerator.createResource( r, path );
 
         // prevent infinite recursion
-        if (visitedClasses.contains(r.getResourceClass()))
+        if (visitedClasses.contains(r.getResourceClass())) {
             return wadlResource;
-        else
+        } else {
+            visitedClasses = new HashSet<Class<?>>(visitedClasses);
             visitedClasses.add(r.getResourceClass());
-        
+        }
+
         // for each resource method
         Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
         for (AbstractResourceMethod m : r.getResourceMethods()) {

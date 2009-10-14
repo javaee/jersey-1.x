@@ -1,6 +1,11 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 95
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=95
+  The recursive cycle detection has been modified to be local to root
+  resource classes such the same sub-resource in two or more root resource
+  classes can be declared in the WADL.
 - Fixed issue 371
   https://jersey.dev.java.net/issues/show_bug.cgi?id=371
   Logging of stack trace of mapped exceptions is not performed.
