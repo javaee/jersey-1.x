@@ -38,12 +38,13 @@
 package com.sun.jersey.api.model;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
 
 /**
  * Abstraction for a method/constructor parameter
  */
-public class Parameter {
+public class Parameter implements AnnotatedElement {
     
     public enum Source {ENTITY, QUERY, MATRIX, PATH, COOKIE, HEADER, CONTEXT, UNKNOWN};
     
@@ -79,10 +80,6 @@ public class Parameter {
         this.defaultValue = defaultValue;
     }
 
-    public Annotation[] getAnnotations() {
-        return annotations;
-    }
-    
     public Annotation getAnnotation() {
         return annotation;
     }
@@ -113,5 +110,25 @@ public class Parameter {
 
     public Type getParameterType() {
         return type;
-    }    
+    }
+
+    public <T extends Annotation> T getAnnotation(Class<T> annotationType) {
+        for (Annotation a : annotations) {
+            if (annotationType == a.annotationType())
+                return annotationType.cast(a);
+        }
+        return null;
+    }
+
+    public Annotation[] getAnnotations() {
+        return annotations.clone();
+    }
+
+    public Annotation[] getDeclaredAnnotations() {
+        return annotations.clone();
+    }
+
+    public boolean isAnnotationPresent(Class<? extends Annotation> annotationType) {
+        return getAnnotation(annotationType) != null;
+    }
 }

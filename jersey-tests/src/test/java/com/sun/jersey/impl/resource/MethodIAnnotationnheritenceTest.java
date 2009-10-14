@@ -38,11 +38,18 @@
 package com.sun.jersey.impl.resource;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -496,16 +503,68 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
     }
 
 
-    public static abstract class BaseResource {
+    public static abstract class SimpleBaseResource {
         @GET
         @Produces("text/plain")
         public abstract Object get();
     }
 
     @Path("concrete")
-    public static class ConcreteSubTypeResource extends BaseResource {
+    public static class SimpleConcreteSubTypeResource extends SimpleBaseResource {
         public String get() {
             return "get";
+        }
+    }
+
+    public void testSimpleConcreteSubTypeResource() {
+        initiateWebApplication(SimpleConcreteSubTypeResource.class);
+
+        String s = resource("/concrete")
+                .get(String.class);
+        assertEquals("get", s);
+    }
+
+
+    @Target({ElementType.METHOD, ElementType.PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Shared {
+        String value();
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface BaseMethod {
+    }
+
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface SubMethod {
+    }
+
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface BaseParam {
+    }
+
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface SubParam {
+    }
+
+    public static abstract class BaseResource {
+        @Shared("base")
+        @BaseMethod
+        @GET
+        @Produces("text/plain")
+        public abstract Object get(@Shared("base") @BaseParam @QueryParam("x") String x, @Shared("base") @BaseParam @QueryParam("y") String y);
+    }
+
+    @Path("concrete")
+    public static class ConcreteSubTypeResource extends BaseResource {
+        @Shared("sub")
+        @SubMethod
+        public String get(@Shared("sub") @SubParam String x, @Shared("sub") @SubParam String y) {
+            return x + y;
         }
     }
 
@@ -513,7 +572,24 @@ public class MethodIAnnotationnheritenceTest extends AbstractResourceTester {
         initiateWebApplication(ConcreteSubTypeResource.class);
 
         String s = resource("/concrete")
+                .queryParam("x", "X")
+                .queryParam("y", "Y")
                 .get(String.class);
-        assertEquals("get", s);
+        assertEquals("XY", s);
+
+        AbstractResource ar = IntrospectionModeller.createResource(ConcreteSubTypeResource.class);
+        AbstractResourceMethod am = ar.getResourceMethods().get(0);
+
+        assertTrue(am.isAnnotationPresent(SubMethod.class));
+        assertTrue(am.isAnnotationPresent(BaseMethod.class));
+        assertEquals("sub", am.getAnnotation(Shared.class).value());
+
+        assertTrue(am.getParameters().get(0).isAnnotationPresent(SubParam.class));
+        assertTrue(am.getParameters().get(0).isAnnotationPresent(BaseParam.class));
+        assertEquals("sub", am.getParameters().get(0).getAnnotation(Shared.class).value());
+
+        assertTrue(am.getParameters().get(1).isAnnotationPresent(SubParam.class));
+        assertTrue(am.getParameters().get(1).isAnnotationPresent(BaseParam.class));
+        assertEquals("sub", am.getParameters().get(1).getAnnotation(Shared.class).value());
     }
 }

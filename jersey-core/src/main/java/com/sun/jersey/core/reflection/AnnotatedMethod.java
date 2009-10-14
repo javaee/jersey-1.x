@@ -186,7 +186,7 @@ public final class AnnotatedMethod implements AnnotatedElement {
     private static Annotation[] mergeMethodAnnotations(Method m, Method am) {
         List<Annotation> al = asList(m.getAnnotations());
         for (Annotation a : am.getAnnotations()) {
-            if (isMethodAnnotation(a))
+            if (!m.isAnnotationPresent(a.getClass()))
                 al.add(a);
         }
         
@@ -201,7 +201,7 @@ public final class AnnotatedMethod implements AnnotatedElement {
         for (int i = 0; i < mp.length; i++) {
             List<Annotation> al = asList(mp[i]);
             for (Annotation a : amp[i])
-                if (isParameterAnnotation(a))
+                if (!isAnnotatonPresent(a.getClass(), al))
                     al.add(a);
             ala.add(al);            
         }
@@ -213,7 +213,15 @@ public final class AnnotatedMethod implements AnnotatedElement {
         
         return paa;
     }
-    
+
+    private static boolean isAnnotatonPresent(Class<? extends Annotation> ca, List<Annotation> la) {
+        for (Annotation a : la) {
+            if (ca == a.getClass())
+                return true;
+        }
+        return false;
+    }
+
     private static Method findAnnotatedMethod(Method m) {   
         Method am = findAnnotatedMethod(m.getDeclaringClass(), m);
         return (am != null) ? am : m;

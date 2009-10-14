@@ -1,6 +1,11 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 385
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=385
+  Enable non-JAX-RS annotations on interface or abstract methods and
+  parameters to be merged with the annotations on the concrete method and 
+  parameters (if such annotations are not already declared).
 - Fixed issue 383
   https://jersey.dev.java.net/issues/show_bug.cgi?id=383
   Singleton instances added to the set of singletons of the Application/
