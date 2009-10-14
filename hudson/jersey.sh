@@ -11,5 +11,3 @@ java -version
 JERSEY_HTTP_SLEEP=2000 JERSEY_HTTP_STOPSEC=2 mvn -e clean install
 # jersey-bundle needs to be tested as well
 # JERSEY_HTTP_SLEEP=2000 JERSEY_HTTP_STOPSEC=2 mvn -e clean test -Pbundle-dependency
-# 3 attempts to deploy:
-mvn -Dmaven.test.skip=true deploy || mvn -Dmaven.test.skip=true deploy || mvn -Dmaven.test.skip=true deploy 
