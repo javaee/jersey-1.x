@@ -1,6 +1,9 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 371
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=371
+  Logging of stack trace of mapped exceptions is not performed.
 - Fixed issue 385
   https://jersey.dev.java.net/issues/show_bug.cgi?id=385
   Enable non-JAX-RS annotations on interface or abstract methods and

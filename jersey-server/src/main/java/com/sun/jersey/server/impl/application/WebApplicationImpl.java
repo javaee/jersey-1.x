@@ -1047,15 +1047,14 @@ public final class WebApplicationImpl implements WebApplication {
     private void mapWebApplicationException(WebApplicationException e, 
             HttpResponseContext response) {
         if (e.getResponse().getEntity() != null) {
-            onException(e, e.getResponse(), response);
+            onException(e, e.getResponse(), response, false);
         } else {
             if (!mapException(e, response)) {
-                onException(e, e.getResponse(), response);                    
+                onException(e, e.getResponse(), response, false);
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
     private boolean mapException(Throwable e,
             HttpResponseContext response) {
         ExceptionMapper em = exceptionFactory.find(e.getClass());
@@ -1069,35 +1068,38 @@ public final class WebApplicationImpl implements WebApplication {
             Response r = em.toResponse(e);
             if (r == null)
                 r = Response.noContent().build();
-            onException(e, r, response);
+            onException(e, r, response, true);
         } catch (RuntimeException ex) {
             LOGGER.severe("Exception mapper " + em +
                     " for Throwable " + e +
                     " threw a RuntimeTxception when " +
                     "attempting to obtain the response");
             Response r = Response.serverError().build();
-            onException(ex, r, response);
+            onException(ex, r, response, false);
         }
         return true;
     }
     
     private static void onException(Throwable e,
             Response r,
-            HttpResponseContext response) {
-        // Log the stack trace
-        if (r.getStatus() >= 500) {
-            LOGGER.log(Level.SEVERE, "Internal server error", e);
-        }
+            HttpResponseContext response,
+            boolean mapped) {
+        if (!mapped) {
+            // Log the stack trace
+            if (r.getStatus() >= 500) {
+                LOGGER.log(Level.SEVERE, "Internal server error", e);
+            }
 
-        if (r.getStatus() >= 500 && r.getEntity() == null) {
-            // Write out the exception to a string
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            pw.flush();
+            if (r.getStatus() >= 500 && r.getEntity() == null) {
+                // Write out the exception to a string
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
 
-            r = Response.status(r.getStatus()).entity(sw.toString()).
-                    type("text/plain").build();
+                r = Response.status(r.getStatus()).entity(sw.toString()).
+                        type("text/plain").build();
+            }
         }
         
         response.setResponse(r);        
