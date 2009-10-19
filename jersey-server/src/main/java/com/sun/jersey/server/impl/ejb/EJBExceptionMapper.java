@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.server.impl.ejb;
 
+import com.sun.jersey.api.container.MappableContainerException;
 import javax.ejb.EJBException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -66,6 +67,8 @@ public class EJBExceptionMapper implements ExceptionMapper<EJBException> {
             }
         }
 
-        return Response.serverError().build();
+        // Re-throw so the exception can be passed through to the
+        // servlet container
+        throw new MappableContainerException((cause == null) ? exception : cause);
     }
 }

@@ -1,6 +1,35 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 391
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=390
+  The Jersey servlet-layer catches a MappableContainerException and will
+  rethrow the cause wrapped in a ServletException. This ensures that such
+  mappable exceptions can be mapped by the Web application.
+- Fixed issue 390
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=390
+  A com.sun.jersey.api.container.MappableContainerException may be thrown
+  from an ExceptionMapper and as such that expception will be re-thrown to
+  the underlying HTTP container.
+  The EJBException mapper was modified to throw a MappableContainerException
+  with the cause of an EJBException. This ensures that such runtime exceptions
+  can be mapped by the Web application.
+- Fixed issue 389
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=389
+  For Web applications HttpServletResponse.sendError will be called instead
+  of HttpServletResponse.setStatus under the following conditions:
+  1) no bytes have been written to the response output stream; and
+  2) the status code is an error code, namely a value >= 400.
+  Such behaviour ensures that error pages mapped to error codes declared in the
+  web.xml will work if Jersey or the applicaton returns an error code with no
+  entity.
+- Fixed issue 387
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=387
+  Enabling Jersey response logging with views no longer results in an
+  illegal state exception.
+- Fixed issue 388
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=388
+  Maven web-based archetypes use version 2.5 of web.xml.
 - Fixed issue 392
   https://jersey.dev.java.net/issues/show_bug.cgi?id=392
   Issue 336 (fixed in 1.1.3-ea) caused a regression such that it was no longer 

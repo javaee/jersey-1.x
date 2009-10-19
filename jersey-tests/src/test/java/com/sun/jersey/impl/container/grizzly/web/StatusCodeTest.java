@@ -38,42 +38,31 @@
 package com.sun.jersey.impl.container.grizzly.web;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpMethodTest extends AbstractGrizzlyWebContainerTester {
+public class StatusCodeTest extends AbstractGrizzlyWebContainerTester {
     @Path("/test")
     public static class HttpMethodResource {
+        @Path("{status}")
         @GET
-        public String get() {
-            return "GET";
+        public Response get(@PathParam("status") int status, @QueryParam("e") String e) {
+            return (e == null)
+                ? Response.status(status).header("X-FOO", "foo").build()
+                : Response.status(status).entity(e).header("X-FOO", "foo").build();
         }
-               
-        @POST
-        public String post(String entity) {
-            return entity;
-        }
-        
-        @PUT
-        public String put(String entity) {
-            return entity;
-        }
-        
-        @DELETE
-        public String delete() {
-            return "DELETE";
-        }    
     }
         
-    public HttpMethodTest(String testName) {
+    public StatusCodeTest(String testName) {
         super(testName);
     }
     
@@ -81,45 +70,40 @@ public class HttpMethodTest extends AbstractGrizzlyWebContainerTester {
         return Client.create();
     }
 
-    public void testGet() {
+    public void test400NoEntity() {
         startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("GET", r.get(String.class));
-    }
-    
-    public void testPost() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("POST", r.post(String.class, "POST"));
-    }    
-    
-    public void testPostEmpty() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("", r.post(String.class, ""));
+        WebResource r = createClient().resource(getUri().path("test/400").build());
+        ClientResponse cr = r.get(ClientResponse.class);
+        // TODO bug in Grizzly
+//        assertEquals("foo", cr.getHeaders().getFirst("X-FOO"));
+        assertEquals(400, cr.getStatus());
     }
 
-    public void testPut() {
+    public void test400WithEntity() {
         startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("PUT", r.post(String.class, "PUT"));
+        WebResource r = createClient().resource(getUri().path("test/400").queryParam("e", "xxx").build());
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(400, cr.getStatus());
+        assertEquals("foo", cr.getHeaders().getFirst("X-FOO"));
+        assertEquals("xxx", cr.getEntity(String.class));
     }
-    
-    public void testDelete() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("DELETE", r.delete(String.class));
-    }
-    
-    public void testAll() {
-        startServer(HttpMethodResource.class);
-        WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("GET", r.get(String.class));
 
-        assertEquals("POST", r.post(String.class, "POST"));
-        
-        assertEquals("PUT", r.post(String.class, "PUT"));
-        
-        assertEquals("DELETE", r.delete(String.class));
+
+    public void test500NoEntity() {
+        startServer(HttpMethodResource.class);
+        WebResource r = createClient().resource(getUri().path("test/500").build());
+        ClientResponse cr = r.get(ClientResponse.class);
+        // TODO bug in Grizzly
+//        assertEquals("foo", cr.getHeaders().getFirst("X-FOO"));
+        assertEquals(500, cr.getStatus());
+    }
+
+    public void test500WithEntity() {
+        startServer(HttpMethodResource.class);
+        WebResource r = createClient().resource(getUri().path("test/500").queryParam("e", "xxx").build());
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("foo", cr.getHeaders().getFirst("X-FOO"));
+        assertEquals("xxx", cr.getEntity(String.class));
     }
 }

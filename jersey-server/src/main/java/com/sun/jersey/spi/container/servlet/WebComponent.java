@@ -38,6 +38,7 @@
 package com.sun.jersey.spi.container.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.ApplicationAdapter;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -221,23 +222,27 @@ public class WebComponent implements ContainerListener {
             this.response = response;
         }
 
+        ContainerResponse cResponse;
+
+        long contentLength;
+
         public OutputStream writeStatusAndHeaders(long contentLength,
                 ContainerResponse cResponse) throws IOException {
-            response.setStatus(cResponse.getStatus());
-            if (contentLength != -1 && contentLength < Integer.MAX_VALUE)
-                response.setContentLength((int)contentLength);
-
-            MultivaluedMap<String, Object> headers = cResponse.getHttpHeaders();
-            for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
-                for (Object v : e.getValue()) {
-                    response.addHeader(e.getKey(), ContainerResponse.getHeaderValue(v));
-                }
-            }
-
+            this.contentLength = contentLength;
+            this.cResponse = cResponse;
             return this;
         }
 
         public void finish() throws IOException {
+            if (out != null)
+                return;
+
+            if (cResponse.getStatus() >= 400)
+                response.sendError(cResponse.getStatus());
+            else
+                response.setStatus(cResponse.getStatus());
+
+            writeHeaders();
         }
 
         OutputStream out;
@@ -249,14 +254,18 @@ public class WebComponent implements ContainerListener {
 
         @Override
         public void write(byte b[]) throws IOException {
-            initiate();
-            out.write(b);
+            if (b.length > 0) {
+                initiate();
+                out.write(b);
+            }
         }
 
         @Override
         public void write(byte b[], int off, int len) throws IOException {
-            initiate();
-            out.write(b, off, len);
+            if (len > 0) {
+                initiate();
+                out.write(b, off, len);
+            }
         }
 
         @Override
@@ -272,8 +281,27 @@ public class WebComponent implements ContainerListener {
         }
 
         void initiate() throws IOException {
-            if (out == null)
+            if (out == null) {
+                writeStatusAndHeaders();
                 out = response.getOutputStream();
+            }
+        }
+
+        void writeStatusAndHeaders() {
+            response.setStatus(cResponse.getStatus());
+            writeHeaders();
+        }
+
+        void writeHeaders() {
+            if (contentLength != -1 && contentLength < Integer.MAX_VALUE)
+                response.setContentLength((int)contentLength);
+
+            MultivaluedMap<String, Object> headers = cResponse.getHttpHeaders();
+            for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
+                for (Object v : e.getValue()) {
+                    response.addHeader(e.getKey(), ContainerResponse.getHeaderValue(v));
+                }
+            }
         }
     }
 
@@ -339,8 +367,10 @@ public class WebComponent implements ContainerListener {
 
             _application.handleRequest(cRequest, new Writer(response));
 
-        } catch (ContainerException e) {
-            throw new ServletException(e);
+        } catch (MappableContainerException ex) {
+            throw new ServletException(ex.getCause());
+        } catch (ContainerException ex) {
+            throw new ServletException(ex);
         } finally {
             UriRuleProbeProvider.requestEnd();
 

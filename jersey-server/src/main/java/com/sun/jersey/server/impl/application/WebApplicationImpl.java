@@ -1079,6 +1079,10 @@ public final class WebApplicationImpl implements WebApplication {
             if (r == null)
                 r = Response.noContent().build();
             onException(e, r, response, true);
+        } catch (MappableContainerException ex) {
+            // If the exception mapper throws a MappableContainerException then
+            // rethrow it to the HTTP container
+            throw ex;
         } catch (RuntimeException ex) {
             LOGGER.severe("Exception mapper " + em +
                     " for Throwable " + e +
