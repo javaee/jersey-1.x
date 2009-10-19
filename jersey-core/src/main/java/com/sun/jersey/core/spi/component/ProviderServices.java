@@ -57,13 +57,11 @@ import java.util.logging.Logger;
 public class ProviderServices {
     private static final Logger LOGGER = Logger.getLogger(ProviderServices.class.getName());
     
-    private final InjectableProviderFactory injectableFactory;
-    
     private final ProviderFactory componentProviderFactory;
     
     private final Set<Class<?>> providers;
     
-    private final Set<?> providerInstances;
+    private final Set providerInstances;
 
     /**
      * Create the provider services.
@@ -74,16 +72,48 @@ public class ProviderServices {
      * @param providerInstances
      */
     public ProviderServices(
-            InjectableProviderFactory injectableFactory,
             ProviderFactory componentProviderFactory,
             Set<Class<?>> providers,
             Set<?> providerInstances) {
-        this.injectableFactory = injectableFactory;
         this.componentProviderFactory = componentProviderFactory;
         this.providers = providers;
         this.providerInstances = providerInstances;
     }
-    
+
+    public void update(Set<Class<?>> providers, Set<?> providerInstances, InjectableProviderFactory ipf) {
+        final Set<Class<?>> addedProviders = diff(this.providers, providers);
+        final Set<?> addedProviderInstances = diff(this.providerInstances, providerInstances);
+
+        this.providers.clear();
+        this.providers.addAll(providers);
+
+        this.providerInstances.clear();
+        this.providerInstances.addAll(providerInstances);
+
+        final ProviderServices _ps = new ProviderServices(componentProviderFactory, addedProviders, addedProviderInstances);
+        final InjectableProviderFactory _ipf = new InjectableProviderFactory();
+        _ipf.configureProviders(_ps);
+        ipf.update(_ipf);
+    }
+
+    private <T> Set<T> diff(Set<T> s1, Set<T> s2) {
+        Set<T> diff = new LinkedHashSet<T>();
+
+        for (T t : s1) {
+            if (!s2.contains(t)) {
+                diff.add(t);
+            }
+        }
+
+        for (T t : s2) {
+            if (!s1.contains(t)) {
+                diff.add(t);
+            }
+        }
+
+        return diff;
+    }
+
     public ProviderFactory getComponentProviderFactory() {
         return componentProviderFactory;
     }
@@ -130,6 +160,19 @@ public class ProviderServices {
         void onAdd(T t);
     }
     
+    public <T> void getProviders(Class<T> provider, ProviderListener listener) {
+        for (T t : getProviderInstances(provider)) {
+            listener.onAdd(t);
+        }
+
+        for (ProviderClass pc : getProviderOnlyClasses(provider)) {
+            Object o = getComponent(pc);
+            if (o != null) {
+                listener.onAdd(provider.cast(o));
+            }
+        }
+    }
+
     public <T> void getProvidersAndServices(Class<T> provider, ProviderListener listener) {
         for (T t : getProviderInstances(provider)) {
             listener.onAdd(t);
@@ -227,14 +270,19 @@ public class ProviderServices {
     }
 
     private Set<ProviderClass> getProviderAndServiceClasses(Class<?> service) {
-        Set<ProviderClass> sp = new LinkedHashSet<ProviderClass>();
-        for(Class c : getProviderClasses(service)) {
-            sp.add(new ProviderClass(c));
-        }
+        Set<ProviderClass> sp = getProviderOnlyClasses(service);
         getServiceClasses(service, sp);
         return sp;
     }    
     
+    private Set<ProviderClass> getProviderOnlyClasses(Class<?> service) {
+        Set<ProviderClass> sp = new LinkedHashSet<ProviderClass>();
+        for(Class c : getProviderClasses(service)) {
+            sp.add(new ProviderClass(c));
+        }
+        return sp;
+    }
+
     private Set<ProviderClass> getServiceClasses(Class<?> service) {
         Set<ProviderClass> sp = new LinkedHashSet<ProviderClass>();
         getServiceClasses(service, sp);

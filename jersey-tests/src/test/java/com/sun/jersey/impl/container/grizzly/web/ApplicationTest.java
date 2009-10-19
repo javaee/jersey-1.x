@@ -42,6 +42,11 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -50,9 +55,12 @@ import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  *
@@ -76,7 +84,7 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
         public Set<Class<?>> getClasses() {
             return classes;
         }
-        
+
     }
 
     public static class ResourceConfigApp extends DefaultResourceConfig {
@@ -87,7 +95,7 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
 
     @Path("/")
     public static class Resource {
-        
+
         @GET
         @Produces("text/plain")
         public String get(@Context ResourceConfig rc) {
@@ -95,7 +103,7 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
             return rc.getProperty("property").toString();
         }
     }
-    
+
     public void testAppWithResourceConfigPropertyName() {
         Map<String, String> initParams = new HashMap<String, String>();
         initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS, App.class.getName());
@@ -183,7 +191,7 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
         @Produces("text/plain")
         public String get(@Context ResourceConfig rc) {
 
-            assertEquals(ResourceSingleton.class, 
+            assertEquals(ResourceSingleton.class,
                     rc.getSingletons().iterator().next().getClass());
             assertEquals(ResourceSingleton.class,
                     rc.getExplicitRootResources().get("/explicit").getClass());
@@ -216,7 +224,7 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
 
     public static class InjectApp extends DefaultResourceConfig {
         public InjectApp(@Context ServletContext sc) {
-            getClasses().add(ResourceInject.class);
+            getClasses().add(ResourceInjectApp.class);
 
             assertNotNull(sc);
             getProperties().put("z", sc.getInitParameter("x"));
@@ -224,7 +232,7 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
     }
 
     @Path("/")
-    public static class ResourceInject {
+    public static class ResourceInjectApp {
 
         @GET
         @Produces("text/plain")
@@ -244,5 +252,81 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
                 path("/").build());
 
         assertEquals("y", r.get(String.class));
+    }
+
+
+    public static class SingletonTypeOne {
+    }
+
+    public static class SingletonTypeTwo {
+    }
+
+    public class SingletonTypeProvider extends SingletonTypeInjectableProvider<Context, SingletonTypeOne> {
+        public SingletonTypeProvider() {
+            super(SingletonTypeOne.class, new SingletonTypeOne());
+        }
+    }
+
+    @Produces("text/plain")
+    public class ToUpperWriter implements MessageBodyWriter<String> {
+
+        public boolean isWriteable(Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType) {
+            return String.class == type;
+        }
+
+        public long getSize(String t, Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType) {
+            return -1;
+        }
+
+        public void writeTo(String t, Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType,
+                MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+            entityStream.write(t.toUpperCase().getBytes());
+        }
+    }
+
+    public static class InjectAppProvider extends DefaultResourceConfig {
+        public InjectAppProvider(@Context ServletContext sc) {
+            getClasses().add(ResourceInjectAppProvider.class);
+            getClasses().add(SingletonTypeProvider.class);
+            getClasses().add(ToUpperWriter.class);
+            
+            getSingletons().add(
+                    new SingletonTypeInjectableProvider<Context, SingletonTypeTwo>(
+                        SingletonTypeTwo.class, new SingletonTypeTwo()) {});
+
+            assertNotNull(sc);
+            getProperties().put("z", sc.getInitParameter("x"));
+        }
+    }
+
+    @Path("/")
+    public static class ResourceInjectAppProvider {
+
+        public ResourceInjectAppProvider(@Context SingletonTypeOne one, @Context SingletonTypeTwo two) {
+            assertNotNull(one);
+            assertNotNull(two);
+        }
+
+        @GET
+        @Produces("text/plain")
+        public String get(@Context ResourceConfig rc) {
+            return rc.getProperty("z").toString();
+        }
+    }
+
+    public void testInjectProvider() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS, InjectAppProvider.class.getName());
+        initParams.put("x", "y");
+
+        startServer(initParams);
+
+        WebResource r = Client.create().resource(getUri().
+                path("/").build());
+
+        assertEquals("Y", r.get(String.class));
     }
 }

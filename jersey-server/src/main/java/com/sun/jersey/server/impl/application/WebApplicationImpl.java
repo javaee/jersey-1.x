@@ -508,7 +508,6 @@ public final class WebApplicationImpl implements WebApplication {
         };
 
         ProviderServices providerServices = new ProviderServices(
-                this.injectableFactory,
                 this.cpFactory,
                 resourceConfig.getProviderClasses(),
                 resourceConfig.getProviderSingletons());
@@ -562,21 +561,32 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new ContextInjectableProvider<ResourceContext>(
                 ResourceContext.class, resourceContext));
         
+        // Configure the injectable factory with declared providers
         injectableFactory.configure(providerServices);
+
+        boolean updateRequired = false;
 
         // Create application-declared Application instance as a component
         if (rc instanceof DeferredResourceConfig) {
             DeferredResourceConfig drc = (DeferredResourceConfig)rc;
             resourceConfig.add(drc.getApplication(cpFactory));
+            updateRequired = true;
         }
 
-        //Pipelined, decentralized configuration
-        for(ResourceConfigurator configurator : providerServices.getProviders(ResourceConfigurator.class))
+        // Pipelined, decentralized configuration
+        for(ResourceConfigurator configurator : providerServices.getProviders(ResourceConfigurator.class)) {
             configurator.configure(this.resourceConfig);
+            updateRequired = true;
+        }
 
         // Validate the resource config
         this.resourceConfig.validate();
 
+        if (updateRequired) {
+            // Check if application modified provider classes or singletons
+            providerServices.update(resourceConfig.getProviderClasses(),
+                    resourceConfig.getProviderSingletons(), injectableFactory);
+        }
         
         // Obtain all context resolvers
         final ContextResolverFactory crf = new ContextResolverFactory(

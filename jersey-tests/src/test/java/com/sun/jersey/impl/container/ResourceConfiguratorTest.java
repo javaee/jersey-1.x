@@ -41,8 +41,17 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceConfigurator;
 import com.sun.jersey.impl.AbstractResourceTester;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  *
@@ -50,31 +59,88 @@ import javax.ws.rs.Path;
  */
 public class ResourceConfiguratorTest extends AbstractResourceTester {
 
+    public static abstract class StringHolder {
+        public final String s;
+
+        public StringHolder(String s) { this.s = s; }
+    }
+
+    public static class StringHolderOne extends StringHolder {
+        public StringHolderOne(String s) { super(s); }
+    }
+
+    public static class StringHolderTwo extends StringHolder {
+        public StringHolderTwo(String s) { super(s); }
+    }
+    
+    @Produces("text/plain")
+    public static class StringHolderOneWriter implements MessageBodyWriter<StringHolderOne> {
+
+        public boolean isWriteable(Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType) {
+            return StringHolderOne.class == type;
+        }
+
+        public long getSize(StringHolderOne t, Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType) {
+            return -1;
+        }
+
+        public void writeTo(StringHolderOne t, Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType,
+                MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+            entityStream.write(t.s.toUpperCase().getBytes());
+        }
+    }
+
+    @Produces("text/plain")
+    public static class StringHolderTwoWriter implements MessageBodyWriter<StringHolderTwo> {
+
+        public boolean isWriteable(Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType) {
+            return StringHolderTwo.class == type;
+        }
+
+        public long getSize(StringHolderTwo t, Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType) {
+            return -1;
+        }
+
+        public void writeTo(StringHolderTwo t, Class<?> type, Type genericType,
+                Annotation[] annotations, MediaType mediaType,
+                MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+            entityStream.write(t.s.toUpperCase().getBytes());
+        }
+    }
+
     @Path("/one")
     public static class ResourceOne {
         @GET
-        public String get() { 
-            return "ONE";
+        public StringHolderOne get() {
+            return new StringHolderOne("one");
         }
     }
     
     @Path("/two")
     public static class ResourceTwo {
         @GET
-        public String get() {
-            return "TWO";
+        public StringHolderTwo get() {
+            return new StringHolderTwo("two");
         }
     }
 
     public static class ConfigOne implements ResourceConfigurator {
         public void configure(ResourceConfig config) {
             config.getClasses().add(ResourceOne.class);
+            config.getClasses().add(StringHolderOneWriter.class);
         }
     }
 
     public static class ConfigTwo implements ResourceConfigurator {
         public void configure(ResourceConfig config) {
             config.getClasses().add(ResourceTwo.class);
+
+            config.getSingletons().add(new StringHolderTwoWriter());
         }
     }
 

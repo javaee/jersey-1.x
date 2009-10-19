@@ -1,6 +1,11 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 392
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=392
+  Issue 336 (fixed in 1.1.3-ea) caused a regression such that it was no longer 
+  possible to register provider classes in an Application, a ResourceConfig or
+  a ResourceConfigurator.
 - Fixed issue 95
   https://jersey.dev.java.net/issues/show_bug.cgi?id=95
   The recursive cycle detection has been modified to be local to root

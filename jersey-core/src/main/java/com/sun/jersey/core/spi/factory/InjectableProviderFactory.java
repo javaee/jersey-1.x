@@ -79,7 +79,13 @@ public class InjectableProviderFactory implements InjectableProviderContext {
     
     private final Map<Class<? extends Annotation>, LinkedList<MetaInjectableProvider>> ipm =
             new HashMap<Class<? extends Annotation>, LinkedList<MetaInjectableProvider>>();
-        
+
+    public final void update(InjectableProviderFactory ipf) {
+        for (Map.Entry<Class<? extends Annotation>, LinkedList<MetaInjectableProvider>> e : ipf.ipm.entrySet()) {
+            getList(e.getKey()).addAll(e.getValue());
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public final void add(InjectableProvider ip) {
         Type[] args = getMetaArguments(ip.getClass());
@@ -101,12 +107,17 @@ public class InjectableProviderFactory implements InjectableProviderContext {
                         add(ip);
                     }
         });
-//        for (InjectableProvider ip :
-//            providerServices.getProvidersAndServices(InjectableProvider.class)) {
-//            add(ip);
-//        }
     }
     
+    public final void configureProviders(ProviderServices providerServices) {
+        providerServices.getProviders(InjectableProvider.class,
+                new ProviderListener<InjectableProvider>() {
+                    public void onAdd(InjectableProvider ip) {
+                        add(ip);
+                    }
+        });
+    }
+
     private LinkedList<MetaInjectableProvider> getList(Class<? extends Annotation> c) {
         LinkedList<MetaInjectableProvider> l = ipm.get(c);
         if (l == null) {

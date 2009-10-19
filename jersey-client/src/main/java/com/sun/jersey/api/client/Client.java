@@ -194,7 +194,6 @@ public class Client extends Filterable implements ClientHandler {
                 : new IoCProviderFactory(injectableFactory, provider);
 
         ProviderServices providerServices = new ProviderServices(
-                injectableFactory,
                 this.componentProviderFactory,
                 config.getClasses(),
                 config.getSingletons());
