@@ -41,6 +41,7 @@ import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.container.MappableContainerException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -293,5 +294,35 @@ public class ResourceExceptionTest extends AbstractResourceTester {
         ClientResponse cr = resource("/", false).
                 get(ClientResponse.class);        
         assertEquals(500, cr.getStatus());
+    }
+
+
+    @Provider
+    public static class ThrowingTestExceptionMapper implements ExceptionMapper<TestException> {
+        public Response toResponse(TestException we) {
+            throw new MappableContainerException(new UnsupportedOperationException());
+        }
+    }
+
+    @Path("/")
+    static public class ThrowingTestExceptionResource {
+        @GET
+        public String get() throws TestException {
+            throw new TestException();
+        }
+    }
+
+    public void testThrowingTestExceptionResource() {
+        initiateWebApplication(ThrowingTestExceptionResource.class,
+                ThrowingTestExceptionMapper.class);
+
+        boolean caught = false;
+        try {
+            resource("/").get(ClientResponse.class);
+        } catch (MappableContainerException e) {
+            assertEquals(UnsupportedOperationException.class, e.getCause().getClass());
+            caught = true;
+        }
+        assertTrue(caught);
     }
 }
