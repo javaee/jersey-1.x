@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>war</packaging>
+                <packaging>ear</packaging>
+                <packaging>ejb</packaging>
+            </packagings>
+            <goals>
+                <goal>package</goal>
+                <goal>org.codehaus.mevenide:netbeans-deploy-plugin:1.2.4:deploy</goal>
+            </goals>
+            <properties>
+                <netbeans.deploy.clientUrlPart>/resources/users</netbeans.deploy.clientUrlPart>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>war</packaging>
+                <packaging>ear</packaging>
+                <packaging>ejb</packaging>
+            </packagings>
+            <goals>
+                <goal>package</goal>
+                <goal>org.codehaus.mevenide:netbeans-deploy-plugin:1.2.4:deploy</goal>
+            </goals>
+            <properties>
+                <netbeans.deploy.clientUrlPart>/resources/users</netbeans.deploy.clientUrlPart>
+                <netbeans.deploy.debugmode>true</netbeans.deploy.debugmode>
+            </properties>
+        </action>
+    </actions>
