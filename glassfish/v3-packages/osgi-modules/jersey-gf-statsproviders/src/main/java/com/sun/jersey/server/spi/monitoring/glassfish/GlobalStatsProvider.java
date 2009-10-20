@@ -103,7 +103,7 @@ public class GlobalStatsProvider {
      */
     public synchronized void register() {
         if(!registered) {
-            StatsProviderManager.register(ContainerMonitoring.JERSEY, PluginPoint.SERVER, "/jersey/global", this);
+            StatsProviderManager.register(ContainerMonitoring.JERSEY, PluginPoint.SERVER, "", this);
             Logger.getLogger(GlassfishMonitoringServiceProvider.LOGGER_JERSEY_MONITORING).log(Level.INFO, "GlobalStatsProvider registered");
             registered = true;
         }
