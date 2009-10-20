@@ -39,9 +39,11 @@ package com.sun.jersey.server.spi.monitoring.glassfish;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.glassfish.api.monitoring.ContainerMonitoring;
+import org.glassfish.external.probe.provider.PluginPoint;
+import org.glassfish.external.probe.provider.StatsProviderManager;
 import org.glassfish.external.statistics.annotations.Reset;
 import org.glassfish.gmbal.AMXMetadata;
-import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.gmbal.ManagedObject;
 
 /**
@@ -53,102 +55,48 @@ import org.glassfish.gmbal.ManagedObject;
 @ManagedObject
 public class ApplicationStatsProvider {
 
-    private Map<String, Long> rootResourceClassCounter;
-    private Map<String, Long> resourceClassCounter;
+    private final Map<String, ResourceStatsProvider> resourceStatsProviders;
 
-    @ManagedAttribute(id="rootresourceclasshitcount-description")
-    public String getRootResourceClassHitCountDesc() {
-        return "Root resource class hit count";
-    }
-
-    private long rootResourceClassHitCountStartTime = new java.util.Date().getTime();
-    private long rootResourceClassHitCountLastSampleTime;
-
-    @ManagedAttribute(id="rootresourceclasshitcount-starttime")
-    public long getRootResourceClassHitCountStartTime() {
-        return rootResourceClassHitCountStartTime;
-    }
-
-    @ManagedAttribute(id="rootresourceclasshitcount-lastsampletime")
-    public long getRootResourceClassHitCountLastSampleTime() {
-        return rootResourceClassHitCountLastSampleTime;
-    }
-
-    @ManagedAttribute(id="rootresourceclasshitcount")
-    public Map<String, Long> getRootResourceClassCounter() {
-        return rootResourceClassCounter;
-    }
-
-    @ManagedAttribute(id="resourceclasshitcount-description")
-    public String getResourceClassHitCountDesc() {
-        return "Resource class hit count";
-    }
-
-
-    private long resourceClassHitCountStartTime = new java.util.Date().getTime();
-    private long resourceClassHitCountLastSampleTime;
-
-    @ManagedAttribute(id="resourceclasshitcount-starttime")
-    public long getResourceClassHitCountStartTime() {
-        return resourceClassHitCountStartTime;
-    }
-
-    @ManagedAttribute(id="resourceclasshitcount-lastsampletime")
-    public long getResourceClassHitCountLastSampleTime() {
-        return resourceClassHitCountLastSampleTime;
-    }
-
-    @ManagedAttribute(id="resourceclasshitcount")
-    public Map<String, Long> getResourceClassCounter() {
-        return resourceClassCounter;
-    }
+    private final String applicationName;
 
     @Reset
     public void reset() {
-        rootResourceClassHitCountStartTime = new java.util.Date().getTime();
-        rootResourceClassHitCountLastSampleTime = 0;
-        rootResourceClassCounter = new HashMap<String, Long>();
-        resourceClassHitCountStartTime = rootResourceClassHitCountStartTime;
-        resourceClassHitCountLastSampleTime = 0;
-        resourceClassCounter = new HashMap<String, Long>();
     }
 
-    public ApplicationStatsProvider() {
-        rootResourceClassCounter = new HashMap<String, Long>();
-        resourceClassCounter = new HashMap<String, Long>();
+    public ApplicationStatsProvider(String applicationName) {
+        resourceStatsProviders = new HashMap<String, ResourceStatsProvider>();
+        this.applicationName = applicationName;
     }
 
+    private ResourceStatsProvider getResourceStatsProvider(String resourceName) {
 
-    public void rootResourceClassHit(String resourceClassName) {
+        synchronized (resourceStatsProviders) {
 
-        synchronized (rootResourceClassCounter) {
-            if (rootResourceClassCounter.containsKey(resourceClassName)) {
-
-                rootResourceClassCounter.put(
-                        resourceClassName,
-                        rootResourceClassCounter.get(resourceClassName) + 1);
+            if (resourceStatsProviders.containsKey(resourceName)) {
+                return resourceStatsProviders.get(resourceName);
             } else {
-                rootResourceClassCounter.put(resourceClassName, new Long(1));
+                ResourceStatsProvider rsp = new ResourceStatsProvider(resourceName);
+
+                StatsProviderManager.register(ContainerMonitoring.JERSEY,
+                        PluginPoint.SERVER, "applications/" + applicationName + "/jersey/resources/resource" + resourceStatsProviders.size(),
+                        rsp);
+
+                resourceStatsProviders.put(resourceName, rsp);
+
+                return rsp;
             }
         }
+        
+    }
 
-        rootResourceClassHitCountLastSampleTime = new java.util.Date().getTime();
+    public void rootResourceClassHit(String resourceClassName) {
+        ResourceStatsProvider rsp = getResourceStatsProvider(resourceClassName);
+        rsp.rootResourceHit();
     }
 
 
     public void resourceClassHit(String resourceClassName) {
-
-        synchronized (resourceClassCounter) {
-            if (resourceClassCounter.containsKey(resourceClassName)) {
-
-                resourceClassCounter.put(
-                        resourceClassName,
-                        resourceClassCounter.get(resourceClassName) + 1);
-            } else {
-                resourceClassCounter.put(resourceClassName, new Long(1));
-            }
-        }
-
-        resourceClassHitCountLastSampleTime = new java.util.Date().getTime();
+        ResourceStatsProvider rsp = getResourceStatsProvider(resourceClassName);
+        rsp.resourceHit();
     }
 }

@@ -49,10 +49,8 @@ import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.ResourceObjectR
 import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.SubLocatorRuleEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.glassfish.api.monitoring.ContainerMonitoring;
@@ -60,10 +58,8 @@ import org.glassfish.external.probe.provider.PluginPoint;
 import org.glassfish.external.probe.provider.StatsProviderManager;
 import org.glassfish.external.probe.provider.annotations.ProbeListener;
 import org.glassfish.external.probe.provider.annotations.ProbeParam;
-import org.glassfish.external.statistics.annotations.Reset;
 import org.glassfish.gmbal.AMXMetadata;
 import org.glassfish.gmbal.ManagedObject;
-import org.glassfish.gmbal.ManagedAttribute;
 import org.glassfish.internal.api.Globals;
 import org.jvnet.hk2.component.Habitat;
 
@@ -73,10 +69,9 @@ import org.jvnet.hk2.component.Habitat;
  */
 
 @AMXMetadata(type="jersey-global-mon", group="monitoring")
-@ManagedObject
+//@ManagedObject
 public class GlobalStatsProvider {
 
-    private Set<String> applications;
     private Map<String, ApplicationStatsProvider> applicationStatsProviders;
     private static GlobalStatsProvider INSTANCE = null;
 
@@ -93,7 +88,6 @@ public class GlobalStatsProvider {
             = new ThreadLocal<ApplicationStatsProvider>();
 
     private GlobalStatsProvider() {
-        applications = new HashSet<String>();
         applicationStatsProviders = new HashMap<String, ApplicationStatsProvider>();
     }
 
@@ -115,29 +109,17 @@ public class GlobalStatsProvider {
         }
     }
     
-    @ManagedAttribute(id="applicationlist")
-    public Set<String> getApplications() {
-        return applications;
-    }
-
-    @Reset
-    public void reset() {
-        applications = new HashSet<String>();
-    }
-
     @ProbeListener("glassfish:jersey:server:requestStart")
     public void requestStart(@ProbeParam("requestUri") java.net.URI requestUri) {
 
         // add application to applications (global "statistics")
         String applicationName = getApplicationName(requestUri.getPath());
 
-        applications.add(applicationName);
-
         ApplicationStatsProvider applicationStatsProvider;
 
         if (!applicationStatsProviders.containsKey(applicationName)) {
             //register new ApplicationStatsProvider
-            applicationStatsProvider = new ApplicationStatsProvider();
+            applicationStatsProvider = new ApplicationStatsProvider(applicationName);
             applicationStatsProviders.put(applicationName, applicationStatsProvider);
 
             // strange functionality of PluginPoint.APPLICATIONS; it causes to
