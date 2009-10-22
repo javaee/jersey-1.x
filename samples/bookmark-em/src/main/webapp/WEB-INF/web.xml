@@ -2,14 +2,10 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
-        <servlet-class>com.sun.jersey.server.impl.container.servlet.ServletAdaptor</servlet-class>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.feature.Redirect</param-name>
             <param-value>true</param-value>
-        </init-param>
-        <init-param>
-            <param-name>unit:BookmarkPU</param-name>
-            <param-value>persistence/bookmark</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -17,16 +13,6 @@
         <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/resources/*</url-pattern>
     </servlet-mapping>
-    <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
-    </session-config>
-    <welcome-file-list>
-	<welcome-file>
-            index.jsp
-        </welcome-file>
-    </welcome-file-list>
     <persistence-unit-ref>
         <persistence-unit-ref-name>persistence/bookmark</persistence-unit-ref-name>
         <persistence-unit-name>BookmarkPU</persistence-unit-name>

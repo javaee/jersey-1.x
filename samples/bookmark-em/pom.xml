@@ -51,53 +51,40 @@
         <profile>
             <id>test</id>
         </profile>
-	<profile>
-		<id>skip-test</id>
-		<activation>
-                        <activeByDefault>true</activeByDefault>
-                </activation>
-		<properties>
-			<maven.test.skip>true</maven.test.skip>
-		</properties>
-	</profile>
         <profile>
-            <id>jdk-1.5</id>
+            <id>skip-test</id>
             <activation>
-                <jdk>1.5</jdk>
+                <activeByDefault>true</activeByDefault>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1.12</version>
-                </dependency>
-            </dependencies>
-        </profile> 
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
     </profiles>
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
-		<scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${project.version}</version>
-		<scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
             <version>${project.version}</version>
-		<scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-test-framework</artifactId>
             <version>${project.version}</version>
-		<scope>provided</scope>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish</groupId>
@@ -182,6 +169,7 @@
         </repository>
     </repositories>
     <properties>
-        <netbeans.hint.deploy.server>J2EE</netbeans.hint.deploy.server>
+        <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
     </properties>
 </project>
+

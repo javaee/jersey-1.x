@@ -42,13 +42,6 @@ import com.sun.jersey.samples.bookmark_em.entities.UserEntity;
 import com.sun.jersey.samples.bookmark_em.util.tx.TransactionManager;
 import com.sun.jersey.samples.bookmark_em.util.tx.Transactional;
 import javax.persistence.EntityManager;
-import javax.transaction.HeuristicMixedException;
-import javax.transaction.HeuristicRollbackException;
-import javax.transaction.InvalidTransactionException;
-import javax.transaction.NotSupportedException;
-import javax.transaction.RollbackException;
-import javax.transaction.SystemException;
-import javax.transaction.Transaction;
 import javax.transaction.UserTransaction;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -141,7 +134,7 @@ public class UserResource {
     }
     
     @DELETE
-    public void deleteUser() throws NotSupportedException, SystemException, Exception {
+    public void deleteUser() {
         if (null == userEntity) {
             throw new NotFoundException("userid " + userid + "does not exist!");
         }
