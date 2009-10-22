@@ -1,65 +1,37 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>ManagedBeansWebApp Example</title></head>
+<html><head><title>ManagedBeansWebApp Sample</title></head>
 
 
-  <body>
-      <h1>ManagedBeansWebApp Example</h1>
-      
-      <p>This example demonstrates how to develop RESTful web service with a Servlet 2.5 container.</p>
-      
-      <h2>Contents</h2>
-      <p>The example consists of two java classes:</p>
-      <dl>
-          <dt><code>com.sun.jersey.samples.managedbeans.resources.ManagedBeanPerRequestResource</code></dt>
-          <dt><code>com.sun.jersey.samples.managedbeans.resources.ManagedBeanSingletonResource</code></dt>
-      </dl>
-    <p>The mapping of the URI path space is presented in the following table:</p>
-	<table border="1">
-    <tr>
-      <th>URI path</th>
-      <th>Resource class</th>
-      <th>HTTP method</th>
-      <th>Description</th>
-    </tr>
-    <tr>
-      <td>/managed-beans-war/managedbean/per-request</td>
-      <td>ManagedBeanPerRequestResource</td>
-      <td>GET</td>
-      <td>Returns injected value and increments it</td>
-    </tr>
-    <tr>
-      <td>/managed-beans-war/managedbean/singleton</td>
-      <td>ManagedBeanSingletonResource</td>
-      <td>GET</td>
-      <td>Returns injected value and increments it</td>
-    </tr>
-        </table>
+    <body>
+        <h1>ManagedBeansWebApp Sample</h1>
 
-    <p>The starting point of the application is the main <code>index.html</code>
-page. The application consists only from two resources
-and main page provides links to them. The output is just single integer value which
-is injected to the Managed Bean from web.xml file:
+        <p>This sample demonstrates the Java EE 6 feature of managed beans.
+            JAX-RS root resource classes are annotated with @ManagedBean, which means EE-related
+            resources may be injected into instances of those classes.
+        </p>
 
-<pre>
-    &lt;env-entry&gt;
-        &lt;env-entry-name&gt;injectedResource&lt;/env-entry-name&gt;
-        &lt;env-entry-type&gt;java.lang.Integer&lt;/env-entry-type&gt;
-        &lt;env-entry-value&gt;<b>1</b>&lt;/env-entry-value&gt;
-    &lt;/env-entry&gt;
-</pre>
+        <h2>Contents</h2>
+        <p>The sample consists of two root resource classes that are managed beans and
+            one stateless session bean. One root resource class is managed in the
+            default JAX-RS life-cyle of per-request and the other is managed in the
+            lifecycle of singleton (meaning on instance per web application).
+            <br/>
+            Two EE-related artifacts are injected into each root resource class instance.
+            The first is a resource constant defined in the web.xml.
+            The second is a stateless session EJB.</p>
 
-As you can see, injected value is "1" and this is exactly what you get when you
-hit per-request resource. Singleton returns "1" too, but only once - every  hit
-increases value of stored variable (so you can see that is really singleton).
-</p>
+        <h2>Running the Example</h2>
 
-      <h2>Running the Example</h2>
-      <p>If you are working with Jersey GlassFish update center module installed into your existing GlassFish instance, 
-you will need to follow instructions at <a href="../../README.html">the module README file</a> in order to deploy the example.
-<p>Otherwise, you can run the example using embedded GlassFish as follows:</p>
-      <p> run 
-      <blockquote><code>mvn glassfish:run</code><p></blockquote>
-      <p>From a web browser, visit:</p>
-      <blockquote><code><a href="http://localhost:8080/managed-beans-webapp/managedbean/per-request">http://localhost:8080/managed-beans-webapp/managedbean/per-request</a></code></blockquote>
-      <blockquote><code><a href="http://localhost:8080/managed-beans-webapp/managedbean/singleton">http://localhost:8080/managed-beans-webapp/managedbean/singleton</a></code></blockquote>
- </body></html>
+        <p style="color: red">This sample utilizes EE6 features of the GlassFish
+            in Glassfish v3 build 68 and later versions. This sample will not work with Glassfish v3
+            Prelude or Preview.</p>
+
+        <p>If you are working with the Jersey GlassFish update center module
+            installed into your existing GlassFish instance,
+            you will need to follow instructions at
+            <a href="../../README.html">the module README file</a> in order to
+            deploy the sample.</p>
+        <p>From a web browser, visit:</p>
+        <blockquote><code><a href="http://localhost:8080/managed-beans-webapp">http://localhost:8080/managed-beans-webapp</a></code></blockquote>
+    </body>
+</html>

@@ -11,9 +11,8 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Jersey Web Application</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/app/*</url-pattern>
     </servlet-mapping>
-
     <env-entry>
         <env-entry-name>injectedResource</env-entry-name>
         <env-entry-type>java.lang.Integer</env-entry-type>

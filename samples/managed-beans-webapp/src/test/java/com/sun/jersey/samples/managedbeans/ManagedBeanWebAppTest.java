@@ -53,7 +53,7 @@ public class ManagedBeanWebAppTest extends JerseyTest {
 
     public ManagedBeanWebAppTest() throws Exception {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.managedbeans.resources")
-                .contextPath("managed-beans-webapp").build());
+                .contextPath("managed-beans-webapp").servletPath("app").build());
     }
 
     /**
@@ -64,23 +64,23 @@ public class ManagedBeanWebAppTest extends JerseyTest {
     public void testPerRequestResource() throws Exception {
         WebResource webResource = resource();
         String responseMsg = webResource.path("managedbean/per-request").get(String.class);
-        assertEquals("1", responseMsg);
+        assertEquals("message 1", responseMsg);
 
         responseMsg = webResource.path("managedbean/per-request").get(String.class);
-        assertEquals("1", responseMsg);
+        assertEquals("message 1", responseMsg);
     }
 
     @Test
     public void testSingletonResource() throws Exception {
         WebResource webResource = resource();
         String responseMsg = webResource.path("managedbean/singleton").get(String.class);
-        assertEquals("1", responseMsg);
+        assertEquals("message 1", responseMsg);
 
         responseMsg = webResource.path("managedbean/singleton").get(String.class);
-        assertEquals("2", responseMsg);
+        assertEquals("message 2", responseMsg);
 
         responseMsg = webResource.path("managedbean/singleton").get(String.class);
-        assertEquals("3", responseMsg);
+        assertEquals("message 3", responseMsg);
     }
 
     @Test

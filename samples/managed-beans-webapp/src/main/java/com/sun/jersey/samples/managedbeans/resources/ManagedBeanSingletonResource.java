@@ -44,6 +44,7 @@ import javax.annotation.Resource;
 import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.EJB;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
@@ -59,10 +60,8 @@ public class ManagedBeanSingletonResource {
 
     @Context UriInfo ui;
     
-    public ManagedBeanSingletonResource() {
-        Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In constructor " + this);
-    }
-
+    @EJB StatelessSessionBean ssb;
+    
     @PostConstruct
     public void postConstruct() {
         Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In post construct " + this);
@@ -78,6 +77,6 @@ public class ManagedBeanSingletonResource {
     public String getMessage() {
         Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In getMessage " + this + " " + ui);
 
-        return Integer.toString(injectedResource++);
+        return ssb.getMessage() + " " + Integer.toString(injectedResource++);
     }
 }

@@ -37,44 +37,11 @@
 
 package com.sun.jersey.samples.managedbeans.resources;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.Resource;
-import javax.annotation.ManagedBean;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.ejb.EJB;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import javax.ejb.Stateless;
 
-@Path("/managedbean/per-request")
-@ManagedBean
-public class ManagedBeanPerRequestResource {
-
-    @Resource(name="injectedResource") int injectedResource = 0;
-
-    @Context UriInfo ui;
-
-    @EJB StatelessSessionBean ssb;
-    
-    @PostConstruct
-    public void postConstruct() {
-        Logger.getLogger(ManagedBeanPerRequestResource.class.getName()).log(Level.INFO, "In post construct " + this + "; UriInfo: " + ui);
-    }
-
-    @PreDestroy
-    public void preDestroy() {
-        Logger.getLogger(ManagedBeanPerRequestResource.class.getName()).log(Level.INFO, "In pre destroy");
-    }
-
-    @GET 
-    @Produces("text/plain")
+@Stateless
+public class StatelessSessionBean {
     public String getMessage() {
-        Logger.getLogger(ManagedBeanPerRequestResource.class.getName()).log(Level.INFO, "In getMessage " + this + "; UriInfo: " + ui);
-
-        return ssb.getMessage() + " " + Integer.toString(injectedResource++);
+        return "message";
     }
 }
