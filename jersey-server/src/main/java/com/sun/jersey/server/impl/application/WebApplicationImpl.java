@@ -281,8 +281,8 @@ public final class WebApplicationImpl implements WebApplication {
     private class ComponentProcessorImpl implements IoCComponentProcessor {
         private final ResourceComponentInjector rci;
 
-        ComponentProcessorImpl(ComponentScope s, AbstractResource resource) {
-            this.rci = new ResourceComponentInjector(injectableFactory, s, resource);
+        ComponentProcessorImpl(ResourceComponentInjector rci) {
+            this.rci = rci;
         }
 
         public void preConstruct() {
@@ -293,6 +293,14 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
+    private static final IoCComponentProcessor NULL_COMPONENT_PROCESSOR = new IoCComponentProcessor() {
+        public void preConstruct() {
+        }
+
+        public void postConstruct(Object o) {
+        }
+    };
+
     private class ComponentProcessorFactoryImpl implements IoCComponentProcessorFactory {
         private final ConcurrentMap<Class, IoCComponentProcessor> componentProcessorMap =
                 new ConcurrentHashMap<Class, IoCComponentProcessor>();
@@ -300,17 +308,24 @@ public final class WebApplicationImpl implements WebApplication {
         public IoCComponentProcessor get(Class c, ComponentScope scope) {
             IoCComponentProcessor cp = componentProcessorMap.get(c);
             if (cp != null) {
-                return cp;
+                return (cp == NULL_COMPONENT_PROCESSOR) ? null : cp;
             }
 
             synchronized (metaClassMap) {
                 cp = componentProcessorMap.get(c);
                 if (cp != null) {
-                    return cp;
+                    return (cp == NULL_COMPONENT_PROCESSOR) ? null : cp;
                 }
 
-                cp = new ComponentProcessorImpl(scope, getAbstractResource(c));
-                componentProcessorMap.put(c, cp);
+                final ResourceComponentInjector rci = new ResourceComponentInjector(
+                        injectableFactory, scope, getAbstractResource(c));
+                if (rci.hasInjectableArtifacts()) {
+                    cp = new ComponentProcessorImpl(rci);
+                    componentProcessorMap.put(c, cp);
+                } else {
+                    cp = null;
+                    componentProcessorMap.put(c, NULL_COMPONENT_PROCESSOR);
+                }
             }
             return cp;
         }

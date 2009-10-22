@@ -91,6 +91,16 @@ public final class ResourceComponentInjector {
         processSetters(ipc, s, resource.getSetterMethods());
     }
 
+    /**
+     * Ascertain if there are any injectable artifacts to be injected.
+     *
+     * @return true if there are any injectable artifacts to be injected.
+     */
+    public boolean hasInjectableArtifacts() {
+        return singletonFields.length > 0 || perRequestFields.length > 0 ||
+                singletonSetters.length > 0 || perRequestSetters.length > 0;
+    }
+
     private void processFields(InjectableProviderContext ipc, ComponentScope s,
             List<AbstractField> fields) {
         Map<Field, Injectable<?>> singletons = new HashMap<Field, Injectable<?>>();

@@ -107,22 +107,14 @@ public class IoCComponentProcessorTest extends TestCase {
         }
     }
     
-    public void testInjected() throws IOException {
-        ClientConfig cc = new DefaultClientConfig();
-        cc.getClasses().add(MyProvider.class);
-        MyIoCComponentProviderFactory pf = new MyIoCComponentProviderFactory();
-        Client c = Client.create(cc, pf);
-        assertEquals(MyProvider.class, pf.componentClass);
-    }
-
-    static class MyIoCComponentProviderFactory implements 
+    static class MyIoCComponentProviderFactory implements
             IoCComponentProviderFactory,
             IoCComponentProcessorFactoryInitializer {
 
         private IoCComponentProcessorFactory cpf;
 
         public Class<?> componentClass;
-        
+
         public void init(IoCComponentProcessorFactory cpf) {
             this.cpf = cpf;
         }
@@ -156,5 +148,40 @@ public class IoCComponentProcessorTest extends TestCase {
         public IoCComponentProvider getComponentProvider(ComponentContext cc, Class c) {
             return getComponentProvider(c);
         }
+    }
+
+    public void testInjected() throws IOException {
+        ClientConfig cc = new DefaultClientConfig();
+        cc.getClasses().add(MyProvider.class);
+        MyIoCComponentProviderFactory pf = new MyIoCComponentProviderFactory();
+        Client c = Client.create(cc, pf);
+        assertEquals(MyProvider.class, pf.componentClass);
+    }
+
+
+    @Provider
+    public static class MyProviderNoInject implements MessageBodyWriter<String>, PostConstructListener, SingletonScope {
+        public void postConstruct() {
+        }
+
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return type == String.class;
+        }
+
+        public long getSize(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return -1;
+        }
+
+        public void writeTo(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+            entityStream.write(t.getBytes());
+        }
+    }
+
+    public void testNoInjected() throws IOException {
+        ClientConfig cc = new DefaultClientConfig();
+        cc.getClasses().add(MyProviderNoInject.class);
+        MyIoCComponentProviderFactory pf = new MyIoCComponentProviderFactory();
+        Client c = Client.create(cc, pf);
+        assertEquals(MyProviderNoInject.class, pf.componentClass);
     }
 }

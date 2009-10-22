@@ -56,6 +56,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -110,9 +111,11 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
 
         @Context Providers p;
 
+        @QueryParam("q") String q;
+        
         @GET
         public String get() {
-            return "GET " + ui.getRequestUri();
+            return "GET " + q + " " + ui.getRequestUri();
         }
 
         public void postConstruct() {
@@ -178,13 +181,6 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
         }
     }
     
-    public void testInjected() throws IOException {
-        initiateWebApplication(new MyIoCComponentProviderFactory(), MyResource.class, MyProvider.class);
-
-        String s = resource("/").get(String.class);
-        assertEquals("GET test:/base/ test:/base/", s);
-    }
-
     static class MyIoCComponentProviderFactory implements 
             IoCComponentProviderFactory,
             IoCComponentProcessorFactoryInitializer {
@@ -199,22 +195,40 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
             if (PostConstructListener.class.isAssignableFrom(c)) {
                 ComponentScope cs = SingletonScope.class.isAssignableFrom(c) ? ComponentScope.Singleton : ComponentScope.PerRequest;
                 final IoCComponentProcessor cp = cpf.get(c, cs);
-                return new IoCFullyManagedComponentProvider() {
 
-                    public Object getInstance() {
-                        Object o = null;
-                        try {
-                            o = c.newInstance();
-                        } catch (InstantiationException ex) {
-                            throw new RuntimeException(ex);
-                        } catch (IllegalAccessException ex) {
-                            throw new RuntimeException(ex);
+                if (cp != null) {
+                    return new IoCFullyManagedComponentProvider() {
+
+                        public Object getInstance() {
+                            Object o = null;
+                            try {
+                                o = c.newInstance();
+                            } catch (InstantiationException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (IllegalAccessException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                            cp.postConstruct(o);
+                            ((PostConstructListener)o).postConstruct();
+                            return o;
                         }
-                        cp.postConstruct(o);
-                        ((PostConstructListener)o).postConstruct();
-                        return o;
-                    }
-                };
+                    };
+                } else {
+                    return new IoCFullyManagedComponentProvider() {
+
+                        public Object getInstance() {
+                            Object o = null;
+                            try {
+                                o = c.newInstance();
+                            } catch (InstantiationException ex) {
+                                throw new RuntimeException(ex);
+                            } catch (IllegalAccessException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                            return o;
+                        }
+                    };
+                }
             } else {
                 return null;
             }
@@ -223,5 +237,31 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
         public IoCComponentProvider getComponentProvider(ComponentContext cc, Class c) {
             return getComponentProvider(c);
         }
+    }
+
+    public void testInjected() throws IOException {
+        initiateWebApplication(new MyIoCComponentProviderFactory(), MyResource.class, MyProvider.class);
+
+        String s = resource("/").queryParam("q", "p").get(String.class);
+        assertEquals("GET p test:/base/?q=p test:/base/?q=p", s);
+    }
+
+
+    @Path("/")
+    public static class MyResourceNoInject implements PostConstructListener, PerRequestScope {
+        @GET
+        public String get() {
+            return "GET";
+        }
+
+        public void postConstruct() {
+        }
+    }
+
+    public void testNoInjected() throws IOException {
+        initiateWebApplication(new MyIoCComponentProviderFactory(), MyResourceNoInject.class);
+
+        String s = resource("/").get(String.class);
+        assertEquals("GET", s);
     }
 }

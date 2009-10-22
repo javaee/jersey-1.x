@@ -51,7 +51,8 @@ public interface IoCComponentProcessorFactory {
      *
      * @param c the class.
      * @param scope the scope.
-     * @return the IoC component processor.
+     * @return the IoC component processor or null if no processor is
+     *         available for the class and scope.
      */
     IoCComponentProcessor get(Class c, ComponentScope scope);
 }

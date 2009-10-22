@@ -37,6 +37,7 @@
 package com.sun.jersey.server.impl.ejb;
 
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import javax.annotation.PostConstruct;
 import javax.interceptor.InvocationContext;
@@ -50,13 +51,16 @@ final class EJBInjectionInterceptor {
     }
 
     @PostConstruct
-    private void init(InvocationContext context) throws Exception {
+    private void init(final InvocationContext context) throws Exception {
         if (cpf == null) {
             // Not initialized
             return;
         }
-        Object beanInstance = context.getTarget();
-        cpf.get(beanInstance.getClass(), ComponentScope.Singleton).postConstruct(beanInstance);
+        
+        final Object beanInstance = context.getTarget();
+        final IoCComponentProcessor icp = cpf.get(beanInstance.getClass(), ComponentScope.Singleton);
+        if (icp != null)
+            icp.postConstruct(beanInstance);
         
         // Invoke next interceptor in chain
         context.proceed();

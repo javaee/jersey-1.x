@@ -38,12 +38,15 @@ package com.sun.jersey.server.impl.jcdi;
 
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -53,13 +56,16 @@ import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.InjectionTarget;
+import javax.enterprise.inject.spi.ProcessInjectionTarget;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class JCDIComponentProviderFactory implements
-        IoCComponentProviderFactory {
+        IoCComponentProviderFactory,
+        IoCComponentProcessorFactoryInitializer {
 
     private static final Logger LOGGER = Logger.getLogger(
             JCDIComponentProviderFactory.class.getName());
@@ -69,6 +75,55 @@ public class JCDIComponentProviderFactory implements
     public JCDIComponentProviderFactory(Object bm) {
         this.bm = (BeanManager)bm;
     }
+
+    // IoCComponentProcessorFactoryInitializer
+
+    public void init(final IoCComponentProcessorFactory cpf) {
+        // TODO get list of registered ProcessInjectionTarget
+        final Collection<ProcessInjectionTarget> pitc = Collections.emptyList();
+
+        for (final ProcessInjectionTarget pit : pitc) {
+            final Class<?> c = pit.getAnnotatedType().getJavaClass();
+            final Bean<?> b = getBean(c);
+            if (b == null)
+                continue;
+            
+            final IoCComponentProcessor icp = cpf.get(c, getComponentScope(b));
+            if (icp == null)
+                continue;
+
+            final InjectionTarget it = pit.getInjectionTarget();
+            final InjectionTarget nit = new InjectionTarget() {
+                public void inject(Object t, CreationalContext cc) {
+                    it.inject(t, cc);
+                    icp.postConstruct(t);
+                }
+
+                public void postConstruct(Object t) {
+                    it.postConstruct(t);
+                }
+
+                public void preDestroy(Object t) {
+                    it.preDestroy(t);
+                }
+
+                public Object produce(CreationalContext cc) {
+                    return it.produce(cc);
+                }
+
+                public void dispose(Object t) {
+                    it.dispose(t);
+                }
+
+                public Set getInjectionPoints() {
+                    return it.getInjectionPoints();
+                }
+            };
+            pit.setInjectionTarget(nit);
+        }
+    }
+
+    // IoCComponentProviderFactory
 
     public IoCComponentProvider getComponentProvider(Class<?> c) {
         return getComponentProvider(null, c);
@@ -100,6 +155,15 @@ public class JCDIComponentProviderFactory implements
                 return c.cast(bm.getReference(b, c, bcc));
             }
         };
+    }
+
+    private Bean<?> getBean(Class<?> c) {
+        final Set<Bean<?>> bs = bm.getBeans(c);
+        if (bs.isEmpty()) {
+            return null;
+        }
+
+        return bm.resolve(bs);
     }
 
     private ComponentScope getComponentScope(Bean<?> b) {

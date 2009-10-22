@@ -37,7 +37,7 @@
 package com.sun.jersey.core.spi.component.ioc;
 
 /**
- * A component processor capable of performing pre-constructon and
+ * A component processor capable of performing pre-construction and
  * post-construction initialization.
  * 
  * @author Paul.Sandoz@Sun.Com
