@@ -3,7 +3,7 @@ package com.sun.jersey.lift
 
 import javax.servlet.http.HttpServletRequest
 import _root_.net.liftweb.http.{Req, S, RequestVar}
-import _root_.net.liftweb.util.{Log, Full}
+import _root_.net.liftweb.util.Log
 /**
  * A request scoped variable for accessing the current resource bean when
  * using implicit views

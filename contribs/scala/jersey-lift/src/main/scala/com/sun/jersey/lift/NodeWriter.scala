@@ -5,7 +5,6 @@ import _root_.java.lang.annotation.Annotation
 import _root_.java.lang.reflect.Type
 
 import _root_.net.liftweb.http.{S, LiftServlet}
-import _root_.net.liftweb.util.{Full, Box, Log}
 import _root_.net.liftweb.http.provider.servlet.HTTPRequestServlet
 
 import javax.servlet.ServletContext

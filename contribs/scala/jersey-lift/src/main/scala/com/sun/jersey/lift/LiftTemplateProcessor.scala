@@ -4,8 +4,9 @@ import _root_.java.io.{IOException, OutputStream}
 import _root_.java.net.MalformedURLException
 import _root_.java.util.Enumeration
 
+import _root_.net.liftweb.common.{Full, Box}
 import _root_.net.liftweb.http.{S, LiftServlet, TemplateFinder}
-import _root_.net.liftweb.util.{Full, Box, Log}
+import _root_.net.liftweb.util.Log
 import _root_.net.liftweb.http.provider.servlet.HTTPRequestServlet
 
 import javax.ws.rs.Produces
