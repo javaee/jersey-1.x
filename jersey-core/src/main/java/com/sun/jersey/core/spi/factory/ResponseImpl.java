@@ -82,6 +82,10 @@ public final class ResponseImpl extends Response {
     public Type getEntityType() {
         return entityType;
     }
+
+    public boolean isMetatadataSet() {
+        return headers != null;
+    }
     
     // Response 
     

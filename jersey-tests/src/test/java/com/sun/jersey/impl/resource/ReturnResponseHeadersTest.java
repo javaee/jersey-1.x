@@ -34,13 +34,20 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.resource;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.ClientResponse;
-import javax.ws.rs.POST;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.core.header.OutBoundHeaders;
+import java.net.URI;
+import java.util.Date;
+import java.util.Locale;
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 /**
@@ -48,26 +55,123 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ReturnResponseHeadersTest extends AbstractResourceTester {
-    
+
     public ReturnResponseHeadersTest(String testName) {
         super(testName);
     }
 
     @Path("/")
-    static public class TestRepresentationBean { 
-        @POST
-        public Response doPost(String in) {
-            return Response.ok("content", "text/plain").language("en").build();
+    static public class HeadersResource {
+
+        @Path("method")
+        @GET
+        public Response getWithMethod() {
+            CacheControl cc = new CacheControl();
+            cc.setNoCache(true);
+            cc.setNoTransform(false);
+            return Response.ok("content").
+                    cacheControl(cc).
+                    language(Locale.ENGLISH).
+                    contentLocation(URI.create("/path")).
+                    type("text/plain").
+                    tag("tag").
+                    lastModified(new Date(0)).
+                    location(URI.create("/path")).
+                    header("X-FOO", "foo").
+                    build();
+        }
+
+        @Path("header")
+        @GET
+        public Response getWithHeader() {
+            return Response.ok("content").
+                    header("Cache-Control", "no-cache").
+                    header("Content-Language", "en").
+                    header("Content-Location", URI.create("/path")).
+                    header("Content-Type", "text/plain").
+                    header("ETag", "\"tag\"").
+                    header("Last-Modified", new Date(0)).
+                    header("Location", URI.create("/path")).
+                    header("X-FOO", "foo").
+                    build();
+        }
+
+        @Path("metadata")
+        @GET
+        public Response getMetadata() {
+            Response r = Response.ok("content").build();
+            MultivaluedMap<String, Object> headers = r.getMetadata();
+            headers.putSingle("Cache-Control", "no-cache");
+            headers.putSingle("Content-Language", "en");
+            headers.putSingle("Content-Location", URI.create("/path"));
+            headers.putSingle("Content-Type", "text/plain");
+            headers.putSingle("ETag", "\"tag\"");
+            headers.putSingle("Last-Modified", new Date(0));
+            headers.putSingle("Location", URI.create("/path"));
+            headers.putSingle("X-FOO", "foo");
+            return r;
+        }
+
+        @Path("response")
+        @GET
+        public Response getResponse() {
+            final OutBoundHeaders headers = new OutBoundHeaders();
+            headers.putSingle("Cache-Control", "no-cache");
+            headers.putSingle("Content-Language", "en");
+            headers.putSingle("Content-Location", URI.create("/path"));
+            headers.putSingle("Content-Type", "text/plain");
+            headers.putSingle("ETag", "\"tag\"");
+            headers.putSingle("Last-Modified", new Date(0));
+            headers.putSingle("Location", URI.create("/path"));
+            headers.putSingle("X-FOO", "foo");
+
+            return new Response() {
+                @Override
+                public Object getEntity() {
+                    return "content";
+                }
+
+                @Override
+                public int getStatus() {
+                    return 204;
+                }
+
+                @Override
+                public MultivaluedMap<String, Object> getMetadata() {
+                    return headers;
+                }
+
+            };
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public void testRepresentationHeaders() throws Exception {
-        initiateWebApplication(TestRepresentationBean.class);
-        
-        ClientResponse response = resource("/").entity("content").
-                accept("text/plain").post(ClientResponse.class);
-        assertEquals("content", response.getEntity(String.class));
-        assertEquals("en", response.getLanguage());
+
+    public void testAllHeaders() throws Exception {
+        initiateWebApplication(HeadersResource.class);
+        WebResource r = resource("/");
+        r.addFilter(new LoggingFilter());
+
+        checkHeaders(r.path("method").get(ClientResponse.class).getHeaders());
+        checkHeaders(r.path("header").get(ClientResponse.class).getHeaders());
+        checkHeaders(r.path("metadata").get(ClientResponse.class).getHeaders());
+        checkHeaders(r.path("response").get(ClientResponse.class).getHeaders());
+    }
+
+    private void checkHeaders(MultivaluedMap<String, String> headers) {
+        checkHeader("Cache-Control", "no-cache", headers);
+        checkHeader("Content-Language", "en", headers);
+        checkHeader("Content-Location", "/path", headers);
+        checkHeader("Content-Type", "text/plain", headers);
+        checkHeader("ETag", "\"tag\"", headers);
+        checkHeader("Last-Modified", "Thu, 01 Jan 1970 00:00:00 GMT", headers);
+        checkHeader("Location", "test:/base/path", headers);
+        checkHeader("X-FOO", "foo", headers);
+    }
+
+    private void checkHeader(String name, String expectedValue,
+            MultivaluedMap<String, String> headers) {
+        String value = headers.getFirst(name);
+        assertNotNull(value);
+        assertEquals(expectedValue, value);
     }
 }

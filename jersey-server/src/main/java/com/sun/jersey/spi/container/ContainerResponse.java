@@ -428,6 +428,9 @@ public class ContainerResponse implements HttpResponseContext {
     }
     
     private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r) {
+        if (r.isMetatadataSet())
+            return setResponseNonOptimal(r);
+        
         this.originalEntity = this.entity = r.getEntity();
         this.entityType = r.getEntityType();
         if (entity instanceof GenericEntity) {
