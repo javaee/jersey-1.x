@@ -79,7 +79,7 @@ public class ResourceStatsProvider {
         if(resourceClassHitCount != null)
             map.put("resource", resourceClassHitCount);
 
-        return new MapStatsImpl("hit count", CountStatisticImpl.UNIT_COUNT, "map stats desc", map);
+        return new MapStatsImpl("hitcount", CountStatisticImpl.UNIT_COUNT, "Hit count for resource class " + resourceClassName, map);
     }
 
     public void rootResourceHit() {
@@ -103,7 +103,7 @@ public class ResourceStatsProvider {
     }
 
     @ManagedData
-    public static class MapStatsImpl extends StatisticImpl implements Stats {
+    public class MapStatsImpl extends StatisticImpl implements Stats {
 
         private final Map<String, ResourceStatistcImpl> values;
 

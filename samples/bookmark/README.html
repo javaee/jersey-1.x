@@ -77,11 +77,11 @@ which was inspired by the <a href="http://del.icio.us/v1">http://del.icio.us/</a
 
     <h2>Running the Example</h2>
 
-<p>Bookmark example runs on Glassfish V2 application server (<a href="http://glassfish.dev.java.net/">http://glassfish.dev.java.net</a>)
+<p>Bookmark example runs on Glassfish V2.1 or V3 application server (<a href="http://glassfish.dev.java.net/">http://glassfish.dev.java.net</a>)
 and needs a running JavaDB (<a href="http://developers.sun.com/javadb/">http://developers.sun.com/javadb/</a>)
-instance for underlying data (it comes along with GlassFish V2). 
+instance for underlying data (it comes along with GlassFish).
 
-<p>Presuming, you have installed Glassfish v2. <code>AS_HOME</code> variable should point to
+<p>Presuming, you have installed Glassfish v2.1 or v3 <code>AS_HOME</code> variable should point to
 your glassfish installation directory.
 
 <h4>Building And Starting The Bookmark Service</h4>
@@ -118,7 +118,8 @@ and make sure you do not miss the backslash (\) in <code>create\=true</code> par
 <h4>Test Client Running</h4>
 
 <pre class="cliSample">
-mvn exec:java -Dexec.mainClass=com.sun.jersey.samples.bookmark.test.Main
+mvn test -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory\
+    -DenableLogging -DJERSEY_HTTP_PORT=8080 -Ptest
 </pre>
 
 <h2>TODOs</h2>
