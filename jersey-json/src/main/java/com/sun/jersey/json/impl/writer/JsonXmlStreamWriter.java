@@ -173,7 +173,6 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         try {
             this.mainWriter.close();
         } catch (IOException ex) {
-            Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
             throw new XMLStreamException(ex);
         }
     }
@@ -182,7 +181,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         try {
             mainWriter.flush();
         } catch (IOException ex) {
-            Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
+            throw new XMLStreamException(ex);
         }
     }
 
@@ -196,7 +195,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
             }
             pollStack();
         } catch (IOException ex) {
-            Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
+            throw new XMLStreamException(ex);
         }
     }
 
@@ -228,7 +227,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
             processingStack.get(depth - 1).lastElementWriter = processingStack.get(depth).writer;
             pollStack();
         } catch (IOException ex) {
-            Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
+            throw new XMLStreamException(ex);
         }
     }
 
@@ -250,6 +249,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     public void writeCharacters(String text) throws XMLStreamException {
         if (processingStack.get(depth).isNotEmpty) {
             writeStartElement(null, "$", null);
+            // TODO why is this a recursive call?
             writeCharacters(text);
             writeEndElement();
         } else {
@@ -261,7 +261,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
                 }
                 processingStack.get(depth).lastWasPrimitive = true;
             } catch (IOException ex) {
-                Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
+                throw new XMLStreamException(ex);
             }
         }
     }
@@ -432,7 +432,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
             depth++;
             processingStack.add(depth, createProcessingState());
         } catch (IOException ex) {
-            Logger.getLogger(JsonXmlStreamWriter.class.getName()).log(Level.SEVERE, null, ex);
+            throw new XMLStreamException(ex);
         }
     }
 
