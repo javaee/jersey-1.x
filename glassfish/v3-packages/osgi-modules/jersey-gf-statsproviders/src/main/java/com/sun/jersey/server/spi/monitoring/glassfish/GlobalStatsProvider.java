@@ -58,7 +58,6 @@ import org.glassfish.external.probe.provider.PluginPoint;
 import org.glassfish.external.probe.provider.StatsProviderManager;
 import org.glassfish.external.probe.provider.annotations.ProbeListener;
 import org.glassfish.external.probe.provider.annotations.ProbeParam;
-import org.glassfish.gmbal.AMXMetadata;
 import org.glassfish.internal.api.Globals;
 import org.jvnet.hk2.component.Habitat;
 
@@ -67,7 +66,6 @@ import org.jvnet.hk2.component.Habitat;
  * @author pavel.bucek@sun.com
  */
 
-@AMXMetadata(type="jersey-global-mon", group="monitoring")
 public class GlobalStatsProvider {
 
     private Map<String, ApplicationStatsProvider> applicationStatsProviders;

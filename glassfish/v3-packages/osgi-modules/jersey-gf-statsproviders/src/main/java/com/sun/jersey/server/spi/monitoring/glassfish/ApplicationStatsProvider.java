@@ -43,16 +43,12 @@ import org.glassfish.api.monitoring.ContainerMonitoring;
 import org.glassfish.external.probe.provider.PluginPoint;
 import org.glassfish.external.probe.provider.StatsProviderManager;
 import org.glassfish.external.statistics.annotations.Reset;
-import org.glassfish.gmbal.AMXMetadata;
-import org.glassfish.gmbal.ManagedObject;
 
 /**
  *
  * @author pavel.bucek@sun.com
  */
 
-@AMXMetadata(type="jersey-application-mon", group="monitoring")
-@ManagedObject
 public class ApplicationStatsProvider {
 
     private final Map<String, ResourceStatsProvider> resourceStatsProviders;

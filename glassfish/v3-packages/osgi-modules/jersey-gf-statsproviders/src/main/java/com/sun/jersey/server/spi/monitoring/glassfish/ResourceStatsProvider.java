@@ -61,8 +61,8 @@ import org.glassfish.gmbal.ManagedObject;
 @ManagedObject
 public class ResourceStatsProvider {
 
-    private ResourceStatistcImpl rootResourceClassHitCount;
-    private ResourceStatistcImpl resourceClassHitCount;
+    private ResourceStatisticImpl rootResourceClassHitCount;
+    private ResourceStatisticImpl resourceClassHitCount;
 
     private final String resourceClassName;
 
@@ -72,19 +72,19 @@ public class ResourceStatsProvider {
 
     @ManagedAttribute(id="hitcount")
     public MapStatsImpl getHitCount() {
-        HashMap<String, ResourceStatistcImpl> map = new HashMap<String, ResourceStatistcImpl>();
+        HashMap<String, ResourceStatisticImpl> map = new HashMap<String, ResourceStatisticImpl>();
 
         if(rootResourceClassHitCount != null)
             map.put("rootresource", rootResourceClassHitCount);
         if(resourceClassHitCount != null)
             map.put("resource", resourceClassHitCount);
 
-        return new MapStatsImpl("hitcount", CountStatisticImpl.UNIT_COUNT, "Hit count for resource class " + resourceClassName, map);
+        return new MapStatsImpl(map);
     }
 
     public void rootResourceHit() {
         if (rootResourceClassHitCount == null)
-            rootResourceClassHitCount = new ResourceStatistcImpl("RootResource",
+            rootResourceClassHitCount = new ResourceStatisticImpl("RootResourceHitCount",
                     StatisticImpl.UNIT_COUNT,
                     "Root resource class hit count for " + resourceClassName,
                     resourceClassName);
@@ -94,7 +94,7 @@ public class ResourceStatsProvider {
 
     public void resourceHit() {
         if (resourceClassHitCount == null)
-            resourceClassHitCount = new ResourceStatistcImpl("Resource",
+            resourceClassHitCount = new ResourceStatisticImpl("ResourceHitCount",
                     StatisticImpl.UNIT_COUNT,
                     "Resource class hit count for " + resourceClassName,
                     resourceClassName);
@@ -103,12 +103,11 @@ public class ResourceStatsProvider {
     }
 
     @ManagedData
-    public class MapStatsImpl extends StatisticImpl implements Stats {
+    public class MapStatsImpl implements Stats {
 
-        private final Map<String, ResourceStatistcImpl> values;
+        private final Map<String, ResourceStatisticImpl> values;
 
-        public MapStatsImpl(String name, String unit, String desc, Map<String, ResourceStatistcImpl> values) {
-            super(name, unit, desc);
+        public MapStatsImpl(Map<String, ResourceStatisticImpl> values) {
             this.values = values;
         }
 
@@ -123,107 +122,9 @@ public class ResourceStatsProvider {
         }
 
         @Override
-        public Statistic[] getStatistics() {
-            return values.values().toArray(new ResourceStatistcImpl[values.values().size()]);
-        }
-    }
-
-    public class ResourceStatistcImpl extends StatisticImpl
-            implements CountStatistic, InvocationHandler {
-
-        private long count = 0L;
-        private final long initCount;
-        private final CountStatistic cs =
-                (CountStatistic) Proxy.newProxyInstance(
-                CountStatistic.class.getClassLoader(),
-                new Class[]{CountStatistic.class},
-                this);
-
-        private String resourceClassName;
-        private String capilatisedName;
-
-        public ResourceStatistcImpl(long countVal, String name, String unit,
-                String desc, long sampleTime, long startTime) {
-            super(name, unit, desc, startTime, sampleTime);
-            count = countVal;
-            initCount = countVal;
-        }
-
-        public ResourceStatistcImpl(String name, String unit, String desc) {
-            this(0L, name, unit, desc, -1L, System.currentTimeMillis());
-        }
-
-        public ResourceStatistcImpl(String name, String unit, String desc, String resourceClassName) {
-            this(0L, name.toLowerCase(), unit, desc, -1L, System.currentTimeMillis());
-
-            this.resourceClassName = resourceClassName;
-            this.capilatisedName = name;
-        }
-
-
-        public synchronized CountStatistic getStatistic() {
-            return cs;
-        }
-
-        @Override
-        public synchronized Map getStaticAsMap() {
-            Map m = super.getStaticAsMap();
-            m.put("count", getCount());
-            m.put("classname", resourceClassName);
-            m.put("name", capilatisedName);
-            return m;
-        }
-
-        @Override
-        public synchronized String toString() {
-            return super.toString() + NEWLINE + "Count: " + getCount();
-        }
-
-        @Override
-        public synchronized long getCount() {
-            return count;
-        }
-
-        public synchronized void setCount(long countVal) {
-            count = countVal;
-            sampleTime = System.currentTimeMillis();
-        }
-
-        public synchronized void increment() {
-            count++;
-            sampleTime = System.currentTimeMillis();
-        }
-
-        public synchronized void increment(long delta) {
-            count = count + delta;
-            sampleTime = System.currentTimeMillis();
-        }
-
-        public synchronized void decrement() {
-            count--;
-            sampleTime = System.currentTimeMillis();
-        }
-
-        @Override
-        public synchronized void reset() {
-            super.reset();
-            count = initCount;
-            sampleTime = -1L;
-        }
-
-        // todo: equals implementation
-        @Override
-        public Object invoke(Object proxy, Method m, Object[] args) throws Throwable {
-            Object result;
-            try {
-                result = m.invoke(this, args);
-            } catch (InvocationTargetException e) {
-                throw e.getTargetException();
-            } catch (Exception e) {
-                throw new RuntimeException("unexpected invocation exception: " + e.getMessage());
-            } finally {
-            }
-            return result;
+        @ManagedAttribute
+        public ResourceStatisticImpl[] getStatistics() {
+            return values.values().toArray(new ResourceStatisticImpl[values.values().size()]);
         }
     }
 }

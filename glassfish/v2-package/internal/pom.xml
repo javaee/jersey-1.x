@@ -103,6 +103,15 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/jersey-javadoc</outputDirectory>
                                 </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey.samples</groupId>
+                                    <artifactId>bookmark</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>zip</type>
+                                    <classifier>gf-project</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/samples</outputDirectory>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>bookstore</artifactId>
