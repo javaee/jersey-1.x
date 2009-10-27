@@ -108,6 +108,7 @@
         <module>jersey-test-framework</module>
         <module>archive</module>
         <module>jersey-documentation</module>
+        <module>ri</module>
     </modules>
     <build>
         <plugins>
