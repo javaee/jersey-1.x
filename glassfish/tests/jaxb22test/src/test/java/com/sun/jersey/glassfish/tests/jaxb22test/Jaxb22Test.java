@@ -60,7 +60,6 @@ public class Jaxb22Test extends JerseyTest {
     public void testMyResource() throws Exception {
         WebResource webResource = resource();
         String responseMsg = webResource.path("myresource").get(String.class);
-        System.out.println(responseMsg);
         Assert.assertTrue(responseMsg.contains("NATURAL"));
     }
 
@@ -68,7 +67,6 @@ public class Jaxb22Test extends JerseyTest {
     public void testMyResourceBean() throws Exception {
         WebResource webResource = resource();
         String responseMsg = webResource.path("myresource/bean").get(String.class);
-        System.out.println(responseMsg);
         Assert.assertTrue(responseMsg.contains("["));
         Assert.assertTrue(responseMsg.contains(":1024}"));
     }
