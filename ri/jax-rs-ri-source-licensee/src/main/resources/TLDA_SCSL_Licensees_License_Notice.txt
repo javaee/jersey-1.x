@@ -1,0 +1,3 @@
+If you received the contents of this file pursuant to a Technology License and Distribution Agreement (TLDA) or Sun Community Source
+License (SCSL) agreement with Sun, then such TLDA or SCSL, whichever is applicable, and not the license found at or referenced 
+by a License.txt (or License.html) file or a source header file, shall apply to your use of the contents of the file.

@@ -1,0 +1,16 @@
+<assembly>
+  <!--id>dist</id-->
+  <formats>
+    <format>zip</format>
+  </formats>
+  <fileSets>
+     <fileSet>
+      <directory>target/assembly</directory>
+      <includes>
+        <include>jersey-server-*.jar</include>
+        <include>jersey-core-*.jar</include>
+      </includes>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+   </fileSets>
+</assembly>
