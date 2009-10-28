@@ -176,6 +176,6 @@
         </repository>
     </repositories>
     <properties>
-        <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
+        <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
     </properties>
 </project>
