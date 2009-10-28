@@ -160,6 +160,15 @@
                 </configuration>
             </plugin>
             <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>com/sun/jersey/test/framework/impl/container/http/*Test.java</exclude>
+                        <exclude>com/sun/jersey/test/framework/impl/container/http/testpackage/*Test.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
