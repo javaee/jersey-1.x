@@ -53,34 +53,42 @@ import javax.ws.rs.core.UriInfo;
 @RequestScoped
 public class JCDIBeanPerRequestResource {
 
-    @Resource(name="injectedResource") int injectedResource = 0;
+    private @Resource(name="injectedResource") int injectedResource = 0;
 
-    @Context UriInfo ui;
-    
-    public JCDIBeanPerRequestResource() {
-        Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO, "In constructor " + this);
-    }
+    private @Context UriInfo uiFieldInject;
+
+    private UriInfo uiMethodInject;
 
     @Context
     public void set(UriInfo ui) {
-        System.out.println("SET UI:" + ui);
-        this.ui = ui;
+        this.uiMethodInject = ui;
     }
+    
     @PostConstruct
     public void postConstruct() {
-        Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO, "In post construct " + this + "; UriInfo: " + ui);
-    }
-
-    @PreDestroy
-    public void preDestroy() {
-        Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO, "In pre destroy");
+        Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO, 
+                "In post construct " + this +
+                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
+        
+        if (uiFieldInject == null || uiMethodInject == null)
+            throw new IllegalStateException();
     }
 
     @GET 
     @Produces("text/plain")
     public String getMessage() {
-        Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO, "In getMessage " + this + "; UriInfo: " + ui);
-
+        Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO,
+                "In getMessage " + this +
+                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
+        
+        if (uiFieldInject == null || uiMethodInject == null)
+            throw new IllegalStateException();
+        
         return Integer.toString(injectedResource++);
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO, "In pre destroy");
     }
 }

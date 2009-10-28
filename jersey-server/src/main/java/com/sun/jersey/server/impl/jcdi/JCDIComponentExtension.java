@@ -23,7 +23,7 @@ public class JCDIComponentExtension implements Extension {
             JCDIComponentExtension.class.getName());
 
     private final List<ProcessInjectionTarget> l = new ArrayList<ProcessInjectionTarget>();
-
+    
     public Collection<ProcessInjectionTarget> getProcessInjectionTargets() {
         return Collections.unmodifiableCollection(l);
     }

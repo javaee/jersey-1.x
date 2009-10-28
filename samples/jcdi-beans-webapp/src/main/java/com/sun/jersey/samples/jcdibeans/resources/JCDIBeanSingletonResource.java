@@ -53,29 +53,42 @@ import javax.ws.rs.core.UriInfo;
 @ApplicationScoped
 public class JCDIBeanSingletonResource {
 
-    @Resource(name="injectedResource") int injectedResource = 0;
+    private @Resource(name="injectedResource") int injectedResource = 0;
 
-    @Context UriInfo ui;
+    private @Context UriInfo uiFieldInject;
     
-    public JCDIBeanSingletonResource() {
-        Logger.getLogger(JCDIBeanSingletonResource.class.getName()).log(Level.INFO, "In constructor " + this);
-    }
+    private UriInfo uiMethodInject;
 
+    @Context
+    public void set(UriInfo ui) {
+        this.uiMethodInject = ui;
+    }
+    
     @PostConstruct
     public void postConstruct() {
-        Logger.getLogger(JCDIBeanSingletonResource.class.getName()).log(Level.INFO, "In post construct " + this);
-    }
+        Logger.getLogger(JCDIBeanSingletonResource.class.getName()).log(Level.INFO,
+                "In post construct " + this +
+                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
 
-    @PreDestroy
-    public void preDestroy() {
-        Logger.getLogger(JCDIBeanSingletonResource.class.getName()).log(Level.INFO, "In pre destroy " + this);
+        if (uiFieldInject == null || uiMethodInject == null)
+            throw new IllegalStateException();
     }
 
     @GET 
     @Produces("text/plain")
     public String getMessage() {
-        Logger.getLogger(JCDIBeanSingletonResource.class.getName()).log(Level.INFO, "In getMessage " + this + " " + ui);
+        Logger.getLogger(JCDIBeanSingletonResource.class.getName()).log(Level.INFO,
+                "In getMessage " + this +
+                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
 
+        if (uiFieldInject == null || uiMethodInject == null)
+            throw new IllegalStateException();
+        
         return Integer.toString(injectedResource++);
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        Logger.getLogger(JCDIBeanSingletonResource.class.getName()).log(Level.INFO, "In pre destroy " + this);
     }
 }

@@ -43,7 +43,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
@@ -141,17 +141,9 @@ public class JCDIComponentProviderFactory implements
         LOGGER.info("Binding the JCDI managed class " + c.getName() +
                 " to JCDIComponentProviderFactory in the scope " + cs);
 
-        return new IoCManagedComponentProvider() {
-            public ComponentScope getScope() {
-                return cs;
-            }
-
-            public Object getInjectableInstance(Object o) {
-                return o;
-            }
-
+        return new IoCFullyManagedComponentProvider() {
             public Object getInstance() {
-                CreationalContext<?> bcc = bm.createCreationalContext(b);
+                final CreationalContext<?> bcc = bm.createCreationalContext(b);
                 return c.cast(bm.getReference(b, c, bcc));
             }
         };
