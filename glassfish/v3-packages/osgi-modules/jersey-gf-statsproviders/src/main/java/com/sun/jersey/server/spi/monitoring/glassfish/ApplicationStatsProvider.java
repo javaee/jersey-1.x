@@ -74,7 +74,7 @@ public class ApplicationStatsProvider {
                 ResourceStatsProvider rsp = new ResourceStatsProvider(resourceName);
 
                 StatsProviderManager.register(ContainerMonitoring.JERSEY,
-                        PluginPoint.SERVER, "applications/" + applicationName + "/jersey/resources/resource" + resourceStatsProviders.size(),
+                        PluginPoint.SERVER, "applications/" + applicationName + "/jersey/resources/resource-" + resourceStatsProviders.size(),
                         rsp);
 
                 resourceStatsProviders.put(resourceName, rsp);
