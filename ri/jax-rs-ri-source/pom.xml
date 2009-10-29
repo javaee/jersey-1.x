@@ -61,38 +61,21 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin> 
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xslt-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>copy</id>
-                        <phase>generate-sources</phase>
+                        <id>update-gf-deps</id>
+                        <phase>package</phase> <!-- append to the packaging phase. -->
                         <goals>
-                            <goal>copy</goal>
+                            <goal>transform</goal> <!-- goals == mojos -->
                         </goals>
                         <configuration>
-                          <stripVersion>false</stripVersion>
-                          <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.sun.jersey</groupId>
-                                    <artifactId>jersey-core</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <classifier>sources</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>com.sun.jersey</groupId>
-                                    <artifactId>jersey-server</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <classifier>sources</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}</outputDirectory>
-                                </artifactItem>
-                          </artifactItems>
+                            <xslFile>src/main/xslt/archive-pom.xsl</xslFile>
+                            <srcDir>../../</srcDir>
+                            <srcIncludes>pom.xml</srcIncludes>
+                            <destDir>target/pom-file</destDir>
                         </configuration>
                     </execution>
                 </executions>
