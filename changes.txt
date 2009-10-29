@@ -1,6 +1,11 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 397
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=397
+  Fixed issue for JSON/JAXB mapped marshalling that results in a stack
+  overflow if the client aborts the connection when marshalling is in
+  operation.
 - Fixed issue 393
   https://jersey.dev.java.net/issues/show_bug.cgi?id=393
   Headers may be added to the multi-valued map returned from 

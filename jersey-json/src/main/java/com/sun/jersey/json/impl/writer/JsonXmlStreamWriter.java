@@ -249,20 +249,23 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     public void writeCharacters(String text) throws XMLStreamException {
         if (processingStack.get(depth).isNotEmpty) {
             writeStartElement(null, "$", null);
-            // TODO why is this a recursive call?
-            writeCharacters(text);
+            _writeCharacters(text);
             writeEndElement();
         } else {
-            try {
-                if (isNonString(processingStack.get(depth - 1).currentName)) {
-                    processingStack.get(depth).writer.write(JsonEncoder.encode(text));
-                } else {
-                    processingStack.get(depth).writer.write("\"" + JsonEncoder.encode(text) + "\"");
-                }
-                processingStack.get(depth).lastWasPrimitive = true;
-            } catch (IOException ex) {
-                throw new XMLStreamException(ex);
+            _writeCharacters(text);
+        }
+    }
+
+    private void _writeCharacters(String text) throws XMLStreamException {
+        try {
+            if (isNonString(processingStack.get(depth - 1).currentName)) {
+                processingStack.get(depth).writer.write(JsonEncoder.encode(text));
+            } else {
+                processingStack.get(depth).writer.write("\"" + JsonEncoder.encode(text) + "\"");
             }
+            processingStack.get(depth).lastWasPrimitive = true;
+        } catch (IOException ex) {
+            throw new XMLStreamException(ex);
         }
     }
 
