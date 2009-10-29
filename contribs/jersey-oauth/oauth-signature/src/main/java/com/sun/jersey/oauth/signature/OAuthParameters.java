@@ -84,6 +84,9 @@ public class OAuthParameters extends HashMap<String, String> {
     /** Name of parameter containing the verifier code. */
     public static final String VERIFIER = "oauth_verifier";
 
+    /** Name of parameter containing the callback URL. */
+    public static final String CALLBACK = "oauth_callback";
+
     /* Authorization scheme and delimiter. */
     private static final String SCHEME_SPACE = SCHEME + ' ';
 
@@ -373,11 +376,37 @@ public class OAuthParameters extends HashMap<String, String> {
      * Builder pattern method to return {@link Parameters} after setting
      * verifier code.
      *
-     * @param version the verifier code.
+     * @param verifier the verifier code.
      * @return this parameters object.
      */
     public OAuthParameters verifier(String verifier) {
         setVerifier(verifier);
+        return this;
+    }
+
+    /**
+     * Returns the callback URL.
+     */
+    private String getCallback() {
+        return get(CALLBACK);
+    }
+
+    /**
+     * Sets the callback URL.
+     */
+    private void setCallback(String callback) {
+        put(CALLBACK, callback);
+    }
+
+    /**
+     * Builder pattern method to return {@link Parameters} after setting
+     * callback URL.
+     *
+     * @param callback the callback URL.
+     * @return this parameters object.
+     */
+    public OAuthParameters callback(String callback) {
+        setCallback(callback);
         return this;
     }
 
