@@ -53,6 +53,7 @@
         <module>atompub-contacts-server</module>
         <module>bookstore</module>
         <module>bookmark</module>
+        <module>bookmark-em</module>
         <module>entity-provider</module>
         <module>extended-wadl-webapp</module>
         <module>generate-wadl</module>
