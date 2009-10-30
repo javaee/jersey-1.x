@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <probe-providers>
 <probe-provider moduleProviderName="glassfish" moduleName="jersey" probeProviderName="server" class="com.sun.jersey.server.probes.UriRuleProbeProvider">
-   <probe name="ruleAccept">
+   <probe name="ruleAccept" hidden="true">
       <method>ruleAccept</method>
       <probe-param type="java.lang.String" name="ruleName" />
       <probe-param type="java.lang.CharSequence" name="path"/>
