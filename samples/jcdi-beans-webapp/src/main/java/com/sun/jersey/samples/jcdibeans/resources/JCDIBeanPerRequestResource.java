@@ -70,8 +70,8 @@ public class JCDIBeanPerRequestResource {
                 "In post construct " + this +
                 "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
         
-        if (uiFieldInject == null || uiMethodInject == null)
-            throw new IllegalStateException();
+//        if (uiFieldInject == null || uiMethodInject == null)
+//            throw new IllegalStateException();
     }
 
     @GET 
@@ -81,8 +81,8 @@ public class JCDIBeanPerRequestResource {
                 "In getMessage " + this +
                 "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
         
-        if (uiFieldInject == null || uiMethodInject == null)
-            throw new IllegalStateException();
+//        if (uiFieldInject == null || uiMethodInject == null)
+//            throw new IllegalStateException();
         
         return Integer.toString(injectedResource++);
     }

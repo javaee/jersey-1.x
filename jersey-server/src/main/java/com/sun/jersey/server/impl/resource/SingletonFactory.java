@@ -149,13 +149,16 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
         public void init(AbstractResource abstractResource) {
             super.init(abstractResource);
             
-            ResourceComponentInjector rci = new ResourceComponentInjector(
-                    sipc,
-                    ComponentScope.Singleton,
-                    abstractResource);
-
             resource = iicp.getInstance();
-            rci.inject(null, iicp.getInjectableInstance(resource));
+
+            if (destroyable == null) {
+                ResourceComponentInjector rci = new ResourceComponentInjector(
+                        sipc,
+                        ComponentScope.Singleton,
+                        abstractResource);
+
+                rci.inject(null, iicp.getInjectableInstance(resource));
+            }
         }
 
         @Override

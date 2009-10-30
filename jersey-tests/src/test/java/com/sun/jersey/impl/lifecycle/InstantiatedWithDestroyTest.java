@@ -118,8 +118,14 @@ public class InstantiatedWithDestroyTest extends AbstractResourceTester {
     static class InstantiatedIoCComponentProviderFactory implements IoCComponentProviderFactory {
         private Set<Class> destroyedClasses = new HashSet<Class>();
 
+        private boolean hasGetInjectableInstanceBeenCalled = false;
+        
         public Set<Class> getDestroyedClasses() {
             return destroyedClasses;
+        }
+
+        public boolean hasGetInjectableInstanceBeenCalled() {
+            return hasGetInjectableInstanceBeenCalled;
         }
         
         public IoCComponentProvider getComponentProvider(Class c) {
@@ -141,6 +147,7 @@ public class InstantiatedWithDestroyTest extends AbstractResourceTester {
             }
 
             public Object getInjectableInstance(Object o) {
+                hasGetInjectableInstanceBeenCalled = true;
                 return o;
             }
 
@@ -166,6 +173,7 @@ public class InstantiatedWithDestroyTest extends AbstractResourceTester {
         String s = resource("/").get(String.class);
 
         assertTrue(f.getDestroyedClasses().contains(PerRequestResource.class));
+        assertFalse(f.hasGetInjectableInstanceBeenCalled());
     }
 
     public void testSingleton() {
@@ -178,5 +186,6 @@ public class InstantiatedWithDestroyTest extends AbstractResourceTester {
         
         assertTrue(f.getDestroyedClasses().contains(SingletonResource.class));
         assertTrue(f.getDestroyedClasses().contains(StringWriter.class));
+        assertFalse(f.hasGetInjectableInstanceBeenCalled());
     }
 }

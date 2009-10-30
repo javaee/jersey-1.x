@@ -479,8 +479,11 @@ public class WebComponent implements ContainerListener {
 
         EJBComponentProviderFactoryInitilizer.initialize(rc);
 
+        // TODO should the JCDI initializer go before the EJB initializer ?
         JCDIComponentProviderFactoryInitializer.initialize(rc);
-        
+
+        // TODO should the EJB and managed bean initializer be disabled
+        // if JCDI is initialized?
         ManagedBeanComponentProviderFactoryInitilizer.initialize(rc);
         
         GlassFishMonitoringInitializer.initialize();

@@ -62,6 +62,11 @@ public class ManagedBeanSingletonResource {
     
     @EJB StatelessSessionBean ssb;
     
+    @Context
+    public void set(UriInfo ui) {
+        Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In setter for UriInfo " + this);
+    }
+    
     @PostConstruct
     public void postConstruct() {
         Logger.getLogger(ManagedBeanSingletonResource.class.getName()).log(Level.INFO, "In post construct " + this);

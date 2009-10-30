@@ -43,7 +43,9 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +54,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -136,18 +139,46 @@ public class JCDIComponentProviderFactory implements
         }
 
         final Bean<?> b = bm.resolve(bs);
+        final Class<? extends Annotation> s = b.getScope();
         final ComponentScope cs = getComponentScope(b);
 
         LOGGER.info("Binding the JCDI managed class " + c.getName() +
+                " in the scope " + s.getName() +
                 " to JCDIComponentProviderFactory in the scope " + cs);
 
-        return new IoCFullyManagedComponentProvider() {
-            public Object getInstance() {
-                final CreationalContext<?> bcc = bm.createCreationalContext(b);
-                return c.cast(bm.getReference(b, c, bcc));
-            }
-        };
+        if (s == Dependent.class) {
+            return new ComponentProviderDestroyable() {
+
+                // IoCInstantiatedComponentProvider
+
+                public Object getInjectableInstance(Object o) {
+                    return o;
+                }
+
+                public Object getInstance() {
+                    final CreationalContext<?> bcc = bm.createCreationalContext(b);
+                    return c.cast(bm.getReference(b, c, bcc));
+                }
+
+                // IoCDestroyable
+                
+                public void destroy(Object o) {
+                    final CreationalContext cc = bm.createCreationalContext(b);
+                    ((Bean)b).destroy(o, cc);
+                }
+            };
+        } else {
+            return new IoCFullyManagedComponentProvider() {
+                public Object getInstance() {
+                    final CreationalContext<?> bcc = bm.createCreationalContext(b);
+                    return c.cast(bm.getReference(b, c, bcc));
+                }
+            };
+        }
     }
+
+    private interface ComponentProviderDestroyable extends IoCInstantiatedComponentProvider, IoCDestroyable {
+    };
 
     private Bean<?> getBean(Class<?> c) {
         final Set<Bean<?>> bs = bm.getBeans(c);
@@ -170,6 +201,7 @@ public class JCDIComponentProviderFactory implements
                 new HashMap<Class<? extends Annotation>, ComponentScope>();
         m.put(ApplicationScoped.class, ComponentScope.Singleton);
         m.put(RequestScoped.class, ComponentScope.PerRequest);
+        m.put(Dependent.class, ComponentScope.PerRequest);
         return m;
     }
 }

@@ -56,30 +56,51 @@ public class JCDIBeanWebAppTest extends JerseyTest {
                 .contextPath("jcdi-beans-webapp").build());
     }
 
-    /**
-     * Test that the expected response is sent back.
-     * @throws java.lang.Exception
-     */
     @Test
     public void testPerRequestResource() throws Exception {
-        WebResource webResource = resource();
-        String responseMsg = webResource.path("jcdibean/per-request").get(String.class);
+        WebResource webResource = resource().path("jcdibean/per-request");
+
+        String responseMsg = webResource.get(String.class);
         assertEquals("1", responseMsg);
 
-        responseMsg = webResource.path("jcdibean/per-request").get(String.class);
+        responseMsg = webResource.get(String.class);
         assertEquals("1", responseMsg);
     }
 
     @Test
     public void testSingletonResource() throws Exception {
-        WebResource webResource = resource();
-        String responseMsg = webResource.path("jcdibean/singleton").get(String.class);
+        WebResource webResource = resource().path("jcdibean/singleton");
+        String responseMsg = webResource.get(String.class);
         assertEquals("1", responseMsg);
 
-        responseMsg = webResource.path("jcdibean/singleton").get(String.class);
+        responseMsg = webResource.get(String.class);
         assertEquals("2", responseMsg);
 
-        responseMsg = webResource.path("jcdibean/singleton").get(String.class);
+        responseMsg = webResource.get(String.class);
+        assertEquals("3", responseMsg);
+    }
+
+    @Test
+    public void testDependentPerRequestResource() throws Exception {
+        WebResource webResource = resource().path("jcdibean/dependent/per-request");
+
+        String responseMsg = webResource.get(String.class);
+        assertEquals("1", responseMsg);
+
+        responseMsg = webResource.get(String.class);
+        assertEquals("1", responseMsg);
+    }
+
+    @Test
+    public void testDependentSingletonResource() throws Exception {
+        WebResource webResource = resource().path("jcdibean/dependent/singleton");
+        String responseMsg = webResource.get(String.class);
+        assertEquals("1", responseMsg);
+
+        responseMsg = webResource.get(String.class);
+        assertEquals("2", responseMsg);
+
+        responseMsg = webResource.get(String.class);
         assertEquals("3", responseMsg);
     }
 

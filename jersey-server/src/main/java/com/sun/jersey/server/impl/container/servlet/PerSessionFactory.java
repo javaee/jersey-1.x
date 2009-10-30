@@ -217,16 +217,20 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
         @Override
         public void init(AbstractResource abstractResource) {
             super.init(abstractResource);
-            
-            this.rci = new ResourceComponentInjector(
-                    sipc,
-                    ComponentScope.Undefined,
-                    abstractResource);
+
+            if (destroyable == null) {
+                this.rci = new ResourceComponentInjector(
+                        sipc,
+                        ComponentScope.Undefined,
+                        abstractResource);
+            }
         }
 
         protected Object _getInstance(HttpContext hc) {
             Object o = iicp.getInstance();
-            rci.inject(hc, iicp.getInjectableInstance(o));
+            if (destroyable == null) {
+                rci.inject(hc, iicp.getInjectableInstance(o));
+            }
             return o;
         }
 

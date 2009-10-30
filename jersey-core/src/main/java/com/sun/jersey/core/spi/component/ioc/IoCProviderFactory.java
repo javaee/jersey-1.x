@@ -129,13 +129,16 @@ public class IoCProviderFactory extends ProviderFactory {
             this.destroyable = (iicp instanceof IoCDestroyable)
                     ? (IoCDestroyable) iicp : null;
             
+            o = iicp.getInstance();
+
             this.cd = (destroyable == null) ? new ComponentDestructor(c) : null;
 
-            ComponentInjector ci = new ComponentInjector(
-                    ipc,
-                    c);
-            o = iicp.getInstance();
-            ci.inject(iicp.getInjectableInstance(o));
+            if (destroyable == null) {
+                ComponentInjector ci = new ComponentInjector(
+                        ipc,
+                        c);
+                ci.inject(iicp.getInjectableInstance(o));
+            }
         }
 
         public Object getInstance() {

@@ -34,13 +34,59 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.core.spi.component.ioc;
 
-/**
- *
- * @author Paul.Sandoz@Sun.Com
- */
-public interface IoCDestroyable {
+package com.sun.jersey.samples.jcdibeans.resources;
 
-    public void destroy(Object o);
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.ws.rs.GET;
+import javax.ws.rs.Produces;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
+@Path("/jcdibean/dependent/per-request")
+public class JCDIBeanDependentPerRequestResource {
+
+    private @Resource(name="injectedResource") int injectedResource = 0;
+
+    private @Context UriInfo uiFieldInject;
+
+    private UriInfo uiMethodInject;
+
+    @Context
+    public void set(UriInfo ui) {
+        this.uiMethodInject = ui;
+    }
+    
+    @PostConstruct
+    public void postConstruct() {
+        Logger.getLogger(JCDIBeanDependentPerRequestResource.class.getName()).log(Level.INFO, 
+                "In post construct " + this +
+                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
+        
+//        if (uiFieldInject == null || uiMethodInject == null)
+//            throw new IllegalStateException();
+    }
+
+    @GET 
+    @Produces("text/plain")
+    public String getMessage() {
+        Logger.getLogger(JCDIBeanDependentPerRequestResource.class.getName()).log(Level.INFO,
+                "In getMessage " + this +
+                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
+        
+//        if (uiFieldInject == null || uiMethodInject == null)
+//            throw new IllegalStateException();
+        
+        return Integer.toString(injectedResource++);
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        Logger.getLogger(JCDIBeanDependentPerRequestResource.class.getName()).log(Level.INFO, "In pre destroy");
+    }
 }
