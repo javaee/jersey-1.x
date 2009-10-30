@@ -1,6 +1,14 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 384
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=384
+  Work around issue in the LW HTTP server:
+    http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6886436
+  for responses that return a 204 status code. This issue can manifest
+  itself if, for example, a client invokes a POST method that returns 204
+  then invokes a GET method. This may cause some clients to hang, specifically
+  HttpURLConnection (browsers and the Apache HTTP client do not hang).
 - Fixed issue 397
   https://jersey.dev.java.net/issues/show_bug.cgi?id=397
   Fixed issue for JSON/JAXB mapped marshalling that results in a stack

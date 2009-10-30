@@ -49,6 +49,7 @@ import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpsExchange;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -89,9 +90,15 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
                     values.add(ContainerResponse.getHeaderValue(v));
                 eh.put(e.getKey(), values);
             }
-            
-            exchange.sendResponseHeaders(cResponse.getStatus(), 
-                    getResponseLength(contentLength));
+
+            if (cResponse.getStatus() == 204) {
+                // Work around bug in LW HTTP server
+                // http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6886436
+                exchange.sendResponseHeaders(cResponse.getStatus(), -1);
+            } else {
+                exchange.sendResponseHeaders(cResponse.getStatus(),
+                        getResponseLength(contentLength));
+            }
             return exchange.getResponseBody();
         }
 
@@ -189,7 +196,6 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
             throw ex;
         }
         exchange.getResponseBody().flush();
-        exchange.getResponseBody().close();
         exchange.close();                    
     }
 
