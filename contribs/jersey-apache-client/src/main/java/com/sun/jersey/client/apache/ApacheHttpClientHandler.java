@@ -250,10 +250,15 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         try {
             client.executeMethod(getHostConfiguration(client, props), method, getHttpState(props));
 
-            return new ClientResponse(method.getStatusCode(),
+            ClientResponse r = new ClientResponse(method.getStatusCode(),
                     getInBoundHeaders(method),
                     new HttpClientResponseInputStream(method),
                     getMessageBodyWorkers());
+            if (!r.hasEntity()) {
+                r.bufferEntity();
+                r.close();
+            }
+            return r;
         } catch (Exception e) {
             method.releaseConnection();
             throw new ClientHandlerException(e);

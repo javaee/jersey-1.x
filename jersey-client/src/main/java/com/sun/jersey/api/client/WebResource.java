@@ -567,7 +567,7 @@ public class WebResource extends Filterable implements
     private <T> T handle(GenericType<T> gt, ClientRequest ro) throws UniformInterfaceException {
         ClientResponse r = getHeadHandler().handle(ro);
         
-        if (gt.getRawClass() == ClientResponse.class) gt.getRawClass().cast(r);
+        if (gt.getRawClass() == ClientResponse.class) return gt.getRawClass().cast(r);
         
         if (r.getStatus() < 300) return r.getEntity(gt);
         

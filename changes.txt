@@ -1,6 +1,13 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 357
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=357
+  The Apache HTTP client handler for the Client API will automatically
+  release the connection if no response entity is present. Thus it is not
+  necessary to call ClientResponse.close if the response has no entity.
+  This avoids the client blocking when all the threads of the connection
+  manager are utilized.
 - Fixed issue 384
   https://jersey.dev.java.net/issues/show_bug.cgi?id=384
   Work around issue in the LW HTTP server:
