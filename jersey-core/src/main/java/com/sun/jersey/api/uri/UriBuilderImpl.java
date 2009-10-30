@@ -556,7 +556,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
     
     private URI _build(boolean encode, Object... values) {
-        if (values == null || values.length == 0)
+        if (values == null || values.length == 0) 
             return createURI(create());
 
         if (ssp != null)
@@ -606,7 +606,7 @@ public class UriBuilderImpl extends UriBuilder {
         
         if (fragment != null && fragment.length() > 0) sb.append('#').append(fragment);
         
-        return sb.toString();
+        return UriComponent.encodeTemplateNames(sb.toString());
     }
     
     private URI createURI(String uri) {

@@ -241,6 +241,24 @@ public class UriComponent {
         return _encode(s, t, template, false);
     }
 
+    /**
+     * Encodes a string with template parameters names present, specifically the
+     * characters '{' and '}' will be percent-encoded.
+     * 
+     * @param s the string with zero or more template parameters names
+     * @return the string with encoded template parameters names.
+     */
+    public static String encodeTemplateNames(String s) {
+        int i = s.indexOf('{');
+        if (i != -1)
+            s = s.replace("{", "%7B");
+        i = s.indexOf('}');
+        if (i != -1)
+            s = s.replace("}", "%7D");
+
+        return s;
+    }
+
     private static String _encode(String s, Type t, boolean template, boolean contextualEncode) {
         final boolean[] table = ENCODING_TABLES[t.ordinal()];
 

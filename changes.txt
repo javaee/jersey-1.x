@@ -1,6 +1,10 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 232
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=232
+  The characters '{' and '}' are percent encoded if a URI is built using
+  UriBuilder.build and no template parameter values are given as input.
 - Fixed issue 357
   https://jersey.dev.java.net/issues/show_bug.cgi?id=357
   The Apache HTTP client handler for the Client API will automatically

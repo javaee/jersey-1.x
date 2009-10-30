@@ -118,4 +118,8 @@ public class UriComponentEncodeTest extends TestCase {
                 UriComponent.contextualEncode("a a%20 ", UriComponent.Type.PATH));
 
     }
+
+    public void testEncodeTemplateNames() {
+        assertEquals("%7Bfoo%7D", UriComponent.encodeTemplateNames("{foo}"));
+    }
 }

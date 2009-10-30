@@ -717,4 +717,13 @@ public class UriBuilderTest extends TestCase {
         bu = UriBuilder.fromPath("").host("abc").host(null).build();
         assertEquals(URI.create(""), bu);
     }
+
+
+    public void testEncodeTemplateNames() {
+        URI bu = UriBuilder.fromPath("http://localhost:8080").
+                path("/{a}/{b}").
+                replaceQuery("q={c}").
+                build();
+        assertEquals(URI.create("http://localhost:8080/%7Ba%7D/%7Bb%7D?q=%7Bc%7D"), bu);
+    }
 }
