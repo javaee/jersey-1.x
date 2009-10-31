@@ -58,7 +58,7 @@ public class ResourceClassRuleEvent extends AbstractRuleEvent {
 
     @Override
     public void process(ApplicationStatsProvider appStatsProvider) {
-        appStatsProvider.rootResourceClassHit(this.getClazz().getClass().getName());
+        appStatsProvider.rootResourceClassHit(this.getResource().getClass().getName());
 
         int size = eventList.size();
 
@@ -66,7 +66,7 @@ public class ResourceClassRuleEvent extends AbstractRuleEvent {
             if((eventList.get(i) == this) && (size > (i + 1))) {
                 // path is consumed, so no need for rightHandPathRule
                 if(eventList.get(i + 1).getRuleName().equals(HttpMethodRule.class.getSimpleName())) {
-                    appStatsProvider.resourceClassHit(this.getClazz().getClass().getName());
+                    appStatsProvider.resourceClassHit(this.getResource().getClass().getName());
 
                     break;
                 }
@@ -76,7 +76,7 @@ public class ResourceClassRuleEvent extends AbstractRuleEvent {
                 // path is not consumed; sequence of calls can look like
                 // ResourceClassRule; RightHandPathRule; HttpMethodRule
                 if(eventList.get(i + 2).getRuleName().equals(HttpMethodRule.class.getSimpleName())) {
-                    appStatsProvider.resourceClassHit(this.getClazz().getClass().getName());
+                    appStatsProvider.resourceClassHit(this.getResource().getClass().getName());
 
                     break;
                 }

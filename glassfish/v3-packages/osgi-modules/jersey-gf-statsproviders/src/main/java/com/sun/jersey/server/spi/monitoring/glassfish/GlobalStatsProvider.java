@@ -47,6 +47,8 @@ import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.DummyRuleEvent;
 import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.ResourceClassRuleEvent;
 import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.ResourceObjectRuleEvent;
 import com.sun.jersey.server.spi.monitoring.glassfish.ruleevents.SubLocatorRuleEvent;
+import com.sun.jersey.server.spi.monitoring.glassfish.probes.UriRuleProbeProvider;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -105,8 +107,9 @@ public class GlobalStatsProvider {
         }
     }
     
-    @ProbeListener("glassfish:jersey:server:requestStart")
+    @ProbeListener("glassfish:jersey:server-hidden:requestStart")
     public void requestStart(@ProbeParam("requestUri") java.net.URI requestUri) {
+        UriRuleProbeProvider.requestStart(requestUri.toString());
 
         // add application to applications (global "statistics")
         String applicationName = getApplicationName(requestUri.getPath());
@@ -156,28 +159,30 @@ public class GlobalStatsProvider {
     }
 
     
-    @ProbeListener("glassfish:jersey:server:ruleAccept")
+    @ProbeListener("glassfish:jersey:server-hidden:ruleAccept")
     public void ruleAccept(
             @ProbeParam("ruleName") String ruleName,
             @ProbeParam("path") CharSequence path,
-            @ProbeParam("clazz") Object clazz) {
+            @ProbeParam("resource") Object resource) {
+
+        UriRuleProbeProvider.ruleAccept(ruleName, path.toString(), (resource == null ? "null" : resource.getClass().getName()));
 
         AbstractRuleEvent ruleEvent;
 
         if(ruleName.equals(ResourceClassRule.class.getSimpleName())) {
-            ruleEvent = new ResourceClassRuleEvent(ruleName, path, clazz, ruleEvents.get());
+            ruleEvent = new ResourceClassRuleEvent(ruleName, path, resource, ruleEvents.get());
         } else if(ruleName.equals(SubLocatorRule.class.getSimpleName())) {
-            ruleEvent = new SubLocatorRuleEvent(ruleName, path, clazz, ruleEvents.get());
+            ruleEvent = new SubLocatorRuleEvent(ruleName, path, resource, ruleEvents.get());
         } else if(ruleName.equals(ResourceObjectRule.class.getSimpleName())) {
-            ruleEvent = new ResourceObjectRuleEvent(ruleName, path, clazz, ruleEvents.get());
+            ruleEvent = new ResourceObjectRuleEvent(ruleName, path, resource, ruleEvents.get());
         } else {
-            ruleEvent = new DummyRuleEvent(ruleName, path, clazz);
+            ruleEvent = new DummyRuleEvent(ruleName, path, resource);
         }
         
         ruleEvents.get().add(ruleEvent);
     }
 
-    @ProbeListener("glassfish:jersey:server:requestEnd")
+    @ProbeListener("glassfish:jersey:server-hidden:requestEnd")
     public void requestEnd() {
         for(AbstractRuleEvent ruleEvent : ruleEvents.get()) {
             ruleEvent.process(currentApplicationStatProvider.get());
@@ -185,5 +190,7 @@ public class GlobalStatsProvider {
 
         // clean ruleEvents list
         ruleEvents.get().clear();
+
+        UriRuleProbeProvider.requestEnd();
     }
 }

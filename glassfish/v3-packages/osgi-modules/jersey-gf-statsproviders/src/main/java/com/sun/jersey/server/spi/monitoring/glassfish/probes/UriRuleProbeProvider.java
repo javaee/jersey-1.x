@@ -35,44 +35,36 @@
  * holder.
  */
 
-package com.sun.jersey.server.spi.monitoring.glassfish.ruleevents;
-
-import com.sun.jersey.server.spi.monitoring.glassfish.ApplicationStatsProvider;
+package com.sun.jersey.server.spi.monitoring.glassfish.probes;
 
 /**
+ * A probe provider, for GlassFish monitoring, that reports low-level events
+ * when URI rules are matched.
  *
  * @author pavel.bucek@sun.com
  */
-
-public abstract class AbstractRuleEvent {
-    private String ruleName;
-    private CharSequence path;
-    private Object resource;
-
-    public AbstractRuleEvent(String ruleName, CharSequence path, Object resource) {
-        this.ruleName = ruleName;
-        this.path = path;
-        this.resource = resource;
+public class UriRuleProbeProvider {
+    /**
+     * Invoked when matching starts.
+     *
+     * @param requestUri the request URI.
+     */
+    public static void requestStart(String requestUri) {
     }
 
-    public String getRuleName() {
-        return ruleName;
+    /**
+     * Invoked when a UriRule is matched.
+     *
+     * @param ruleName the URI rule name.
+     * @param path the matched path.
+     * @param resourceClassName the name of resource class associated with matching.
+     */
+    public static void ruleAccept(String ruleName, String path, String resourceClassName) {
     }
 
-    public CharSequence getPath() {
-        return path;
-    }
-
-    public Object getResource() {
-        return resource;
-    }
-
-    public abstract void process(ApplicationStatsProvider appStatsProvider);
-
-    @Override
-    public String toString() {
-        return "[" + this.getClass().getSimpleName() +
-                ":\truleName=" + ruleName + ";\tpath=" + path +
-                ";\tresource=" + resource + "]";
+    /**
+     * Invoked when matching ends.
+     */
+    public static void requestEnd() {
     }
 }

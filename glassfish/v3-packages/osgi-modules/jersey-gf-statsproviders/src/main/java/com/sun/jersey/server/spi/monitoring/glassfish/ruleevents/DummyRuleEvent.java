@@ -45,8 +45,8 @@ import com.sun.jersey.server.spi.monitoring.glassfish.ApplicationStatsProvider;
  */
 public class DummyRuleEvent extends AbstractRuleEvent {
 
-    public DummyRuleEvent(String ruleName, CharSequence path, Object clazz) {
-        super(ruleName, path, clazz);
+    public DummyRuleEvent(String ruleName, CharSequence path, Object resource) {
+        super(ruleName, path, resource);
     }
 
     @Override

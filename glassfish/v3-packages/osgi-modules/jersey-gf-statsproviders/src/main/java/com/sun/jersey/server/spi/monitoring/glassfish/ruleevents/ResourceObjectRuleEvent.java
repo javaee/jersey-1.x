@@ -45,8 +45,8 @@ import java.util.List;
  */
 public class ResourceObjectRuleEvent extends ResourceClassRuleEvent {
 
-    public ResourceObjectRuleEvent(String ruleName, CharSequence path, Object clazz, List<AbstractRuleEvent> eventList) {
-        super(ruleName, path, clazz, eventList);
+    public ResourceObjectRuleEvent(String ruleName, CharSequence path, Object resource, List<AbstractRuleEvent> eventList) {
+        super(ruleName, path, resource, eventList);
     }
 
 }

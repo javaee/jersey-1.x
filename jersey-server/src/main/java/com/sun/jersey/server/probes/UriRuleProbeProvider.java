@@ -57,9 +57,9 @@ public class UriRuleProbeProvider {
      * 
      * @param ruleName the URI rule name.
      * @param path the matched path.
-     * @param clazz the resource class associated with matching.
+     * @param resourceClass the resource class instance associated with matching.
      */
-    public static void ruleAccept(String ruleName, CharSequence path, Object clazz) {
+    public static void ruleAccept(String ruleName, CharSequence path, Object resourceClass) {
     }
 
     /**

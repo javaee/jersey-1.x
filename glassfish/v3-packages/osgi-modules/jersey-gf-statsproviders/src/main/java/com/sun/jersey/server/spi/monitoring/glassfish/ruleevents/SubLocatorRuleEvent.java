@@ -62,7 +62,7 @@ public class SubLocatorRuleEvent extends AbstractRuleEvent {
         if(this.getPath().equals("")) {
             for (int i = 0; i < size; i++) {
                 if ((eventList.get(i) == this) && (size > (i + 1))) {
-                    appStatsProvider.resourceClassHit(eventList.get(i + 1).getClazz().getClass().getName());
+                    appStatsProvider.resourceClassHit(eventList.get(i + 1).getResource().getClass().getName());
                     break;
                 }
             }
@@ -70,7 +70,7 @@ public class SubLocatorRuleEvent extends AbstractRuleEvent {
             for (int i = 0; i < size; i++) {
                 if ((eventList.get(i) == this) && (size > (i + 2))) {
                     if(eventList.get(i + 2).getRuleName().equals(HttpMethodRule.class.getSimpleName())) {
-                        appStatsProvider.resourceClassHit(eventList.get(i + 2).getClazz().getClass().getName());
+                        appStatsProvider.resourceClassHit(eventList.get(i + 2).getResource().getClass().getName());
 
                         break;
                     }

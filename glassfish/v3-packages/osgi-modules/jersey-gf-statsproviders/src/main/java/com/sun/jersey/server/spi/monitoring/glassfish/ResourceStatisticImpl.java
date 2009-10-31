@@ -58,15 +58,13 @@ public class ResourceStatisticImpl extends StatisticImpl
             new Class[]{CountStatistic.class},
             this);
     private String resourceClassName;
-    private String capilatisedName;
 
     public ResourceStatisticImpl(long countVal, String name, String unit,
             String desc, long sampleTime, long startTime) {
-        super(name.toLowerCase(), unit, desc, startTime, sampleTime);
+        super(name, unit, desc, startTime, sampleTime);
 
         count = countVal;
         initCount = countVal;
-        capilatisedName = name;
     }
 
     public ResourceStatisticImpl(String name, String unit, String desc) {
@@ -88,7 +86,6 @@ public class ResourceStatisticImpl extends StatisticImpl
         Map m = super.getStaticAsMap();
         m.put("count", getCount());
         m.put("classname", resourceClassName);
-        m.put("name", capilatisedName);
         return m;
     }
 
