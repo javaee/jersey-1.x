@@ -43,6 +43,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
@@ -54,6 +55,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +66,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -194,6 +197,41 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
         } catch (UniformInterfaceException e) {
             report(e);
             fail("Caught exception: " + e);
+        }
+    }
+
+    @Path("/")
+    public class ProducesFormDataCharsetResource {
+
+        // Test "multipart/form-data" the easy way (with subclasses)
+        @GET
+        @Produces("multipart/form-data")
+        public Response get(@QueryParam("charset") String charset) {
+            return Response.ok(new FormDataMultiPart().
+                                 field("foo", "\u00A9 CONTENT \u00FF \u2200 \u22FF",
+                                 MediaType.valueOf("text/plain;charset=" + charset))).build();
+        }
+    }
+    
+    public void testProducesFormDataCharsetResource() throws Exception {
+        startServer(ProducesFormDataCharsetResource.class);
+
+        client.addFilter(new LoggingFilter());
+        String c = "\u00A9 CONTENT \u00FF \u2200 \u22FF";
+        for (String charset : Arrays.asList(
+                "US-ASCII",
+                "ISO-8859-1",
+                "UTF-8",
+                "UTF-16BE",
+                "UTF-16LE",
+                "UTF-16")) {
+            FormDataMultiPart p = client.resource(getUri()).path("/").
+                    queryParam("charset", charset).
+                    accept("multipart/form-data").
+                    get(FormDataMultiPart.class);
+
+            String expected = new String(c.getBytes(charset), charset);
+            assertEquals(expected, p.getField("foo").getValue());
         }
     }
 

@@ -39,8 +39,7 @@ package com.sun.jersey.multipart;
 
 import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.core.header.FormDataContentDisposition;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import com.sun.jersey.core.header.MediaTypes;
 import java.text.ParseException;
 import javax.ws.rs.core.MediaType;
 
@@ -275,25 +274,11 @@ public class FormDataBodyPart extends BodyPart {
      *         media type other than <code>text/plain</code>
      */
     public String getValue() {
-        if (!MediaType.TEXT_PLAIN_TYPE.equals(getMediaType())) {
+        if (!MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, getMediaType())) {
             throw new IllegalStateException("Media type is not text/plain");
         }
         if (getEntity() instanceof BodyPartEntity) {
-            StringBuilder sb = new StringBuilder();
-            try {
-                InputStreamReader reader = new InputStreamReader(((BodyPartEntity) getEntity()).getInputStream());
-                int ch = 0;
-                while (true) {
-                    ch = reader.read();
-                    if (ch < 0) {
-                        break;
-                    }
-                    sb.append((char) ch);
-                }
-                reader.close();
-            } catch (IOException e) {
-            }
-            return sb.toString();
+            return getEntityAs(String.class);
         } else {
             return (String) getEntity();
         }
