@@ -13,14 +13,14 @@ the embedded Grizzly server. The last section of this chapter
 presents a reference to equivalent functionality for getting started
 with a Web application.</para>
 <para>First, it is necessary to depend on the correct Jersey artifacts
-as described in the <ulink url="dependencies.html">dependencies</ulink>
-document.</para>
+as described in <xref linkend="chapter_deps"/>
+</para>
 <para>Maven developers require a dependency on 
 
 <itemizedlist>
   <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.pom">jersey-server</ulink> module, </listitem>
    <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.pom">grizzly-servlet-webserver</ulink> module </listitem>
-   <listitem>and optionally for WADL support if using Java SE 5 the <ulink url="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.pom">jaxb-impl</ulink> module</listitem>
+   <listitem>and optionally for WADL support if using Java SE 5 the <ulink url="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.12.pom">jaxb-impl</ulink> module</listitem>
  </itemizedlist>
  </para>
  <para>
@@ -55,12 +55,12 @@ Non-maven developers require:
 <listitem><ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.jar">grizzly-servlet-webserver.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.jar">jersey-server.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/&version;/jersey-core-&version;.jar">jersey-core.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.0/jsr311-api-1.0.jar">jsr311-api.jar</ulink>,</listitem>
+<listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/&jsr311-version;/jsr311-api-&jsr311-version;.jar">jsr311-api.jar</ulink>,</listitem>
 <listitem><ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</ulink></listitem>
 </itemizedlist></para>
 <para>and optionally for WADL support if using Java SE 5:
 <itemizedlist>
-<listitem><ulink url="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.jar">jaxb-impl.jar</ulink>,</listitem>
+<listitem><ulink url="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.12.jar">jaxb-impl.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</ulink></listitem>
@@ -90,8 +90,8 @@ The path id “dependency.classpath” may then be referenced as the
 classpath to be used for compiling or executing.</para>
 <para>Second, create a new project (using your favourite IDE or just
 ant/maven) and add the dependences. (For those who want to skip the
-creation of their own project take a look at the last <link linkend="getting.started.created">section</link>
-of this document.)</para>
+creation of their own project take a look at <xref linkend="getting.started.created"/>
+</para>
 
 <section>
 <title>Creating a root resource</title>
@@ -170,8 +170,8 @@ in your favourite browser.</para>
 </para>
 </section>
 
-<section>
-<title id="getting.started.created">Here's one Paul created earlier</title>
+<section id="getting.started.created">
+<title>Here's one Paul created earlier</title>
 <para>The example code presented above is shipped as the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/&version;/helloworld-&version;-project.zip">HelloWorld</ulink>
 sample in the Java.Net maven repository.</para>
 <para>For developers wishing to get started by deploying a Web

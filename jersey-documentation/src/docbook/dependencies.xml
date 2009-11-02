@@ -4,7 +4,7 @@
 <!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
 ]>
-<chapter>
+<chapter id="chapter_deps">
 
 <title>Dependencies</title>
 
