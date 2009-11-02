@@ -34,41 +34,42 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.samples.jcdibeans.resources;
 
-import com.sun.jersey.spi.resource.Singleton;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.ManagedBean;
-import javax.annotation.Resource;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
-@Path("/jcdibean/dependent/singleton")
-@Singleton
-@ManagedBean
-public class JCDIBeanDependentSingletonResource {
-
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
+@Path("ejb/stateless")
+@Stateless
+public class EJBStatelessSessionBeanResource {
     private @Resource(name="injectedResource") int injectedResource = 0;
 
     private @Context UriInfo uiFieldInject;
-    
+
     private UriInfo uiMethodInject;
 
     @Context
     public void set(UriInfo ui) {
         this.uiMethodInject = ui;
     }
-    
+
     @PostConstruct
     public void postConstruct() {
-        Logger.getLogger(JCDIBeanDependentSingletonResource.class.getName()).log(Level.INFO,
+        Logger.getLogger(EJBStatelessSessionBeanResource.class.getName()).log(Level.INFO,
                 "In post construct " + this +
                 "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
 
@@ -76,21 +77,21 @@ public class JCDIBeanDependentSingletonResource {
 //            throw new IllegalStateException();
     }
 
-    @GET 
+    @GET
     @Produces("text/plain")
     public String getMessage() {
-        Logger.getLogger(JCDIBeanDependentSingletonResource.class.getName()).log(Level.INFO,
+        Logger.getLogger(EJBStatelessSessionBeanResource.class.getName()).log(Level.INFO,
                 "In getMessage " + this +
                 "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
 
 //        if (uiFieldInject == null || uiMethodInject == null)
 //            throw new IllegalStateException();
-        
+
         return Integer.toString(injectedResource++);
     }
 
     @PreDestroy
     public void preDestroy() {
-        Logger.getLogger(JCDIBeanDependentSingletonResource.class.getName()).log(Level.INFO, "In pre destroy " + this);
+        Logger.getLogger(EJBStatelessSessionBeanResource.class.getName()).log(Level.INFO, "In pre destroy " + this);
     }
 }

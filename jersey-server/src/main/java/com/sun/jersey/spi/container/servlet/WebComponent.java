@@ -477,13 +477,14 @@ public class WebComponent implements ContainerListener {
 
         rc.getClasses().add(JSPTemplateProcessor.class);
 
+        // TODO
+        // If JCDI is enabled should EJB injection be disabled?
         EJBComponentProviderFactoryInitilizer.initialize(rc);
 
-        // TODO should the JCDI initializer go before the EJB initializer ?
         JCDIComponentProviderFactoryInitializer.initialize(rc);
 
-        // TODO should the EJB and managed bean initializer be disabled
-        // if JCDI is initialized?
+        // TODO
+        // If JCDI is enabled then no need to initialize managed beans
         ManagedBeanComponentProviderFactoryInitilizer.initialize(rc);
         
         GlassFishMonitoringInitializer.initialize();

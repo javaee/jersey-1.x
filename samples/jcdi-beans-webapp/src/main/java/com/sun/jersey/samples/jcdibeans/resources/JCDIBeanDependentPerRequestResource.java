@@ -39,6 +39,7 @@ package com.sun.jersey.samples.jcdibeans.resources;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.ManagedBean;
 import javax.annotation.Resource;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -49,6 +50,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
 @Path("/jcdibean/dependent/per-request")
+@ManagedBean
 public class JCDIBeanDependentPerRequestResource {
 
     private @Resource(name="injectedResource") int injectedResource = 0;
@@ -66,7 +68,7 @@ public class JCDIBeanDependentPerRequestResource {
     public void postConstruct() {
         Logger.getLogger(JCDIBeanDependentPerRequestResource.class.getName()).log(Level.INFO, 
                 "In post construct " + this +
-                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
+                "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
         
 //        if (uiFieldInject == null || uiMethodInject == null)
 //            throw new IllegalStateException();
@@ -77,7 +79,7 @@ public class JCDIBeanDependentPerRequestResource {
     public String getMessage() {
         Logger.getLogger(JCDIBeanDependentPerRequestResource.class.getName()).log(Level.INFO,
                 "In getMessage " + this +
-                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
+                "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
         
 //        if (uiFieldInject == null || uiMethodInject == null)
 //            throw new IllegalStateException();

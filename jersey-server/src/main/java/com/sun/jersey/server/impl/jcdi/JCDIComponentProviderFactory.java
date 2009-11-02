@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
@@ -142,11 +143,14 @@ public class JCDIComponentProviderFactory implements
         final Class<? extends Annotation> s = b.getScope();
         final ComponentScope cs = getComponentScope(b);
 
-        LOGGER.info("Binding the JCDI managed class " + c.getName() +
-                " in the scope " + s.getName() +
-                " to JCDIComponentProviderFactory in the scope " + cs);
-
         if (s == Dependent.class) {
+            if (!c.isAnnotationPresent(ManagedBean.class))
+                return null;
+
+            LOGGER.info("Binding the JCDI managed-bean class " + c.getName() +
+                    " in the scope " + s.getName() +
+                    " to JCDIComponentProviderFactory in the scope " + cs);
+
             return new ComponentProviderDestroyable() {
 
                 // IoCInstantiatedComponentProvider
@@ -161,13 +165,17 @@ public class JCDIComponentProviderFactory implements
                 }
 
                 // IoCDestroyable
-                
+
                 public void destroy(Object o) {
                     final CreationalContext cc = bm.createCreationalContext(b);
                     ((Bean)b).destroy(o, cc);
                 }
             };
         } else {
+            LOGGER.info("Binding the JCDI managed class " + c.getName() +
+                    " in the scope " + s.getName() +
+                    " to JCDIComponentProviderFactory in the scope " + cs);
+
             return new IoCFullyManagedComponentProvider() {
                 public Object getInstance() {
                     final CreationalContext<?> bcc = bm.createCreationalContext(b);

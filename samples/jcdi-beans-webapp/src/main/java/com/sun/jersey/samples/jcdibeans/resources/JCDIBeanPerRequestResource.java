@@ -68,7 +68,7 @@ public class JCDIBeanPerRequestResource {
     public void postConstruct() {
         Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO, 
                 "In post construct " + this +
-                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
+                "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
         
 //        if (uiFieldInject == null || uiMethodInject == null)
 //            throw new IllegalStateException();
@@ -79,7 +79,7 @@ public class JCDIBeanPerRequestResource {
     public String getMessage() {
         Logger.getLogger(JCDIBeanPerRequestResource.class.getName()).log(Level.INFO,
                 "In getMessage " + this +
-                "; uiFieldInject: " + uiFieldInject + "; UuiMethodInjectr: " + uiMethodInject);
+                "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
         
 //        if (uiFieldInject == null || uiMethodInject == null)
 //            throw new IllegalStateException();
