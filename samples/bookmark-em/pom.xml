@@ -187,6 +187,11 @@
             <url>http://download.java.net/maven/1</url>
             <layout>legacy</layout>
         </repository>
+        <repository>
+            <id>glassfish-repository</id>
+            <name>Repository for Glassfish</name>
+            <url>http://maven.glassfish.org/content/groups/glassfish</url>
+        </repository>
     </repositories>
     <properties>
         <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
