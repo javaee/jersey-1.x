@@ -120,7 +120,7 @@ public class IntrospectionModeller {
                 classScopeConsumesAnnotation, classScopeProducesAnnotation);
         workOutSubResourceLocatorsList(resource, methodList, isEncodedAnotOnClass);
 
-        workOutPostConstructPreDestroy(resource, methodList);
+        workOutPostConstructPreDestroy(resource);
         
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest(ImplMessages.NEW_AR_CREATED_BY_INTROSPECTION_MODELER(
@@ -211,19 +211,19 @@ public class IntrospectionModeller {
         }
     }
 
-    private static void workOutPostConstructPreDestroy(
-            AbstractResource resource,
-            MethodList methodList) {
+    private static void workOutPostConstructPreDestroy(AbstractResource resource) {
         Class postConstruct = ReflectionHelper.classForName("javax.annotation.PostConstruct");
         if (postConstruct == null)
             return;
 
         Class preDestroy = ReflectionHelper.classForName("javax.annotation.PreDestroy");
 
+        final MethodList methodList = new MethodList(resource.getResourceClass(), true);
         for (AnnotatedMethod m : methodList.
                 hasAnnotation(postConstruct).
                 hasNumParams(0).
                 hasReturnType(void.class)) {
+            ReflectionHelper.setAccessibleMethod(m.getMethod());
             resource.getPostConstructMethods().add(m.getMethod());
         }
 
@@ -231,6 +231,7 @@ public class IntrospectionModeller {
                 hasAnnotation(preDestroy).
                 hasNumParams(0).
                 hasReturnType(void.class)) {
+            ReflectionHelper.setAccessibleMethod(m.getMethod());
             resource.getPreDestroyMethods().add(m.getMethod());
         }
     }

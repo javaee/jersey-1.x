@@ -140,4 +140,110 @@ public class PerRequestLifecycleTest extends AbstractResourceTester {
         WebResource r = resource("/sub");
         assertEquals("GET", r.get(String.class));
     }
+
+    public static abstract class AbstractResource {
+        File f;
+
+        @GET
+        public String getFileName() {
+            assertNotNull(f);
+            return f.getAbsolutePath();
+        }
+    }
+
+    @Path("/")
+    public static class PreDestroyPostConstructResource extends AbstractResource {
+
+        @PostConstruct
+        public void postConstruct() throws IOException {
+            f = File.createTempFile("jersey", null);
+        }
+
+        @PreDestroy
+        public void preDestroy() {
+            assertTrue(f.exists());
+            f.delete();
+        }
+    }
+
+    @Path("/")
+    public static class PreDestroyPostConstructResourcePrivate extends AbstractResource {
+
+        @PostConstruct
+        private void postConstruct() throws IOException {
+            f = File.createTempFile("jersey", null);
+        }
+
+        @PreDestroy
+        private void preDestroy() {
+            assertTrue(f.exists());
+            f.delete();
+        }
+    }
+
+    @Path("/")
+    public static class PreDestroyPostConstructResourceProtected extends AbstractResource {
+
+        @PostConstruct
+        protected void postConstruct() throws IOException {
+            f = File.createTempFile("jersey", null);
+        }
+
+        @PreDestroy
+        protected void preDestroy() {
+            assertTrue(f.exists());
+            f.delete();
+        }
+    }
+
+    public static abstract class PostConstructResourceInherited extends AbstractResource {
+
+        @PostConstruct
+        private void postConstruct() throws IOException {
+            f = File.createTempFile("jersey", null);
+        }
+
+    }
+
+    @Path("/")
+    public static class PreDestroyResourceInherited extends PostConstructResourceInherited {
+
+        @PreDestroy
+        private void preDestroy() {
+            assertTrue(f.exists());
+            f.delete();
+        }
+    }
+
+    public void testPreDestroyPostCreateResource() {
+        initiateWebApplication(PreDestroyPostConstructResource.class);
+        WebResource r = resource("/");
+        String s = r.get(String.class);
+        File f = new File(s);
+        assertFalse(f.exists());
+    }
+
+    public void testPreDestroyPostCreateResourcePrivate() {
+        initiateWebApplication(PreDestroyPostConstructResourcePrivate.class);
+        WebResource r = resource("/");
+        String s = r.get(String.class);
+        File f = new File(s);
+        assertFalse(f.exists());
+    }
+
+    public void testPreDestroyPostCreateResourceProtected() {
+        initiateWebApplication(PreDestroyPostConstructResourceProtected.class);
+        WebResource r = resource("/");
+        String s = r.get(String.class);
+        File f = new File(s);
+        assertFalse(f.exists());
+    }
+
+    public void testPreDestroyPostCreateResourceInherited() {
+        initiateWebApplication(PreDestroyResourceInherited.class);
+        WebResource r = resource("/");
+        String s = r.get(String.class);
+        File f = new File(s);
+        assertFalse(f.exists());
+    }
 }

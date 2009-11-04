@@ -152,6 +152,25 @@ public class ReflectionHelper {
     }
 
     /**
+     * Set a method to be accessible.
+     *
+     * @param m the method to be set as accessible
+     */
+    public static void setAccessibleMethod(final Method m) {
+        if (Modifier.isPublic(m.getModifiers()))
+            return;
+        
+        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            public Object run() {
+                if (!m.isAccessible()) {
+                    m.setAccessible(true);
+                }
+                return m;
+            }
+        });
+    }
+
+    /**
      * Get the class that is the type argument of a parameterized type.
      * <p>
      * @param parameterizedType must be an instance of ParameterizedType

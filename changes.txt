@@ -1,6 +1,9 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 229
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=229
+  @PostConstruct and @PreDestroy method can have any visibility.
 - Fixed issue 406
   https://jersey.dev.java.net/issues/show_bug.cgi?id=406
   FormDataBodyPart.getValue will honor the charset parameter of the media

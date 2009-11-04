@@ -54,9 +54,26 @@ public class MethodList implements Iterable<AnnotatedMethod> {
     private AnnotatedMethod[] methods;
     
     public MethodList(Class c) {
-        this(c.getMethods());
+        this(c, false);
     }
     
+    public MethodList(Class c, boolean declaredMethods) {
+        this(declaredMethods ? getAllDeclaredMethods(c) : getMethods(c));
+    }
+
+    private static List<Method> getAllDeclaredMethods(Class c) {
+        List<Method> l = new ArrayList<Method>();
+        while (c != Object.class) {
+            l.addAll(Arrays.asList(c.getDeclaredMethods()));
+            c = c.getSuperclass();
+        }
+        return l;
+    }
+
+    private static List<Method> getMethods(Class c) {
+        return Arrays.asList(c.getMethods());
+    }
+
     public MethodList(List<Method> methods) {
         List<AnnotatedMethod> l = new ArrayList<AnnotatedMethod>();
         for (Method m : methods) {

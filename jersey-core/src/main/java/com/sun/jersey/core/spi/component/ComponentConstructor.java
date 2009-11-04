@@ -118,11 +118,12 @@ public class ComponentConstructor<T> {
     private static Method getPostConstructMethod(Class c) {
         Class postConstructClass = ReflectionHelper.classForName("javax.annotation.PostConstruct");
         if (postConstructClass != null) {
-            MethodList methodList = new MethodList(c);
+            MethodList methodList = new MethodList(c, true);
             for (AnnotatedMethod m : methodList.
                     hasAnnotation(postConstructClass).
                     hasNumParams(0).
                     hasReturnType(void.class)) {
+                ReflectionHelper.setAccessibleMethod(m.getMethod());
                 return m.getMethod();
             }
         }

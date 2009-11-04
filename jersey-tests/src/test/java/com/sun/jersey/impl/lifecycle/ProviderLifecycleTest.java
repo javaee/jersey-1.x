@@ -71,17 +71,10 @@ public class ProviderLifecycleTest extends AbstractResourceTester {
     public static class FileType {
     }
     
-    @Provider
-    public static class FileReferenceWriter implements MessageBodyWriter<FileType> {
+    public static abstract class AbstractFileReferenceWriter implements MessageBodyWriter<FileType> {
         List<File> files;
 
         @Context HttpContext hc;
-        
-        @PostConstruct
-        public void postConstruct() {
-            assertNotNull(hc);
-            this.files = new ArrayList<File>();
-        }
 
         public boolean isWriteable(Class<?> type, Type genericType,
                 Annotation[] annotations, MediaType mediaType) {
@@ -102,9 +95,71 @@ public class ProviderLifecycleTest extends AbstractResourceTester {
             files.add(f);
             entityStream.write(f.getAbsolutePath().getBytes());
         }
+    }
+
+    @Provider
+    public static class FileReferenceWriter extends AbstractFileReferenceWriter {
+        @PostConstruct
+        public void postConstruct() {
+            assertNotNull(hc);
+            this.files = new ArrayList<File>();
+        }
 
         @PreDestroy
         public void preDestroy() {
+            assertNotNull(files);
+            for (File f : files) {
+                f.delete();
+            }
+        }
+    }
+
+    @Provider
+    public static class FileReferenceWriterPrivate extends AbstractFileReferenceWriter {
+        @PostConstruct
+        private void postConstruct() {
+            assertNotNull(hc);
+            this.files = new ArrayList<File>();
+        }
+
+        @PreDestroy
+        private void preDestroy() {
+            assertNotNull(files);
+            for (File f : files) {
+                f.delete();
+            }
+        }
+    }
+
+    @Provider
+    public static class FileReferenceWriterProtected extends AbstractFileReferenceWriter {
+        @PostConstruct
+        protected void postConstruct() {
+            assertNotNull(hc);
+            this.files = new ArrayList<File>();
+        }
+
+        @PreDestroy
+        protected void preDestroy() {
+            assertNotNull(files);
+            for (File f : files) {
+                f.delete();
+            }
+        }
+    }
+
+    public static abstract class FileReferenceWriterPostConstruct extends AbstractFileReferenceWriter {
+        @PostConstruct
+        private void postConstruct() {
+            assertNotNull(hc);
+            this.files = new ArrayList<File>();
+        }
+    }
+
+    @Provider
+    public static class FileReferenceWriterPreDestroy extends FileReferenceWriterPostConstruct {
+        @PreDestroy
+        private void preDestroy() {
             assertNotNull(files);
             for (File f : files) {
                 f.delete();
@@ -129,6 +184,42 @@ public class ProviderLifecycleTest extends AbstractResourceTester {
 
         w.destroy();
         
+        assertFalse(f.exists());
+    }
+
+    public void testProviderPrivate() {
+        initiateWebApplication(FileReferenceWriterPrivate.class, FileTypeResource.class);
+        WebResource r = resource("/");
+        String s = r.get(String.class);
+        File f = new File(s);
+        assertTrue(f.exists());
+
+        w.destroy();
+
+        assertFalse(f.exists());
+    }
+
+    public void testProviderProtected() {
+        initiateWebApplication(FileReferenceWriterProtected.class, FileTypeResource.class);
+        WebResource r = resource("/");
+        String s = r.get(String.class);
+        File f = new File(s);
+        assertTrue(f.exists());
+
+        w.destroy();
+
+        assertFalse(f.exists());
+    }
+
+    public void testProviderInherited() {
+        initiateWebApplication(FileReferenceWriterPreDestroy.class, FileTypeResource.class);
+        WebResource r = resource("/");
+        String s = r.get(String.class);
+        File f = new File(s);
+        assertTrue(f.exists());
+
+        w.destroy();
+
         assertFalse(f.exists());
     }
 }

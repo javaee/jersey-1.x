@@ -62,11 +62,12 @@ public class ComponentDestructor {
     private static Method getPreDestroyMethod(Class c) {
         Class preDestroyClass = ReflectionHelper.classForName("javax.annotation.PreDestroy");
         if (preDestroyClass != null) {
-            MethodList methodList = new MethodList(c);
+            MethodList methodList = new MethodList(c, true);
             for (AnnotatedMethod m : methodList.
                     hasAnnotation(preDestroyClass).
                     hasNumParams(0).
                     hasReturnType(void.class)) {
+                ReflectionHelper.setAccessibleMethod(m.getMethod());
                 return m.getMethod();
             }
         }
