@@ -69,11 +69,10 @@ public class JCDIBeanDependentSingletonResource {
     @PostConstruct
     public void postConstruct() {
         Logger.getLogger(JCDIBeanDependentSingletonResource.class.getName()).log(Level.INFO,
-                "In post construct " + this +
-                "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
+                "In post construct " + this);
 
-//        if (uiFieldInject == null || uiMethodInject == null)
-//            throw new IllegalStateException();
+        if (uiFieldInject == null || uiMethodInject == null)
+            throw new IllegalStateException();
     }
 
     @GET 
@@ -83,8 +82,8 @@ public class JCDIBeanDependentSingletonResource {
                 "In getMessage " + this +
                 "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
 
-//        if (uiFieldInject == null || uiMethodInject == null)
-//            throw new IllegalStateException();
+        if (uiFieldInject == null || uiMethodInject == null)
+            throw new IllegalStateException();
         
         return Integer.toString(injectedResource++);
     }

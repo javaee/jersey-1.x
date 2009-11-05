@@ -63,7 +63,7 @@ public class MethodList implements Iterable<AnnotatedMethod> {
 
     private static List<Method> getAllDeclaredMethods(Class c) {
         List<Method> l = new ArrayList<Method>();
-        while (c != Object.class) {
+        while (c != null && c != Object.class) {
             l.addAll(Arrays.asList(c.getDeclaredMethods()));
             c = c.getSuperclass();
         }

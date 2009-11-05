@@ -42,7 +42,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -70,11 +69,10 @@ public class EJBStatelessSessionBeanResource {
     @PostConstruct
     public void postConstruct() {
         Logger.getLogger(EJBStatelessSessionBeanResource.class.getName()).log(Level.INFO,
-                "In post construct " + this +
-                "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
+                "In post construct " + this);
 
-//        if (uiFieldInject == null || uiMethodInject == null)
-//            throw new IllegalStateException();
+        if (uiFieldInject == null || uiMethodInject == null)
+            throw new IllegalStateException();
     }
 
     @GET
@@ -84,8 +82,8 @@ public class EJBStatelessSessionBeanResource {
                 "In getMessage " + this +
                 "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
 
-//        if (uiFieldInject == null || uiMethodInject == null)
-//            throw new IllegalStateException();
+        if (uiFieldInject == null || uiMethodInject == null)
+            throw new IllegalStateException();
 
         return Integer.toString(injectedResource++);
     }

@@ -86,14 +86,6 @@
         </dependency>
     </dependencies>
     <build>
-        <resources>
-            <resource>
-                <directory>${basedir}/src/main/java</directory>
-                <includes>
-                    <include>META-INF/**/*</include>
-                </includes>
-            </resource>
-        </resources>
         <finalName>jcdi-beans-webapp</finalName>
         <plugins>
             <plugin>

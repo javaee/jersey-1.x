@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.server.impl.jcdi;
 
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
@@ -47,17 +48,17 @@ import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionTarget;
@@ -83,18 +84,28 @@ public class JCDIComponentProviderFactory implements
     // IoCComponentProcessorFactoryInitializer
 
     public void init(final IoCComponentProcessorFactory cpf) {
-        // TODO get list of registered ProcessInjectionTarget
-        final Collection<ProcessInjectionTarget> pitc = Collections.emptyList();
-
-        for (final ProcessInjectionTarget pit : pitc) {
+        // TODO reference is null
+        final JCDIComponentExtension e = getRef(JCDIComponentExtension.class);
+        if (e == null) {
+            throw new ContainerException("Reference to " + JCDIComponentExtension.class + " is null");
+        }
+        
+        for (final ProcessInjectionTarget pit : e.getProcessInjectionTargets()) {
             final Class<?> c = pit.getAnnotatedType().getJavaClass();
             final Bean<?> b = getBean(c);
             if (b == null)
                 continue;
-            
+
+            final Class<? extends Annotation> s = b.getScope();
+            if (s == Dependent.class &&
+                    !c.isAnnotationPresent(ManagedBean.class))
+                continue;
+
             final IoCComponentProcessor icp = cpf.get(c, getComponentScope(b));
             if (icp == null)
                 continue;
+
+            LOGGER.info("Adapting InjectionTarget for " + c.getName());
 
             final InjectionTarget it = pit.getInjectionTarget();
             final InjectionTarget nit = new InjectionTarget() {
@@ -125,21 +136,20 @@ public class JCDIComponentProviderFactory implements
             };
             pit.setInjectionTarget(nit);
         }
+        e.clear();
     }
 
     // IoCComponentProviderFactory
 
     public IoCComponentProvider getComponentProvider(Class<?> c) {
         return getComponentProvider(null, c);
-    }
+    };
 
     public IoCComponentProvider getComponentProvider(ComponentContext cc, final Class<?> c) {
-        final Set<Bean<?>> bs = bm.getBeans(c);
-        if (bs.isEmpty()) {
+        final Bean<?> b = getBean(c);
+        if (b == null)
             return null;
-        }
-
-        final Bean<?> b = bm.resolve(bs);
+        
         final Class<? extends Annotation> s = b.getScope();
         final ComponentScope cs = getComponentScope(b);
 
@@ -149,7 +159,7 @@ public class JCDIComponentProviderFactory implements
 
             LOGGER.info("Binding the JCDI managed-bean class " + c.getName() +
                     " in the scope " + s.getName() +
-                    " to JCDIComponentProviderFactory in the scope " + cs);
+                    " to JCDIComponentProviderFactory");
 
             return new ComponentProviderDestroyable() {
 
@@ -194,7 +204,22 @@ public class JCDIComponentProviderFactory implements
             return null;
         }
 
-        return bm.resolve(bs);
+        try {
+            return bm.resolve(bs);
+        } catch(AmbiguousResolutionException ex) {
+            LOGGER.log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+
+    private <T> T getRef(Class<T> c) {
+        Bean<?> b = getBean(c);
+        if (b == null) {
+            return null;
+        }
+        
+        CreationalContext<?> cc = bm.createCreationalContext(b);
+        return c.cast(bm.getReference(b, c, cc));
     }
 
     private ComponentScope getComponentScope(Bean<?> b) {

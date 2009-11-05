@@ -67,8 +67,7 @@ public class JCDIBeanSingletonResource {
     @PostConstruct
     public void postConstruct() {
         Logger.getLogger(JCDIBeanSingletonResource.class.getName()).log(Level.INFO,
-                "In post construct " + this +
-                "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
+                "In post construct " + this);
 
 //        if (uiFieldInject == null || uiMethodInject == null)
 //            throw new IllegalStateException();
