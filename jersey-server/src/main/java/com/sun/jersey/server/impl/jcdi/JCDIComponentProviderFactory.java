@@ -84,7 +84,6 @@ public class JCDIComponentProviderFactory implements
     // IoCComponentProcessorFactoryInitializer
 
     public void init(final IoCComponentProcessorFactory cpf) {
-        // TODO reference is null
         final JCDIComponentExtension e = getRef(JCDIComponentExtension.class);
         if (e == null) {
             throw new ContainerException("Reference to " + JCDIComponentExtension.class + " is null");

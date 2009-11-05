@@ -1,6 +1,9 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 411
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=411
+  Fixed regression in MethodList class caused by fixing issue 229.
 - Fixed issue 229
   https://jersey.dev.java.net/issues/show_bug.cgi?id=229
   @PostConstruct and @PreDestroy method can have any visibility.
