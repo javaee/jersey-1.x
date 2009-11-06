@@ -60,6 +60,13 @@
       <version>2.5</version>
       <scope>provided</scope>
     </dependency>
+    <!-- This dependency is required due to some issue with the 
+         life java.mail dependency which declared [1.4,1.5) -->
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.2</version>
+    </dependency>
     <dependency>
       <groupId>net.liftweb</groupId>
       <artifactId>lift-webkit</artifactId>
