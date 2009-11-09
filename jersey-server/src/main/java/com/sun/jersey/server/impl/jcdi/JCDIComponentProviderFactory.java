@@ -104,7 +104,7 @@ public class JCDIComponentProviderFactory implements
             if (icp == null)
                 continue;
 
-            LOGGER.info("Adapting InjectionTarget for " + c.getName());
+            LOGGER.info("Adapting InjectionTarget for " + c.getName() + " in the scope " + b.getScope());
 
             final InjectionTarget it = pit.getInjectionTarget();
             final InjectionTarget nit = new InjectionTarget() {
