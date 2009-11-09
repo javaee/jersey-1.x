@@ -39,7 +39,6 @@ package com.sun.jersey.api.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -82,7 +81,7 @@ public class DefaultResourceConfig extends ResourceConfig {
      *        and provider classes
      */
     public DefaultResourceConfig(Class<?>... classes) {
-        this(new HashSet<Class<?>>(Arrays.asList(classes)));
+        this(new LinkedHashSet<Class<?>>(Arrays.asList(classes)));
     }
     
     /**

@@ -1,6 +1,10 @@
 release 1.1.5 (2010)
 
 release 1.1.4 (2009-11)
+- Fixed issue 412
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=412
+  Ensure that ResourceConfig and extensions of retain the order of
+  classes and singletons that are added.
 - Fixed issue 411
   https://jersey.dev.java.net/issues/show_bug.cgi?id=411
   Fixed regression in MethodList class caused by fixing issue 229.

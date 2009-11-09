@@ -34,76 +34,70 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.api.core;
 
-package com.sun.jersey.server.impl.application;
-
-import com.sun.jersey.api.core.ResourceConfig;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
-import javax.ws.rs.core.MediaType;
 
-/* package */ class ComponentsResourceConfig extends ResourceConfig {
 
-    private final ResourceConfig rc;
+/**
+ * @author Paul.Sandoz@Sun.Com
+ */
+public class ClassNamesResourceConfigTest extends AbstractResourceConfigOrderTest {
 
-    private final Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
-    
-    
-    public ComponentsResourceConfig(ResourceConfig rc, Class<?>... components) {
-        this(rc, new LinkedHashSet<Class<?>>(Arrays.asList(components)));
-    }
-    
-    public ComponentsResourceConfig(ResourceConfig rc, Set<Class<?>> components) {
-        this.rc = rc;
+    public void testClasses() {
+        ClassNamesResourceConfig rc = new ClassNamesResourceConfig(
+                getClassArrayDeclaration());
 
-        this.classes.addAll(rc.getClasses());
-        this.classes.addAll(components);
+        assertEquals(LIST, new ArrayList(rc.getClasses()));
     }
 
-    @Override
-    public Set<Class<?>> getClasses() {
-        return classes;
-    }
-    
-    @Override
-    public Set<Object> getSingletons() {
-        return rc.getSingletons();
-    }
-    
-    @Override
-    public Map<String, MediaType> getMediaTypeMappings() {
-        return rc.getMediaTypeMappings();
+    public void testClassNames() {
+        ClassNamesResourceConfig rc = new ClassNamesResourceConfig(
+                getStringDeclaration());
+
+        assertEquals(LIST, new ArrayList(rc.getClasses()));
     }
 
-    @Override
-    public Map<String, String> getLanguageMappings() {
-        return rc.getLanguageMappings();
-    }
-    
-    @Override
-    public Map<String, Object> getExplicitRootResources() {
-        return rc.getExplicitRootResources();
+    public void testPropertiesClassNames() {
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(ClassNamesResourceConfig.PROPERTY_CLASSNAMES,
+                getStringDeclaration());
+        ClassNamesResourceConfig rc = new ClassNamesResourceConfig(props);
+
+        assertEquals(LIST, new ArrayList(rc.getClasses()));
     }
 
-    @Override
-    public Map<String, Boolean> getFeatures() {
-        return rc.getFeatures();
-    }
-    
-    @Override
-    public boolean getFeature(String featureName) {
-        return rc.getFeature(featureName);
-    }
-    
-    @Override
-    public Map<String, Object> getProperties() {
-        return rc.getProperties();
+    public void testtestPropertiesClassNamesArray() {
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(ClassNamesResourceConfig.PROPERTY_CLASSNAMES,
+            getStringArrayDeclaration());
+        ClassNamesResourceConfig rc = new ClassNamesResourceConfig(props);
+
+        assertEquals(LIST, new ArrayList(rc.getClasses()));
     }
 
-    @Override
-    public Object getProperty(String propertyName) {
-        return rc.getProperty(propertyName);
+    private Class[] getClassArrayDeclaration() {
+        return LIST.toArray(new Class[0]);
+    }
+
+    private String getStringDeclaration() {
+        StringBuilder sb = new StringBuilder();
+        for (Class<?> c : LIST) {
+            if (sb.length() > 0)
+                sb.append(';');
+            sb.append(c.getName());
+        }
+        return sb.toString();
+    }
+
+    private String[] getStringArrayDeclaration() {
+        String[] array = new String[LIST.size()];
+        int i = 0;
+        for (Class<?> c : LIST) {
+            array[i++] = c.getName();
+        }
+        return array;
     }
 }

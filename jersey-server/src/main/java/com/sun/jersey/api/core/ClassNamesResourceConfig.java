@@ -36,7 +36,7 @@
  */
 package com.sun.jersey.api.core;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -108,7 +108,7 @@ public class ClassNamesResourceConfig extends DefaultResourceConfig {
     }
 
     private static Set<Class<?>> convertToSet(String[] classes) {
-        Set<Class<?>> s = new HashSet<Class<?>>();
+        Set<Class<?>> s = new LinkedHashSet<Class<?>>();
         for (String c : classes) {
             try {
                 s.add(getClassLoader().loadClass(c));

@@ -78,6 +78,19 @@ public class MethodListTest extends TestCase {
         _test(CPrivate.class, true);
     }
 
+    public class CPrivateBase {
+        private void a() {}
+    }
+
+    public class CPrivateInherited extends CPrivateBase {
+        private void b() {}
+        private void c() {}
+    }
+
+    public void testCPrivateMethodsInherited() {
+        _test(CPrivateInherited.class, true);
+    }
+
     private void _test(Class c) {
         _test(c, false);
     }

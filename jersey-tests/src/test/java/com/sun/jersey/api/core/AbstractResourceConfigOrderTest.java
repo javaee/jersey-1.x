@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * 
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,37 +34,44 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.server.impl.jcdi;
+package com.sun.jersey.api.core;
 
-import com.sun.jersey.api.core.ResourceConfig;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import junit.framework.TestCase;
+
 
 /**
- *
  * @author Paul.Sandoz@Sun.Com
  */
-public class JCDIComponentProviderFactoryInitializer {
-    private static final Logger LOGGER = Logger.getLogger(
-            JCDIComponentProviderFactoryInitializer.class.getName());
+public abstract class AbstractResourceConfigOrderTest extends TestCase {
 
-    public static void initialize(ResourceConfig rc) {
-        try {
-            Object beanManager = new InitialContext().
-                    lookup("java:comp/BeanManager");
-            // Some implementations of InitialContext return null instead of
-            // throwing NamingException if there is no Object associated with
-            // the name
-            if (beanManager == null) {
-                LOGGER.config("The JCDI BeanManager is not available. JAX-RS JCDI support is disabled.");
-                return;
+    public static class One {
+    }
+
+    public static class Two {
+    }
+    
+    public static class Three {
+    }
+
+    protected final static List<Class<?>> LIST =
+            getList(Arrays.asList(One.class, Two.class, Three.class));
+    
+    protected static <T> List<T> getList(List<T> l) {
+        for (int i = 0; i < l.size(); i++) {
+            List<T> l1 = new ArrayList<T>(new HashSet<T>(l));
+            List<T> l2 = new ArrayList<T>(new LinkedHashSet<T>(l));
+            if (!l1.equals(l2)) {
+                break;
             }
-
-            rc.getSingletons().add(new JCDIComponentProviderFactory(beanManager));
-        } catch (NamingException ex) {
-            LOGGER.log(Level.CONFIG, "The JCDI BeanManager is not available. JAX-RS JCDI support is disabled.", ex);
+            Collections.rotate(l, 1);
         }
+        return l;
     }
 }
