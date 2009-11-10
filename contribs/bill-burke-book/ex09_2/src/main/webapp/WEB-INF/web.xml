@@ -3,11 +3,6 @@
         "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-    <context-param>
-        <param-name>resteasy.servlet.mapping.prefix</param-name>
-        <param-value>/rest</param-value>
-    </context-param>
-
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>
@@ -21,7 +16,7 @@
 
     <servlet-mapping>
         <servlet-name>Jersey Web Application</servlet-name>
-        <url-pattern>/rest/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

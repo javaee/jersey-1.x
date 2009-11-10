@@ -9,7 +9,7 @@
     </context-param>
 
     <servlet>
-        <servlet-name>Resteasy</servlet-name>
+        <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>
             com.sun.jersey.spi.container.servlet.ServletContainer
         </servlet-class>
