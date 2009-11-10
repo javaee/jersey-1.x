@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.oreilly.rest.workbook</groupId>
-    <artifactId>ex04_1</artifactId>
+    <artifactId>ex10_1</artifactId>
     <version>1.0</version>
     <packaging>war</packaging>
-    <name>ex04_1</name>
+    <name>ex10_1</name>
     <description/>
 
     <repositories>
@@ -30,19 +30,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.0-beta2</version>
-        </dependency>
-        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-bundle</artifactId>
             <version>1.1.5-ea-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-apache-client</artifactId>
-            <version>1.1.5-ea-SNAPSHOT</version>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.1.12</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
