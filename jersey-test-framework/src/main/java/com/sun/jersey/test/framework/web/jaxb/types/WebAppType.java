@@ -51,7 +51,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType (name="web-app", propOrder={
     "contextParam",
-    "listener",
+    "listeners",
     "servletType",
     "servletMapping"
 })
@@ -62,7 +62,7 @@ public class WebAppType {
     private List<ContextParamType> contextParam;
 
     @XmlElement(name="listener")
-    private ListenerType listener;
+    private List<ListenerType> listeners;
 
     @XmlElement(name="servlet", required=true)
     private ServletType servletType;
@@ -78,12 +78,12 @@ public class WebAppType {
         this.contextParam = contextParam;
     }
 
-    public ListenerType getListener() {
-        return listener;
+    public List<ListenerType> getListeners() {
+        return listeners;
     }
 
-    public void setListener(ListenerType listener) {
-        this.listener = listener;
+    public void setListeners(List<ListenerType> listeners) {
+        this.listeners = listeners;
     }
 
     public ServletMappingType getServletMapping() {

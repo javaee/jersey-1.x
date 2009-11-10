@@ -93,6 +93,12 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         final String contextListenerClassName;
 
+        final String contextAttributeListenerClassName;
+
+        final String requestListenerClassName;
+
+        final String requestAttributeListenerClassName;
+
         final Map<String, String> initParams;
 
         final Map<String, String> contextParams;
@@ -119,6 +125,12 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             this.contextParams = ad.getContextParams();
             this.contextListenerClassName = (ad.getContextListenerClass() != null) 
                     ? ad.getContextListenerClass().getName() : "";
+            this.contextAttributeListenerClassName = (ad.getContextAttributeListenerClass() != null)
+                    ? ad.getContextAttributeListenerClass().getName() : "";
+            this.requestListenerClassName = (ad.getRequestListenerClass() != null)
+                    ? ad.getRequestListenerClass().getName() : "";
+            this.requestAttributeListenerClassName = (ad.getRequestAttributeListenerClass() != null)
+                    ? ad.getRequestAttributeListenerClass().getName() : "";
 
             instantiateGrizzlyWebServer();
 
@@ -169,6 +181,18 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             
             if ( !contextListenerClassName.equals("") ) {
                 sa.addServletListener(contextListenerClassName);
+            }
+
+            if ( !contextAttributeListenerClassName.equals("") ) {
+                sa.addServletListener(contextAttributeListenerClassName);
+            }
+
+            if ( !requestListenerClassName.equals("") ) {
+                sa.addServletListener(requestListenerClassName);
+            }
+
+            if ( !requestAttributeListenerClassName.equals("") ) {
+                sa.addServletListener(requestAttributeListenerClassName);
             }
 
             // Filter support

@@ -90,12 +90,44 @@ public class WebXmlGenerator {
             webAppType.setContextParam(contextParameters);
         }
 
+        // add any listeners to be registered
+        List<ListenerType> listeners = new ArrayList<ListenerType>();
+
         // check if the deployment descriptor should have any context listener defined
         if( applicationDescriptor.getContextListenerClass() != null &&
                 !applicationDescriptor.getContextListenerClass().getName().equals("")) {
             ListenerType listener = new ListenerType();
             listener.setListenerClass(applicationDescriptor.getContextListenerClass().getName());
-            webAppType.setListener(listener);
+            listeners.add(listener);
+        }
+        
+        // check if the deployment descriptor should have any context attribute listener defined
+        if( applicationDescriptor.getContextAttributeListenerClass() != null &&
+                !applicationDescriptor.getContextAttributeListenerClass().getName().equals("")) {
+            ListenerType listener = new ListenerType();
+            listener.setListenerClass(applicationDescriptor.getContextAttributeListenerClass().getName());
+            listeners.add(listener);            
+        }
+        
+        // check if the deployment descriptor should have any servlet request listener defined
+        if( applicationDescriptor.getRequestListenerClass() != null &&
+                !applicationDescriptor.getRequestListenerClass().getName().equals("")) {
+            ListenerType listener = new ListenerType();
+            listener.setListenerClass(applicationDescriptor.getRequestListenerClass().getName());
+            listeners.add(listener);            
+        }
+        
+        // check if the deployment descriptor should have any servlet request attribute listener defined
+        if( applicationDescriptor.getRequestAttributeListenerClass() != null &&
+                !applicationDescriptor.getRequestAttributeListenerClass().getName().equals("")) {
+            ListenerType listener = new ListenerType();
+            listener.setListenerClass(applicationDescriptor.getRequestAttributeListenerClass().getName());
+            listeners.add(listener);            
+        }
+
+        // add a listener only if atleast one is registerd.
+        if(listeners.size() > 0) {
+            webAppType.setListeners(listeners);
         }
 
         // add the servlet information to the deployment descriptor
