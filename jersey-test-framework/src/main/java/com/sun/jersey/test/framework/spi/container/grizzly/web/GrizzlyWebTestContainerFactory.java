@@ -46,7 +46,10 @@ import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import java.io.IOException;
 import java.net.URI;
+import java.util.EventListener;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.Filter;
 import javax.servlet.Servlet;
@@ -93,11 +96,7 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         final String contextListenerClassName;
 
-        final String contextAttributeListenerClassName;
-
-        final String requestListenerClassName;
-
-        final String requestAttributeListenerClassName;
+        final List<Class<? extends EventListener>> eventListeners;
 
         final Map<String, String> initParams;
 
@@ -125,12 +124,7 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             this.contextParams = ad.getContextParams();
             this.contextListenerClassName = (ad.getContextListenerClass() != null) 
                     ? ad.getContextListenerClass().getName() : "";
-            this.contextAttributeListenerClassName = (ad.getContextAttributeListenerClass() != null)
-                    ? ad.getContextAttributeListenerClass().getName() : "";
-            this.requestListenerClassName = (ad.getRequestListenerClass() != null)
-                    ? ad.getRequestListenerClass().getName() : "";
-            this.requestAttributeListenerClassName = (ad.getRequestAttributeListenerClass() != null)
-                    ? ad.getRequestAttributeListenerClass().getName() : "";
+            this.eventListeners = ad.getListeners();
 
             instantiateGrizzlyWebServer();
 
@@ -178,21 +172,25 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
                 }
                 sa.setServletInstance(servletInstance);
             }
-            
-            if ( !contextListenerClassName.equals("") ) {
-                sa.addServletListener(contextListenerClassName);
+
+            if (eventListeners != null) {
+                for(Class<? extends EventListener> eventListener : eventListeners) {
+                    sa.addServletListener(eventListener.getName());
+                }
             }
 
-            if ( !contextAttributeListenerClassName.equals("") ) {
-                sa.addServletListener(contextAttributeListenerClassName);
-            }
-
-            if ( !requestListenerClassName.equals("") ) {
-                sa.addServletListener(requestListenerClassName);
-            }
-
-            if ( !requestAttributeListenerClassName.equals("") ) {
-                sa.addServletListener(requestAttributeListenerClassName);
+            // the following statement is not required, but let it be here for
+            // backward compatibility with 1.1.3 and 1.1.4
+            try {
+                if (!contextListenerClassName.equals("") &&
+                        ((eventListeners == null) ||
+                        (eventListeners != null &&
+                        !eventListeners.contains((Class<? extends EventListener>)
+                        Class.forName(contextListenerClassName))))) {
+                    sa.addServletListener(contextListenerClassName);
+                }
+            } catch (ClassNotFoundException ex) {
+                throw new TestContainerException(ex);
             }
 
             // Filter support

@@ -5,7 +5,10 @@ import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
+import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.servlet.Filter;
 import javax.servlet.ServletContextAttributeListener;
@@ -65,13 +68,10 @@ public class WebAppDescriptor extends AppDescriptor {
 
         protected Class<? extends Filter> filterClass;
 
+        @Deprecated
         protected Class<? extends ServletContextListener> contextListenerClass;
 
-        protected Class<? extends ServletContextAttributeListener> contextAttributeListenerClass;
-
-        protected Class<? extends ServletRequestListener> requestListenerClass;
-
-        protected Class<? extends ServletRequestAttributeListener> requestAttributeListenerClass;
+        protected List<Class<? extends EventListener>> listeners;
 
         protected String contextPath = "";
 
@@ -230,62 +230,38 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
+         * Set a listener class
+         *
+         * @param eventListenerClass the servlet event listener class.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>eventListenerClass</code> is null.
+         */
+        public Builder listenerClass(Class<? extends EventListener> eventListenerClass) {
+            if (eventListenerClass == null)
+                throw new IllegalArgumentException("The servlet event listener class must not be null");
+
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<Class<? extends EventListener>>();
+            }
+
+            this.listeners.add(eventListenerClass);
+            return this;
+        }
+
+        /**
          * Set the servlet context listener.
          *
          * @param contextListenerClass the servlet context listener class.
          * @return this builder.
          * @throws IllegalArgumentException if <code>contextListenerClass</code> is null.
+         * @deprecated This method has been deprecated. Use <code>listenerClass()</code> instead.
          */
+        @Deprecated
         public Builder contextListenerClass(Class<? extends ServletContextListener> contextListenerClass) {
             if (contextListenerClass == null)
                 throw new IllegalArgumentException("The servlet context listener class must not be null");
 
             this.contextListenerClass = contextListenerClass;
-            return this;
-        }
-
-        /**
-         * Set the servlet context attribute listener.
-         *
-         * @param contextAttributeListenerClass the servlet context attribute listener class.
-         * @return this builder.
-         * @throws IllegalArgumentException if <code>contextAttributeListenerClass</code> is null.
-         */
-        public Builder contextAttributeListenerClass(Class<? extends ServletContextAttributeListener> contextAttributeListenerClass) {
-            if (contextAttributeListenerClass == null)
-                throw new IllegalArgumentException("The servlet context attribute listener class must not be null");
-
-            this.contextAttributeListenerClass = contextAttributeListenerClass;
-            return this;
-        }
-
-        /**
-         * Set the servlet request listener.
-         *
-         * @param requestListenerClass the servlet request listener class.
-         * @return this builder.
-         * @throws IllegalArgumentException if <code>requestListenerClass</code> is null.
-         */
-        public Builder requestListenerClass(Class<? extends ServletRequestListener> requestListenerClass) {
-            if (requestListenerClass == null)
-                throw new IllegalArgumentException("The servlet request listener class must not be null");
-
-            this.requestListenerClass = requestListenerClass;
-            return this;
-        }
-
-        /**
-         * Set the servlet request attribute listener.
-         *
-         * @param requestAttributeListenerClass the servlet request attribute listener class.
-         * @return this builder.
-         * @throws IllegalArgumentException if <code>requestAttributeListenerClass</code> is null.
-         */
-        public Builder requestAttributeListenerClass(Class<? extends ServletRequestAttributeListener> requestAttributeListenerClass) {
-            if (requestAttributeListenerClass == null)
-                throw new IllegalArgumentException("The servlet request attribute listener class must not be null");
-
-            this.requestAttributeListenerClass = requestAttributeListenerClass;
             return this;
         }
 
@@ -310,9 +286,7 @@ public class WebAppDescriptor extends AppDescriptor {
             this.servletClass = ServletContainer.class;
             this.filterClass = null;
             this.contextListenerClass = null;
-            this.contextAttributeListenerClass = null;
-            this.requestListenerClass = null;
-            this.requestAttributeListenerClass = null;
+            this.listeners = null;
             this.contextPath = "";
             this.servletPath = "";
         }
@@ -328,11 +302,7 @@ public class WebAppDescriptor extends AppDescriptor {
 
     private final Class<? extends ServletContextListener> contextListenerClass;
 
-    private final Class<? extends ServletContextAttributeListener> contextAttributeListenerClass;
-
-    private final Class<? extends ServletRequestListener> requestListenerClass;
-
-    private final Class<? extends ServletRequestAttributeListener> requestAttributeListenerClass;
+    private final List<Class<? extends EventListener>> listeners;
     
     private final String contextPath;
 
@@ -357,9 +327,7 @@ public class WebAppDescriptor extends AppDescriptor {
         this.contextPath = b.contextPath;
         this.servletPath = b.servletPath;
         this.contextListenerClass = b.contextListenerClass;
-        this.contextAttributeListenerClass = b.contextAttributeListenerClass;
-        this.requestListenerClass = b.requestListenerClass;
-        this.requestAttributeListenerClass = b.requestAttributeListenerClass;
+        this.listeners = b.listeners;
     }
 
     /**
@@ -419,42 +387,24 @@ public class WebAppDescriptor extends AppDescriptor {
     }
 
     /**
+     * Get all the registered Listener classes
+     * @return the registered listener classes, or <code>null</code>
+     *         if none is registered.
+     */
+    public List<Class<? extends EventListener>> getListeners() {
+        return listeners;
+    }
+
+    /**
      * Get the servlet context listener class.
      *
      * @return the servlet context listener class, or <code>null</code>
      *         if the class is not set.
+     * @deprecated This method has been deprecated. Use <code>getListeners()</code> instead.
      */
+    @Deprecated
     public Class<? extends ServletContextListener> getContextListenerClass() {
         return contextListenerClass;
     }
-
-    /**
-     * Get the servlet context attribute listener class.
-     *
-     * @return the servlet context attribute listener class, or <code>null</code>
-     *         if the class is not set.
-     */
-    public Class<? extends ServletContextAttributeListener> getContextAttributeListenerClass() {
-        return contextAttributeListenerClass;
-    }
-
-    /**
-     * Get the servlet request listener class.
-     *
-     * @return the servlet request listener class, or <code>null</code>
-     *         if the class is not set.
-     */
-    public Class<? extends ServletRequestListener> getRequestListenerClass() {
-        return requestListenerClass;
-    }
-
-    /**
-     * Get the servlet request attribute listener class.
-     *
-     * @return the servlet request attribute listener class, or <code>null</code>
-     *         if the class is not set.
-     */
-    public Class<? extends ServletRequestAttributeListener> getRequestAttributeListenerClass() {
-        return requestAttributeListenerClass;
-    }
+    
 }

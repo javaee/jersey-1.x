@@ -44,8 +44,10 @@ import com.sun.jersey.test.framework.web.jaxb.types.ServletMappingType;
 import com.sun.jersey.test.framework.web.jaxb.types.ServletType;
 import com.sun.jersey.test.framework.web.jaxb.types.WebAppType;
 import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -93,39 +95,38 @@ public class WebXmlGenerator {
         // add any listeners to be registered
         List<ListenerType> listeners = new ArrayList<ListenerType>();
 
-        // check if the deployment descriptor should have any context listener defined
-        if( applicationDescriptor.getContextListenerClass() != null &&
-                !applicationDescriptor.getContextListenerClass().getName().equals("")) {
-            ListenerType listener = new ListenerType();
-            listener.setListenerClass(applicationDescriptor.getContextListenerClass().getName());
-            listeners.add(listener);
-        }
-        
-        // check if the deployment descriptor should have any context attribute listener defined
-        if( applicationDescriptor.getContextAttributeListenerClass() != null &&
-                !applicationDescriptor.getContextAttributeListenerClass().getName().equals("")) {
-            ListenerType listener = new ListenerType();
-            listener.setListenerClass(applicationDescriptor.getContextAttributeListenerClass().getName());
-            listeners.add(listener);            
-        }
-        
-        // check if the deployment descriptor should have any servlet request listener defined
-        if( applicationDescriptor.getRequestListenerClass() != null &&
-                !applicationDescriptor.getRequestListenerClass().getName().equals("")) {
-            ListenerType listener = new ListenerType();
-            listener.setListenerClass(applicationDescriptor.getRequestListenerClass().getName());
-            listeners.add(listener);            
-        }
-        
-        // check if the deployment descriptor should have any servlet request attribute listener defined
-        if( applicationDescriptor.getRequestAttributeListenerClass() != null &&
-                !applicationDescriptor.getRequestAttributeListenerClass().getName().equals("")) {
-            ListenerType listener = new ListenerType();
-            listener.setListenerClass(applicationDescriptor.getRequestAttributeListenerClass().getName());
-            listeners.add(listener);            
+        if (applicationDescriptor.getListeners() != null) {
+            for(Class<? extends EventListener> listenerClass :
+                   applicationDescriptor.getListeners()) {
+                ListenerType listener = new ListenerType();
+                listener.setListenerClass(listenerClass.getName());
+                listeners.add(listener);
+            }
         }
 
-        // add a listener only if atleast one is registerd.
+           // the following statements in the try block are not required, but let it be here for
+            // backward compatibility with 1.1.3 and 1.1.4
+            try {
+                String contextListenerClassName = (applicationDescriptor.getContextListenerClass() != null) ?
+                    applicationDescriptor.getContextListenerClass().getName() :
+                    "";
+                List<Class<? extends EventListener>> eventListeners = applicationDescriptor.getListeners();
+                if (!contextListenerClassName.equals("") &&
+                        ((eventListeners == null) ||
+                        (eventListeners != null &&
+                        !eventListeners.contains((Class<? extends EventListener>)
+                        Class.forName(contextListenerClassName))))) {
+
+                    ListenerType listener = new ListenerType();
+                    listener.setListenerClass(applicationDescriptor.getContextListenerClass().getName());
+                    listeners.add(listener);
+
+                }
+            } catch (ClassNotFoundException ex) {
+                throw new TestContainerException(ex);
+            }
+
+        // add listeners only if atleast one is registerd.
         if(listeners.size() > 0) {
             webAppType.setListeners(listeners);
         }
