@@ -93,7 +93,7 @@ public class PatchTest {
 
     @Test
     public void testCustomerResourceJersey() throws Exception {
-        Client c = ApacheHttpClient.create();  3
+        Client c = ApacheHttpClient.create();
         WebResource wr = c.resource("http://localhost:9095/customers");
 
         System.out.println("*** Create a new Customer ***");
