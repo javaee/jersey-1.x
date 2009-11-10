@@ -15,7 +15,7 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>Resteasy</servlet-name>
+        <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
