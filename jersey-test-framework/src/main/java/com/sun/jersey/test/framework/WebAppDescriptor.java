@@ -6,6 +6,7 @@ import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGl
 import com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
@@ -424,7 +425,13 @@ public class WebAppDescriptor extends AppDescriptor {
         this.filterClass = b.filterClass;
         this.contextPath = b.contextPath;
         this.servletPath = b.servletPath;
-        this.listeners = b.listeners;
+        if (b.listeners == null) {
+                List<Class<? extends EventListener>> emptyList = Collections.emptyList();
+                this.listeners = Collections.unmodifiableList(emptyList);
+        } else {
+                this.listeners = Collections.unmodifiableList(b.listeners);
+        }
+        
     }
 
     /**

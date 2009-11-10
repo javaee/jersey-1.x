@@ -169,12 +169,10 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
                 sa.setServletInstance(servletInstance);
             }
 
-            if (eventListeners != null) {
-                for(Class<? extends EventListener> eventListener : eventListeners) {
-                    sa.addServletListener(eventListener.getName());
-                }
+            for(Class<? extends EventListener> eventListener : eventListeners) {
+                sa.addServletListener(eventListener.getName());
             }
-
+         
             // Filter support
             if ( filterClass!=null ) {
                 try {

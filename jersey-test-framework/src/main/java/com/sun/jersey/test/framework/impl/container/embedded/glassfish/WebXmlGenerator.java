@@ -95,15 +95,13 @@ public class WebXmlGenerator {
         // add any listeners to be registered
         List<ListenerType> listeners = new ArrayList<ListenerType>();
 
-        if (applicationDescriptor.getListeners() != null) {
-            for(Class<? extends EventListener> listenerClass :
-                   applicationDescriptor.getListeners()) {
-                ListenerType listener = new ListenerType();
-                listener.setListenerClass(listenerClass.getName());
-                listeners.add(listener);
-            }
+        for(Class<? extends EventListener> listenerClass :
+               applicationDescriptor.getListeners()) {
+            ListenerType listener = new ListenerType();
+            listener.setListenerClass(listenerClass.getName());
+            listeners.add(listener);
         }
-
+      
         // add listeners only if atleast one is registerd.
         if(listeners.size() > 0) {
             webAppType.setListeners(listeners);
