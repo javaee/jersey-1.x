@@ -94,8 +94,6 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         final Class filterClass;
 
-        final String contextListenerClassName;
-
         final List<Class<? extends EventListener>> eventListeners;
 
         final Map<String, String> initParams;
@@ -122,8 +120,6 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             this.filterClass = ad.getFilterClass();
             this.initParams = ad.getInitParams();
             this.contextParams = ad.getContextParams();
-            this.contextListenerClassName = (ad.getContextListenerClass() != null) 
-                    ? ad.getContextListenerClass().getName() : "";
             this.eventListeners = ad.getListeners();
 
             instantiateGrizzlyWebServer();
@@ -177,20 +173,6 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
                 for(Class<? extends EventListener> eventListener : eventListeners) {
                     sa.addServletListener(eventListener.getName());
                 }
-            }
-
-            // the following statement is not required, but let it be here for
-            // backward compatibility with 1.1.3 and 1.1.4
-            try {
-                if (!contextListenerClassName.equals("") &&
-                        ((eventListeners == null) ||
-                        (eventListeners != null &&
-                        !eventListeners.contains((Class<? extends EventListener>)
-                        Class.forName(contextListenerClassName))))) {
-                    sa.addServletListener(contextListenerClassName);
-                }
-            } catch (ClassNotFoundException ex) {
-                throw new TestContainerException(ex);
             }
 
             // Filter support

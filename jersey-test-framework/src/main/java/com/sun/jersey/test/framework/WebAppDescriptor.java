@@ -15,6 +15,9 @@ import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRequestAttributeListener;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpSessionListener;
+import javax.servlet.http.HttpSessionActivationListener;
+import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpServlet;
 
 /**
@@ -67,9 +70,6 @@ public class WebAppDescriptor extends AppDescriptor {
         protected Class<? extends HttpServlet> servletClass = ServletContainer.class;
 
         protected Class<? extends Filter> filterClass;
-
-        @Deprecated
-        protected Class<? extends ServletContextListener> contextListenerClass;
 
         protected List<Class<? extends EventListener>> listeners;
 
@@ -230,41 +230,142 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
-         * Set a listener class
+         * Set a <code>ServletContextListener</code> class
          *
-         * @param eventListenerClass the servlet event listener class.
+         * @param contextListenerClass the servlet context listener class.
          * @return this builder.
-         * @throws IllegalArgumentException if <code>eventListenerClass</code> is null.
+         * @throws IllegalArgumentException if <code>contextListenerClass</code> is null.
          */
-        public Builder listenerClass(Class<? extends EventListener> eventListenerClass) {
-            if (eventListenerClass == null)
-                throw new IllegalArgumentException("The servlet event listener class must not be null");
+        public Builder contextListenerClass(Class<? extends ServletContextListener> contextListenerClass) {
+            if (contextListenerClass == null)
+                throw new IllegalArgumentException("The servlet context listener class must not be null");
 
             if (this.listeners == null) {
                 this.listeners = new ArrayList<Class<? extends EventListener>>();
             }
 
-            this.listeners.add(eventListenerClass);
+            this.listeners.add(contextListenerClass);
             return this;
         }
 
         /**
-         * Set the servlet context listener.
+         * Set a <code>ServletContextListener</code> class
          *
          * @param contextListenerClass the servlet context listener class.
          * @return this builder.
          * @throws IllegalArgumentException if <code>contextListenerClass</code> is null.
-         * @deprecated This method has been deprecated. Use <code>listenerClass()</code> instead.
          */
-        @Deprecated
-        public Builder contextListenerClass(Class<? extends ServletContextListener> contextListenerClass) {
-            if (contextListenerClass == null)
+        public Builder contextAttributeListenerClass(Class<? extends ServletContextAttributeListener> contextAttributeListenerClass) {
+            if (contextAttributeListenerClass == null)
                 throw new IllegalArgumentException("The servlet context listener class must not be null");
 
-            this.contextListenerClass = contextListenerClass;
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<Class<? extends EventListener>>();
+            }
+
+            this.listeners.add(contextAttributeListenerClass);
             return this;
         }
 
+        /**
+         * Set a <code>ServletRequestListener</code> class
+         *
+         * @param requestListenerClass the servlet request listener class.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>requestListenerClass</code> is null.
+         */
+        public Builder requestListenerClass(Class<? extends ServletRequestListener> requestListenerClass) {
+            if (requestListenerClass == null)
+                throw new IllegalArgumentException("The servlet request listener class must not be null");
+
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<Class<? extends EventListener>>();
+            }
+
+            this.listeners.add(requestListenerClass);
+            return this;
+        }
+
+        /**
+         * Set a <code>ServletRequestAttributeListener</code> class
+         *
+         * @param requestAttributeListenerClass the servlet request attribute listener class.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>requestAttributeListenerClass</code> is null.
+         */
+        public Builder requestAttributeListenerClass(Class<? extends ServletRequestAttributeListener> requestAttributeListenerClass) {
+            if (requestAttributeListenerClass == null)
+                throw new IllegalArgumentException("The servlet request attribute listener class must not be null");
+
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<Class<? extends EventListener>>();
+            }
+
+            this.listeners.add(requestAttributeListenerClass);
+            return this;
+        }
+
+        /**
+         * Set a <code>HttpSessionListener</code> class
+         *
+         * @param contextListenerClass the HTTP Session Listener class.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>httpSessionListenerClass</code> is null.
+         */
+        public Builder httpSessionListenerClass(Class<? extends HttpSessionListener> httpSessionListenerClass) {
+            if (httpSessionListenerClass == null)
+                throw new IllegalArgumentException("The http session listener class must not be null");
+
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<Class<? extends EventListener>>();
+            }
+
+            this.listeners.add(httpSessionListenerClass);
+            return this;
+        }
+
+        /**
+         * Set a <code>HttpSessionActivationListener</code> class
+         *
+         * @param httpSessionActivationListenerClass the HTTP Session Activation Listener class.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>httpSessionActivationListenerClass</code> is null.
+         */
+        public Builder httpSessionActivationListenerClass(Class<?
+            extends HttpSessionActivationListener> httpSessionActivationListenerClass) {
+            if (httpSessionActivationListenerClass == null)
+                throw new IllegalArgumentException("The http session activation listener " +
+                        "class must not be null");
+
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<Class<? extends EventListener>>();
+            }
+
+            this.listeners.add(httpSessionActivationListenerClass);
+            return this;
+        }
+
+        /**
+         * Set a <code>HttpSessionAttributeListener</code> class
+         *
+         * @param httpSessionAttributeListenerClass the HTTPSessionAttributeListener class.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>httpSessionAttributeListenerClass</code> is null.
+         */
+        public Builder httpSessionAttributeListenerClass(Class<?
+            extends HttpSessionAttributeListener> httpSessionAttributeListenerClass) {
+            if (httpSessionAttributeListenerClass == null)
+                throw new IllegalArgumentException("The http session attribute listener " +
+                        "class must not be null");
+
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<Class<? extends EventListener>>();
+            }
+
+            this.listeners.add(httpSessionAttributeListenerClass);
+            return this;
+        }
+        
         /**
          * Build the Web-based application descriptor.
          * .
@@ -285,7 +386,6 @@ public class WebAppDescriptor extends AppDescriptor {
             this.contextParams = null;
             this.servletClass = ServletContainer.class;
             this.filterClass = null;
-            this.contextListenerClass = null;
             this.listeners = null;
             this.contextPath = "";
             this.servletPath = "";
@@ -299,8 +399,6 @@ public class WebAppDescriptor extends AppDescriptor {
     private final Class<? extends HttpServlet> servletClass;
 
     private final Class<? extends Filter> filterClass;
-
-    private final Class<? extends ServletContextListener> contextListenerClass;
 
     private final List<Class<? extends EventListener>> listeners;
     
@@ -326,7 +424,6 @@ public class WebAppDescriptor extends AppDescriptor {
         this.filterClass = b.filterClass;
         this.contextPath = b.contextPath;
         this.servletPath = b.servletPath;
-        this.contextListenerClass = b.contextListenerClass;
         this.listeners = b.listeners;
     }
 
@@ -393,18 +490,6 @@ public class WebAppDescriptor extends AppDescriptor {
      */
     public List<Class<? extends EventListener>> getListeners() {
         return listeners;
-    }
-
-    /**
-     * Get the servlet context listener class.
-     *
-     * @return the servlet context listener class, or <code>null</code>
-     *         if the class is not set.
-     * @deprecated This method has been deprecated. Use <code>getListeners()</code> instead.
-     */
-    @Deprecated
-    public Class<? extends ServletContextListener> getContextListenerClass() {
-        return contextListenerClass;
     }
     
 }
