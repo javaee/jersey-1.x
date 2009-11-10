@@ -282,7 +282,22 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         } else if (strMethod.equals("OPTIONS")) {
             return new OptionsMethod(uri);
         } else {
-            throw new ClientHandlerException("Method " + strMethod + " is not supported.");
+            return new CustomMethod(strMethod, uri);
+        }
+    }
+
+    private class CustomMethod extends PostMethod {
+        private String method;
+
+        CustomMethod(String method, String uri) {
+            super(uri);
+
+            this.method = method;
+        }
+
+        @Override
+        public String getName() {
+            return method;
         }
     }
 
