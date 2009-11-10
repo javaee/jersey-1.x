@@ -286,7 +286,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         }
     }
 
-    private class CustomMethod extends PostMethod {
+    private static class CustomMethod extends PostMethod {
         private String method;
 
         CustomMethod(String method, String uri) {

@@ -1,4 +1,7 @@
 release 1.1.5 (2010)
+- Added examples from Bill Burke's book "RESTful Java with JAX-RS"
+  modified to be runnable with Jersey and with additional tests.
+- Apache HTTP Client now supports custom HTTP methods.
 
 release 1.1.4 (2009-11)
 - Fixed issue 412

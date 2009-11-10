@@ -91,15 +91,9 @@ public class PatchTest {
         }
     }
 
-//   @Test
-// not working:
-//    com.sun.jersey.api.client.ClientHandlerException: Method PATCH is not supported.
-//            at com.sun.jersey.client.apache.ApacheHttpClientHandler.getHttpMethod(ApacheHttpClientHandler.java:285)
-//            at com.sun.jersey.client.apache.ApacheHttpClientHandler.handle(ApacheHttpClientHandler.java:139)
-//            at com.sun.jersey.api.client.Client.handle(Client.java:453)
-
+    @Test
     public void testCustomerResourceJersey() throws Exception {
-        Client c = ApacheHttpClient.create();
+        Client c = ApacheHttpClient.create();  3
         WebResource wr = c.resource("http://localhost:9095/customers");
 
         System.out.println("*** Create a new Customer ***");
@@ -141,8 +135,6 @@ public class PatchTest {
                 + "</customer>";
 
         response = wr.type(MediaType.APPLICATION_XML).method("PATCH", ClientResponse.class, updateCustomer);
-
-        System.out.println(">>>>> " + response.getStatus());
 
         Assert.assertEquals(204, response.getStatus()); // 204 = no content
 
