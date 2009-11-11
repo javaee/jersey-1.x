@@ -426,8 +426,7 @@ public class WebAppDescriptor extends AppDescriptor {
         this.contextPath = b.contextPath;
         this.servletPath = b.servletPath;
         if (b.listeners == null) {
-                List<Class<? extends EventListener>> emptyList = Collections.emptyList();
-                this.listeners = Collections.unmodifiableList(emptyList);
+                this.listeners = Collections.emptyList();
         } else {
                 this.listeners = Collections.unmodifiableList(b.listeners);
         }
