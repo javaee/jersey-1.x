@@ -92,6 +92,10 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
         this.threadLocalHc = threadLocalHc;
     }
     
+    public ComponentScope getScope(Class c) {
+        return ComponentScope.PerRequest;
+    }
+
     public ResourceComponentProvider getComponentProvider(Class c) {
         return new PerRequest();
     }
@@ -113,6 +117,10 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
         
         public final Object getInstance() {
             return getInstance(threadLocalHc);
+        }
+
+        public final ComponentScope getScope() {
+            return ComponentScope.PerRequest;
         }
 
         public void init(AbstractResource abstractResource) {
@@ -170,16 +178,16 @@ public final class PerRequestFactory implements ResourceComponentProviderFactory
             try {
                 return rcc.construct(hc);
             } catch (InstantiationException ex) {
-                throw new ContainerException("Unable to create resource", ex);
+                throw new ContainerException("Unable to create resource " + rcc.getResourceClass(), ex);
             } catch (IllegalAccessException ex) {
-                throw new ContainerException("Unable to create resource", ex);
+                throw new ContainerException("Unable to create resource " + rcc.getResourceClass(), ex);
             } catch (InvocationTargetException ex) {
                 // Propagate the target exception so it may be mapped to a response
                 throw new MappableContainerException(ex.getTargetException());
             } catch (WebApplicationException ex) {
                 throw ex;
             } catch (RuntimeException ex) {
-                throw new ContainerException("Unable to create resource", ex);
+                throw new ContainerException("Unable to create resource " + rcc.getResourceClass(), ex);
             }
         }
     }

@@ -46,6 +46,15 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 public interface IoCComponentProcessorFactory {
     
     /**
+     * Get the scope of the component, if that component is managed
+     * by the Jersey runtime.
+     *
+     * @param c the class to determine the scope from.
+     * @return the scope, otherwise null if the scope cannot be determined.
+     */
+    ComponentScope getScope(Class c);
+
+    /**
      * Get a {@link IoCComponentProcessor} instance given a class
      * and scope.
      *

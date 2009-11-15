@@ -38,9 +38,11 @@ package com.sun.jersey.impl.methodparams;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.inject.Inject;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -50,6 +52,7 @@ import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -73,7 +76,7 @@ public class FormParamTest extends AbstractResourceTester {
     public static class JAXBBean {
 
         public String value;
-        
+
         public JAXBBean() {}
 
         public boolean equals(Object o) {
@@ -88,7 +91,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public class FormResourceX {
+    public static class FormResourceX {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String post(
@@ -104,7 +107,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public class FormResourceY {
+    public static class FormResourceY {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String post(
@@ -146,7 +149,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public class FormParamTypes
+    public static class FormParamTypes
     {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -174,7 +177,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public class FormDefaultValueParamTypes
+    public static class FormDefaultValueParamTypes
     {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -193,7 +196,7 @@ public class FormParamTest extends AbstractResourceTester {
         WebResource r = resource("/");
 
         Form form = new Form();
-        
+
         String s = r.post(String.class, form);
         assertEquals("1 3.14 3.14", s);
     }
@@ -213,7 +216,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public class FormConstructorValueParamTypes
+    public static class FormConstructorValueParamTypes
     {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
@@ -236,7 +239,7 @@ public class FormParamTest extends AbstractResourceTester {
 
 
     @Path("/")
-    public class MultipartFormResourceX {
+    public static class MultipartFormResourceX {
         @POST
         @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
         public String post(
@@ -253,7 +256,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public class MultipartFormResourceY {
+    public static class MultipartFormResourceY {
         @POST
         @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
         public String post(
@@ -314,7 +317,7 @@ public class FormParamTest extends AbstractResourceTester {
 
 
     @Path("/")
-    public class MultipartFormParamTypes
+    public static class MultipartFormParamTypes
     {
         @POST
         @Consumes("multipart/form-data")
@@ -356,7 +359,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public class MultipartFormResourceNull {
+    public static class MultipartFormResourceNull {
         @POST
         @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
         public String post(
@@ -399,7 +402,7 @@ public class FormParamTest extends AbstractResourceTester {
 
 
     @Path("/")
-    public class FormResourceJAXB {
+    public static class FormResourceJAXB {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public JAXBBean post(
@@ -442,7 +445,7 @@ public class FormParamTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public class FormResourceDate {
+    public static class FormResourceDate {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String post(
@@ -474,4 +477,164 @@ public class FormParamTest extends AbstractResourceTester {
         assertEquals("POST", b);
     }
 
+    public class ParamBean {
+        @FormParam("a") String a;
+
+        @FormParam("b") String b;
+
+        @Context UriInfo ui;
+
+        @QueryParam("a") String qa;
+    }
+
+    @Path("/")
+    public static class FormResourceBean {
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String post(
+                @Inject ParamBean pb,
+                @FormParam("a") String a,
+                @FormParam("b") String b,
+                Form form) {
+            assertEquals(pb.a, form.getFirst("a"));
+            assertEquals(pb.b, form.getFirst("b"));
+            return pb.a + pb.b;
+        }
+    }
+
+    public void testFormParamBean() {
+        initiateWebApplication(FormResourceBean.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        form.add("a", "foo");
+        form.add("b", "bar");
+
+        String s = r.post(String.class, form);
+        assertEquals("foobar", s);
+    }
+
+    @Path("/")
+    public static class FormResourceBeanNoFormParam {
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String post(@Inject ParamBean pb) {
+            return pb.a + pb.b;
+        }
+    }
+
+    public void testFormParamBeanNoFormParam() {
+        initiateWebApplication(FormResourceBeanNoFormParam.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        form.add("a", "foo");
+        form.add("b", "bar");
+
+        String s = r.post(String.class, form);
+        assertEquals("foobar", s);
+    }
+
+    @Path("/")
+    public static class FormResourceBeanConstructor {
+        private final ParamBean pb;
+
+        public FormResourceBeanConstructor(@Inject ParamBean pb) {
+            this.pb = pb;
+        }
+
+        @GET
+        public String get() {
+            return "GET";
+        }
+        
+        @POST
+        @Consumes(MediaType.TEXT_PLAIN)
+        public String postText(String s) {
+            return s;
+        }
+        
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String post(String s) {
+            assertTrue(s.contains("a=foo"));
+            assertTrue(s.contains("b=bar"));
+
+            return pb.a + pb.b;
+        }
+    }
+
+    public void testFormParamBeanConstructor() {
+        initiateWebApplication(FormResourceBeanConstructor.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        form.add("a", "foo");
+        form.add("b", "bar");
+
+        String s = r.post(String.class, form);
+        assertEquals("foobar", s);
+    }
+
+    public void testFormParamBeanConstructorIllegalState() {
+        initiateWebApplication(FormResourceBeanConstructor.class);
+
+        WebResource r = resource("/");
+
+        boolean caught = false;
+        try {
+            ClientResponse cr = r.get(ClientResponse.class);
+        } catch (ContainerException ex) {
+            assertEquals(IllegalStateException.class, ex.getCause().getCause().getClass());
+            caught = true;
+        }
+        assertTrue(caught);
+
+
+        caught = false;
+        try {
+            ClientResponse cr = r.post(ClientResponse.class, "text");
+        } catch (ContainerException ex) {
+            assertEquals(IllegalStateException.class, ex.getCause().getCause().getClass());
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+
+
+    @Path("/")
+    public static class FormResourceBeanConstructorFormParam {
+        private final ParamBean pb;
+
+        public FormResourceBeanConstructorFormParam(@Inject ParamBean pb) {
+            this.pb = pb;
+        }
+
+        @POST
+        @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+        public String post(
+                @FormParam("a") String a,
+                @FormParam("b") String b,
+                Form form) {
+            assertEquals(a, form.getFirst("a"));
+            assertEquals(b, form.getFirst("b"));
+            return a + b;
+        }
+    }
+
+    public void testFormParamBeanConstructorFormParam() {
+        initiateWebApplication(FormResourceBeanConstructorFormParam.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        form.add("a", "foo");
+        form.add("b", "bar");
+
+        String s = r.post(String.class, form);
+        assertEquals("foobar", s);
+    }
 }

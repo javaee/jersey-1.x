@@ -292,23 +292,6 @@ public class BasicValidatorTest extends TestCase {
         assertTrue(validator.fatalIssuesFound());
     }
 
-    @Path("emptyResource")
-    public static class TestEmptyResource {
-
-        public void getSRMethod() {
-        }
-    }
-
-    public void testEmptyResource() throws Exception {
-        System.out.println("---\nAn issue should be reported if a resource does not contain any method neither any locator:");
-        AbstractResource ar = IntrospectionModeller.createResource(TestEmptyResource.class);
-        BasicValidator validator = new BasicValidator();
-        validator.validate(ar);
-        printIssueList(validator);
-        assertTrue(!validator.getIssueList().isEmpty());
-        assertTrue(!validator.getIssueList().get(0).isFatal());
-    }
-
     @Path("rootAmbigResourceMethodsGET")
     public static class TestAmbigResourceMethodsGET {
 

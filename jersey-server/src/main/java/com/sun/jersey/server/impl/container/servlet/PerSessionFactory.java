@@ -81,6 +81,10 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
         this.threadLocalHc = threadLocalHc;
     }
 
+    public ComponentScope getScope(Class c) {
+        return ComponentScope.Undefined;
+    }
+
     public ResourceComponentProvider getComponentProvider(Class c) {
         return new PerSesson();
     }
@@ -133,6 +137,10 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
             return getInstance(threadLocalHc);
         }
 
+        public final ComponentScope getScope() {
+            return ComponentScope.Undefined;
+        }
+        
         public final Object getInstance(HttpContext hc) {
             HttpSession hs = hsr.getSession();
 

@@ -80,6 +80,35 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
     public static class Six {
     }
 
+    public void testClone() {
+        List rcSingletons = getList(Arrays.asList(new Four(), new Five(), new Six()));
+        List<Class<?>> rcClasses = getList(Arrays.asList(Four.class, Five.class, Six.class));
+        DefaultResourceConfig rc = new DefaultResourceConfig(
+                rcClasses.toArray(new Class<?>[0]));
+        rc.getSingletons().addAll(rcSingletons);
+        rc.getMediaTypeMappings().put("xml", MediaType.APPLICATION_XML_TYPE);
+        rc.getLanguageMappings().put("en", "en");
+        rc.getExplicitRootResources().put("{test}", new One());
+        rc.getProperties().put("X", "X");
+        rc.getFeatures().put("X", Boolean.TRUE);
+        
+        ResourceConfig clone = rc.clone();
+
+        assertEquals(rcClasses, new ArrayList(clone.getClasses()));
+
+        assertEquals(rcSingletons, new ArrayList(clone.getSingletons()));
+
+        assertEquals(MediaType.APPLICATION_XML_TYPE, clone.getMediaTypeMappings().get("xml"));
+
+        assertEquals("en", clone.getLanguageMappings().get("en"));
+
+        assertEquals(One.class, clone.getExplicitRootResources().get("{test}").getClass());
+
+        assertEquals("X", rc.getProperties().get("X"));
+
+        assertTrue(rc.getFeatures().get("X"));
+    }
+
     public void testAdd() {
         List rc1Singletons = getList(Arrays.asList(new One(), new Two(), new Three()));
         DefaultResourceConfig rc1 = new DefaultResourceConfig(
@@ -93,8 +122,9 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         rc2.getSingletons().addAll(rc2Singletons);
         rc2.getMediaTypeMappings().put("xml", MediaType.APPLICATION_XML_TYPE);
         rc2.getLanguageMappings().put("en", "en");
-
         rc2.getExplicitRootResources().put("{test}", new One());
+        rc2.getProperties().put("X", "X");
+        rc2.getFeatures().put("X", Boolean.TRUE);
 
         rc1.add(rc2);
 
@@ -112,5 +142,9 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         assertEquals("en", rc1.getLanguageMappings().get("en"));
 
         assertEquals(One.class, rc1.getExplicitRootResources().get("{test}").getClass());
+
+        assertEquals("X", rc1.getProperties().get("X"));
+
+        assertTrue(rc1.getFeatures().get("X"));
     }
 }

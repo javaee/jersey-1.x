@@ -58,13 +58,13 @@ public class DefaultResourceConfig extends ResourceConfig {
     
     private final Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
     
-    private final Set<Object> singletons = new LinkedHashSet<Object>();
+    private final Set<Object> singletons = new LinkedHashSet<Object>(1);
     
-    private final Map<String, MediaType> mediaExtentions = new HashMap<String, MediaType>();
+    private final Map<String, MediaType> mediaExtentions = new HashMap<String, MediaType>(1);
     
-    private final Map<String, String> languageExtentions = new HashMap<String, String>();
+    private final Map<String, String> languageExtentions = new HashMap<String, String>(1);
 
-    private final Map<String, Object> explicitRootResources = new HashMap<String, Object>();
+    private final Map<String, Object> explicitRootResources = new HashMap<String, Object>(1);
 
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     

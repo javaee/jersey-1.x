@@ -135,7 +135,9 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
     }
 
     private synchronized void setId() {
-        hc.getProperties().put("request-id", Long.toString(++id));
+        if ( hc.getProperties().get("request-id") == null) {
+            hc.getProperties().put("request-id", Long.toString(++id));
+        }
     }
 
     private StringBuilder prefixId(StringBuilder b) {
@@ -237,10 +239,12 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
                 OutputStream out = crw.writeStatusAndHeaders(-1, response);
                 out.write(entity);
             }
+            crw.finish();
         }
     }
 
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+        setId();
         response.setContainerResponseWriter(
                 new Adapter(response.getContainerResponseWriter()));
         return response;

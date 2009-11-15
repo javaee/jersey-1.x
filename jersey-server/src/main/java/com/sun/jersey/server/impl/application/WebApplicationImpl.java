@@ -77,7 +77,6 @@ import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.ResourceConfigurator;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.spi.component.ComponentInjector;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderFactory;
@@ -128,11 +127,13 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.impl.BuildId;
+import com.sun.jersey.server.impl.model.parameter.FormParamInjectableProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorFactory;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
+import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
@@ -140,6 +141,7 @@ import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -161,7 +163,54 @@ public final class WebApplicationImpl implements WebApplication {
 
     private final ConcurrentMap<Class, ResourceClass> metaClassMap =
             new ConcurrentHashMap<Class, ResourceClass>();
-    
+
+    private static class ClassAnnotationKey {
+        private final Class c;
+
+        private final Set<Annotation> as;
+
+        public ClassAnnotationKey(Class c, Annotation[] as) {
+            this.c = c;
+            this.as = new HashSet<Annotation>(Arrays.asList(as));
+        }
+
+        /**
+         * @return the c
+         */
+        public Class getClassKey() {
+            return c;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 67 * hash + (this.c != null ? this.c.hashCode() : 0);
+            hash = 67 * hash + (this.as != null ? this.as.hashCode() : 0);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ClassAnnotationKey other = (ClassAnnotationKey) obj;
+            if (this.c != other.c && (this.c == null || !this.c.equals(other.c))) {
+                return false;
+            }
+            if (this.as != other.as && (this.as == null || !this.as.equals(other.as))) {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    private final ConcurrentMap<ClassAnnotationKey, ResourceClass> metaClassAnnotationKeyMap =
+            new ConcurrentHashMap<ClassAnnotationKey, ResourceClass>();
+
     private final ThreadLocalHttpContext context;
     
     private final CloseableServiceFactory closeableFactory;
@@ -274,6 +323,35 @@ public final class WebApplicationImpl implements WebApplication {
             }
         });
 
+        injectableFactory.add(new InjectableProvider<Inject, Type>() {
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
+            }
+
+            public Injectable<Injectable> getInjectable(ComponentContext ic, Inject a, Type c) {
+                if (c instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)c;
+                    if (pt.getRawType() == Injectable.class) {
+                        if (pt.getActualTypeArguments().length == 1) {
+                            final Injectable<?> i = injectableFactory.getInjectable(
+                                    a.annotationType(),
+                                    ic,
+                                    a,
+                                    pt.getActualTypeArguments()[0],
+                                    ComponentScope.PERREQUEST_UNDEFINED_SINGLETON);
+                            return new Injectable<Injectable>() {
+                                public Injectable getValue() {
+                                    return i;
+                                }
+                            };
+                        }
+                    }
+                }
+
+                return null;
+            }
+        });
+
         closeableFactory = new CloseableServiceFactory(context);
         injectableFactory.add(closeableFactory);
     }
@@ -292,7 +370,7 @@ public final class WebApplicationImpl implements WebApplication {
             rci.inject(context.get(), o);
         }
     }
-
+    
     private static final IoCComponentProcessor NULL_COMPONENT_PROCESSOR = new IoCComponentProcessor() {
         public void preConstruct() {
         }
@@ -305,6 +383,10 @@ public final class WebApplicationImpl implements WebApplication {
         private final ConcurrentMap<Class, IoCComponentProcessor> componentProcessorMap =
                 new ConcurrentHashMap<Class, IoCComponentProcessor>();
 
+        public ComponentScope getScope(Class c) {
+            return rcpFactory.getScope(c);
+        }
+        
         public IoCComponentProcessor get(Class c, ComponentScope scope) {
             IoCComponentProcessor cp = componentProcessorMap.get(c);
             if (cp != null) {
@@ -338,7 +420,7 @@ public final class WebApplicationImpl implements WebApplication {
         return wa;
     }
 
-    public ResourceClass getResourceClass(Class c) {
+    public ResourceClass getResourceClass(final Class c) {
         assert c != null;
 
         // Try the non-blocking read, the most common opertaion
@@ -366,6 +448,52 @@ public final class WebApplicationImpl implements WebApplication {
         return rc;
     }
 
+    public ResourceClass getResourceClass(final ComponentContext cc, final Class c) {
+        assert c != null;
+
+        if (cc == null || cc.getAnnotations().length == 0)
+            return getResourceClass(c);
+
+        if (cc.getAnnotations().length == 1) {
+            final Annotation a = cc.getAnnotations()[0];
+            if (a.annotationType() == Inject.class) {
+                final Inject i = Inject.class.cast(a);
+                final String value = (i.value() != null)
+                        ? i.value().trim()
+                        : "";
+                if (value.length() == 0)
+                    return getResourceClass(c);
+            }
+        }
+        
+        final ClassAnnotationKey cak = new ClassAnnotationKey(c,
+                cc.getAnnotations());
+
+        // Try the non-blocking read, the most common opertaion
+        ResourceClass rc = metaClassAnnotationKeyMap.get(cak);
+        if (rc != null) {
+            return rc;
+        }
+
+        // ResourceClass is not present use a synchronized block
+        // to ensure that only one ResourceClass instance is created
+        // and put to the map
+        synchronized (metaClassMap) {
+            // One or more threads may have been blocking on the synchronized
+            // block, re-check the map
+            rc = metaClassAnnotationKeyMap.get(cak);
+            if (rc != null) {
+                return rc;
+            }
+
+            rc = newResourceClass(getAbstractResource(c));
+            rc.init(rcpFactory, cc);
+
+            metaClassAnnotationKeyMap.put(cak, rc);
+        }
+        return rc;
+    }
+
     private ResourceClass getResourceClass(AbstractResource ar) {
         if (metaClassMap.containsKey(ar.getResourceClass()))
             return metaClassMap.get(ar.getResourceClass());
@@ -382,7 +510,7 @@ public final class WebApplicationImpl implements WebApplication {
 
         ResourceClass rc = newResourceClass(ar);
         metaClassMap.put(ar.getResourceClass(), rc);
-        rc.init(resource);
+        rc.initSingleton(resource);
         return rc;
     }
 
@@ -469,7 +597,8 @@ public final class WebApplicationImpl implements WebApplication {
                 LOGGER.log(Level.INFO, b.toString());
             }
 
-            this.resourceConfig = new ComponentsResourceConfig(rc, components);
+            this.resourceConfig = rc.clone();
+            this.resourceConfig.getClasses().addAll(Arrays.asList(components));
         } else {
             this.resourceConfig = rc;
         }
@@ -487,6 +616,18 @@ public final class WebApplicationImpl implements WebApplication {
         if (_provider != null)
             providerFactories.add(_provider);
 
+        // Set up the component provider factory to be
+        // used with non-resource class components
+        this.cpFactory = (providerFactories.isEmpty())
+                ? new ProviderFactory(injectableFactory)
+                : new IoCProviderFactory(injectableFactory, providerFactories);
+
+        // Set up the resource component provider factory
+        this.rcpFactory = (providerFactories.isEmpty())
+                ? new ResourceFactory(this.resourceConfig, this.injectableFactory)
+                : new IoCResourceFactory(this.resourceConfig, this.injectableFactory, providerFactories);
+
+        // Initiate IoCComponentProcessorFactoryInitializer
         for (IoCComponentProviderFactory f : providerFactories) {
             IoCComponentProcessorFactory cpf = null;
             if (f instanceof IoCComponentProcessorFactoryInitializer) {
@@ -498,18 +639,7 @@ public final class WebApplicationImpl implements WebApplication {
             }
 
         }
-
-        // Set up the component provider factory to be
-        // used with non-resource class components
-        this.cpFactory = (providerFactories.isEmpty())
-                ? new ProviderFactory(injectableFactory)
-                : new IoCProviderFactory(injectableFactory, providerFactories);
-
-        // Set up the resource component provider factory
-        this.rcpFactory = (providerFactories.isEmpty())
-                ? new ResourceFactory(this.resourceConfig, this.injectableFactory)
-                : new IoCResourceFactory(this.resourceConfig, this.injectableFactory, providerFactories);
-                
+         
         this.resourceContext = new ResourceContext() {
             public <T> T getResource(Class<T> c) {
                 final ResourceClass rc = getResourceClass(c);
@@ -528,38 +658,70 @@ public final class WebApplicationImpl implements WebApplication {
                 resourceConfig.getProviderSingletons());
 
         // Add injectable provider for @Inject
+
+        injectableFactory.add(
+            new InjectableProvider<Inject, Type>() {
+                    public ComponentScope getScope() {
+                        return ComponentScope.PerRequest;
+                    }
+
+                    public Injectable<Object> getInjectable(ComponentContext cc, Inject a, Type t) {
+                        if (!(t instanceof Class))
+                            return null;
+
+                        final ResourceComponentProvider rcp = getResourceClass(cc, (Class)t).rcProvider;
+
+                        return new Injectable<Object>() {
+                            public Object getValue() {
+                                return rcp.getInstance(context);
+                            }
+                        };
+                    }
+
+                });
+
         injectableFactory.add(
             new InjectableProvider<Inject, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.Undefined;
                     }
 
-                    @SuppressWarnings("unchecked")
-                    public Injectable<Object> getInjectable(ComponentContext ic, Inject a, final Type c) {
-                        if (!(c instanceof Class))
+                    public Injectable<Object> getInjectable(ComponentContext cc, Inject a, Type t) {
+                        if (!(t instanceof Class))
                             return null;
 
-                        if (providerFactories.isEmpty())
+                        final ResourceComponentProvider rcp = getResourceClass(cc, (Class)t).rcProvider;
+                        if (rcp.getScope() == ComponentScope.PerRequest)
                             return null;
-
-                        for (IoCComponentProviderFactory f : providerFactories) {
-                            final IoCComponentProvider p = f.getComponentProvider(ic, (Class)c);
-                            if (p != null) {
-                                return new Injectable<Object>() {
-                                    public Object getValue() {
-                                        try {
-                                            return p.getInstance();
-                                        } catch (Exception e) {
-                                            LOGGER.log(Level.SEVERE, "Could not get instance from IoC component provider for type " +
-                                                    c, e);
-                                            throw new ContainerException("Could not get instance from IoC component provider for type " +
-                                                    c, e);
-                                        }
-                                    }
-                                };
+                        
+                        return new Injectable<Object>() {
+                            public Object getValue() {
+                                return rcp.getInstance(context);
                             }
-                        }
-                        return null;
+                        };
+                    }
+
+                });
+
+        injectableFactory.add(
+            new InjectableProvider<Inject, Type>() {
+                    public ComponentScope getScope() {
+                        return ComponentScope.Singleton;
+                    }
+
+                    public Injectable<Object> getInjectable(ComponentContext cc, Inject a, Type t) {
+                        if (!(t instanceof Class))
+                            return null;
+
+                        final ResourceComponentProvider rcp = getResourceClass(cc, (Class)t).rcProvider;
+                        if (rcp.getScope() != ComponentScope.Singleton)
+                            return null;
+
+                        return new Injectable<Object>() {
+                            public Object getValue() {
+                                return rcp.getInstance(context);
+                            }
+                        };
                     }
 
                 });
@@ -569,8 +731,24 @@ public final class WebApplicationImpl implements WebApplication {
                 FeaturesAndProperties.class, resourceConfig));
 
         // Allow injection of resource config
-        injectableFactory.add(new ContextInjectableProvider<ResourceConfig>(
-                ResourceConfig.class, resourceConfig));
+        // Since the resourceConfig reference can change refer to the
+        // reference directly.
+        injectableFactory.add(
+            new InjectableProvider<Context, Type>() {
+                    public ComponentScope getScope() {
+                        return ComponentScope.Singleton;
+                    }
+
+                    public Injectable<ResourceConfig> getInjectable(ComponentContext cc, Context a, Type t) {
+                        if (t != ResourceConfig.class)
+                            return null;
+                        return new Injectable<ResourceConfig>() {
+                            public ResourceConfig getValue() {
+                                return resourceConfig;
+                            }
+                        };
+                    }
+                });
 
         // Allow injection of resource context
         injectableFactory.add(new ContextInjectableProvider<ResourceContext>(
@@ -584,6 +762,9 @@ public final class WebApplicationImpl implements WebApplication {
         // Create application-declared Application instance as a component
         if (rc instanceof DeferredResourceConfig) {
             DeferredResourceConfig drc = (DeferredResourceConfig)rc;
+            // Check if resource config has already been cloned
+            if (resourceConfig == drc)
+                resourceConfig = drc.clone();
             resourceConfig.add(drc.getApplication(cpFactory));
             updateRequired = true;
         }
@@ -682,6 +863,7 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new MatrixParamInjectableProvider(mpep));
         injectableFactory.add(new PathParamInjectableProvider(mpep));
         injectableFactory.add(new QueryParamInjectableProvider(mpep));
+        injectableFactory.add(new FormParamInjectableProvider(mpep));
 
         // Intiate filters
         filterFactory = new FilterFactory(providerServices, resourceConfig);
@@ -743,6 +925,10 @@ public final class WebApplicationImpl implements WebApplication {
 
     public void destroy() {
         for (ResourceClass rc : metaClassMap.values()) {
+            rc.destroy();
+        }
+
+        for (ResourceClass rc : metaClassAnnotationKeyMap.values()) {
             rc.destroy();
         }
 

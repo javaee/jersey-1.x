@@ -1,4 +1,52 @@
 release 1.1.5 (2010)
+- Fixed issue 422
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=422
+  The container response filter of the server-side LoggingFilter now ensures
+  that when the ServletContainer is utilized response headers are written when
+  there is no response entity present.
+  This was a regression as the ContainerResponseAdapter of the LoggingFilter
+  was not correctly adapting the finish method.
+- Fixed issue 423
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=423
+  Injection on to 299 managed beans in the dependent scope (scope is managed
+  by Jersey) is correctly supported for Jersey-based injection artifacts
+  such as @Context ResourceContext and @Inject T.
+- Fixed issue 125
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=125
+  @FormParam injection is supported for the same targets as other @*Param
+  annotations. Injection will only occur if there is a request entity
+  of the type "application/x-www-form-urlencoded", otherwise an
+  IllegalStateException will be thrown.
+  Form parameter beans are now supported, and the 
+  @com.sun.jersey.spi.inject.Inject annotation may now be utilized to obtain
+  such beans, for example:
+    class MyFormBean {
+       @FormParam("a") String a;
+       @FormParam("b") String b;
+    }
+
+    @Path("foo")
+    class MyResource {
+      @POST
+      public ... post(@Inject MyFormBean b) { ... }
+    }
+- Fixed issue 424
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=424
+  The @com.sun.jersey.spi.inject.Inject annotation may now be utilized to inject
+  a resource class.
+  This is the recommend over the approach of using ResourceContext.
+  If a per-request managed resource is required to be injected into a
+  singleton managed resource then the resource class can be declared as the
+  parameterized type of Injectable, for example:
+    @Inject Injectable<MyPerRequestResource>
+- Fixed issue 418
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=418
+  Reloading of the servlet container no longer retains previous references to
+  root reosurce and provider classes declared in an extension of Application
+  or ResourceConfig.
+  The root cause: the WebApplication implementation was not cloning the
+  ResourceConfig instance passed to it on initiation if additional
+  root resource and provider classes needed to be added.
 - Added examples from Bill Burke's book "RESTful Java with JAX-RS"
   modified to be runnable with Jersey and with additional tests.
 - Apache HTTP Client now supports custom HTTP methods.

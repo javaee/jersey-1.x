@@ -49,6 +49,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.MessageBodyWorkers;
+import com.sun.jersey.spi.resource.Singleton;
 import com.sun.jersey.spi.template.TemplateContext;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -89,8 +90,7 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
 
     public static interface SingletonScope {}
     
-    @Path("/")
-    public static class MyResource implements PostConstructListener, PerRequestScope {
+    public static class AbstractResource implements PostConstructListener {
         @Context ResourceConfig rc;
 
         @Context MessageBodyWorkers mbw;
@@ -111,13 +111,6 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
 
         @Context Providers p;
 
-        @QueryParam("q") String q;
-        
-        @GET
-        public String get() {
-            return "GET " + q + " " + ui.getRequestUri();
-        }
-
         public void postConstruct() {
             assertNotNull(rc);
             assertNotNull(mbw);
@@ -129,6 +122,31 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
             assertNotNull(r);
             assertNotNull(sc);
             assertNotNull(p);
+        }
+    }
+
+    @Path("/perrequest")
+    public static class PerRequestResource extends AbstractResource implements PerRequestScope {
+        @QueryParam("q") String q;
+
+        @Override
+        public void postConstruct() {
+            super.postConstruct();
+            assertNotNull(q);
+        }
+        
+        @GET
+        public String get() {
+            return "GET " + q + " " + ui.getRequestUri();
+        }
+    }
+
+    @Path("/singleton")
+    @Singleton
+    public static class SingletonResource extends AbstractResource implements SingletonScope {
+        @GET
+        public String get(@QueryParam("q") String q) {
+            return "GET " + q + " " + ui.getRequestUri();
         }
     }
 
@@ -193,7 +211,9 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
 
         public IoCComponentProvider getComponentProvider(final Class c) {
             if (PostConstructListener.class.isAssignableFrom(c)) {
-                ComponentScope cs = SingletonScope.class.isAssignableFrom(c) ? ComponentScope.Singleton : ComponentScope.PerRequest;
+                final ComponentScope cs = (!c.isAnnotationPresent(Provider.class))
+                        ? cpf.getScope(c)
+                        : ComponentScope.Singleton;
                 final IoCComponentProcessor cp = cpf.get(c, cs);
 
                 if (cp != null) {
@@ -212,6 +232,10 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
                             ((PostConstructListener)o).postConstruct();
                             return o;
                         }
+
+                        public ComponentScope getScope() {
+                            return cs;
+                        }
                     };
                 } else {
                     return new IoCFullyManagedComponentProvider() {
@@ -227,6 +251,10 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
                             }
                             return o;
                         }
+
+                        public ComponentScope getScope() {
+                            return cs;
+                        }
                     };
                 }
             } else {
@@ -240,10 +268,14 @@ public class IoCComponentProcessorTest extends AbstractResourceTester {
     }
 
     public void testInjected() throws IOException {
-        initiateWebApplication(new MyIoCComponentProviderFactory(), MyResource.class, MyProvider.class);
+        initiateWebApplication(new MyIoCComponentProviderFactory(), 
+                PerRequestResource.class, SingletonResource.class, MyProvider.class);
 
-        String s = resource("/").queryParam("q", "p").get(String.class);
-        assertEquals("GET p test:/base/?q=p test:/base/?q=p", s);
+        String s = resource("/perrequest").queryParam("q", "p").get(String.class);
+        assertEquals("GET p test:/base/perrequest?q=p test:/base/perrequest?q=p", s);
+
+        s = resource("/singleton").queryParam("q", "p").get(String.class);
+        assertEquals("GET p test:/base/singleton?q=p test:/base/singleton?q=p", s);
     }
 
 

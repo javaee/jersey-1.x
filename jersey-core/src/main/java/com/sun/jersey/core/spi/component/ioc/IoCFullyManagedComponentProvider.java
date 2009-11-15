@@ -36,6 +36,8 @@
  */
 package com.sun.jersey.core.spi.component.ioc;
 
+import com.sun.jersey.core.spi.component.ComponentScope;
+
 /**
  * An IoC-fully-managed component provider.
  * <p>
@@ -53,4 +55,10 @@ package com.sun.jersey.core.spi.component.ioc;
  * @see IoCComponentProcessorFactory
  */
 public interface IoCFullyManagedComponentProvider extends IoCComponentProvider {
+    /**
+     * Get the scope.
+     *
+     * @return the scope.
+     */
+    ComponentScope getScope();
 }

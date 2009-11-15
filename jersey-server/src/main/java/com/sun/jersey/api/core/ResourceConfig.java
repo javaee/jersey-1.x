@@ -642,4 +642,31 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
         a.clear();
         a.addAll(x);
     }
+
+    /**
+     * Clone this resource configuration.
+     * <p>
+     * The set of classes, set of singletons, map of explicit root resources,
+     * map of language mappings, map of media type mappings, map of features and
+     * map of properties will be cloned.
+     *
+     * @return a cloned instance of this resource configuration.
+     */
+    @Override
+    public ResourceConfig clone() {
+        ResourceConfig that = new DefaultResourceConfig();
+
+        that.getClasses().addAll(this.getClasses());
+        that.getSingletons().addAll(this.getSingletons());
+
+        that.getExplicitRootResources().putAll(this.getExplicitRootResources());
+
+        that.getLanguageMappings().putAll(this.getLanguageMappings());
+        that.getMediaTypeMappings().putAll(this.getMediaTypeMappings());
+
+        that.getFeatures().putAll(this.getFeatures());
+        that.getProperties().putAll(this.getProperties());
+        
+        return that;
+    }
 }

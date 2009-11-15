@@ -288,6 +288,10 @@ public class Client extends Filterable implements ClientHandler {
             this.injectableFactory = injectableFactory;
         }
 
+        public ComponentScope getScope(Class c) {
+            return ComponentScope.Singleton;
+        }
+
         public IoCComponentProcessor get(Class c, ComponentScope scope) {
             final ComponentInjector ci = new ComponentInjector(injectableFactory, c);
             return new IoCComponentProcessor() {

@@ -149,6 +149,10 @@ public class ResourceComponentConstructor {
         }
     }
 
+    public Class getResourceClass() {
+        return c;
+    }
+    
     public Object construct(HttpContext hc)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
@@ -159,7 +163,7 @@ public class ResourceComponentConstructor {
         return o;
     }
     
-    public Object _construct(HttpContext hc)
+    private Object _construct(HttpContext hc)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         if (constructor == null) {

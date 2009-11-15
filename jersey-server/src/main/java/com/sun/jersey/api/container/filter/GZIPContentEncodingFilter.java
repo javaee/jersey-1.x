@@ -107,6 +107,7 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
 
         public void finish() throws IOException {
             gos.finish();
+            crw.finish();
         }
     }
 

@@ -37,7 +37,6 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
-import com.sun.jersey.api.ParamException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -45,8 +44,6 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
-import com.sun.jersey.server.impl.model.parameter.multivalued.ExtractorContainerException;
-import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Injectable;
@@ -144,27 +141,6 @@ public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider
         }
     }
 
-    private static final class FormParamInjectable extends AbstractHttpContextInjectable<Object> {
-        private final MultivaluedParameterExtractor extractor;
-        private final boolean decode;
-
-        FormParamInjectable(MultivaluedParameterExtractor extractor, boolean decode) {
-            this.extractor = extractor;
-            this.decode = decode;
-        }
-
-        public Object getValue(HttpContext context) {
-            Form form = (Form)
-                    context.getProperties().get(FORM_PROPERTY);
-            try {
-                return extractor.extract(form);
-            } catch (ExtractorContainerException e) {
-                throw new ParamException.FormParamException(e.getCause(),
-                        extractor.getName(), extractor.getDefaultStringValue());
-            }
-        }
-    }
-
     protected List<Injectable> getInjectables(AbstractResourceMethod method) {
         List<Injectable> is = new ArrayList<Injectable>(method.getParameters().size());
         for (int i = 0; i < method.getParameters().size(); i++) {
@@ -176,12 +152,6 @@ public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider
                             p.getParameterType(), p.getAnnotations()));
                 } else
                     return null;
-            } else if (p.getAnnotation().annotationType() == FormParam.class) {
-                MultivaluedParameterExtractor e = mpep.get(p);
-                if (e == null)
-                    return null;
-                is.add(new FormParamInjectable(e, !p.isEncoded()));
-                
             } else {
                 Injectable injectable = getInjectableProviderContext().
                         getInjectable(p, ComponentScope.PerRequest);

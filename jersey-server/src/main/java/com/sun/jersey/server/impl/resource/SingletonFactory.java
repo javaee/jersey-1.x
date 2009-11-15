@@ -69,6 +69,10 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
         this.sipc = sipc;
     }
 
+    public ComponentScope getScope(Class c) {
+        return ComponentScope.Singleton;
+    }
+
     public ResourceComponentProvider getComponentProvider(Class c) {
         return new Singleton();
     }
@@ -99,6 +103,10 @@ public final class SingletonFactory implements ResourceComponentProviderFactory 
             return resource;
         }
 
+        public final ComponentScope getScope() {
+            return ComponentScope.Singleton;
+        }
+        
         public void destroy() {
             try {
                 rcd.destroy(resource);

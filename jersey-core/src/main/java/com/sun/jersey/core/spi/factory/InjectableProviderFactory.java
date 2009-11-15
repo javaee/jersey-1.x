@@ -206,14 +206,14 @@ public class InjectableProviderFactory implements InjectableProviderContext {
             if (i != null)
                 return i;
             else {
-                // TODO log warnings if injection cannot be performed
-                // This is a little tricky for injection of 
-                // ContextResolver<JAXBContext> as it is meant to be null 
-                // or an aggregation.
-                // LOGGER.warning(ic.getAccesibleObject().toString());
             }
         }
         
+        // TODO log warnings if injection cannot be performed
+        // This is a little tricky for injection of
+        // ContextResolver<JAXBContext> as it is meant to be null
+        // or an aggregation.
+        // LOGGER.warning(ic.getAccesibleObject().toString());
         return null;
     }
     

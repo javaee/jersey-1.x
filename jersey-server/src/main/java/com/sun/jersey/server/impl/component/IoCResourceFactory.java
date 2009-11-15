@@ -39,6 +39,7 @@ package com.sun.jersey.server.impl.component;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
@@ -66,14 +67,14 @@ public class IoCResourceFactory extends ResourceFactory {
     }
 
     @Override
-    public ResourceComponentProvider getComponentProvider(Class c) {
+    public ResourceComponentProvider getComponentProvider(ComponentContext cc, Class c) {
         IoCComponentProvider icp = null;
         for (IoCComponentProviderFactory f : factories) {
-            icp = f.getComponentProvider(c);
+            icp = f.getComponentProvider(cc, c);
             if (icp != null)
                 break;
         }
-        return (icp == null) ? super.getComponentProvider(c) : wrap(c, icp);
+        return (icp == null) ? super.getComponentProvider(cc, c) : wrap(c, icp);
     }
 
     private ResourceComponentProvider wrap(Class c, IoCComponentProvider icp) {
@@ -105,6 +106,10 @@ public class IoCResourceFactory extends ResourceFactory {
         public void init(AbstractResource abstractResource) {
         }
 
+        public ComponentScope getScope() {
+            return ifmcp.getScope();
+        }
+
         public Object getInstance(HttpContext hc) {
             return ifmcp.getInstance();
         }
@@ -132,6 +137,10 @@ public class IoCResourceFactory extends ResourceFactory {
                     ipc,
                     ComponentScope.PerRequest,
                     abstractResource);
+        }
+
+        public ComponentScope getScope() {
+            return ComponentScope.PerRequest;
         }
 
         public Object getInstance(HttpContext hc) {
@@ -167,6 +176,10 @@ public class IoCResourceFactory extends ResourceFactory {
             rci.inject(null, imcp.getInjectableInstance(o));
         }
 
+        public ComponentScope getScope() {
+            return ComponentScope.Singleton;
+        }
+
         public Object getInstance(HttpContext hc) {
             return o;
         }
@@ -194,6 +207,10 @@ public class IoCResourceFactory extends ResourceFactory {
                     ipc,
                     ComponentScope.Undefined,
                     abstractResource);
+        }
+
+        public ComponentScope getScope() {
+            return ComponentScope.Undefined;
         }
 
         public Object getInstance(HttpContext hc) {

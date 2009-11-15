@@ -30,6 +30,7 @@ import javax.ws.rs.Produces;
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.resource.Singleton;
+import junit.framework.Assert;
 
 /**
  * A resource class that injects two spring beans of the same type using the
@@ -39,33 +40,38 @@ import com.sun.jersey.spi.resource.Singleton;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
-@Path( NameBasedInjectingResource.PATH )
+@Path(NameBasedInjectingResource.PATH)
 @Singleton
 public class NameBasedInjectingResource {
-    
+
     static final String PATH = "NameBasedInjectingResource";
-    
-    @Inject( "namedItem3_1" )
+
+    @Inject("namedItem3_1")
     private Item3 _item1;
-    @Inject( "namedItem3_2" )
+
+    @Inject("namedItem3_2")
     private Item3 _item2;
-    
+
     public NameBasedInjectingResource() {
     }
 
     @GET
-    @Path( "{value}" )
-    @Produces( "application/xml" )
-    public Item3 getItemByValue( @PathParam( "value" ) String value ) {
-        if ( value.equals( _item1.getValue() ) ) {
+    @Path("{value}")
+    @Produces("application/xml")
+    public Item3 getItemByValue(
+            @PathParam("value") String value,
+            @Inject("namedItem3_1") Item3 item1,
+            @Inject("namedItem3_2") Item3 item2) {
+
+        Assert.assertEquals(item1, _item1);
+        Assert.assertEquals(item2, _item2);
+        
+        if (value.equals(_item1.getValue())) {
             return _item1;
-        }
-        else if ( value.equals( _item2.getValue() ) ) {
+        } else if (value.equals(_item2.getValue())) {
             return _item2;
-        }
-        else {
-            throw new NotFoundException( "No item with value '" + value + "' found." );
+        } else {
+            throw new NotFoundException("No item with value '" + value + "' found.");
         }
     }
-    
 }

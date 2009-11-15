@@ -41,7 +41,9 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ComponentConstructor;
+import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentInjector;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import java.lang.annotation.Annotation;
@@ -69,7 +71,11 @@ public class ResourceFactory {
         return ipc;
     }
 
-    public ResourceComponentProvider getComponentProvider(Class c) {
+    public ComponentScope getScope(Class c) {
+        return getComponentProviderFactory(c).getScope(c);
+    }
+
+    public ResourceComponentProvider getComponentProvider(ComponentContext cc, Class c) {
         return getComponentProviderFactory(c).getComponentProvider(c);
     }
 
@@ -79,8 +85,7 @@ public class ResourceFactory {
         // Use annotations to identify the correct provider, note that
         // @ResourceComponentProviderClass is a meta-annotation so we look for annotations
         // on the annotations of the resource class
-        Annotation annotations[] = c.getAnnotations();
-        for (Annotation a: annotations) {
+        for (Annotation a: c.getAnnotations()) {
             Class<?> annotationClass = a.annotationType();
             ResourceComponentProviderFactoryClass rf = annotationClass.getAnnotation(
                     ResourceComponentProviderFactoryClass.class);

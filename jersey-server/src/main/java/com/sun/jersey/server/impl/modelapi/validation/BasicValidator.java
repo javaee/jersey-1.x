@@ -84,13 +84,6 @@ import javax.ws.rs.core.MediaType;
 public class BasicValidator extends AbstractModelValidator {
 
     public void visitAbstractResource(AbstractResource resource) {
-        // resource should have at least one resource method, subresource method or subresource locator
-        if ((resource.getResourceMethods().size() + resource.getSubResourceMethods().size() + resource.getSubResourceLocators().size()) == 0) {
-            issueList.add(new ResourceModelIssue(
-                    resource,
-                    ImplMessages.ERROR_NO_SUB_RES_METHOD_LOCATOR_FOUND(resource.getResourceClass()),
-                    false)); // there might still be Views associated with the resource
-        }
         // uri template of the resource, if present should not contain null value
         if (resource.isRootResource() && ((null == resource.getPath()) || (null == resource.getPath().getValue()))) {
             issueList.add(new ResourceModelIssue(

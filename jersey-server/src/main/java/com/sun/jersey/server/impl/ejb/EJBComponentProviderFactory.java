@@ -38,6 +38,7 @@ package com.sun.jersey.server.impl.ejb;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
@@ -140,6 +141,10 @@ final class EJBComponentProviderFactory implements
 
         EJBManagedComponentProvider(Object o) {
             this.o = o;
+        }
+
+        public ComponentScope getScope() {
+            return ComponentScope.Singleton;
         }
 
         public Object getInstance() {

@@ -36,8 +36,8 @@
  */
 package com.sun.jersey.spi.inject;
 
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -46,15 +46,16 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Used to annotate fields or parameters that shall be injected with instances 
- * obtained from the registered IoC component provider factory (if any).
+ * Used to annotate fields or parameters that shall be injected with 
+ * resource class instances or instances obtained from registered
+ * IoC component provider factories (if any).
  * <p>
  * If the name of instance to inject is not recognized or there is no IoC
  * component provider factory registered then no injection will occur.
  *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */
-@Target({FIELD, PARAMETER, CONSTRUCTOR })
+@Target({PARAMETER, METHOD, FIELD})
 @Retention(RUNTIME)
 @Documented
 public @interface Inject {

@@ -63,6 +63,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.enterprise.inject.spi.ProcessInjectionTarget;
+import javax.ws.rs.ext.Provider;
 
 /**
  *
@@ -75,6 +76,14 @@ public class JCDIComponentProviderFactory implements
     private static final Logger LOGGER = Logger.getLogger(
             JCDIComponentProviderFactory.class.getName());
 
+    private static final IoCComponentProcessor NULL_COMPONENT_PROCESSOR = new IoCComponentProcessor() {
+        public void preConstruct() {
+        }
+
+        public void postConstruct(Object o) {
+        }
+    };
+    
     private final BeanManager bm;
 
     public JCDIComponentProviderFactory(Object bm) {
@@ -100,17 +109,41 @@ public class JCDIComponentProviderFactory implements
                     !c.isAnnotationPresent(ManagedBean.class))
                 continue;
 
-            final IoCComponentProcessor icp = cpf.get(c, getComponentScope(b));
-            if (icp == null)
-                continue;
+            final ComponentScope cs = (s == Dependent.class)
+                    ? cpf.getScope(c)
+                    : (c.isAnnotationPresent(Provider.class))
+                        ? ComponentScope.Singleton
+                        : getComponentScope(b);
 
             LOGGER.info("Adapting InjectionTarget for " + c.getName() + " in the scope " + b.getScope());
 
             final InjectionTarget it = pit.getInjectionTarget();
             final InjectionTarget nit = new InjectionTarget() {
+                private volatile IoCComponentProcessor icp;
+
+                private IoCComponentProcessor getProcessor() {
+                    IoCComponentProcessor result = icp;
+                    if (result == null) { // First check (no locking)
+                        synchronized(this) {
+                            result = icp;
+                            if (result == null) // Second check (with locking)
+                                icp = result = computeProcessor();
+                        }
+                    }
+                    return result;
+                }
+
+                private IoCComponentProcessor computeProcessor() {
+                    IoCComponentProcessor icp = cpf.get(c, cs);
+                    if (icp == null) {
+                        return NULL_COMPONENT_PROCESSOR;
+                    }
+                    return icp;
+                }
+
                 public void inject(Object t, CreationalContext cc) {
                     it.inject(t, cc);
-                    icp.postConstruct(t);
+                    getProcessor().postConstruct(t);
                 }
 
                 public void postConstruct(Object t) {
@@ -186,6 +219,10 @@ public class JCDIComponentProviderFactory implements
                     " to JCDIComponentProviderFactory in the scope " + cs);
 
             return new IoCFullyManagedComponentProvider() {
+                public ComponentScope getScope() {
+                    return cs;
+                }
+
                 public Object getInstance() {
                     final CreationalContext<?> bcc = bm.createCreationalContext(b);
                     return c.cast(bm.getReference(b, c, bcc));

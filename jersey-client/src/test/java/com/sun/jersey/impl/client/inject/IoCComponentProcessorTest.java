@@ -121,7 +121,7 @@ public class IoCComponentProcessorTest extends TestCase {
 
         public IoCComponentProvider getComponentProvider(final Class c) {
             if (PostConstructListener.class.isAssignableFrom(c)) {
-                ComponentScope cs = SingletonScope.class.isAssignableFrom(c) ? ComponentScope.Singleton : ComponentScope.PerRequest;
+                final ComponentScope cs = SingletonScope.class.isAssignableFrom(c) ? ComponentScope.Singleton : ComponentScope.PerRequest;
                 final IoCComponentProcessor cp = cpf.get(c, cs);
                 return new IoCFullyManagedComponentProvider() {
 
@@ -138,6 +138,10 @@ public class IoCComponentProcessorTest extends TestCase {
                         cp.postConstruct(o);
                         ((PostConstructListener)o).postConstruct();
                         return o;
+                    }
+
+                    public ComponentScope getScope() {
+                        return cs;
                     }
                 };
             } else {

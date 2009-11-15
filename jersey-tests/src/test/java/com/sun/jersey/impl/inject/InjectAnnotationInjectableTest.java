@@ -40,6 +40,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
 import java.io.IOException;
 
 import javax.ws.rs.GET;
@@ -47,6 +48,8 @@ import javax.ws.rs.Path;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.inject.Inject;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.resource.Singleton;
 
 /**
  *
@@ -57,6 +60,141 @@ public class InjectAnnotationInjectableTest extends AbstractResourceTester {
     public InjectAnnotationInjectableTest(String testName) {
         super(testName);
     }
+
+    @Singleton
+    public static class SingletonSubResourceResource {
+        @GET
+        public String get() {
+            return "SINGLETON";
+        }
+    }
+
+    @Path("/")
+    public static class PerRequestResource {
+        private final SingletonSubResourceResource sr;
+
+        public PerRequestResource(@Inject SingletonSubResourceResource sr) {
+            this.sr = sr;
+        }
+
+        @Path("sr")
+        public SingletonSubResourceResource get(@Inject SingletonSubResourceResource _sr) {
+            assertEquals(sr, _sr);
+            return sr;
+        }
+    }
+
+    public void testPerRequest() {
+        initiateWebApplication(PerRequestResource.class);
+
+        String value = resource("/sr").get(String.class);
+        assertEquals("SINGLETON", value);
+    }
+
+
+    public static class PerRequestSubResourceResource {
+        @GET
+        public String get() {
+            return "PER-REQUEST";
+        }
+    }
+
+    @Singleton
+    @Path("/")
+    public static class SingletonResource {
+        private final Injectable<PerRequestSubResourceResource> request;
+        private final SingletonSubResourceResource singleton;
+        
+        public SingletonResource(
+                @Inject Injectable<PerRequestSubResourceResource> request,
+                @Inject SingletonSubResourceResource singleton) {
+            this.request = request;
+            this.singleton = singleton;
+        }
+
+        @Path("request")
+        public PerRequestSubResourceResource get(@Inject PerRequestSubResourceResource _sr) {
+            PerRequestSubResourceResource sr = request.getValue();
+            assertEquals(sr, _sr);
+            return sr;
+        }
+
+        @Path("singleton")
+        public SingletonSubResourceResource get(@Inject SingletonSubResourceResource _singleton) {
+            assertEquals(singleton, _singleton);
+            return singleton;
+        }
+    }
+
+    public void testSingleton() {
+        initiateWebApplication(SingletonResource.class);
+
+        String value = resource("/request").get(String.class);
+        assertEquals("PER-REQUEST", value);
+
+        value = resource("/singleton").get(String.class);
+        assertEquals("SINGLETON", value);
+    }
+
+
+    @Singleton
+    @Path("/")
+    public static class BadInjectSingletonResource {
+        private final PerRequestSubResourceResource sr;
+
+        public BadInjectSingletonResource(@Inject PerRequestSubResourceResource sr) {
+            this.sr = sr;
+            assertNull(sr);
+        }
+        
+        @GET
+        public String get() {
+            return "SINGLETON";
+        }
+    }
+
+    public void testBadInjectSingleton() {
+        initiateWebApplication(BadInjectSingletonResource.class);
+
+        String value = resource("/").get(String.class);
+        assertEquals("SINGLETON", value);
+    }
+
+
+    @Path("/")
+    public static class PerRequestNamedInjectResource {
+        private final SingletonSubResourceResource sr1;
+
+        private final SingletonSubResourceResource sr2;
+
+        public PerRequestNamedInjectResource(
+                @Inject("1") SingletonSubResourceResource sr1,
+                @Inject("2") SingletonSubResourceResource sr2) {
+            this.sr1 = sr1;
+            this.sr2 = sr2;
+        }
+
+        @Path("sr1")
+        public SingletonSubResourceResource get1(@Inject("1") SingletonSubResourceResource _sr1) {
+            assertEquals(sr1, _sr1);
+            return sr1;
+        }
+
+        @Path("sr2")
+        public SingletonSubResourceResource get2(@Inject("2") SingletonSubResourceResource _sr2) {
+            assertEquals(sr2, _sr2);
+            return sr2;
+        }
+    }
+
+    public void testPerRequestNamedInjectResource() {
+        initiateWebApplication(PerRequestNamedInjectResource.class);
+
+        assertEquals("SINGLETON", resource("/sr1").get(String.class));
+        assertEquals("SINGLETON", resource("/sr2").get(String.class));
+    }
+
+
 
     @Path("/")
     public static class MyResource {
@@ -89,13 +227,9 @@ public class InjectAnnotationInjectableTest extends AbstractResourceTester {
 
         public IoCComponentProvider getComponentProvider(Class c) {
             if (c == MyBean.class) {
-                return new IoCComponentProvider() {
+                return new IoCFullyManagedComponentProvider() {
                     public ComponentScope getScope() {
                         return ComponentScope.PerRequest;
-                    }
-
-                    public Object getInjectableInstance(Object o) {
-                        return o;
                     }
 
                     public Object getInstance() {

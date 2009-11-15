@@ -39,6 +39,7 @@ package com.sun.jersey.server.spi.component;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.core.spi.component.ComponentProvider;
+import com.sun.jersey.core.spi.component.ComponentScope;
 
 /**
  * A resource class component provider.
@@ -54,6 +55,13 @@ public interface ResourceComponentProvider extends ComponentProvider {
      */
     void init(AbstractResource abstractResource);
 
+    /**
+     * Get the scope.
+     *
+     * @return the scope.
+     */
+    ComponentScope getScope();
+    
     /**
      * Get the instance.
      *
