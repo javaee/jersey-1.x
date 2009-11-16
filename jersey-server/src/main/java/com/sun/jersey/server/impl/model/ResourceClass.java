@@ -57,6 +57,7 @@ import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.api.view.ImplicitProduces;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
+import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.server.impl.template.ViewableRule;
@@ -197,13 +198,21 @@ public final class ResourceClass {
     }
         
     public void init(ResourceFactory rcpFactory) {
-        this.rcProvider = rcpFactory.getComponentProvider(resource.getResourceClass());
+        init(rcpFactory, null);
+    }
+
+    public void init(ResourceFactory rcpFactory, ComponentContext cc) {
+        this.rcProvider = rcpFactory.getComponentProvider(cc, resource.getResourceClass());
         rcProvider.init(resource);
     }
 
-    public void init(final Object resource) {
+    public void initSingleton(final Object resource) {
         this.rcProvider = new ResourceComponentProvider() {
             public void init(AbstractResource abstractResource) {
+            }
+
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
             }
 
             public Object getInstance(HttpContext hc) {
