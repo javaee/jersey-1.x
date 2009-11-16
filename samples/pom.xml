@@ -34,10 +34,7 @@
  and therefore, elected the GPL Version 2 license, then the option applies
  only if the new code is made subject to such option by the copyright
  holder.
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>jersey-samples</artifactId>
@@ -51,9 +48,9 @@
         <module>atompub-contacts-client</module>
         <module>atompub-contacts-models</module>
         <module>atompub-contacts-server</module>
-        <module>bookstore</module>
         <module>bookmark</module>
         <module>bookmark-em</module>
+        <module>bookstore</module>
         <module>entity-provider</module>
         <module>extended-wadl-webapp</module>
         <module>generate-wadl</module>
@@ -62,9 +59,11 @@
         <module>helloworld-webapp</module>
         <module>https-clientserver-grizzly</module>
         <module>https-server-glassfish</module>
-        <module>jmaki-backend</module>
+        <module>jacksonjsonprovider</module>
         <module>jaxb</module>
+        <module>jcdi-beans-webapp</module>
         <module>jersey-ejb</module>
+        <module>jmaki-backend</module>
         <module>json-from-jaxb</module>
         <module>jsonp</module>
         <module>managed-beans-webapp</module>
@@ -77,7 +76,6 @@
         <module>sparklines</module>
         <module>spring-annotations</module>
         <module>storage-service</module>
-        <module>jcdi-beans-webapp</module>
     </modules>
     <build>
         <plugins>
