@@ -237,12 +237,16 @@ public class WebComponent implements ContainerListener {
             if (out != null)
                 return;
 
+            // Note that the writing of headers MUST be performed before
+            // the invocation of sendError as on some Servlet implementations
+            // modification of the response headers will have no effect
+            // after the invocation of sendError.
+            writeHeaders();
+            
             if (cResponse.getStatus() >= 400)
                 response.sendError(cResponse.getStatus());
             else
                 response.setStatus(cResponse.getStatus());
-
-            writeHeaders();
         }
 
         OutputStream out;

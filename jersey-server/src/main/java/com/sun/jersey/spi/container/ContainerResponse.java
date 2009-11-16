@@ -219,6 +219,7 @@ public class ContainerResponse implements HttpResponseContext {
             return;        
         
         if (entity == null) {
+            isCommitted = true;
             responseWriter.writeStatusAndHeaders(-1, this);
             responseWriter.finish();
             return;
@@ -246,6 +247,7 @@ public class ContainerResponse implements HttpResponseContext {
                     ", and MIME media type, " + contentType + ", was not found");
             
             if (request.getMethod().equals("HEAD")) {
+                isCommitted = true;
                 responseWriter.writeStatusAndHeaders(-1, this);
                 responseWriter.finish();
                 return;

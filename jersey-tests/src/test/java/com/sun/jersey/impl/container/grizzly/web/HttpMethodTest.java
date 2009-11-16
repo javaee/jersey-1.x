@@ -38,12 +38,14 @@
 package com.sun.jersey.impl.container.grizzly.web;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -102,7 +104,7 @@ public class HttpMethodTest extends AbstractGrizzlyWebContainerTester {
     public void testPut() {
         startServer(HttpMethodResource.class);
         WebResource r = createClient().resource(getUri().path("test").build());
-        assertEquals("PUT", r.post(String.class, "PUT"));
+        assertEquals("PUT", r.put(String.class, "PUT"));
     }
     
     public void testDelete() {
@@ -118,8 +120,52 @@ public class HttpMethodTest extends AbstractGrizzlyWebContainerTester {
 
         assertEquals("POST", r.post(String.class, "POST"));
         
-        assertEquals("PUT", r.post(String.class, "PUT"));
+        assertEquals("PUT", r.put(String.class, "PUT"));
         
         assertEquals("DELETE", r.delete(String.class));
+    }
+
+    @Path("/test")
+    public static class HttpMethodResponseErrorResource {
+        @GET
+        public Response get() {
+            return getResponse();
+        }
+
+        @POST
+        public Response post() {
+            return getResponse();
+        }
+
+        @PUT
+        public Response put() {
+            return getResponse();
+        }
+
+        @DELETE
+        public Response delete() {
+            return getResponse();
+        }
+
+        private Response getResponse() {
+            return Response.status(400).header("X-FOO", "foo").build();
+        }
+    }
+
+    public void testResponseError() {
+        startServer(HttpMethodResponseErrorResource.class);
+        WebResource r = createClient().resource(getUri().path("test").build());
+
+        testResponseError(r.get(ClientResponse.class));
+        testResponseError(r.post(ClientResponse.class));
+        testResponseError(r.put(ClientResponse.class));
+        testResponseError(r.delete(ClientResponse.class));
+    }
+
+    private void testResponseError(ClientResponse cr) {
+        assertEquals(400, cr.getStatus());
+
+        assertNotNull(cr.getHeaders().getFirst("X-FOO"));
+        assertEquals("foo", cr.getHeaders().getFirst("X-FOO"));
     }
 }

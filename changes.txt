@@ -1,4 +1,17 @@
 release 1.1.5 (2010)
+- Fixed issue 421
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=421
+  ContainerResponse.write() now consistently sets the isCommitted state.
+- Fixed issue 420
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=420
+  Some servlet containers do not support the addition of headers after
+  a HttpServletResponse.sendError is invoked.
+  Jersey will invoke sendError for a response status code >=400 when there
+  is no response entity. The headers are now written before sendError is
+  invoked.
+- Fixed issue 419
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=419
+  Upgraded simple server to version 4.1.14.
 - Fixed issue 422
   https://jersey.dev.java.net/issues/show_bug.cgi?id=422
   The container response filter of the server-side LoggingFilter now ensures

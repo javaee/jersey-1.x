@@ -41,9 +41,7 @@ package com.sun.jersey.spi.container;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 
