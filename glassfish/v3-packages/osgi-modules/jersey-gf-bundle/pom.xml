@@ -108,7 +108,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <probe-provider-xml-file-names>gfprobe-provider.xml</probe-provider-xml-file-names>
+                            <probe-provider-xml-file-names>jersey-gf-bundle-probe-provider.xml</probe-provider-xml-file-names>
                         </manifestEntries>
                     </archive>
                 </configuration>
