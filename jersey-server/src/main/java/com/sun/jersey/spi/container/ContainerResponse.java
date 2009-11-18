@@ -264,10 +264,11 @@ public class ContainerResponse implements HttpResponseContext {
             isCommitted = true;
             responseWriter.writeStatusAndHeaders(0, this);
         } else {
-            OutputStream o = new CommittingOutputStream(size);
+            if (out == null)
+                out = new CommittingOutputStream(size);
             p.writeTo(entity, entity.getClass(), entityType,
                     annotations, contentType, getHttpHeaders(),
-                    o);            
+                    out);
             if (!isCommitted) {
                 isCommitted = true;
                 responseWriter.writeStatusAndHeaders(-1, this);
