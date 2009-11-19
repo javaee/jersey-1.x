@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.samples.jcdibeans.resources;
 
+import com.sun.jersey.api.core.ResourceContext;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -61,6 +62,8 @@ public class EJBStatelessSessionBeanResource {
 
     private UriInfo uiMethodInject;
 
+    private @Context ResourceContext rc;
+    
     @Context
     public void set(UriInfo ui) {
         this.uiMethodInject = ui;
@@ -71,7 +74,7 @@ public class EJBStatelessSessionBeanResource {
         Logger.getLogger(EJBStatelessSessionBeanResource.class.getName()).log(Level.INFO,
                 "In post construct " + this);
 
-        if (uiFieldInject == null || uiMethodInject == null)
+        if (uiFieldInject == null || uiMethodInject == null || rc == null)
             throw new IllegalStateException();
     }
 
@@ -82,7 +85,7 @@ public class EJBStatelessSessionBeanResource {
                 "In getMessage " + this +
                 "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
 
-        if (uiFieldInject == null || uiMethodInject == null)
+        if (uiFieldInject == null || uiMethodInject == null || rc == null)
             throw new IllegalStateException();
 
         return Integer.toString(injectedResource++);

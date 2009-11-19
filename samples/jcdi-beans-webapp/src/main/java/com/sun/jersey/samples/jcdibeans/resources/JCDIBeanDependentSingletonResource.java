@@ -37,6 +37,7 @@
 
 package com.sun.jersey.samples.jcdibeans.resources;
 
+import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.spi.resource.Singleton;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,6 +60,8 @@ public class JCDIBeanDependentSingletonResource {
 
     private @Context UriInfo uiFieldInject;
     
+    private @Context ResourceContext rc;
+
     private UriInfo uiMethodInject;
 
     @Context
@@ -71,7 +74,7 @@ public class JCDIBeanDependentSingletonResource {
         Logger.getLogger(JCDIBeanDependentSingletonResource.class.getName()).log(Level.INFO,
                 "In post construct " + this);
 
-        if (uiFieldInject == null || uiMethodInject == null)
+        if (uiFieldInject == null || uiMethodInject == null || rc == null)
             throw new IllegalStateException();
     }
 
@@ -82,7 +85,7 @@ public class JCDIBeanDependentSingletonResource {
                 "In getMessage " + this +
                 "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
 
-        if (uiFieldInject == null || uiMethodInject == null)
+        if (uiFieldInject == null || uiMethodInject == null || rc == null)
             throw new IllegalStateException();
         
         return Integer.toString(injectedResource++);

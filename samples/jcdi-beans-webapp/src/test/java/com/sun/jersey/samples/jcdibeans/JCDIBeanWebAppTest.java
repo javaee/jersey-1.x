@@ -58,13 +58,13 @@ public class JCDIBeanWebAppTest extends JerseyTest {
 
     @Test
     public void testPerRequestResource() throws Exception {
-        WebResource webResource = resource().path("jcdibean/per-request");
+        WebResource webResource = resource().path("jcdibean/per-request").queryParam("x", "x");
 
         String responseMsg = webResource.get(String.class);
-        assertEquals("1", responseMsg);
+        assertEquals("x1", responseMsg);
 
         responseMsg = webResource.get(String.class);
-        assertEquals("1", responseMsg);
+        assertEquals("x1", responseMsg);
     }
 
     @Test
@@ -82,13 +82,13 @@ public class JCDIBeanWebAppTest extends JerseyTest {
 
     @Test
     public void testDependentPerRequestResource() throws Exception {
-        WebResource webResource = resource().path("jcdibean/dependent/per-request");
+        WebResource webResource = resource().path("jcdibean/dependent/per-request").queryParam("x", "x");
 
         String responseMsg = webResource.get(String.class);
-        assertEquals("1", responseMsg);
+        assertEquals("x1", responseMsg);
 
         responseMsg = webResource.get(String.class);
-        assertEquals("1", responseMsg);
+        assertEquals("x1", responseMsg);
     }
 
     @Test

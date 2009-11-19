@@ -37,6 +37,7 @@
 
 package com.sun.jersey.samples.jcdibeans.resources;
 
+import com.sun.jersey.api.core.ResourceContext;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.ManagedBean;
@@ -46,6 +47,7 @@ import javax.annotation.PreDestroy;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
@@ -57,6 +59,10 @@ public class JCDIBeanDependentPerRequestResource {
 
     private @Context UriInfo uiFieldInject;
 
+    private @Context ResourceContext rc;
+
+    private @QueryParam("x") String x;
+    
     private UriInfo uiMethodInject;
 
     @Context
@@ -69,8 +75,8 @@ public class JCDIBeanDependentPerRequestResource {
         Logger.getLogger(JCDIBeanDependentPerRequestResource.class.getName()).log(Level.INFO, 
                 "In post construct " + this +
                 "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
-        
-        if (uiFieldInject == null || uiMethodInject == null)
+
+        if (uiFieldInject == null || uiMethodInject == null || rc == null)
             throw new IllegalStateException();
     }
 
@@ -81,10 +87,10 @@ public class JCDIBeanDependentPerRequestResource {
                 "In getMessage " + this +
                 "; uiFieldInject: " + uiFieldInject + "; uiMethodInject: " + uiMethodInject);
         
-        if (uiFieldInject == null || uiMethodInject == null)
+        if (uiFieldInject == null || uiMethodInject == null || rc == null)
             throw new IllegalStateException();
         
-        return Integer.toString(injectedResource++);
+        return x + injectedResource++;
     }
 
     @PreDestroy
