@@ -157,7 +157,34 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/apidocs/contribs/jersey-simple-server</outputDirectory>
                                 </artifactItem>
-                            </artifactItems>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                                    <artifactId>oauth-server</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <classifier>javadoc</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/apidocs/contribs/oauth/server</outputDirectory>
+                                </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                                    <artifactId>oauth-client</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <classifier>javadoc</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/apidocs/contribs/oauth/client</outputDirectory>
+                                </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                                    <artifactId>oauth-signature</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <classifier>javadoc</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/apidocs/contribs/oauth/signature</outputDirectory>
+                                </artifactItem>
+                             </artifactItems>
                         </configuration>
                     </execution>
                      <execution>
@@ -298,7 +325,31 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/contribs</outputDirectory>
                                 </artifactItem>
-                           </artifactItems>
+                                <artifactItem>
+                                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                                    <artifactId>oauth-server</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/contribs</outputDirectory>
+                                </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                                    <artifactId>oauth-client</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/contribs</outputDirectory>
+                                </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                                    <artifactId>oauth-signature</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}/contribs</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
