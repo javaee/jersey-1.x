@@ -178,7 +178,7 @@
             </resource>
         </resources>
         <plugins>
-            <plugin> <!-- want to unpack sources from individual modules -->
+         <plugin> <!-- want to unpack sources from individual modules -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -347,26 +347,23 @@
             </executions>
           </plugin>
             <plugin>
-              <!-- TODO: temporarily reintroducing bnd wrap: we need proper osgification here -->
-              <artifactId>maven-antrun-plugin</artifactId>
-              <executions>
-                <execution>
-                  <phase>package</phase>
-              <configuration>
-                    <tasks> <!-- download bnd tool, and create osgified jar file using it -->
-                      <get src="http://www.aqute.biz/repo/biz/aQute/bnd/0.0.379/bnd-0.0.379.jar" dest="${project.build.directory}/bnd.jar"/>
-                      <java jar="${project.build.directory}/bnd.jar" fork="true">
-                        <arg line="wrap -output ${project.build.directory}/osgified.jar ${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
-                      </java>
-                      <move file="${project.build.directory}/osgified.jar" tofile="${project.build.directory}/${project.artifactId}-${project.version}.jar"/>
-                      <delete file="${project.build.directory}/bnd.jar"/>
-                    </tasks>
-              </configuration>
-                  <goals>
-                    <goal>run</goal>
-                  </goals>
-                </execution>
-              </executions>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>com.sun.*</Export-Package>
+                    </instructions>
+                    <unpackBundle>true</unpackBundle>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>osgi-bundle</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
            <plugin> <!-- remove the generated src dir-->
                 <artifactId>maven-clean-plugin</artifactId>

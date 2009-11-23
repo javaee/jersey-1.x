@@ -88,7 +88,7 @@
                         <Export-Package>com.sun.*</Export-Package>
                         <Import-Package>com.sun.xml.bind.annotation, com.sun.syndication.*;resolution:=optional, org.jdom.*;resolution:=optional, javassist.util.proxy;resolution:=optional;version="3.8", *</Import-Package>
                         <DynamicImport-Package>org.glassfish.flashlight.provider</DynamicImport-Package>
-                        <Build-Id>${buildNumber}</Build-Id>
+                        <Build-Id>${project.version} ${buildNumber}</Build-Id>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
