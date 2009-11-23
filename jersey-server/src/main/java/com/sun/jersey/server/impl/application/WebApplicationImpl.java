@@ -798,9 +798,6 @@ public final class WebApplicationImpl implements WebApplication {
         // Obtain all the exception mappers
         this.exceptionFactory = new ExceptionMapperFactory();
         
-        // Obtain all resource method dispatchers
-        this.dispatcherFactory = new ResourceMethodDispatcherFactory(providerServices);
-        
         // Obtain all message body readers/writers
         this.bodyFactory = new MessageBodyFactory(providerServices);
         injectableFactory.add(
@@ -885,6 +882,9 @@ public final class WebApplicationImpl implements WebApplication {
                         "present in the list of request filters.");
             }
         }
+
+        // Initiate resource method dispatchers
+        this.dispatcherFactory = new ResourceMethodDispatcherFactory(providerServices);
 
         // Inject on all components
         cpFactory.injectOnAllComponents();

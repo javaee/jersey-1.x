@@ -210,9 +210,14 @@ public class InjectableProviderFactory implements InjectableProviderContext {
         }
         
         // TODO log warnings if injection cannot be performed
-        // This is a little tricky for injection of
-        // ContextResolver<JAXBContext> as it is meant to be null
-        // or an aggregation.
+        // This is a little tricky for the following:
+        // - injection of ContextResolver<JAXBContext> as it is meant to be null
+        //   or an aggregation.
+        // - injection for Parameter instance. If an injection provider for a
+        //   Parameter instance cannot be found an injection provider for the
+        //   Parameter instance type is obtained (if registered).
+        // Seems that this will require warnings be logged the the caller of
+        // this method
         // LOGGER.warning(ic.getAccesibleObject().toString());
         return null;
     }

@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.ApplicationAdapter;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.WebAppResourceConfig;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.MediaTypes;
@@ -549,7 +550,7 @@ public class WebComponent implements ContainerListener {
      * Get the default resource configuration if one is not declared in the
      * web.xml.
      * <p>
-     * This implementaton returns an instance of {@link ClasspathResourceConfig}
+     * This implementaton returns an instance of {@link WebAppResourceConfig}
      * that scans in files and directories as declared by the
      * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
@@ -565,7 +566,7 @@ public class WebComponent implements ContainerListener {
      */
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
             WebConfig wc) throws ServletException  {
-        return getClassPathResourceConfig(props, wc);
+        return getWebAppResourceConfig(props, wc);
     }
 
     
@@ -578,13 +579,10 @@ public class WebComponent implements ContainerListener {
 
     //
     
-    /* package */ ResourceConfig getClassPathResourceConfig(Map<String, Object> props,
+    /* package */ ResourceConfig getWebAppResourceConfig(Map<String, Object> props,
             WebConfig webConfig) throws ServletException  {
-        // Default to using class path resource config
-        String[] paths = getPaths(webConfig.getInitParameter(
-                ClasspathResourceConfig.PROPERTY_CLASSPATH));
-        props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
-        return new ClasspathResourceConfig(props);
+        // Default to using Web app resource config
+        return new WebAppResourceConfig(props, webConfig.getServletContext());
     }
 
     private ResourceConfig createResourceConfig(WebConfig webConfig)
@@ -626,6 +624,7 @@ public class WebComponent implements ContainerListener {
             Class resourceConfigClass = ReflectionHelper.
                     classForNameWithException(resourceConfigClassName);
 
+            // TODO add support for WebAppResourceConfig
             if (resourceConfigClass == ClasspathResourceConfig.class) {
                 String[] paths = getPaths(webConfig.getInitParameter(
                         ClasspathResourceConfig.PROPERTY_CLASSPATH));

@@ -41,6 +41,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.WebAppResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
@@ -112,22 +113,20 @@ import javax.ws.rs.core.UriBuilder;
  * {@link PackagesResourceConfig}.
  * 
  * <p>
- * If none of the above initialization parameters are present a new 
- * instance of {@link ClasspathResourceConfig} is created. The initialization 
- * parameter "com.sun.jersey.config.property.classpath" MAY be set to provide 
- * one or more paths. Each path MUST be separated by ';'. Each path MUST
- * be a virtual path as specified by the {@link ServletContext#getRealPath} 
- * method, and each path is transformed by that method. 
+ * If none of the above resource configuration related initialization parameters
+ * are present a new instance of {@link WebAppResourceConfig} is created. The
+ * initialization parameter "com.sun.jersey.config.property.classpath" MAY be
+ * set to provide one or more resource paths. Each path MUST be separated by ';'.
  * 
- * The transformed paths are added as a property value to a Map instance using 
+ * The resource paths are added as a property value to a Map instance using
  * the property name (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any 
  * additional initialization parameters are then added to the Map instance. 
  * Then that Map instance is passed to the constructor of 
- * {@link ClasspathResourceConfig}.
+ * {@link WebAppResourceConfig}.
  * 
- * If this parameter is not set then the default value is set to the following 
- * virtual paths: 
- * "/WEB-INF/lib;/WEB-INF/classes".
+ * If the initialization parameter is not present then the following resource
+ * paths are utilized:
+ * "/WEB-INF/lib" and "/WEB-INF/classes".
  * <p>
  * All initialization parameters are added as properties of the created
  * {@link ResourceConfig}.
@@ -330,7 +329,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * Get the default resource configuration if one is not declared in the
      * web.xml.
      * <p>
-     * This implementaton returns an instance of {@link ClasspathResourceConfig}
+     * This implementaton returns an instance of {@link WebAppResourceConfig}
      * that scans in files and directories as declared by the
      * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
@@ -346,7 +345,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      */
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
             WebConfig wc) throws ServletException  {
-        return webComponent.getClassPathResourceConfig(props, wc);
+        return webComponent.getWebAppResourceConfig(props, wc);
     }
 
     /**
@@ -496,7 +495,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * Get the default resource configuration if one is not declared in the
      * web.xml.
      * <p>
-     * This implementaton returns an instance of {@link ClasspathResourceConfig}
+     * This implementaton returns an instance of {@link WebAppResourceConfig}
      * that scans in files and directories as declared by the
      * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.

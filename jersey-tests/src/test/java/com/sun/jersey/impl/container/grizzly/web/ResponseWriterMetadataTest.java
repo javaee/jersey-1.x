@@ -106,9 +106,6 @@ public class ResponseWriterMetadataTest extends AbstractGrizzlyWebContainerTeste
     }
     
     public void testResponse() {
-        Map<String, String> initParams = new HashMap<String, String>();
-        initParams.put(PackagesResourceConfig.PROPERTY_PACKAGES, 
-                "com.sun.jersey.impl.container.grizzly.web");
         setServletClass(ResponseServletContainer.class);
         startServer(Resource.class);
         

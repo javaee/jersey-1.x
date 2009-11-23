@@ -37,13 +37,11 @@
 
 package com.sun.jersey.api.core;
 
-import com.sun.jersey.server.impl.container.config.AnnotatedClassScanner;
+import com.sun.jersey.core.spi.scanning.FilesScanner;
 import java.io.File;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
@@ -51,10 +49,11 @@ import javax.ws.rs.ext.Provider;
  * declared by the property {@link ClasspathResourceConfig#PROPERTY_CLASSPATH}. 
  * That property MUST be included in the map of initial properties passed to 
  * the constructor.
- * 
+ *
+ * @author Paul.Sandoz@Sun.Com
  * @author Frank D. Martinez. fmartinez@asimovt.com
  */
-public class ClasspathResourceConfig extends DefaultResourceConfig {
+public class ClasspathResourceConfig extends ScanningResourceConfig {
     /**
      * The property value MUST be an instance String or String[]. Each String
      * instance represents one or more paths that MUST be separated by ';'. 
@@ -92,8 +91,6 @@ public class ClasspathResourceConfig extends DefaultResourceConfig {
      *        directories containing jar files for class files.
      */
     public ClasspathResourceConfig(String[] paths) {
-        super();
-        
         if (paths == null || paths.length == 0)
             throw new IllegalArgumentException(
                     "Array of paths must not be null or empty");
@@ -112,9 +109,9 @@ public class ClasspathResourceConfig extends DefaultResourceConfig {
     }
     
     private void init(String[] paths) {    
-        File[] roots = new File[paths.length];
-        for (int i = 0;  i< paths.length; i++) {
-            roots[i] = new File(paths[i]);
+        final File[] files = new File[paths.length];
+        for (int i = 0;  i < paths.length; i++) {
+            files[i] = new File(paths[i]);
         }
 
         if (LOGGER.isLoggable(Level.INFO)) {
@@ -125,30 +122,8 @@ public class ClasspathResourceConfig extends DefaultResourceConfig {
             
             LOGGER.log(Level.INFO, b.toString());            
         }
-        
-        AnnotatedClassScanner scanner = new AnnotatedClassScanner(
-                Path.class, Provider.class);
-        scanner.scan(roots);
 
-        getClasses().addAll(scanner.getMatchingClasses());
-        
-        if (LOGGER.isLoggable(Level.INFO) && !getClasses().isEmpty()) {
-            StringBuilder b = new StringBuilder();
-            b.append("Root resource classes found:");
-            for (Class c : getClasses())
-                if (c.isAnnotationPresent(Path.class))
-                    b.append('\n').append("  ").append(c);
-            
-            LOGGER.log(Level.INFO, b.toString());
-            
-            b = new StringBuilder();
-            b.append("Provider classes found:");
-            for (Class c : getClasses())
-                if (c.isAnnotationPresent(Provider.class))
-                    b.append('\n').append("  ").append(c);
-            
-            LOGGER.log(Level.INFO, b.toString());            
-        }
+        init(new FilesScanner(files));
     }
     
     private static String[] getPaths() {
