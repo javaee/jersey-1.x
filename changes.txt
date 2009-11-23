@@ -1,4 +1,8 @@
 release 1.1.5 (2010)
+- Fixed issue 430
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=430
+  Fixed injection of per-request resources on to per-request (non-299)
+  managed beans.
 - Fixed issue 429
   https://jersey.dev.java.net/issues/show_bug.cgi?id=429
   Package scanning deployment on JBoss 5.x app servers now works correctly.

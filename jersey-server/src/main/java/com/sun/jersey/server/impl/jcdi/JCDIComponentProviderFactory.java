@@ -109,10 +109,10 @@ public class JCDIComponentProviderFactory implements
                     !c.isAnnotationPresent(ManagedBean.class))
                 continue;
 
-            final ComponentScope cs = (s == Dependent.class)
-                    ? cpf.getScope(c)
-                    : (c.isAnnotationPresent(Provider.class))
-                        ? ComponentScope.Singleton
+            final ComponentScope cs = c.isAnnotationPresent(Provider.class)
+                    ? ComponentScope.Singleton
+                    : s == Dependent.class
+                        ? cpf.getScope(c)
                         : getComponentScope(b);
 
             LOGGER.info("Adapting InjectionTarget for " + c.getName() + " in the scope " + b.getScope());

@@ -39,13 +39,20 @@ package com.sun.jersey.server.impl.ejb;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
 import javax.interceptor.InvocationContext;
+import javax.ws.rs.ext.Provider;
 
 final class EJBInjectionInterceptor {
 
     private IoCComponentProcessorFactory cpf;
 
+    private final ConcurrentMap<Class, IoCComponentProcessor> componentProcessorMap =
+            new ConcurrentHashMap<Class, IoCComponentProcessor>();
+    
     public void setFactory(IoCComponentProcessorFactory cpf) {
         this.cpf = cpf;
     }
@@ -56,13 +63,48 @@ final class EJBInjectionInterceptor {
             // Not initialized
             return;
         }
-        
+
         final Object beanInstance = context.getTarget();
-        final IoCComponentProcessor icp = cpf.get(beanInstance.getClass(), ComponentScope.Singleton);
+        final IoCComponentProcessor icp = get(beanInstance.getClass());
         if (icp != null)
             icp.postConstruct(beanInstance);
         
         // Invoke next interceptor in chain
         context.proceed();
+    }
+
+    private static final IoCComponentProcessor NULL_COMPONENT_PROCESSOR = new IoCComponentProcessor() {
+        public void preConstruct() {
+        }
+
+        public void postConstruct(Object o) {
+        }
+    };
+    
+    private IoCComponentProcessor get(final Class c) {
+        IoCComponentProcessor cp = componentProcessorMap.get(c);
+        if (cp != null) {
+            return (cp == NULL_COMPONENT_PROCESSOR) ? null : cp;
+        }
+
+        synchronized (componentProcessorMap) {
+            cp = componentProcessorMap.get(c);
+            if (cp != null) {
+                return (cp == NULL_COMPONENT_PROCESSOR) ? null : cp;
+            }
+
+            final ComponentScope cs = c.isAnnotationPresent(ManagedBean.class)
+                    ? c.isAnnotationPresent(Provider.class)
+                        ? ComponentScope.Singleton
+                        : cpf.getScope(c)
+                    : ComponentScope.Singleton;
+            cp = cpf.get(c, cs);
+            if (cp != null) {
+                componentProcessorMap.put(c, cp);
+            } else {
+                componentProcessorMap.put(c, NULL_COMPONENT_PROCESSOR);
+            }
+        }
+        return cp;
     }
 }

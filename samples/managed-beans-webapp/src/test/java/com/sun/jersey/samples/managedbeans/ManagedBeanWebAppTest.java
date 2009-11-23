@@ -37,6 +37,7 @@
 
 package com.sun.jersey.samples.managedbeans;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -62,12 +63,12 @@ public class ManagedBeanWebAppTest extends JerseyTest {
      */
     @Test
     public void testPerRequestResource() throws Exception {
-        WebResource webResource = resource();
+        WebResource webResource = resource().queryParam("x", "x");
         String responseMsg = webResource.path("managedbean/per-request").get(String.class);
-        assertEquals("message 1", responseMsg);
+        assertEquals("message x1", responseMsg);
 
         responseMsg = webResource.path("managedbean/per-request").get(String.class);
-        assertEquals("message 1", responseMsg);
+        assertEquals("message x1", responseMsg);
     }
 
     @Test
@@ -83,6 +84,15 @@ public class ManagedBeanWebAppTest extends JerseyTest {
         assertEquals("message 3", responseMsg);
     }
 
+    @Test
+    public void testExceptionMapper() throws Exception {
+        WebResource webResource = resource().path("managedbean/singleton/exception");
+
+        ClientResponse cr = webResource.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("ManagedBeanException", cr.getEntity(String.class));
+    }
+    
     @Test
     public void testApplicationWadl() {
         WebResource webResource = resource();

@@ -50,6 +50,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
 @Path("/jcdibean/singleton")
 @ApplicationScoped
 public class JCDIBeanSingletonResource {
@@ -87,6 +91,11 @@ public class JCDIBeanSingletonResource {
             throw new IllegalStateException();
         
         return Integer.toString(injectedResource++);
+    }
+
+    @Path("exception")
+    public String getException() {
+        throw new JDCIBeanException();
     }
 
     @PreDestroy

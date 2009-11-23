@@ -37,6 +37,7 @@
 
 package com.sun.jersey.samples.jcdibeans;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -102,6 +103,24 @@ public class JCDIBeanWebAppTest extends JerseyTest {
 
         responseMsg = webResource.get(String.class);
         assertEquals("3", responseMsg);
+    }
+
+    @Test
+    public void testExceptionMapper() throws Exception {
+        WebResource webResource = resource().path("/jcdibean/singleton/exception");
+
+        ClientResponse cr = webResource.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("JDCIBeanException", cr.getEntity(String.class));
+    }
+
+    @Test
+    public void testDependentExceptionMapper() throws Exception {
+        WebResource webResource = resource().path("/jcdibean/dependent/singleton/exception");
+
+        ClientResponse cr = webResource.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("JDCIBeanDependentException", cr.getEntity(String.class));
     }
 
     @Test

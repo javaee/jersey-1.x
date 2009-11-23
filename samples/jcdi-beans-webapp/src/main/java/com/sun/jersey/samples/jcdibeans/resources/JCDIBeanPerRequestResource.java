@@ -51,6 +51,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
+/**
+ *
+ * @author Paul.Sandoz@Sun.Com
+ */
 @Path("/jcdibean/per-request")
 @RequestScoped
 public class JCDIBeanPerRequestResource {

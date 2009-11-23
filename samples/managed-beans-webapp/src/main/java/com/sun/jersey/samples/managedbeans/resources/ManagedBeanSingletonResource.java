@@ -84,4 +84,9 @@ public class ManagedBeanSingletonResource {
 
         return ssb.getMessage() + " " + Integer.toString(injectedResource++);
     }
+
+    @Path("exception")
+    public String getException() {
+        throw new ManagedBeanException();
+    }
 }
