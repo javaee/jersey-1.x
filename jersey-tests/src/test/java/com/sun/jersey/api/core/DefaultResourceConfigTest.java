@@ -36,11 +36,7 @@
  */
 package com.sun.jersey.api.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import javax.ws.rs.core.MediaType;
 
 
@@ -146,5 +142,113 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         assertEquals("X", rc1.getProperties().get("X"));
 
         assertTrue(rc1.getFeatures().get("X"));
+    }
+
+    public void testMediaTypeMapSingleString() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, "text:text/plain");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+        
+        assertTrue(rc1.getMediaTypeMappings().get("text") != null);
+        assertTrue(rc1.getMediaTypeMappings().get("text").equals(MediaType.TEXT_PLAIN_TYPE));
+    }
+
+    public void testMediaTypeMapMultipleString() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, "text:text/plain,xml:application/xml");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+        
+        assertTrue(rc1.getMediaTypeMappings().get("text").equals(MediaType.TEXT_PLAIN_TYPE));
+        assertTrue(rc1.getMediaTypeMappings().get("xml").equals(MediaType.APPLICATION_XML_TYPE));
+    }
+
+    public void testMediaTypeMapMultipleStringArray() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, new String[] {"text:text/plain", "xml:application/xml"});
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+        
+        assertTrue(rc1.getMediaTypeMappings().get("text").equals(MediaType.TEXT_PLAIN_TYPE));
+        assertTrue(rc1.getMediaTypeMappings().get("xml").equals(MediaType.APPLICATION_XML_TYPE));
+    }
+
+    public void testMediaTypeMapInvalid() {
+        boolean caught = false;
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, "text");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, "text/plain");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, ":text/plain");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, "text/plain:");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, "text:invalid/foo/bar");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
     }
 }

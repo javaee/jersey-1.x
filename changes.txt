@@ -1,4 +1,10 @@
 release 1.1.5 (2010)
+- Added new feature - now its possible to set media type mappings via
+  ResourceConfig property (ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS);
+  this can be set as a parameter in web.xml file.
+  Allowed types are String and String[], format: "segment:media/type".
+  Multiple definitions are comma separated. This was implemented mainly
+  to match similar RESTEasy feature.
 - Fixed issue 430
   https://jersey.dev.java.net/issues/show_bug.cgi?id=430
   Fixed injection of per-request resources on to per-request (non-299)

@@ -44,15 +44,10 @@ import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
+import com.sun.jersey.api.uri.UriComponent;
+
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Path;
@@ -128,7 +123,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      */
     public static final String FEATURE_IMPLICIT_VIEWABLES 
             = "com.sun.jersey.config.feature.ImplicitViewables";
-    
+
     /**
      * If true then disable WADL generation.
      * <p>
@@ -139,6 +134,15 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      */
     public static final String FEATURE_DISABLE_WADL
             = "com.sun.jersey.config.feature.DisableWADL";
+
+    /**
+     * This property can be used to set media type mapping.
+     * <p>Accepted types are String and String[]. Mappings have to be in following
+     * format: "segment1 : mediaType1, segment2 : mediaType2" (for example it can
+     * be set to "text:text/plain"). 
+     */
+    public static final String PROPERTY_MEDIA_TYPE_MAPPINGS
+            = "com.sun.jersey.config.property.MediaTypeMappings";
 
     /**
      * If set the default resource component provider factory for the
@@ -345,6 +349,8 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * singletons.
      * <p>A registered class that is an interface or an abstract class
      * is removed from the registered classes.
+     * <p>Additionaly this methods validates property PROPERTY_MEDIA_TYPE_MAPPINGS
+     * and adds its parsed content into ResourceConfigs mediaTypeMappings map.
      * 
      * @throws IllegalArgumentException if the set of registered singletons 
      *         contains more than one instance of the same root resource class.
@@ -407,6 +413,61 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
                     "The set of registered singletons contains " +
                     "more than one instance of the same root resource class");
         }
+
+        // parse and validate mediaTypeMappings set thru PROPERTY_MEDIA_TYPE_MAPPINGS property 
+        Object mappings = getProperty(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS);
+        if (mappings != null) {
+
+            Map<String, MediaType> mappingsMap = null;
+            if (mappings instanceof String) {
+                mappingsMap = parseMediaTypeMappings((String) mappings);
+            } else if (mappings instanceof String[]) {
+                for (int j = 0; j < ((String[]) mappings).length; j++)
+                    if (mappingsMap == null)
+                        mappingsMap = parseMediaTypeMappings(((String[]) mappings)[j]);
+                    else
+                        mappingsMap.putAll(parseMediaTypeMappings(((String[]) mappings)[j]));
+            } else {
+                throw new IllegalArgumentException("Provided media type mappings is invalid. Acceptable types are String" +
+                        " and String[].");
+            }
+
+            getMediaTypeMappings().putAll(mappingsMap);
+
+        }
+    }
+
+    private Map<String, MediaType> parseMediaTypeMappings(String mediaTypeMappings) {
+
+        if(mediaTypeMappings == null)
+            return Collections.EMPTY_MAP;
+
+        Map<String, MediaType> mediaTypeMappingsMap = new HashMap<String, MediaType>();
+
+        String[] records = mediaTypeMappings.split(",");
+
+        for(int i = 0; i < records.length; i++) {
+
+            String[] record = records[i].split(":");
+
+            if(record.length != 2)
+                throw new IllegalArgumentException("Media type mapping \"" + mediaTypeMappings + "\" is invalid. It " +
+                        "should contain two parts (segment and media type) separated by colon (:).");
+
+            String trimmedSegment = record[0].trim();
+            String trimmedMediaType = record[1].trim();
+
+            if(trimmedSegment.length() == 0)
+                throw new IllegalArgumentException("Segment value in MediaTypeMappings record \"" + records[i] + "\" is empty.");
+
+            if(trimmedMediaType.length() == 0)
+                throw new IllegalArgumentException("Media type value in MediaTypeMappings record \"" + records[i] + "\" is empty.");
+
+            mediaTypeMappingsMap.put(
+                    UriComponent.contextualEncode(trimmedSegment, UriComponent.Type.PATH_SEGMENT),
+                    MediaType.valueOf(trimmedMediaType));
+        }
+        return mediaTypeMappingsMap;
     }
 
     /**
