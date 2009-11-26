@@ -1,4 +1,12 @@
 release 1.1.5 (2010)
+- Added new feature - now its possible to set language mappings via
+  ResourceConfig property (ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS);
+  this can be set as a parameter in web.xml file.
+  Allowed types are String and String[], format: "segment:language-tag".
+  Language tag is defined in RFC 2616 (http://www.ietf.org/rfc/rfc2616.txt).
+    language-tag  = primary-tag *( "-" subtag )
+    primary-tag   = 1*8ALPHA
+    subtag        = 1*8ALPHA
 - Added new feature - now its possible to set media type mappings via
   ResourceConfig property (ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS);
   this can be set as a parameter in web.xml file.

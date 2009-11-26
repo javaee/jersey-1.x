@@ -251,4 +251,127 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
 
         assertTrue(caught);
     }
+
+
+    public void testLanguageMapSingleString() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, "english:en");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+
+        assertTrue(rc1.getLanguageMappings().get("english") != null);
+        assertTrue(rc1.getLanguageMappings().get("english").equals("en"));
+    }
+
+    public void testLanguageMapMultipleString() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, "english:en, czech:cz");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+
+        assertTrue(rc1.getLanguageMappings().get("english").equals("en"));
+        assertTrue(rc1.getLanguageMappings().get("czech").equals("cz"));
+    }
+
+    public void testLanguageMapMultipleStringArray() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, new String[] {"english:en", "czech:cz"});
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+
+        assertTrue(rc1.getLanguageMappings().get("english").equals("en"));
+        assertTrue(rc1.getLanguageMappings().get("czech").equals("cz"));
+    }
+
+    public void testLanguageInvalid() {
+        boolean caught = false;
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, "english");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, ":cz");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, "english:");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, "english:aa-");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, "english:-aa");
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+
+        caught = false;
+        rc1 = new DefaultResourceConfig();
+        propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, "english:aabbccddee-aabbccddeef"); // second part has more than 8 characters
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        try {
+            rc1.validate();
+        } catch (IllegalArgumentException iae) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
 }
