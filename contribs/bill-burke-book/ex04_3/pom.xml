@@ -45,8 +45,14 @@
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-bundle</artifactId>
+            <artifactId>jersey-server</artifactId>
             <version>1.1.5-ea-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>1.1.5-ea-SNAPSHOT</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
