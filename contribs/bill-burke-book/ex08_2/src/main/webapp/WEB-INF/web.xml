@@ -3,11 +3,6 @@
         "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-    <context-param>
-        <param-name>resteasy.media.type.mappings</param-name>
-        <param-value>html : text/html, txt : text/plain, xml : application/xml</param-value>
-    </context-param>
-
     <servlet>
         <servlet-name>Jersey Web Application</servlet-name>
         <servlet-class>
@@ -16,6 +11,10 @@
         <init-param>
             <param-name>javax.ws.rs.Application</param-name>
             <param-value>com.restfully.shop.services.ShoppingApplication</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.property.MediaTypeMappings</param-name>
+            <param-value>html : text/html, txt : text/plain, xml : application/xml</param-value>
         </init-param>
     </servlet>
 
