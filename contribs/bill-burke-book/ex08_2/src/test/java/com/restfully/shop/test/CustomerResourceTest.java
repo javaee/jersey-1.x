@@ -32,11 +32,10 @@ public class CustomerResourceTest {
     @Test
     public void testCustomerResource() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers/");
+        WebResource wr = c.resource("http://localhost:9095/customers/1");
 
         // Get customer
         System.out.println("*** GET Customer (default) **");
-        wr = wr.path("1"); // second customer
         ClientResponse response = wr.get(ClientResponse.class);
         System.out.println("Content-Type: " + response.getHeaders().get("Content-Type"));
 
@@ -48,32 +47,32 @@ public class CustomerResourceTest {
     @Test
     public void testCustomerResourceMediaTypeMappingsTXT() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers/");
+        WebResource wr = c.resource("http://localhost:9095/customers/1.txt");
 
         // Get customer
         System.out.println("*** GET Customer as TXT **");
-        wr = wr.path("1.txt"); // second customer
-        ClientResponse response = wr.accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+        ClientResponse response = wr.get(ClientResponse.class);
         System.out.println("Content-Type: " + response.getHeaders().get("Content-Type"));
 
         System.out.println(response.getEntity(String.class));
 
         Assert.assertEquals(200, response.getStatus()); // 200 = ok
+        Assert.assertTrue(response.getHeaders().get("Content-Type").toString().equals("[text/plain]"));
     }
 
     @Test
     public void testCustomerResourceMediaTypeMappingsHTML() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers/");
+        WebResource wr = c.resource("http://localhost:9095/customers/1.html");
 
         // Get customer
         System.out.println("*** GET Customer as TXT **");
-        wr = wr.path("1.html"); // second customer
-        ClientResponse response = wr.accept(MediaType.TEXT_HTML).get(ClientResponse.class);
+        ClientResponse response = wr.get(ClientResponse.class);
         System.out.println("Content-Type: " + response.getHeaders().get("Content-Type"));
 
         System.out.println(response.getEntity(String.class));
 
         Assert.assertEquals(200, response.getStatus()); // 200 = ok
+        Assert.assertTrue(response.getHeaders().get("Content-Type").toString().equals("[text/html]"));
     }
 }
