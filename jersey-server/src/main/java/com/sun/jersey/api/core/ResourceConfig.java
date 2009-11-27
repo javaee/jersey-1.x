@@ -38,6 +38,7 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
@@ -427,117 +428,85 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
                     "more than one instance of the same root resource class");
         }
 
-        // parse and validate mediaTypeMappings set thru PROPERTY_MEDIA_TYPE_MAPPINGS property 
-        Object mediaTypeMappings = getProperty(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS);
-        if (mediaTypeMappings != null) {
-
-            Map<String, MediaType> mappingsMap = null;
-            if (mediaTypeMappings instanceof String) {
-                mappingsMap = parseMediaTypeMappings((String) mediaTypeMappings);
-            } else if (mediaTypeMappings instanceof String[]) {
-                for (int j = 0; j < ((String[]) mediaTypeMappings).length; j++)
-                    if (mappingsMap == null)
-                        mappingsMap = parseMediaTypeMappings(((String[]) mediaTypeMappings)[j]);
-                    else
-                        mappingsMap.putAll(parseMediaTypeMappings(((String[]) mediaTypeMappings)[j]));
-            } else {
-                throw new IllegalArgumentException("Provided media type mappings is invalid. Acceptable types are String" +
-                        " and String[].");
+        // parse and validate mediaTypeMappings set thru PROPERTY_MEDIA_TYPE_MAPPINGS property
+        parseAndValidateMappings(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, getMediaTypeMappings(), new TypeParser<MediaType>() {
+            public MediaType valueOf(String value) {
+                return MediaType.valueOf(value);
             }
-
-            getMediaTypeMappings().putAll(mappingsMap);
-        }
+        });
 
         // parse and validate language mappings set thru PROPERTY_LANGUAGE_MAPPINGS property
-        Object languageMappings = getProperty(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS);
-        if (languageMappings != null) {
+        parseAndValidateMappings(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, getLanguageMappings(), new TypeParser<String>() {
+            public String valueOf(String value) {
+                return LanguageTag.valueOf(value).toString();
+            }
+        });
 
-            Map<String, String> mappingsMap = null;
-            if (languageMappings instanceof String) {
-                mappingsMap = parseLanguageMappings((String) languageMappings);
-            } else if (languageMappings instanceof String[]) {
-                for (int j = 0; j < ((String[]) languageMappings).length; j++)
-                    if (mappingsMap == null)
-                        mappingsMap = parseLanguageMappings(((String[]) languageMappings)[j]);
+        // encode key values of mediaTypeMappings and languageMappings maps
+        encodeKeys(getMediaTypeMappings());
+        encodeKeys(getLanguageMappings());
+    }
+
+    private interface TypeParser<T> {
+        public T valueOf(String s);
+    }
+    
+    private <T> void parseAndValidateMappings(String property, Map<String, T> mappingsMap, TypeParser<T> parser) {
+        Object mappings = getProperty(property);
+        if (mappings != null) {
+
+            Map<String, T> tempMappingsMap = null;
+            if (mappings instanceof String) {
+                tempMappingsMap = parseMappings(property, (String) mappings, parser);
+            } else if (mappings instanceof String[]) {
+                for (int j = 0; j < ((String[]) mappings).length; j++)
+                    if (tempMappingsMap == null)
+                        tempMappingsMap = parseMappings(property, ((String[]) mappings)[j], parser);
                     else
-                        mappingsMap.putAll(parseLanguageMappings(((String[]) languageMappings)[j]));
+                        tempMappingsMap.putAll(parseMappings(property, ((String[]) mappings)[j], parser));
             } else {
-                throw new IllegalArgumentException("Provided language mappings is invalid. Acceptable types are String" +
+                throw new IllegalArgumentException("Provided " + property + " mappings is invalid. Acceptable types are String" +
                         " and String[].");
             }
 
-            getLanguageMappings().putAll(mappingsMap);
-
+            mappingsMap.putAll(tempMappingsMap);
         }
     }
 
-    private Map<String, MediaType> parseMediaTypeMappings(String mediaTypeMappings) {
-
-        if(mediaTypeMappings == null)
+    private <T> Map<String, T> parseMappings(String property, String mappings, TypeParser<T> parser) {
+        if(mappings == null)
             return Collections.EMPTY_MAP;
 
-        Map<String, MediaType> mediaTypeMappingsMap = new HashMap<String, MediaType>();
+        Map<String, T> mappingsMap = new HashMap<String, T>();
 
-        String[] records = mediaTypeMappings.split(",");
+        String[] records = mappings.split(",");
 
         for(int i = 0; i < records.length; i++) {
             String[] record = records[i].split(":");
             if(record.length != 2)
-                throw new IllegalArgumentException("Media type mapping \"" + mediaTypeMappings + "\" is invalid. It " +
+                throw new IllegalArgumentException("Provided " + property + " mapping \"" + mappings + "\" is invalid. It " +
                         "should contain two parts (segment and media type) separated by colon (:).");
 
             String trimmedSegment = record[0].trim();
-            String trimmedMediaType = record[1].trim();
+            String trimmedValue = record[1].trim();
 
             if(trimmedSegment.length() == 0)
-                throw new IllegalArgumentException("Segment value in MediaTypeMappings record \"" + records[i] + "\" is empty.");
-            if(trimmedMediaType.length() == 0)
-                throw new IllegalArgumentException("Media type value in MediaTypeMappings record \"" + records[i] + "\" is empty.");
+                throw new IllegalArgumentException("Segment value in " + property + " mappings record \"" + records[i] + "\" is empty.");
+            if(trimmedValue.length() == 0)
+                throw new IllegalArgumentException("Value in " + property + " mappings record \"" + records[i] + "\" is empty.");
             
-            mediaTypeMappingsMap.put(
-                    UriComponent.contextualEncode(trimmedSegment, UriComponent.Type.PATH_SEGMENT),
-                    MediaType.valueOf(trimmedMediaType));
+            mappingsMap.put(trimmedSegment, parser.valueOf(trimmedValue));
         }
 
-        return mediaTypeMappingsMap;
+        return mappingsMap;
     }
 
-    private Map<String, String> parseLanguageMappings(String languageMappings) {
-        if(languageMappings == null)
-            return Collections.EMPTY_MAP;
-
-        Map<String, String> languageMappingsMap = new HashMap<String, String>();
-
-        String[] records = languageMappings.split(",");
-
-        for(int i = 0; i < records.length; i++) {
-            String[] record = records[i].split(":");
-            if(record.length != 2)
-                throw new IllegalArgumentException("Language mapping \"" + languageMappings + "\" is invalid. It " +
-                        "should contain two parts (segment and language) separated by colon (:).");
-
-            String trimmedSegment = record[0].trim();
-            String trimmedLanguage = record[1].trim();
-
-            if(trimmedSegment.length() == 0)
-                throw new IllegalArgumentException("Segment value in LanguageMappings record \"" + records[i] + "\" is empty.");
-            if(trimmedLanguage.length() == 0)
-                throw new IllegalArgumentException("Language value in LanguageMappings record \"" + records[i] + "\" is empty.");
-
-            // language-tag check (http://www.ietf.org/rfc/rfc2616.txt)
-            //    language-tag  = primary-tag *( "-" subtag )
-            //    primary-tag   = 1*8ALPHA
-            //    subtag        = 1*8ALPHA
-            if(!trimmedLanguage.matches("[a-zA-Z]{1,8}(\\-{1,8}[a-zA-Z]{1,8})*"))
-                throw new IllegalArgumentException("Language value in LanguageMappings record has to match regexp" +
-                        "\"[a-zA-Z]{1,8}(\\\\-{1,8}[a-zA-Z]{1,8})*\". See RFC 2616 for more details.");
-
-            languageMappingsMap.put(
-                    UriComponent.contextualEncode(trimmedSegment, UriComponent.Type.PATH_SEGMENT),
-                    trimmedLanguage);
-        }
-
-        return languageMappingsMap;
+    private <T> void encodeKeys(Map<String, T> map) {
+        Map<String, T> tempMap = new HashMap<String, T>();
+        for(Map.Entry<String, T> entry : map.entrySet())
+            tempMap.put(UriComponent.contextualEncode(entry.getKey(), UriComponent.Type.PATH_SEGMENT), entry.getValue());
+        map.clear();
+        map.putAll(tempMap);
     }
 
     /**

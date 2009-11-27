@@ -262,7 +262,7 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         rc1.validate();
 
         assertTrue(rc1.getLanguageMappings().get("english") != null);
-        assertTrue(rc1.getLanguageMappings().get("english").equals("en"));
+        assertTrue("Mappings for \"english\" is not \"en\"; current value: " + rc1.getLanguageMappings().get("english"), rc1.getLanguageMappings().get("english").equals("en"));
     }
 
     public void testLanguageMapMultipleString() {

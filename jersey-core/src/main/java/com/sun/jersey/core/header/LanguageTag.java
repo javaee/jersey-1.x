@@ -56,6 +56,18 @@ public class LanguageTag {
     
     protected LanguageTag() {    
     }
+
+    public static LanguageTag valueOf(String s) throws IllegalArgumentException {
+        LanguageTag lt = new LanguageTag();
+
+        try {
+            lt.parse(s);
+        } catch (ParseException pe) {
+            throw new IllegalArgumentException(pe);
+        }
+
+        return lt;
+    }
     
     public LanguageTag(String primaryTag, String subTags) {
         if (subTags != null && subTags.length() > 0)
@@ -146,5 +158,49 @@ public class LanguageTag {
 
     public final String getSubTags() {
         return subTags;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if(object instanceof LanguageTag) {
+            LanguageTag lt = (LanguageTag)object;
+
+            if(this.tag != null)
+                if(!this.tag.equals(lt.getTag()))
+                    return false;
+            else
+                if(lt.getTag() != null)
+                    return false;
+
+            if(this.primaryTag != null)
+                if(!this.primaryTag.equals(lt.getPrimaryTag()))
+                    return false;
+            else
+                if(lt.getPrimaryTag() != null)
+                    return false;
+
+            if(this.subTags != null)
+                if(!this.subTags.equals(lt.getSubTags()))
+                    return false;
+            else
+                if(lt.getSubTags() != null)
+                    return false;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return  (tag == null ? 0 : tag.hashCode()) +
+                (primaryTag == null ? 0 : primaryTag.hashCode()) +
+                (subTags == null ? 0 : primaryTag.hashCode());
+    }
+
+    @Override
+    public String toString() {
+        return primaryTag + (subTags == null ? "" : subTags);
     }
 }
