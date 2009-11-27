@@ -351,7 +351,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Export-Package>com.sun.*</Export-Package>
+                        <Export-Package>com.sun.jersey.*</Export-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
