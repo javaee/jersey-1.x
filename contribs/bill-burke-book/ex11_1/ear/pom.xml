@@ -14,9 +14,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
-        <groupId>com.oreilly.rest.workbook</groupId>
+        <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
         <artifactId>ex11_1_pom</artifactId>
-        <version>1.0</version>
+        <version>1.1.5-ea-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>ex11_1-ear</artifactId>
@@ -31,15 +31,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.oreilly.rest.workbook</groupId>
+            <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
             <artifactId>ex11_1</artifactId>
-            <version>1.0</version>
+            <version>1.1.5-ea-SNAPSHOT</version>
             <type>ejb</type>
         </dependency>
         <dependency>
-            <groupId>com.oreilly.rest.workbook</groupId>
+            <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
             <artifactId>ex11_1-war</artifactId>
-            <version>1.0</version>
+            <version>1.1.5-ea-SNAPSHOT</version>
             <type>war</type>
         </dependency>
     </dependencies>

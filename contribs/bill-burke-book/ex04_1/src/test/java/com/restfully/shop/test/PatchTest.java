@@ -38,6 +38,15 @@ import javax.ws.rs.core.MediaType;
  * @author <a href="mailto:pavel.bucek@sun.com">Pavel Bucek</a>
  */
 public class PatchTest {
+
+    private String getJettyPort() {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if(port != null)
+            return port;
+
+        else return "9095"; // default
+    }
+    
     private static class HttpPatch extends HttpPost {
         public HttpPatch(String s) {
             super(s);
@@ -64,7 +73,7 @@ public class PatchTest {
 
         DefaultHttpClient client = new DefaultHttpClient();
 
-        HttpPost post = new HttpPost("http://localhost:9095/customers");
+        HttpPost post = new HttpPost("http://localhost:" + getJettyPort() + "/customers");
         StringEntity entity = new StringEntity(newCustomer);
         entity.setContentType("application/xml");
         post.setEntity(entity);
@@ -74,7 +83,7 @@ public class PatchTest {
         Assert.assertEquals(201, response.getStatusLine().getStatusCode());
         System.out.println("Location: " + response.getLastHeader("Location"));
 
-        HttpPatch patch = new HttpPatch("http://localhost:9095/customers/1");
+        HttpPatch patch = new HttpPatch("http://localhost:" + getJettyPort() + "/customers/1");
 
         // Update the new customer.  Change Bill's name to William
         String patchCustomer = "<customer>"
@@ -89,7 +98,7 @@ public class PatchTest {
 
         // Show the update
         System.out.println("**** After Update ***");
-        HttpGet get = new HttpGet("http://localhost:9095/customers/1");
+        HttpGet get = new HttpGet("http://localhost:" + getJettyPort() + "/customers/1");
         response = client.execute(get);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
 
@@ -107,7 +116,7 @@ public class PatchTest {
     @Test
     public void testCustomerResourceJersey() throws Exception {
         Client c = ApacheHttpClient.create();
-        WebResource wr = c.resource("http://localhost:9095/customers");
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/customers");
 
         System.out.println("*** Create a new Customer ***");
         // Create a new customer

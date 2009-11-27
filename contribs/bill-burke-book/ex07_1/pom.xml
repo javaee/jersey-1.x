@@ -16,9 +16,13 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.oreilly.rest.workbook</groupId>
+    <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
     <artifactId>ex07_1</artifactId>
-    <version>1.0</version>
+    <parent>
+        <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
+        <artifactId>workbook-pom</artifactId>
+        <version>1.1.5-ea-SNAPSHOT</version>
+    </parent>
     <packaging>war</packaging>
     <name>ex07_1</name>
     <description/>
@@ -104,11 +108,11 @@
                     <contextPath>/</contextPath>
                     <scanIntervalSeconds>2</scanIntervalSeconds>
                     <stopKey>foo</stopKey>
-                    <stopPort>9999</stopPort>
+                    <stopPort>${my.jetty.stop.port}</stopPort>
                     <connectors>
                         <connector
                                 implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-                            <port>9095</port>
+                            <port>${my.jetty.port}</port>
                             <maxIdleTime>60000</maxIdleTime>
                         </connector>
                     </connectors>

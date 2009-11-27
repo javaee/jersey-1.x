@@ -64,5 +64,6 @@
         <module>jersey-guice</module>
         <module>jersey-oauth</module>
         <module>scala</module>
+        <module>bill-burke-book</module>
     </modules>
 </project>

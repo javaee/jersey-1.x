@@ -29,11 +29,20 @@ import com.sun.jersey.api.client.ClientResponse;
  * @author <a href="mailto:pavel.bucek@sun.com">Pavel Bucek</a>
  */
 public class CustomerResourceTest {
+
+    private String getJettyPort() {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if(port != null)
+            return port;
+
+        else return "9095"; // default
+    }
+    
     @Test
     public void testCustomerResource() throws Exception {
         // Show the update
         System.out.println("**** Get Unknown Customer ***");
-        URL getUrl = new URL("http://localhost:9095/customers/1");
+        URL getUrl = new URL("http://localhost:" + getJettyPort() + "/customers/1");
         HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();
         connection.setRequestMethod("GET");
         try {
@@ -48,7 +57,7 @@ public class CustomerResourceTest {
     @Test
     public void testCustomerResourceJersey() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers/1");
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/customers/1");
 
         // Show the update
         System.out.println("**** Get Unknown Customer ***");

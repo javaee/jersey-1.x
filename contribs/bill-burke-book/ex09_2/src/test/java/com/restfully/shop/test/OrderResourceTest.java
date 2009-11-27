@@ -36,6 +36,15 @@ import java.util.Map;
  * @version $Revision: 1 $
  */
 public class OrderResourceTest {
+
+    private String getJettyPort() {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if(port != null)
+            return port;
+
+        else return "9095"; // default
+    }
+
     protected Map<String, Link> processLinkHeaders(ClientResponse response) {
         List<String> linkHeaders = (List<String>) response.getHeaders().get("Link");
         Map<String, Link> links = new HashMap<String, Link>();
@@ -49,7 +58,7 @@ public class OrderResourceTest {
     @Test
     public void testCreateCancelPurge() throws Exception {
         Client c = new Client();
-        String url = "http://localhost:9095/shop";
+        String url = "http://localhost:" + getJettyPort() + "/shop";
 
         WebResource wr = c.resource(url);
         ClientResponse response = wr.head();

@@ -32,12 +32,21 @@ import com.sun.jersey.api.client.ClientResponse;
  * @author <a href="mailto:pavel.bucek@sun.com">Pavel Bucek</a>
  */
 public class InjectionTest {
+    
+    private String getJettyPort() {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if(port != null)
+            return port;
+
+        else return "9095"; // default
+    }
+
     @Test
     public void testCarResource() throws Exception {
         DefaultHttpClient client = new DefaultHttpClient();
 
         System.out.println("**** CarResource Via @MatrixParam ***");
-        HttpGet get = new HttpGet("http://localhost:9095/cars/matrix/mercedes/e55;color=black/2006");
+        HttpGet get = new HttpGet("http://localhost:" + getJettyPort() + "/cars/matrix/mercedes/e55;color=black/2006");
         HttpResponse response = client.execute(get);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         BufferedReader reader = new BufferedReader(new
@@ -50,7 +59,7 @@ public class InjectionTest {
         }
 
         System.out.println("**** CarResource Via PathSegment ***");
-        get = new HttpGet("http://localhost:9095/cars/segment/mercedes/e55;color=black/2006");
+        get = new HttpGet("http://localhost:" + getJettyPort() + "/cars/segment/mercedes/e55;color=black/2006");
         response = client.execute(get);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         reader = new BufferedReader(new
@@ -63,7 +72,7 @@ public class InjectionTest {
         }
 
         System.out.println("**** CarResource Via PathSegments ***");
-        get = new HttpGet("http://localhost:9095/cars/segments/mercedes/e55/amg/year/2006");
+        get = new HttpGet("http://localhost:" + getJettyPort() + "/cars/segments/mercedes/e55/amg/year/2006");
         response = client.execute(get);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         reader = new BufferedReader(new
@@ -76,7 +85,7 @@ public class InjectionTest {
         }
 
         System.out.println("**** CarResource Via PathSegment ***");
-        get = new HttpGet("http://localhost:9095/cars/uriinfo/mercedes/e55;color=black/2006");
+        get = new HttpGet("http://localhost:" + getJettyPort() + "/cars/uriinfo/mercedes/e55;color=black/2006");
         response = client.execute(get);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         reader = new BufferedReader(new
@@ -97,7 +106,7 @@ public class InjectionTest {
         DefaultHttpClient client = new DefaultHttpClient();
 
         System.out.println("**** CustomerResource No Query params ***");
-        HttpGet get = new HttpGet("http://localhost:9095/customers");
+        HttpGet get = new HttpGet("http://localhost:" + getJettyPort() + "/customers");
         HttpResponse response = client.execute(get);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         BufferedReader reader = new BufferedReader(new
@@ -110,7 +119,7 @@ public class InjectionTest {
         }
 
         System.out.println("**** CustomerResource With Query params ***");
-        get = new HttpGet("http://localhost:9095/customers?start=1&size=3");
+        get = new HttpGet("http://localhost:" + getJettyPort() + "/customers?start=1&size=3");
         response = client.execute(get);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         reader = new BufferedReader(new
@@ -123,7 +132,7 @@ public class InjectionTest {
         }
 
         System.out.println("**** CustomerResource With UriInfo and Query params ***");
-        get = new HttpGet("http://localhost:9095/customers/uriinfo?start=2&size=2");
+        get = new HttpGet("http://localhost:" + getJettyPort() + "/customers/uriinfo?start=2&size=2");
         response = client.execute(get);
         Assert.assertEquals(200, response.getStatusLine().getStatusCode());
         reader = new BufferedReader(new
@@ -139,7 +148,7 @@ public class InjectionTest {
     @Test
     public void testCarResourceJersey() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/cars");
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/cars");
 
         System.out.println("**** CarResource Via @MatrixParam ***");
         ClientResponse response = wr.path("matrix/mercedes/e55;color=black/2006").get(ClientResponse.class);
@@ -171,7 +180,7 @@ public class InjectionTest {
     @Test
     public void testCustomerResourceJersey() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers");
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/customers");
 
         System.out.println("**** CustomerResource No Query params ***");
         ClientResponse response = wr.get(ClientResponse.class);
@@ -187,7 +196,7 @@ public class InjectionTest {
 
         System.out.println("**** CustomerResource With UriInfo and Query params ***");
         // TODO there is probably some better way how to construct that url..
-        response = c.resource("http://localhost:9095/customers/uriinfo?start=2&size=2").get(ClientResponse.class);
+        response = c.resource("http://localhost:" + getJettyPort() + "/customers/uriinfo?start=2&size=2").get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
 
         System.out.println(response.getEntity(String.class));

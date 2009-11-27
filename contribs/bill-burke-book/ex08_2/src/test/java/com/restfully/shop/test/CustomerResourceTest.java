@@ -28,11 +28,19 @@ import javax.ws.rs.core.MediaType;
  * @author <a href="mailto:pavel.bucek@sun.com">Pavel Bucek</a>
  */
 public class CustomerResourceTest {
+    
+    private String getJettyPort() {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if(port != null)
+            return port;
+
+        else return "9095"; // default
+    }
 
     @Test
     public void testCustomerResource() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers/1");
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/customers/1");
 
         // Get customer
         System.out.println("*** GET Customer (default) **");
@@ -47,7 +55,7 @@ public class CustomerResourceTest {
     @Test
     public void testCustomerResourceMediaTypeMappingsTXT() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers/1.txt");
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/customers/1.txt");
 
         // Get customer
         System.out.println("*** GET Customer as TXT **");
@@ -63,7 +71,7 @@ public class CustomerResourceTest {
     @Test
     public void testCustomerResourceMediaTypeMappingsHTML() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers/1.html");
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/customers/1.html");
 
         // Get customer
         System.out.println("*** GET Customer as TXT **");

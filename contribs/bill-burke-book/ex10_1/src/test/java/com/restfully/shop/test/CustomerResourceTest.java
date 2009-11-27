@@ -28,11 +28,20 @@ import javax.ws.rs.core.MediaType;
  * @version $Revision: 1 $
  */
 public class CustomerResourceTest {
+
+    private String getJettyPort() {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if(port != null)
+            return port;
+
+        else return "9095"; // default
+    }
+
     @Test
     public void testCustomerResource() throws Exception {
         Client c = new Client();
 
-        WebResource wr = c.resource("http://localhost:9095/customers/1");
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/customers/1");
         ClientResponse response = wr.get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         Customer cust = response.getEntity(Customer.class);

@@ -34,6 +34,15 @@ import javax.ws.rs.core.MediaType;
  * @author <a href="mailto:pavel.bucek@sun.com">Pavel Bucek</a>
  */
 public class CustomerResourceTest {
+    
+    private String getJettyPort() {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if(port != null)
+            return port;
+
+        else return "9095"; // default
+    }
+    
     @Test
     public void testCustomerResource() throws Exception {
         System.out.println("*** Create a new Customer ***");
@@ -48,7 +57,7 @@ public class CustomerResourceTest {
                 + "<country>USA</country>"
                 + "</customer>";
 
-        URL postUrl = new URL("http://localhost:9095/customers");
+        URL postUrl = new URL("http://localhost:" + getJettyPort() + "/customers");
         HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
         connection.setDoOutput(true);
         connection.setInstanceFollowRedirects(false);
@@ -64,7 +73,7 @@ public class CustomerResourceTest {
 
         // Get the new customer
         System.out.println("*** GET Created Customer **");
-        URL getUrl = new URL("http://localhost:9095/customers/1");
+        URL getUrl = new URL("http://localhost:" + getJettyPort() + "/customers/1");
         connection = (HttpURLConnection) getUrl.openConnection();
         connection.setRequestMethod("GET");
         System.out.println("Content-Type: " + connection.getContentType());
@@ -85,7 +94,7 @@ public class CustomerResourceTest {
 
         // use first last
         System.out.println("**** Use first-name ***");
-        getUrl = new URL("http://localhost:9095/customers/Bill-Burke");
+        getUrl = new URL("http://localhost:" + getJettyPort() + "/customers/Bill-Burke");
         connection = (HttpURLConnection) getUrl.openConnection();
         connection.setRequestMethod("GET");
 
@@ -105,9 +114,9 @@ public class CustomerResourceTest {
     @Test
     public void testCustomerResourceJersey() throws Exception {
         Client c = new Client();
-        WebResource wr = c.resource("http://localhost:9095/customers");
-        WebResource wr1; // http://localhost:9095/customers/2
-        WebResource wr2; // http://localhost:9095/customers/Pavel-Bucek
+        WebResource wr = c.resource("http://localhost:" + getJettyPort() + "/customers");
+        WebResource wr1; // http://localhost:" + getJettyPort() + "/customers/2
+        WebResource wr2; // http://localhost:" + getJettyPort() + "/customers/Pavel-Bucek
 
         System.out.println("*** Create a new Customer ***");
         // Create a new customer

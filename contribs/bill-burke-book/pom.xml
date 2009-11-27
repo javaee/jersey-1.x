@@ -16,9 +16,9 @@
     <name>OReilly Workbook Examples</name>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.oreilly.rest.workbook</groupId>
+    <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
     <artifactId>workbook-pom</artifactId>
-    <version>1.0</version>
+    <version>1.1.5-ea-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -38,4 +38,29 @@
         <module>ex10_1</module>
         <module>ex11_2</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>hudson</id>
+            <activation>
+                <property>
+                    <name>env.JERSEY_HTTP_PORT</name>
+                </property>
+            </activation>
+            <properties>
+                <my.jetty.port>${env.JERSEY_HTTP_PORT}</my.jetty.port>
+                <my.jetty.stop.port>${env.JETTY_STOP_PORT}</my.jetty.stop.port>
+            </properties>
+        </profile>
+        <profile>
+            <id>non-hudson</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <my.jetty.port>9095</my.jetty.port>
+                <my.jetty.stop.port>9999</my.jetty.stop.port>
+            </properties>
+        </profile>
+    </profiles>
 </project>

@@ -24,11 +24,20 @@ import org.junit.Test;
  * @version $Revision: 1 $
  */
 public class CustomerResourceTest {
+    
+    private String getJettyPort() {
+        String port = System.getenv("JERSEY_HTTP_PORT");
+        if(port != null)
+            return port;
+
+        else return "9095"; // default
+    }
+    
     @Test
     public void testQueryCustomers() throws Exception {
         Client c = new Client();
 
-        String url = "http://localhost:9095/customers";
+        String url = "http://localhost:" + getJettyPort() + "/customers";
         while (url != null) {
 
             WebResource wr = c.resource(url);
