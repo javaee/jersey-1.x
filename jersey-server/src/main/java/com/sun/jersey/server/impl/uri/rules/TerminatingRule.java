@@ -55,9 +55,13 @@ public class TerminatingRule implements UriRule {
         UriRuleProbeProvider.ruleAccept(TerminatingRule.class.getSimpleName(), path,
                 resource);
 
+        if (context.isTracingEnabled()) {
+            context.trace("accept termination: \"" + path + "\"");
+        }
+
         if (context.getResponse().isResponseSet())
             throw new WebApplicationException(context.getResponse().getResponse());
         else
             return false;
-        }
-    }    
+    }
+}    

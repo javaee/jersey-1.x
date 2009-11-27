@@ -36,7 +36,13 @@
  */
 package com.sun.jersey.api.core;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.ws.rs.core.MediaType;
 
 
@@ -152,8 +158,19 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         rc1.setPropertiesAndFeatures(propertyMap);
         rc1.validate();
         
-        assertTrue(rc1.getMediaTypeMappings().get("text") != null);
-        assertTrue(rc1.getMediaTypeMappings().get("text").equals(MediaType.TEXT_PLAIN_TYPE));
+        assertNotNull(rc1.getMediaTypeMappings().get("text"));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, rc1.getMediaTypeMappings().get("text"));
+    }
+
+    public void testMediaTypeMapSingleStringNullValue() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, null);
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+
+        assertTrue(rc1.getMediaTypeMappings().isEmpty());
     }
 
     public void testMediaTypeMapMultipleString() {
@@ -164,8 +181,8 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         rc1.setPropertiesAndFeatures(propertyMap);
         rc1.validate();
         
-        assertTrue(rc1.getMediaTypeMappings().get("text").equals(MediaType.TEXT_PLAIN_TYPE));
-        assertTrue(rc1.getMediaTypeMappings().get("xml").equals(MediaType.APPLICATION_XML_TYPE));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, rc1.getMediaTypeMappings().get("text"));
+        assertEquals(MediaType.APPLICATION_XML_TYPE, rc1.getMediaTypeMappings().get("xml"));
     }
 
     public void testMediaTypeMapMultipleStringArray() {
@@ -176,8 +193,20 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         rc1.setPropertiesAndFeatures(propertyMap);
         rc1.validate();
         
-        assertTrue(rc1.getMediaTypeMappings().get("text").equals(MediaType.TEXT_PLAIN_TYPE));
-        assertTrue(rc1.getMediaTypeMappings().get("xml").equals(MediaType.APPLICATION_XML_TYPE));
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, rc1.getMediaTypeMappings().get("text"));
+        assertEquals(MediaType.APPLICATION_XML_TYPE, rc1.getMediaTypeMappings().get("xml"));
+    }
+
+    public void testMediaTypeMapStringArrayNullValues() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, new String[] {null, "text:text/plain", "xml:application/xml"});
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+
+        assertEquals(MediaType.TEXT_PLAIN_TYPE, rc1.getMediaTypeMappings().get("text"));
+        assertEquals(MediaType.APPLICATION_XML_TYPE, rc1.getMediaTypeMappings().get("xml"));
     }
 
     public void testMediaTypeMapInvalid() {
@@ -261,8 +290,19 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         rc1.setPropertiesAndFeatures(propertyMap);
         rc1.validate();
 
-        assertTrue(rc1.getLanguageMappings().get("english") != null);
-        assertTrue("Mappings for \"english\" is not \"en\"; current value: " + rc1.getLanguageMappings().get("english"), rc1.getLanguageMappings().get("english").equals("en"));
+        assertNotNull(rc1.getLanguageMappings().get("english"));
+        assertEquals("en", rc1.getLanguageMappings().get("english"));
+    }
+
+    public void testLangaugeMapSingleStringNullValue() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, null);
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+
+        assertTrue(rc1.getMediaTypeMappings().isEmpty());
     }
 
     public void testLanguageMapMultipleString() {
@@ -273,8 +313,8 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         rc1.setPropertiesAndFeatures(propertyMap);
         rc1.validate();
 
-        assertTrue(rc1.getLanguageMappings().get("english").equals("en"));
-        assertTrue(rc1.getLanguageMappings().get("czech").equals("cz"));
+        assertEquals("en", rc1.getLanguageMappings().get("english"));
+        assertEquals("cz", rc1.getLanguageMappings().get("czech"));
     }
 
     public void testLanguageMapMultipleStringArray() {
@@ -285,8 +325,20 @@ public class DefaultResourceConfigTest extends AbstractResourceConfigOrderTest {
         rc1.setPropertiesAndFeatures(propertyMap);
         rc1.validate();
 
-        assertTrue(rc1.getLanguageMappings().get("english").equals("en"));
-        assertTrue(rc1.getLanguageMappings().get("czech").equals("cz"));
+        assertEquals("en", rc1.getLanguageMappings().get("english"));
+        assertEquals("cz", rc1.getLanguageMappings().get("czech"));
+    }
+
+    public void testLanguageMapMultipleStringArrayNullValues() {
+        DefaultResourceConfig rc1 = new DefaultResourceConfig();
+        Map<String, Object> propertyMap = new HashMap<String, Object>();
+        propertyMap.put(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, new String[] {null, "english:en", "czech:cz"});
+
+        rc1.setPropertiesAndFeatures(propertyMap);
+        rc1.validate();
+
+        assertEquals("en", rc1.getLanguageMappings().get("english"));
+        assertEquals("cz", rc1.getLanguageMappings().get("czech"));
     }
 
     public void testLanguageInvalid() {

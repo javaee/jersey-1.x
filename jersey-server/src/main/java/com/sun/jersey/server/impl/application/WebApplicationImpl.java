@@ -75,6 +75,7 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.ResourceConfigurator;
+import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
@@ -247,6 +248,8 @@ public final class WebApplicationImpl implements WebApplication {
 
     private WadlFactory wadlFactory;
 
+    private boolean isTraceEnabled;
+
     public WebApplicationImpl() {
         this.context = new ThreadLocalHttpContext();
 
@@ -413,6 +416,10 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
  
+    public FeaturesAndProperties getFeaturesAndProperties() {
+        return resourceConfig;
+    }
+
     @Override
     public WebApplication clone() {
         WebApplicationImpl wa = new WebApplicationImpl();
@@ -894,6 +901,9 @@ public final class WebApplicationImpl implements WebApplication {
         
         // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(processRootResources());
+
+        this.isTraceEnabled = resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE) |
+                resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE_PER_REQUEST);
     }
 
     public MessageBodyWorkers getMessageBodyWorkers() {
@@ -912,7 +922,7 @@ public final class WebApplicationImpl implements WebApplication {
     public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
         final WebApplicationContext localContext = new
                 WebApplicationContext(this, request, response);
-        
+
         context.set(localContext);
         try {
             _handleRequest(localContext, request, response);
@@ -933,6 +943,16 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         cpFactory.destroy();
+    }
+
+    // Traceable
+
+    public boolean isTracingEnabled() {
+        return isTraceEnabled;
+    }
+
+    public void trace(String message) {
+        context.get().trace(message);
     }
 
     private void _handleRequest(final WebApplicationContext localContext,

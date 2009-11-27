@@ -62,6 +62,19 @@ public final class AtomicMatchingPatterns<R> implements UriRules<R> {
     }
     
     public Iterator<R> match(CharSequence path, UriMatchResultContext resultContext) {
+        if (resultContext.isTracingEnabled()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("match path \"").append(path).append("\" -> ");
+            boolean first = true;
+            for (PatternRulePair<R> prp : rules) {
+                if (!first)
+                    sb.append(", ");
+                sb.append("\"").append(prp.p.toString()).append("\"");
+                first = false;
+            }
+            resultContext.trace(sb.toString());
+        }
+
         for (PatternRulePair<R> prp : rules) {
             // Match each template
             final MatchResult mr = prp.p.match(path);

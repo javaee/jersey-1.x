@@ -39,6 +39,7 @@ package com.sun.jersey.impl.uri;
 
 import com.sun.jersey.impl.*;
 import com.sun.jersey.server.impl.application.WebApplicationContext;
+import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.spi.container.ContainerRequest;
 import javax.ws.rs.core.UriInfo;
 import junit.framework.*;
@@ -54,20 +55,22 @@ public class UriPathHttpRequestTest extends TestCase {
     }
     
     public void testGeneral() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10", "/context/");
-        UriInfo ui = new WebApplicationContext(null, r, null);
+        UriInfo ui = new WebApplicationContext(wai, r, null);
         assertEquals("widgets/10", ui.getPath());
         assertEquals("widgets/10", ui.getPath(true));
         assertEquals("widgets/10", ui.getPath(false));
     }    
     
     public void testEncoded() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets%20/%2010", "/context/");
-        UriInfo ui = new WebApplicationContext(null, r, null);
+        UriInfo ui = new WebApplicationContext(wai, r, null);
         assertEquals("widgets / 10", ui.getPath());
         assertEquals("widgets / 10", ui.getPath(true));
         assertEquals("widgets%20/%2010", ui.getPath(false));

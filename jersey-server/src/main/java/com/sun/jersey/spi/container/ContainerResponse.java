@@ -39,6 +39,8 @@ package com.sun.jersey.spi.container;
 import com.sun.jersey.core.header.OutBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.core.TraceInformation;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.factory.ResponseBuilderHeaders;
 import com.sun.jersey.core.spi.factory.ResponseImpl;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -49,6 +51,7 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericEntity;
@@ -154,7 +157,7 @@ public class ContainerResponse implements HttpResponseContext {
             }
         }
     };
-    
+
     /**
      * Instantate a new ContainerResponse.
      * 
@@ -217,7 +220,11 @@ public class ContainerResponse implements HttpResponseContext {
     public void write() throws IOException {
         if (isCommitted)
             return;        
-        
+
+        if (request.isTracingEnabled()) {
+            configureTrace(responseWriter);
+        }
+
         if (entity == null) {
             isCommitted = true;
             responseWriter.writeStatusAndHeaders(-1, this);
@@ -264,6 +271,13 @@ public class ContainerResponse implements HttpResponseContext {
             isCommitted = true;
             responseWriter.writeStatusAndHeaders(0, this);
         } else {
+            if (request.isTracingEnabled()) {
+                request.trace(String.format("matched message body writer: %s, \"%s\" -> %s",
+                        ReflectionHelper.objectToString(entity),
+                        contentType,
+                        ReflectionHelper.objectToString(p)));
+            }
+
             if (out == null)
                 out = new CommittingOutputStream(size);
             p.writeTo(entity, entity.getClass(), entityType,
@@ -275,6 +289,22 @@ public class ContainerResponse implements HttpResponseContext {
             }
         }
         responseWriter.finish();
+    }
+
+    private void configureTrace(final ContainerResponseWriter crw) {
+        final TraceInformation ti = (TraceInformation)request.getProperties().
+                get(TraceInformation.class.getName());
+        setContainerResponseWriter(new ContainerResponseWriter() {
+            public OutputStream writeStatusAndHeaders(long contentLength,
+                    ContainerResponse response) throws IOException {
+                ti.addTraceHeaders();
+                return crw.writeStatusAndHeaders(contentLength, response);
+            }
+
+            public void finish() throws IOException {
+                crw.finish();
+            }
+        });
     }
 
     /**
@@ -507,7 +537,7 @@ public class ContainerResponse implements HttpResponseContext {
                 _headers.putSingle(HttpHeaders.LOCATION, location);
             }
         }
-        
+
         return _headers;
     }
 }

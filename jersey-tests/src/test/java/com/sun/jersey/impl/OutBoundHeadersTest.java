@@ -35,43 +35,90 @@
  * holder.
  */
 
-package com.sun.jersey.impl.uri.rules;
+package com.sun.jersey.impl;
 
-import com.sun.jersey.server.impl.uri.rules.PatternRulePair;
-import com.sun.jersey.server.impl.uri.rules.AtomicMatchingPatterns;
-import com.sun.jersey.server.impl.uri.PathPattern;
-import com.sun.jersey.spi.uri.rules.UriRules;
-import java.util.ArrayList;
+import com.sun.jersey.core.header.OutBoundHeaders;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import junit.framework.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class LinearMatchingTest extends AbstractMatchingTester {
+public class OutBoundHeadersTest extends TestCase {
     
-    public LinearMatchingTest(String testName) {
+    public OutBoundHeadersTest(String testName) {
         super(testName);
     }
-
-    public boolean isTracingEnabled() {
-        return false;
-    }
-
-    public void trace(String message) {
+    
+    
+    public void testGet() {
+        OutBoundHeaders h = new OutBoundHeaders();
+        
+        h.add("Content-Type", "value");
+        
+        Object s = h.getFirst("content-type");
+        assertEquals("value", s);
+        s = h.getFirst("cONTENT-tYPE");
+        assertEquals("value", s);
     }
     
-    private class LinearRulesBuilder extends RulesBuilder {
-        protected UriRules<String> _build() {
-            List<PatternRulePair<String>> l = new ArrayList<PatternRulePair<String>>();
-            for (Map.Entry<PathPattern, String> e : rulesMap.entrySet())
-                l.add(new PatternRulePair<String>(e.getKey(), e.getValue()));            
-            return new AtomicMatchingPatterns<String>(l);
+    public void testPut() {
+        OutBoundHeaders h = new OutBoundHeaders();
+        
+        h.add("Content-Type", "value");
+
+        h.get("CONTENT-TYPE").set(0, "value1");
+        
+        Object s = h.getFirst("content-type");
+        assertEquals("value1", s);
+        s = h.getFirst("cONTENT-tYPE");
+        assertEquals("value1", s);
+    }
+    
+    public void testOrder() {
+        OutBoundHeaders h = new OutBoundHeaders();
+
+        for (int i = 0; i < 1000; i++) {
+            h.add(UUID.randomUUID().toString() + i, i);
+        }
+
+        int i = 0;
+        for (Map.Entry<String, List<Object>> e : h.entrySet()) {
+            assertEquals(i, e.getValue().get(0));
+            i++;
         }
     }
     
-    protected RulesBuilder create() {
-        return new LinearRulesBuilder();
+    public void testMoreGet() {
+        OutBoundHeaders h = new OutBoundHeaders();
+        
+        for (int i = 0; i < 100; i++) {
+            String key = generate(i);
+            String value = key;
+            
+            h.add(key, value);
+            assertEquals(value, h.getFirst(key));
+
+            value = value + "NEW";
+            
+            h.get(key).set(0, value);
+            assertEquals(value, h.getFirst(key));
+        }
     }
+    
+    private String generate(int size) {
+        StringBuilder b = new StringBuilder();
+        char c = 'A';
+        while (size-- > 0) {
+            b.append(Character.toLowerCase(c));
+            b.append(Character.toUpperCase(c));
+            c++;
+        }
+        
+        return b.toString();
+    }
+    
 }

@@ -40,6 +40,8 @@ import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
@@ -49,6 +51,7 @@ import com.sun.jersey.core.header.MatchingEntityTag;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.server.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -101,8 +104,10 @@ public class ContainerRequest implements HttpRequestContext {
     private static final Logger LOGGER = Logger.getLogger(ContainerRequest.class.getName());
     
     private static final Annotation[] EMTPTY_ANNOTATIONS = new Annotation[0];
-    
-    private final MessageBodyWorkers bodyContext;
+
+    private final WebApplication wa;
+
+    private final boolean isTraceEnabled;
     
     private Map<String, Object> properties;
     
@@ -168,8 +173,9 @@ public class ContainerRequest implements HttpRequestContext {
             URI baseUri,
             URI requestUri,
             InBoundHeaders headers,
-            InputStream entity) {        
-        this.bodyContext = wa.getMessageBodyWorkers();
+            InputStream entity) {
+        this.wa = wa;
+        this.isTraceEnabled = wa.isTracingEnabled();
         this.method = method;
         this.baseUri = baseUri;
         this.requestUri = requestUri;
@@ -179,7 +185,8 @@ public class ContainerRequest implements HttpRequestContext {
     }
 
     /* package */ ContainerRequest(ContainerRequest r) {
-        this.bodyContext = r.bodyContext;
+        this.wa = r.wa;
+        this.isTraceEnabled = r.isTraceEnabled;
     }
 
     // ContainerRequest
@@ -277,8 +284,28 @@ public class ContainerRequest implements HttpRequestContext {
      * @return the message body workers.
      */
     public MessageBodyWorkers getMessageBodyWorkers() {
-        return bodyContext;
+        return wa.getMessageBodyWorkers();
     }
+
+    // Traceable
+
+    public boolean isTracingEnabled() {
+        return isTraceEnabled;
+    }
+
+    public void trace(String message) {
+        if (!isTracingEnabled())
+            return;
+
+        if (wa.getFeaturesAndProperties().getFeature(ResourceConfig.FEATURE_TRACE_PER_REQUEST) &&
+                !getRequestHeaders().containsKey("X-Jersey-Trace-Accept"))
+            return;
+
+        TraceInformation ti = (TraceInformation)getProperties().
+                get(TraceInformation.class.getName());
+        ti.trace(message);
+    }
+
 
     // HttpRequestContext
     
@@ -395,7 +422,7 @@ public class ContainerRequest implements HttpRequestContext {
             mediaType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
         }
 
-        MessageBodyReader<T> bw = bodyContext.getMessageBodyReader(
+        MessageBodyReader<T> bw = getMessageBodyWorkers().getMessageBodyReader(
                 type, genericType,
                 as, mediaType);
         if (bw == null) {
@@ -404,6 +431,13 @@ public class ContainerRequest implements HttpRequestContext {
 
             throw new WebApplicationException(
                     Responses.unsupportedMediaType().build());
+        }
+
+        if (isTracingEnabled()) {
+            trace(String.format("matched message body reader: %s, \"%s\" -> %s",
+                    genericType,
+                    mediaType,
+                    ReflectionHelper.objectToString(bw)));
         }
 
         try {

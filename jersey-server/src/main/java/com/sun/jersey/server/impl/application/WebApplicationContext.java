@@ -39,6 +39,7 @@ package com.sun.jersey.server.impl.application;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.ExtendedUriInfo;
+import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
@@ -69,6 +70,8 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
 
     private final WebApplicationImpl app;
 
+    private final boolean isTraceEnabled;
+
     private ContainerRequest request;
     
     private ContainerResponse response;
@@ -78,9 +81,15 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     public WebApplicationContext(WebApplicationImpl app,
             ContainerRequest request, ContainerResponse response) {
         this.app = app;
+        this.isTraceEnabled = app.isTracingEnabled();
         this.request = request;
         this.response = response;
         this.responseFilters = Collections.EMPTY_LIST;
+
+        if (isTracingEnabled()) {
+            getProperties().put(TraceInformation.class.getName(), 
+                    new TraceInformation(this));
+        }
     }
 
     public List<ContainerResponseFilter> getResponseFilters() {
@@ -105,7 +114,19 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return request.getProperties();
     }
 
+    // Traceable
     
+    public boolean isTracingEnabled() {
+        return isTraceEnabled;
+    }
+
+    public void trace(String message) {
+        if (!isTracingEnabled())
+            return;
+
+        request.trace(message);
+    }
+
     // UriMatchResultContext
 
     private MatchResult matchResult;

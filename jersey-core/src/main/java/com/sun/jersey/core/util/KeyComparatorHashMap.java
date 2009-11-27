@@ -269,6 +269,7 @@ public class KeyComparatorHashMap<K,V>
      *
      * @return the number of key-value mappings in this map.
      */
+    @Override
     public int size() {
         return size;
     }
@@ -278,6 +279,7 @@ public class KeyComparatorHashMap<K,V>
      *
      * @return <tt>true</tt> if this map contains no key-value mappings.
      */
+    @Override
     public boolean isEmpty() {
         return size == 0;
     }
@@ -312,6 +314,7 @@ public class KeyComparatorHashMap<K,V>
      *          <tt>null</tt> if the map contains no mapping for this key.
      * @see #put(Object, Object)
      */
+    @Override
     public V get(Object key) {
         K k = (K)maskNull(key);
         int hash = keyComparatorHash(k);
@@ -334,6 +337,7 @@ public class KeyComparatorHashMap<K,V>
      * @return <tt>true</tt> if this map contains a mapping for the specified
      * key.
      */
+    @Override
     public boolean containsKey(Object key) {
         K k = (K)maskNull(key);
         int hash = keyComparatorHash(k);
@@ -374,6 +378,7 @@ public class KeyComparatorHashMap<K,V>
      *	       also indicate that the HashMap previously associated
      *	       <tt>null</tt> with the specified key.
      */
+    @Override
     public V put(K key, V value) {
 	K k = maskNull(key);
         int hash = keyComparatorHash(k);
@@ -483,6 +488,7 @@ public class KeyComparatorHashMap<K,V>
      * @param m mappings to be stored in this map.
      * @throws NullPointerException if the specified map is null.
      */
+    @Override
     public void putAll(Map<? extends K, ? extends V> m) {
         int numKeysToBeAdded = m.size();
         if (numKeysToBeAdded == 0)
@@ -523,6 +529,7 @@ public class KeyComparatorHashMap<K,V>
      *	       also indicate that the map previously associated <tt>null</tt>
      *	       with the specified key.
      */
+    @Override
     public V remove(Object key) {
         Entry<K,V> e = removeEntryForKey(key);
         return (e == null ? null : e.value);
@@ -595,6 +602,7 @@ public class KeyComparatorHashMap<K,V>
     /**
      * Removes all mappings from this map.
      */
+    @Override
     public void clear() {
         modCount++;
         Entry[] tab = table;
@@ -611,6 +619,7 @@ public class KeyComparatorHashMap<K,V>
      * @return <tt>true</tt> if this map maps one or more keys to the
      *         specified value.
      */
+    @Override
     public boolean containsValue(Object value) {
 	if (value == null) 
             return containsNullValue();
@@ -641,6 +650,7 @@ public class KeyComparatorHashMap<K,V>
      *
      * @return a shallow copy of this map.
      */
+    @Override
     public Object clone() {
         KeyComparatorHashMap<K,V> result = null;
 	try { 
@@ -688,6 +698,7 @@ public class KeyComparatorHashMap<K,V>
             return oldValue;
         }
     
+        @Override
         public boolean equals(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
@@ -703,11 +714,13 @@ public class KeyComparatorHashMap<K,V>
             return false;
         }
     
+        @Override
         public int hashCode() {
             return (key==NULL_KEY ? 0 : key.hashCode()) ^
                    (value==null   ? 0 : value.hashCode());
         }
     
+        @Override
         public String toString() {
             return getKey() + "=" + getValue();
         }
@@ -865,6 +878,7 @@ public class KeyComparatorHashMap<K,V>
         public Iterator/*<Map.Entry<K,V>>*/ iterator() {
             return newEntryIterator();
         }
+        @Override
         public boolean contains(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
@@ -872,12 +886,14 @@ public class KeyComparatorHashMap<K,V>
             Entry<K,V> candidate = getEntry(e.getKey());
             return candidate != null && candidate.equals(e);
         }
+        @Override
         public boolean remove(Object o) {
             return removeMapping(o) != null;
         }
         public int size() {
             return size;
         }
+        @Override
         public void clear() {
             KeyComparatorHashMap.this.clear();
         }

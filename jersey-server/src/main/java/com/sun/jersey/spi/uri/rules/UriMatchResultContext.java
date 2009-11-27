@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.spi.uri.rules;
 
+import com.sun.jersey.api.core.Traceable;
 import java.util.regex.MatchResult;
 
 /**
@@ -43,7 +44,7 @@ import java.util.regex.MatchResult;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface UriMatchResultContext {
+public interface UriMatchResultContext extends Traceable {
     /**
      * Get the match result
      * 

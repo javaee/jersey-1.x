@@ -95,4 +95,20 @@ public final class ThreadLocalHttpContext implements HttpContext {
             throw new IllegalStateException();
         }
     }
+
+    public boolean isTracingEnabled() {
+        try {
+            return context.get().isTracingEnabled();
+        } catch (NullPointerException ex) {
+            throw new IllegalStateException();
+        }
+    }
+
+    public void trace(String message) {
+        try {
+            context.get().trace(message);
+        } catch (NullPointerException ex) {
+            throw new IllegalStateException();
+        }
+    }
 }

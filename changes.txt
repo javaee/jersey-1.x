@@ -1,4 +1,18 @@
 release 1.1.5 (2010)
+- Added tracing feature.
+  Tracing provides useful information that describes how a request
+  is processed and dispatched to JAX-RS/Jersey components. This can aid
+  debugging when the application is not behaving as expected either
+  because of a bug in the application code or in the Jersey code.
+  Trace messages will be output as response headers with a header name of the
+  form "X-Jersey-Trace-XXX", where XXX is a decimal value corresponding to the
+  trace message number, and a header value that is the trace message.
+  See ResourceConfig.FEATURE_TRACE and ResourceConfig.FEATURE_TRACE_PER_REQUEST.
+  Tracing can be abled for a web application by adding the following init-param:
+    <init-param>
+        <param-name>com.sun.jersey.config.feature.Trace</param-name>
+        <param-value>true</param-value>
+    </init-param>
 - Added new feature - now its possible to set language mappings via
   ResourceConfig property (ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS);
   this can be set as a parameter in web.xml file.

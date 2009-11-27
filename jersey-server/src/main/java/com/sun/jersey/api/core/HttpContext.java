@@ -45,7 +45,7 @@ import java.util.Map;
  * a HttpContext is injected on to a resource class using the 
  * annotation {@link javax.ws.rs.core.Context}.
  */
-public interface HttpContext {
+public interface HttpContext extends Traceable {
     /**
      * Get the extended URI information.
      * @return the extended URI information.

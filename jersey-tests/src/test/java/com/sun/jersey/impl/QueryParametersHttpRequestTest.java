@@ -38,6 +38,7 @@
 package com.sun.jersey.impl;
 
 import com.sun.jersey.server.impl.application.WebApplicationContext;
+import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.spi.container.ContainerRequest;
 import javax.ws.rs.core.MultivaluedMap;
 import junit.framework.*;
@@ -53,10 +54,11 @@ public class QueryParametersHttpRequestTest extends TestCase {
     }
     
     public void testGeneral() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(), 
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?verbose=true&item=1&item=2", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(p.get("verbose").size(), 1);
         assertEquals(p.getFirst("verbose"),"true");
@@ -67,46 +69,51 @@ public class QueryParametersHttpRequestTest extends TestCase {
     }
     
     public void testEmpty() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(), 
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(p.size(),0);
     }
     
     public void testSingleAmpersand() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?&", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(p.size(),0);
     }
     
     public void testMultipleAmpersand() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?&&%20=%20&&&", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(p.size(),1);
     }
     
     public void testInterspersedAmpersand() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?a=1&&b=2", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(p.size(),2);
     }
     
     public void testEmptyValues() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?one&two&three", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(p.getFirst("one"),"");
         assertEquals(p.getFirst("two"),"");
@@ -114,10 +121,11 @@ public class QueryParametersHttpRequestTest extends TestCase {
     }
     
     public void testMultipleEmptyValues() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?one&one&one", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(p.get("one").size(), 3);
         assertEquals(p.get("one").get(0),"");
@@ -126,54 +134,57 @@ public class QueryParametersHttpRequestTest extends TestCase {
     }
     
     public void testWhiteSpace() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x+=+1%20&%20y+=+2", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(p.getFirst("x "), " 1 ");
         assertEquals(p.getFirst(" y "), " 2");
     }
     
     public void testDecoded() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x+=+1%20&%20y+=+2", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters();
         assertEquals(" 1 ", p.getFirst("x "));
         assertEquals(" 2", p.getFirst(" y "));
         
-        r = new TestHttpRequestContext(new DummyWebApplication(),
+        r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x=1&y=1+%2B+2", "/context");
-        p = new WebApplicationContext(null, r, null)
+        p = new WebApplicationContext(wai, r, null)
                 .getQueryParameters(true);
         assertEquals("1", p.getFirst("x"));
         assertEquals("1 + 2", p.getFirst("y"));
         
-        r = new TestHttpRequestContext(new DummyWebApplication(),
+        r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x=1&y=1+%26+2", "/context");
-        p = new WebApplicationContext(null, r, null)
+        p = new WebApplicationContext(wai, r, null)
                 .getQueryParameters(true);
         assertEquals("1", p.getFirst("x"));
         assertEquals("1 & 2", p.getFirst("y"));
         
-        r = new TestHttpRequestContext(new DummyWebApplication(),
+        r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x=1&y=1+%7C%7C+2", "/context");
-        p = new WebApplicationContext(null, r, null)
+        p = new WebApplicationContext(wai, r, null)
                 .getQueryParameters(true);
         assertEquals("1", p.getFirst("x"));
         assertEquals("1 || 2", p.getFirst("y"));
     }
         
     public void testEncoded() throws Exception {
-        ContainerRequest r = new TestHttpRequestContext(new DummyWebApplication(),
+        WebApplicationImpl wai = new WebApplicationImpl();
+        ContainerRequest r = new TestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x+=+1%20&%20y+=+2", "/context");
-        MultivaluedMap<String, String> p = new WebApplicationContext(null, r, null).
+        MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
                 getQueryParameters(false);
         assertEquals("+1%20", p.getFirst("x "));
         assertEquals("+2", p.getFirst(" y "));

@@ -38,7 +38,6 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.core.util.FeaturesAndProperties;
-import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
@@ -47,8 +46,17 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
 import com.sun.jersey.api.uri.UriComponent;
 
+import com.sun.jersey.core.header.LanguageTag;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Path;
@@ -137,23 +145,90 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             = "com.sun.jersey.config.feature.DisableWADL";
 
     /**
-     * This property can be used to set media type mapping.
-     * <p>Accepted types are String and String[]. Mappings have to be in following
-     * format: "segment1 : mediaType1, segment2 : mediaType2" (for example it can
-     * be set to "text:text/plain"). 
+     * If true then enable tracing.
+     * <p>
+     * Tracing provides useful information that describes how a request
+     * is processed and dispatched to JAX-RS/Jersey components. This can aid
+     * debugging when the application is not behaving as expected either
+     * because of a bug in the application code or in the Jersey code.
+     * <p>
+     * Trace messages will be output as response headers
+     * with a header name of the form "X-Jersey-Trace-XXX", where XXX is a
+     * decimal value corresponding to the trace message number, and a header
+     * value that is the trace message.
+     * <p>
+     * Trace messages will be output in the same order as traces occur.
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_TRACE
+            = "com.sun.jersey.config.feature.Trace";
+
+    /**
+     * If true then enable tracing on a per-request basis.
+     * <p>
+     * Tracing provides useful information that describes how a request
+     * is processed and dispatched to JAX-RS/Jersey components. This can aid
+     * debugging when the application is not behaving as expected either
+     * because of a bug in the application code or in the Jersey code.
+     * <p>
+     * Trace messages will be output if a request header is present with a
+     * header name of "X-Jersey-Trace-Accept" (the header value is ignored).
+     * <p>
+     * Trace messages will be output as response headers
+     * with a header name of the form "X-Jersey-Trace-XXX", where XXX is a
+     * decimal value corresponding to the trace message number, and a header
+     * value that is the trace message.
+     * <p>
+     * Trace messages will be output in the same order as traces occur.
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_TRACE_PER_REQUEST
+            = "com.sun.jersey.config.feature.TracePerRequest";
+
+    /**
+     * If set the map of file extension to media type mappings that will be
+     * added to the map that is returned from {@link #getMediaTypeMappings() }.
+     * <p>
+     * This type of this property must be a String or String[] that contains
+     * one or more comma separated key value pairs of the form
+     * "&lt;key&gt; : &lt;value&gt;, &lt;key&gt; : &lt;value&gt;" where the key
+     * is the file extension and the value is the media type. For example,
+     * the following declares two mappings for XML and JSON:
+     * "xml : application/xml, json : application/json"
+     * <p>
+     * The value of this property will be validated, and keys/values added to
+     * map returned from {@link #getMediaTypeMappings()}, when the
+     * {@link #validate()} method is invoked.
+     * <p>
+     * Validation will verify that media types are valid.
      */
     public static final String PROPERTY_MEDIA_TYPE_MAPPINGS
             = "com.sun.jersey.config.property.MediaTypeMappings";
 
     /**
-     * This property can be used to set language mapping.
-     * <p>Accepted types are String and String[]. Mappings have to be in following
-     * format: "segment1 : language-tag1, segment2 : language-tag2" (for example it can
-     * be set to "text:en-US").
-     * <p>language tag format is defined at http://www.ietf.org/rfc/rfc2616.txt:
-     *       language-tag  = primary-tag *( "-" subtag )
-     *       primary-tag   = 1*8ALPHA
-     *       subtag        = 1*8ALPHA
+     * If set the map of file extension to langauge mappings that will be
+     * added to the map that is returned from {@link #getLanguageMappings() }.
+     * <p>
+     * This type of this property must be a String or String[] that contains
+     * one or more comma separated key value pairs of the form
+     * "&lt;key&gt; : &lt;value&gt;, &lt;key&gt; : &lt;value&gt;" where the key
+     * is the file extension and the value is the language tag. For example,
+     * the following declares two mappings for the languages "en" and "en-US:
+     * "english : en, american : en-US".
+     * <p>
+     * The value of this property will be validated, and keys/values added to
+     * map returned from {@link #getMediaTypeMappings()}, when the
+     * {@link #validate()} method is invoked.
+     * <p>
+     * Validation will verify that language tags are valid according to HTTP/1.1
+     * and are of the form:
+     * <pre>
+     *   language-tag  = primary-tag *( "-" subtag )
+     *   primary-tag   = 1*8ALPHA
+     *   subtag        = 1*8ALPHA
+     * </pre>
      */
     public static final String PROPERTY_LANGUAGE_MAPPINGS
             = "com.sun.jersey.config.property.LanguageMappings";
@@ -361,13 +436,21 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * A registered class is removed from the set of registered classes
      * if an instance of that class is a member of the set of registered
      * singletons.
-     * <p>A registered class that is an interface or an abstract class
+     * <p>
+     * A registered class that is an interface or an abstract class
      * is removed from the registered classes.
-     * <p>Additionaly this methods validates property PROPERTY_MEDIA_TYPE_MAPPINGS
-     * and adds its parsed content into ResourceConfigs mediaTypeMappings map.
+     * <p>
+     * File extension to media type and language mappings in the properties
+     * {@link #PROPERTY_MEDIA_TYPE_MAPPINGS} and {@link #PROPERTY_LANGUAGE_MAPPINGS},
+     * respectively, are processed and key/values pairs added to the maps
+     * returned from {@link #getMediaTypeMappings() } and 
+     * {@link #getLanguageMappings() }, respectively. The characters of file
+     * extension values will be contextually encoded according to the set of 
+     * valid characters defined for a path segment.
      * 
      * @throws IllegalArgumentException if the set of registered singletons 
-     *         contains more than one instance of the same root resource class.
+     *         contains more than one instance of the same root resource class,
+     *         or validation of media type and language mappings failed.
      */
     public void validate() {
         // Remove any registered classes if instances exist in registered 
@@ -429,14 +512,16 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
         }
 
         // parse and validate mediaTypeMappings set thru PROPERTY_MEDIA_TYPE_MAPPINGS property
-        parseAndValidateMappings(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS, getMediaTypeMappings(), new TypeParser<MediaType>() {
+        parseAndValidateMappings(ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS,
+                getMediaTypeMappings(), new TypeParser<MediaType>() {
             public MediaType valueOf(String value) {
                 return MediaType.valueOf(value);
             }
         });
 
         // parse and validate language mappings set thru PROPERTY_LANGUAGE_MAPPINGS property
-        parseAndValidateMappings(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS, getLanguageMappings(), new TypeParser<String>() {
+        parseAndValidateMappings(ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS,
+                getLanguageMappings(), new TypeParser<String>() {
             public String valueOf(String value) {
                 return LanguageTag.valueOf(value).toString();
             }
@@ -451,54 +536,51 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
         public T valueOf(String s);
     }
     
-    private <T> void parseAndValidateMappings(String property, Map<String, T> mappingsMap, TypeParser<T> parser) {
+    private <T> void parseAndValidateMappings(String property,
+            Map<String, T> mappingsMap, TypeParser<T> parser) {
         Object mappings = getProperty(property);
-        if (mappings != null) {
+        if (mappings == null)
+            return;
 
-            Map<String, T> tempMappingsMap = null;
-            if (mappings instanceof String) {
-                tempMappingsMap = parseMappings(property, (String) mappings, parser);
-            } else if (mappings instanceof String[]) {
-                for (int j = 0; j < ((String[]) mappings).length; j++)
-                    if (tempMappingsMap == null)
-                        tempMappingsMap = parseMappings(property, ((String[]) mappings)[j], parser);
-                    else
-                        tempMappingsMap.putAll(parseMappings(property, ((String[]) mappings)[j], parser));
-            } else {
-                throw new IllegalArgumentException("Provided " + property + " mappings is invalid. Acceptable types are String" +
-                        " and String[].");
-            }
-
-            mappingsMap.putAll(tempMappingsMap);
+        if (mappings instanceof String) {
+            parseMappings(property, (String) mappings, mappingsMap, parser);
+        } else if (mappings instanceof String[]) {
+            final String[] mappingsArray = (String[])mappings;
+            for (int i = 0; i < mappingsArray.length; i++)
+                parseMappings(property, mappingsArray[i], mappingsMap, parser);
+        } else {
+            throw new IllegalArgumentException("Provided " + property +
+                    " mappings is invalid. Acceptable types are String" +
+                    " and String[].");
         }
     }
 
-    private <T> Map<String, T> parseMappings(String property, String mappings, TypeParser<T> parser) {
-        if(mappings == null)
-            return Collections.EMPTY_MAP;
-
-        Map<String, T> mappingsMap = new HashMap<String, T>();
-
+    private <T> void parseMappings(String property, String mappings,
+            Map<String, T> mappingsMap, TypeParser<T> parser) {
+        if (mappings == null)
+            return;
+        
         String[] records = mappings.split(",");
 
         for(int i = 0; i < records.length; i++) {
             String[] record = records[i].split(":");
-            if(record.length != 2)
-                throw new IllegalArgumentException("Provided " + property + " mapping \"" + mappings + "\" is invalid. It " +
-                        "should contain two parts (segment and media type) separated by colon (:).");
+            if (record.length != 2)
+                throw new IllegalArgumentException("Provided " + property +
+                        " mapping \"" + mappings + "\" is invalid. It " +
+                        "should contain two parts, key and value, separated by ':'.");
 
             String trimmedSegment = record[0].trim();
             String trimmedValue = record[1].trim();
 
-            if(trimmedSegment.length() == 0)
-                throw new IllegalArgumentException("Segment value in " + property + " mappings record \"" + records[i] + "\" is empty.");
-            if(trimmedValue.length() == 0)
-                throw new IllegalArgumentException("Value in " + property + " mappings record \"" + records[i] + "\" is empty.");
+            if (trimmedSegment.length() == 0)
+                throw new IllegalArgumentException("The key in " + property +
+                        " mappings record \"" + records[i] + "\" is empty.");
+            if (trimmedValue.length() == 0)
+                throw new IllegalArgumentException("The value in " + property +
+                        " mappings record \"" + records[i] + "\" is empty.");
             
             mappingsMap.put(trimmedSegment, parser.valueOf(trimmedValue));
         }
-
-        return mappingsMap;
     }
 
     private <T> void encodeKeys(Map<String, T> map) {

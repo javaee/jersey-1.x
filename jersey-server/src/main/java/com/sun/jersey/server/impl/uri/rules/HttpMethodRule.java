@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.core.header.QualitySourceMediaType;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -148,6 +149,23 @@ public final class HttpMethodRule implements UriRule {
         final HttpRequestContext request = context.getRequest();
         final HttpResponseContext response = context.getResponse();
 
+        if (context.isTracingEnabled()) {
+            final String currentPath = context.getUriInfo().getMatchedURIs().get(0);
+            if (isSubResource) {
+                final String prevPath = context.getUriInfo().getMatchedURIs().get(1);
+                context.trace(String.format("accept sub-resource methods: \"%s\" : \"%s\", %s -> %s",
+                        prevPath,
+                        currentPath.substring(prevPath.length()),
+                        context.getRequest().getMethod(),
+                        ReflectionHelper.objectToString(resource)));
+            } else {
+                context.trace(String.format("accept resource methods: \"%s\", %s -> %s",
+                        currentPath,
+                        context.getRequest().getMethod(),
+                        ReflectionHelper.objectToString(resource)));
+            }
+        }
+
         // Get the list of resource methods for the HTTP method
         ResourceMethodListPair methods = map.get(request.getMethod());
         if (methods == null) {
@@ -190,6 +208,17 @@ public final class HttpMethodRule implements UriRule {
                 context.pushResource(resource);
                 // Set the template values
                 context.pushMatch(method.getTemplate(), method.getTemplate().getTemplateVariables());
+            }
+
+            if (context.isTracingEnabled()) {
+                if (isSubResource) {
+                    context.trace(String.format("matched sub-resource method: @Path(\"%s\") %s",
+                            method.getTemplate(),
+                            method.getDispatcher()));
+                } else {
+                    context.trace(String.format("matched resource method: %s",
+                            method.getDispatcher()));
+                }
             }
 
             // Push the response filters

@@ -38,6 +38,7 @@
 package com.sun.jersey.server.impl.uri.rules;
 
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
@@ -60,6 +61,13 @@ public final class ResourceObjectRule extends BaseRule {
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         // Set the template values
         pushMatch(context);
+
+        if (context.isTracingEnabled()) {
+            context.trace(String.format("accept resource: \"%s\" -> @Path(\"%s\") %s",
+                    context.getUriInfo().getMatchedURIs().get(0),
+                    getTemplate().getTemplate(),
+                    ReflectionHelper.objectToString(resourceObject)));
+        }
 
         context.pushResource(resourceObject);
 

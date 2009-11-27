@@ -40,6 +40,7 @@ package com.sun.jersey.server.impl.uri.rules;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -90,26 +91,48 @@ public final class SubLocatorRule extends BaseRule {
         pushMatch(context);
 
         // Invoke the sub-locator to get the sub-resource
-        resource = invokeSubLocator(resource, context);
+        Object subResource = invokeSubLocator(resource, context);
         // If null then no match
-        if (resource == null)
+        if (subResource == null) {
+            if (context.isTracingEnabled()) {
+                trace(resource, subResource, context);
+            }
             return false;
+        }
 
         // Check if instance is a class
-        if (resource instanceof Class) {
+        if (subResource instanceof Class) {
             // If so then get the instance of that class
-            resource = context.getResource((Class)resource);
+            subResource = context.getResource((Class)subResource);
         }
-        context.pushResource(resource);
+        context.pushResource(subResource);
         
+        if (context.isTracingEnabled()) {
+            trace(resource, subResource, context);
+        }
+
         // Match sub-rules on the returned resource class
-        final Iterator<UriRule> matches = context.getRules(resource.getClass()).
+        final Iterator<UriRule> matches = context.getRules(subResource.getClass()).
                 match(path, context);
         while(matches.hasNext())
-            if(matches.next().accept(path, resource, context))
+            if(matches.next().accept(path, subResource, context))
                 return true;
 
         return false;            
+    }
+
+    private void trace(Object resource, Object subResource, UriRuleContext context) {
+        final String prevPath = context.getUriInfo().getMatchedURIs().get(1);
+        final String currentPath = context.getUriInfo().getMatchedURIs().get(0);
+
+        context.trace(
+                String.format("accept sub-resource locator: \"%s\" : \"%s\" -> @Path(\"%s\") " +
+                    "%s = %s",
+                prevPath,
+                currentPath.substring(prevPath.length()),
+                getTemplate().getTemplate(),
+                ReflectionHelper.methodInstanceToString(resource, m),
+                subResource));
     }
     
     private Object invokeSubLocator(Object resource, UriRuleContext context) {

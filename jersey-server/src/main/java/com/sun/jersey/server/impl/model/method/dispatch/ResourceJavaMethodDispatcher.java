@@ -79,4 +79,9 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
     
     protected abstract void _dispatch(Object resource, HttpContext context)
             throws IllegalAccessException, InvocationTargetException;
+
+    @Override
+    public String toString() {
+        return method.toString();
+    }
 }

@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.core.header.QualitySourceMediaType;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -96,6 +97,13 @@ public class ViewableRule implements UriRule {
         ResolvedViewable rv = tc.resolveViewable(v);
         if (rv == null)
             return false;
+
+        if (context.isTracingEnabled()) {
+            context.trace(String.format("accept implicit view: \"%s\" -> %s, %s",
+                    templatePath,
+                    ReflectionHelper.objectToString(resource),
+                    rv.getTemplateName()));
+        }
 
         // Push the response filters
         context.pushContainerResponseFilters(responseFilters);

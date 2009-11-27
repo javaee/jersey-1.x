@@ -55,7 +55,7 @@ import javax.ws.rs.core.UriBuilder;
 /**
  * An abstraction of a HTTP request.
  */
-public interface HttpRequestContext extends HttpHeaders, Request, SecurityContext {
+public interface HttpRequestContext extends HttpHeaders, Request, SecurityContext, Traceable {
     /**
      * Get the base URI of the application. URIs of root resource classes
      * are all relative to this base URI.

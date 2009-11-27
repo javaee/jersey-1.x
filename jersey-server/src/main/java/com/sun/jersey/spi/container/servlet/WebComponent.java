@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.ApplicationAdapter;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.api.core.WebAppResourceConfig;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.InBoundHeaders;
@@ -219,18 +220,23 @@ public class WebComponent implements ContainerListener {
     private final static class Writer extends OutputStream implements ContainerResponseWriter {
         final HttpServletResponse response;
 
-        Writer(HttpServletResponse response) {
-            this.response = response;
-        }
-
         ContainerResponse cResponse;
 
         long contentLength;
+
+        OutputStream out;
+
+        boolean statusAndHeadersWritten = false;
+
+        Writer(HttpServletResponse response) {
+            this.response = response;
+        }
 
         public OutputStream writeStatusAndHeaders(long contentLength,
                 ContainerResponse cResponse) throws IOException {
             this.contentLength = contentLength;
             this.cResponse = cResponse;
+            this.statusAndHeadersWritten = false;
             return this;
         }
 
@@ -249,8 +255,6 @@ public class WebComponent implements ContainerListener {
             else
                 response.setStatus(cResponse.getStatus());
         }
-
-        OutputStream out;
 
         public void write(int b) throws IOException {
             initiate();
@@ -275,6 +279,7 @@ public class WebComponent implements ContainerListener {
 
         @Override
         public void flush() throws IOException {
+            writeStatusAndHeaders();
             if (out != null)
                 out.flush();
         }
@@ -293,8 +298,12 @@ public class WebComponent implements ContainerListener {
         }
 
         void writeStatusAndHeaders() {
-            response.setStatus(cResponse.getStatus());
+            if (statusAndHeadersWritten)
+                return;
+
             writeHeaders();
+            response.setStatus(cResponse.getStatus());
+            statusAndHeadersWritten = true;
         }
 
         void writeHeaders() {
@@ -315,7 +324,7 @@ public class WebComponent implements ContainerListener {
      *
      * @param baseUri the base URI of the request.
      * @param requestUri the URI of the request.
-     * @param request the {@link HttpServletRequest} object that
+     * @param cRequest the {@link HttpServletRequest} object that
      *        contains the request the client made to
      *	      the Web component.
      * @param response the {@link HttpServletResponse} object that
@@ -327,7 +336,9 @@ public class WebComponent implements ContainerListener {
      * @exception ServletException if the HTTP request cannot
      *            be handled.
      */
-    public void service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
+    public void service(URI baseUri, URI requestUri,
+            final HttpServletRequest request,
+            final HttpServletResponse response)
             throws ServletException, IOException {
         // Copy the application field to local instance to ensure that the
         // currently loaded web application is used to process
@@ -365,22 +376,39 @@ public class WebComponent implements ContainerListener {
         filterFormParameters(request, cRequest);
 
         try {
+            UriRuleProbeProvider.requestStart(requestUri);
+
             requestInvoker.set(request);
             responseInvoker.set(response);
 
-            UriRuleProbeProvider.requestStart(requestUri);
-
             _application.handleRequest(cRequest, new Writer(response));
-
         } catch (MappableContainerException ex) {
+            traceOnException(cRequest, response);
             throw new ServletException(ex.getCause());
         } catch (ContainerException ex) {
+            traceOnException(cRequest, response);
             throw new ServletException(ex);
+        } catch (RuntimeException ex) {
+            traceOnException(cRequest, response);
+            throw ex;
         } finally {
             UriRuleProbeProvider.requestEnd();
 
             requestInvoker.set(null);
-            responseInvoker.set(null);
+            responseInvoker.set(null);            
+        }
+    }
+
+    private void traceOnException(final ContainerRequest cRequest, final HttpServletResponse response) {
+        if (cRequest.isTracingEnabled()) {
+            final TraceInformation ti = (TraceInformation)cRequest.getProperties().
+                    get(TraceInformation.class.getName());
+
+            ti.addTraceHeaders(new TraceInformation.TraceHeaderListener() {
+                public void onHeader(String name, String value) {
+                    response.addHeader(name, value);
+                }
+            });
         }
     }
     

@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,43 +35,30 @@
  * holder.
  */
 
-package com.sun.jersey.impl.uri.rules;
-
-import com.sun.jersey.server.impl.uri.rules.PatternRulePair;
-import com.sun.jersey.server.impl.uri.rules.AtomicMatchingPatterns;
-import com.sun.jersey.server.impl.uri.PathPattern;
-import com.sun.jersey.spi.uri.rules.UriRules;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+package com.sun.jersey.api.core;
 
 /**
- *
+ * Traceable support for checking if tracing is enabled and to add trace
+ * messages.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class LinearMatchingTest extends AbstractMatchingTester {
-    
-    public LinearMatchingTest(String testName) {
-        super(testName);
-    }
+public interface Traceable {
 
-    public boolean isTracingEnabled() {
-        return false;
-    }
+    /**
+     * Check if tracing is enabled.
+     *
+     * @return true if tracing is enabled, otherwise false.
+     */
+    boolean isTracingEnabled();
 
-    public void trace(String message) {
-    }
-    
-    private class LinearRulesBuilder extends RulesBuilder {
-        protected UriRules<String> _build() {
-            List<PatternRulePair<String>> l = new ArrayList<PatternRulePair<String>>();
-            for (Map.Entry<PathPattern, String> e : rulesMap.entrySet())
-                l.add(new PatternRulePair<String>(e.getKey(), e.getValue()));            
-            return new AtomicMatchingPatterns<String>(l);
-        }
-    }
-    
-    protected RulesBuilder create() {
-        return new LinearRulesBuilder();
-    }
+    /**
+     * Add a trace message.
+     * <p>
+     * A trace message will be added if {@link #isTracingEnabled()} returns
+     * true and tracing contraints are satisfied.
+     *
+     * @param message the trace message to add.
+     */
+    void trace(String message);
 }

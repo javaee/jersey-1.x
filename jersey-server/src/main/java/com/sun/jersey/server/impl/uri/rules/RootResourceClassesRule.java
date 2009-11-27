@@ -62,6 +62,10 @@ public final class RootResourceClassesRule implements UriRule {
         UriRuleProbeProvider.ruleAccept(RootResourceClassesRule.class.getSimpleName(), path,
                 resource);
 
+        if (context.isTracingEnabled()) {
+            context.trace("accept root resource classes: \"" + path + "\"");
+        }
+
         final Iterator<UriRule> matches = rules.match(path, context);
         while(matches.hasNext())
             if(matches.next().accept(path, resource, context))

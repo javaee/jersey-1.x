@@ -41,7 +41,9 @@ package com.sun.jersey.spi.container;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.Traceable;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 
@@ -53,7 +55,7 @@ import java.io.IOException;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface WebApplication {
+public interface WebApplication extends Traceable {
     /**
      *
      * @return true if th web application is initiated, otherwise false.
@@ -102,7 +104,14 @@ public interface WebApplication {
      * @return the cloned instance.
      */
     WebApplication clone();
-            
+
+    /**
+     * Get the features and properties.
+     * 
+     * @return the features and properties.
+     */
+    FeaturesAndProperties getFeaturesAndProperties();
+
     /**
      * Get the message body workers that can be used for getting
      * message body readers and writers. 

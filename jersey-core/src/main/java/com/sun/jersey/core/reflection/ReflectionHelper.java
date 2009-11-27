@@ -40,6 +40,7 @@ package com.sun.jersey.core.reflection;
 import com.sun.jersey.impl.ImplMessages;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -57,7 +58,95 @@ import java.util.Map;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ReflectionHelper {
-    
+
+    /**
+     * Create a string representation of an object.
+     * <p>
+     * Returns a string consisting of the name of the class of which the
+     * object is an instance, the at-sign character '<code>@</code>', and
+     * the unsigned hexadecimal representation of the hash code of the
+     * object. In other words, this method returns a string equal to the
+     * value of:
+     * <blockquote>
+     * <pre>
+     * o.getClass().getName() + '@' + Integer.toHexString(o.hashCode())
+     * </pre></blockquote>
+     *
+     *
+     * @param o the object.
+     * @return the string representaton of the object.
+     */
+    public static String objectToString(Object o) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(o.getClass().getName()).
+                append('@').append(Integer.toHexString(o.hashCode()));
+        return sb.toString();
+    }
+
+    /**
+     * Create a string representation of a method and an instance whose
+     * class implements the method.
+     * <p>
+     * Returns a string consisting of the name of the class of which the object
+     * is an instance, the at-sign character '<code>@</code>',
+     * the unsigned hexadecimal representation of the hash code of the
+     * object, the character '<code>.</code>', the name of the method,
+     * the character '<code>(</code>', the list of method parameters, and
+     * the character '<code>)</code>'. In other words, thos method returns a
+     * string equal to the value of:
+     * <blockquote>
+     * <pre>
+     * o.getClass().getName() + '@' + Integer.toHexString(o.hashCode()) +
+     * '.' + m.getName() + '(' + &lt;parameters&gt; + ')'.
+     * </pre></blockquote>
+     * 
+     * @param o the object whose class implements <code>m</code>.
+     * @param m the method.
+     * @return the string representation of the method and instance.
+     */
+    public static String methodInstanceToString(Object o, Method m) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(o.getClass().getName()).
+                append('@').append(Integer.toHexString(o.hashCode())).
+                append('.').append(m.getName()).append('(');
+
+        Class[] params = m.getParameterTypes();
+        for (int i = 0; i < params.length; i++) {
+            sb.append(getTypeName(params[i]));
+            if (i < (params.length - 1))
+                sb.append(",");
+        }
+
+        sb.append(')');
+
+        return sb.toString();
+    }
+
+    /**
+     * 
+     * @param type
+     * @return
+     */
+    private static String getTypeName(Class type) {
+        if (type.isArray()) {
+            try {
+                Class cl = type;
+                int dimensions = 0;
+                while (cl.isArray()) {
+                    dimensions++;
+                    cl = cl.getComponentType();
+                }
+                StringBuffer sb = new StringBuffer();
+                sb.append(cl.getName());
+                for (int i = 0; i < dimensions; i++) {
+                    sb.append("[]");
+                }
+                return sb.toString();
+            } catch (Throwable e) { /*FALLTHRU*/ }
+        }
+        return type.getName();
+    }
+
     /**
      * Get the Class from the class name.
      * <p>

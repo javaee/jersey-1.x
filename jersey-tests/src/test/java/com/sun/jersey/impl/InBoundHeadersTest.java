@@ -38,15 +38,18 @@
 package com.sun.jersey.impl;
 
 import com.sun.jersey.core.header.InBoundHeaders;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import junit.framework.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpHeadersTest extends TestCase {
+public class InBoundHeadersTest extends TestCase {
     
-    public HttpHeadersTest(String testName) {
+    public InBoundHeadersTest(String testName) {
         super(testName);
     }
     
@@ -73,6 +76,20 @@ public class HttpHeadersTest extends TestCase {
         assertEquals("value1", s);
         s = h.getFirst("cONTENT-tYPE");
         assertEquals("value1", s);
+    }
+    
+    public void testOrder() {
+        InBoundHeaders h = new InBoundHeaders();
+
+        for (int i = 0; i < 1000; i++) {
+            h.add(UUID.randomUUID().toString() + i, "" + i);
+        }
+
+        int i = 0;
+        for (Map.Entry<String, List<String>> e : h.entrySet()) {
+            assertEquals("" + i, e.getValue().get(0));
+            i++;
+        }
     }
     
     public void testMoreGet() {

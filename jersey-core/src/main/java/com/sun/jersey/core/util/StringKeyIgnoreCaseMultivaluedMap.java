@@ -49,7 +49,7 @@ import javax.ws.rs.core.MultivaluedMap;
  * @author Paul.Sandoz@Sun.Com
  */
 public class StringKeyIgnoreCaseMultivaluedMap<V>
-        extends KeyComparatorHashMap<String, List<V>>
+        extends KeyComparatorLinkedHashMap<String, List<V>>
         implements MultivaluedMap<String, V> {
         
     public StringKeyIgnoreCaseMultivaluedMap() {
