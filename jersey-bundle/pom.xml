@@ -34,7 +34,8 @@
  and therefore, elected the GPL Version 2 license, then the option applies
  only if the new code is made subject to such option by the copyright
  holder.
---><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey</groupId>
@@ -314,6 +315,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
+                    <links>
+                        <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
+                    </links>
                     <sourcepath>${gen-src-dir}</sourcepath>
                     <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl com.sun.jersey.atom.rome.impl com.sun.jersey.fastinfoset.impl com.sun.jersey.json.impl</excludePackageNames>
                     <notimestamp>true</notimestamp>

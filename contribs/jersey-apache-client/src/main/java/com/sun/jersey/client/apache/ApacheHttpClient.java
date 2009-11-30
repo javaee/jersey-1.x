@@ -67,13 +67,15 @@ import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
  * {@link ApacheHttpClientConfig#PROPERTY_PREEMPTIVE_AUTHENTICATION} must
  * be set to true.
  * <p>
- * If a response entity is obtained that is an instance of {@link Closeable}
+ * If a response entity is obtained that is an instance of
+ * {@link java.io.Closeable}
  * then the instance MUST be closed after processing the entity to release
  * connection-based resources.
  * <p>
- * If a {@link ClientResponse} is obtained and an entity is not read from the
- * response then {@link ClientResponse#close() } MUST be called after processing
- * the response to release connection-based resources.
+ * If a {@link com.sun.jersey.api.client.ClientResponse} is obtained and an
+ * entity is not read from the response then
+ * {@link com.sun.jersey.api.client.ClientResponse#close() } MUST be called 
+ * after processing the response to release connection-based resources.
  * 
  * @author jorgeluisw@mac.com
  * @author Paul.Sandoz@Sun.Com

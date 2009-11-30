@@ -60,7 +60,7 @@ import javax.servlet.ServletException;
  * <p>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @auhtor Paul.Sandoz@Sun.Com
+ * @author Paul.Sandoz@Sun.Com
  * @author recht@dev.java.net
  */
 public class SpringServlet extends ServletContainer {

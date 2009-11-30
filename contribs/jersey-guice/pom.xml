@@ -103,6 +103,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
+                    <links>
+                        <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
+                        <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/jersey/</link>
+                    </links>
                     <notimestamp>true</notimestamp>
                 </configuration>
                 <executions>

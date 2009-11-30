@@ -111,7 +111,8 @@
  *     &lt;/servlet-mapping&gt;
  *   &lt;/web-app&gt;
  * </blockquote></pre>
- * It is possible to combine package-based registration and {@link Application}
+ * It is possible to combine package-based registration and 
+ * {@link javax.ws.rs.core.Application}
  * registered by extending {@link com.sun.jersey.api.core.PackagesResourceConfig}
  * and registering the extended class, for example:
  * <blockquote><pre>

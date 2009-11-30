@@ -252,7 +252,7 @@ public class WebAppDescriptor extends AppDescriptor {
         /**
          * Set a <code>ServletContextListener</code> class
          *
-         * @param contextListenerClass the servlet context listener class.
+         * @param contextAttributeListenerClass the servlet context listener class.
          * @return this builder.
          * @throws IllegalArgumentException if <code>contextListenerClass</code> is null.
          */
@@ -309,7 +309,7 @@ public class WebAppDescriptor extends AppDescriptor {
         /**
          * Set a <code>HttpSessionListener</code> class
          *
-         * @param contextListenerClass the HTTP Session Listener class.
+         * @param httpSessionListenerClass the HTTP Session Listener class.
          * @return this builder.
          * @throws IllegalArgumentException if <code>httpSessionListenerClass</code> is null.
          */

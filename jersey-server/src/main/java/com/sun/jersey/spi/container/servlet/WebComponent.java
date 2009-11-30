@@ -325,7 +325,7 @@ public class WebComponent implements ContainerListener {
      *
      * @param baseUri the base URI of the request.
      * @param requestUri the URI of the request.
-     * @param cRequest the {@link HttpServletRequest} object that
+     * @param request the {@link HttpServletRequest} object that
      *        contains the request the client made to
      *	      the Web component.
      * @param response the {@link HttpServletResponse} object that

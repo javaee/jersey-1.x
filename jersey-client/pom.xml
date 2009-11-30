@@ -71,6 +71,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
+                    <links>
+                        <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
+                    </links>
                     <excludePackageNames>com.sun.jersey.client.impl com.sun.ws.rs.ex</excludePackageNames>
                 </configuration>
                 <executions>

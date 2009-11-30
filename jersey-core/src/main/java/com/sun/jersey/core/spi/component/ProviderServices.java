@@ -66,7 +66,6 @@ public class ProviderServices {
     /**
      * Create the provider services.
      *
-     * @param injectableFactory
      * @param componentProviderFactory
      * @param providers
      * @param providerInstances

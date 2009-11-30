@@ -36,11 +36,9 @@
 
 package com.sun.jersey.oauth.signature;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -105,7 +103,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * protection realm.
      *
      * @param realm the protection realm for the request.
@@ -131,7 +129,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * consumer key.
      *
      * @param consumerKey the consumer key.
@@ -156,7 +154,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * token.
      *
      * @param token the access or request token.
@@ -182,7 +180,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * signature method.
      *
      * @param signatureMethod the signature method used to sign the request.
@@ -208,7 +206,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * signature.
      *
      * @param signature the signature for the request.
@@ -238,7 +236,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * timestamp.
      *
      * @param timestamp positive integer, typically number of seconds since epoch.
@@ -257,10 +255,9 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * timestamp to the current time.
      *
-     * @param timestamp positive integer, typically number of seconds since epoch.
      * @return this parameters object.
      */
     public OAuthParameters timestamp() {
@@ -284,7 +281,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
     
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * nonce.
      *
      * @param nonce a value that should be unique for a given timestamp.
@@ -303,10 +300,9 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * nonce to a randomly-generated UUID.
      *
-     * @param nonce a value that should be unique for a given timestamp.
      * @return this parameters object.
      */
     public OAuthParameters nonce() {
@@ -329,7 +325,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * version.
      *
      * @param version the protocol version.
@@ -348,7 +344,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * version to the default value of 1.0.
      *
      * @return this parameters object.
@@ -373,7 +369,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * verifier code.
      *
      * @param verifier the verifier code.
@@ -399,7 +395,7 @@ public class OAuthParameters extends HashMap<String, String> {
     }
 
     /**
-     * Builder pattern method to return {@link Parameters} after setting
+     * Builder pattern method to return {@link OAuthParameters} after setting
      * callback URL.
      *
      * @param callback the callback URL.

@@ -39,6 +39,7 @@ package com.sun.jersey.multipart.file;
 
 import java.io.File;
 import javax.ws.rs.core.MediaType;
+import com.sun.jersey.multipart.file.DefaultMediaTypePredictor.CommonMediaTypes;
 
 /**
  * An interface which allows developers implement their own media type
@@ -55,7 +56,7 @@ public interface MediaTypePredictor {
      * @param file The file from which to get the {@link MediaType}
      * @return The {@link MediaType} for the give file; <code>null</code> - if file
      *          is null; "application/octet-stream" if extension not recognized.
-     * @see CommonMediaType#getMediaTypeFromFileName(java.lang.String)
+     * @see CommonMediaTypes#getMediaTypeFromFileName(java.lang.String)
      */
     public MediaType getMediaTypeFromFile(final File file);
 

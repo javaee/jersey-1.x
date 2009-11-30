@@ -77,7 +77,7 @@ public class FileDataBodyPart
      *
      * @param name The name of body part
      * @param fileEntity The file that represents the entity
-     * @see FileDataBodyPart#getMediaTypeFromFile(java.io.File)
+     * @see MediaTypePredictor#getMediaTypeFromFile(java.io.File)
      * @see FileDataBodyPart#FileDataBodyPart(java.lang.String, java.io.File, javax.ws.rs.core.MediaType)
      */
     public FileDataBodyPart(final String name,
@@ -122,7 +122,7 @@ public class FileDataBodyPart
      * @param mediaType
      * @param value
      * @throws java.lang.UnsupportedOperationException Operation not supported.
-     * @see FileDataBodyPart#setFileEntity(javax.ws.rs.core.MediaType, java.io.File)
+     * @see FileDataBodyPart#setFileEntity(java.io.File, javax.ws.rs.core.MediaType)
      */
     @Override
     public void setValue(MediaType mediaType,

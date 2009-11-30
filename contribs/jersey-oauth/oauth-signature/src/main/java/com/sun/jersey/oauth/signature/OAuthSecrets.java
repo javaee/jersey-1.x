@@ -64,10 +64,10 @@ public class OAuthSecrets {
     }
 
     /**
-     * Builder pattern method to return {@link Secrets} after setting
+     * Builder pattern method to return {@link OAuthSecrets} after setting
      * consumer secret.
      *
-     * @param consumer the consumer secret.
+     * @param consumerSecret the consumer secret.
      */
     public OAuthSecrets consumerSecret(String consumerSecret) {
     	setConsumerSecret(consumerSecret);
@@ -89,10 +89,10 @@ public class OAuthSecrets {
     }
 
     /**
-     * Builder pattern method to return {@link Secrets} after setting
+     * Builder pattern method to return {@link OAuthSecrets} after setting
      * consumer secret.
      *
-     * @param consumer the consumer secret.
+     * @param tokenSecret the token secret.
      */
     public OAuthSecrets tokenSecret(String tokenSecret) {
     	setTokenSecret(tokenSecret);

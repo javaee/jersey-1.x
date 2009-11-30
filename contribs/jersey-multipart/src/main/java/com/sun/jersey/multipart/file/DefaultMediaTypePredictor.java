@@ -131,7 +131,7 @@ public class DefaultMediaTypePredictor
          * @param file The file from which to predict the {@link MediaType}
          * @return The {@link MediaType} for the give file; <code>null</code> - if file
          *          is null; "application/octet-stream" if extension not recognized.
-         * @see CommonMediaType#getMediaTypeFromFileName(java.lang.String)
+         * @see CommonMediaTypes#getMediaTypeFromFileName(java.lang.String)
          */
         public static MediaType getMediaTypeFromFile(final File file) {
             if (file == null) {

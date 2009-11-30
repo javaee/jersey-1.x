@@ -64,7 +64,7 @@ public interface OAuthRequest {
     public String getRequestURL();
 
     /**
-     * Returns an {@link Iterator} of {@link String} objects containing the
+     * Returns an {@link Set} of {@link String} objects containing the
      * names of the parameters contained in the request.
      *
      * @return the names of the parameters.
