@@ -34,12 +34,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.server.impl.jcdi;
 
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.server.impl.InitialContextHelper;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+package com.sun.jersey.server.impl;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -47,27 +44,17 @@ import javax.naming.NamingException;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class JCDIComponentProviderFactoryInitializer {
-    private static final Logger LOGGER = Logger.getLogger(
-            JCDIComponentProviderFactoryInitializer.class.getName());
+public class InitialContextHelper {
 
-    public static void initialize(ResourceConfig rc) {
+    public static InitialContext getInitialContext() {
         try {
-            InitialContext ic = InitialContextHelper.getInitialContext();
-            if (ic == null)
-                return;
-            Object beanManager = ic.lookup("java:comp/BeanManager");
-            // Some implementations of InitialContext return null instead of
-            // throwing NamingException if there is no Object associated with
-            // the name
-            if (beanManager == null) {
-                LOGGER.config("The JCDI BeanManager is not available. JAX-RS JCDI support is disabled.");
-                return;
-            }
-
-            rc.getSingletons().add(new JCDIComponentProviderFactory(beanManager));
+            // Deployment on Google App Engine will
+            // result in a LinkageError
+            return new InitialContext();
         } catch (NamingException ex) {
-            LOGGER.log(Level.CONFIG, "The JCDI BeanManager is not available. JAX-RS JCDI support is disabled.", ex);
+            return null;
+        } catch (LinkageError ex) {
+            return null;
         }
     }
 }

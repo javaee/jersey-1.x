@@ -50,6 +50,7 @@ import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.util.ReaderWriter;
+import com.sun.jersey.server.impl.InitialContextHelper;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
@@ -742,7 +743,7 @@ public class WebComponent implements ContainerListener {
         // Obtain any instances that are registered in JNDI
         // Assumes such instances are singletons
         // Registered classes have to be interfaces
-        javax.naming.Context x = getContext();
+        javax.naming.Context x = InitialContextHelper.getInitialContext();
         if (x != null) {
             Iterator<Class<?>> i = rc.getClasses().iterator();
             while (i.hasNext()) {
@@ -762,16 +763,6 @@ public class WebComponent implements ContainerListener {
                 } catch (NamingException ex) {
                 }
             }
-        }
-    }
-
-    private javax.naming.Context getContext() {
-        try {
-            return new InitialContext();
-        } catch (NamingException ex) {
-            return null;
-        } catch (LinkageError ex) {
-            return null;
         }
     }
 

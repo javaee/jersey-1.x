@@ -37,6 +37,7 @@
 package com.sun.jersey.server.impl.managedbeans;
 
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.server.impl.InitialContextHelper;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,13 +49,18 @@ import javax.naming.NamingException;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ManagedBeanComponentProviderFactoryInitilizer {
+
     private static final Logger LOGGER = Logger.getLogger(
             ManagedBeanComponentProviderFactoryInitilizer.class.getName());
 
     public static void initialize(ResourceConfig rc) {
         try {
-           Object injectionMgr = new InitialContext().
-                   lookup("com.sun.enterprise.container.common.spi.util.InjectionManager");
+            InitialContext ic = InitialContextHelper.getInitialContext();
+            if (ic == null) {
+                return;
+            }
+            Object injectionMgr = ic.
+                    lookup("com.sun.enterprise.container.common.spi.util.InjectionManager");
             // Some implementations of InitialContext return null instead of
             // throwing NamingException if there is no Object associated with
             // the name

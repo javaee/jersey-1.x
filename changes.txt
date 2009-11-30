@@ -1,4 +1,7 @@
 release 1.1.5 (2010)
+- Fixed issue 379
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=379
+  Jersey applications can now be deployed on Google App Engine.
 - Added tracing feature.
   Tracing provides useful information that describes how a request
   is processed and dispatched to JAX-RS/Jersey components. This can aid

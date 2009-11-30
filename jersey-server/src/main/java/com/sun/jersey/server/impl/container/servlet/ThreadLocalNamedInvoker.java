@@ -56,7 +56,7 @@ public class ThreadLocalNamedInvoker<T> extends ThreadLocalInvoker<T> {
         this.name = name;
     }
     
-    @SuppressWarnings("unchecked")
+    @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // if no instance yet exists for the current thread then look one up
         // and stash it

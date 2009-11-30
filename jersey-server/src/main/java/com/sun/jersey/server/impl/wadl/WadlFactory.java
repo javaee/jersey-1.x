@@ -51,6 +51,7 @@ import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.server.impl.uri.PathPattern;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import java.lang.reflect.Method;
 import java.util.logging.Level;
 import javax.ws.rs.core.Context;
 
@@ -133,6 +134,14 @@ public final class WadlFactory {
         
         try {
             Class.forName("javax.xml.bind.JAXBElement");
+
+            // TODO WadlFactory should be turned into a component
+            // Attempt to use JAXB, deployment on Google App Engine will
+            // result in a LinkageError
+            Class jaxbContext = Class.forName("javax.xml.bind.DatatypeConverter");
+            Method m = jaxbContext.getMethod("parseInt", String.class);
+            m.invoke(null, "1");
+            
             return true;
         } catch(ClassNotFoundException e) {
             LOGGER.log(Level.CONFIG,
@@ -140,6 +149,14 @@ public final class WadlFactory {
                     "because JAXB jars are not " + 
                     "included in the java class path. " +
                     "To enable WADL include JAXB 2.x jars in the java class path.");
+            return false;
+        } catch (LinkageError e) {
+            LOGGER.log(Level.CONFIG,
+                    "WADL generation is disabled.", e);
+            return false;
+        } catch (Exception e) {
+            LOGGER.log(Level.CONFIG,
+                    "WADL generation is disabled.", e);
             return false;
         }
     }

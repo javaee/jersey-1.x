@@ -37,6 +37,7 @@
 package com.sun.jersey.server.impl.ejb;
 
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.server.impl.InitialContextHelper;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,7 +54,11 @@ public final class EJBComponentProviderFactoryInitilizer {
 
     public static void initialize(ResourceConfig rc) {
         try {
-            Object interceptorBinder = new InitialContext().
+            InitialContext ic = InitialContextHelper.getInitialContext();
+            if (ic == null) {
+                return;
+            }
+            Object interceptorBinder = ic.
                     lookup("java:org.glassfish.ejb.container.interceptor_binding_spi");
             // Some implementations of InitialContext return null instead of
             // throwing NamingException if there is no Object associated with
