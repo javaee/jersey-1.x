@@ -16,8 +16,8 @@
     <name>OReilly Workbook Examples</name>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
-    <artifactId>workbook-pom</artifactId>
+    <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
+    <artifactId>all-examples</artifactId>
     <version>1.1.5-ea-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -85,4 +85,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>java.net-m2-dist-repository</id>
+            <name>java.net-m2-repository</name>
+            <url>java-net:/maven2-repository/trunk/repository/</url>
+        </repository>
+    </distributionManagement>
+
 </project>

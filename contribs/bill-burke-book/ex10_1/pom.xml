@@ -16,13 +16,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
-    <artifactId>ex10_1</artifactId>
     <parent>
-        <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
-        <artifactId>workbook-pom</artifactId>
+        <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
+        <artifactId>all-examples</artifactId>
         <version>1.1.5-ea-SNAPSHOT</version>
     </parent>
+    <artifactId>ex10_1</artifactId>
     <packaging>war</packaging>
     <name>ex10_1</name>
     <description/>
@@ -32,29 +31,18 @@
             <id>java.net</id>
             <url>http://download.java.net/maven/2</url>
         </repository>
-        <repository>
-            <id>maven repo</id>
-            <name>maven repo</name>
-            <url>http://repo1.maven.org/maven2/</url>
-        </repository>
-        <!-- For resteasy -->
-        <repository>
-            <id>jboss</id>
-            <name>jboss repo</name>
-            <url>http://repository.jboss.org/maven2</url>
-        </repository>
-    </repositories>
+   </repositories>
 
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.1.5-ea-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>1.1.5-ea-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

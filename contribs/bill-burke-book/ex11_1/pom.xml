@@ -15,13 +15,12 @@
     <name>Jersey JAX-RS EJB Test</name>
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
-    <artifactId>ex11_1_pom</artifactId>
     <parent>
-        <groupId>com.sun.jersey.contrib.bill-burke-book</groupId>
-        <artifactId>workbook-pom</artifactId>
+        <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
+        <artifactId>all-examples</artifactId>
         <version>1.1.5-ea-SNAPSHOT</version>
     </parent>
+    <artifactId>ex11_1_pom</artifactId>
     <packaging>pom</packaging>
 
     <repositories>
@@ -29,12 +28,7 @@
             <id>java.net</id>
             <url>http://download.java.net/maven/2</url>
         </repository>
-        <repository>
-            <id>maven repo</id>
-            <name>maven repo</name>
-            <url>http://repo1.maven.org/maven2/</url>
-        </repository>
-        <!-- For resteasy -->
+       <!-- For JBoss -->
         <repository>
             <id>jboss</id>
             <name>jboss repo</name>
