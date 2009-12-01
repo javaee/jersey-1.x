@@ -66,70 +66,60 @@ public class RepresentationDocType {
     
     /**
      * @return the element
-     * @author Martin Grotzke
      */
     public QName getElement() {
         return element;
     }
     /**
      * @param element the element to set
-     * @author Martin Grotzke
      */
     public void setElement( QName element ) {
         this.element = element;
     }
     /**
      * @return the example
-     * @author Martin Grotzke
      */
     public String getExample() {
         return example;
     }
     /**
      * @param example the example to set
-     * @author Martin Grotzke
      */
     public void setExample( String example ) {
         this.example = example;
     }
     /**
      * @return the status
-     * @author Martin Grotzke
      */
     public Long getStatus() {
         return status;
     }
     /**
      * @param status the status to set
-     * @author Martin Grotzke
      */
     public void setStatus( Long status ) {
         this.status = status;
     }
     /**
      * @return the mediaType
-     * @author Martin Grotzke
      */
     public String getMediaType() {
         return mediaType;
     }
     /**
      * @param mediaType the mediaType to set
-     * @author Martin Grotzke
      */
     public void setMediaType( String mediaType ) {
         this.mediaType = mediaType;
     }
     /**
      * @return the doc
-     * @author Martin Grotzke
      */
     public String getDoc() {
         return doc;
     }
     /**
      * @param doc the doc to set
-     * @author Martin Grotzke
      */
     public void setDoc( String doc ) {
         this.doc = doc;

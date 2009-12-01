@@ -139,8 +139,8 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
     }
 
     /**
-     * @return
-     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createApplication()
+     * @return application
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createApplication()
      */
     public Application createApplication() {
         final Application result = _delegate.createApplication();
@@ -164,78 +164,78 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createMethod(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
+     * @param ar abstract resource
+     * @param arm abstract resource method
+     * @return method
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createMethod(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Method createMethod( AbstractResource arg0,
-            AbstractResourceMethod arg1 ) {
-        return _delegate.createMethod( arg0, arg1 );
+    public Method createMethod( AbstractResource ar,
+            AbstractResourceMethod arm ) {
+        return _delegate.createMethod( ar, arm );
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createRequest(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
+     * @param ar abstract resource
+     * @param arm abstract resource method
+     * @return request
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createRequest(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Request createRequest( AbstractResource arg0,
-            AbstractResourceMethod arg1 ) {
-        return _delegate.createRequest( arg0, arg1 );
+    public Request createRequest( AbstractResource ar,
+            AbstractResourceMethod arm ) {
+        return _delegate.createRequest( ar, arm );
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @return
-     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
+     * @param ar abstract resource
+     * @param am abstract method
+     * @param p parameter
+     * @return parameter
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
-    public Param createParam( AbstractResource arg0,
-            AbstractMethod arg1, Parameter arg2 ) {
-        return _delegate.createParam( arg0, arg1, arg2 );
+    public Param createParam( AbstractResource ar,
+            AbstractMethod am, Parameter p ) {
+        return _delegate.createParam( ar, am, p );
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @return
-     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
+     * @param ar abstract resource
+     * @param arm abstract resource method
+     * @param mt media type
+     * @return respresentation type
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
      */
     public RepresentationType createRequestRepresentation(
-            AbstractResource arg0, AbstractResourceMethod arg1, MediaType arg2 ) {
-        return _delegate.createRequestRepresentation( arg0, arg1, arg2 );
+            AbstractResource ar, AbstractResourceMethod arm, MediaType mt ) {
+        return _delegate.createRequestRepresentation( ar, arm, mt );
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResource(com.sun.jersey.api.model.AbstractResource, java.lang.String)
+     * @param ar abstract resource
+     * @param path
+     * @return resource
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createResource(com.sun.jersey.api.model.AbstractResource, java.lang.String)
      */
-    public Resource createResource( AbstractResource arg0, String arg1 ) {
-        return _delegate.createResource( arg0, arg1 );
+    public Resource createResource( AbstractResource ar, String path ) {
+        return _delegate.createResource( ar, path );
     }
 
     /**
-     * @return
-     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResources()
+     * @return resources
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createResources()
      */
     public Resources createResources() {
         return _delegate.createResources();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
+     * @param ar abstract resource
+     * @param arm abstract resource method
+     * @return response
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Response createResponse( AbstractResource arg0,
-            AbstractResourceMethod arg1 ) {
-        return _delegate.createResponse( arg0, arg1 );
+    public Response createResponse( AbstractResource ar,
+            AbstractResourceMethod arm ) {
+        return _delegate.createResponse( ar, arm );
     }
 
 }

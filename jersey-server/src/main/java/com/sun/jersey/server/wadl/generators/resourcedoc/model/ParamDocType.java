@@ -91,7 +91,6 @@ public class ParamDocType {
 
     /**
      * @return the commentText
-     * @author Martin Grotzke
      */
     public String getCommentText() {
         return commentText;
@@ -99,7 +98,6 @@ public class ParamDocType {
 
     /**
      * @param commentText the commentText to set
-     * @author Martin Grotzke
      */
     public void setCommentText( String commentText ) {
         this.commentText = commentText;
@@ -107,7 +105,6 @@ public class ParamDocType {
 
     /**
      * @return the className
-     * @author Martin Grotzke
      */
     public String getParamName() {
         return paramName;
@@ -115,10 +112,8 @@ public class ParamDocType {
 
     /**
      * @param paramName the className to set
-     * @author Martin Grotzke
      */
     public void setParamName( String paramName ) {
         this.paramName = paramName;
     }
-    
 }

@@ -90,8 +90,7 @@ public class ResourceDocAccessor {
      * @param resourceClass
      * @param method
      * @param p
-     * @return
-     * @author Martin Grotzke
+     * @return param doc type
      */
     public ParamDocType getParamDoc( Class<?> resourceClass, Method method,
             Parameter p ) {

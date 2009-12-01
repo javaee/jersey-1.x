@@ -75,7 +75,6 @@ public class AnnotationDocType {
 
     /**
      * @return the annotationTypeName
-     * @author Martin Grotzke
      */
     public String getAnnotationTypeName() {
         return annotationTypeName;
@@ -83,7 +82,6 @@ public class AnnotationDocType {
 
     /**
      * @param annotationTypeName the annotationTypeName to set
-     * @author Martin Grotzke
      */
     public void setAnnotationTypeName( String annotationTypeName ) {
         this.annotationTypeName = annotationTypeName;

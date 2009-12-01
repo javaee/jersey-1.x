@@ -57,7 +57,6 @@ public class RequestDocType {
 
     /**
      * @return the representationDoc
-     * @author Martin Grotzke
      */
     public RepresentationDocType getRepresentationDoc() {
         return representationDoc;
@@ -65,7 +64,6 @@ public class RequestDocType {
 
     /**
      * @param representationDoc the representationDoc to set
-     * @author Martin Grotzke
      */
     public void setRepresentationDoc( RepresentationDocType representationDoc ) {
         this.representationDoc = representationDoc;

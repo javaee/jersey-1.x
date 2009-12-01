@@ -85,7 +85,6 @@ public class ResponseDocType {
 
     /**
      * @return the returnDoc
-     * @author Martin Grotzke
      */
     public String getReturnDoc() {
         return returnDoc;
@@ -93,7 +92,6 @@ public class ResponseDocType {
 
     /**
      * @param returnDoc the returnDoc to set
-     * @author Martin Grotzke
      */
     public void setReturnDoc( String returnDoc ) {
         this.returnDoc = returnDoc;

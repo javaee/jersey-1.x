@@ -110,7 +110,6 @@ public class MethodDocType {
 
     /**
      * @return the className
-     * @author Martin Grotzke
      */
     public String getMethodName() {
         return methodName;
@@ -118,7 +117,6 @@ public class MethodDocType {
 
     /**
      * @param methodName the className to set
-     * @author Martin Grotzke
      */
     public void setMethodName( String methodName ) {
         this.methodName = methodName;
@@ -126,7 +124,6 @@ public class MethodDocType {
 
     /**
      * @return the returnDoc
-     * @author Martin Grotzke
      */
     public String getReturnDoc() {
         return returnDoc;
@@ -134,7 +131,6 @@ public class MethodDocType {
 
     /**
      * @param returnDoc the returnDoc to set
-     * @author Martin Grotzke
      */
     public void setReturnDoc( String returnDoc ) {
         this.returnDoc = returnDoc;
@@ -142,7 +138,6 @@ public class MethodDocType {
 
     /**
      * @return the returnTypeExample
-     * @author Martin Grotzke
      */
     public String getReturnTypeExample() {
         return returnTypeExample;
@@ -150,7 +145,6 @@ public class MethodDocType {
 
     /**
      * @param returnTypeExample the returnTypeExample to set
-     * @author Martin Grotzke
      */
     public void setReturnTypeExample( String returnTypeExample ) {
         this.returnTypeExample = returnTypeExample;
@@ -158,7 +152,6 @@ public class MethodDocType {
 
     /**
      * @return the requestDoc
-     * @author Martin Grotzke
      */
     public RequestDocType getRequestDoc() {
         return requestDoc;
@@ -166,7 +159,6 @@ public class MethodDocType {
 
     /**
      * @param requestDoc the requestDoc to set
-     * @author Martin Grotzke
      */
     public void setRequestDoc( RequestDocType requestDoc ) {
         this.requestDoc = requestDoc;
@@ -174,7 +166,6 @@ public class MethodDocType {
 
     /**
      * @return the responseDoc
-     * @author Martin Grotzke
      */
     public ResponseDocType getResponseDoc() {
         return responseDoc;
@@ -182,7 +173,6 @@ public class MethodDocType {
 
     /**
      * @param responseDoc the responseDoc to set
-     * @author Martin Grotzke
      */
     public void setResponseDoc( ResponseDocType responseDoc ) {
         this.responseDoc = responseDoc;

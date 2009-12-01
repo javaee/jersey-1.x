@@ -68,7 +68,6 @@ public interface WadlGenerator {
      * Sets the delegate that is decorated by this wadl generator. Is invoked directly after
      * this generator is instantiated before {@link #init()} or any setter method is invoked.
      * @param delegate the wadl generator to decorate
-     * @author Martin Grotzke
      */
     void setWadlGeneratorDelegate( WadlGenerator delegate );
     
@@ -76,7 +75,6 @@ public interface WadlGenerator {
      * Invoked before all methods related to wadl-building are invoked. This method is used in a
      * decorator like manner, and therefore has to invoke <code>this.delegate.init()</code>.
      * @throws Exception
-     * @author Martin Grotzke
      */
     void init() throws Exception;
     
@@ -98,7 +96,6 @@ public interface WadlGenerator {
      * ObjectFactory (annotated with {@link XmlRegistry}) to this package.
      * @return simply the {@link #getRequiredJaxbContextPath()} of the delegate or the
      *  {@link #getRequiredJaxbContextPath()} + ":" + ${yourContextPath}.
-     * @author Martin Grotzke
      */
     String getRequiredJaxbContextPath();
     

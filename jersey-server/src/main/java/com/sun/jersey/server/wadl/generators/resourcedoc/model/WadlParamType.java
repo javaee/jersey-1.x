@@ -65,7 +65,6 @@ public class WadlParamType {
 
     /**
      * @return the commentText
-     * @author Martin Grotzke
      */
     public String getDoc() {
         return doc;
@@ -73,7 +72,6 @@ public class WadlParamType {
 
     /**
      * @param commentText the commentText to set
-     * @author Martin Grotzke
      */
     public void setDoc( String commentText ) {
         this.doc = commentText;
@@ -81,7 +79,6 @@ public class WadlParamType {
 
     /**
      * @return the className
-     * @author Martin Grotzke
      */
     public String getName() {
         return name;
@@ -89,7 +86,6 @@ public class WadlParamType {
 
     /**
      * @param paramName the className to set
-     * @author Martin Grotzke
      */
     public void setName( String paramName ) {
         this.name = paramName;
@@ -97,7 +93,6 @@ public class WadlParamType {
 
     /**
      * @return the style
-     * @author Martin Grotzke
      */
     public String getStyle() {
         return style;
@@ -105,7 +100,6 @@ public class WadlParamType {
 
     /**
      * @param style the style to set
-     * @author Martin Grotzke
      */
     public void setStyle( String style ) {
         this.style = style;
@@ -113,7 +107,6 @@ public class WadlParamType {
 
     /**
      * @return the type
-     * @author Martin Grotzke
      */
     public QName getType() {
         return type;
@@ -121,10 +114,8 @@ public class WadlParamType {
 
     /**
      * @param type the type to set
-     * @author Martin Grotzke
      */
     public void setType( QName type ) {
         this.type = type;
     }
-    
 }

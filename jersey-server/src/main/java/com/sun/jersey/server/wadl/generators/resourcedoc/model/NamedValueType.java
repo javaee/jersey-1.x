@@ -66,7 +66,6 @@ public class NamedValueType {
 
     /**
      * @return the name
-     * @author Martin Grotzke
      */
     public String getName() {
         return name;
@@ -74,7 +73,6 @@ public class NamedValueType {
 
     /**
      * @param name the name to set
-     * @author Martin Grotzke
      */
     public void setName( String name ) {
         this.name = name;
@@ -82,7 +80,6 @@ public class NamedValueType {
 
     /**
      * @return the value
-     * @author Martin Grotzke
      */
     public String getValue() {
         return value;
@@ -90,7 +87,6 @@ public class NamedValueType {
 
     /**
      * @param value the value to set
-     * @author Martin Grotzke
      */
     public void setValue( String value ) {
         this.value = value;

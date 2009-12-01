@@ -83,7 +83,6 @@ public class ClassDocType {
 
     /**
      * @return the commentText
-     * @author Martin Grotzke
      */
     public String getCommentText() {
         return commentText;
@@ -91,7 +90,6 @@ public class ClassDocType {
 
     /**
      * @param commentText the commentText to set
-     * @author Martin Grotzke
      */
     public void setCommentText( String commentText ) {
         this.commentText = commentText;
@@ -99,7 +97,6 @@ public class ClassDocType {
 
     /**
      * @return the className
-     * @author Martin Grotzke
      */
     public String getClassName() {
         return className;
@@ -107,7 +104,6 @@ public class ClassDocType {
 
     /**
      * @param className the className to set
-     * @author Martin Grotzke
      */
     public void setClassName( String className ) {
         this.className = className;
