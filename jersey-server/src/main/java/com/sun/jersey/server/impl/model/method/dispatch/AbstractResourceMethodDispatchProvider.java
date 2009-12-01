@@ -54,7 +54,8 @@ import javax.ws.rs.core.Response;
  * A partial implementation of {@link ResourceMethodDispatchProvider} that
  * creates instances of {@link RequestDispatcher}.
  * <p>
- * Implementing classes are required to override the {@link #getInjectableValuesProvider(com.sun.jersey.api.model.AbstractResourceMethod) }
+ * Implementing classes are required to override the
+ * {@link #getInjectableValuesProvider(com.sun.jersey.api.model.AbstractResourceMethod) }
  * method to return a {@link InjectableValuesProvider} associated with the parameters
  * of the abstract resource method.
  * 
@@ -68,13 +69,6 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         if (pp == null)
             return null;
 
-        // TODO
-        // Strictly speaking a GET request can contain an entity in the
-        // message body, but this is likely to be not implemented by many
-        // servers and clients, but should we support it?
-        boolean requireReturnOfRepresentation =
-                "GET".equals(abstractResourceMethod.getHttpMethod());
-
         Class<?> returnType = abstractResourceMethod.getReturnType();
         if (Response.class.isAssignableFrom(returnType)) {
             return new ResponseOutInvoker(abstractResourceMethod, pp);
@@ -84,8 +78,6 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
             } else {
                 return new TypeOutInvoker(abstractResourceMethod, pp);
             }
-        } else if (requireReturnOfRepresentation) {
-            return null;
         } else {
             return new VoidOutInvoker(abstractResourceMethod, pp);
         }
@@ -110,7 +102,8 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
      *         can be created for the parameters of the abstract
      *         resource method.
      */
-    protected abstract InjectableValuesProvider getInjectableValuesProvider(AbstractResourceMethod abstractResourceMethod);
+    protected abstract InjectableValuesProvider getInjectableValuesProvider(
+            AbstractResourceMethod abstractResourceMethod);
 
 
     private static abstract class EntityParamInInvoker extends ResourceJavaMethodDispatcher {
