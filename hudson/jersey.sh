@@ -2,7 +2,7 @@
 # beta-testing Maven 2.0.9 on Hudson slaves --- this will become the default Maven version soon (Kohsuke)
 export M2_HOME=/files/hudson/tools/maven-2.0.9
 export PATH=$M2_HOME/bin:$PATH
-export MAVEN_OPTS="-Xmx1024m"
+export MAVEN_OPTS="-Xms512m -Xmx1024m -XX:PermSize=256m -XX:MaxPermSize=512m"
 mvn -version
 java -version
 
