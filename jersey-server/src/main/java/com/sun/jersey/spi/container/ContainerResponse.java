@@ -51,7 +51,6 @@ import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericEntity;
@@ -362,6 +361,10 @@ public class ContainerResponse implements HttpResponseContext {
     // HttpResponseContext
     
     public Response getResponse() {
+        if (response == null) {
+            setResponse(null);
+        }
+        
         return response;
     }
     
