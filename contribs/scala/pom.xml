@@ -52,11 +52,7 @@
 
   <properties>
     <jetty.version>6.1.19</jetty.version>
-    <!--
-      TODO lets move to this release from the snapshot as soon as it is out!
-      <lift.version>1.1-M5</lift.version>
-    -->
-    <lift.version>1.1-SNAPSHOT</lift.version>
+    <lift.version>1.1-M7</lift.version>
     <scala.version>2.7.5</scala.version>
   </properties>
 
