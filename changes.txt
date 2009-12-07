@@ -1,4 +1,5 @@
 release 1.1.5 (2010)
+- Upgraded jersey-simple-server to version 4.1.15.
 - If an exception is mapped to a Response then that exception is now available
   from the HttpResponseContext.getMappedThrowable() method.
 - Fixed issue 379
