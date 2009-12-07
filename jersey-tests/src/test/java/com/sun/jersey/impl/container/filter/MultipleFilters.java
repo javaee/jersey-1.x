@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.impl.container.filter;
 
+import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -95,6 +96,10 @@ public class MultipleFilters extends AbstractResourceTester {
 
         public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             response.getHttpHeaders().add("X-TEST", "one");
+            Throwable t = response.getMappedThrowable();
+            if (t != null) {
+                response.getHttpHeaders().add("X-TEST-EXCEPTION", t.getClass().getName());
+            }
             return response;
         }        
     }
@@ -107,6 +112,10 @@ public class MultipleFilters extends AbstractResourceTester {
 
         public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             response.getHttpHeaders().add("X-TEST", "two");
+            Throwable t = response.getMappedThrowable();
+            if (t != null) {
+                response.getHttpHeaders().add("X-TEST-EXCEPTION", t.getClass().getName());
+            }
             return response;
         }        
     }
@@ -245,7 +254,36 @@ public class MultipleFilters extends AbstractResourceTester {
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
                 Arrays.asList(f1, f2));
         initiateWebApplication(rc);
-        _test();
+
+        WebResource r = resource("/", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+        assertEquals("onetwo", cr.getEntity(String.class));
+        List<String> xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("one", xTest.get(0));
+        assertEquals("two", xTest.get(1));
+        List<String> xTestE = cr.getMetadata().get("X-TEST-EXCEPTION");
+        assertEquals(2, xTestE.size());
+        assertEquals(WebApplicationException.class.getName().toString(),
+                xTestE.get(0));
+        assertEquals(WebApplicationException.class.getName().toString(),
+                xTestE.get(1));
+
+
+        cr = r.path("/foo").get(ClientResponse.class);
+        assertEquals(404, cr.getStatus());
+        xTest = cr.getMetadata().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("one", xTest.get(0));
+        assertEquals("two", xTest.get(1));
+        xTestE = cr.getMetadata().get("X-TEST-EXCEPTION");
+        assertEquals(2, xTestE.size());
+        assertEquals(NotFoundException.class.getName().toString(),
+                xTestE.get(0));
+        assertEquals(NotFoundException.class.getName().toString(),
+                xTestE.get(1));
     }
 
     public void _test() {

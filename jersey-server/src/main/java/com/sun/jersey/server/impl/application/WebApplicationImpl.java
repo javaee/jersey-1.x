@@ -38,8 +38,6 @@ package com.sun.jersey.server.impl.application;
 
 import com.sun.jersey.server.impl.container.filter.FilterFactory;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -58,7 +56,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ExceptionMapper;
@@ -68,14 +65,12 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.container.filter.UriConnegFilter;
 import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.ResourceConfigurator;
-import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
@@ -136,6 +131,7 @@ import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.spi.StringReaderWorkers;
+import com.sun.jersey.spi.container.ExceptionMapperContext;
 import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
@@ -910,6 +906,10 @@ public final class WebApplicationImpl implements WebApplication {
         return bodyFactory;
     }
 
+    public ExceptionMapperContext getExceptionMapperContext() {
+        return exceptionFactory;
+    }
+    
     public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
             throws IOException {
         final ContainerResponse response = new ContainerResponse(
@@ -978,11 +978,11 @@ public final class WebApplicationImpl implements WebApplication {
                 throw new NotFoundException(request.getRequestUri());
             }            
         } catch (WebApplicationException e) {
-            mapWebApplicationException(e, response);
+            response.mapWebApplicationException(e);
         } catch (MappableContainerException e) {
-            mapMappableContainerException(e, response);
+            response.mapMappableContainerException(e);
         } catch (RuntimeException e) {
-            if (!mapException(e, response)) {
+            if (!response.mapException(e)) {
                 LOGGER.log(Level.SEVERE, "The RuntimeException could not be mapped to a response, " +
                         "re-throwing to the HTTP container", e);
                 throw e;
@@ -1001,11 +1001,11 @@ public final class WebApplicationImpl implements WebApplication {
                 localContext.setContainerResponse(response);
             }
         } catch (WebApplicationException e) {
-            mapWebApplicationException(e, response);
+            response.mapWebApplicationException(e);
         } catch (MappableContainerException e) {
-            mapMappableContainerException(e, response);
+            response.mapMappableContainerException(e);
         } catch (RuntimeException e) {
-            if (!mapException(e, response)) {
+            if (!response.mapException(e)) {
                 LOGGER.log(Level.SEVERE, "The RuntimeException could not be mapped to a response, " +
                         "re-throwing to the HTTP container", e);
                 throw e;
@@ -1020,7 +1020,7 @@ public final class WebApplicationImpl implements WebApplication {
                         "as the response is already committed. Re-throwing to the HTTP container", e);
                 throw e;
             } else {
-                mapWebApplicationException(e, response);
+                response.mapWebApplicationException(e);
                 response.write();
             }
         }
@@ -1253,90 +1253,5 @@ public final class WebApplicationImpl implements WebApplication {
                 this.getClass().getClassLoader(),
                 new Class[]{c},
                 i);
-    }
-
-    private void mapMappableContainerException(MappableContainerException e,
-            HttpResponseContext response) {
-        Throwable cause = e.getCause();
-
-        if (cause instanceof WebApplicationException) {
-            mapWebApplicationException((WebApplicationException)cause, response);
-        } else if (!mapException(cause, response)) {
-            if (cause instanceof RuntimeException) {
-                LOGGER.log(Level.SEVERE, "The RuntimeException could not be mapped to a response, " +
-                        "re-throwing to the HTTP container", cause);
-                throw (RuntimeException)cause;
-            } else {
-                LOGGER.log(Level.SEVERE, "The exception contained within " +
-                        "MappableContainerException could not be mapped to a response, " +
-                        "re-throwing to the HTTP container", cause);
-                throw e;
-            }
-        }
-    }
-
-    private void mapWebApplicationException(WebApplicationException e, 
-            HttpResponseContext response) {
-        if (e.getResponse().getEntity() != null) {
-            onException(e, e.getResponse(), response, false);
-        } else {
-            if (!mapException(e, response)) {
-                onException(e, e.getResponse(), response, false);
-            }
-        }
-    }
-
-    private boolean mapException(Throwable e,
-            HttpResponseContext response) {
-        ExceptionMapper em = exceptionFactory.find(e.getClass());
-        if (em == null) return false;
-
-        if (LOGGER.isLoggable(Level.CONFIG)) {
-            LOGGER.config("Mapping exception, " + e + ", to the ExceptionMapper, " + em);
-        }
-
-        try {
-            Response r = em.toResponse(e);
-            if (r == null)
-                r = Response.noContent().build();
-            onException(e, r, response, true);
-        } catch (MappableContainerException ex) {
-            // If the exception mapper throws a MappableContainerException then
-            // rethrow it to the HTTP container
-            throw ex;
-        } catch (RuntimeException ex) {
-            LOGGER.severe("Exception mapper " + em +
-                    " for Throwable " + e +
-                    " threw a RuntimeTxception when " +
-                    "attempting to obtain the response");
-            Response r = Response.serverError().build();
-            onException(ex, r, response, false);
-        }
-        return true;
-    }
-    
-    private static void onException(Throwable e,
-            Response r,
-            HttpResponseContext response,
-            boolean mapped) {
-        if (!mapped) {
-            // Log the stack trace
-            if (r.getStatus() >= 500) {
-                LOGGER.log(Level.SEVERE, "Internal server error", e);
-            }
-
-            if (r.getStatus() >= 500 && r.getEntity() == null) {
-                // Write out the exception to a string
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                pw.flush();
-
-                r = Response.status(r.getStatus()).entity(sw.toString()).
-                        type("text/plain").build();
-            }
-        }
-        
-        response.setResponse(r);        
     }
 }

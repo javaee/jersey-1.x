@@ -49,6 +49,20 @@ import java.util.List;
  */
 public interface InjectableProviderContext {
     /**
+     * Check if one or more injectable provider is registered to process an
+     * anotation and a context type for a given scope.
+     * 
+     * @param ac the annotation class.
+     * @param cc the context type.
+     * @param s the scope.
+     * @return true if one or more injectable provider is registered,
+     *         otherwise false.
+     */
+    boolean isInjectableProviderRegistered(Class<? extends Annotation> ac,
+            Class<?> cc,
+            ComponentScope s);
+
+    /**
      * Get an injectable.
      * 
      * @param <A> the type of the annotation.
@@ -81,7 +95,7 @@ public interface InjectableProviderContext {
      * @param ic the injectable context.
      * @param a the annotation instance.
      * @param c the context type.
-     * @param s the list of scope, ordered by preference.
+     * @param ls the list of scope, ordered by preference.
      * @return the injectable, otherwise null if an injectable could 
      *         not be found.
      */
@@ -90,5 +104,37 @@ public interface InjectableProviderContext {
             ComponentContext ic,
             A a,
             C c,
-            List<ComponentScope> s);
+            List<ComponentScope> ls);
+
+    public static final class InjectableScopePair {
+        public final Injectable i;
+        public final ComponentScope cs;
+
+        public InjectableScopePair(Injectable i, ComponentScope cs) {
+            this.i = i;
+            this.cs = cs;
+        }
+    }
+    
+    /**
+     * Get an injectable.
+     *
+     * @param <A> the type of the annotation.
+     * @param <C> the the context type. Types of the {@link java.lang.reflect.Type} and
+     *        {@link com.sun.jersey.api.model.Parameter} are the only types that
+     *        are supported.
+     * @param ac the annotation class.
+     * @param ic the injectable context.
+     * @param a the annotation instance.
+     * @param c the context type.
+     * @param ls the list of scope, ordered by preference.
+     * @return the injectable and scope, otherwise null if an injectable could
+     *         not be found.
+     */
+    <A extends Annotation, C> InjectableScopePair getInjectableWithScope(
+            Class<? extends Annotation> ac,
+            ComponentContext ic,
+            A a,
+            C c,
+            List<ComponentScope> ls);
 }

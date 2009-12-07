@@ -122,6 +122,14 @@ public interface WebApplication extends Traceable {
     MessageBodyWorkers getMessageBodyWorkers();
 
     /**
+     * Get the exception mapper context that can be used to map exceptions
+     * to responses.
+     *
+     * @return the exception mapper context.
+     */
+    ExceptionMapperContext getExceptionMapperContext();
+    
+    /**
      * Get an instance of {@link HttpContext} that is a proxy to
      * a thread local instance of {@link HttpContext}.
      * 

@@ -53,36 +53,43 @@ public final class ServerInjectableProviderFactory extends InjectableProviderFac
             implements ServerInjectableProviderContext {
     
     public Injectable getInjectable(Parameter p, ComponentScope s) {
+        InjectableScopePair isp = getInjectableiWithScope(p, s);
+        if (isp == null)
+            return null;
+        return isp.i;
+    }
+    
+    public InjectableScopePair getInjectableiWithScope(Parameter p, ComponentScope s) {
         if (p.getAnnotation() == null) return null;
-        
+
         ComponentContext ic = new AnnotatedContext(p.getAnnotations());
-        
+
         if (s == ComponentScope.PerRequest) {
             // Find a per request injectable with Parameter
-            Injectable i = getInjectable(p.getAnnotation().annotationType(), ic, p.getAnnotation(), 
+            Injectable i = getInjectable(p.getAnnotation().annotationType(), ic, p.getAnnotation(),
                     p, ComponentScope.PerRequest);
-            if (i != null) return i;
+            if (i != null) return new InjectableScopePair(i, ComponentScope.PerRequest);
 
             // Find a per request, undefined or singleton injectable with parameter Type
-            return getInjectable(
-                    p.getAnnotation().annotationType(), 
-                    ic, 
-                    p.getAnnotation(), 
+            return getInjectableWithScope(
+                    p.getAnnotation().annotationType(),
+                    ic,
+                    p.getAnnotation(),
                     p.getParameterType(),
                     ComponentScope.PERREQUEST_UNDEFINED_SINGLETON
                     );
         } else {
             // Find a undefined or singleton injectable with parameter Type
-            return getInjectable(
-                    p.getAnnotation().annotationType(), 
-                    ic, 
-                    p.getAnnotation(), 
+            return getInjectableWithScope(
+                    p.getAnnotation().annotationType(),
+                    ic,
+                    p.getAnnotation(),
                     p.getParameterType(),
                     ComponentScope.UNDEFINED_SINGLETON
-                    );            
+                    );
         }
     }
-    
+
     public List<Injectable> getInjectable(List<Parameter> ps, ComponentScope s) {
         List<Injectable> is = new ArrayList<Injectable>();
         for (Parameter p : ps)

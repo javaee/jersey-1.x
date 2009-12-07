@@ -38,6 +38,7 @@ package com.sun.jersey.spi.container;
 
 import com.sun.jersey.core.header.OutBoundHeaders;
 import com.sun.jersey.api.Responses;
+import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.core.reflection.ReflectionHelper;
@@ -46,11 +47,14 @@ import com.sun.jersey.core.spi.factory.ResponseImpl;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.GenericEntity;
@@ -59,6 +63,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
@@ -78,13 +83,15 @@ public class ContainerResponse implements HttpResponseContext {
     
     private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
     
-    private final MessageBodyWorkers bodyContext;
+    private final WebApplication wa;
     
     private ContainerRequest request;
     
     private ContainerResponseWriter responseWriter;
 
     private Response response;
+
+    private Throwable mappedThrowable;
     
     private int status;
     
@@ -168,7 +175,7 @@ public class ContainerResponse implements HttpResponseContext {
             WebApplication wa, 
             ContainerRequest request,
             ContainerResponseWriter responseWriter) {
-        this.bodyContext = wa.getMessageBodyWorkers();
+        this.wa = wa;
         this.request = request;
         this.responseWriter = responseWriter;
         this.status = Responses.NO_CONTENT;
@@ -176,7 +183,7 @@ public class ContainerResponse implements HttpResponseContext {
     
     /*package */ ContainerResponse(
             ContainerResponse acr) {
-        this.bodyContext = acr.bodyContext;
+        this.wa = acr.wa;
     }
 
     // ContainerResponse
@@ -233,7 +240,7 @@ public class ContainerResponse implements HttpResponseContext {
         
         MediaType contentType = getMediaType();
         if (contentType == null) {
-            contentType = bodyContext.getMessageBodyWriterMediaType(
+            contentType = getMessageBodyWorkers().getMessageBodyWriterMediaType(
                         entity.getClass(),
                         entityType,
                         annotations,
@@ -245,7 +252,7 @@ public class ContainerResponse implements HttpResponseContext {
             getHttpHeaders().putSingle("Content-Type", contentType);
         }
         
-        final MessageBodyWriter p = bodyContext.getMessageBodyWriter(
+        final MessageBodyWriter p = getMessageBodyWorkers().getMessageBodyWriter(
                 entity.getClass(), entityType, 
                 annotations, contentType);
         if (p == null) {
@@ -355,7 +362,108 @@ public class ContainerResponse implements HttpResponseContext {
      * @return the message body workers.
      */
     public MessageBodyWorkers getMessageBodyWorkers() {
-        return bodyContext;
+        return wa.getMessageBodyWorkers();
+    }
+
+    /**
+     * Map the cause of a mapable container exception to a response.
+     * <p>
+     * If the cause cannot be mapped and then that cause is re-thrown
+     * if a runtime exception otherwise the mappable contaner exception is
+     * re-thrown.
+     * 
+     * @param e the mappable container exception whose cause will be mapped to
+     *        a response.
+     */
+    public void mapMappableContainerException(MappableContainerException e) {
+        Throwable cause = e.getCause();
+
+        if (cause instanceof WebApplicationException) {
+            mapWebApplicationException((WebApplicationException)cause);
+        } else if (!mapException(cause)) {
+            if (cause instanceof RuntimeException) {
+                LOGGER.log(Level.SEVERE, "The RuntimeException could not be mapped to a response, " +
+                        "re-throwing to the HTTP container", cause);
+                throw (RuntimeException)cause;
+            } else {
+                LOGGER.log(Level.SEVERE, "The exception contained within " +
+                        "MappableContainerException could not be mapped to a response, " +
+                        "re-throwing to the HTTP container", cause);
+                throw e;
+            }
+        }
+    }
+
+    /**
+     * Map a web application exception to a response.
+     *
+     * @param e the web application exception.
+     */
+    public void mapWebApplicationException(WebApplicationException e) {
+        if (e.getResponse().getEntity() != null) {
+            onException(e, e.getResponse(), false);
+        } else {
+            if (!mapException(e)) {
+                onException(e, e.getResponse(), false);
+            }
+        }
+    }
+
+    /**
+     * Map an exception to a response.
+     *
+     * @param e the exception.
+     * @return true if the exception was mapped, otherwise false.
+     */
+    public boolean mapException(Throwable e) {
+        ExceptionMapper em = wa.getExceptionMapperContext().find(e.getClass());
+        if (em == null) return false;
+
+        if (LOGGER.isLoggable(Level.CONFIG)) {
+            LOGGER.config("Mapping exception, " + e + ", to the ExceptionMapper, " + em);
+        }
+
+        try {
+            Response r = em.toResponse(e);
+            if (r == null)
+                r = Response.noContent().build();
+            onException(e, r, true);
+        } catch (MappableContainerException ex) {
+            // If the exception mapper throws a MappableContainerException then
+            // rethrow it to the HTTP container
+            throw ex;
+        } catch (RuntimeException ex) {
+            LOGGER.severe("Exception mapper " + em +
+                    " for Throwable " + e +
+                    " threw a RuntimeException when " +
+                    "attempting to obtain the response");
+            Response r = Response.serverError().build();
+            onException(ex, r, false);
+        }
+        return true;
+    }
+
+    private void onException(Throwable e, Response r, boolean mapped) {
+        if (!mapped) {
+            // Log the stack trace
+            if (r.getStatus() >= 500) {
+                LOGGER.log(Level.SEVERE, "Internal server error", e);
+            }
+
+            if (r.getStatus() >= 500 && r.getEntity() == null) {
+                // Write out the exception to a string
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                e.printStackTrace(pw);
+                pw.flush();
+
+                r = Response.status(r.getStatus()).entity(sw.toString()).
+                        type("text/plain").build();
+            }
+        }
+
+        setResponse(r);
+        this.mappedThrowable = e;
     }
 
     // HttpResponseContext
@@ -372,6 +480,7 @@ public class ContainerResponse implements HttpResponseContext {
         this.isCommitted = false;
         this.out = null;
         this.response = response = (response != null) ? response : Responses.noContent().build();
+        this.mappedThrowable = null;
         
         this.status = response.getStatus();
         
@@ -386,6 +495,10 @@ public class ContainerResponse implements HttpResponseContext {
         return response != null;
     }
     
+    public Throwable getMappedThrowable() {
+        return mappedThrowable;
+    }
+
     public int getStatus() {
         return status;
     }

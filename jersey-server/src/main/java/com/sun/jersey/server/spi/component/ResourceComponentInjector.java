@@ -36,7 +36,6 @@
  */
 package com.sun.jersey.server.spi.component;
 
-import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractField;
@@ -47,6 +46,8 @@ import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.core.spi.component.AccessibleObjectContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
+import com.sun.jersey.spi.inject.InjectableProviderContext.InjectableScopePair;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -85,7 +86,7 @@ public final class ResourceComponentInjector {
      * @param s the scope underwhich injection will be performed.
      * @param resource the abstract resource model.
      */
-    public ResourceComponentInjector(InjectableProviderContext ipc, ComponentScope s, AbstractResource resource) {
+    public ResourceComponentInjector(ServerInjectableProviderContext ipc, ComponentScope s, AbstractResource resource) {
         // processFields(ipc, s, resource.getResourceClass());
         processFields(ipc, s, resource.getFields());
         processSetters(ipc, s, resource.getSetterMethods());
@@ -101,7 +102,7 @@ public final class ResourceComponentInjector {
                 singletonSetters.length > 0 || perRequestSetters.length > 0;
     }
 
-    private void processFields(InjectableProviderContext ipc, ComponentScope s,
+    private void processFields(ServerInjectableProviderContext ipc, ComponentScope s,
             List<AbstractField> fields) {
         Map<Field, Injectable<?>> singletons = new HashMap<Field, Injectable<?>>();
         Map<Field, Injectable<?>> perRequest = new HashMap<Field, Injectable<?>>();
@@ -110,58 +111,16 @@ public final class ResourceComponentInjector {
         for (AbstractField af : fields) {
             aoc.setAccesibleObject(af.getField());
             Parameter p = af.getParameters().get(0);
-            
-            if (p.getAnnotation() == null) continue;
 
-            if (s == ComponentScope.PerRequest) {
-                // Find a per request injectable with Parameter
-                Injectable i = ipc.getInjectable(
-                        p.getAnnotation().annotationType(), 
-                        aoc, 
-                        p.getAnnotation(), 
-                        p, 
-                        ComponentScope.PerRequest);
-                if (i != null) {
-                    configureField(af.getField());
-                    perRequest.put(af.getField(), i);
+            InjectableScopePair isp = ipc.getInjectableiWithScope(p, s);
+            if (isp != null) {
+                configureField(af.getField());
+                if (s == ComponentScope.PerRequest && isp.cs != ComponentScope.Singleton) {
+                    perRequest.put(af.getField(), isp.i);
                 } else {
-                    i = ipc.getInjectable(
-                            p.getAnnotation().annotationType(), 
-                            aoc, 
-                            p.getAnnotation(), 
-                            p.getParameterType(),
-                            ComponentScope.PERREQUEST_UNDEFINED
-                            );
-                    if (i != null) {
-                        configureField(af.getField());
-                        perRequest.put(af.getField(), i);                        
-                    } else {
-                        i = ipc.getInjectable(
-                                p.getAnnotation().annotationType(), 
-                                aoc, 
-                                p.getAnnotation(), 
-                                p.getParameterType(),
-                                ComponentScope.Singleton
-                                );
-                        if (i != null) {
-                            configureField(af.getField());
-                            singletons.put(af.getField(), i);                        
-                        }
-                    }
+                    singletons.put(af.getField(), isp.i);
                 }
-            } else {
-                Injectable i = ipc.getInjectable(
-                        p.getAnnotation().annotationType(), 
-                        aoc, 
-                        p.getAnnotation(), 
-                        p.getParameterType(),
-                        ComponentScope.UNDEFINED_SINGLETON
-                        );            
-                if (i != null) {
-                    configureField(af.getField());
-                    singletons.put(af.getField(), i);                        
-                }
-            }            
+            }
         }
         
         int size = singletons.entrySet().size();
@@ -196,7 +155,7 @@ public final class ResourceComponentInjector {
         }
     }
     
-    private void processSetters(InjectableProviderContext ipc, ComponentScope s,
+    private void processSetters(ServerInjectableProviderContext ipc, ComponentScope s,
             List<AbstractSetterMethod> setterMethods) {
         Map<Method, Injectable<?>> singletons = new HashMap<Method, Injectable<?>>();
         Map<Method, Injectable<?>> perRequest = new HashMap<Method, Injectable<?>>();
@@ -205,54 +164,15 @@ public final class ResourceComponentInjector {
         for (AbstractSetterMethod sm : setterMethods) {
             Parameter p = sm.getParameters().get(0);
             aoc.setAccesibleObject(sm.getMethod(), p.getAnnotations());
-            
-            if (p.getAnnotation() == null) continue;
 
-            if (s == ComponentScope.PerRequest) {
-                // Find a per request injectable with Parameter
-                Injectable i = ipc.getInjectable(
-                        p.getAnnotation().annotationType(), 
-                        aoc, 
-                        p.getAnnotation(), 
-                        p, 
-                        ComponentScope.PerRequest);
-                if (i != null) {
-                     perRequest.put(sm.getMethod(), i);
+            InjectableScopePair isp = ipc.getInjectableiWithScope(p, s);
+            if (isp != null) {
+                if (s == ComponentScope.PerRequest && isp.cs != ComponentScope.Singleton) {
+                    perRequest.put(sm.getMethod(), isp.i);
                 } else {
-                    i = ipc.getInjectable(
-                            p.getAnnotation().annotationType(), 
-                            aoc, 
-                            p.getAnnotation(), 
-                            p.getParameterType(),
-                            ComponentScope.PERREQUEST_UNDEFINED
-                            );
-                    if (i != null) {
-                        perRequest.put(sm.getMethod(), i);                        
-                    } else {
-                        i = ipc.getInjectable(
-                                p.getAnnotation().annotationType(), 
-                                aoc, 
-                                p.getAnnotation(), 
-                                p.getParameterType(),
-                                ComponentScope.Singleton
-                                );
-                        if (i != null) {
-                            singletons.put(sm.getMethod(), i);                        
-                        }
-                    }
+                    singletons.put(sm.getMethod(), isp.i);
                 }
-            } else {
-                Injectable i = ipc.getInjectable(
-                        p.getAnnotation().annotationType(), 
-                        aoc, 
-                        p.getAnnotation(), 
-                        p.getParameterType(),
-                        ComponentScope.UNDEFINED_SINGLETON
-                        );            
-                if (i != null) {
-                    singletons.put(sm.getMethod(), i);                        
-                }
-            }            
+            }
         }
                 
         int size = singletons.entrySet().size();

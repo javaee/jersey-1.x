@@ -45,10 +45,10 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
-import com.sun.jersey.spi.inject.InjectableProviderContext;
 import java.util.List;
 
 /**
@@ -60,7 +60,7 @@ public class IoCResourceFactory extends ResourceFactory {
     
     public IoCResourceFactory(
             ResourceConfig config,
-            InjectableProviderContext ipc,
+            ServerInjectableProviderContext ipc,
             List<IoCComponentProviderFactory> factories) {
         super(config, ipc);
         this.factories = factories;
@@ -123,11 +123,11 @@ public class IoCResourceFactory extends ResourceFactory {
     }
     
     private static class PerRequestWrapper implements ResourceComponentProvider {
-        private final InjectableProviderContext ipc;
+        private final ServerInjectableProviderContext ipc;
         private final IoCManagedComponentProvider imcp;
         private ResourceComponentInjector rci;
         
-        PerRequestWrapper(InjectableProviderContext ipc, IoCManagedComponentProvider imcp) {
+        PerRequestWrapper(ServerInjectableProviderContext ipc, IoCManagedComponentProvider imcp) {
             this.ipc = ipc;
             this.imcp = imcp;
         }
@@ -158,11 +158,11 @@ public class IoCResourceFactory extends ResourceFactory {
     }
 
     private static class SingletonWrapper implements ResourceComponentProvider {
-        private final InjectableProviderContext ipc;
+        private final ServerInjectableProviderContext ipc;
         private final IoCManagedComponentProvider imcp;
         private Object o;
 
-        SingletonWrapper(InjectableProviderContext ipc, IoCManagedComponentProvider imcp) {
+        SingletonWrapper(ServerInjectableProviderContext ipc, IoCManagedComponentProvider imcp) {
             this.ipc = ipc;
             this.imcp = imcp;
         }
@@ -193,11 +193,11 @@ public class IoCResourceFactory extends ResourceFactory {
     }
 
     private static class UndefinedWrapper implements ResourceComponentProvider {
-        private final InjectableProviderContext ipc;
+        private final ServerInjectableProviderContext ipc;
         private final IoCManagedComponentProvider imcp;
         private ResourceComponentInjector rci;
 
-        UndefinedWrapper(InjectableProviderContext ipc, IoCManagedComponentProvider imcp) {
+        UndefinedWrapper(ServerInjectableProviderContext ipc, IoCManagedComponentProvider imcp) {
             this.ipc = ipc;
             this.imcp = imcp;
         }

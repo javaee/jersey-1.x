@@ -38,6 +38,7 @@ package com.sun.jersey.server.impl.application;
 
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ProviderServices;
+import com.sun.jersey.spi.container.ExceptionMapperContext;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
@@ -49,7 +50,7 @@ import javax.ws.rs.ext.ExceptionMapper;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ExceptionMapperFactory {
+public class ExceptionMapperFactory implements ExceptionMapperContext {
     
     private static class ExceptionMapperType {
         ExceptionMapper em;
@@ -75,6 +76,8 @@ public class ExceptionMapperFactory {
         }
     }
 
+    // ExceptionMapperContext
+    
     public ExceptionMapper find(Class<? extends Throwable> c) {
         int distance = Integer.MAX_VALUE;
         ExceptionMapper selectedEm = null;

@@ -44,8 +44,8 @@ import com.sun.jersey.core.spi.component.ComponentConstructor;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
-import com.sun.jersey.spi.inject.InjectableProviderContext;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,17 +57,17 @@ import java.util.Map;
 public class ResourceFactory {
     private final ResourceConfig config;
 
-    private final InjectableProviderContext ipc;
+    private final ServerInjectableProviderContext ipc;
 
     private final Map<Class, ResourceComponentProviderFactory> factories;
     
-    public ResourceFactory(ResourceConfig config, InjectableProviderContext ipc) {
+    public ResourceFactory(ResourceConfig config, ServerInjectableProviderContext ipc) {
         this.config = config;
         this.ipc = ipc;
         this.factories = new HashMap<Class, ResourceComponentProviderFactory>();
     }
 
-    public InjectableProviderContext getInjectableProviderContext() {
+    public ServerInjectableProviderContext getInjectableProviderContext() {
         return ipc;
     }
 

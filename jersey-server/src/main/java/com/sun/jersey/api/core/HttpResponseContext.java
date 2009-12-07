@@ -76,6 +76,14 @@ public interface HttpResponseContext {
     boolean isResponseSet();
     
     /**
+     * Get the throwable (if any) that was mapped to a response.
+     * 
+     * @return the throwable that was mapped to a response, otherwise null
+     *         if no throwable was mapped to a response.
+     */
+    Throwable getMappedThrowable();
+
+    /**
      * @return the status of the response
      */
     int getStatus();

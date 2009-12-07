@@ -186,13 +186,24 @@ public class InjectableProviderFactory implements InjectableProviderContext {
     
     // InjectableProviderContext
 
+    public boolean isInjectableProviderRegistered(Class<? extends Annotation> ac,
+            Class<?> cc,
+            ComponentScope s) {
+        return !findInjectableProviders(ac, cc, s).isEmpty();
+    }
+    
     public final <A extends Annotation, C> Injectable getInjectable(
             Class<? extends Annotation> ac,             
             ComponentContext ic,
             A a,
             C c,
             ComponentScope s) {
-        return getInjectable(ac, ic, a, c, Collections.singletonList(s));
+        for (MetaInjectableProvider mip : findInjectableProviders(ac, c.getClass(), s)) {
+            Injectable i = mip.ip.getInjectable(ic, a, c);
+            if (i != null)
+                return i;
+        }
+        return null;
     }
     
     public final <A extends Annotation, C> Injectable getInjectable(
@@ -202,7 +213,7 @@ public class InjectableProviderFactory implements InjectableProviderContext {
             C c,
             List<ComponentScope> ls) {
         for (ComponentScope s : ls) {
-            Injectable i = _getInjectable(ac, ic, a, c, s);
+            Injectable i = getInjectable(ac, ic, a, c, s);
             if (i != null)
                 return i;
             else {
@@ -221,18 +232,17 @@ public class InjectableProviderFactory implements InjectableProviderContext {
         // LOGGER.warning(ic.getAccesibleObject().toString());
         return null;
     }
-    
-    @SuppressWarnings("unchecked")
-    private <A extends Annotation, C> Injectable _getInjectable(
-            Class<? extends Annotation> ac,             
+
+    public <A extends Annotation, C> InjectableScopePair getInjectableWithScope(
+            Class<? extends Annotation> ac,
             ComponentContext ic,
             A a,
             C c,
-            ComponentScope s) {
-        for (MetaInjectableProvider mip : findInjectableProviders(ac, c.getClass(), s)) {
-            Injectable i = mip.ip.getInjectable(ic, a, c);
+            List<ComponentScope> ls) {
+        for (ComponentScope s : ls) {
+            Injectable i = getInjectable(ac, ic, a, c, s);
             if (i != null)
-                return i;
+                return new InjectableScopePair(i, s);
         }
         return null;
     }
