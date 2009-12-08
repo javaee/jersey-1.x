@@ -1,4 +1,10 @@
 release 1.1.5 (2010)
+- Fixed issue 439
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=439
+  Proxied objects, using java.lang.reflect.Proxy, that invoke the Java method
+  of the proxy will correctly re-throw any target exception caught from a
+  InvocationTargetException, rather than the proxying throwing a
+  java.lang.reflect.UndeclaredThrowableException.
 - Upgraded jersey-simple-server to version 4.1.15.
 - If an exception is mapped to a Response then that exception is now available
   from the HttpResponseContext.getMappedThrowable() method.

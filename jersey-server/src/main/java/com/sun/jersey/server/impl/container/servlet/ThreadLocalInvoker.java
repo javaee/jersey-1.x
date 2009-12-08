@@ -38,6 +38,7 @@
 package com.sun.jersey.server.impl.container.servlet;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 
@@ -87,6 +88,13 @@ public class ThreadLocalInvoker<T> implements InvocationHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (threadLocalInstance.get() == null)
             throw new IllegalStateException();
-        return method.invoke(threadLocalInstance.get(), args);
+        
+        try {
+            return method.invoke(threadLocalInstance.get(), args);
+        } catch (IllegalAccessException ex) {
+            throw new IllegalStateException(ex);
+        } catch (InvocationTargetException ex) {
+            throw ex.getTargetException();
+        }
     }
 }

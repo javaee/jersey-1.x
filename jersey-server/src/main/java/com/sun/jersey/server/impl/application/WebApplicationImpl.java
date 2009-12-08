@@ -136,6 +136,7 @@ import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -251,12 +252,24 @@ public final class WebApplicationImpl implements WebApplication {
 
         InvocationHandler requestHandler = new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {                
-                return method.invoke(context.getRequest(), args);
+                try {
+                    return method.invoke(context.getRequest(), args);
+                } catch (IllegalAccessException ex) {
+                    throw new IllegalStateException(ex);
+                } catch (InvocationTargetException ex) {
+                    throw ex.getTargetException();
+                }
             }
         };
         InvocationHandler uriInfoHandler = new InvocationHandler() {
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                return method.invoke(context.getUriInfo(), args);
+                try {
+                    return method.invoke(context.getUriInfo(), args);
+                } catch (IllegalAccessException ex) {
+                    throw new IllegalStateException(ex);
+                } catch (InvocationTargetException ex) {
+                    throw ex.getTargetException();
+                }
             }
         };
         
