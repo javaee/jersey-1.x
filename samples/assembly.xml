@@ -36,23 +36,33 @@
  holder.
 -->
 <assembly>
-  <id>project</id>
-  <formats>
-    <format>zip</format>
-  </formats>
-  <moduleSets>
-    <moduleSet>
-      <sources>
-        <fileSets>
-          <fileSet>
+    <id>project</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <moduleSets>
+        <moduleSet>
+            <sources>
+                <fileSets>
+                    <fileSet>
+                        <useDefaultExcludes>true</useDefaultExcludes>
+                        <excludes>
+                            <exclude>**/target/**</exclude>
+                            <exclude>**/generated/**</exclude>
+                        </excludes>
+                    </fileSet>
+                </fileSets>
+            </sources>
+        </moduleSet>
+    </moduleSets>
+    <fileSets>
+        <fileSet>
+            <directory></directory>
             <useDefaultExcludes>true</useDefaultExcludes>
-              <excludes>
-                <exclude>**/target/**</exclude>
-                <exclude>**/generated/**</exclude>
-              </excludes>
-          </fileSet>
-        </fileSets>
-      </sources>
-    </moduleSet>
-  </moduleSets>
+            <includes>
+                <include>pom.xml</include>
+                <include>assembly.xml</include>
+            </includes>
+        </fileSet>
+    </fileSets>
 </assembly>
