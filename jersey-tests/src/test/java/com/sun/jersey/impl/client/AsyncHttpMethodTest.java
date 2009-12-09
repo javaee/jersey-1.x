@@ -347,9 +347,9 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         });
 
         f.cancel(true);
-        assertTrue(f.isCancelled());
 
         cdl.await();
+        assertTrue(f.isCancelled());
         assertEquals(1, l.size());
         assertTrue(l.get(0));
     }
