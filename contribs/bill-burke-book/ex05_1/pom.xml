@@ -18,7 +18,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
-        <artifactId>all-examples</artifactId>
+        <artifactId>bill-burke-book-examples</artifactId>
         <version>1.1.5-ea-SNAPSHOT</version>
     </parent>
     <artifactId>ex05_1</artifactId>
