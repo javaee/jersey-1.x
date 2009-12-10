@@ -173,11 +173,9 @@ JAXBBean bean = r.
     <section>
         <title>Getting started with the Jersey client</title>
         <para>Refer to the
-            <!-- Is there a versioned variation of this URI? -->
-            <ulink url="https://jersey.dev.java.net/source/browse/*checkout*/jersey/trunk/jersey/dependencies.html">dependencies document</ulink>,
-            specifically the “Core client” section, for details on the dependencies when using the Jersey client with Maven and Ant.
-            The dependences document also links to a getting started document that explains how to write a simple JAX-RS service,
-            and links to many samples that utilize both JAX-RS and the Jersey client API to communicate with the JAX-RS-based services.
+            <ulink url="#chapter_deps">dependencies chapter</ulink>,
+            and specifically the <ulink url="#core_client">Core client</ulink> section,
+            for details on the dependencies when using the Jersey client with Maven and Ant.
         </para>
         <para>Refer to the
             <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/package-summary.html">Java API documentation</ulink> for details on the Jersey client API packages and classes.
@@ -491,7 +489,8 @@ JAXBBean bean = r.
             The <literal>setUp</literal> method, called before a test is executed, creates an instance of
             the Glassfish server, deploys the application, and a <literal>WebResource</literal> instance
             that references the base resource:
-            <programlisting>    @Overrideprotected void setUp() throws Exception {
+            <programlisting>    @Override
+    protected void setUp() throws Exception {
         super.setUp();
 
         // Start Glassfish
@@ -511,7 +510,8 @@ JAXBBean bean = r.
     }</programlisting>
             The <literal>tearDown</literal> method, called after a test is executed,
             stops the Glassfish server.
-            <programlisting>    @Overrideprotected void tearDown() throws Exception {
+            <programlisting>    @Override
+   protected void tearDown() throws Exception {
         super.tearDown();
         glassfish.stop();
    }</programlisting></para>
@@ -564,33 +564,4 @@ JAXBBean bean = r.
             </para>
             </section>
         </section>
-
-<!--
-        <section>
-            <title>Future directions</title>
-            <para>The following represent future directions for the client API:</para>
-            <orderedlist>
-                <listitem>
-                    <para>Testing framework. Support for a testing framework is planned for the next release of
-                Jersey. This framework will make it easier to write functional tests using the JUnit
-                framework including tests using the client API.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>Services as clients. It is predicated that if REST becomes popular within the enterprise
-                then it will become common that services will be clients of other services. Namely, loosely
-                coupled service composition. The client API can be utilized by RESTful Web services but it
-                could be improved in a number of ways. For example, the server-side resources can be shared
-                with the Client, or the support for injection of WebResource instances that are pre-configured
-                according to some policy associated with the URI.
-                    </para>
-                </listitem>
-                <listitem>
-                    <para>Asynchronous support.There is basic asynchronous support, see
-                        <ulink url="https://jersey.dev.java.net/nonav/apidocs/latest/jersey/com/sun/jersey/api/client/AsyncWebResource.html">AsyncWebResource</ulink>. However, this is limited to the returning of a Future instance and the threading logic is limited. For the best support It is necessary to utilize underlying HTTP functionality that supports asynchronous request and response management such that threads can be managed efficiently, suspended while waiting for a response and callbacks occurring when a response has arrived. Such support does not yet exist. It is expected that such support could be useful for comet-based services that are also clients of other services.
-                    </para>
-                </listitem>
-            </orderedlist>
-        </section>
--->
     </chapter>

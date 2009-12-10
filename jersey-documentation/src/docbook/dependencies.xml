@@ -61,7 +61,7 @@ Tasks for Maven</ulink> very useful. For the convenience of non-maven developers
 
 <para>All dependences in this documented are referenced by hyper-links</para>
 
-<section>
+<section id="core_server">
 <title>Core server</title>
 <para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.pom">jersey-server</ulink>
 module. The following dependency needs to be added to the pom:
@@ -127,7 +127,7 @@ include the asm.jar in the minimum set of required jars.
 
 </section>
 
-<section>
+<section id="core_client">
 <title>Core client</title>
 <para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-client/&version;/jersey-client-&version;.pom">jersey-client</ulink>
 module. The following dependency needs to be added to the pom:
