@@ -42,6 +42,7 @@ import junit.framework.TestSuite;
 
 /**
  * @author Paul C. Bryan <pbryan@sun.com>
+ * @author Hubert A. Le Van Gong <hubert.levangong at Sun.COM>
  */
 public class SignatureTest extends TestCase {
 
@@ -55,6 +56,42 @@ public class SignatureTest extends TestCase {
     private static final String VERSION = "1.0";
     private static final String SIGNATURE = "tR3+Ty81lMeYAr/Fid0kMTYa/WM=";
 
+    private static final String RSA_PRIVKEY =
+            "MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBALRiMLAh9iimur8V" +
+            "A7qVvdqxevEuUkW4K+2KdMXmnQbG9Aa7k7eBjK1S+0LYmVjPKlJGNXHDGuy5Fw/d" +
+            "7rjVJ0BLB+ubPK8iA/Tw3hLQgXMRRGRXXCn8ikfuQfjUS1uZSatdLB81mydBETlJ" +
+            "hI6GH4twrbDJCR2Bwy/XWXgqgGRzAgMBAAECgYBYWVtleUzavkbrPjy0T5FMou8H" +
+            "X9u2AC2ry8vD/l7cqedtwMPp9k7TubgNFo+NGvKsl2ynyprOZR1xjQ7WgrgVB+mm" +
+            "uScOM/5HVceFuGRDhYTCObE+y1kxRloNYXnx3ei1zbeYLPCHdhxRYW7T0qcynNmw" +
+            "rn05/KO2RLjgQNalsQJBANeA3Q4Nugqy4QBUCEC09SqylT2K9FrrItqL2QKc9v0Z" +
+            "zO2uwllCbg0dwpVuYPYXYvikNHHg+aCWF+VXsb9rpPsCQQDWR9TT4ORdzoj+Nccn" +
+            "qkMsDmzt0EfNaAOwHOmVJ2RVBspPcxt5iN4HI7HNeG6U5YsFBb+/GZbgfBT3kpNG" +
+            "WPTpAkBI+gFhjfJvRw38n3g/+UeAkwMI2TJQS4n8+hid0uus3/zOjDySH3XHCUno" +
+            "cn1xOJAyZODBo47E+67R4jV1/gzbAkEAklJaspRPXP877NssM5nAZMU0/O/NGCZ+" +
+            "3jPgDUno6WbJn5cqm8MqWhW1xGkImgRk+fkDBquiq4gPiT898jusgQJAd5Zrr6Q8" +
+            "AO/0isr/3aa6O6NLQxISLKcPDk2NOccAfS/xOtfOz4sJYM3+Bs4Io9+dZGSDCA54" +
+            "Lw03eHTNQghS0A==";
+    private static final String RSA_CERTIFICATE =
+            "-----BEGIN CERTIFICATE-----\n" +
+            "MIIBpjCCAQ+gAwIBAgIBATANBgkqhkiG9w0BAQUFADAZMRcwFQYDVQQDDA5UZXN0\n" +
+            "IFByaW5jaXBhbDAeFw03MDAxMDEwODAwMDBaFw0zODEyMzEwODAwMDBaMBkxFzAV\n" +
+            "BgNVBAMMDlRlc3QgUHJpbmNpcGFsMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKB\n" +
+            "gQC0YjCwIfYoprq/FQO6lb3asXrxLlJFuCvtinTF5p0GxvQGu5O3gYytUvtC2JlY\n" +
+            "zypSRjVxwxrsuRcP3e641SdASwfrmzyvIgP08N4S0IFzEURkV1wp/IpH7kH41Etb\n" +
+            "mUmrXSwfNZsnQRE5SYSOhh+LcK2wyQkdgcMv11l4KoBkcwIDAQABMA0GCSqGSIb3\n" +
+            "DQEBBQUAA4GBAGZLPEuJ5SiJ2ryq+CmEGOXfvlTtEL2nuGtr9PewxkgnOjZpUy+d\n" +
+            "4TvuXJbNQc8f4AMWL/tO9w0Fk80rWKp9ea8/df4qMq5qlFWlx6yOLQxumNOmECKb\n" +
+            "WpkUQDIDJEoFUzKMVuJf4KO/FJ345+BNLGgbJ6WujreoM1X/gYfdnJ/J\n" +
+            "-----END CERTIFICATE-----";
+    private static final String RSA_SIGNATURE_METHOD = RSA_SHA1.NAME;
+    private static final String RSA_SIGNATURE = "jvTp/wX1TYtByB1m+Pbyo0lnCOLI" +
+            "syGCH7wke8AUs3BpnwZJtAuEJkvQL2/9n4s5wUmUl4aCI4BwpraNx4RtEXMe5qg5" +
+            "T1LVTGliMRpKasKsW//e+RinhejgCuzoH26dyF8iY2ZZ/5D1ilgeijhV/vBka5tw" +
+            "t399mXwaYdCwFYE=";
+    private static final String RSA_NONCE = "13917289812797014437";
+    private static final String RSA_TIMESTAMP = "1196666512";
+
+    
     /**
      * Creates the test case.
      *
@@ -125,6 +162,68 @@ public class SignatureTest extends TestCase {
         assertEquals(params.getVersion(), VERSION);
         assertEquals(params.getSignature(), SIGNATURE);
 
+        try {
+            // verify signature using request that was just signed
+            assertTrue(OAuthSignature.verify(request, params, secrets));
+        }
+        catch (OAuthSignatureException se) {
+            fail(se.getMessage());
+        }
+
+        // RSA-SHA1 test
+        RSASHA1test();
+    }
+    
+
+    private void RSASHA1test() {
+        DummyRequest request = new DummyRequest().requestMethod("GET").
+         requestURL("http://photos.example.net/photos").
+         parameterValue("file", "vacaction.jpg").parameterValue("size", "original");
+
+        OAuthParameters params = new OAuthParameters().realm(REALM).
+         consumerKey(CONSUMER_KEY).
+         signatureMethod(RSA_SIGNATURE_METHOD).timestamp(RSA_TIMESTAMP).
+         nonce(RSA_NONCE).version(VERSION);
+
+        OAuthSecrets secrets = new OAuthSecrets().consumerSecret(RSA_PRIVKEY);
+
+        // generate digital signature; ensure it matches the OAuth spec
+        String signature = null;
+
+        try {
+            signature = OAuthSignature.generate(request, params, secrets);
+        }
+        catch (OAuthSignatureException se) {
+            fail(se.getMessage());
+        }
+        assertEquals(signature, RSA_SIGNATURE);
+
+        OAuthParameters saved = (OAuthParameters)params.clone();
+
+        try {
+            // sign the request; clear params; parse params from request; ensure they match original
+            OAuthSignature.sign(request, params, secrets);
+        }
+        catch (OAuthSignatureException se) {
+            fail(se.getMessage());
+        }
+
+        // signing the request should not have modified the original parameters
+        assertTrue(params.equals(saved));
+        assertTrue(params.getSignature() == null);
+
+        params = new OAuthParameters();
+        params.readRequest(request);
+        assertEquals(params.getRealm(), REALM);
+        assertEquals(params.getConsumerKey(), CONSUMER_KEY);
+//        assertEquals(params.getToken(), ACCESS_TOKEN);
+        assertEquals(params.getSignatureMethod(), RSA_SIGNATURE_METHOD);
+        assertEquals(params.getTimestamp(), RSA_TIMESTAMP);
+        assertEquals(params.getNonce(), RSA_NONCE);
+        assertEquals(params.getVersion(), VERSION);
+        assertEquals(params.getSignature(), RSA_SIGNATURE);
+
+        secrets = new OAuthSecrets().consumerSecret(RSA_CERTIFICATE);
         try {
             // verify signature using request that was just signed
             assertTrue(OAuthSignature.verify(request, params, secrets));

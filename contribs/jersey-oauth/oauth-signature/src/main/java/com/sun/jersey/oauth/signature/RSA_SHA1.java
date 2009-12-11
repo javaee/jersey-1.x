@@ -47,6 +47,12 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.security.cert.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+
 
 /**
  * An OAuth signature method that implements RSA-SHA1.
@@ -61,6 +67,8 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
     private static final String SIGNATURE_ALGORITHM = "SHA1withRSA";
     
     private static final String KEY_TYPE = "RSA";
+
+    private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE";
 
     public RSA_SHA1() {
     }
@@ -162,14 +170,27 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
             throw new IllegalStateException(nsae);
         }
 
-        byte[] decodedPubKey;
+        RSAPublicKey rsaPubKey = null;
 
-        try {
-            decodedPubKey = Base64.decode(secrets.getConsumerSecret());
+        String tmpkey = secrets.getConsumerSecret();
+        if (tmpkey.startsWith(BEGIN_CERT)) {
+            try {
+                Certificate cert = null;
+                ByteArrayInputStream bais = new ByteArrayInputStream(tmpkey.getBytes());
+                BufferedInputStream bis = new BufferedInputStream(bais);
+                CertificateFactory certfac = CertificateFactory.getInstance("X.509");
+                while (bis.available() > 0) {
+                    cert = certfac.generateCertificate(bis);
+                }
+                rsaPubKey = (RSAPublicKey) cert.getPublicKey();
+            } catch (IOException ex) {
+                Logger.getLogger(RSA_SHA1.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CertificateException ex) {
+                Logger.getLogger(RSA_SHA1.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
         }
-        catch (IOException ioe) {
-            throw new InvalidSecretException("invalid consumer secret");
-        }
+
 
         byte[] decodedSignature;
 
@@ -178,26 +199,6 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
         }
         catch (IOException ioe) {
             return false;
-        }
-
-        KeyFactory keyf;
-
-        try {
-            keyf = KeyFactory.getInstance(KEY_TYPE);
-        }
-        catch (NoSuchAlgorithmException nsae) {
-            throw new IllegalStateException(nsae);
-        }
-
-        EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decodedPubKey);
-
-        RSAPublicKey rsaPubKey;
-
-        try {
-            rsaPubKey = (RSAPublicKey)keyf.generatePublic(keySpec);
-        }
-        catch (InvalidKeySpecException ikse) {
-            throw new IllegalStateException(ikse);
         }
 
         try {
