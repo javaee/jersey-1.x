@@ -169,7 +169,7 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         uc.setRequestMethod(ro.getMethod());
 
         // Write the request headers
-        writeOutBoundHeaders(ro.getMetadata(), uc);
+        writeOutBoundHeaders(ro.getHeaders(), uc);
 
         // Write the entity (if any)
         Object entity = ro.getEntity();
@@ -202,13 +202,13 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
 
                         @Override
                         public void commit() throws IOException {
-                            writeOutBoundHeaders(ro.getMetadata(), uc);
+                            writeOutBoundHeaders(ro.getHeaders(), uc);
                         }
                     };
                 }
             });
         } else {
-            writeOutBoundHeaders(ro.getMetadata(), uc);
+            writeOutBoundHeaders(ro.getHeaders(), uc);
         }
         
         // Return the in-bound response

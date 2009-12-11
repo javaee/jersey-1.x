@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.ProtocolException;
 import java.util.List;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
@@ -290,9 +291,15 @@ public abstract class TerminatingClientHandler implements ClientHandler {
             bw.writeTo(entity, entityClass, entityType,
                     EMPTY_ANNOTATIONS, mediaType, headers, out);
             out.flush();
-        } finally {
-            out.close();
+        } catch (IOException ex) {
+            try { out.close(); } catch (Exception e) { }
+            throw ex;
+        } catch (RuntimeException ex) {
+            try { out.close(); } catch (Exception e) { }
+            throw ex;
         }
+
+        out.close();
     }
 
 
