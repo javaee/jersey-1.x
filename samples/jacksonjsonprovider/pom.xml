@@ -44,7 +44,6 @@
         <version>1.1.5-ea-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.samples.jacksonjsonprovider</groupId>
     <artifactId>jacksonjsonprovider</artifactId>
     <name>Jackson JAX-RS JSON Provider - Jersey sample</name>
     <build>
