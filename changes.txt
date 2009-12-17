@@ -1,4 +1,7 @@
 release 1.1.5 (2010)
+- Added formatted feature.
+  When enabled, XML returned from resources will be formatted (line breaks and
+  indentation).
 - Fixed issue 439
   https://jersey.dev.java.net/issues/show_bug.cgi?id=439
   Proxied objects, using java.lang.reflect.Proxy, that invoke the Java method
