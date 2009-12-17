@@ -56,9 +56,13 @@ public interface FeaturesAndProperties {
     /**
      * If true then returned XML will be formatted.
      * <p>
-     * Formatting is done by setting Marshaller.JAXB_FORMATTED_OUTPUT when
-     * Marshallers are created. This will cause that produced XML will be
-     * formatted (line breaks and indentation).
+     * If true then an entity written by a {@link javax.ws.rs.ext.MessageBodyWriter}
+     * may be formatted for the purposes of human readability if that
+     * <code>MessageBodyWriter</code> can support such formatting.
+     * <p>
+     * JAXB-based message body writers that produce XML documents support this
+     * property such that , if true, those XML documents will be formatted for
+     * human readability. 
      * <p>
      * The default value is false.
      */
