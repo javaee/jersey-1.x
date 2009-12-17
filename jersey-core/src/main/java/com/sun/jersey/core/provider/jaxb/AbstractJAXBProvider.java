@@ -38,9 +38,11 @@
 package com.sun.jersey.core.provider.jaxb;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.WeakHashMap;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
@@ -70,6 +72,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     private final ContextResolver<Unmarshaller> mtUnmarshaller;
     
     private final ContextResolver<Marshaller> mtMarshaller;
+
+    private boolean jaxbFormattedOutput = false;
         
     public AbstractJAXBProvider(Providers ps) {
         this(ps, null);
@@ -88,6 +92,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             this.mtUnmarshaller = null;
             this.mtMarshaller = null;
         }
+    }
+
+    @Context
+    public void setConfiguration(FeaturesAndProperties fp) {
+        jaxbFormattedOutput = fp.getFeature("com.sun.jersey.config.feature.Formatted");
     }
 
     protected boolean isSupported(MediaType m) {
@@ -126,7 +135,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             if (m != null) return m;
         }
 
-        return getJAXBContext(type, mt).createMarshaller();
+        Marshaller m = getJAXBContext(type, mt).createMarshaller();
+        if(jaxbFormattedOutput)
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, jaxbFormattedOutput);
+        return m;
+
     }
     
     private final Marshaller getMarshaller(Class type) throws JAXBException {
@@ -135,7 +148,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             if (u != null) return u;
         }
 
-        return getJAXBContext(type).createMarshaller();
+        Marshaller m = getJAXBContext(type).createMarshaller();
+        if(jaxbFormattedOutput)
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, jaxbFormattedOutput);
+        return m;
     }
     
     private final JAXBContext getJAXBContext(Class type, MediaType mt) throws JAXBException {
