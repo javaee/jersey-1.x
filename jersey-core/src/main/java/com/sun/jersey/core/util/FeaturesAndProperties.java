@@ -54,6 +54,18 @@ public interface FeaturesAndProperties {
             = "com.sun.jersey.config.feature.DisableXmlSecurity";
 
     /**
+     * If true then returned XML will be formatted.
+     * <p>
+     * Formatting is done by setting Marshaller.JAXB_FORMATTED_OUTPUT when
+     * Marshallers are created. This will cause that produced XML will be
+     * formatted (line breaks and indentation).
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_FORMATTED
+            = "com.sun.jersey.config.feature.Formatted";
+
+    /**
      * Get the map of features associated with the client.
      *
      * @return the features.

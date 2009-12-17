@@ -96,7 +96,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
 
     @Context
     public void setConfiguration(FeaturesAndProperties fp) {
-        jaxbFormattedOutput = fp.getFeature("com.sun.jersey.config.feature.Formatted");
+        jaxbFormattedOutput = fp.getFeature(FeaturesAndProperties.FEATURE_FORMATTED);
     }
 
     protected boolean isSupported(MediaType m) {

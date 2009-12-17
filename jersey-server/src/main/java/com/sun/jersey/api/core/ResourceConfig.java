@@ -188,18 +188,6 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             = "com.sun.jersey.config.feature.TracePerRequest";
 
     /**
-     * If true then returned XML will be formatted.
-     * <p>
-     * Formatting is done by setting Marshaller.JAXB_FORMATTED_OUTPUT when
-     * Marshallers are created. This will cause that produced XML will be
-     * formatted (line breaks and indentation).
-     * <p>
-     * The default value is false.
-     */
-    public static final String FEATURE_FORMATTED
-            = "com.sun.jersey.config.feature.Formatted";
-
-    /**
      * If set the map of file extension to media type mappings that will be
      * added to the map that is returned from {@link #getMediaTypeMappings() }.
      * <p>
