@@ -40,7 +40,6 @@ package com.sun.jersey.core.reflection;
 import com.sun.jersey.impl.ImplMessages;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -605,5 +604,51 @@ public class ReflectionHelper {
         } else {
             return resolveTypeVariable(c, dc, tv, submap);
         }
+    }
+
+    /**
+     * Find a method on a class given an existing method.
+     * <p>
+     * If there exists a public method on the class that has the same name
+     * and parameters as the existing method then that public method is
+     * returned.
+     * <p>
+     * Otherwise, if there exists a public method on the class that has
+     * the same name and the same number of parameters as the existing method,
+     * and each generic parameter type, in order, of the public method is equal
+     * to the generic parameter type, in the same order, of the existing method
+     * or is an instance of {@link TypeVariable} then that public method is
+     * returned.
+     *
+     * @param c the class to search for a public method
+     * @param m the method to find
+     * @return the found public method.
+     */
+    public static Method findMethodOnClass(Class c, Method m) {
+        try {
+            return c.getMethod(m.getName(), m.getParameterTypes());
+        } catch (NoSuchMethodException ex) {
+            for (Method _m : c.getMethods()) {
+                if (_m.getName().equals(m.getName()) &&
+                        _m.getParameterTypes().length == m.getParameterTypes().length) {
+                    if (compareParameterTypes(m.getGenericParameterTypes(),
+                            _m.getGenericParameterTypes())) {
+                        return _m;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private static boolean compareParameterTypes(Type[] ts, Type[] _ts) {
+        for (int i = 0; i < ts.length; i++) {
+            if (!ts[i].equals(_ts[i])) {
+                if (!(_ts[i] instanceof TypeVariable)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }

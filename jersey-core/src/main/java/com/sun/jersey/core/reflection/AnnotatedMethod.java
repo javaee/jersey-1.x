@@ -226,16 +226,14 @@ public final class AnnotatedMethod implements AnnotatedElement {
         Method am = findAnnotatedMethod(m.getDeclaringClass(), m);
         return (am != null) ? am : m;
     }
-    
+
     private static Method findAnnotatedMethod(Class<?> c, Method m) {
         if (c == Object.class)
             return null;
-        
-        try {
-            m = c.getMethod(m.getName(), m.getParameterTypes());
-        } catch (NoSuchMethodException ex) {
+
+        m = ReflectionHelper.findMethodOnClass(c, m);
+        if (m == null)
             return null;
-        }
 
         if (hasAnnotations(m)) return m;
         
@@ -253,18 +251,6 @@ public final class AnnotatedMethod implements AnnotatedElement {
 
         return null;
     }    
-    
-    private static boolean isMethodAnnotation(Annotation a) {
-        for (Class<? extends Annotation> ac : METHOD_META_ANNOTATIONS) {
-            if (a.annotationType().getAnnotation(ac) != null) return true;            
-        }
-
-        return METHOD_ANNOTATIONS.contains(a.annotationType());
-    }
-    
-    private static boolean isParameterAnnotation(Annotation a) {
-        return PARAMETER_ANNOTATIONS.contains(a.annotationType());
-    }
     
     private static boolean hasAnnotations(Method m) {
         return hasMetaMethodAnnotations(m) || 
@@ -290,7 +276,7 @@ public final class AnnotatedMethod implements AnnotatedElement {
     private static boolean hasParameterAnnotations(Method m) {
         for (Annotation[] as : m.getParameterAnnotations()) 
             for (Annotation a : as)
-                if (PARAMETER_ANNOTATIONS.contains(a)) return true;
+                if (PARAMETER_ANNOTATIONS.contains(a.annotationType())) return true;
                 
         return false;
     }

@@ -63,15 +63,23 @@ public final class RequestDispatcherWrapper implements RequestDispatcher {
     }
 
     public void forward(ServletRequest req, ServletResponse rsp) throws ServletException, IOException {
-        ResolvedViewable rv = (ResolvedViewable)hc.getProperties().get("com.sun.jersey.spi.template.ResolvedViewable");
+        final ResolvedViewable rv = (ResolvedViewable)hc.getProperties().
+                get("com.sun.jersey.spi.template.ResolvedViewable");
 
-        req.setAttribute("httpContext", hc);
+        final Object oldIt = req.getAttribute("it");
+        final Object oldResolvingClass = req.getAttribute("resolvingClass");
+
         req.setAttribute("resolvingClass", rv.getResolvingClass());
         req.setAttribute("it", it);
+        req.setAttribute("httpContext", hc);
         req.setAttribute("_basePath", basePath);
         req.setAttribute("_request", req);
         req.setAttribute("_response", rsp);
+
         d.forward(req,rsp);
+
+        req.setAttribute("resolvingClass", oldResolvingClass);
+        req.setAttribute("it", oldIt);
     }
 
     public void include(ServletRequest req, ServletResponse rsp) throws ServletException, IOException {

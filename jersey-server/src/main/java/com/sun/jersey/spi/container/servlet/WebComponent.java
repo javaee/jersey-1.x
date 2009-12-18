@@ -87,7 +87,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -242,7 +241,7 @@ public class WebComponent implements ContainerListener {
         }
 
         public void finish() throws IOException {
-            if (out != null)
+            if (statusAndHeadersWritten)
                 return;
 
             // Note that the writing of headers MUST be performed before

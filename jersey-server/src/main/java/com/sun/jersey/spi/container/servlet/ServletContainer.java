@@ -755,11 +755,29 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @throws javax.servlet.ServletException
      */
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String servletPath = request.getServletPath();
+        if (request.getAttribute("javax.servlet.include.request_uri") != null) {
+            final String includeRequestURI = (String)request.getAttribute("javax.servlet.include.request_uri");
 
+            if (!includeRequestURI.equals(request.getRequestURI())) {
+                doFilter(request, response, chain,
+                        includeRequestURI,
+                        (String)request.getAttribute("javax.servlet.include.servlet_path"),
+                        (String)request.getAttribute("javax.servlet.include.query_string"));
+                return;
+            }
+        }
+
+        doFilter(request, response, chain,
+                request.getRequestURI(),
+                request.getServletPath(),
+                request.getQueryString());
+    }
+
+    private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+            String requestURI, String servletPath, String queryString) throws IOException, ServletException {
         // if we match the static content regular expression lets delegate to the filter chain
         // to use the default container servlets & handlers
-        Pattern p = getStaticContentPattern();
+        final Pattern p = getStaticContentPattern();
         if (p != null && p.matcher(servletPath).matches()) {
             chain.doFilter(request, response);
             return;
@@ -772,8 +790,8 @@ public class ServletContainer extends HttpServlet implements Filter {
                 path("/").
                 build();
 
-        final URI requestUri = absoluteUriBuilder.replacePath(request.getRequestURI()).
-                replaceQuery(request.getQueryString()).
+        final URI requestUri = absoluteUriBuilder.replacePath(requestURI).
+                replaceQuery(queryString).
                 build();
 
         service(baseUri, requestUri, request, response);

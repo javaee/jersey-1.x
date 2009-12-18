@@ -1,5 +1,17 @@
 release 1.1.5 (2010)
-- Added formatted feature.
+- Fixed issues when a Response is returned with a Viewable and a status code
+  >= 400.
+- Fixed issue 447
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=447
+  JAX-RS annotated methods on interfaces or abstract methods on abstract classes
+  that have parameters that are instances of java.lang.reflect.TypeVariable are
+  correctly detected as the annotated methods to process.
+- Fixed issue 439
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=432
+  Servlet RequestDispatcher.forward works when forwarding to Jersey managed
+  URIs. For example a JSP view may utilize <c:import url="/some/jaxrs/path" />
+  to include another view.
+- Added formatted feature, see FeaturesAndProperties.FEATURE_FORMATTED
   When enabled, XML returned from resources will be formatted (line breaks and
   indentation).
 - Fixed issue 439

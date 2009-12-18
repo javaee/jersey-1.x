@@ -77,7 +77,7 @@ public class MethodList implements Iterable<AnnotatedMethod> {
     public MethodList(List<Method> methods) {
         List<AnnotatedMethod> l = new ArrayList<AnnotatedMethod>();
         for (Method m : methods) {
-            if (!m.isBridge())
+            if (!m.isBridge() && m.getDeclaringClass() != Object.class)
                 l.add(new AnnotatedMethod(m));
         }
 
@@ -88,7 +88,7 @@ public class MethodList implements Iterable<AnnotatedMethod> {
     public MethodList(Method... methods) {
         List<AnnotatedMethod> l = new ArrayList<AnnotatedMethod>();
         for (Method m : methods) {
-            if (!m.isBridge())
+            if (!m.isBridge() && m.getDeclaringClass() != Object.class)
                 l.add(new AnnotatedMethod(m));
         }
 
