@@ -38,6 +38,7 @@
 package com.sun.jersey.api.view;
 
 import com.sun.jersey.spi.template.TemplateContext;
+import com.sun.jersey.spi.template.ViewProcessor;
 
 /**
  * A viewable type referencing a template by name and a model to be passed
@@ -72,11 +73,11 @@ import com.sun.jersey.spi.template.TemplateContext;
  * replaced with a '/' character, followed by a '/' character,
  * followed by the relative template name.
  *
- * If the absolute template name cannot be resolved into a fully qualified
- * template name (see {@link TemplateContext}) then the super class of the
- * resolving class is utilized, and is set as the resolving class. Traversal up
- * the inheritence hierarchy proceeds until an absolute template name can be
- * resolved into a fully qualified template name, or the Object class is
+ * If the absolute template name cannot be resolved into a template reference
+ * (see {@link ViewProcessor} and {@link TemplateContext}) then the super class
+ * of the resolving class is utilized, and is set as the resolving class.
+ * Traversal up the inheritence hierarchy proceeds until an absolute template
+ * name can be resolved into a template reference, or the Object class is
  * reached, which means the absolute template name could not be resolved and
  * an error will result.
  * 

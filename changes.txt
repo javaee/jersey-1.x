@@ -1,4 +1,17 @@
 release 1.1.5 (2010)
+- Fixed issue 446
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=447
+  Deprecated TemplateProcessor, instead use ViewProcessor, which provides
+  better support when resolving a template name and writing out a template.
+  Note that existing implementations of TemplateProcessor are still supported.
+  When writing out an view with an absolute template name, or a view with a
+  resolving class then it is not required that an HTTP request be in scope
+  (unless the ViewProcessor implementation requires it).
+  *BREAKING CHANGES* for com.sun.jersey.spi.template.TemplateContext and
+  com.sun.jersey.spi.template.ResolvedViewable.
+  TemplateContext no longer has a method to obtain the set of TemplateProcessor.
+  The constructors of ResolvedViewable were modified to be compatible with
+  ViewProcessor.
 - Fixed issues when a Response is returned with a Viewable and a status code
   >= 400.
 - Fixed issue 447

@@ -34,59 +34,40 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.impl.template;
 
-package com.sun.jersey.server.impl.template;
-
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.spi.template.ResolvedViewable;
-import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.api.view.Viewable;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import javax.ws.rs.ext.MessageBodyWriter;
+import com.sun.jersey.spi.template.ViewProcessor;
 import java.io.IOException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.net.URL;
+import javax.ws.rs.ext.Provider;
 
 /**
- *
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewable> {
+@Provider
+public class TestViewProcessor implements ViewProcessor<String> {
 
-    @Context UriInfo ui;
-    
-    @Context TemplateContext tc;
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return Viewable.class.isAssignableFrom(type);
+    public String resolve(String path) {
+        if (!path.endsWith(".testp"))
+            path = path + ".testp";
+        
+        URL u = this.getClass().getResource(path);
+        if (u == null) return null;
+        return path;
     }
 
-    public void writeTo(Viewable v, 
-            Class<?> type, Type genericType, Annotation[] annotations, 
-            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
-            OutputStream entityStream) throws IOException {
-        final ResolvedViewable rv = resolve(v);
-        if (rv == null)
-            throw new IOException("The template name, " +
-                    v.getTemplateName() +
-                    ", could not be resolved to a fully qualified template name");
-
-        rv.writeTo(entityStream);
+    public void writeTo(String resolvedPath, Viewable viewable, OutputStream out) throws IOException {
+        PrintStream ps = new PrintStream(out);
+        ps.print("path=");
+        ps.print(resolvedPath);
+        ps.println();
+        ps.print("model=");
+        ps.print(viewable.getModel().toString());
+        ps.println();
     }
 
-    private ResolvedViewable resolve(Viewable v) {
-        if (v instanceof ResolvedViewable) {
-            return (ResolvedViewable)v;
-        } else {
-            return tc.resolveViewable(v, ui);
-        }
-    }
-    
-    public long getSize(Viewable t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return -1;
-    }
 }

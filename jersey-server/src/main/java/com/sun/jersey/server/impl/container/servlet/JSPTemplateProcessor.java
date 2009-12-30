@@ -40,8 +40,9 @@ package com.sun.jersey.server.impl.container.servlet;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.spi.template.ViewProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
@@ -56,7 +57,7 @@ import javax.ws.rs.core.Context;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class JSPTemplateProcessor implements TemplateProcessor {
+public class JSPTemplateProcessor implements ViewProcessor<String> {
     private @Context HttpContext hc;
     
     private @Context ServletContext servletContext;
@@ -106,7 +107,7 @@ public class JSPTemplateProcessor implements TemplateProcessor {
         return null;
     }
 
-    public void writeTo(String resolvedPath, Object model, OutputStream out) throws IOException {
+    public void writeTo(String resolvedPath, Viewable viewable, OutputStream out) throws IOException {
         // Commit the status and headers to the HttpServletResponse
         out.flush();
 
@@ -115,8 +116,8 @@ public class JSPTemplateProcessor implements TemplateProcessor {
             throw new ContainerException("No request dispatcher for: " + resolvedPath);
         }
 
-        d = new RequestDispatcherWrapper(d, basePath, hc, model);
-        
+        d = new RequestDispatcherWrapper(d, basePath, hc, viewable);
+
         try {
             d.forward(requestInvoker.get(), responseInvoker.get());
         } catch (Exception e) {

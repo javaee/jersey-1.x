@@ -45,6 +45,7 @@ import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.spi.template.ViewProcessor;
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Response;
 
@@ -53,7 +54,7 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ViewableTest extends AbstractGrizzlyWebContainerTester {
-    public static class XTemplateProcessor implements TemplateProcessor {
+    public static class XViewProcessor implements ViewProcessor<String> {
 
         public String resolve(String name) {
             if (name.endsWith(".x"))
@@ -66,6 +67,12 @@ public class ViewableTest extends AbstractGrizzlyWebContainerTester {
             out.flush();
 
             out.write(fullyQualifedName.getBytes());
+        }
+
+        public void writeTo(String t, Viewable viewable, OutputStream out) throws IOException {
+            out.flush();
+
+            out.write(t.getBytes());
         }
 
     }
@@ -96,13 +103,13 @@ public class ViewableTest extends AbstractGrizzlyWebContainerTester {
     }
 
     public void testGet() {
-        startServer(ViewableResource.class, XTemplateProcessor.class);
+        startServer(ViewableResource.class, XViewProcessor.class);
         WebResource r = createClient().resource(getUri().path("/").build());
         assertEquals("/view.x", r.get(String.class));
     }
     
     public void testGet500() {
-        startServer(ViewableResource.class, XTemplateProcessor.class);
+        startServer(ViewableResource.class, XViewProcessor.class);
         WebResource r = createClient().resource(getUri().path("/500").build());
 
         ClientResponse cr = r.get(ClientResponse.class);

@@ -35,58 +35,80 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.template;
+package com.sun.jersey.impl.template;
 
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.spi.template.ResolvedViewable;
-import com.sun.jersey.spi.template.TemplateContext;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.view.Viewable;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import javax.ws.rs.ext.MessageBodyWriter;
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.spi.template.ViewProcessor;
 import java.io.IOException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
+import java.io.OutputStream;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewable> {
-
-    @Context UriInfo ui;
+public class ViewAndTemplateProcessorTest extends AbstractResourceTester {
     
-    @Context TemplateContext tc;
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return Viewable.class.isAssignableFrom(type);
+    public ViewAndTemplateProcessorTest(String testName) {
+        super(testName);
     }
 
-    public void writeTo(Viewable v, 
-            Class<?> type, Type genericType, Annotation[] annotations, 
-            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
-            OutputStream entityStream) throws IOException {
-        final ResolvedViewable rv = resolve(v);
-        if (rv == null)
-            throw new IOException("The template name, " +
-                    v.getTemplateName() +
-                    ", could not be resolved to a fully qualified template name");
+    public static class ViewImpl implements ViewProcessor<String> {
 
-        rv.writeTo(entityStream);
-    }
+        public String resolve(String name) {
+            if (name.endsWith(".vp"))
+                return name;
 
-    private ResolvedViewable resolve(Viewable v) {
-        if (v instanceof ResolvedViewable) {
-            return (ResolvedViewable)v;
-        } else {
-            return tc.resolveViewable(v, ui);
+            return null;
+        }
+
+        public void writeTo(String t, Viewable viewable, OutputStream out) throws IOException {
+            out.write(t.getBytes());
         }
     }
-    
-    public long getSize(Viewable t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return -1;
+
+    public static class TemplateImpl implements TemplateProcessor {
+
+        public String resolve(String name) {
+            if (name.endsWith(".tp"))
+                return name;
+
+            return null;
+        }
+
+        public void writeTo(String fullyQualifedName, Object model, OutputStream out) throws IOException {
+            out.write(fullyQualifedName.getBytes());
+        }
+    }
+
+    @Path("/")
+    public static class TemplateResource {
+        @Path("vp")
+        @GET 
+        public Viewable getVp() {
+            return new Viewable("/view.vp", "get");
+        }
+
+        @Path("tp")
+        @GET
+        public Viewable getTp() {
+            return new Viewable("/view.tp", "get");
+        }
+    }
+
+    public void testExplicitTemplate() throws IOException {
+        ResourceConfig rc = new DefaultResourceConfig(TemplateResource.class,
+                ViewImpl.class, TemplateImpl.class);
+        initiateWebApplication(rc);
+        WebResource r = resource("/");
+
+        assertEquals("/view.vp", r.path("vp").get(String.class));
+        assertEquals("/view.tp", r.path("tp").get(String.class));
     }
 }

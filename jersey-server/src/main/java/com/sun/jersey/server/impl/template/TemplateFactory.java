@@ -43,6 +43,7 @@ import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.spi.template.TemplateProcessor;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.template.TemplateContextException;
+import com.sun.jersey.spi.template.ViewProcessor;
 import java.util.List;
 import java.util.Set;
 import javax.ws.rs.core.UriInfo;
@@ -53,19 +54,31 @@ import javax.ws.rs.core.UriInfo;
  */
 public final class TemplateFactory implements TemplateContext {
     
-    private final Set<TemplateProcessor> templates;
-    
+    private final Set<ViewProcessor> viewProcessors;
+
     public TemplateFactory(ProviderServices providerServices) {
-        templates = providerServices.getProvidersAndServices(
+        viewProcessors = providerServices.getProvidersAndServices(
+                ViewProcessor.class);
+
+        Set<TemplateProcessor> templateProcessors = providerServices.getProvidersAndServices(
                 TemplateProcessor.class);
+
+        for (TemplateProcessor tp : templateProcessors) {
+            viewProcessors.add(new TemplateViewProcessor(tp));
+        }
+    }
+
+    /**
+     * Get the set of template processors.
+     *
+     * @return the set of template processors.
+     */
+    private Set<ViewProcessor> getViewProcessors() {
+        return viewProcessors;
     }
 
     // TemplateContext
     
-    public Set<TemplateProcessor> getTemplateProcessors() {
-        return templates;
-    }
-
     public ResolvedViewable resolveViewable(Viewable v) {
         if (v.isTemplateNameAbsolute()) {
             return resolveAbsoluteViewable(v);
@@ -108,10 +121,10 @@ public final class TemplateFactory implements TemplateContext {
 
     
     private ResolvedViewable resolveAbsoluteViewable(Viewable v) {
-        for (TemplateProcessor t : getTemplateProcessors()) {
-            String resolvedPath = t.resolve(v.getTemplateName());
-            if (resolvedPath != null) {
-                return new ResolvedViewable(t, resolvedPath, v.getModel());
+        for (ViewProcessor vp : getViewProcessors()) {
+            Object resolvedTemplateObject = vp.resolve(v.getTemplateName());
+            if (resolvedTemplateObject != null) {
+                return new ResolvedViewable(vp, resolvedTemplateObject, v);
             }
         }
 
@@ -127,10 +140,10 @@ public final class TemplateFactory implements TemplateContext {
         for (Class c = resolvingClass; c != Object.class; c = c.getSuperclass()) {
             String absolutePath = getAbsolutePath(c, path);
 
-            for (TemplateProcessor t : getTemplateProcessors()) {
-                String resolvedPath = t.resolve(absolutePath);
-                if (resolvedPath != null) {
-                    return new ResolvedViewable(t, resolvedPath, v.getModel(), c);
+            for (ViewProcessor vp : getViewProcessors()) {
+                Object resolvedTemplateObject = vp.resolve(absolutePath);
+                if (resolvedTemplateObject != null) {
+                    return new ResolvedViewable(vp, resolvedTemplateObject, v, c);
                 }
             }
         }
@@ -139,10 +152,10 @@ public final class TemplateFactory implements TemplateContext {
         for (Class c = resolvingClass; c != Object.class; c = c.getSuperclass()) {
             String absolutePath = getAbsoluteName(c, path);
 
-            for (TemplateProcessor t : getTemplateProcessors()) {
-                String resolvedPath = t.resolve(absolutePath);
-                if (resolvedPath != null) {
-                    return new ResolvedViewable(t, resolvedPath, v.getModel(), c);
+            for (ViewProcessor vp : getViewProcessors()) {
+                Object resolvedTemplateObject = vp.resolve(absolutePath);
+                if (resolvedTemplateObject != null) {
+                    return new ResolvedViewable(vp, resolvedTemplateObject, v, c);
                 }
             }
         }

@@ -45,6 +45,9 @@ import javax.ws.rs.ext.Provider;
 /**
  * A template processor.
  * <p>
+ * NOTE that this interface has been deprecated, instead use the
+ * {@link ViewProcessor} interface.
+ * <p>
  * Implementations of this interface shall be capable of resolving a
  * template name into a fully qualified template name that identifies
  * a template supported by the implementation. And, processing the
@@ -61,22 +64,25 @@ import javax.ws.rs.ext.Provider;
  * template processors (not implemented).
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @deprecated see {@link ViewProcessor}
  */
 public interface TemplateProcessor {
    
     /**
      * Resolve a template name into a fully qualified template name that
      * identifies a template.
-     * 
+     *
+     * @deprecated see {@link ViewProcessor}
      * @param name the template name
      * @return the fully qualified template name, otherwise null
      *         if the template name cannot be resolved.
      */
     String resolve(String name);
-    
+
     /**
      * Process a template and write the result to an output stream.
-     * 
+     *
+     * @deprecated see {@link ViewProcessor}
      * @param fullyQualifedName the fully qualified template name identifying a
      *        template. This is obtained by calling the resolve method with a
      *        template name.

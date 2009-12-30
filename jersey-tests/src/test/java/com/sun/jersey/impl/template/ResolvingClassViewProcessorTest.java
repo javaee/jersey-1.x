@@ -52,86 +52,32 @@ import javax.ws.rs.Path;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class FlatInheritedTemplateProcessorTest extends AbstractResourceTester {
+public class ResolvingClassViewProcessorTest extends AbstractResourceTester {
     
-    public FlatInheritedTemplateProcessorTest(String testName) {
+    public ResolvingClassViewProcessorTest(String testName) {
         super(testName);
     }
 
-    public static class ExplicitTemplateBase {
+    public static class ResolvingClass {
     }
-
+    
     @Path("/")
-    public static class ExplicitTemplate extends ExplicitTemplateBase {
+    public static class ExplicitTemplate {
         @GET public Viewable get() {
-            return new Viewable("show", "get");
-        }
-
-        @Path("inherit")
-        @GET public Viewable getInherited() {
-            return new Viewable("inherit", "get");
-        }
-
-        @Path("override")
-        @GET public Viewable getOverriden() {
-            return new Viewable("override", "get");
+            return new Viewable("show", "get", ResolvingClass.class);
         }
     }
 
     public void testExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedTemplateProcessorTest$ExplicitTemplateBase.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ResolvingClassViewProcessorTest/ResolvingClass/show.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
-
-        p = new Properties();
-        p.load(r.path("inherit").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedTemplateProcessorTest$ExplicitTemplateBase.inherit.testp", p.getProperty("path"));
-        assertEquals("get", p.getProperty("model"));
-
-        p = new Properties();
-        p.load(r.path("override").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedTemplateProcessorTest$ExplicitTemplate.override.testp", p.getProperty("path"));
-        assertEquals("get", p.getProperty("model"));
-    }
-
-
-    public static class ImplicitTemplateBase {
-    }
-    
-    @Path("/")
-    public static class ImplicitTemplate extends ImplicitTemplateBase {
-        public String toString() {
-            return "ImplicitTemplate";
-        }
-    }
-
-    public void testImplicitTemplate() throws IOException {
-        ResourceConfig rc = new DefaultResourceConfig(ImplicitTemplate.class,
-                TestTemplateProcessor.class);
-        rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
-        initiateWebApplication(rc);
-        WebResource r = resource("/");
-
-        Properties p = new Properties();
-        p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedTemplateProcessorTest$ImplicitTemplateBase.index.testp", p.getProperty("path"));
-        assertEquals("ImplicitTemplate", p.getProperty("model"));
-
-        p = new Properties();
-        p.load(r.path("inherit").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedTemplateProcessorTest$ImplicitTemplateBase.inherit.testp", p.getProperty("path"));
-        assertEquals("ImplicitTemplate", p.getProperty("model"));
-
-        p = new Properties();
-        p.load(r.path("override").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedTemplateProcessorTest$ImplicitTemplate.override.testp", p.getProperty("path"));
-        assertEquals("ImplicitTemplate", p.getProperty("model"));
     }
 
 }

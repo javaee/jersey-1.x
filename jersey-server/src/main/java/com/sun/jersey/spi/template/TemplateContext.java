@@ -37,7 +37,6 @@
 package com.sun.jersey.spi.template;
 
 import com.sun.jersey.api.view.Viewable;
-import java.util.Set;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -48,13 +47,6 @@ import javax.ws.rs.core.UriInfo;
  */
 public interface TemplateContext {
     
-    /**
-     * Get the set of template processors.
-     * 
-     * @return the set of template processors.
-     */
-    Set<TemplateProcessor> getTemplateProcessors();
-
     /**
      * Resolve a {@link Viewable}.
      * <p>
@@ -105,7 +97,7 @@ public interface TemplateContext {
      * class of the viewable is utilized to resolve the relative template name
      * into an absolute template name.
      *
-     * If the resolving class is not set (a null value) then the clas of the
+     * If the resolving class is not set (a null value) then the class of the
      * <code>resolvingClass</code> parameter is utilized as the resolving class.
      *
      * If the <code>resolvingClass</code> parameter is null then a

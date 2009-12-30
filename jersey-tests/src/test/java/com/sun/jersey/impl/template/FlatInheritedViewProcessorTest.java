@@ -52,9 +52,9 @@ import javax.ws.rs.Path;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class InheritedTemplateProcessorTest extends AbstractResourceTester {
+public class FlatInheritedViewProcessorTest extends AbstractResourceTester {
     
-    public InheritedTemplateProcessorTest(String testName) {
+    public FlatInheritedViewProcessorTest(String testName) {
         super(testName);
     }
 
@@ -80,23 +80,23 @@ public class InheritedTemplateProcessorTest extends AbstractResourceTester {
 
     public void testExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com/sun/jersey/impl/template/InheritedTemplateProcessorTest/ExplicitTemplateBase/show.testp", p.getProperty("path"));
+        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ExplicitTemplateBase.show.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("inherit").get(InputStream.class));
-        assertEquals("/com/sun/jersey/impl/template/InheritedTemplateProcessorTest/ExplicitTemplateBase/inherit.testp", p.getProperty("path"));
+        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ExplicitTemplateBase.inherit.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("override").get(InputStream.class));
-        assertEquals("/com/sun/jersey/impl/template/InheritedTemplateProcessorTest/ExplicitTemplate/override.testp", p.getProperty("path"));
+        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ExplicitTemplate.override.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
     }
 
@@ -113,24 +113,24 @@ public class InheritedTemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com/sun/jersey/impl/template/InheritedTemplateProcessorTest/ImplicitTemplateBase/index.testp", p.getProperty("path"));
+        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ImplicitTemplateBase.index.testp", p.getProperty("path"));
         assertEquals("ImplicitTemplate", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("inherit").get(InputStream.class));
-        assertEquals("/com/sun/jersey/impl/template/InheritedTemplateProcessorTest/ImplicitTemplateBase/inherit.testp", p.getProperty("path"));
+        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ImplicitTemplateBase.inherit.testp", p.getProperty("path"));
         assertEquals("ImplicitTemplate", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("override").get(InputStream.class));
-        assertEquals("/com/sun/jersey/impl/template/InheritedTemplateProcessorTest/ImplicitTemplate/override.testp", p.getProperty("path"));
+        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ImplicitTemplate.override.testp", p.getProperty("path"));
         assertEquals("ImplicitTemplate", p.getProperty("model"));
     }
 

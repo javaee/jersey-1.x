@@ -17,8 +17,8 @@ import com.sun.jersey.api.core.HttpContext
 import com.sun.jersey.api.core.ResourceConfig
 import com.sun.jersey.api.container.ContainerException
 import com.sun.jersey.spi.container.servlet.ServletContainer
-import com.sun.jersey.spi.template.TemplateProcessor
-import com.sun.jersey.server.impl.container.servlet.RequestDispatcherWrapper
+import com.sun.jersey.api.view.Viewable
+import com.sun.jersey.spi.template.ViewProcessor
 
 import javax.servlet.RequestDispatcher
 import javax.servlet.ServletContext
@@ -35,65 +35,44 @@ import javax.ws.rs.ext.Provider
  */
 @Provider
 @Produces(Array("text/html;qs=5", "text/xhtml"))
-class LiftTemplateProcessor(resourceConfig: ResourceConfig) extends TemplateProcessor {
+class LiftTemplateProcessor extends ViewProcessor[NodeSeq] {
   @Context
   var servletContext: ServletContext = null
   @Context
   var request: HttpServletRequest = null
 
-  def resolve(path: String): String = {
+  def resolve(path: String): NodeSeq = {
     if (servletContext == null)
       return null
 
-    try {
-      // TODO this code actually results in looking up the resource twice
-      // once here first then again Lift land 
-      // I wonder if there's a better way to do this just once?
-      if (servletContext.getResource(path) == null) {
-        if (servletContext.getResource(path + ".html") == null &&
-            servletContext.getResource(path + ".xhtml") == null) {
-          return null
-        }
-      }
-      //Log.debug(() => "Found HTML template " + htmlpath)
-      return path
-    } catch {
-      case e: MalformedURLException =>
-      // TODO log
+    val aPath = if (path.startsWith("/"))
+      path.substring(1)
+    else
+      path
+    val paths = List.fromArray(aPath.split("/"))
+    // Log.debug(() => "About to search for Lift resource " + paths)
+
+    val template: Box[NodeSeq] = TemplateFinder.findAnyTemplate(paths)
+    template match {
+      case Full(nodes) => nodes;
+      case other => null;
     }
-    //Log.debug(() => "No Lift template found for " + path)
-    null
+
   }
 
-  def writeTo(resolvedPath: String, model: AnyRef, out: OutputStream): Unit = {
-    ResourceBean.set(request, model)
+  def writeTo(nodes: NodeSeq, viewable: Viewable, out: OutputStream): Unit = {
+    ResourceBean.set(request, viewable.getModel())
 
     // Commit the status and headers to the HttpServletResponse
     out.flush()
 
-    val aPath = if (resolvedPath.startsWith("/")) 
-      resolvedPath.substring(1)
-    else
-      resolvedPath
-    val paths = List.fromArray(aPath.split("/"))
-    // Log.debug(() => "About to search for Lift resource " + paths)
-    
-    val template: Box[NodeSeq] = TemplateFinder.findAnyTemplate(paths)
-    template match {
-      case Full(nodes) => {
-        if (request != null) {
-          val transformedNodes = S.render(nodes, new HTTPRequestServlet(request))
-          val text = transformedNodes.toString()
-          out.write(text.getBytes())
-        }
-        else {
-          throw new ContainerException("request was not injected properly by the JAXRS runtime!");
-        }
-      }
-
-      case other => {
-        throw new ContainerException("No template found for " + resolvedPath + " got '" + other + "'");
-      }
+    if (request != null) {
+      val transformedNodes = S.render(nodes, new HTTPRequestServlet(request))
+      val text = transformedNodes.toString()
+      out.write(text.getBytes())
+    }
+    else {
+      throw new ContainerException("request was not injected properly by the JAXRS runtime!");
     }
   }
 }

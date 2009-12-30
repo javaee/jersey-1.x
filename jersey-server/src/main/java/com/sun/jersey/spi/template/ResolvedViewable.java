@@ -45,60 +45,58 @@ import java.io.OutputStream;
  * A resolved {@link Viewable}.
  * <p>
  * A resolved viewable is obtained from the resolving methods on
- * {@link TemplateContext} and has associated with it a {@link TemplateProcessor}
- * that is capable of processing the template, referenced by the template name,
- * that is a fully qualified name as produced from
- * {@link TemplateProcessor#resolve(java.lang.String)}.
+ * {@link TemplateContext} and has associated with it a {@link ViewProcessor}
+ * that is capable of processing a template identified by a template reference.
  * 
+ * @param <T> the type of the resolved template object.
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResolvedViewable extends Viewable {
+public class ResolvedViewable<T> extends Viewable {
     
-    private final TemplateProcessor template;
+    private final ViewProcessor<T> vp;
 
+    private final T templateObject;
+    
     /**
      * Create a resolved viewable.
-     * 
-     * @param t the template processor.
-     * @param fullyQualifiedName the fully qualified template name identifying a
-     *        template.
-     * @param model the model.
+     *
+     * @param vp the view processor that resolved a template name to a template
+     *        reference.
+     * @param t the template reference.
+     * @param v the viewable that is resolved.
      */
-    public ResolvedViewable(TemplateProcessor t, String fullyQualifiedName, Object model) {
-        this(t, fullyQualifiedName, model, null);
+    public ResolvedViewable(ViewProcessor<T> vp, T t, Viewable v) {
+        this(vp, t, v, null);
     }
 
     /**
      * Create a resolved viewable.
-     * 
-     * @param t the template processor.
-     * @param fullyQualifiedName the fully qualified template name identifying a
-     *        template.
-     * @param model the model.
+     *
+     * @param vp the view processor that resolved a template name to a template
+     *        reference.
+     * @param t the template reference.
+     * @param v the viewable that is resolved.
      * @param resolvingClass the resolving class that was used to resolve a
      *        relative template name into an absolute template name.
      */
-    public ResolvedViewable(TemplateProcessor t, String fullyQualifiedName, Object model, Class<?> resolvingClass) {
-        super(fullyQualifiedName, model, resolvingClass);
-        
-        this.template = t;
+    public ResolvedViewable(ViewProcessor<T> vp, T t, Viewable v, Class<?> resolvingClass) {
+        super(v.getTemplateName(), v.getModel(), resolvingClass);
+
+        this.vp = vp;
+        this.templateObject = t;
     }
-    
+
     /**
-     * Write to the template, that is referenced by the fully qualified
-     * template name.
+     * Write the resolved viewable.
      * <p>
-     * The model of the resolved viewable is passed to the template.
-     * <p>
-     * This method defers to {@link TemplateProcessor#writeTo(java.lang.String, java.lang.Object, java.io.OutputStream) }.
+     * This method defers to {@link ViewProcessor#writeTo(java.lang.Object, com.sun.jersey.api.view.Viewable, java.io.OutputStream)  }
+     * to write the viewable utilizing the template reference.
      * 
-     * @param out the output stream that the template processor writes
-     *        the processing of the template referenced by the fully qualified
-     *        template name.
+     * @param out the output stream that the view processor writes to.
      * 
      * @throws java.io.IOException
      */
     public void writeTo(OutputStream out) throws IOException {
-        template.writeTo(getTemplateName(), getModel(), out);
+        vp.writeTo(templateObject, this, out);
     }
 }

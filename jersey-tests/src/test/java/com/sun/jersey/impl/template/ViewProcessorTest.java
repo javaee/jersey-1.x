@@ -54,9 +54,9 @@ import javax.ws.rs.Produces;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class FlatTemplateProcessorTest extends AbstractResourceTester {
+public class ViewProcessorTest extends AbstractResourceTester {
     
-    public FlatTemplateProcessorTest(String testName) {
+    public ViewProcessorTest(String testName) {
         super(testName);
     }
 
@@ -69,22 +69,49 @@ public class FlatTemplateProcessorTest extends AbstractResourceTester {
         @POST public Viewable post() {
             return new Viewable("show", "post");
         }
+
+        @Path("absolute")
+        @GET public Viewable getAbs() {
+            return new Viewable("/com/sun/jersey/impl/template/ViewProcessorTest/ExplicitTemplate/absolute/show", "get");
+        }
+
+        @Path("absolute")
+        @POST public Viewable postAbs() {
+            return new Viewable("/com/sun/jersey/impl/template/ViewProcessorTest/ExplicitTemplate/absolute/show", "post");
+        }
     }
 
     public void testExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatTemplateProcessorTest$ExplicitTemplate.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ExplicitTemplate/show.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.post(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatTemplateProcessorTest$ExplicitTemplate.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ExplicitTemplate/show.testp", p.getProperty("path"));
+        assertEquals("post", p.getProperty("model"));
+    }
+
+    public void testExplicitAbsoluteTemplate() throws IOException {
+        ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
+                TestViewProcessor.class);
+        initiateWebApplication(rc);
+        WebResource r = resource("/absolute");
+
+        Properties p = new Properties();
+        p.load(r.get(InputStream.class));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ExplicitTemplate/absolute/show.testp", p.getProperty("path"));
+        assertEquals("get", p.getProperty("model"));
+
+        p = new Properties();
+        p.load(r.post(InputStream.class));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ExplicitTemplate/absolute/show.testp", p.getProperty("path"));
         assertEquals("post", p.getProperty("model"));
     }
 
@@ -97,14 +124,14 @@ public class FlatTemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatTemplateProcessorTest$ImplicitTemplate.index.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ImplicitTemplate/index.testp", p.getProperty("path"));
         assertEquals("ImplicitTemplate", p.getProperty("model"));
     }
 
@@ -125,24 +152,24 @@ public class FlatTemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitExplicitTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatTemplateProcessorTest$ImplicitExplicitTemplate.index.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ImplicitExplicitTemplate/index.testp", p.getProperty("path"));
         assertEquals("ImplicitExplicitTemplate", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.post(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatTemplateProcessorTest$ImplicitExplicitTemplate.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ImplicitExplicitTemplate/show.testp", p.getProperty("path"));
         assertEquals("post", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("sub").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatTemplateProcessorTest$ImplicitExplicitTemplate.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ImplicitExplicitTemplate/show.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
     }
 
@@ -157,14 +184,14 @@ public class FlatTemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitWithGetTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitWithGetTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
         Properties p = new Properties();
         p.load(r.accept("text/plain").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatTemplateProcessorTest$ImplicitWithGetTemplate.index.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ImplicitWithGetTemplate/index.testp", p.getProperty("path"));
         assertEquals("ImplicitWithGetTemplate", p.getProperty("model"));
 
         assertEquals("ImplicitWithGetTemplate", r.accept("application/foo").get(String.class));
@@ -182,14 +209,14 @@ public class FlatTemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitWithSubResourceGetTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitWithSubResourceGetTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/sub");
 
         Properties p = new Properties();
         p.load(r.accept("text/plain").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatTemplateProcessorTest$ImplicitWithSubResourceGetTemplate.sub.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/ViewProcessorTest/ImplicitWithSubResourceGetTemplate/sub.testp", p.getProperty("path"));
         assertEquals("ImplicitWithSubResourceGetTemplate", p.getProperty("model"));
 
         assertEquals("ImplicitWithSubResourceGetTemplate", r.accept("application/foo").get(String.class));

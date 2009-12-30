@@ -37,6 +37,7 @@
 
 package com.sun.jersey.impl.template;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -47,37 +48,83 @@ import java.io.InputStream;
 import java.util.Properties;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ResolvingClassTemplateProcessorTest extends AbstractResourceTester {
+public class ExceptionViewProcessorTest extends AbstractResourceTester {
     
-    public ResolvingClassTemplateProcessorTest(String testName) {
+    public ExceptionViewProcessorTest(String testName) {
         super(testName);
     }
 
-    public static class ResolvingClass {
+    @Provider
+    public static class WebAppAbsoluteExceptionMapper implements ExceptionMapper<WebApplicationException> {
+
+        public Response toResponse(WebApplicationException exception) {
+            if (exception.getResponse().getStatus() == 404) {
+                return Response.status(404).entity(
+                        new Viewable("/com/sun/jersey/impl/template/ExceptionViewProcessorTest/404", "404")).build();
+            }
+
+            return exception.getResponse();
+        }
+
     }
-    
+
+    @Provider
+    public static class WebAppResolvingClassExceptionMapper implements ExceptionMapper<WebApplicationException> {
+
+        public Response toResponse(WebApplicationException exception) {
+            if (exception.getResponse().getStatus() == 404) {
+                return Response.status(404).entity(
+                        new Viewable("404", "404", WebAppResolvingClassExceptionMapper.class)).build();
+            }
+
+            return exception.getResponse();
+        }
+
+    }
+
     @Path("/")
     public static class ExplicitTemplate {
         @GET public Viewable get() {
-            return new Viewable("show", "get", ResolvingClass.class);
+            return new Viewable("show", "get");
         }
     }
 
-    public void testExplicitTemplate() throws IOException {
+    public void testAbsoluteExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestTemplateProcessor.class);
+                TestViewProcessor.class, WebAppAbsoluteExceptionMapper.class);
         initiateWebApplication(rc);
-        WebResource r = resource("/");
+        WebResource r = resource("/doesnotexist", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(404, cr.getStatus());
 
         Properties p = new Properties();
-        p.load(r.get(InputStream.class));
-        assertEquals("/com/sun/jersey/impl/template/ResolvingClassTemplateProcessorTest/ResolvingClass/show.testp", p.getProperty("path"));
-        assertEquals("get", p.getProperty("model"));
+        p.load(cr.getEntity(InputStream.class));
+        assertEquals("/com/sun/jersey/impl/template/ExceptionViewProcessorTest/404.testp", p.getProperty("path"));
+        assertEquals("404", p.getProperty("model"));
     }
 
+    public void testResolvingClassExplicitTemplate() throws IOException {
+        ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
+                TestViewProcessor.class, WebAppResolvingClassExceptionMapper.class);
+        initiateWebApplication(rc);
+        WebResource r = resource("/doesnotexist", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(404, cr.getStatus());
+
+        Properties p = new Properties();
+        p.load(cr.getEntity(InputStream.class));
+        assertEquals("/com/sun/jersey/impl/template/ExceptionViewProcessorTest/WebAppResolvingClassExceptionMapper/404.testp", p.getProperty("path"));
+        assertEquals("404", p.getProperty("model"));
+    }
 }

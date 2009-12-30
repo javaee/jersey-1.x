@@ -34,59 +34,57 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spi.template;
 
-package com.sun.jersey.server.impl.template;
-
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.spi.template.ResolvedViewable;
-import com.sun.jersey.spi.template.TemplateContext;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.view.Viewable;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.IOException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
+import java.io.OutputStream;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.Provider;
 
 /**
- *
+ * A view processor.
+ * <p>
+ * Implementations of this interface shall be capable of resolving a
+ * template name to a template reference that identifies a template supported
+ * by the implementation. And, processing the template, identified by template
+ * reference, the results of which are written to an output stream.
+ * <p>
+ * Implementations can register a view processor as a provider, for
+ * example, annotating the implementation class with {@link Provider}
+ * or registering an implementing class or instance as a singleton with
+ * {@link ResourceConfig} or {@link Application}.
+ * <p>
+ * Such view processors could be JSP view processors (supported by the
+ * Jersey servlet and filter implementations) or say Freemarker or Velocity
+ * view processors (not implemented).
+ * 
+ * @param <T> the type of the template object.
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewable> {
-
-    @Context UriInfo ui;
+public interface ViewProcessor<T> {
+   
+    /**
+     * Resolve a template name to a template reference.
+     * 
+     * @param name the template name
+     * @return the template reference, otherwise null
+     *         if the template name cannot be resolved.
+     */
+    T resolve(String name);
     
-    @Context TemplateContext tc;
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return Viewable.class.isAssignableFrom(type);
-    }
-
-    public void writeTo(Viewable v, 
-            Class<?> type, Type genericType, Annotation[] annotations, 
-            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
-            OutputStream entityStream) throws IOException {
-        final ResolvedViewable rv = resolve(v);
-        if (rv == null)
-            throw new IOException("The template name, " +
-                    v.getTemplateName() +
-                    ", could not be resolved to a fully qualified template name");
-
-        rv.writeTo(entityStream);
-    }
-
-    private ResolvedViewable resolve(Viewable v) {
-        if (v instanceof ResolvedViewable) {
-            return (ResolvedViewable)v;
-        } else {
-            return tc.resolveViewable(v, ui);
-        }
-    }
-    
-    public long getSize(Viewable t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return -1;
-    }
+    /**
+     * Process a template and write the result to an output stream.
+     * 
+     * @param t the template reference. This is obtained by calling the
+     *        {@link #resolve(java.lang.String)} method with a template name.
+     * @param viewable the viewable that contains the model to be passed to the
+     *        template.
+     * @param out the output stream to write the result of processing the
+     *        template.
+     * @throws java.io.IOException if there was an error processing the
+     *         template.
+     */
+    void writeTo(T t, Viewable viewable, OutputStream out) throws IOException;
 }

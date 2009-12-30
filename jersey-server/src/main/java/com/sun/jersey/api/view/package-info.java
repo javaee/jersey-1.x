@@ -49,14 +49,15 @@
  * method but for the purposes of this section the focus is on resource methods.
  * <p>
  * The {@link com.sun.jersey.api.view.Viewable}, returned by a resource method,
- * will be processed such that the template name is resolved to a fully qualified
- * template name that identifies a template of a template processor.
+ * will be processed such that the template name is resolved to a template
+ * reference that identifies a template capable of being processed by an
+ * appropriate view processor.
  * 
- * The template processor then processes template given the model to produce a
+ * The view processor then processes template given the model to produce a
  * response entity that is returned to the client.
  * <p>
  * For example, the template name could reference a Java Server Page (JSP) and
- * the model will be accessible to that JSP. The JSP template processor will
+ * the model will be accessible to that JSP. The JSP view processor will
  * process the JSP resulting in an HTML document that is returned
  * as the response entity. (See later for more details.)
  * <p>
@@ -69,6 +70,6 @@
  *
  * <h2>Integration with Java Server Pages (JSPs)</h2>
  *
- * <h2>Developing a Template Processor</h2>
+ * <h2>Developing a View Processor</h2>
  */
 package com.sun.jersey.api.view;
