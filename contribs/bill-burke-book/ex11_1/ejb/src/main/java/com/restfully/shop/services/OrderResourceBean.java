@@ -102,6 +102,7 @@ public class OrderResourceBean implements OrderResource
       builder.header("Link", new Link("purge", purgeUrl, null));
    }
 
+   @Override
    public Response createOrder(Order order, UriInfo uriInfo)
    {
       OrderEntity entity = new OrderEntity();
@@ -115,11 +116,13 @@ public class OrderResourceBean implements OrderResource
 
    }
 
+   @Override
    public void purgeOrders()
    {
       int updated = em.createQuery("delete from PurchaseOrder o where o.cancelled = true").executeUpdate();
    }
 
+   @Override
    public Response getOrdersHeaders(UriInfo uriInfo)
    {
       Response.ResponseBuilder builder = Response.ok();
@@ -128,6 +131,7 @@ public class OrderResourceBean implements OrderResource
       return builder.build();
    }
 
+   @Override
    public Response getOrders(int start,
                              int size,
                              UriInfo uriInfo)
@@ -190,13 +194,14 @@ public class OrderResourceBean implements OrderResource
       builder.header("Link", new Link("cancel", cancelUrl, null));
    }
 
+   @Override
    public void cancelOrder(int id)
    {
       OrderEntity order = em.getReference(OrderEntity.class, id);
       order.setCancelled(true);
    }
 
-
+   @Override
    public Response getOrder(int id, UriInfo uriInfo)
    {
       OrderEntity entity = em.getReference(OrderEntity.class, id);
@@ -214,6 +219,7 @@ public class OrderResourceBean implements OrderResource
       return builder.build();
    }
 
+   @Override
    public Response getOrderHeaders(int id, UriInfo uriInfo)
    {
       OrderEntity order = em.getReference(OrderEntity.class, id);

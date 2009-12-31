@@ -13,7 +13,8 @@
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 
-    <ejb-local-ref>
+<!-- No need to explicitly reference the EJBs. Default to their standard EJB 3.1 name -->
+<!--    <ejb-local-ref>
         <ejb-ref-name>ejb/CustomerResource</ejb-ref-name>
         <ejb-ref-type>Session</ejb-ref-type>
         <local>com.restfully.shop.services.CustomerResource</local>
@@ -39,5 +40,5 @@
         <ejb-ref-type>Session</ejb-ref-type>
         <local>com.restfully.shop.services.StoreResource</local>
         <ejb-link>com.restfull.shop.services.StoreResourceBean</ejb-link>
-    </ejb-local-ref>
+    </ejb-local-ref>-->
 </web-app>

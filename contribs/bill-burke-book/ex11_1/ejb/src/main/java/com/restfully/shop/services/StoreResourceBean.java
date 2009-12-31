@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 @Stateless
 public class StoreResourceBean implements StoreResource
 {
+   @Override
    public Response head(UriInfo uriInfo)
    {
       UriBuilder absolute = uriInfo.getBaseUriBuilder();

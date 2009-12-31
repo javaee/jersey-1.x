@@ -22,6 +22,7 @@ import java.util.Set;
 public class ShoppingApplication extends Application
 {
 
+   @Override
    public Set<Class<?>> getClasses()
    {
       Set<Class<?>> classes = new HashSet<Class<?>>();
@@ -30,26 +31,36 @@ public class ShoppingApplication extends Application
       return classes;
    }
 
+   @Override
    public Set<Object> getSingletons()
    {
       HashSet<Object> set = new HashSet();
       try
       {
          InitialContext ctx = new InitialContext();
+
+         // Modified JNDI lookup names to use standardized EJB 3.1 JNDI naming
+         // Could also use a "java:app/ex11_1-1.1.5-ea-SNAPSHOT/" prefix.
+         // Of course making this all be part a single WAR would allow for a
+         // simple and portable "java:module/" prefix.
          Object obj = ctx.lookup(
-                 "java:comp/env/ejb/CustomerResource");
+//                 "java:comp/env/ejb/CustomerResource");
+                 "java:global/ex11_1/ex11_1-1.1.5-ea-SNAPSHOT/CustomerResourceBean");
          set.add(obj);
 
          obj = ctx.lookup(
-                 "java:comp/env/ejb/OrderResource");
+//                 "java:comp/env/ejb/OrderResource");
+                 "java:global/ex11_1/ex11_1-1.1.5-ea-SNAPSHOT/OrderResourceBean");
          set.add(obj);
 
          obj = ctx.lookup(
-                 "java:comp/env/ejb/ProductResource");
+//                 "java:comp/env/ejb/ProductResource");
+                 "java:global/ex11_1/ex11_1-1.1.5-ea-SNAPSHOT/ProductResourceBean");
          set.add(obj);
 
          obj = ctx.lookup(
-                 "java:comp/env/ejb/StoreResource");
+//                 "java:comp/env/ejb/StoreResource");
+                 "java:global/ex11_1/ex11_1-1.1.5-ea-SNAPSHOT/StoreResourceBean");
          set.add(obj);
 
       }

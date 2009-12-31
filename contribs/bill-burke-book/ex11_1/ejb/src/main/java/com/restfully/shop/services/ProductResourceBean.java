@@ -35,6 +35,7 @@ public class ProductResourceBean implements ProductResource
    @PersistenceContext
    private EntityManager em;
 
+   @Override
    public Response createProduct(Product product, UriInfo uriInfo)
    {
       ProductEntity entity = new ProductEntity();
@@ -65,6 +66,7 @@ public class ProductResourceBean implements ProductResource
       return product;
    }
 
+   @Override
    public Products getProducts(int start,
                                int size,
                                String name,
@@ -123,6 +125,7 @@ public class ProductResourceBean implements ProductResource
       return products;
    }
 
+   @Override
    public Product getProduct(int id)
    {
       ProductEntity product = em.getReference(ProductEntity.class, id);

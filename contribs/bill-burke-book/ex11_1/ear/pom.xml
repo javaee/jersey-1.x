@@ -42,6 +42,19 @@
             <version>${project.version}</version>
             <type>war</type>
         </dependency>
+        <!-- Adding explicit (yet "provided") dependencies to Jersey runtime -->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -62,33 +75,59 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jboss-maven-plugin</artifactId>
-                <version>1.3.1</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.glassfish</groupId>
+                <artifactId>maven-embedded-glassfish-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <goalPrefix>embedded-glassfish</goalPrefix>
+                    <app>${basedir}/target/ex11_1.ear</app>
+                    <autoDelete>true</autoDelete>
+                    <port>8080</port>
+                </configuration>
+
                 <executions>
                     <execution>
-                        <id>jboss-deploy</id>
+                        <id>start-glassfish</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>glassfish-deploy</id>
                         <phase>pre-integration-test</phase>
                         <goals>
                             <goal>deploy</goal>
                         </goals>
-                        <configuration>
-                            <fileName>${basedir}/target/ex11_1.ear</fileName>
-                        </configuration>
                     </execution>
                     <execution>
-                        <id>jboss-undeploy</id>
+                        <id>glassfish-undeploy</id>
                         <phase>post-integration-test</phase>
                         <goals>
                             <goal>undeploy</goal>
                         </goals>
-                        <configuration>
-                            <fileName>${basedir}/target/ex11_1.ear</fileName>
-                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>stop-glassfish</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -108,14 +147,38 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
+
         </plugins>
     </build>
+
+<!--
+Hack to avoid having to run the tests which require a running
+JavaDB instance (not having one would break the Hudson build).
+Running "mvn clean install" will not run the tests.
+To run the tests, use "mvn -P test clean install".
+-->
+    <profiles>
+        <profile>
+            <id>test</id>
+        </profile>
+
+        <profile>
+            <id>skip-test</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
+    </profiles>
+
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/glassfish/</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
