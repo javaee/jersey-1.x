@@ -51,6 +51,7 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -65,21 +66,21 @@ import javax.ws.rs.core.MediaType;
 public final class HttpMethodRule implements UriRule {
     private final Map<String, ResourceMethodListPair> map;
 
-    private final List<QualitySourceMediaType> priorityMediaTypes;
-
     private final String allow;
 
     private final boolean isSubResource;
 
     public HttpMethodRule(
-            Map<String, List<ResourceMethod>> methods,
-            List<QualitySourceMediaType> priorityMediaTypes) {
-        this(methods, priorityMediaTypes, false);
+            Map<String, List<ResourceMethod>> methods) {
+        this(methods, false);
     }
 
     private static class ResourceMethodListPair {
         final List<ResourceMethod> normal;
+
         final List<ResourceMethod> wildPriority;
+
+        final List<QualitySourceMediaType> priorityMediaTypes;
 
         ResourceMethodListPair(List<ResourceMethod> normal) {
             this.normal = normal;
@@ -95,6 +96,31 @@ public final class HttpMethodRule implements UriRule {
                         wildPriority.add(method);
                     }
                 }
+            }
+
+            List<QualitySourceMediaType> pmts = new LinkedList<QualitySourceMediaType>();
+            for (ResourceMethod m : normal) {
+                for (MediaType mt : m.getProduces()) {
+                    QualitySourceMediaType qsmt = get(mt);
+                    if (qsmt != null) {
+                        if (qsmt.getQualitySource() > QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR) {
+                            pmts.add(qsmt);
+                        }
+                    }
+                }
+            }
+
+            Collections.sort(pmts, MediaTypes.QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR);
+            priorityMediaTypes = pmts.isEmpty() ? null : pmts;
+        }
+
+        QualitySourceMediaType get(MediaType mt) {
+            if (mt instanceof QualitySourceMediaType) {
+                return (QualitySourceMediaType)mt;
+            } else if (mt.getParameters().containsKey("qs")) {
+                return new QualitySourceMediaType(mt);
+            } else {
+                return null;
             }
         }
 
@@ -114,24 +140,20 @@ public final class HttpMethodRule implements UriRule {
 
     public HttpMethodRule(
             Map<String, List<ResourceMethod>> methods,
-            List<QualitySourceMediaType> priorityMediaTypes,
             boolean isSubResource) {
         this.map = new HashMap<String, ResourceMethodListPair>();
         for (Map.Entry<String, List<ResourceMethod>> e : methods.entrySet()) {
            this.map.put(e.getKey(), new ResourceMethodListPair(e.getValue()));
         }
 
-        this.priorityMediaTypes = priorityMediaTypes;
         this.isSubResource = isSubResource;
         this.allow = getAllow(methods);
     }
 
     private String getAllow(Map<String, List<ResourceMethod>> methods) {
         StringBuilder s = new StringBuilder();
-        boolean first = true;
         for (String method : methods.keySet()) {
-            if (!first) s.append(",");
-            first = false;
+            if (s.length() > 0) s.append(",");
 
             s.append(method);
         }
@@ -177,9 +199,9 @@ public final class HttpMethodRule implements UriRule {
         }
 
         // Get the list of matching methods
-        List<MediaType> accept = (priorityMediaTypes == null)
-                ? request.getAcceptableMediaTypes()
-                : request.getAcceptableMediaTypes(priorityMediaTypes);
+        List<MediaType> accept = getSpecificAcceptableMediaTypes(
+                request.getAcceptableMediaTypes(),
+                methods.priorityMediaTypes);
 
         final Matcher m = new Matcher();
         final MatchStatus s = m.match(methods, request.getMediaType(), accept);
@@ -316,5 +338,33 @@ public final class HttpMethodRule implements UriRule {
 
             return MatchStatus.NO_MATCH_FOR_PRODUCE;
         }
+    }
+
+    /**
+     * Get a list of media types that are acceptable for the response.
+     *
+     * @param acceptableMediaType the list of acceptable media types.
+     * @param priorityMediaTypes the list of media types that take priority.
+     * @return a singleton list containing the most specific media
+     *         type for first media type in <code>priorityMediaTypes<code> that
+     *         is compatible with an acceptable media type, otherwise the
+     *         list of acceptable media type as returned by
+     *         {@link #getAcceptableMediaTypes() }.
+     *
+     */
+    public static List<MediaType> getSpecificAcceptableMediaTypes(
+            final List<MediaType> acceptableMediaType,
+            final List<? extends MediaType> priorityMediaTypes) {
+        if (priorityMediaTypes != null) {
+            for (MediaType pmt : priorityMediaTypes) {
+                for (MediaType amt : acceptableMediaType) {
+                    if (amt.isCompatible(pmt)) {
+                        return Collections.singletonList(MediaTypes.mostSpecific(amt, pmt));
+                    }
+                }
+            }
+        }
+
+        return acceptableMediaType;
     }
 }

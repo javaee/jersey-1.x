@@ -187,22 +187,27 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
      * Select the first media type, from a list of media types, that is most
      * acceptable according to the requested acceptable media types.
      *
+     * @deprecated
      * @param mediaTypes the list of media types
      * @return the most acceptable media type, or null if no media type
      *         was found to be acceptable.
      */
+    @Deprecated
     MediaType getAcceptableMediaType(List<MediaType> mediaTypes);
         
     /**
      * Get a list of media types that are acceptable for the response.
      *
-     * @param priorityMediaTypes the list of media types that take priority.
-     * 
+     * @deprecated
+     * @param priorityMediaTypes the list of media types that take priority,
+     *        ordered according to the quality source parameter, "qs" as the
+     *        primary key.
      * @return a list of requested response media types sorted according
-     * to higest relative quality value, which is product of the 
-     * quality parameter, q, of an acceptable media type, and the quality source
-     * parameter, qs, of matching media type.
+     *         to highest relative quality value, which is product of the
+     *         quality parameter, q, of an acceptable media type, and the 
+     *         quality source parameter, qs, of matching media type.
      */
+    @Deprecated
     List<MediaType> getAcceptableMediaTypes(List<QualitySourceMediaType> priorityMediaTypes);
 
     /**

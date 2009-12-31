@@ -340,20 +340,9 @@ public abstract class HttpHeaderReader {
         }
     };
 
-    private static final Comparator<QualitySourceMediaType> QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR
-            = new Comparator<QualitySourceMediaType>() {
-        public int compare(QualitySourceMediaType o1, QualitySourceMediaType o2) {
-            int i = o2.getQualitySource() - o1.getQualitySource();
-            if (i != 0)
-                return i;
-
-            return MediaTypes.MEDIA_TYPE_COMPARATOR.compare(o1, o2);
-        }
-    };
-
     public static List<QualitySourceMediaType> readQualitySourceMediaType(String header) throws ParseException {
         return HttpHeaderReader.readAcceptableList(
-                QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR,
+                MediaTypes.QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR,
                 QUALITY_SOURCE_MEDIA_TYPE_CREATOR,
                 header);
     }
@@ -373,7 +362,8 @@ public abstract class HttpHeaderReader {
         return readQualitySourceMediaType(sb.toString());
     }
 
-    public static List<AcceptableMediaType> readAcceptMediaType(String header, final List<QualitySourceMediaType> priorityMediaTypes) throws ParseException {
+    public static List<AcceptableMediaType> readAcceptMediaType(String header,
+            final List<QualitySourceMediaType> priorityMediaTypes) throws ParseException {
         return HttpHeaderReader.readAcceptableList(
                 new Comparator<AcceptableMediaType>() {
                    public int compare(AcceptableMediaType o1, AcceptableMediaType o2) {

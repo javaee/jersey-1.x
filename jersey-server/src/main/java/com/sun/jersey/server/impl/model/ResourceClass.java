@@ -142,7 +142,7 @@ public final class ResourceClass {
                     new RightHandPathRule(
                     config.getFeature(ResourceConfig.FEATURE_REDIRECT),                    
                     p.getTemplate().endsWithSlash(),
-                    new HttpMethodRule(rmm, implictProduces, true)));
+                    new HttpMethodRule(rmm, true)));
         }
 
         // Create the rules for the HTTP methods
@@ -150,7 +150,7 @@ public final class ResourceClass {
         if (!methodMap.isEmpty()) {
             // No need to adapt with the RightHandPathRule as the URI path
             // will be consumed when such a rule is accepted
-            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(methodMap, implictProduces));
+            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(methodMap));
         }
 
         

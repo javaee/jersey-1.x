@@ -150,7 +150,15 @@ public class ImplicitProducesViewProcessorTest extends AbstractResourceTester {
         assertEquals("/com/sun/jersey/impl/template/ImplicitProducesViewProcessorTest/ImplicitWithGetTemplate/index.testp", p.getProperty("path"));
         assertEquals("ImplicitWithGetTemplate", p.getProperty("model"));
 
+        p = new Properties();
+        cr = r.accept("*/*").get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.TEXT_PLAIN_TYPE, cr.getType()));
+        p.load(cr.getEntityInputStream());
+        assertEquals("/com/sun/jersey/impl/template/ImplicitProducesViewProcessorTest/ImplicitWithGetTemplate/index.testp", p.getProperty("path"));
+        assertEquals("ImplicitWithGetTemplate", p.getProperty("model"));
+
         assertEquals("ImplicitWithGetTemplate", r.accept("application/foo").get(String.class));
+
     }
 
     @Path("/")

@@ -44,6 +44,7 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -134,7 +135,8 @@ public class ViewableRule implements UriRule {
     private MediaType getContentType(HttpRequestContext request, HttpResponseContext response) {
         List<MediaType> accept = (priorityMediaTypes == null)
                 ? request.getAcceptableMediaTypes()
-                : request.getAcceptableMediaTypes(priorityMediaTypes);
+                : HttpMethodRule.getSpecificAcceptableMediaTypes(request.getAcceptableMediaTypes(),
+                    priorityMediaTypes);
         if (!accept.isEmpty()) {
             MediaType contentType = accept.get(0);
 

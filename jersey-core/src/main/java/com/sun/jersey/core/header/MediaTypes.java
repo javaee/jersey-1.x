@@ -37,7 +37,6 @@
 
 package com.sun.jersey.core.header;
 
-import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -123,13 +122,13 @@ public class MediaTypes {
      * Assumes each list is already ordered according to {@link #MEDIA_TYPE_COMPARATOR}
      * and therefore the least specific media type is at the end of the list.
      */
-    public static final Comparator<List<MediaType>> MEDIA_TYPE_LIST_COMPARATOR =
-            new Comparator<List<MediaType>>() {
-        public int compare(List<MediaType> o1, List<MediaType> o2) {
+    public static final Comparator<List<? extends MediaType>> MEDIA_TYPE_LIST_COMPARATOR =
+            new Comparator<List<? extends MediaType>>() {
+        public int compare(List<? extends MediaType> o1, List<? extends MediaType> o2) {
             return MEDIA_TYPE_COMPARATOR.compare(getLeastSpecific(o1), getLeastSpecific(o2));
         }
 
-        public MediaType getLeastSpecific(List<MediaType> l) {
+        public MediaType getLeastSpecific(List<? extends MediaType> l) {
             return l.get(l.size() - 1);
         }
     };
@@ -216,13 +215,51 @@ public class MediaTypes {
         }
     }
 
+    /**
+     * Comparator for lists of quality source media types.
+     */
+    public static final Comparator<QualitySourceMediaType> QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR
+            = new Comparator<QualitySourceMediaType>() {
+        public int compare(QualitySourceMediaType o1, QualitySourceMediaType o2) {
+            int i = o2.getQualitySource() - o1.getQualitySource();
+            if (i != 0)
+                return i;
+
+            return MediaTypes.MEDIA_TYPE_COMPARATOR.compare(o1, o2);
+        }
+    };
+
+    /**
+     * A singleton list containing the general media type.
+     */
+    public static final List<MediaType> GENERAL_QUALITY_SOURCE_MEDIA_TYPE_LIST =
+            createQualitySourceMediaTypeList();
+
+    private static List<MediaType> createQualitySourceMediaTypeList() {
+        return Collections.<MediaType>singletonList(new QualitySourceMediaType("*", "*"));
+    }
+
+    /**
+     * Create a list of quality source media type from the Produces annotation.
+     * <p>
+     * @param mime the Produces annotation.
+     * @return the list of {@link QualitySourceMediaType}, ordered according to 
+     *         {@link #QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR}.
+     */
+    public static List<MediaType> createQualitySourceMediaTypes(Produces mime) {
+        if (mime == null) {
+            return GENERAL_QUALITY_SOURCE_MEDIA_TYPE_LIST;
+        }
+
+        return new ArrayList<MediaType>(createQualitySourceMediaTypes(mime.value()));
+    }
 
     /**
      * Create a list of quality source media type from an array of media types.
      * <p>
      * @param mediaTypes the array of meda types.
      * @return the list of {@link QualitySourceMediaType}, ordered according to
-     * the quality source as the primiary key and {@link #MEDIA_TYPE_COMPARATOR}
+     * the quality source as the primary key and {@link #MEDIA_TYPE_COMPARATOR}
      * as the secondary key.
      */
     public static List<QualitySourceMediaType> createQualitySourceMediaTypes(String[] mediaTypes) {

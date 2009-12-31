@@ -38,7 +38,6 @@
 package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import java.io.DataInput;
 import java.text.ParseException;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
@@ -66,6 +65,10 @@ public class QualitySourceMediaType extends MediaType {
         this.qs = qs;
     }
         
+    public QualitySourceMediaType(MediaType mt) {
+        this(mt.getType(), mt.getSubtype(), getQs(mt), mt.getParameters());
+    }
+
     public int getQualitySource() {
         return qs;
     }
@@ -85,20 +88,34 @@ public class QualitySourceMediaType extends MediaType {
         if (reader.hasNext()) {
             parameters = HttpHeaderReader.readParameters(reader);
             if (parameters != null) {
-                String v = parameters.get(QUALITY_SOURCE_FACTOR);
-                if (v != null) {
-                    try {
-                        qs = (int)(Float.valueOf(v) * 1000.0);
-                    } catch (NumberFormatException ex) {
-                        ParseException pe = new ParseException("The quality source (qs) value, " + v + ", is not a valid value", 0);
-                        pe.initCause(ex);
-                    }
-                    if (qs < 0)
-                        throw new ParseException("The quality source (qs) value, " + v + ", must be non-negative number", 0);
-                }
+                qs = getQs(parameters.get(QUALITY_SOURCE_FACTOR));
             }
         }
 
         return new QualitySourceMediaType(type, subType, qs, parameters);
+    }
+
+    private static int getQs(MediaType mt) {
+        try {
+            return getQs(mt.getParameters().get(QUALITY_SOURCE_FACTOR));
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+    }
+
+    private static int getQs(String v) throws ParseException {
+        if (v == null)
+            return DEFAULT_QUALITY_SOURCE_FACTOR;
+        
+        try {
+            final int qs = (int)(Float.valueOf(v) * 1000.0);
+            if (qs < 0)
+                throw new ParseException("The quality source (qs) value, " + v + ", must be non-negative number", 0);
+            return qs;
+        } catch (NumberFormatException ex) {
+            ParseException pe = new ParseException("The quality source (qs) value, " + v + ", is not a valid value", 0);
+            pe.initCause(ex);
+            throw pe;
+        }
     }
 }

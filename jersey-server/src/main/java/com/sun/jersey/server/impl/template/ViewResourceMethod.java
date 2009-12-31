@@ -41,9 +41,7 @@ import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
-import java.util.LinkedList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -56,17 +54,8 @@ public class ViewResourceMethod extends ResourceMethod {
             "GET",
             UriTemplate.EMPTY,
             MediaTypes.GENERAL_MEDIA_TYPE_LIST,
-            getMediaTypeList(produces),
+            produces,
             false,
             null);
-    }
-
-    private static List<MediaType> getMediaTypeList(List<QualitySourceMediaType> produces) {
-        List<MediaType> l = new LinkedList<MediaType>();
-
-        for (QualitySourceMediaType p : produces) {
-            l.add(p);
-        }
-        return l;
     }
 }

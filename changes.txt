@@ -1,4 +1,27 @@
 release 1.1.5 (2010)
+- Support the quality source parameter, "qs", on media types declared with
+  @Produces or @ImplicitProduces.
+  The media type, M say, with the highest quality source parameter for a request
+  will be selected as the most acceptable media type if X is an acceptable
+  media type.
+  For example, given the following resource class:
+  public class Foo {
+    @Produces("application/xml")
+    String get() { ... }
+
+    @Produces("text/html;qs=2")
+    String get() { ... }
+  }
+  and given an Accept header of "*/*" or "application/xml, text/*;q=0.8"
+  then "text/html" will be produced because the application prefers "text/html"
+  over "application/xml" even though the client does not.
+  Given an Accept header of "application/xml" then "application/xml" will be
+  produced.
+- Fixed issue 382
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=382
+  Quality source parameters, "qs", on media types declared with @Produces or
+  @ImplicitProduces on resource classes will work correctly for an
+  Accept header of "*/*"
 - Fixed issue 446
   https://jersey.dev.java.net/issues/show_bug.cgi?id=447
   Deprecated TemplateProcessor, instead use ViewProcessor, which provides

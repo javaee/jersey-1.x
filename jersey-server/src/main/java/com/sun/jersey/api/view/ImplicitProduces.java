@@ -50,11 +50,10 @@ import java.lang.annotation.Target;
  * The list of media types may be declared individually as String items or
  * as a comma separated list of one or more String items.
  * <p>
- * A quality source parameter, qs, may be declared as a paramter of a media
- * type. The quality source will be multiple by the quality parameter, q, of
- * an acceptable matching media type. This enables the application to prefer say
- * "text/html" over "application/xml" even if the client declares a higher 
- * quality value for the latter than the former.
+ * A quality source parameter, qs, may be declared as a parameter of a media
+ * type. This enables the application to prefer to produce say "text/html" over
+ * "application/xml" if the former has a higher quality source value than
+ * the latter and the former is an acceptable media type.
  */
 @Inherited
 @Target({ElementType.TYPE})
