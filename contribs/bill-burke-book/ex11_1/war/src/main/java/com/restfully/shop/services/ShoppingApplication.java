@@ -39,28 +39,20 @@ public class ShoppingApplication extends Application
       {
          InitialContext ctx = new InitialContext();
 
-         // Modified JNDI lookup names to use standardized EJB 3.1 JNDI naming
-         // Could also use a "java:app/ex11_1-1.1.5-ea-SNAPSHOT/" prefix.
-         // Of course making this all be part a single WAR would allow for a
-         // simple and portable "java:module/" prefix.
          Object obj = ctx.lookup(
-//                 "java:comp/env/ejb/CustomerResource");
-                 "java:global/ex11_1/ex11_1-1.1.5-ea-SNAPSHOT/CustomerResourceBean");
+                 "java:comp/env/ejb/CustomerResource");
          set.add(obj);
 
          obj = ctx.lookup(
-//                 "java:comp/env/ejb/OrderResource");
-                 "java:global/ex11_1/ex11_1-1.1.5-ea-SNAPSHOT/OrderResourceBean");
+                 "java:comp/env/ejb/OrderResource");
          set.add(obj);
 
          obj = ctx.lookup(
-//                 "java:comp/env/ejb/ProductResource");
-                 "java:global/ex11_1/ex11_1-1.1.5-ea-SNAPSHOT/ProductResourceBean");
+                 "java:comp/env/ejb/ProductResource");
          set.add(obj);
 
          obj = ctx.lookup(
-//                 "java:comp/env/ejb/StoreResource");
-                 "java:global/ex11_1/ex11_1-1.1.5-ea-SNAPSHOT/StoreResourceBean");
+                 "java:comp/env/ejb/StoreResource");
          set.add(obj);
 
       }
