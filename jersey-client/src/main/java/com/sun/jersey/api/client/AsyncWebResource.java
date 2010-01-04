@@ -156,18 +156,18 @@ public class AsyncWebResource extends Filterable implements
      * Compares this resource to the specified object.
      * <p>
      * The result is true if and only if the argument is not null and is a
-     * <code>WebResource</code> object whose URI is equal to the URI of this
-     * <code>WebResource</code>.
+     * <code>AsyncWebResource</code> object whose URI is equal to the URI of this
+     * <code>AsyncWebResource</code>.
      *
-     * @param obj the object to compare this <code>WebResource</code> against.
-     * @return true if the <code>WebResource</code> are equal; false otherwise.
+     * @param obj the object to compare this <code>AsyncWebResource</code> against.
+     * @return true if the <code>AsyncWebResource</code> are equal; false otherwise.
      */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
 
-        if (obj instanceof WebResource) {
-            final AsyncWebResource that = (AsyncWebResource) obj;
+        if (obj instanceof AsyncWebResource) {
+            final AsyncWebResource that = (AsyncWebResource)obj;
             return that.u.equals(this.u);
         }
         return false;

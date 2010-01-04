@@ -1,4 +1,7 @@
 release 1.1.5 (2010)
+- Fixed issue 450
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=450
+  Equals method of AsyncWebResource was incorrect.
 - Support the quality source parameter, "qs", on media types declared with
   @Produces or @ImplicitProduces.
   The media type, M say, with the highest quality source parameter for a request
