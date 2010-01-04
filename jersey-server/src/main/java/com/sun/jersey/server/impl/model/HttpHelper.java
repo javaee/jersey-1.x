@@ -71,7 +71,7 @@ public final class HttpHelper {
      *         returned.
      */
     public static MediaType getContentType(HttpRequestContext request) {
-        return getContentType(request.getRequestHeaders().getFirst("Content-Type"));
+        return getContentType(request.getRequestHeaders().getFirst(HttpHeaders.CONTENT_TYPE));
     }
     
     /**
@@ -130,7 +130,7 @@ public final class HttpHelper {
     }
 
     public static Set<MatchingEntityTag> getIfMatch(HttpRequestContext request) {
-        final String ifMatch = request.getHeaderValue("If-Match");
+        final String ifMatch = request.getHeaderValue(HttpHeaders.IF_MATCH);
         if (ifMatch == null || ifMatch.length() == 0) {
             return null;
         }
@@ -142,7 +142,7 @@ public final class HttpHelper {
     }
 
     public static Set<MatchingEntityTag> getIfNoneMatch(HttpRequestContext request) {
-        final String ifNoneMatch = request.getHeaderValue("If-None-Match");
+        final String ifNoneMatch = request.getHeaderValue(HttpHeaders.IF_NONE_MATCH);
         if (ifNoneMatch == null || ifNoneMatch.length() == 0) {
             return null;
         }
@@ -164,7 +164,7 @@ public final class HttpHelper {
      *         type "*\\/*" is returned.
      */
     public static List<AcceptableMediaType> getAccept(HttpRequestContext request) {
-        final String accept = request.getHeaderValue("Accept");
+        final String accept = request.getHeaderValue(HttpHeaders.ACCEPT);
         if (accept == null || accept.length() == 0) {
             return MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE_LIST;
         }
@@ -177,7 +177,7 @@ public final class HttpHelper {
     
     public static List<AcceptableMediaType> getAccept(HttpRequestContext request,
             List<QualitySourceMediaType> priorityMediaTypes) {
-        final String accept = request.getHeaderValue("Accept");
+        final String accept = request.getHeaderValue(HttpHeaders.ACCEPT);
         if (accept == null || accept.length() == 0) {
             return MediaTypes.GENERAL_ACCEPT_MEDIA_TYPE_LIST;
         }
@@ -191,12 +191,25 @@ public final class HttpHelper {
     /**
      * Get the list of language tag from the "Accept-Language" of an HTTP request.
      * <p>
+     * @deprecated see {@link #getAcceptLanguage(com.sun.jersey.api.core.HttpRequestContext) }.
      * @param request The HTTP request.
      * @return The list of LanguageTag. This list
      *         is ordered with the highest quality acceptable language tag occuring first.
      */
+    @Deprecated
     public static List<AcceptableLanguageTag> getAcceptLangauge(HttpRequestContext request) {
-        final String acceptLanguage = request.getHeaderValue("Accept-Language");
+        return getAcceptLanguage(request);
+    }
+    
+    /**
+     * Get the list of language tag from the "Accept-Language" of an HTTP request.
+     * <p>
+     * @param request The HTTP request.
+     * @return The list of LanguageTag. This list
+     *         is ordered with the highest quality acceptable language tag occuring first.
+     */
+    public static List<AcceptableLanguageTag> getAcceptLanguage(HttpRequestContext request) {
+        final String acceptLanguage = request.getHeaderValue(HttpHeaders.ACCEPT_LANGUAGE);
         if (acceptLanguage == null || acceptLanguage.length() == 0) {
             return Collections.singletonList(new AcceptableLanguageTag("*", null));
         }
@@ -206,7 +219,7 @@ public final class HttpHelper {
             throw clientError("Bad Accept-Language header value: '" + acceptLanguage + "'", e);
         }
     }
-    
+
     /**
      * Get the list of language tag from the "Accept-Charset" of an HTTP request.
      * <p>
@@ -215,7 +228,7 @@ public final class HttpHelper {
      *         is ordered with the highest quality acceptable charset occuring first.
      */
     public static List<AcceptableToken> getAcceptCharset(HttpRequestContext request) {
-        final String acceptCharset = request.getHeaderValue("Accept-Charset");
+        final String acceptCharset = request.getHeaderValue(HttpHeaders.ACCEPT_CHARSET);
         try {
             if (acceptCharset == null || acceptCharset.length() == 0) {
                 return Collections.singletonList(new AcceptableToken("*"));
@@ -234,7 +247,7 @@ public final class HttpHelper {
      *         is ordered with the highest quality acceptable charset occuring first.
      */
     public static List<AcceptableToken> getAcceptEncoding(HttpRequestContext request) {
-        final String acceptEncoding = request.getHeaderValue("Accept-Encoding");
+        final String acceptEncoding = request.getHeaderValue(HttpHeaders.ACCEPT_ENCODING);
         try {
             if (acceptEncoding == null || acceptEncoding.length() == 0) {
                 return Collections.singletonList(new AcceptableToken("*"));

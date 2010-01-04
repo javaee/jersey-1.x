@@ -1,11 +1,17 @@
 release 1.1.5 (2010)
+- Fixed issue 362
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=362
+  Deprecated HttpHelper.getAcceptLangauge and added new method
+  HttpHelper.getAcceptLanguage.
 - Fixed issue 448
   https://jersey.dev.java.net/issues/show_bug.cgi?id=448
   Ensure that spring 2.5.x dependency version does not depend on Spring 3.0.
 - Fixed issue 450
   https://jersey.dev.java.net/issues/show_bug.cgi?id=450
   Equals method of AsyncWebResource was incorrect.
-- Support the quality source parameter, "qs", on media types declared with
+- Fixed issue 202
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=202
+  Support the quality source parameter, "qs", on media types declared with
   @Produces or @ImplicitProduces.
   The media type, M say, with the highest quality source parameter for a request
   will be selected as the most acceptable media type if X is an acceptable
