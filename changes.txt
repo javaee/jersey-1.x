@@ -1,4 +1,7 @@
 release 1.1.5 (2010)
+- Fixed issue 448
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=448
+  Ensure that spring 2.5.x dependency version does not depend on Spring 3.0.
 - Fixed issue 450
   https://jersey.dev.java.net/issues/show_bug.cgi?id=450
   Equals method of AsyncWebResource was incorrect.

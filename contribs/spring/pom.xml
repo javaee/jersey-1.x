@@ -178,7 +178,7 @@
     </build>
     <properties>
         <spring20-release-version>2.0.5</spring20-release-version>
-        <spring25-release-version>[2.5.2,)</spring25-release-version>
+        <spring25-release-version>[2.5.2,3)</spring25-release-version>
     </properties>
     <profiles>
         <profile>
