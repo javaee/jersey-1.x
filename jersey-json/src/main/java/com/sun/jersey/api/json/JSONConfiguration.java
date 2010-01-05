@@ -88,13 +88,13 @@ public class JSONConfiguration {
          */
         NATURAL
     };
-    
+
     private final Notation notation;
     private final Collection<String> arrays;
     private final Collection<String> attrsAsElems;
     private final Collection<String> nonStrings;
     private final boolean rootUnwrapping;
-    private final boolean humanReadableFormating;
+    private final boolean humanReadableFormatting;
     private final Map<String, String> jsonXml2JsonNs;
     private final boolean usePrefixAtNaturalAttributes;
 
@@ -115,7 +115,7 @@ public class JSONConfiguration {
         private Builder(Notation notation) {
             this.notation = notation;
         }
-        
+
         /**
          * Constructs a new immutable {@link JSONConfiguration} object based on options set on this Builder
          *
@@ -190,7 +190,7 @@ public class JSONConfiguration {
 
         /**
          * Setter for XML to JSON namespace mapping.
-         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED_JETTISON} 
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED_JETTISON}
          * and {@link JSONConfiguration.Notation#MAPPED} notations only.
          * <p>
          * The value is a map with zero or more
@@ -304,7 +304,7 @@ public class JSONConfiguration {
 
         /**
          * Setter for XML root element unwrapping.
-         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} 
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED}
          * and {@link JSONConfiguration.Notation#NATURAL} notations only.
          * <p>
          * If set to true, JSON code corresponding to the XML root element will be stripped out
@@ -326,10 +326,37 @@ public class JSONConfiguration {
         attrsAsElems = b.attrsAsElems;
         nonStrings = b.nonStrings;
         rootUnwrapping = b.rootUnwrapping;
-        humanReadableFormating = b.humanReadableFormatting;
+        humanReadableFormatting = b.humanReadableFormatting;
         jsonXml2JsonNs = b.jsonXml2JsonNs;
         usePrefixAtNaturalAttributes = b.usePrefixAtNaturalAttributes;
     }
+
+    private JSONConfiguration(JSONConfiguration jsonConf, boolean formatted) {
+        notation = jsonConf.notation;
+        arrays = jsonConf.arrays;
+        attrsAsElems = jsonConf.attrsAsElems;
+        nonStrings = jsonConf.nonStrings;
+        rootUnwrapping = jsonConf.rootUnwrapping;
+        humanReadableFormatting = formatted;
+        jsonXml2JsonNs = jsonConf.jsonXml2JsonNs;
+        usePrefixAtNaturalAttributes = jsonConf.usePrefixAtNaturalAttributes;
+    }
+
+    /**
+     * A static method for obtaining {@link JSONConfiguration} instance with humanReadableFormatting
+     * set according to formatted parameter.
+     *
+     * @param c original instance of {@link JSONConfiguration}, can't be null
+     * @param formatted
+     * @return copy of provided {@link JSONConfiguration} with humanReadableFormatting set to formatted.
+     * @throws IllegalArgumentException when provided JSONConfiguration is null.
+     */
+    public static JSONConfiguration createJSONConfigurationWithFormatted(JSONConfiguration c, boolean formatted) throws IllegalArgumentException {
+        if(c == null)
+            throw new IllegalArgumentException("JSONConfiguration can't be null");
+        return new JSONConfiguration(c, formatted);
+    }
+
     /**
      * The default JSONConfiguration uses {@link JSONConfiguration.Notation#MAPPED} notation with root unwrapping option set to true.
      */
@@ -343,7 +370,7 @@ public class JSONConfiguration {
      * @return a builder for JSONConfiguration instance
      */
     public static NaturalBuilder natural() {
-        // this is to make sure people trying to use NATURAL notation will get clear message what is missing, when an old JAXB RI version is used
+          // this is to make sure people trying to use NATURAL notation will get clear message what is missing, when an old JAXB RI version is used
         try {
             Class.forName("com.sun.xml.bind.annotation.OverrideAnnotationOf");
         } catch (ClassNotFoundException ex) {
@@ -388,7 +415,7 @@ public class JSONConfiguration {
         return badgerFishBuilder;
     }
 
-    
+
     /**
      * Returns JSON notation selected for this configuration
      * @return JSON notation
@@ -401,7 +428,7 @@ public class JSONConfiguration {
      * Returns JSON array names property
      * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
      * @return collection of array names
-     * @see MappedBuilder#arrays(java.lang.String[])
+     * @see MappedBuilder#arrays(java.lang.String...)
      */
     public Collection<String> getArrays() {
         return (arrays != null) ? Collections.unmodifiableCollection(arrays) : null;
@@ -411,7 +438,7 @@ public class JSONConfiguration {
      * Returns names of attributes, which will be handled as elements
      * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
      * @return attribute as element names collection
-     * @see MappedBuilder#attributeAsElement(java.lang.String[])
+     * @see MappedBuilder#attributeAsElement(java.lang.String...)
      */
     public Collection<String> getAttributeAsElements() {
         return (attrsAsElems != null) ? Collections.unmodifiableCollection(attrsAsElems) : null;
@@ -431,7 +458,7 @@ public class JSONConfiguration {
      * Returns names of JSON objects, which will be serialized out as non-strings, i.e. without delimiting their values with double quotes
      * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
      * @return name of non-string JSON objects
-     * @see MappedBuilder#nonStrings(java.lang.String[])
+     * @see MappedBuilder#nonStrings(java.lang.String...)
      */
     public Collection<String> getNonStrings() {
         return (nonStrings != null) ? Collections.unmodifiableCollection(nonStrings) : null;
@@ -439,7 +466,7 @@ public class JSONConfiguration {
 
     /**
      * Says if the root element will be stripped off
-     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} 
+     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED}
      * and {@link Notation#NATURAL} notations.
      * @return true, if root element has to be stripped off
      * @see MappedBuilder#rootUnwrapping(boolean)
@@ -466,7 +493,7 @@ public class JSONConfiguration {
      * @see NaturalBuilder#humanReadableFormatting(boolean)
      */
     public boolean isHumanReadableFormatting() {
-        return humanReadableFormating;
+        return humanReadableFormatting;
     }
 
     @Override

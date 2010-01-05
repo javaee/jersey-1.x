@@ -73,8 +73,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     
     private final ContextResolver<Marshaller> mtMarshaller;
 
-    private boolean jaxbFormattedOutput = false;
-        
+    private boolean formattedOutput = false;
+
     public AbstractJAXBProvider(Providers ps) {
         this(ps, null);
     }
@@ -96,7 +96,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
 
     @Context
     public void setConfiguration(FeaturesAndProperties fp) {
-        jaxbFormattedOutput = fp.getFeature(FeaturesAndProperties.FEATURE_FORMATTED);
+        formattedOutput = fp.getFeature(FeaturesAndProperties.FEATURE_FORMATTED);
     }
 
     protected boolean isSupported(MediaType m) {
@@ -136,8 +136,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         }
 
         Marshaller m = getJAXBContext(type, mt).createMarshaller();
-        if(jaxbFormattedOutput)
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, jaxbFormattedOutput);
+        if(formattedOutput)
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formattedOutput);
         return m;
 
     }
@@ -149,8 +149,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         }
 
         Marshaller m = getJAXBContext(type).createMarshaller();
-        if(jaxbFormattedOutput)
-            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, jaxbFormattedOutput);
+        if(formattedOutput)
+            m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formattedOutput);
         return m;
     }
     
@@ -193,5 +193,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         } catch (Exception ex) {
             throw new JAXBException("Error creating SAXSource", ex);
         }
+    }
+
+    protected boolean getFormattedOutput() {
+        return formattedOutput;
     }
 }

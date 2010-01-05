@@ -37,22 +37,20 @@
 package com.sun.jersey.json.impl;
 
 import com.sun.jersey.api.json.JSONConfiguration;
-import java.io.File;
-import java.io.OutputStream;
-import java.io.Writer;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.ValidationEventHandler;
+import com.sun.jersey.api.json.JSONMarshaller;
+import org.w3c.dom.Node;
+import org.xml.sax.ContentHandler;
+
+import javax.xml.bind.*;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
 import javax.xml.validation.Schema;
-import org.w3c.dom.Node;
-import org.xml.sax.ContentHandler;
+import java.io.File;
+import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  *
@@ -101,8 +99,20 @@ public final class JSONMarshallerImpl extends BaseJSONMarshaller implements Mars
         return jaxbMarshaller.getNode(jaxbObject);
     }
 
-    public void setProperty(String key, Object value) throws PropertyException {
-        jaxbMarshaller.setProperty(key, value);
+    public void setProperty(String name, Object value) throws PropertyException {
+        if(name == null)
+            throw new IllegalArgumentException("Name can't be null.");
+
+        if(name.equals(JSONMarshaller.FORMATTED)) {
+            if(!(value instanceof Boolean)) {
+                throw new PropertyException("property " + name + " must be an instance of type " +
+                "boolean, not " + value.getClass().getName());
+            }
+
+            jsonConfig = JSONConfiguration.createJSONConfigurationWithFormatted(jsonConfig, (Boolean)value);
+        } else {
+            jaxbMarshaller.setProperty(name, value);
+        }
     }
 
     public Object getProperty(String key) throws PropertyException {

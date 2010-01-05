@@ -37,12 +37,9 @@
 package com.sun.jersey.json.impl.provider.entity;
 
 import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -51,6 +48,11 @@ import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 
 /**
  *
@@ -103,7 +105,8 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
     protected void writeTo(Object t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException {
-        JSONJAXBContext.getJSONMarshaller(m).
-                marshallToJSON(t, new OutputStreamWriter(entityStream, c));
+        JSONMarshaller jsonMarshaller = JSONJAXBContext.getJSONMarshaller(m);
+        jsonMarshaller.setProperty(JSONMarshaller.FORMATTED, getFormattedOutput());
+        jsonMarshaller.marshallToJSON(t, new OutputStreamWriter(entityStream, c));
     }
 }

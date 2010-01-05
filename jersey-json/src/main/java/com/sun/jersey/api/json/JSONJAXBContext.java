@@ -41,16 +41,9 @@ import com.sun.jersey.json.impl.BaseJSONUnmarshaller;
 import com.sun.jersey.json.impl.JSONMarshallerImpl;
 import com.sun.jersey.json.impl.JSONUnmarshallerImpl;
 import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.Validator;
+
+import javax.xml.bind.*;
+import java.util.*;
 
 /**
  * An adaption of {@link JAXBContext} that supports marshalling

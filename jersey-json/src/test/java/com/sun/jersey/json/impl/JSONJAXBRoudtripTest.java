@@ -40,20 +40,16 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.StringTokenizer;
+import junit.framework.TestCase;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import junit.framework.TestCase;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  *
@@ -137,7 +133,13 @@ public class JSONJAXBRoudtripTest extends TestCase {
         System.out.println("NATURAL NOTATION");
         allBeansTest(new JSONJAXBContext(JSONConfiguration.natural().build(), classes), beans);
     }
-    
+
+    public void testNaturalNotationFormatted() throws Exception {
+        System.out.println("NATURAL NOTATION FORMATTED");
+        allBeansTest(new JSONJAXBContext(JSONConfiguration.natural().humanReadableFormatting(true).build(), classes), beans);
+    }
+
+
     public void testNaturalNotationDeprecatedConfig() throws Exception {
         System.out.println("NATURAL NOTATION DEPRECATED CONFIG");
         Map<String, Object> props = new HashMap<String, Object>();

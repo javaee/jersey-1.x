@@ -39,15 +39,17 @@ package com.sun.jersey.json.impl;
 import com.sun.jersey.api.json.JSONConfigurated;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONMarshaller;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.stream.XMLStreamWriter;
 
 /**
  *
@@ -59,7 +61,7 @@ public class BaseJSONMarshaller implements JSONMarshaller, JSONConfigurated {
     
     protected final Marshaller jaxbMarshaller;
     
-    protected final JSONConfiguration jsonConfig;
+    protected JSONConfiguration jsonConfig;
 
     public BaseJSONMarshaller(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
         this(jaxbContext.createMarshaller(), jsonConfig);
@@ -104,5 +106,9 @@ public class BaseJSONMarshaller implements JSONMarshaller, JSONConfigurated {
         } catch (IOException ex) {
             throw new JAXBException(ex);
         }
+    }
+
+    public void setProperty(String key, Object value) throws PropertyException {
+        // do nothing
     }
 }

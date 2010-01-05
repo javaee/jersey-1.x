@@ -37,12 +37,13 @@
 
 package com.sun.jersey.api.json;
 
-import java.io.OutputStream;
-import java.io.Writer;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.MarshalException;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.OutputStream;
+import java.io.Writer;
 
 /**
  * A JSON marshaller responsible for serializing Java content trees, defined
@@ -51,6 +52,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Jakub.Podlesak@Sun.COM, Paul.Sandoz@Sun.COM
  */
 public interface JSONMarshaller {
+
+    public static final String FORMATTED = "com.sun.jersey.api.json.JSONMarshaller.formatted";
 
     /**
      * Marshall the content tree rooted at <code>jaxbElement</code> into an
@@ -90,4 +93,22 @@ public interface JSONMarshaller {
      * @throws IllegalArgumentException If any of the method parameters are null.
      */
     void marshallToJSON(Object jaxbElement, Writer writer) throws JAXBException;
+
+
+    /**
+     * Set the particular property in the underlying implementation of
+     * {@link JSONMarshaller}. Attempting to set an undefined property
+     * will result in a PropertyException being thrown.
+     *
+     * @param name the name of the property to be set. This value can either
+     *              be specified using one of the constant fields or a user
+     *              supplied string.
+     * @param value the value of the property to be set
+     *
+     * @throws PropertyException when there is an error processing the given
+     *                            property or value
+     * @throws IllegalArgumentException
+     *      If the name parameter is null
+     */
+    void setProperty(String name, Object value) throws PropertyException;
 }
