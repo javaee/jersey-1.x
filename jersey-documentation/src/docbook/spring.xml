@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
+<!ENTITY % ents SYSTEM "jersey.ent" >
+%ents;
+]>
+<chapter>
+    <title>Jersey With Spring</title>
+    <section>
+        <title>Introduction</title>
+        <para>This chapter explains how to get started with a simple project that utilizes Jersey
+            with <ulink url="http://www.springsource.org/">Spring</ulink>. At the end of this
+            chapter, the reader will be able to configure Jersey inside the Spring framework and
+            take advantage of some Spring specific features available in Jersey. The intended
+            audience of this chapter is developers already familiar with Spring who are interested
+            in using Jersey in their applications.</para>
+        <para>The easiest way to explain how to use Jersey with Spring is via an example. Rather
+            than creating a Spring application from scratch, we will start with a Web application
+            generated from a Maven archetype and then modify it to run inside Spring.</para>
+        <note>
+            <para>Should we cite a version of spring here?</para>
+        </note>
+    </section>
+    <section>
+        <title>Creating a Web Application</title>
+        <para>In this section we shall create a simple Web application using one of Jersey's <ulink
+                url="http://maven.apache.org/">Maven</ulink> archetypes. Most development
+            environments support Maven and Maven archetypes, but to avoid narrowing this discussion
+            to any specific development envinroment, we shall use command-line tools instead. To
+            create the basic Web application execute the following command:
+            <programlisting>mvn archetype:generate -DarchetypeCatalog=http://download.java.net/maven/2</programlisting>
+            and select the <literal>jersey-quickstart-webapp</literal> option. When prompted choose
+                <literal>example.jersey.spring</literal> for the <literal>groupId</literal> and
+            choose <literal>example-spring-jersey</literal> for the <literal>artifactId</literal>.
+            For all other options choose the default values.</para>
+        <para>Once the Web application has been generated, it is a good idea to test it to make
+            sure that it is properly configured. For example, using <ulink url="https://glassfish.dev.java.net">Glassfish</ulink>
+            listening to port 8080,
+            we can compile and test the application in the <literal>example-spring-jersey</literal>
+            directory as shown below:
+            <programlisting linenumbering="numbered">mvn clean install
+asadmin deploy target/example-spring-jersey.war
+curl -v http://localhost:8080/example-spring-jersey/webresources/myresource</programlisting>
+            If everything works, the last line printed by the <literal>curl</literal> command should be 
+            <literal>Hi there!</literal> (if the <literal>curl</literal> command is not available
+            on your system, you can try pointing to the URL using your system's browser).
+        </para>
+    </section>
+    <section>
+        <title>Converting a Web Application to Spring</title>
+        <para/>
+    </section>
+    <section>
+        <title>Scopes</title>
+        <para/>
+    </section>
+    <section>
+        <title>Sub-Resources</title>
+        <para/>
+    </section>
+    <section>
+        <title>Injecting Spring Beans</title>
+        <para/>
+    </section>
+    <section>
+        <title>Spring-based AOP</title>
+        <para/>
+    </section>
+    <section>
+        <title>Jersey-managed Spring-instantiated resources</title>
+        <para/>
+    </section>
+</chapter>
