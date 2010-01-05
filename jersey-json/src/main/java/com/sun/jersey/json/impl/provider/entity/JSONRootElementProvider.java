@@ -106,7 +106,8 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
             Marshaller m, OutputStream entityStream)
             throws JAXBException {
         JSONMarshaller jsonMarshaller = JSONJAXBContext.getJSONMarshaller(m);
-        jsonMarshaller.setProperty(JSONMarshaller.FORMATTED, getFormattedOutput());
+        if(getFormattedOutput())
+            jsonMarshaller.setProperty(JSONMarshaller.FORMATTED, true);
         jsonMarshaller.marshallToJSON(t, new OutputStreamWriter(entityStream, c));
     }
 }
