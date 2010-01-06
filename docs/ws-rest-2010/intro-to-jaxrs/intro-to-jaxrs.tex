@@ -1,0 +1,352 @@
+%
+% DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+% 
+% Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+% 
+% The contents of this file are subject to the terms of either the GNU
+% General Public License Version 2 only ("GPL") or the Common Development
+% and Distribution License("CDDL") (collectively, the "License").  You
+% may not use this file except in compliance with the License. You can obtain
+% a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
+% or jersey/legal/LICENSE.txt.  See the License for the specific
+% language governing permissions and limitations under the License.
+% 
+% When distributing the software, include this License Header Notice in each
+% file and include the License file at jersey/legal/LICENSE.txt.
+% Sun designates this particular file as subject to the "Classpath" exception
+% as provided by Sun in the GPL Version 2 section of the License file that
+% accompanied this code.  If applicable, add the following below the License
+% Header, with the fields enclosed by brackets [] replaced by your own
+% identifying information: "Portions Copyrighted [year]
+% [name of copyright owner]"
+% 
+% Contributor(s):
+% 
+% If you wish your version of this file to be governed by only the CDDL or
+% only the GPL Version 2, indicate your decision by adding "[Contributor]
+% elects to include this software in this distribution under the [CDDL or GPL
+% Version 2] license."  If you don't indicate a single choice of license, a
+% recipient has the option to distribute your version of this file under
+% either the CDDL, the GPL Version 2 or to extend the choice of license to
+% its licensees as provided above.  However, if you add GPL Version 2 code
+% and therefore, elected the GPL Version 2 license, then the option applies
+% only if the new code is made subject to such option by the copyright
+% holder.
+
+\documentclass{acm_proc_article-sp}
+
+\begin{document}
+
+\title{An Introduction to the Java API for RESTful Web Services}
+\subtitle{Extended Abstract}
+
+\numberofauthors{1}
+\author{
+\alignauthor
+Marc Hadley\\
+       \affaddr{Sun Microsystems, Inc.}\\
+       \affaddr{Network Drive}\\
+       \affaddr{Burlington, MA}\\
+       \email{marc.hadley@sun.com}
+}
+
+\date{4 January 2010}
+
+\maketitle
+\begin{abstract}
+This paper provides a short introduction to the Java\texttrademark\ API for RESTful Web Services (JAX-RS)\cite{jaxrs11}. JAX-RS is the result of Java Specification Request (JSR) 311 and is a component of the Java Enterprise Edition platform (Java EE 6)\cite{javaee6}.
+\end{abstract}
+
+\category{D.3.3}{Programming Languages}{Language Constructs and Features}
+\category{H.4.3}{Information Systems Applications}{Communication Applications}
+\category{H.5.4}{Information Interfaces and Presentation}{Hypertext/Hypermedia}
+
+\section{Introduction}
+
+The aim of JAX-RS is to make development of Java Web services built according to the Representational State Transfer\cite{rest} (REST) architectural style both straightforward and natural for the developer. To this end, where possible, the API offers declarative annotations that allow a developer to:
+
+\begin{itemize}
+\item Identify components of the application
+\item Route requests to an appropriate method in a selected class
+\item Extract data from a request into the arguments of a method
+\item Provide metadata used in responses
+\end{itemize}
+
+The API also offers a number of utility classes and interfaces to aid with the more dynamic aspects of the application.
+
+This paper provides a short introduction to JAX-RS, more in depth information can be obtained from the specification\cite{jaxrs11} or \textit{RESTful Java with JAX-RS}\cite{burke:restfuljava}.
+
+\section{Applications}
+
+When using JAX-RS, the unit of deployment is an application. All of the files that make up an application are packaged together and deployed into some form of container that supplies HTTP services.
+
+A JAX-RS application consists of:
+
+\begin{description}
+\item[Application subclass] An optional \texttt{Application} subclass that defines the other classes that make up the application.
+\item[Root resource classes] One or more root resource classes that define entry points into the URI space used by the application.
+\item[Providers] Zero or more providers that supply extended functionality to the JAX-RS runtime.
+\end{description}
+
+An example \texttt{Application} subclass is shown below:
+
+\begin{verbatim}
+@ApplicationPath("acme")
+public AcmeApplication extends Application {
+}
+\end{verbatim}
+
+The \texttt{ApplicationPath} annotation specifies the base URI path segment to which all root resource class URI are relative. By default all route resource classes and providers packaged with the \texttt{Application} subclass are included in the application. An \texttt{Application} subclass can also specify a subset of the packaged classes by overriding the \texttt{getClasses} method.
+
+\section{Root Resource Classes}
+
+Root resource classes provide entry points into the URI space used by the application. Root resource classes are plain old Java objects (POJOs) that are annotated with \texttt{@Path}. Below is an example root resource class:
+
+\begin{verbatim}
+@Path("widgets")
+public class WidgetsResource {
+  @GET
+  public WidgetsRepresentation getWidgetList() {
+    ...
+  }
+}
+\end{verbatim}
+
+In the above example, the root resource class is published at the relative URI \texttt{widgets}. If this class were part of the \texttt{AcmeApplication} shown earlier then its URI path would be \texttt{/acme/widgets}.
+
+The \texttt{@GET} annotation on the \texttt{getWidgetList} method indicates that the method is a resource method that should be called when dispatching an HTTP GET request for that URI. Additional annotations are provided to support the other common HTTP methods and the set is extensible for other less common methods. The value returned from the method is converted into a response body by an entity provider, see section \ref{providers} for more details. Returning a non-\texttt{void} Java type results in a 200 OK response, a \texttt{void} method results in a 204 No Content response.
+
+To expose a single widget as a resource, we can add a sub-resource method to the resource class as follows:
+
+\begin{verbatim}
+@Path("widgets")
+public class WidgetsResource {
+  @GET
+  public WidgetsRepresentation getWidgetList() {
+    ...
+  }
+  
+  @GET @Path("{id}")
+  public WidgetRespresentation getWidget(
+      @PathParam("id") String widgetId) {
+    ...
+  }
+}
+\end{verbatim}
+
+In the above, HTTP GET requests for \texttt{/acme/widgets/\{id\}} will be dispatched to the \texttt{getWidget} method. The \texttt{\{id\}} indicates that the path is a URI template that will match any URI with the prefix \texttt{/acme/widgets/} and a single following path segment, e.g \texttt{/acme/widgets/foo}.
+
+\subsection{Extracting Request Data}
+
+In the previous example, the actual value of the template variable \texttt{id} is extracted from the request with the \texttt{@Path\-Param} annotation and supplied as the value of the \texttt{widgetId} method argument.
+
+Additional annotations allow extraction of data from other parts of the request:
+URI query parameters with \texttt{@Query\-Param}, URI matrix parameters with \texttt{@Matrix\-Param}, HTTP headers with \texttt{@Header\-Param}, and, finally, HTTP cookies with \texttt{@Cookie\-Param}.
+
+The type of a method argument that carries one of the above annotations is any Java type with a \texttt{String} constructor or that has a static method called \texttt{valueOf} or \texttt{fromString} that returns an instance of the type from a single \texttt{String} argument.
+
+For HTTP methods that support an entity body like POST, the data in the entity body can also be extracted into a Java method argument. Conversion from the serialized data in the request entity to a Java type is the responsibility of an entity provider, see section \ref{providers} for more details.
+
+In addition to the declarative method of extracting request data described above, JAX-RS also provides a set of interfaces that may be queried dynamically:
+
+\begin{description}
+\item[Application] Provides access to the \texttt{Application} subclass created by the JAX-RS runtime.
+\item[UriInfo] Provides access to the components of the request URI and convenience methods for creating new URIs based on the request URI.
+\item[Request] Provides methods for working with preconditions and dynamic content negotiation.
+\item[HttpHeaders] Provides methods for working with the content of HTTP request headers.
+\item[SecurityContext] Provides methods for determining the security context in which a request is executing.
+\item[Providers] Supports lookup of providers, see section \ref{providers}.
+\end{description}
+
+An instance of any of the above interfaces may be injected into a resource class field or method parameter using the \texttt{@Context} annotation, e.g.:
+
+\begin{verbatim}
+@Path("widgets")
+public class WidgetsResource {
+
+  @Context SecurityContext sc;
+  
+  @GET
+  public WidgetsRepresentation getWidgetList() {
+    if (sc.isSecure()) {
+      // Secure channel
+      ...
+    } else {
+      // Insecure channel
+      ...
+    }
+  }
+}
+\end{verbatim}
+
+\subsection{Customizing the Response}
+
+Often a response requires a different status code than the default 200 OK or 204 No Content that is generated when a resource method returns a non\texttt{void} Java type or \texttt{void} respectively. Certain types of response also require additional metadata in headers. In this case the method can return an instance of the \texttt{Response} interface. A utility builder class is supplied that simplifies the construction of a custom response, e.g.:
+
+\begin{verbatim}
+URI locationURI = createResource(...);
+Response response = Response.status(CREATED)
+  .location(locationURI)
+  .build();
+return response;
+\end{verbatim}
+
+or, more conveniently:
+
+\begin{verbatim}
+URI locationURI = createResource(...);
+Response response = Response.created(locationURI)
+  .build();
+return response;
+\end{verbatim}
+
+The JAX-RS runtime will convert relative URIs to absolute URIs when necessary and is also responsible for serialization of custom types used as header values.
+
+\subsection{Building URIs}
+
+A RESTful application will use URIs extensively. The JAX-RS \texttt{UriBuilder} provides facilities for constructing URIs both from scratch and from existing URIs and makes it easy to construct URIs based on the URI templates contained in \texttt{@Path} annotations. E.g.:
+
+\begin{verbatim}
+@Path("widgets")
+public class WidgetsResource {
+
+  @Context UriInfo ui;
+  
+  @GET @Path("{id}")
+  public WidgetRespresentation getWidget(
+      @PathParam("id") String widgetId) {
+    ...
+  }
+    
+  @POST
+  public Response createWidget(
+      WidgetRepresentation widget) {
+    String widgetId = saveWidget(widget);
+    UriBuilder ub = ui.getRequestUriBuilder();
+    URI widgetURI = ub
+      .path(WidgetsResource.class, "getWidget")
+      .build(widgetId);
+    return Response.created(widgetURI).build();
+  }
+}
+\end{verbatim}
+
+The \texttt{createWidget} method constructs \texttt{widgetURI} using:
+
+\begin{itemize}
+\item The request URI, e.g. \texttt{http://.../acme/widgets}
+\item The relative URI template of the sub-resource (\texttt{\{id\}}) extracted from the \texttt{@Path} annotation on the \texttt{getWidget} method
+\item The value of the URI template parameter contained in \texttt{widgetId}.
+\end{itemize}
+
+If \texttt{widgetId} contained the value "foo" then \texttt{widgetURI} will contain \texttt{http://.../acme/widgets/foo} since the value of \texttt{widgetId} is substituted for the URI template parameter \texttt{\{id\}}.
+
+\subsection{Exception Handling}
+
+Exceptions thrown by a resource class method are caught by the JAX-RS runtime and converted to error responses. By default, exceptions are converted to a 500 Server Error response. JAX-RS offers two ways of customizing the default error response:
+
+\begin{itemize}
+\item Methods can throw \texttt{Web\-Application\-Exception} which can contain a customized \texttt{Response}.
+\item The application can include a bundled exception mapping provider which will be called to create a customized \texttt{Response} when an exception is caught, see section \ref{exceptionmapping} for more details.
+\end{itemize}
+
+The above methods can be mixed within an application with the latter being particularly well suited to cases where many methods can throw the same exception(s) since it naturally centralizes error handling in one place.
+
+\subsection{Declarative Content Negotiation}
+
+As prior example have shown, when dispatching requests to Java methods, the JAX-RS runtime does the following to route the request to the appropriate Java method: 
+
+\begin{enumerate}
+\item The request URI is compared to the URI templates supplied as values of \texttt{@Path} annotations
+\item The request method is compared to method designator annotations (\texttt{@GET}, \texttt{@POST}, etc.)
+\end{enumerate}
+
+JAX-RS also provides annotations that allow a developer to use different methods depending on the media types of the request and response:
+
+\begin{enumerate}
+\item[3.] The media type of the request body (\texttt{Content-Type} header) is compared to the value(s) of \texttt{@Consumes} annotations
+\item[4.] The media type(s) that the client is requesting that the response use (\texttt{Accept} header) is compared to the value(s) of \texttt{@Produces} annotations
+\end{enumerate}
+
+The order above denotes significance from most (request URI) to least (desired response media type); the exact algorithm used to match requests to the appropriate Java method is described in section 3.7 of the JAX-RS specification\cite{jaxrs11}.
+
+The following shows an example of declarative content negotiation:
+
+\begin{verbatim}
+@Path("widgets")
+public class WidgetsResource {
+
+  @GET @Produces("application/xml")
+  public Document getXml() {...}
+  
+  @GET @Produces("application/json")
+  public String getJson() {...}
+}
+\end{verbatim}
+
+In the above example, a GET request for \texttt{/acme/widgets} with an \texttt{Accept} header value \texttt{application/xml} would be dispatched to the \texttt{getXml} method. Likewise, a GET request for the same URI with an \texttt{Accept} header of \texttt{application/json} would be dispatched to the \texttt{getJson} method. 
+
+\section{Providers}
+\label{providers}
+
+Providers are JAX-RS extensions that supply functionality to the JAX-RS runtime. The two main provider types are described in the following subsections.
+
+\subsection{Entity Providers}
+
+Entity providers supply serialization and/or deserialization services between resource representations and their associated Java types. An entity provider that supports deserialization of a representation to a Java type implements the \texttt{Message\-Body\-Reader} interface. An entity provider that supports serialization of a Java type to a representation implements the \texttt{Message\-Body\-Writer} interface.
+
+Inclusion of an entity provider for a particular Java type in a JAX-RS application allows that type to be used as a resource method argument, as the return type for a resource method, or as the type of entity embedded in a returned \texttt{Response}.
+
+JAX-RS includes a number of built-in entity providers for common Java types including: \texttt{String}, \texttt{InputStream}, \texttt{File} and application-supplied JAXB classes.
+
+Entity providers may use the \texttt{@Consumes} and \texttt{@Provides} annotations to statically declare the media types that they support or can determine whether they support a particular media type and Java type at runtime to accommodate more complex providers.
+
+\subsection{Exception Mapping Providers}
+\label{exceptionmapping}
+
+Exception mapping providers supply mapping services between Java exceptions and a JAX-RS \texttt{Response}. Exception mapping providers implement the \texttt{ExceptionMapper} interface and are called when a resource method throws a checked or runtime exception.
+
+\balancecolumns
+
+The \texttt{Response} returned by an exception mapping provider is treated the same as a \texttt{Response} returned by a resource method: it may use any status code, may contain headers and any contained entity will be serialized using an appropriate entity provider.
+
+\section{Conclusion}
+
+JAX-RS is an annotation-driven Java API that aims to make development of Web services built according to the Representational State Transfer\cite{rest} (REST) architectural style in Java both straightforward and intuitive. This paper has provided a short introduction to the main features of the API, further information can be obtained by reading the specification\cite{jaxrs11} or \textit{RESTful Java with JAX-RS}\cite{burke:restfuljava}.
+
+%Generated by bibtex from your ~.bib file.  Run latex,
+%then bibtex, then latex twice (to resolve references)
+%to create the ~.bbl file.  Insert that ~.bbl file into
+%the .tex source file.
+%\bibliographystyle{abbrv}
+%\bibliography{references}  % references.bib is the name of the Bibliography
+\begin{thebibliography}{1}
+
+\bibitem{burke:restfuljava}
+B.~Burke.
+\newblock {\em {RESTful} {Java} with {JAX-RS}}.
+\newblock O'Reilly, 2009.
+
+\bibitem{javaee6}
+R.~Chinnici and B.~Shannon.
+\newblock {Java} {Platform}, {Enterprise} {Edition} {(JavaEE)} {Specification},
+  {v6}.
+\newblock {JSR}, JCP, November 2009.
+\newblock See http://jcp.org/en/jsr/detail?id=316.
+
+\bibitem{rest}
+R.~Fielding.
+\newblock {Architectural} {Styles} and the {Design} of {Network-based}
+  {Software} {Architectures}.
+\newblock Ph.d dissertation, University of California, Irvine, 2000.
+\newblock See http://roy.gbiv.com/pubs/dissertation/top.htm.
+
+\bibitem{jaxrs11}
+M.~Hadley and P.~Sandoz.
+\newblock {JAXRS:} {Java} {API} for {RESTful} {Web} {Services}.
+\newblock {JSR}, JCP, September 2009.
+\newblock See http://jcp.org/en/jsr/detail?id=311.
+
+\end{thebibliography}
+
+\end{document}
