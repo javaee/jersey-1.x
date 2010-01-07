@@ -419,8 +419,10 @@ public class ContainerResponse implements HttpResponseContext {
         ExceptionMapper em = wa.getExceptionMapperContext().find(e.getClass());
         if (em == null) return false;
 
-        if (LOGGER.isLoggable(Level.CONFIG)) {
-            LOGGER.config("Mapping exception, " + e + ", to the ExceptionMapper, " + em);
+        if (request.isTracingEnabled()) {
+            request.trace(String.format("matched exception mapper: %s -> %s",
+                    ReflectionHelper.objectToString(e),
+                    ReflectionHelper.objectToString(em)));
         }
 
         try {
@@ -446,8 +448,8 @@ public class ContainerResponse implements HttpResponseContext {
     private void onException(Throwable e, Response r, boolean mapped) {
         if (!mapped) {
             // Log the stack trace
-            if (r.getStatus() >= 500) {
-                LOGGER.log(Level.SEVERE, "Internal server error", e);
+            if (r.getStatus() >= 500 || request.isTracingEnabled()) {
+                traceException(e, r);
             }
 
             if (r.getStatus() >= 500 && r.getEntity() == null) {
@@ -460,10 +462,26 @@ public class ContainerResponse implements HttpResponseContext {
                 r = Response.status(r.getStatus()).entity(sw.toString()).
                         type("text/plain").build();
             }
+        } else if (request.isTracingEnabled()) {
+            traceException(e, r);
         }
 
         setResponse(r);
         this.mappedThrowable = e;
+    }
+
+    private void traceException(Throwable e, Response r) {
+        Response.Status s = Response.Status.fromStatusCode(r.getStatus());
+        Level l = (r.getStatus() >= 500) ? Level.SEVERE : Level.INFO;
+        if (s != null) {
+            LOGGER.log(l,
+                    "Mapped exception to response: " + r.getStatus() + " (" + s.getReasonPhrase() + ")",
+                    e);
+        } else {
+            LOGGER.log(l,
+                    "Mapped exception to response: " + r.getStatus(),
+                    e);
+        }
     }
 
     // HttpResponseContext

@@ -37,6 +37,7 @@
 
 package com.sun.jersey.api.core;
 
+import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.spi.container.ContainerListener;
@@ -152,12 +153,19 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * debugging when the application is not behaving as expected either
      * because of a bug in the application code or in the Jersey code.
      * <p>
-     * Trace messages will be output as response headers
+     * Trace messages will be primarily output as response headers
      * with a header name of the form "X-Jersey-Trace-XXX", where XXX is a
      * decimal value corresponding to the trace message number, and a header
      * value that is the trace message.
      * <p>
+     * In certain cases trace messages will be logged on the server-side if such
+     * messages are not suitable as response headers, for example
+     * if such messages are too verbose.
+     * <p>
      * Trace messages will be output in the same order as traces occur.
+     * <p>
+     * To log response header trace messages on the server-side enable response
+     * logging, see {@link LoggingFilter}.
      * <p>
      * The default value is false.
      */
@@ -175,12 +183,19 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * Trace messages will be output if a request header is present with a
      * header name of "X-Jersey-Trace-Accept" (the header value is ignored).
      * <p>
-     * Trace messages will be output as response headers
+     * Trace messages will be primarily output as response headers
      * with a header name of the form "X-Jersey-Trace-XXX", where XXX is a
      * decimal value corresponding to the trace message number, and a header
      * value that is the trace message.
      * <p>
+     * In certain cases trace messages will be logged on the server-side if such
+     * messages are not suitable as response headers, for example
+     * if such messages are too verbose.
+     * <p>
      * Trace messages will be output in the same order as traces occur.
+     * <p>
+     * To log response header trace messages on the server-side enable response
+     * logging, see {@link LoggingFilter}.
      * <p>
      * The default value is false.
      */
