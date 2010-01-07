@@ -69,6 +69,10 @@ public class UriComponent {
          */
         SCHEME,
         /**
+         * The URI authority component type.
+         */
+        AUTHORITY,
+        /**
          * The URI user info component type.
          */
         USER_INFO,
@@ -345,6 +349,8 @@ public class UriComponent {
         tables[Type.USER_INFO.ordinal()] = creatingEncodingTable(l);
 
         l.add("@");
+
+        tables[Type.AUTHORITY.ordinal()] = creatingEncodingTable(l);
 
         tables[Type.PATH_SEGMENT.ordinal()] = creatingEncodingTable(l);
         tables[Type.PATH_SEGMENT.ordinal()][';'] = false;

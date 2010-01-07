@@ -60,6 +60,8 @@ public class UriBuilderImpl extends UriBuilder {
     private String scheme;
     
     private String ssp;
+
+    private String authority;
     
     private String userInfo;
     
@@ -123,9 +125,20 @@ public class UriBuilderImpl extends UriBuilder {
         }
 
         ssp = null;
-        if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
-        if (uri.getHost() != null) host = uri.getHost();
-        if (uri.getPort() != -1) port = uri.getPort();
+        if (uri.getRawAuthority() != null) {
+            if (uri.getRawUserInfo() == null && uri.getHost() == null && uri.getPort() == -1) {
+                authority = uri.getRawAuthority();
+                userInfo = null;
+                host = null;
+                port = -1;
+            } else {
+                authority = null;
+                if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
+                if (uri.getHost() != null) host = uri.getHost();
+                if (uri.getPort() != -1) port = uri.getPort();
+            }
+        }
+
         if (uri.getRawPath() != null && uri.getRawPath().length() > 0) {
             path.setLength(0);
             path.append(uri.getRawPath());
@@ -168,11 +181,24 @@ public class UriBuilderImpl extends UriBuilder {
             this.ssp = uri.getRawSchemeSpecificPart();
         } else {
             this.ssp = null;
-            userInfo = uri.getRawUserInfo();
-            host = uri.getHost();
-            port = uri.getPort();
+            
+            if (uri.getRawAuthority() != null) {
+                if (uri.getRawUserInfo() == null && uri.getHost() == null && uri.getPort() == -1) {
+                    authority = uri.getRawAuthority();
+                    userInfo = null;
+                    host = null;
+                    port = -1;
+                } else {
+                    authority = null;
+                    userInfo = uri.getRawUserInfo();
+                    host = uri.getHost();
+                    port = uri.getPort();
+                }
+            }
+            
             path.setLength(0);
             path.append(replaceNull(uri.getRawPath()));
+
             query.setLength(0);
             query.append(replaceNull(uri.getRawQuery()));
         }
@@ -539,7 +565,8 @@ public class UriBuilderImpl extends UriBuilder {
         encodeMatrix();
         encodeQuery();
         
-        String uri = UriTemplate.createURI(scheme, 
+        String uri = UriTemplate.createURI(
+                scheme, authority,
                 userInfo, host, (port != -1) ? String.valueOf(port) : null,
                 path.toString(), query.toString(), fragment, values, encode);
         return createURI(uri);        
@@ -565,7 +592,8 @@ public class UriBuilderImpl extends UriBuilder {
         encodeMatrix();
         encodeQuery();
 
-        String uri = UriTemplate.createURI(scheme,
+        String uri = UriTemplate.createURI(
+                scheme, authority,
                 userInfo, host, (port != -1) ? String.valueOf(port) : null,
                 path.toString(), query.toString(), fragment, values, encode);
         return createURI(uri);
@@ -594,6 +622,8 @@ public class UriBuilderImpl extends UriBuilder {
                 }
 
                 if (port != -1) sb.append(':').append(port);
+            } else if (authority != null) {
+                sb.append("//").append(authority);
             }
 
             if (path.length() > 0) {

@@ -1,4 +1,8 @@
 release 1.1.5 (2010)
+- Fixed issue 456
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=456
+  UriBuilder can be built from URIs whose authority component is a
+  registry based naming authority.
 - When tracing is enabled exceptions that are mapped to responses will be
   logged.
 - Added formatted support when JSON with natural notation is used

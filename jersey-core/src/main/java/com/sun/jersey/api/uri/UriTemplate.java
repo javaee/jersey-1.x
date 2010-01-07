@@ -490,16 +490,47 @@ public class UriTemplate {
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
             final Map<String, ? extends Object> values, final boolean encode) {
+        return createURI(scheme, null, userInfo, host, port, path, query, fragment,
+                values, encode);
+    }
+    
+    /**
+     * Construct a URI from the component parts each of which may contain
+     * template variables.
+     * <p>
+     * A template values is an Object instance MUST support the toString()
+     * method to convert the template value to a String instance.
+     *
+     * @param scheme the URI scheme component
+     * @param authority the URI authority component
+     * @param userInfo the URI user info component
+     * @param host the URI host component
+     * @param port the URI port component
+     * @param path the URI path component
+     * @param query the URI query componnet
+     * @param fragment the URI fragment component
+     * @param values the template variable to value map
+     * @param encode if true encode a template value according to the correspond
+     *        component type of the associated template variable, otherwise
+     *        contextually encode the template value
+     * @return a URI
+     */
+    public final static String createURI(
+            final String scheme, String authority,
+            final String userInfo, final String host, final String port,
+            final String path, final String query, final String fragment,
+            final Map<String, ? extends Object> values, final boolean encode) {
         Map<String, String> stringValues = new HashMap<String, String>();
         for (Map.Entry<String, ? extends Object> e : values.entrySet()) {
             if (e.getValue() != null)
                 stringValues.put(e.getKey(), e.getValue().toString());
         }
-        
-        return createURIWithStringValues(scheme, userInfo, host, port, path, query, fragment, 
+
+        return createURIWithStringValues(scheme, authority,
+                userInfo, host, port, path, query, fragment,
                 stringValues, encode);
     }
-    
+
     /**
      * Construct a URI from the component parts each of which may contain 
      * template variables.
@@ -524,20 +555,51 @@ public class UriTemplate {
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
             final Map<String, ? extends Object> values, final boolean encode) {
-        
+        return createURIWithStringValues(scheme, null,
+                userInfo, host, port, path, query, fragment,
+                values, encode);
+    }
+    
+    /**
+     * Construct a URI from the component parts each of which may contain
+     * template variables.
+     * <p>
+     * A template value is an Object instance that MUST support the toString()
+     * method to convert the template value to a String instance.
+     *
+     * @param scheme the URI scheme component
+     * @param authority the URI authority info component
+     * @param userInfo the URI user info component
+     * @param host the URI host component
+     * @param port the URI port component
+     * @param path the URI path component
+     * @param query the URI query componnet
+     * @param fragment the URI fragment component
+     * @param values the template variable to value map
+     * @param encode if true encode a template value according to the correspond
+     *        component type of the associated template variable, otherwise
+     *        contextually encode the template value
+     * @return a URI
+     */
+    public final static String createURIWithStringValues(
+            final String scheme, final String authority,
+            final String userInfo, final String host, final String port,
+            final String path, final String query, final String fragment,
+            final Map<String, ? extends Object> values, final boolean encode) {
+
         StringBuilder sb = new StringBuilder();
-        
+
         if (scheme != null)
             createURIComponent(UriComponent.Type.SCHEME, scheme, values, false, sb).
                     append(':');
-        
+
         if (userInfo != null || host != null || port != null) {
             sb.append("//");
-            
-            if (userInfo != null && userInfo.length() > 0) 
+
+            if (userInfo != null && userInfo.length() > 0)
                 createURIComponent(UriComponent.Type.USER_INFO, userInfo, values, encode, sb).
                     append('@');
-            
+
             if (host != null) {
                 // TODO check IPv6 address
                 createURIComponent(UriComponent.Type.HOST, host, values, encode, sb);
@@ -545,25 +607,29 @@ public class UriTemplate {
 
             if (port != null && port.length() > 0) {
                 sb.append(':');
-                createURIComponent(UriComponent.Type.PORT, port, values, false, sb);                
+                createURIComponent(UriComponent.Type.PORT, port, values, false, sb);
             }
+        } else if (authority != null) {
+            sb.append("//");
+            
+            createURIComponent(UriComponent.Type.AUTHORITY, authority, values, encode, sb);
         }
 
         if (path != null)
-            createURIComponent(UriComponent.Type.PATH, path, values, encode, sb);                
-        
+            createURIComponent(UriComponent.Type.PATH, path, values, encode, sb);
+
         if (query != null && query.length() > 0) {
             sb.append('?');
             createURIComponent(UriComponent.Type.QUERY_PARAM, query, values, encode, sb);
         }
-         
+
         if (fragment != null && fragment.length() > 0) {
             sb.append('#');
             createURIComponent(UriComponent.Type.FRAGMENT, fragment, values, encode, sb);
         }
         return sb.toString();
     }
-    
+
     private static StringBuilder createURIComponent(final UriComponent.Type t, 
             String template,
             final Map<String, ? extends Object> values, 
@@ -622,17 +688,51 @@ public class UriTemplate {
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
             final Object[] values, final boolean encode) {
+        return createURI(scheme, null,
+                userInfo, host, port, path, query, fragment,
+                values, encode);
+    }
+    
+    /**
+     * Construct a URI from the component parts each of which may contain
+     * template variables.
+     * <p>
+     * The template values are an array of Object and each Object instance
+     * MUST support the toString() method to convert the template value to
+     * a String instance.
+     *
+     * @param scheme the URI scheme component
+     * @param authority the URI authority component
+     * @param userInfo the URI user info component
+     * @param host the URI host component
+     * @param port the URI port component
+     * @param path the URI path component
+     * @param query the URI query componnet
+     * @param fragment the URI fragment component
+     * @param values the array of template values
+     * @param encode if true encode a template value according to the correspond
+     *        component type of the associated template variable, otherwise
+     *        contextually encode the template value
+     * @return a URI
+     */
+    public final static String createURI(
+            final String scheme, String authority,
+            final String userInfo, final String host, final String port,
+            final String path, final String query, final String fragment,
+            final Object[] values, final boolean encode) {
 
         String[] stringValues = new String[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] != null)
                 stringValues[i] = values[i].toString();
         }
-        
-        return createURIWithStringValues(scheme, userInfo, host, port, path, query, fragment,
+
+        return createURIWithStringValues(
+                scheme, authority,
+                userInfo, host, port, path, query, fragment,
                 stringValues, encode);
     }
-    
+
     /**
      * Construct a URI from the component parts each of which may contain 
      * template variables.
@@ -654,43 +754,77 @@ public class UriTemplate {
             final String userInfo, final String host, final String port, 
             final String path, final String query, final String fragment,
             final String[] values, final boolean encode) {
-        
+        return createURIWithStringValues(
+                scheme, null,
+                userInfo, host, port, path, query, fragment,
+                values, encode);
+    }
+    
+    /**
+     * Construct a URI from the component parts each of which may contain
+     * template variables.
+     *
+     * @param scheme the URI scheme component
+     * @param authority the URI authority component
+     * @param userInfo the URI user info component
+     * @param host the URI host component
+     * @param port the URI port component
+     * @param path the URI path component
+     * @param query the URI query componnet
+     * @param fragment the URI fragment component
+     * @param values the array of template values
+     * @param encode if true encode a template value according to the correspond
+     *        component type of the associated template variable, otherwise
+     *        contextually encode the template value
+     * @return a URI
+     */
+    public final static String createURIWithStringValues(
+            final String scheme, final String authority,
+            final String userInfo, final String host, final String port,
+            final String path, final String query, final String fragment,
+            final String[] values, final boolean encode) {
+
         final Map<String, String> mapValues = new HashMap<String, String>();
         final StringBuilder sb = new StringBuilder();
         int offset = 0;
-        
+
         if (scheme != null) {
-            offset = createURIComponent(UriComponent.Type.SCHEME, scheme, values, 
+            offset = createURIComponent(UriComponent.Type.SCHEME, scheme, values,
                     offset, false, mapValues, sb);
             sb.append(':');
         }
-        
+
         if (userInfo != null || host != null || port != null) {
             sb.append("//");
-            
+
             if (userInfo != null && userInfo.length() > 0) {
-                offset = createURIComponent(UriComponent.Type.USER_INFO, userInfo, values, 
+                offset = createURIComponent(UriComponent.Type.USER_INFO, userInfo, values,
                         offset, encode, mapValues, sb);
                 sb.append('@');
             }
-            
+
             if (host != null) {
                 // TODO check IPv6 address
-                offset = createURIComponent(UriComponent.Type.HOST, host, values, 
+                offset = createURIComponent(UriComponent.Type.HOST, host, values,
                         offset, encode, mapValues, sb);
             }
 
             if (port != null && port.length() > 0) {
                 sb.append(':');
-                offset = createURIComponent(UriComponent.Type.PORT, port, values, 
+                offset = createURIComponent(UriComponent.Type.PORT, port, values,
                         offset, false, mapValues, sb);
             }
+        } else if (authority != null) {
+            sb.append("//");
+            
+            offset = createURIComponent(UriComponent.Type.AUTHORITY, authority, values,
+                    offset, encode, mapValues, sb);
         }
 
         if (path != null)
-            offset = createURIComponent(UriComponent.Type.PATH, path, values, 
+            offset = createURIComponent(UriComponent.Type.PATH, path, values,
                     offset, encode, mapValues, sb);
-        
+
         if (query != null && query.length() > 0) {
             sb.append('?');
             offset = createURIComponent(UriComponent.Type.QUERY_PARAM, query, values,
@@ -704,7 +838,7 @@ public class UriTemplate {
         }
         return sb.toString();
     }
-    
+
     private static int createURIComponent(final UriComponent.Type t, 
             String template,
             final String[] values, final int offset,

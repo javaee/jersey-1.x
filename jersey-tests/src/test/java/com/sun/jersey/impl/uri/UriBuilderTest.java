@@ -86,6 +86,24 @@ public class UriBuilderTest extends TestCase {
         assertEquals(URI.create("http://localhost:8080/a/b/c/d"), bu);
     }
 
+    public void testNameAuthorityUri() {
+        URI bu = UriBuilder.fromUri("http://x_y/a/b/c").build();
+        assertEquals(URI.create("http://x_y/a/b/c"), bu);
+    }
+
+    public void testReplaceNameAuthorityUriWithHost() {
+        URI bu = UriBuilder.fromUri("http://x_y.com/a/b/c").host("xy.com").build();
+        assertEquals(URI.create("http://xy.com/a/b/c"), bu);
+    }
+
+    public void testReplaceNameAuthorityUriWithSSP() {
+        URI bu = UriBuilder.fromUri("http://x_y.com/a/b/c").schemeSpecificPart("//xy.com/a/b/c").build();
+        assertEquals(URI.create("http://xy.com/a/b/c"), bu);
+
+        bu = UriBuilder.fromUri("http://x_y.com/a/b/c").schemeSpecificPart("//v_w.com/a/b/c").build();
+        assertEquals(URI.create("http://v_w.com/a/b/c"), bu);
+    }
+
     public void testReplaceUserInfo() {
         URI bu = UriBuilder.fromUri("http://bob@localhost:8080/a/b/c").
                 userInfo("sue").build();
@@ -569,6 +587,20 @@ public class UriBuilderTest extends TestCase {
         bu = UriBuilder.fromUri("http://localhost:8080/a/b/c").
                 path("/{foo}/{bar}/{baz}/{foo}").buildFromMap(m);
         assertEquals(URI.create("http://localhost:8080/a/b/c/x/y/z/x"), bu);
+    }
+
+    public void testBuildTemplatesWithNameAuthority() {
+        URI bu = UriBuilder.fromUri("http://x_y.com:8080/a/b/c").
+                path("/{foo}/{bar}/{baz}/{foo}").build("x", "y", "z");
+        assertEquals(URI.create("http://x_y.com:8080/a/b/c/x/y/z/x"), bu);
+
+        Map<String, Object> m = new HashMap<String, Object>();
+        m.put("foo", "x");
+        m.put("bar", "y");
+        m.put("baz", "z");
+        bu = UriBuilder.fromUri("http://x_y.com:8080/a/b/c").
+                path("/{foo}/{bar}/{baz}/{foo}").buildFromMap(m);
+        assertEquals(URI.create("http://x_y.com:8080/a/b/c/x/y/z/x"), bu);
     }
 
     public void testBuildFromMap() {
