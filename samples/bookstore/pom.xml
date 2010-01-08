@@ -65,19 +65,18 @@
             <scope>compile</scope>
         </dependency>
         <!-- the following two dependencies can be removed once the
-             latest embedded GF is used -->
+             latest embedded GF is used
         <dependency>
             <groupId>taglibs</groupId>
             <artifactId>standard</artifactId>
             <version>1.1.2</version>
-        </dependency>
+        </dependency> -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-test-framework</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <!--
+        </dependency> <!--
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -133,10 +132,17 @@
                 </configuration>
             </plugin>
 
-            <!-- Run the application using "mvn glassfish:run" -->
+            <!-- Run the application using "mvn embedded-glassfish:run" -->
             <plugin>
                 <groupId>org.glassfish</groupId>
-                <artifactId>maven-glassfish-plugin</artifactId>
+                <artifactId>maven-embedded-glassfish-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <goalPrefix>embedded-glassfish</goalPrefix>
+                    <app>${basedir}/target/bookstore.war</app>
+                    <autoDelete>true</autoDelete>
+                    <port>8080</port>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -202,6 +208,11 @@
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven2-glassfish-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/glassfish/</url>
         </pluginRepository>
         <pluginRepository>
             <id>maven-repository.dev.java.net</id>

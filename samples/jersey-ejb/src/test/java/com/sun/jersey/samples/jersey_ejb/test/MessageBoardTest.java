@@ -10,9 +10,12 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import java.net.URI;
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import java.net.URI;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -36,7 +39,8 @@ public class MessageBoardTest extends JerseyTest {
         WebResource webResource = resource();
         ClientResponse response = webResource.path("app/messages").post(ClientResponse.class, "hello world!");
 
-        assertTrue(response.getClientResponseStatus() == ClientResponse.Status.CREATED);
+        assertTrue("Response status should be CREATED. Current value is \"" + response.getClientResponseStatus() + "\"",
+                response.getClientResponseStatus() == ClientResponse.Status.CREATED);
 
 
 
