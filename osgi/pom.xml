@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.sun.jersey.osgi</groupId>
+    <artifactId>jersey-osgi-project</artifactId>
+    <version>1.1.5-ea-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>jersey-project : osgified</name>
+    <description>
+        Jersey is the open source (under dual CDDL+GPL license) JAX-RS (JSR 311)
+        production quality Reference Implementation for building
+        RESTful Web services.
+    </description>
+    <url>https://jersey.dev.java.net/</url>
+    <organization>
+        <name>Sun Microsystems, Inc</name>
+        <url>http://www.sun.com/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>
+                CDDL+GPL License
+            </name>
+            <url>https://jersey.dev.java.net/CDDL+GPL.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <modules>
+        <module>jsr250-api</module>
+        <module>jsr311-api</module>
+        <module>jersey-core</module>
+        <module>jersey-server</module>
+        <module>jersey-client</module>
+        <module>jersey-json</module>
+        <module>tests</module>
+    </modules>
+   
+</project>
