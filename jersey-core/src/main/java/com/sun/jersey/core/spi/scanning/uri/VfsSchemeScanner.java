@@ -39,7 +39,9 @@ package com.sun.jersey.core.spi.scanning.uri;
 import com.sun.jersey.core.spi.scanning.JarFileScanner;
 import com.sun.jersey.core.spi.scanning.ScannerException;
 import com.sun.jersey.core.spi.scanning.ScannerListener;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
@@ -67,14 +69,48 @@ public class VfsSchemeScanner implements UriSchemeScanner {
                     sl);
         } else {
             final String su = u.toString();
-            final int i = su.indexOf("/WEB-INF/classes");
-            if (i != -1) {
-                final String war = su.substring(0, i).replace("vfszip", "file");
-                final String path = su.substring(i + 1);
-                try {
-                    JarFileScanner.scan(new URL(war).openStream(), path, sl);
-                } catch (IOException ex) {
-                    throw new ScannerException("IO error when scanning war " + u, ex);
+            final int webInfIndex = su.indexOf("/WEB-INF/classes");
+            if (webInfIndex != -1) {
+                final String war = su.substring(0, webInfIndex);
+                final String path = su.substring(webInfIndex + 1);
+
+                final int warParentIndex = war.lastIndexOf('/');
+                final String warParent = su.substring(0, warParentIndex);
+
+                // Check is there is a war within an ear
+                // If so we need to load the ear then obtain the InputStream
+                // of the entry to the war
+                if (warParent.endsWith(".ear")) {
+                    final String warName = su.substring(warParentIndex + 1, war.length());
+                    try {
+                        JarFileScanner.scan(new URL(warParent.replace("vfszip", "file")).openStream(), "",
+                                new ScannerListener() {
+                            public boolean onAccept(String name) {
+                                return name.equals(warName);
+                            }
+
+                            public void onProcess(String name, InputStream in) throws IOException {
+                                // This is required so that the underlying ear
+                                // is not closed
+                                in = new FilterInputStream(in) {
+                                    public void close() throws IOException {};
+                                };
+                                try {
+                                    JarFileScanner.scan(in, path, sl);
+                                } catch (IOException ex) {
+                                    throw new ScannerException("IO error when scanning war " + u, ex);
+                                }
+                            }
+                        });
+                    } catch (IOException ex) {
+                        throw new ScannerException("IO error when scanning war " + u, ex);
+                    }
+                } else {
+                    try {
+                        JarFileScanner.scan(new URL(war.replace("vfszip", "file")).openStream(), path, sl);
+                    } catch (IOException ex) {
+                        throw new ScannerException("IO error when scanning war " + u, ex);
+                    }
                 }
             } else {
                 try {

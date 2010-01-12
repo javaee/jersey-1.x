@@ -1,4 +1,8 @@
 release 1.1.5 (2010)
+- Fixed issue 454
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=454
+  Scanning of classes WEB-INF/classes in a war in ear now works for JBoss 5.x
+  deployments.
 - Fixed issue 456
   https://jersey.dev.java.net/issues/show_bug.cgi?id=456
   UriBuilder can be built from URIs whose authority component is a
