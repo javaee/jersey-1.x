@@ -55,8 +55,6 @@ public class CacheControlImplTest extends TestCase {
      * Test of toString method, of class com.sun.jersey.api.response.CacheControl.
      */
     public void testToString() {
-        System.out.println("toString");
-        
         CacheControlProvider p = new CacheControlProvider();
         CacheControl instance = new CacheControl();
         
@@ -106,4 +104,35 @@ public class CacheControlImplTest extends TestCase {
         assertEquals(expResult, result);
         
     }
-}
+
+
+    public void testRoundTrip() {
+        _testRoundTrip("no-cache, no-transform");
+        _testRoundTrip("no-cache, no-store, no-transform");
+        _testRoundTrip("private, no-cache, no-store, no-transform");
+        _testRoundTrip("private=\"Fred\", no-cache, no-store, no-transform");
+        _testRoundTrip("private=\"Fred, Bob\", no-cache, no-store, no-transform");
+        _testRoundTrip("no-transform, key1=value1");
+        _testRoundTrip("no-transform, key1=\"value1 with spaces\"");
+        _testRoundTrip("no-store, no-transform, key1=\"value1 with spaces\"");
+        _testRoundTrip("no-transform, key1");
+        _testRoundTrip("must-revalidate, proxy-revalidate");
+        _testRoundTrip("max-age=1, s-maxage=1");
+    }
+
+    private void _testRoundTrip(String s) {
+        CacheControlProvider p = new CacheControlProvider();
+
+        CacheControl cc1 = p.fromString(s);
+        CacheControl cc2 = p.fromString(cc1.toString());
+        cc2.toString();
+
+        cc1.equals(cc2);
+
+        try {
+            assertEquals(cc1, cc2);
+        } catch (RuntimeException ex) {
+            throw ex;
+        }
+    }
+ }

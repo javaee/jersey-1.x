@@ -54,9 +54,6 @@ public class FormDataContentDispositionTest
         contentDispositionType = "form-data";
     }
 
-    /**
-     * Test of toString method, of class com.sun.jersey.api.response.CacheControl.
-     */
     @Override
     public void testCreate() {
         System.out.println("create");
@@ -117,9 +114,6 @@ public class FormDataContentDispositionTest
         }
     }
 
-    /**
-     * Test of toString method, of class com.sun.jersey.api.response.CacheControl.
-     */
     @Override
     public void testToString() {
         Date date = new Date();

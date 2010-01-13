@@ -37,7 +37,10 @@
 
 package com.sun.jersey.core.impl.provider.header;
 
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.spi.HeaderDelegateProvider;
+import java.text.ParseException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -49,7 +52,9 @@ import javax.ws.rs.core.CacheControl;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class CacheControlProvider implements HeaderDelegateProvider<CacheControl> {
-    private static Pattern WHITESPACE = Pattern.compile("\\s");
+    private static final Pattern WHITESPACE = Pattern.compile("\\s");
+    
+    private static final Pattern COMMA_SEPARATED_LIST = Pattern.compile("[\\s]*,[\\s]*");
     
     public boolean supports(Class<?> type) {
         return type == CacheControl.class;
@@ -81,11 +86,81 @@ public final class CacheControlProvider implements HeaderDelegateProvider<CacheC
         return b.toString();        
     }
 
+    private void readFieldNames(List<String> fieldNames, HttpHeaderReader reader, String directiveName)
+            throws ParseException {
+        if (!reader.hasNextSeparator('=', false))
+            return;
+        reader.nextSeparator('=');
+        fieldNames.addAll(Arrays.asList(COMMA_SEPARATED_LIST.split(reader.nextQuotedString())));
+        return;
+    }
+
+    private int readIntValue(HttpHeaderReader reader, String directiveName)
+            throws ParseException {
+        reader.nextSeparator('=');
+        int index = reader.getIndex();
+        try {
+            return Integer.parseInt(reader.nextToken());
+        } catch (NumberFormatException nfe) {
+            ParseException pe = new ParseException(
+                    "Error parsing integer value for " + directiveName + " directive", index);
+            pe.initCause(nfe);
+            throw pe;
+        }
+    }
+
+    private void readDirective(CacheControl cacheControl,
+            HttpHeaderReader reader) throws ParseException {
+        String directiveName = reader.nextToken();
+        if (directiveName.equalsIgnoreCase("private")) {
+            cacheControl.setPrivate(true);
+            readFieldNames(cacheControl.getPrivateFields(), reader, directiveName);
+        } else if (directiveName.equalsIgnoreCase("public")) {
+            // CacheControl API doesn't support 'public' for some reason.
+            cacheControl.getCacheExtension().put(directiveName, null);
+        } else if (directiveName.equalsIgnoreCase("no-cache")) {
+            cacheControl.setNoCache(true);
+            readFieldNames(cacheControl.getNoCacheFields(), reader, directiveName);
+        } else if (directiveName.equalsIgnoreCase("no-store")) {
+            cacheControl.setNoStore(true);
+        } else if (directiveName.equalsIgnoreCase("no-transform")) {
+            cacheControl.setNoTransform(true);
+        } else if (directiveName.equalsIgnoreCase("must-revalidate")) {
+            cacheControl.setMustRevalidate(true);
+        } else if (directiveName.equalsIgnoreCase("proxy-revalidate")) {
+            cacheControl.setProxyRevalidate(true);
+        } else if (directiveName.equalsIgnoreCase("max-age")) {
+            cacheControl.setMaxAge(readIntValue(reader, directiveName));
+        } else if (directiveName.equalsIgnoreCase("s-maxage")) {
+            cacheControl.setSMaxAge(readIntValue(reader, directiveName));
+        } else {
+            String value = null;
+            if (reader.hasNextSeparator('=', false)) {
+                reader.nextSeparator('=');
+                value = reader.nextTokenOrQuotedString();
+            }
+            cacheControl.getCacheExtension().put(directiveName, value);
+        }
+        return;
+    }
+
     public CacheControl fromString(String header) {
-        throw new UnsupportedOperationException(
-                "The CacheControl type is designed only for Cache-Control response headers. " +
-                "It is not required that such a header be parsed by an end-user application " +
-                "to an instance of CacheControl");
+        if (header == null)
+            throw new IllegalArgumentException("Cache control is null");
+        try {
+            HttpHeaderReader reader = HttpHeaderReader.newInstance(header);
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setNoTransform(false); // defaults to true
+            while (reader.hasNext()) {
+                readDirective(cacheControl, reader);
+                if (reader.hasNextSeparator(',', true))
+                    reader.nextSeparator(',');
+            }
+            return cacheControl;
+        } catch (ParseException pe) {
+            throw new IllegalArgumentException(
+                    "Error parsing cache control '" + header + "'", pe);
+        }
     }
     
     private void appendWithSeparator(StringBuffer b, String field) {

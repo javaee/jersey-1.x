@@ -56,9 +56,6 @@ public class ContentDispositionTest extends TestCase {
         contentDispositionType = "inline";
     }
 
-    /**
-     * Test of toString method, of class com.sun.jersey.api.response.CacheControl.
-     */
     public void testCreate() {
         System.out.println("create");
         ContentDisposition contentDisposition = ContentDisposition.type(null).
@@ -109,9 +106,6 @@ public class ContentDispositionTest extends TestCase {
         }
     }
 
-    /**
-     * Test of toString method, of class com.sun.jersey.api.response.CacheControl.
-     */
     public void testToString() {
         Date date = new Date();
         ContentDisposition contentDisposition = ContentDisposition.type(
