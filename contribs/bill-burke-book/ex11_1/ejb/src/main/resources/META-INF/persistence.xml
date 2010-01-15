@@ -5,21 +5,16 @@
              version="1.0">
 
     <persistence-unit name="tempdb">
-    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-    <!-- Not using default JBoss DataSource -->
-    <!--<jta-data-source>java:/DefaultDS</jta-data-source>-->
-    <jta-data-source>jdbc/__default</jta-data-source>
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+        <!--<jta-data-source>jdbc/__default</jta-data-source>-->
+        <!-- Re-using existing pre-defined *embedded* DataSource -->
+        <jta-data-source>jdbc/__TimerPool</jta-data-source>
         <properties>
-<!--
-      <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
-      <property name="javax.persistence.jdbc.url" value="jdbc:derby:tmpDB;create=true"/>
-      <property name="javax.persistence.jdbc.user" value="APP"/>
-      <property name="javax.persistence.jdbc.password" value="APP"/>
--->
-      <property name="eclipselink.target-database" value="DERBY"/>
-      <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
-      <property name="eclipselink.logging.level" value="FINEST"/>
-      <!--<property name="hibernate.hbm2ddl.auto" value="create-drop"/>-->
+            <!-- use the javadb embedded driver. Remove this line when using jdbc/__default. -->
+            <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver"/>
+            <property name="eclipselink.target-database" value="DERBY"/>
+            <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
+            <property name="eclipselink.logging.level" value="FINE"/>
         </properties>
     </persistence-unit>
 </persistence>
