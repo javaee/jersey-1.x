@@ -46,8 +46,8 @@
             <scope>provided</scope>   <!--Should be part of GlassFish v3-->
         </dependency>
         <dependency>
-            <groupId>javax.ejb</groupId>
-            <artifactId>ejb-api</artifactId>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.ejb</artifactId>
             <version>3.0</version>
             <scope>provided</scope>
         </dependency>
