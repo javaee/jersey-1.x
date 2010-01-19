@@ -56,7 +56,7 @@ public class GlassFishMonitoringInitializer {
                 monitoring.register();
             }
         } catch (ServiceConfigurationError ex) {
-            LOGGER.log(Level.SEVERE, "GlassFish Jersey monitoring could not be enabled. " +
+            LOGGER.log(Level.CONFIG, "GlassFish Jersey monitoring could not be enabled. " +
                     "Processing will continue but montoring is disabled.", ex);
         }
     }
