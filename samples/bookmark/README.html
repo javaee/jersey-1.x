@@ -106,7 +106,7 @@ $AS_HOME/bin/asadmin create-jdbc-resource --connectionpoolid bookmarkPool jdbc/b
 $AS_HOME/bin/asadmin deploy target/bookmark.war
 </pre>
 
-<p><b>Notice:</b> On Windows: you might need to replace asadmin with asadmin.bat.
+<p><b>Notice:</b> <font color="red">On Windows</font>: you might need to replace asadmin with asadmin.bat.
 Also, because it seems there are some issues with copy-pasting backslashes, 
 you will also need to use the following one-liner instead of the above mentioned complex command:
 <pre>
@@ -118,8 +118,7 @@ and make sure you do not miss the backslash (\) in <code>create\=true</code> par
 <h4>Test Client Running</h4>
 
 <pre class="cliSample">
-mvn test -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory\
-    -DenableLogging -DJERSEY_HTTP_PORT=8080 -Ptest
+mvn test -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -DenableLogging -DJERSEY_HTTP_PORT=8080 -Ptest
 </pre>
 
 <h2>TODOs</h2>
