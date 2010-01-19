@@ -77,6 +77,9 @@
         <p>Build and deploy the project by executing maven 2 from the project directory</p>
         <blockquote><code>mvn clean package embedded-glassfish:run</code>
         <p style="color: red">Note: You need at least JDK 1.6 to be able to start embedded Glassfish V3.</p></blockquote>
+
+        <p><b>Notice:</b> Since GlassFish V3 needs Java SE 6, the above will not work with Java SE 5</p>
+
         <p>From a web browser, visit:</p>
         <blockquote><code><a href="http://localhost:8080/jersey-ejb">http://localhost:8080/jersey-ejb</a></code>
         </blockquote>
