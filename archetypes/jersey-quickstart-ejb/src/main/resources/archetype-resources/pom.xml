@@ -48,7 +48,7 @@
     </dependencies>
 
     <properties>
-        <jersey-version>1.1.5-ea-SNAPSHOT</jersey-version>
+        <jersey-version>1.2-SNAPSHOT</jersey-version>
         <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
     </properties>
 
