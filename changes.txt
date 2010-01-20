@@ -1,4 +1,7 @@
-release 1.1.5 (2010)
+release 1.2 (03-2010)
+- 
+
+release 1.1.5 (20-01-2010)
 - Fixed issue 437
   https://jersey.dev.java.net/issues/show_bug.cgi?id=437
   Support the parsing of the Cache-Control header.
