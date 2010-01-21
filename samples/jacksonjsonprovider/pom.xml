@@ -151,5 +151,12 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>${version}</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 </project>
+

@@ -59,6 +59,20 @@ public class MainTest extends JerseyTest {
         assertTrue(responseMsg.contains("[]"));
     }
 
+    @Test
+    public void testJSONPPresent() {
+        WebResource r = resource();
+        String responseMsg = r.path("nonJAXBResource").accept("application/javascript").get(String.class);
+        assertTrue(responseMsg.startsWith("callback("));
+    }
+
+    @Test
+    public void testJSONDoesNotReflectJSONPWrapper() {
+        WebResource r = resource();
+        String responseMsg = r.path("nonJAXBResource").accept("application/json").get(String.class);
+        assertTrue(!responseMsg.contains("jsonSource"));
+    }
+
     /**
      * Test if a WADL document is available at the relative path
      * "application.wadl".

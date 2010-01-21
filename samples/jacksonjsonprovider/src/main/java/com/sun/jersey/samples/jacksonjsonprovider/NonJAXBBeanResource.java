@@ -38,6 +38,7 @@
 
 package com.sun.jersey.samples.jacksonjsonprovider;
 
+import com.sun.jersey.api.json.JSONWithPadding;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -49,10 +50,14 @@ import javax.ws.rs.core.MediaType;
  */
 @Path("/nonJAXBResource")
 public class NonJAXBBeanResource {
-    // the resource JSON representation will be serialized by Jackson JAX-RS provider,
-    // while no XML will be available, as the returned instance is not a JAXB bean
+
     @GET @Produces(MediaType.APPLICATION_JSON)
-    public NonJAXBBean getIt() {
+    public NonJAXBBean getSimpleBean() {
         return new NonJAXBBean();
+    }
+
+    @GET @Produces("application/javascript")
+    public JSONWithPadding getSimpleBeanJSONP() {
+        return new JSONWithPadding(getSimpleBean());
     }
 }
