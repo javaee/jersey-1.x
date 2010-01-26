@@ -16,29 +16,6 @@
         <pax-exam-version>0.6.0</pax-exam-version>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>jdk-1.5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-osgi</artifactId>
-                    <version>2.2-promoted-b59</version>
-                    <scope>provided</scope>
-                </dependency>
-                 <dependency>
-                    <groupId>stax</groupId>
-                    <artifactId>stax-api</artifactId>
-                    <version>1.0.1</version>
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
- 
     <repositories>
         <repository>
             <id>ops4j.releases</id>
@@ -97,8 +74,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.0.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
 

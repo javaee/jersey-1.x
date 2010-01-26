@@ -14,7 +14,6 @@
             <groupId>com.sun.jersey.osgi</groupId>
             <artifactId>jersey-core</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>asm</groupId>
@@ -171,6 +170,7 @@
                             javax.mail.*;resolution:=optional,
                             javax.annotation.security;resolution:=optional,
                             javax.enterprise.*;resolution:=optional,
+                            org.apache.servicemix.specs.locator;resolution:=optional,
                             *
                         </Import-Package>
                     </instructions>
@@ -182,8 +182,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.0.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
 
