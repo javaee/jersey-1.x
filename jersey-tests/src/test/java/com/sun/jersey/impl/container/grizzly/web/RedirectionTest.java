@@ -41,18 +41,21 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.ResourceConfig;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
  * @author Jakub Podlesak (japod at sun dot com)
  */
-public class ContextRedirectionTest extends AbstractGrizzlyWebContainerTester {
+public class RedirectionTest extends AbstractGrizzlyWebContainerTester {
     
-    public ContextRedirectionTest(String testName) {
+    public RedirectionTest(String testName) {
         super(testName, "context");
     }
     
@@ -60,24 +63,22 @@ public class ContextRedirectionTest extends AbstractGrizzlyWebContainerTester {
     public static class Resource {
         
         @GET
-        public String get() {
-            return "GET";
+        public String get(@QueryParam("x") String x) {
+            return "GET" + x;
         }
     }
     
-    public void testNoRedirect() {
-        Map<String, String> initParams = new HashMap<String, String>();
-
-        startServer(initParams, Resource.class);
+    public void testContextNoRedirect() {
+        startServer(Resource.class);
 
         Client c = Client.create();
         c.setFollowRedirects(false);
-        WebResource r = c.resource(getUri().build());
+        WebResource r = c.resource(getUri().queryParam("x", "y").build());
 
-        assertEquals("GET", r.get(String.class));
+        _testNoRedirect(r);
     }
 
-    public void testRedirect() {
+    public void testContextRedirect() {
         Map<String, String> initParams = new HashMap<String, String>();
         initParams.put(ResourceConfig.FEATURE_REDIRECT, "true");
 
@@ -85,9 +86,56 @@ public class ContextRedirectionTest extends AbstractGrizzlyWebContainerTester {
 
         Client c = Client.create();
         c.setFollowRedirects(false);
-        WebResource r = c.resource(getUri().build());
+        WebResource r = c.resource(getUri().queryParam("x", "y").build());
 
+        _testRedirect(r);
+    }
+
+
+    @Path("/")
+    public static class ResourceWithPath {
+
+        @Path("foo/")
+        public Resource get() {
+            return new Resource();
+        }
+    }
+
+    public void testPathNoRedirect() {
+        startServer(ResourceWithPath.class);
+
+        Client c = Client.create();
+        c.setFollowRedirects(false);
+        WebResource r = c.resource(getUri().path("foo").queryParam("x", "y").build());
+
+        _testNoRedirect(r);
+    }
+
+    public void testPathRedirect() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ResourceConfig.FEATURE_REDIRECT, "true");
+
+        startServer(initParams, ResourceWithPath.class);
+
+        Client c = Client.create();
+        c.setFollowRedirects(false);
+        WebResource r = c.resource(getUri().path("foo").queryParam("x", "y").build());
+
+        _testRedirect(r);
+    }
+
+
+
+
+    public void _testNoRedirect(WebResource r) {
+        assertEquals("GETy", r.get(String.class));
+    }
+
+    public void _testRedirect(WebResource r) {
         ClientResponse cr = r.get(ClientResponse.class);
         assertEquals(307, cr.getStatus());
+        URI location = cr.getLocation();
+        assertEquals(UriBuilder.fromUri(r.getURI()).path("/").build(), location);
     }
+
 }

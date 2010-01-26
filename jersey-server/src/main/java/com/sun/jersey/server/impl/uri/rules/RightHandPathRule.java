@@ -156,10 +156,9 @@ public class RightHandPathRule implements UriRule {
         
         response.setResponse(
                 Response.temporaryRedirect(
-                    UriBuilder.fromUri(context.getUriInfo().
-                    getAbsolutePath()).path("/").build()
+                    context.getUriInfo().getRequestUriBuilder().path("/").build()
                 ).build()
-                );
+            );
         return true;
     }
 }

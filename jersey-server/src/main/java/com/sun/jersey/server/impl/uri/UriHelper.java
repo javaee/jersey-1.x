@@ -131,7 +131,6 @@ public final class UriHelper {
     
     
     public static URI normalize(URI u, boolean preserveContdSlashes) {
-        
         if (!u.getRawPath().contains("//")) {
             return u.normalize();
         }
@@ -142,7 +141,6 @@ public final class UriHelper {
             return u;
         }
         
-        UriBuilder ub = UriBuilder.fromUri(u);
-        return ub.replacePath(np).build();
+        return UriBuilder.fromUri(u).replacePath(np).build();
     }
 }
