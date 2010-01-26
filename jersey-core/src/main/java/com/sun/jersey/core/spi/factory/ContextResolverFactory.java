@@ -66,11 +66,13 @@ import javax.ws.rs.ext.ContextResolver;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ContextResolverFactory {
-    private final Map<Type, Map<MediaType, ContextResolver>> resolver;
+    private final Map<Type, Map<MediaType, ContextResolver>> resolver =
+            new HashMap<Type, Map<MediaType, ContextResolver>>(4);
     
-    private final Map<Type, ConcurrentHashMap<MediaType, ContextResolver>> cache;
+    private final Map<Type, ConcurrentHashMap<MediaType, ContextResolver>> cache =
+            new HashMap<Type, ConcurrentHashMap<MediaType, ContextResolver>>(4);
 
-    public ContextResolverFactory(ProviderServices providersServices,
+    public void init(ProviderServices providersServices,
             InjectableProviderFactory ipf) {
         Map<Type, Map<MediaType, List<ContextResolver>>> rs =
                 new HashMap<Type, Map<MediaType, List<ContextResolver>>>();
@@ -101,8 +103,6 @@ public class ContextResolverFactory {
         // Reduce set of two or more context resolvers for same type and
         // media type
         
-        this.resolver = new HashMap<Type, Map<MediaType, ContextResolver>>(4);
-        this.cache = new HashMap<Type, ConcurrentHashMap<MediaType, ContextResolver>>(4);
         for (Map.Entry<Type, Map<MediaType, List<ContextResolver>>> e : rs.entrySet()) {
             Map<MediaType, ContextResolver> mr = new KeyComparatorHashMap<MediaType, ContextResolver>(
                     4, MessageBodyFactory.MEDIA_TYPE_COMPARATOR);

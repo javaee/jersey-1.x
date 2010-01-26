@@ -799,17 +799,15 @@ public final class WebApplicationImpl implements WebApplication {
             providerServices.update(resourceConfig.getProviderClasses(),
                     resourceConfig.getProviderSingletons(), injectableFactory);
         }
-        
-        // Obtain all context resolvers
-        final ContextResolverFactory crf = new ContextResolverFactory(
-                providerServices,
-                injectableFactory);
-        
+            
         // Obtain all the templates
         this.templateContext = new TemplateFactory(providerServices);
         // Allow injection of template context
         injectableFactory.add(new ContextInjectableProvider<TemplateContext>(
                 TemplateContext.class, templateContext));
+
+        // Obtain all context resolvers
+        final ContextResolverFactory crf = new ContextResolverFactory();
 
         // Obtain all the exception mappers
         this.exceptionFactory = new ExceptionMapperFactory();
@@ -846,20 +844,12 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
                 Providers.class, p));
-
-        // Initiate the exception mappers
-        exceptionFactory.init(providerServices);
-        
-        // Initiate message body readers/writers
-        bodyFactory.init();
-
         
         // Obtain all String readers
         this.stringReaderFactory = new StringReaderFactory();
         injectableFactory.add(
                 new ContextInjectableProvider<StringReaderWorkers>(
                 StringReaderWorkers.class, stringReaderFactory));
-        stringReaderFactory.init(providerServices);
 
         MultivaluedParameterExtractorProvider mpep =
                 new MultivaluedParameterExtractorFactory(stringReaderFactory);
@@ -867,7 +857,6 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(
                 new ContextInjectableProvider<MultivaluedParameterExtractorProvider>(
                 MultivaluedParameterExtractorProvider.class, mpep));
-
 
         // Add per-request-based injectable providers
         injectableFactory.add(new CookieParamInjectableProvider(mpep));
@@ -878,8 +867,17 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new QueryParamInjectableProvider(mpep));
         injectableFactory.add(new FormParamInjectableProvider(mpep));
 
-        // Intiate filters
-        filterFactory = new FilterFactory(providerServices, resourceConfig);
+        // Create filter factory
+        filterFactory = new FilterFactory(providerServices);
+
+        // Initiate resource method dispatchers
+        dispatcherFactory = new ResourceMethodDispatcherFactory(providerServices);
+
+        // Initiate the WADL factory
+        this.wadlFactory = new WadlFactory(resourceConfig);
+        
+        // Initiate filter
+        filterFactory.init(resourceConfig);
         if (!resourceConfig.getMediaTypeMappings().isEmpty() ||
                 !resourceConfig.getLanguageMappings().isEmpty()) {
             boolean present = false;
@@ -898,15 +896,23 @@ public final class WebApplicationImpl implements WebApplication {
                         "present in the list of request filters.");
             }
         }
+        
+        // Initiate context resolvers
+        crf.init(providerServices, injectableFactory);
 
-        // Initiate resource method dispatchers
-        this.dispatcherFactory = new ResourceMethodDispatcherFactory(providerServices);
+        // Initiate the exception mappers
+        exceptionFactory.init(providerServices);
+
+        // Initiate message body readers/writers
+        bodyFactory.init();
+
+        // Initiate string readers
+        stringReaderFactory.init(providerServices);
+
 
         // Inject on all components
         cpFactory.injectOnAllComponents();
         cpFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
-        
-        this.wadlFactory = new WadlFactory(resourceConfig);
         
         // Obtain all root resources
         this.rootsRule = new RootResourceClassesRule(processRootResources());

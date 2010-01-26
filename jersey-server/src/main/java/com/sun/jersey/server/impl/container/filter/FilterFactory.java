@@ -57,22 +57,24 @@ public final class FilterFactory {
     private static final Logger LOGGER = Logger.getLogger(FilterFactory.class.getName());
     
     private final ProviderServices providerServices;
-    
+
     private final List<ContainerRequestFilter> requestFilters = new LinkedList<ContainerRequestFilter>();
 
     private final List<ContainerResponseFilter> responseFilters = new LinkedList<ContainerResponseFilter>();
 
     private final List<ResourceFilterFactory> resourceFilterFactories = new LinkedList<ResourceFilterFactory>();
 
-    public FilterFactory(ProviderServices providerServices, ResourceConfig resourceConfig) {
+    public FilterFactory(ProviderServices providerServices) {
         this.providerServices = providerServices;
+    }
 
+    public void init(ResourceConfig resourceConfig) {
         // Initiate request filters
         requestFilters.addAll(getRequestFilters(
                 resourceConfig.getProperty(
                     ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS)));
         requestFilters.addAll(providerServices.getServices(ContainerRequestFilter.class));
-        
+
         // Initiate response filters
         responseFilters.addAll(getResponseFilters(
                 resourceConfig.getProperty(

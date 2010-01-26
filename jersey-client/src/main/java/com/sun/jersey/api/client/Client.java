@@ -209,8 +209,7 @@ public class Client extends Filterable implements ClientHandler {
         injectableFactory.configure(providerServices);
 
         // Obtain all context resolvers
-        final ContextResolverFactory crf = new ContextResolverFactory(providerServices,
-                injectableFactory);
+        final ContextResolverFactory crf = new ContextResolverFactory();
 
         // Obtain all message body readers/writers
         final MessageBodyFactory bodyContext = new MessageBodyFactory(providerServices);
@@ -270,6 +269,9 @@ public class Client extends Filterable implements ClientHandler {
                 return null;
             }
         });
+
+        // Initiate context resolvers
+        crf.init(providerServices, injectableFactory);
 
         // Initiate message body readers/writers
         bodyContext.init();
