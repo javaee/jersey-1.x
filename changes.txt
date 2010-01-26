@@ -1,12 +1,12 @@
 release 1.2 (03-2010)
-- Fixed issue 467
-  https://jersey.dev.java.net/issues/show_bug.cgi?id=467
-  @Inject can be utilized on provider-based classes.
-- Fixed issue 467
+- Fixed issue 459
   https://jersey.dev.java.net/issues/show_bug.cgi?id=459
   A 307 (Temporary redirect) response for a resource which has a path
   ending in '/' has a correct full request URI, including query parameters (if present),
   for the Location header.
+- Fixed issue 467
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=467
+  @Inject can be utilized on provider-based classes.
 
 release 1.1.5 (20-01-2010)
 - Fixed issue 437
