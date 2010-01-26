@@ -2,7 +2,7 @@
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  * 
- * Copyright 1997-2007 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
  * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -171,7 +171,7 @@ public class CharsetTest extends AbstractTypeTester {
         MultivaluedMap<String, String> map = new MultivaluedMapImpl();
 
         map.add("name", "\u00A9 CONTENT \u00FF \u2200 \u22FF");
-        map.add("name", "Š š †");
+        map.add("name", "ï¿½ ï¿½ ï¿½");
         _test(map, FormMultivaluedMapResource.class, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
     }
 
@@ -182,7 +182,7 @@ public class CharsetTest extends AbstractTypeTester {
         Form map = new Form();
 
         map.add("name", "\u00A9 CONTENT \u00FF \u2200 \u22FF");
-        map.add("name", "Š š †");
+        map.add("name", "ï¿½ ï¿½ ï¿½");
         _test(map, FormResource.class, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
     }
 
