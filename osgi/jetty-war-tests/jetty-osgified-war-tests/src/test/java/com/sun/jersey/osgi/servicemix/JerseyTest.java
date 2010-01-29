@@ -18,7 +18,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.container.def.options.VMOption;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
@@ -39,7 +38,7 @@ public class JerseyTest {
 
     @Test
     public void testHello() throws Exception {
-        WebResource r = resource().path("/helloworld");
+        WebResource r = resource().path("/webresources/helloworld");
         String result = r.get(String.class);
 
         System.out.println("RESULT = " + result);
@@ -48,7 +47,7 @@ public class JerseyTest {
 
     @Test
     public void testAnother() throws Exception {
-        WebResource r = resource().path("/another");
+        WebResource r = resource().path("/webresources/another");
         String result = r.get(String.class);
 
         System.out.println("RESULT = " + result);
