@@ -105,6 +105,8 @@ public class WadlGeneratorImpl implements WadlGenerator {
     }
 
     public Param createParam( AbstractResource r, AbstractMethod m, final Parameter p ) {
+        if (p.getSource() == Parameter.Source.UNKNOWN)
+            return null;
         Param wadlParam = new Param();
         wadlParam.setName(p.getSourceName());
 
