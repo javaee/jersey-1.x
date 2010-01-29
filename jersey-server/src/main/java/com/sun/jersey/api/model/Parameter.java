@@ -46,7 +46,7 @@ import java.lang.reflect.Type;
  */
 public class Parameter implements AnnotatedElement {
     
-    public enum Source {ENTITY, QUERY, MATRIX, PATH, COOKIE, HEADER, CONTEXT, UNKNOWN};
+    public enum Source {ENTITY, QUERY, MATRIX, PATH, COOKIE, HEADER, CONTEXT, FORM, UNKNOWN};
     
     private final Annotation[] annotations;
     private final Annotation annotation;

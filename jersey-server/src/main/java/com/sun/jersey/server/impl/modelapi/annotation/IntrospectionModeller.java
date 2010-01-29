@@ -67,6 +67,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
@@ -519,6 +520,16 @@ public class IntrospectionModeller {
 
             public Parameter.Source getSource() {
                 return Parameter.Source.PATH;
+            }
+        });
+        m.put(FormParam.class, new ParamAnnotationHelper<FormParam>() {
+
+            public String getValueOf(FormParam a) {
+                return a.value();
+            }
+
+            public Parameter.Source getSource() {
+                return Parameter.Source.FORM;
             }
         });
         return Collections.unmodifiableMap(m);
