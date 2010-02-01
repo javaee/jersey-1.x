@@ -1,4 +1,9 @@
 release 1.2 (03-2010)
+- Fixed issue 468
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=468
+  If URI canonicalization, and optionally URI normalization is set to true, but
+  redirection is set to false (the default) then the request URI is modified to
+  be the canonicalized, and optionally normalized, URI.
 - Fixed issue 464
   https://jersey.dev.java.net/issues/show_bug.cgi?id=464
   Change the context related methods from private to protected.
