@@ -74,7 +74,8 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             Logger.getLogger(ResourceConfig.class.getName());
     
     /**
-     * If true the request URI will be normalized as specified by 
+     * If true and {@link #FEATURE_CANONICALIZE_URI_PATH} is true then the
+     * request URI will be normalized as specified by
      * {@link java.net.URI#normalize}. If not true the request URI is not
      * modified.
      * <p>
@@ -94,11 +95,10 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             = "com.sun.jersey.config.feature.CanonicalizeURIPath";
     
     /**
-     * If true, and either NORMALIZE_URI or CANONICALIZE_URI_PATH is true, 
-     * and the normalization and/or path canonicalization operations on the
+     * If true, and {@link #CANONICALIZE_URI_PATH} is true,
+     * and the canonicalization/normalization operations on the
      * request URI result in a new URI that is not equal to the request URI,
-     * then the client is (temporarily) redirected to the new URI. Otherwise
-     * the request URI is set to be the new URI.
+     * then the client is (temporarily) redirected to the new URI.
      * <p>
      * If true, and the path value of a {@link javax.ws.rs.Path} annotation ends 
      * in a slash, the request URI path does not end in a '/' and would otherwise

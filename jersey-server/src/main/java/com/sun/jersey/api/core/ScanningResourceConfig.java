@@ -49,7 +49,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
 
 /**
- * A resource configuration that performs scannning to find root resource
+ * A resource configuration that performs scanning to find root resource
  * and provider classes.
  * 
  * @author Paul.Sandoz@Sun.Com

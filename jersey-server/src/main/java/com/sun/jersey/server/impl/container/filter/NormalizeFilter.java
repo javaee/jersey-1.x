@@ -58,10 +58,15 @@ public class NormalizeFilter implements ContainerRequestFilter {
             final URI normalizedUri = UriHelper.normalize(uri,
                     !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
 
-            if (uri != normalizedUri &&
-                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT)) {
-                throw new WebApplicationException(
-                        Response.temporaryRedirect(normalizedUri).build());
+            if (uri != normalizedUri) {
+                if (resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT)) {
+                    throw new WebApplicationException(
+                            Response.temporaryRedirect(normalizedUri).build());
+                } else {
+                    final URI baseUri = UriHelper.normalize(request.getBaseUri(),
+                        !resourceConfig.getFeature(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH));
+                    request.setUris(baseUri, normalizedUri);
+                }
             }
         }
         return request;

@@ -110,6 +110,25 @@ public class CanonicalizationFeatureTest extends AbstractGrizzlyWebContainerTest
                 r.path("dblslashes//customers//").get(String.class));
     }    
     
+    public void testContdSlashesNoRedirect() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ResourceConfig.FEATURE_NORMALIZE_URI, "true");
+        initParams.put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, "false");
+        initParams.put(ResourceConfig.FEATURE_REDIRECT, "false");
+
+        startServer(initParams, TestWebResource.class);
+
+        Client c = Client.create();
+        c.setFollowRedirects(false);
+        WebResource r = c.resource(getUri().
+                path("/test").build());
+
+        assertEquals("http://jersey.dev.java.net",
+                r.path("uri/http://jersey.dev.java.net").get(String.class));
+        assertEquals("customers",
+                r.path("dblslashes//customers//").get(String.class));
+    }
+
     public void testContdSlashesCanonicalize() {        
         Map<String, String> initParams = new HashMap<String, String>();
         initParams.put(ResourceConfig.FEATURE_NORMALIZE_URI, "true");
@@ -127,5 +146,26 @@ public class CanonicalizationFeatureTest extends AbstractGrizzlyWebContainerTest
         URI u = UriBuilder.fromPath("qparam//a")
                 .queryParam("qParam", "val").build();
         assertEquals("val", r.uri(u).get(String.class));
-    }    
+    }
+
+    public void testContdSlashesCanonicalizeNoRedirect() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ResourceConfig.FEATURE_NORMALIZE_URI, "true");
+        initParams.put(ResourceConfig.FEATURE_CANONICALIZE_URI_PATH, "true");
+        initParams.put(ResourceConfig.FEATURE_REDIRECT, "false");
+
+        startServer(initParams, TestWebResource.class);
+
+        Client c = Client.create();
+        c.setFollowRedirects(false);
+        WebResource r = c.resource(getUri().
+                path("/test").build());
+
+        assertEquals("http:/jersey.dev.java.net",
+                r.path("uri/http://jersey.dev.java.net").get(String.class));
+        assertEquals("customers", r.path("slashes//customers//").get(String.class));
+        URI u = UriBuilder.fromPath("qparam//a")
+                .queryParam("qParam", "val").build();
+        assertEquals("val", r.uri(u).get(String.class));
+    }
 }
