@@ -1,4 +1,7 @@
 release 1.2 (03-2010)
+- Fixed issue 464
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=464
+  Change the context related methods from private to protected.
 - Fixed issue 466
   https://jersey.dev.java.net/issues/show_bug.cgi?id=466
   Avoid generation of empty params in WADL.

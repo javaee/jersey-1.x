@@ -103,7 +103,16 @@ public class SpringServlet extends ServletContainer {
         }
     }
 
-    private ConfigurableApplicationContext getContext() {
+    /**
+     * Get the application context.
+     * <p>
+     * If the initialization parameter {@link #CONTEXT_CONFIG_LOCATION}
+     * is present then this method will invoke {@link #getChildContext(java.lang.String) }
+     * otherwise this method will invoke {@link #getDefaultContext() }.
+     *
+     * @return the application context.
+     */
+    protected ConfigurableApplicationContext getContext() {
         final String contextConfigLocation = getWebConfig().getInitParameter(CONTEXT_CONFIG_LOCATION);
         if (contextConfigLocation == null) {
             LOGGER.info("Using default applicationContext");
@@ -114,7 +123,33 @@ public class SpringServlet extends ServletContainer {
         }
     }
 
-    private ConfigurableApplicationContext getChildContext(String contextConfigLocation) {
+    /**
+     * Get the default application context.
+     * <p>
+     * The default application context will be looked up from the servlet
+     * context using {@link WebApplicationContextUtils#getRequiredWebApplicationContext(javax.servlet.ServletContext) }.
+     *
+     * @return the default application context.
+     */
+    protected ConfigurableApplicationContext getDefaultContext() {
+        final WebApplicationContext springWebContext =
+                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        final ConfigurableApplicationContext springContext =
+                (ConfigurableApplicationContext) springWebContext;
+        return springContext;
+    }
+
+    /**
+     * Get the child application context.
+     * <p>
+     * The child application context is created as a child of the default
+     * application context obtained from {@link #getDefaultContext() }.
+     * 
+     * @param contextConfigLocation the location of the child application
+     *        context.
+     * @return the child application context.
+     */
+    protected ConfigurableApplicationContext getChildContext(String contextConfigLocation) {
         final ConfigurableWebApplicationContext ctx = new XmlWebApplicationContext();
         ctx.setParent(getDefaultContext());
         ctx.setServletContext(getServletContext());
@@ -122,13 +157,5 @@ public class SpringServlet extends ServletContainer {
 
         ctx.refresh();
         return ctx;
-    }
-
-    private ConfigurableApplicationContext getDefaultContext() {
-        final WebApplicationContext springWebContext =
-                WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-        final ConfigurableApplicationContext springContext =
-                (ConfigurableApplicationContext) springWebContext;
-        return springContext;
     }
 }
