@@ -69,6 +69,7 @@ public class JerseyTest {
         		
                 // this is how you set the default log level when using pax logging (logProfile)
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
+                systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
                 
                 // define maven repository
                 repositories(
