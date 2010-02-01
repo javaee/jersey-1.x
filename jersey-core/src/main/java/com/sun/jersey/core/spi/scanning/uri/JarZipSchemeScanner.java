@@ -68,7 +68,7 @@ public class JarZipSchemeScanner implements UriSchemeScanner {
             new Closing(new URL(jarUrlString).openStream()).f(new Closing.Closure() {
 
                 public void f(final InputStream in) throws IOException {
-                    JarFileScanner.scan(new URL(jarUrlString).openStream(), parent, cfl);
+                    JarFileScanner.scan(in, parent, cfl);
                 }
             });
         } catch (IOException ex) {
