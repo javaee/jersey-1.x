@@ -232,4 +232,78 @@ public class SignatureTest extends TestCase {
             fail(se.getMessage());
         }
     }
+
+
+   /**
+    * Test a Twitter status update.
+    *
+    * Specifically, this test includes some characters (spaces) in one of the
+    * parameters which were incorrectly encoded (as '+' instead of "%20") with
+    * the original encoding routine.
+    */
+   public void testTwitterSig()
+   {
+       final String TWITTERTEST_SIGNATURE = "yfrn/p/4Hnp+XcwUBVfW0cSgc+o=";
+       final String TWITTERTEST_SIGNATURE_ENC =
+               "yfrn%2Fp%2F4Hnp%2BXcwUBVfW0cSgc%2Bo%3D";
+
+       DummyRequest request = new DummyRequest().requestMethod("POST").
+        requestURL("http://twitter.com/statuses/update.json").
+        parameterValue("status", "Hello Twitter World");
+
+       OAuthParameters params = new OAuthParameters().
+        consumerKey(CONSUMER_KEY).token(ACCESS_TOKEN).
+        signatureMethod(SIGNATURE_METHOD).timestamp(TIMESTAMP).
+        nonce(NONCE).version(VERSION);
+
+       OAuthSecrets secrets =
+               new OAuthSecrets().consumerSecret("kd94hf93k423kf44").
+               tokenSecret("pfkkdhi9sl3r4s00");
+
+       // generate digital signature; ensure it matches the OAuth spec
+       String signature = null;
+
+       try {
+           signature = OAuthSignature.generate(request, params, secrets);
+       }
+       catch (OAuthSignatureException se) {
+           fail(se.getMessage());
+       }
+
+       assertEquals(signature, TWITTERTEST_SIGNATURE);
+
+
+       OAuthParameters saved = (OAuthParameters)params.clone();
+
+       try {
+           // sign the request; clear params; parse params from request;
+           // ensure they match original
+           OAuthSignature.sign(request, params, secrets);
+       }
+       catch (OAuthSignatureException se) {
+           fail(se.getMessage());
+       }
+
+       // signing the request should not have modified the original parameters
+       assertTrue(params.equals(saved));
+       assertTrue(params.getSignature() == null);
+
+       params = new OAuthParameters();
+       params.readRequest(request);
+       assertEquals(params.getConsumerKey(), CONSUMER_KEY);
+       assertEquals(params.getToken(), ACCESS_TOKEN);
+       assertEquals(params.getSignatureMethod(), SIGNATURE_METHOD);
+       assertEquals(params.getTimestamp(), TIMESTAMP);
+       assertEquals(params.getNonce(), NONCE);
+       assertEquals(params.getVersion(), VERSION);
+       assertEquals(params.getSignature(), TWITTERTEST_SIGNATURE);
+
+       try {
+           // verify signature using request that was just signed
+           assertTrue(OAuthSignature.verify(request, params, secrets));
+       }
+       catch (OAuthSignatureException se) {
+           fail(se.getMessage());
+       }
+   }
 }

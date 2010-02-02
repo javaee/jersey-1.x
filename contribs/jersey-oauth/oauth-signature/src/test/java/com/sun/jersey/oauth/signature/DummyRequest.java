@@ -36,10 +36,14 @@
 
 package com.sun.jersey.oauth.signature;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Paul C. Bryan <pbryan@sun.com>
@@ -70,8 +74,13 @@ class DummyRequest implements OAuthRequest {
         return this;
     }
 
-    public String getRequestURL() {
-        return requestURL;
+    public URL getRequestURL() {
+        try {
+            return new URL(requestURL);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(DummyRequest.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 
     public void setRequestURL(String url) {

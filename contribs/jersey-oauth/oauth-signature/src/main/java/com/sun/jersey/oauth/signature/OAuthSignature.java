@@ -36,12 +36,18 @@
 
 package com.sun.jersey.oauth.signature;
 
+import com.sun.jersey.api.uri.UriComponent;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * Class used for processing an OAuth signature (signing or verifying).
@@ -141,7 +147,7 @@ public class OAuthSignature {
 
             // "...parameter names and values are escaped using RFC3986 percent-encoding..."
             if (value != null) {
-                list.add(URLCodec.encode(key) + '=' + URLCodec.encode(value));
+                list.add(UriComponent.encode(key, UriComponent.Type.QUERY) + '=' + UriComponent.encode(value, UriComponent.Type.QUERY));
             }
         }
 
@@ -159,7 +165,7 @@ public class OAuthSignature {
             // "... parameter names and values are escaped using RFC3986 percent-encoding..."
             if (values != null) {
                 for (String value : values) {
-                    list.add(URLCodec.encode(key) + '=' + URLCodec.encode(value));
+                    list.add(UriComponent.encode(key, UriComponent.Type.QUERY) + '=' + UriComponent.encode(value, UriComponent.Type.QUERY));
                 }
             }
         }
@@ -181,27 +187,28 @@ public class OAuthSignature {
     }
 
     /**
-     * Constructs the request URL, per section 9.1.2 of the OAuth 1.0
+     * Constructs the request URI, per section 9.1.2 of the OAuth 1.0
      * specification.
      *
-     * @param request the incoming request construct URL from.
-     * @return the constructed URL.
+     * @param request the incoming request to construct the URI from.
+     * @return the constructed URI.
      */
-    private static String constructRequestURL(OAuthRequest request) throws OAuthSignatureException {
-        URL url;
+    private static URI constructRequestURL(OAuthRequest request) throws OAuthSignatureException {
         try {
-            url = new URL(request.getRequestURL());
-        }
-        catch (MalformedURLException mue) {
+            URL url = request.getRequestURL();
+            if (url == null)
+                throw new OAuthSignatureException();
+            StringBuffer buf = new StringBuffer(url.getProtocol()).append("://").append(url.getHost().toLowerCase());
+            int port = url.getPort();
+            if (port > 0 && port != url.getDefaultPort()) {
+                buf.append(':').append(port);
+            }
+            buf.append(url.getPath());
+            return new URI(buf.toString());
+            
+        } catch (URISyntaxException mue) {
             throw new OAuthSignatureException(mue);
         }
-        StringBuffer buf = new StringBuffer(url.getProtocol()).append("://").append(url.getHost().toLowerCase());
-        int port = url.getPort();
-        if (port > 0 && port != url.getDefaultPort()) {
-            buf.append(':').append(port);
-        }
-        buf.append(url.getPath());
-        return buf.toString();
     }
 
     /**
@@ -214,9 +221,16 @@ public class OAuthSignature {
      */
     private static String elements(OAuthRequest request,
     OAuthParameters params) throws OAuthSignatureException {
-        StringBuffer buf = new StringBuffer(URLCodec.encode(request.getRequestMethod().toUpperCase()));
-        buf.append('&').append(URLCodec.encode(constructRequestURL(request)));
-        buf.append('&').append(URLCodec.encode(normalizeParameters(request, params)));
+        StringBuffer buf = new StringBuffer(request.getRequestMethod().toUpperCase());
+        URI uri = constructRequestURL(request);
+        String tp = uri.getScheme();
+        buf.append('&').append(UriComponent.encode(tp, UriComponent.Type.SCHEME));
+        tp = uri.getAuthority();
+        buf.append("%3A%2F%2F").append(UriComponent.encode(tp, UriComponent.Type.AUTHORITY));
+        tp = uri.getPath();
+        buf.append(UriComponent.encode(tp, UriComponent.Type.PATH_SEGMENT));
+        buf.append('&').append(UriComponent.encode(normalizeParameters(request, params), UriComponent.Type.QUERY_PARAM));
+        System.err.println("--->" + buf);
         return buf.toString();
     }
 

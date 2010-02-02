@@ -36,6 +36,7 @@
 
 package com.sun.jersey.oauth.signature;
 
+import com.sun.jersey.api.uri.UriComponent;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -453,7 +454,7 @@ public class OAuthParameters extends HashMap<String, String> {
                 if (nv.length != 2) {
                     continue;
                 }
-                put(URLCodec.decode(nv[0].trim()), URLCodec.decode(dequote(nv[1].trim())));
+                put(UriComponent.decode(nv[0].trim(), UriComponent.Type.QUERY), UriComponent.decode(dequote(nv[1].trim()), UriComponent.Type.QUERY));
             }
         }
 
@@ -474,8 +475,8 @@ public class OAuthParameters extends HashMap<String, String> {
             if (value == null) {
                 continue;
             }
-            buf.append(comma ? ", " : " ").append(URLCodec.encode(key));
-            buf.append("=\"").append(URLCodec.encode(value)).append('"');
+            buf.append(comma ? ", " : " ").append(UriComponent.encode(key, UriComponent.Type.QUERY));
+            buf.append("=\"").append(UriComponent.encode(value, UriComponent.Type.QUERY)).append('"');
             comma = true;
         }
         request.addHeaderValue(AUTHORIZATION_HEADER, buf.toString());

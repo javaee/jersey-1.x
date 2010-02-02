@@ -36,6 +36,7 @@
 
 package com.sun.jersey.oauth.signature;
 
+import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
@@ -61,7 +62,7 @@ public interface OAuthRequest {
      *
      * @return the request URL.
      */
-    public String getRequestURL();
+    public URL getRequestURL();
 
     /**
      * Returns an {@link Set} of {@link String} objects containing the

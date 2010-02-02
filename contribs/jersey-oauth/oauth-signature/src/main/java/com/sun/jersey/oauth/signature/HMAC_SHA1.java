@@ -36,6 +36,7 @@
 
 package com.sun.jersey.oauth.signature;
 
+import com.sun.jersey.api.uri.UriComponent;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -84,14 +85,14 @@ public class HMAC_SHA1 implements OAuthSignatureMethod {
         // null secrets are interpreted as blank per OAuth specification
         String secret = secrets.getConsumerSecret();
         if (secret != null) {
-            buf.append(URLCodec.encode(secret));
+            buf.append(UriComponent.encode(secret, UriComponent.Type.QUERY));
         }
 
         buf.append('&');
 
         secret = secrets.getTokenSecret();
         if (secret != null) {
-            buf.append(URLCodec.encode(secret));
+            buf.append(UriComponent.encode(secret, UriComponent.Type.QUERY));
         }
 
         byte[] key;
