@@ -36,10 +36,14 @@
 
 package com.sun.jersey.oauth.server;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.oauth.signature.OAuthRequest;
@@ -67,8 +71,13 @@ private HttpRequestContext context;
         return context.getMethod();
     }
 
-    public String getRequestURL() {
-        return context.getAbsolutePath().toString();
+    public URL getRequestURL() {
+        try {
+            return context.getRequestUri().toURL();
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(OAuthServerRequest.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 
     private static Set<String> keys(MultivaluedMap<String, String> mvm) {
@@ -114,4 +123,5 @@ private HttpRequestContext context;
     public void addHeaderValue(String name, String value) throws IllegalStateException {
         throw new IllegalStateException("Modifying OAuthServerRequest unsupported");
     }
+
 }
