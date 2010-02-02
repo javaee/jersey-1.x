@@ -36,15 +36,19 @@
 
 package com.sun.jersey.oauth.client;
 
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Providers;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.oauth.signature.OAuthRequest;
+import java.net.URL;
 
 /**
  * Implements the OAuth signature library Request interface, wrapping a Jersey
@@ -85,9 +89,14 @@ class RequestWrapper implements OAuthRequest {
         return clientRequest.getMethod();
     }
 
-    public String getRequestURL() {
-        final URI uri = clientRequest.getURI();
-        return uri.getScheme() + "://" + uri.getAuthority() + uri.getPath();
+    public URL getRequestURL() {
+        try {
+            final URI uri = clientRequest.getURI();
+            return uri.toURL();
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(RequestWrapper.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 
     public Set<String> getParameterNames() {
