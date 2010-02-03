@@ -193,7 +193,13 @@
             <artifactId>http</artifactId>
             <version>20070405</version>
             <scope>test</scope>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client-hypermedia</artifactId>
+	    <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency>
     </dependencies>
     <build>
         <testResources>
@@ -259,3 +265,4 @@
         </plugins>
     </reporting>
 </project>
+

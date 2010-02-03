@@ -50,7 +50,7 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Param;
 import com.sun.research.ws.wadl.ParamStyle;
-import com.sun.research.ws.wadl.RepresentationType;
+import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
@@ -94,8 +94,8 @@ public class WadlGeneratorImpl implements WadlGenerator {
         return wadlMethod;
     }
 
-    public RepresentationType createRequestRepresentation( AbstractResource r, AbstractResourceMethod m, MediaType mediaType ) {
-        RepresentationType wadlRepresentation = new RepresentationType();
+    public Representation createRequestRepresentation( AbstractResource r, AbstractResourceMethod m, MediaType mediaType ) {
+        Representation wadlRepresentation = new Representation();
         wadlRepresentation.setMediaType(mediaType.toString());
         return wadlRepresentation;
     }
@@ -127,6 +127,12 @@ public class WadlGeneratorImpl implements WadlGenerator {
             case HEADER:
                 wadlParam.setStyle(ParamStyle.HEADER);
                 break;
+	    case COOKIE:
+		// Generates name="Cookie" path="<name>"
+		wadlParam.setStyle(ParamStyle.HEADER);
+		wadlParam.setName("Cookie");
+		wadlParam.setPath(p.getSourceName());
+		break;
             default:
                 break;
         }
@@ -170,19 +176,15 @@ public class WadlGeneratorImpl implements WadlGenerator {
         final Response response = new Response();
 
         for (MediaType mediaType: m.getSupportedOutputTypes()) {
-            RepresentationType wadlRepresentation = createResponseRepresentation( r, m, mediaType );
-            JAXBElement<RepresentationType> element = new JAXBElement<RepresentationType>(
-                    new QName("http://research.sun.com/wadl/2006/10","representation"),
-                    RepresentationType.class,
-                    wadlRepresentation);
-            response.getRepresentationOrFault().add(element);
+            Representation wadlRepresentation = createResponseRepresentation( r, m, mediaType );
+            response.getRepresentation().add(wadlRepresentation);
         }
         
         return response;
     }
 
-    public RepresentationType createResponseRepresentation( AbstractResource r, AbstractResourceMethod m, MediaType mediaType ) {
-        RepresentationType wadlRepresentation = new RepresentationType();
+    public Representation createResponseRepresentation( AbstractResource r, AbstractResourceMethod m, MediaType mediaType ) {
+        Representation wadlRepresentation = new Representation();
         wadlRepresentation.setMediaType(mediaType.toString());
         return wadlRepresentation;
     }

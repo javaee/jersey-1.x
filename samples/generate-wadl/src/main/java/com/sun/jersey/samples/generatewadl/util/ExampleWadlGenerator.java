@@ -56,7 +56,7 @@ import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Doc;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
-import com.sun.research.ws.wadl.RepresentationType;
+import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
@@ -181,7 +181,7 @@ public class ExampleWadlGenerator implements WadlGenerator {
      * @return
      * @see com.sun.jersey.server.impl.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
      */
-    public RepresentationType createRequestRepresentation(
+    public Representation createRequestRepresentation(
             AbstractResource arg0, AbstractResourceMethod arg1, MediaType arg2 ) {
         return _delegate.createRequestRepresentation( arg0, arg1, arg2 );
     }

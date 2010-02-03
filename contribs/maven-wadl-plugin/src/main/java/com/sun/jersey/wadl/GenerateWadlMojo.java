@@ -65,6 +65,7 @@ import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Resources;
 
 /**
  * This mojo generates a wadl file, without the need of a running webapp.<br />
@@ -141,7 +142,9 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
             wadlGenerator.init();
             
             final Application a = createApplication( _packagesResourceConfig, wadlGenerator );
-            a.getResources().setBase( _baseUri );
+            for (Resources rs : a.getResources()) {
+                rs.setBase( _baseUri );
+            }
             
             final JAXBContext c = JAXBContext.newInstance( wadlGenerator.getRequiredJaxbContextPath(), 
                     Thread.currentThread().getContextClassLoader() );
@@ -177,7 +180,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
     // When processing xml that doesn't use namespaces, simply omit the
     // namespace prefix as shown in the third CDataElement below.
         of.setCDataElements(
-                new String[] { "http://research.sun.com/wadl/2006/10^doc",   // <ns1:foo>
+                new String[] { "http://wadl.dev.java.net/2009/02^doc",   // <ns1:foo>
                        "ns2^doc",   // <ns2:bar>
                        "^doc"
                        /*,

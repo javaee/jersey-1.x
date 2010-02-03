@@ -52,6 +52,7 @@ import com.sun.jersey.api.model.Parameterized;
 import com.sun.jersey.api.model.PathValue;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.impl.ImplMessages;
+import com.sun.jersey.core.hypermedia.ContextualActionSet;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -60,6 +61,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -122,6 +124,8 @@ public class IntrospectionModeller {
         workOutSubResourceLocatorsList(resource, methodList, isEncodedAnotOnClass);
 
         workOutPostConstructPreDestroy(resource);
+
+        workOutContextualActionSet(resource);
         
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.finest(ImplMessages.NEW_AR_CREATED_BY_INTROSPECTION_MODELER(
@@ -234,6 +238,17 @@ public class IntrospectionModeller {
                 hasReturnType(void.class)) {
             ReflectionHelper.setAccessibleMethod(m.getMethod());
             resource.getPreDestroyMethods().add(m.getMethod());
+        }
+    }
+
+    private static void workOutContextualActionSet(AbstractResource resource) {
+        final MethodList methodList = new MethodList(resource.getResourceClass(), true);
+        for (AnnotatedMethod m : methodList.
+                hasAnnotation(ContextualActionSet.class).
+                hasNumParams(0).
+                hasReturnType(Set.class)) {
+            ReflectionHelper.setAccessibleMethod(m.getMethod());
+            resource.getContextualActionSetMethods().add(m.getMethod());
         }
     }
 

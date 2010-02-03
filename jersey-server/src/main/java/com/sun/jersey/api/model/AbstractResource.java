@@ -58,6 +58,7 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
     private final List<AbstractSubResourceLocator> subResourceLocators;
     private final List<Method> postConstructMethods;
     private final List<Method> preDestroyMethods;
+    private final List<Method> contextualActionSetMethods;
 
     /**
      * Creates a new instance of AbstractResource
@@ -80,6 +81,7 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
         this.subResourceMethods = new ArrayList<AbstractSubResourceMethod>(4);
         this.postConstructMethods = new ArrayList<Method>(1);
         this.preDestroyMethods = new ArrayList<Method>(1);
+        this.contextualActionSetMethods = new ArrayList<Method>(1);
     }
 
     /**
@@ -101,6 +103,7 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
         this.subResourceLocators = ar.subResourceLocators;
         this.postConstructMethods = ar.postConstructMethods;
         this.preDestroyMethods = ar.preDestroyMethods;
+        this.contextualActionSetMethods = ar.contextualActionSetMethods;
     }
 
     public Class<?> getResourceClass() {
@@ -170,6 +173,13 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
      */
     public List<Method> getPreDestroyMethods() {
         return preDestroyMethods;
+    }
+
+    /**
+     * @return Method annotated with @ContextualActionSet
+     */
+    public List<Method> getContextualActionSetMethods() {
+        return contextualActionSetMethods;
     }
 
     public void accept(AbstractModelVisitor visitor) {

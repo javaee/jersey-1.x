@@ -150,7 +150,7 @@ public abstract class Filterable {
      * 
      * @return the head client handler of the filter chain.
      */
-    protected ClientHandler getHeadHandler() {
+    public ClientHandler getHeadHandler() {
         return head;
     }
 }

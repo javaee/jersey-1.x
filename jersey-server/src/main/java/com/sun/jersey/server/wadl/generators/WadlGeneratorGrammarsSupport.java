@@ -55,7 +55,7 @@ import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Grammars;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
-import com.sun.research.ws.wadl.RepresentationType;
+import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
@@ -204,7 +204,7 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      * @return respresentation type
      * @see com.sun.jersey.server.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
      */
-    public RepresentationType createRequestRepresentation(
+    public Representation createRequestRepresentation(
             AbstractResource ar, AbstractResourceMethod arm, MediaType mt ) {
         return _delegate.createRequestRepresentation( ar, arm, mt );
     }

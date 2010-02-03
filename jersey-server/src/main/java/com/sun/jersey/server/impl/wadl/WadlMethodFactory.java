@@ -53,6 +53,7 @@ import com.sun.jersey.server.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Resource;
+import com.sun.research.ws.wadl.Resources;
 
 /**
  *
@@ -105,16 +106,18 @@ import com.sun.research.ws.wadl.Resource;
             AbstractResource resource, String path, WadlGenerator wadlGenerator) {   
         Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(resource) : 
             new WadlBuilder( wadlGenerator ).generate(resource, path);
-        
-        a.getResources().setBase(info.getBaseUri().toString());
-                
-        final Resource r = a.getResources().getResource().get(0);
-        r.setPath(info.getBaseUri().relativize(
-                info.getAbsolutePath()).toString());
-        
-        // remove path params since path is fixed at this point
-        r.getParam().clear();
-        
+
+        for (Resources rs : a.getResources()) {
+            rs.setBase(info.getBaseUri().toString());
+            
+            final Resource r = rs.getResource().get(0);
+            r.setPath(info.getBaseUri().relativize(
+                    info.getAbsolutePath()).toString());
+
+            // remove path params since path is fixed at this point
+            r.getParam().clear();
+        }
+
         return a;
     }
 }

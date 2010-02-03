@@ -40,6 +40,8 @@ package com.sun.jersey.api.client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
+import com.sun.jersey.core.hypermedia.HypermediaController;
+import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -552,7 +554,6 @@ public class WebResource extends Filterable implements
         }        
     }
     
-    
     private <T> T handle(Class<T> c, ClientRequest ro) throws UniformInterfaceException {
         ClientResponse r = getHeadHandler().handle(ro);
         
@@ -563,7 +564,7 @@ public class WebResource extends Filterable implements
         throw new UniformInterfaceException(r,
                 ro.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
     }
-    
+
     private <T> T handle(GenericType<T> gt, ClientRequest ro) throws UniformInterfaceException {
         ClientResponse r = getHeadHandler().handle(ro);
         
