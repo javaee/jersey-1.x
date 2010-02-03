@@ -1,4 +1,13 @@
 release 1.2 (03-2010)
+- Fixed issue 461
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=461
+  An exception thrown from a resource method that is mapped to a response
+  will have the appropriate Content-Type set, if an entity is present and if not
+  already set from the mapped response, as declared by the @Produces annotation
+  and what the client accepts.
+- Fixed issue 433
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=433
+  OAuth signature calculation works correctly with space characters in the URL.
 - Fixed issue 468
   https://jersey.dev.java.net/issues/show_bug.cgi?id=468
   If URI canonicalization, and optionally URI normalization is set to true, but

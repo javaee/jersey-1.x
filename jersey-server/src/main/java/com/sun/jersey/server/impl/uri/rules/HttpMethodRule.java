@@ -56,6 +56,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -64,6 +65,9 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpMethodRule implements UriRule {
+    public static final String CONTENT_TYPE_PROPERTY =
+            "com.sun.jersey.server.impl.uri.rules.HttpMethodRule.Content-Type";
+
     private final Map<String, ResourceMethodListPair> map;
 
     private final String allow;
@@ -212,8 +216,9 @@ public final class HttpMethodRule implements UriRule {
 
             if (method instanceof ViewResourceMethod) {
                 // Set the content type to the most acceptable
-                if (!m.mSelected.isWildcardType() && !m.mSelected.isWildcardSubtype()) {
-                    response.getHttpHeaders().putSingle("Content-Type", m.mSelected);
+                if (!m.mSelected.isWildcardType() &&
+                        !m.mSelected.isWildcardSubtype()) {
+                    response.getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, m.mSelected);
                 }
 
                 // Allow the view to be processed by the further matching view rule
@@ -256,19 +261,30 @@ public final class HttpMethodRule implements UriRule {
             }
 
             // Dispatch to the resource method
-            method.getDispatcher().dispatch(resource, context);
+            try {
+                method.getDispatcher().dispatch(resource, context);
+            } catch (RuntimeException e) {
+                if (m.rmSelected.isProducesDeclared() &&
+                        !m.mSelected.isWildcardType() &&
+                        !m.mSelected.isWildcardSubtype()) {
+                    context.getProperties().put(CONTENT_TYPE_PROPERTY, m.mSelected);
+                }
+
+                throw e;
+            }
 
             // If the content type is not explicitly set then set it
             // to the selected media type, if a concrete media type
             // and @Produces is declared on the resource method or the resource
             // class
-            Object contentType = response.getHttpHeaders().getFirst("Content-Type");
-            if (contentType == null && method.isProducesDeclared()) {
-                if (!m.mSelected.isWildcardType() && !m.mSelected.isWildcardSubtype()) {
-                    response.getHttpHeaders().putSingle("Content-Type", m.mSelected);
-                }
+            Object contentType = response.getHttpHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
+            if (contentType == null &&
+                    m.rmSelected.isProducesDeclared() &&
+                    !m.mSelected.isWildcardType() &&
+                    !m.mSelected.isWildcardSubtype()) {
+                response.getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, m.mSelected);
             }
-
+            
             return true;
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
             response.setResponse(Responses.unsupportedMediaType().build());

@@ -45,6 +45,7 @@ import com.sun.jersey.api.container.MappableContainerException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -325,4 +326,72 @@ public class ResourceExceptionTest extends AbstractResourceTester {
         }
         assertTrue(caught);
     }
+
+
+    public static class MappedException extends RuntimeException {
+    }
+
+    public static class MappedExceptionMapper implements ExceptionMapper<MappedException> {
+
+        public Response toResponse(MappedException exception) {
+            return Response.ok("CONTENT").build();
+        }
+
+    }
+
+    @Path("/")
+    public static class ProducesResource {
+        @Path("wae")
+        @Produces("application/foo, application/bar")
+        @GET
+        public String getWae() {
+            throw new WebApplicationException(Response.ok("CONTENT").build());
+        }
+
+        @Path("me")
+        @Produces("application/foo, application/bar")
+        @GET
+        public String getMe() {
+            throw new MappedException();
+        }
+
+        @Path("404")
+        @Produces("application/foo, application/bar")
+        @GET
+        public String getNotFound() {
+            throw new NotFoundException();
+        }
+    }
+
+    public void testProduces() {
+        initiateWebApplication(ProducesResource.class,
+                MappedExceptionMapper.class);
+
+        ClientResponse cr = resource("/wae", false).
+                accept("application/foo").
+                get(ClientResponse.class);
+        assertEquals("application/foo", cr.getType().toString());
+
+        cr = resource("/wae", false).
+                accept("application/bar").
+                get(ClientResponse.class);
+        assertEquals("application/bar", cr.getType().toString());
+
+
+        cr = resource("/me", false).
+                accept("application/foo").
+                get(ClientResponse.class);
+        assertEquals("application/foo", cr.getType().toString());
+
+        cr = resource("/me", false).
+                accept("application/bar").
+                get(ClientResponse.class);
+        assertEquals("application/bar", cr.getType().toString());
+
+        cr = resource("/m404", false).
+                accept("application/foo").
+                get(ClientResponse.class);
+        assertEquals(null, cr.getType());
+    }
+
 }

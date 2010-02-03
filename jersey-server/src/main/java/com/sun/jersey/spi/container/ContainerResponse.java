@@ -44,6 +44,7 @@ import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.factory.ResponseBuilderHeaders;
 import com.sun.jersey.core.spi.factory.ResponseImpl;
+import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -249,7 +250,7 @@ public class ContainerResponse implements HttpResponseContext {
                     contentType.isWildcardType() || contentType.isWildcardSubtype())
                 contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
             
-            getHttpHeaders().putSingle("Content-Type", contentType);
+            getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, contentType);
         }
         
         final MessageBodyWriter p = getMessageBodyWorkers().getMessageBodyWriter(
@@ -273,7 +274,7 @@ public class ContainerResponse implements HttpResponseContext {
                 annotations, contentType);
         if (request.getMethod().equals("HEAD")) {
             if (size != -1)
-                getHttpHeaders().putSingle("Content-Length", Long.toString(size));
+                getHttpHeaders().putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
             isCommitted = true;
             responseWriter.writeStatusAndHeaders(0, this);
         } else {
@@ -460,14 +461,24 @@ public class ContainerResponse implements HttpResponseContext {
                 pw.flush();
 
                 r = Response.status(r.getStatus()).entity(sw.toString()).
-                        type("text/plain").build();
+                        type(MediaType.TEXT_PLAIN).build();
             }
         } else if (request.isTracingEnabled()) {
             traceException(e, r);
         }
 
         setResponse(r);
+
         this.mappedThrowable = e;
+
+        if (getEntity() != null &&
+                getHttpHeaders().getFirst(HttpHeaders.CONTENT_TYPE) == null) {
+            Object m = request.getProperties().get(HttpMethodRule.CONTENT_TYPE_PROPERTY);
+            if (m != null) {
+                request.getProperties().remove(HttpMethodRule.CONTENT_TYPE_PROPERTY);
+                getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, m);
+            }
+        }
     }
 
     private void traceException(Throwable e, Response r) {
@@ -565,7 +576,7 @@ public class ContainerResponse implements HttpResponseContext {
     }
     
     public MediaType getMediaType() {
-        final Object mediaTypeHeader = getHttpHeaders().getFirst("Content-Type");
+        final Object mediaTypeHeader = getHttpHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
         if (mediaTypeHeader instanceof MediaType) {
             return (MediaType)mediaTypeHeader;
         } else if (mediaTypeHeader != null) {
