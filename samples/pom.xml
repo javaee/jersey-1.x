@@ -52,10 +52,8 @@
         <module>bookmark-em</module>
         <module>bookstore</module>
         <module>entity-provider</module>
-<!--
         <module>extended-wadl-webapp</module>
         <module>generate-wadl</module>
--->
         <module>groovy</module>
         <module>helloworld</module>
         <module>helloworld-webapp</module>
