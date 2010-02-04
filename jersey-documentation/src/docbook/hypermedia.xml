@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
+<!ENTITY % ents SYSTEM "jersey.ent" >
+%ents;
+]>
+<chapter>
+    <title>Hypermedia</title>
+    <section>
+        <title>Introduction</title>
+        <para>It is generally understood that, in order to follow the REST style, URIs should be
+            assigned to anything of interest (resources) and a few, well-defined operations should
+            be used to interact with these resources. For example, the state of a purchase order
+            resource can be updated by POSTing or PATCHing a new value for the its state field.
+            However, there are actions that cannot be easily mapped to read or write operations on
+            resources. These operations are inherently more complex and their details are rarely of
+            interest to clients. For example, given a purchase order resource, the operation of
+            setting its state to <literal>REVIEWED</literal> may involve a number of different steps
+            such as: <orderedlist>
+                <listitem>checking the customer's credit status</listitem>
+                <listitem>reserving product inventory</listitem>
+                <listitem>verifying per-customer quantity limits.</listitem>
+            </orderedlist> Clearly, this <emphasis>workflow</emphasis> cannot be equated to simply
+            updating a field on a resource. Moreover, clients are generally uninterested in the
+            details behind these type of workflows, and in some cases computing the final state of a
+            resource on the client side, as required for a PUT operation, is impractical or
+            impossible.</para>
+        <para>We call these operations <emphasis>actions</emphasis> and, because they are of
+            interest to us, we turn them into <emphasis>action resources</emphasis>. An action
+            resource is a sub-resource defined for the purpose of exposing workflow-related
+            operations on parent resources. As sub-resources, action resources are identified by
+            URIs that are relative to their parent. For instance, the following are examples of
+            action resources:
+            <programlisting>    http://.../orders/1/review
+    http://.../orders/1/pay
+    http://.../orders/1/ship</programlisting>
+            for purchase order "1" identified by <literal>http://.../orders/1</literal>.</para>
+        <para>Action resources as first-class citizens provide the necessary tools for developers to
+            implement HATEOAS. A set of action resources defines --via their link relationships-- a
+                <emphasis>contract</emphasis> with clients that has the potential to evolve over
+            time depending on the application's state. For instance, assuming purchase orders are
+            only reviewed once, the <literal>review</literal> action will become unavailable and the
+                <literal>pay</literal> action will become available after an order is
+        reviewed.</para>
+    </section>
+    <section>
+        <title>Hypermedia by Example</title>
+        <para>The notion of action resources naturally leads to discussions about improved client
+            APIs to support them. Given that action resources are identified by URIs, no additional
+            API is really necessary, but the use of client-side proxies and method invocations to
+            trigger these actions seems quite natural. Additionally, the use of client proxies
+            introduces a level of indirection that enables better support for <emphasis>server
+                evolution</emphasis>, i.e. the ability of a server's contract to support certain
+            changes without breaking existing clients. Finally, it has been argued that using client
+            proxies is simply more natural for developers and less error prone as fewer URIs need to
+            be constructed.</para>
+        <para>Rather than presenting all these extensions abstractly, we shall illustrate their use
+            via an example. The complete example can found in <ulink
+                url="http://download.java.net/maven/2/com/sun/jersey/samples/hypermedia"
+                >samples/hypermedia</ulink>. The <emphasis>Purchase Ordering System</emphasis>
+            exemplifies a system in which customers can submit orders and where orders are guided by
+            a workflow that includes states like <literal>REVIEWED</literal>,
+            <literal>PAYED</literal> and <literal>SHIPPED</literal>. The system's model is comprised
+            of 4 entities: <literal>Order</literal>, <literal>Product</literal>,
+            <literal>Customer</literal> and <literal>Address</literal>. These model entities are
+            controlled by 3 resource classes: <literal>OrderResource</literal>,
+                <literal>CustomerResource</literal> and <literal>ProductResource</literal>.
+            Addresses are sub-resources that are also controlled by
+            <literal>CustomerResource</literal>. An order instance refers to a single customer, a
+            single address (of that customer) and one or more products. The XML representation (or
+            view) of a sample order is shown below. <programlisting><![CDATA[    <order>
+        <id>1</id>
+        <customer>http://.../customers/21</customer>
+        <shippingAddress>http://.../customers/21/address/1</shippingAddress>
+        <orderItems>
+            <product>http://.../products/3345</product>
+            <quantity>1</quantity>
+        </orderItems>
+        <status>RECEIVED</status>
+    </order>]]></programlisting> Note the use of URIs to refer to each component of an order. This
+            form of <emphasis>serialization by reference</emphasis> is supported in Jersey using
+            JAXB beans and the <literal>@XmlJavaTypeAdapter</literal> annotation. An
+                <literal>XmlAdapter</literal> is capable of mapping an object reference in the model
+            to a URI. Refer to <ulink
+                url="http://download.java.net/maven/2/com/sun/jersey/samples/hypermedia"
+                >samples/hypermedia</ulink> for more information on how this mapping is
+        implemented.</para>
+    </section>
+    <section>
+        <title>Server API</title>
+        <para>The server API introduces 3 new annotation types: <literal>@Action</literal>,
+                <literal>@ContextualActionSet</literal> and
+            <literal>@HypermediaController</literal>. The <literal>@Action</literal> annotation
+            identifies a sub-resource as a <emphasis>named action</emphasis>. The
+                <literal>@ContextualActionSet</literal> is used to support contextual contracts and
+            must annotate a method that returns a set of action names. Finally,
+                <literal>@HypermediaController</literal> marks a resource class as a
+                <emphasis>hypermedia controller class</emphasis>: a class with one more methods
+            annotated with <literal>@Action</literal> and at most one method annotated with
+                <literal>@ContextualActionSet</literal>.</para>
+        <para>The following example illustrates the use of all these annotation types to define the
+                <literal>OrderResource</literal> controller.<footnote>
+                <para>Several details about this class are omitted for clarity. The reader is
+                    referred to the hypermedia sample for more details.</para>
+            </footnote>
+            <programlisting linenumbering="numbered"
+            >    @Path("/orders/{id}")
+    @HypermediaController(
+        model=Order.class,
+        linkType=LinkType.LINK_HEADERS)
+    public class OrderResource {
+        
+        private Order order;
+    
+        ...
+        
+        @GET @Produces("application/xml")
+        public Order getOrder(@PathParam("id") String id) {      
+            return order;
+        }
+        
+        @POST @Action("review") @Path("review")
+        public void review(@HeaderParam("notes") String notes) {
+            ...
+            order.setStatus(REVIEWED);
+        }
+        
+        @POST @Action("pay") @Path("pay")
+        public void pay(@QueryParam("newCardNumber") String newCardNumber) {
+            ...
+            order.setStatus(PAYED);
+        }
+        
+        @PUT @Action("ship") @Path("ship")
+        @Produces("application/xml")
+        @Consumes("application/xml")
+        public Order ship(Address newShippingAddress) {
+            ...
+            order.setStatus(SHIPPED);
+            return order;
+        }
+        
+        @POST @Action("cancel") @Path("cancel")
+        public void cancel(@QueryParam("notes") String notes) {
+            ...
+            order.setStatus(CANCELED);
+        }
+    }</programlisting>
+        </para>
+        <para>The <literal>@HypermediaController</literal> annotation above indicates that this
+            resource class is a hypermedia controller for the <literal>Order</literal> class. Each
+            method annotated with <literal>@Action</literal> defines a link relationship and
+            associated action resource. These methods are also annotated with
+            <literal>@Path</literal> to make a sub-resource. There does not appear to be a need to
+            use <literal>@Action</literal> and <literal>@Path</literal> simultaneously, but without
+            the latter some resource methods may become ambiguous. In the future, we hope to
+            eliminate the use of <literal>@Path</literal> when <literal>@Action</literal> is
+            present. The element <literal>linkType</literal> selects the way in which URIs
+            corresponding to action resources are serialized: in this case, using link headers.
+            These link headers become part of the an order's representation. For instance, an order
+            in the <literal>RECEIVED</literal> state, i.e. an order that can only be reviewed or
+            canceled, will be represented as follows. <programlisting>    <![CDATA[Link: <http://.../orders/1/review>;rel=review;op=POST
+    Link: <http://.../orders/1/cancel>;rel=cancel;op=POST
+    <order>
+        <id>1</id>
+        <customer>http://.../customers/21</customer>
+        <shippingAddress>http://.../customers/21/address/1</shippingAddress>
+        <orderItems>
+            <product>http://.../products/3345</product>
+            <quantity>1</quantity>
+        </orderItems>
+        <status>RECEIVED</status>
+    </order>]]></programlisting>
+        </para>
+        <para>Without a method annotated with <literal>@ContextualActionSet</literal>, all actions
+            are available at all times regardless of the state of an order. The following method can
+            be provided to define a contextual contract for this resource. <programlisting
+                linenumbering="numbered"><![CDATA[    @ContextualActionSet
+    public Set<String> getContextualActionSet() {
+        Set<String> result = new HashSet<String>();
+        switch (order.getStatus()) {
+            case RECEIVED:
+                result.add("review");
+                result.add("cancel");
+                break;
+            case REVIEWED:
+                result.add("pay");
+                result.add("cancel");
+                break;
+            case PAYED:
+                result.add("ship");
+                break;
+            case CANCELED:
+            case SHIPPED:
+                break;
+        }
+        return result;
+    }]]></programlisting>
+        </para>
+        <para>This method returns a set of action names based on the order's internal state; the
+            values returned in this set correspond to the <literal>@Action</literal> annotations in
+            the controller. For example, this contextual contract prevents shipping an order that
+            has not been payed by only including the <literal>ship</literal> action in the
+                <literal>PAYED</literal> state.</para>
+    </section>
+    <section>
+        <title>Client API</title>
+        <para>Although action resources can be accessed using traditional APIs for REST, including
+            Jersey's client API, the use of client-side proxies and method invocations to trigger
+            these actions seems quite natural. As we shall see, the use of client proxies also
+            introduces a level of indirection that enables better support for server evolution,
+            permitting the definition of contracts with various degrees of coupling.</para>
+        <para>Client proxies are created based on <emphasis>hypermedia controller
+            interfaces</emphasis>. Hypermedia controller interfaces are Java interfaces annotated by
+                <literal>@HypermediaController</literal> that, akin to the server side API, specify
+            the name of a model class and the type of serialization to use for action resource URIs.
+            The client-side model class should be based on the representation returned by the
+            server; in particular, in our example the client-side model for an
+            <literal>Order</literal> uses instances of <literal>URI</literal> to link an order to a
+            customer, an address and a list of products. <programlisting linenumbering="numbered"
+            >    @HypermediaController(
+        model=Order.class,
+        linkType=LinkType.LINK_HEADERS)
+    public interface OrderController {
+        
+        public Order getModel();
+        
+        @Action("review")
+        public void review(@Name("notes") String notes);
+        
+        @POST @Action("pay")
+        public void pay(@QueryParam("newCardNumber") String newCardNumber);
+        
+        @Action("ship")
+        public Order ship(Address newShippingAddress);
+        
+        @Action("cancel")
+        public void cancel(@Name("notes") String notes);
+    }</programlisting>
+        </para>
+        <para>The <literal>@Action</literal> annotation associates an interface method with a link
+            relation and hence an action resource on the server. Thus, invoking a method on the
+            generated proxy results in an interaction with the corresponding action resource. The
+            way in which the method invocation is mapped to an HTTP request depends on the
+            additional annotations specified in the interface. For instance, the
+            <literal>pay</literal> action in the example above indicates that it must use a
+                <literal>POST</literal> and that the <literal>String</literal> parameter
+                <literal>newCardNumber</literal> must be passed as a query parameter. This is an
+            example of a <emphasis>static</emphasis> contract in which the client has built-in
+            knowledge of the way in which an action is defined by the server.</para>
+        <para>In contrast, the <literal>review</literal> action only provides a name for its
+            parameter using the <literal>@Name</literal> annotation. This is an example of a
+                <emphasis>dynamic</emphasis> contract in which the client is only coupled to the
+                <literal>review</literal> link relation and the knowledge that this relation
+            requires <literal>notes</literal> to be supplied. The exact interaction with the
+                <literal>review</literal> action must therefore be discovered dynamically and the
+                <literal>notes</literal> parameter mapped accordingly. The Jersey client runtime
+            uses WADL fragments that describe action resources to map these method calls into HTTP
+            requests.</para>
+        <para>The following sample shows how to use <literal>OrderController</literal> to generate a
+            proxy to review, pay and ship an order. For the sake of the example, we assume the
+            customer that submitted the order has been suspended and needs to be activated before
+            the order is reviewed. For that purpose, the client code retrieves the customer URI from
+            the order's model and obtains an instance of <literal>CustomerController</literal>.<footnote>
+                <para>
+                    <literal>CustomerController</literal> is a hypermedia controller interface akin
+                    to <literal>OrderController</literal> which is omitted since it does not
+                    highlight any additional feature.</para>
+            </footnote>
+            <programlisting linenumbering="numbered"
+            >    // Instantiate Jersey's Client class
+    Client client = new Client();
+        
+    // Create proxy for order and retrieve model
+    OrderController orderCtrl = client.proxy(
+        "http://.../orders/1", OrderController.class);
+        
+    // Create proxy for customer in order 1
+    CustomerController customerCtrl = client.proxy(
+        orderCtrl.getModel().getCustomer(),
+        CustomerController.class);
+        
+    // Activate customer in order 1 
+    customerCtrl.activate();
+        
+    // Review and pay order 
+    orderCtrl.review("approve");
+    orderCtrl.pay("123456789");
+        
+    // Ship order 
+    Address newAddress = getNewAddress();
+    orderCtrl.ship(newAddress);</programlisting>
+        </para>
+        <para>The client runtime will automatically update the action set throughout a conversation:
+            for example, even though the <literal>review</literal> action does not produce a result,
+            the HTTP response to that action still includes a list of link headers defining the
+            contextual action set, which in this case will consist of the <literal>pay</literal> and
+                <literal>cancel</literal> actions but not the <literal>ship</literal> action. When
+            using proxies, an attempt to interact with any action not in the context will result in
+            a client-side exception.</para>
+        <para>The following annotations are allowed in hypermedia controller interfaces:
+                <literal>@Name</literal>, <literal>@Consumes</literal>,
+            <literal>@Produces</literal>, <literal>@CookieParam</literal>,
+            <literal>@FormParam</literal>, <literal>@HeaderParam</literal>,
+            <literal>@QueryParam</literal>, as well as any HTTP method annotation like
+                <literal>@POST</literal>, <literal>@PUT</literal>, etc. All other annotations not
+            listed here are unsupported at this time (of note, <literal>@MatrixParam</literal> is
+            not supported). The <literal>@Name</literal> annotation used in Jersey is defined in
+                <literal>com.sun.jersey.core.hypermedia</literal>.</para>
+    </section>
+    <section>
+        <title>Server Evolution</title>
+        <para>In the last section, we have seen how the use of client proxies based on
+                <emphasis>partially</emphasis> annotated interfaces facilitates server evolution. An
+            interface method annotated with <literal>@Action</literal> and <literal>@Name</literal>
+            represents a <emphasis>loosely-coupled</emphasis> contract with a server. Changes to
+            action resource URIs, HTTP methods and parameter types on the server will not require a
+            client re-spin. Naturally, as in all client-server architectures, it is always possible
+            to break backward compatibility, but the ability to support more dynamic contracts
+            --usually at the cost of additional processing time-- is still an area of investigation.</para>
+        <para> We see this form of hypermedia support in Jersey as a small step in this direction,
+            showing the potential of using dynamic meta-data for the definition of these type of
+            contracts. The use of dynamic meta-data requires the server to return WADL fragments
+            when using <literal>OPTIONS</literal> on an action resource URI. When dynamic meta-data
+            is not available (for example if using an older version of Jersey on the server) client
+            interfaces should be fully annotated and a <emphasis>tighly-coupled</emphasis> contract
+            should be used instead.</para>
+    </section>
+    <section>
+        <title>Configuring Hypermedia in Jersey</title>
+        <para>There are a few configuration options in  <ulink
+            url="http://download.java.net/maven/2/com/sun/jersey/samples/hypermedia"
+            >samples/hypermedia</ulink> that are worth highlighting. First, a
+            special filter factory <literal>HypermediaFilterFactory</literal> must
+            be enabled. This can be done programmatically by adding
+            <programlisting>com.sun.jersey.api.container.filter.HypermediaFilterFactory</programlisting> to the list defined by
+            <programlisting>com.sun.jersey.spi.container.ResourceFilters</programlisting> or
+            declaratively in the application's <literal>web.xml</literal> file. Refer to
+            <literal>Main.java</literal> in the hypermedia sample for an example of how
+            to do this using Grizzly. Second, hypermedia applications must included the
+            following Maven runtime dependency:
+            <programlisting><![CDATA[    <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-client-hypermedia</artifactId>
+        <version>${jersey-version}</version>
+        <scope>runtime</scope>
+    </dependency>]]></programlisting> in addition to a compile-time
+            dependency with Jersey's client api (<literal>jersey-client</literal> module).
+            Last, even though the annotation <literal>@HypermediaController</literal> has
+            a <literal>linkType</literal> element, only the <literal>LinkType.LINK_HEADERS</literal>
+            option is currently supported and must be used by both clients and servers.
+        </para>
+    </section>
+</chapter>
