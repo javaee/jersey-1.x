@@ -67,11 +67,6 @@
 								</copy>
 								<replace file="${gen-src-dir}/jersey.ent" token="$version" value="${version}"/>
 								<replace file="${gen-src-dir}/jersey.ent" token="$jsr311-version" value="1.1"/>
-								<echo message="Copying individual modules"/>
-								<copy file="../jersey-json/src/docbook/json.xml" todir="${gen-src-dir}"/>
-                <!--
-								<copy file="../jersey-module/src/docbook/module.xml" todir="${gen-src-dir}"/>
-								-->
 							</tasks>
 						</configuration>
 						<id>process-entities</id>
