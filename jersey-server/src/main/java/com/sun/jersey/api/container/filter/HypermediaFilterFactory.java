@@ -56,7 +56,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
@@ -69,8 +68,6 @@ import javax.ws.rs.core.UriInfo;
  * @see com.sun.jersey.api.container.filter
  */
 public class HypermediaFilterFactory implements ResourceFilterFactory {
-
-    private static final Logger LOGGER = Logger.getLogger(HypermediaFilter.class.getName());
 
     private final UriInfo uriInfo;
 
@@ -123,8 +120,10 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
         
         public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             Object resourceInstance = uriInfo.getMatchedResources().get(0);
-            LOGGER.info("HypermediaFilter called for response; " +
+            if (request.isTracingEnabled()) {
+                request.trace("HypermediaFilter called for response; " +
                     "resourceInstance = " + resourceInstance);
+            }
 
             // If contract is contextual
             Set<String> actionSet = null;
@@ -175,8 +174,10 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
 
         public ContainerRequest filter(ContainerRequest request) {
             Object resourceInstance = uriInfo.getMatchedResources().get(0);
-            LOGGER.info("HypermediaFilter called for request; " +
+            if (request.isTracingEnabled()) {
+                request.trace("HypermediaFilter called for request; " +
                     "resourceInstance = " + resourceInstance);
+            }
 
             // If not action method, no need to do any checks
             Action action = abstractMethod.getAnnotation(Action.class);
@@ -221,8 +222,6 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
             if (am.getMethod().getReturnType() == ctrl.model() ||
                     am.isAnnotationPresent(Action.class))
             {
-                LOGGER.info("Found hypermedia method " + am.getMethod()
-                        + " in controller " + ar.getClass().getName());
                 List<ResourceFilter> result = new ArrayList<ResourceFilter>(1);
                 result.add(new HypermediaFilter(am));
                 return result;
