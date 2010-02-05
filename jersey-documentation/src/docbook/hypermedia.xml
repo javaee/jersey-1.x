@@ -295,9 +295,10 @@
             for example, even though the <literal>review</literal> action does not produce a result,
             the HTTP response to that action still includes a list of link headers defining the
             contextual action set, which in this case will consist of the <literal>pay</literal> and
-                <literal>cancel</literal> actions but not the <literal>ship</literal> action. When
-            using proxies, an attempt to interact with any action not in the context will result in
-            a client-side exception.</para>
+                <literal>cancel</literal> actions but not the <literal>ship</literal> action. An 
+            attempt to interact with any action not in the contextual action set will result in
+            a client-side exception if using proxies (as shown above), or a server-side exception 
+            if using some other API.</para>
         <para>The following annotations are allowed in hypermedia controller interfaces:
                 <literal>@Name</literal>, <literal>@Consumes</literal>,
             <literal>@Produces</literal>, <literal>@CookieParam</literal>,
