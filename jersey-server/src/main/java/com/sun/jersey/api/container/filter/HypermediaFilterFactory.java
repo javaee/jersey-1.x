@@ -78,7 +78,8 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
         this.uriInfo = uriInfo;
     }
 
-    private class HypermediaFilter implements ResourceFilter, ContainerResponseFilter {
+    private class HypermediaFilter 
+            implements ResourceFilter, ContainerResponseFilter, ContainerRequestFilter {
 
         private AbstractMethod abstractMethod;
 
@@ -111,7 +112,7 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
         // ResourceFilter
 
         public ContainerRequestFilter getRequestFilter() {
-            return null;
+            return this;
         }
 
         public ContainerResponseFilter getResponseFilter() {
@@ -122,7 +123,7 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
         
         public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             Object resourceInstance = uriInfo.getMatchedResources().get(0);
-            LOGGER.info("HypermediaFilter.filter() called; " +
+            LOGGER.info("HypermediaFilter called for response; " +
                     "resourceInstance = " + resourceInstance);
 
             // If contract is contextual
@@ -168,6 +169,41 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
             }
 
             return response;
+        }
+
+        // ContainerRequestFilter
+
+        public ContainerRequest filter(ContainerRequest request) {
+            Object resourceInstance = uriInfo.getMatchedResources().get(0);
+            LOGGER.info("HypermediaFilter called for request; " +
+                    "resourceInstance = " + resourceInstance);
+
+            // If not action method, no need to do any checks
+            Action action = abstractMethod.getAnnotation(Action.class);
+            if (action == null) {
+                return request;
+            }            
+
+            // If contract is contextual
+            Set<String> actionSet = null;
+            if (contextualActionSetMethod != null) {
+                try {
+                    actionSet = (Set<String>)
+                            contextualActionSetMethod.invoke(resourceInstance);
+                } catch (Exception _) {
+                    // falls through
+                }
+            }
+
+            // Check if action is in contextual action set
+            if (actionSet != null && !actionSet.contains(action.value())) {
+                throw new RuntimeException("Action '" +
+                        action.value() +
+                        "' is not in contextual action set returned by " +
+                        resourceInstance);
+            }
+
+            return request;
         }
     }
     
