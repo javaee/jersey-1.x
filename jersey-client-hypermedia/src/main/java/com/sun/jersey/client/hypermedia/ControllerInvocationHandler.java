@@ -434,11 +434,6 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
         List<RepresentationNode> reps = methodNode.getSupportedInputs();
         if (reps != null) {
             for (RepresentationNode rep : reps) {
-                // Media type must be application/x-www-form-urlencoded
-                if (!rep.getMediaType().equals(APPLICATION_FORM_URLENCODED)) {
-                    continue;
-                }
-
                 // Find param in representation
                 for (Param param : rep.getParam()) {
                     if (param.getName().equals(name.value())) {
