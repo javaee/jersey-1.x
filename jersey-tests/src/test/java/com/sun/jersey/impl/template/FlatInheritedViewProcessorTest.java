@@ -86,17 +86,17 @@ public class FlatInheritedViewProcessorTest extends AbstractResourceTester {
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ExplicitTemplateBase.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatInheritedViewProcessorTest.ExplicitTemplateBase.show.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("inherit").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ExplicitTemplateBase.inherit.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatInheritedViewProcessorTest.ExplicitTemplateBase.inherit.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("override").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ExplicitTemplate.override.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatInheritedViewProcessorTest.ExplicitTemplate.override.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
     }
 
@@ -120,17 +120,17 @@ public class FlatInheritedViewProcessorTest extends AbstractResourceTester {
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ImplicitTemplateBase.index.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatInheritedViewProcessorTest.ImplicitTemplateBase.index.testp", p.getProperty("path"));
         assertEquals("ImplicitTemplate", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("inherit").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ImplicitTemplateBase.inherit.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatInheritedViewProcessorTest.ImplicitTemplateBase.inherit.testp", p.getProperty("path"));
         assertEquals("ImplicitTemplate", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("override").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatInheritedViewProcessorTest$ImplicitTemplate.override.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatInheritedViewProcessorTest.ImplicitTemplate.override.testp", p.getProperty("path"));
         assertEquals("ImplicitTemplate", p.getProperty("model"));
     }
 

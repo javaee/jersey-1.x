@@ -1,4 +1,13 @@
 release 1.2 (03-2010)
+- Modified the resolving of "flat-file" templates so the location is
+    '/' + resourceClass.getName().replace('.', '/').replace('$', '.') + '.' + path
+  Thus if there is a resource class named com.Foo and there is an index.html
+  template then the path to the template can be:
+    com/Foo.index.html
+  in addition to:
+    com/Foo/index.html
+  Thus templates can be co-located with Java class files rather than in
+  sub-directories.
 - Fixed issue 461
   https://jersey.dev.java.net/issues/show_bug.cgi?id=461
   An exception thrown from a resource method that is mapped to a response

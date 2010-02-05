@@ -79,12 +79,12 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatViewProcessorTest$ExplicitTemplate.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatViewProcessorTest.ExplicitTemplate.show.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.post(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatViewProcessorTest$ExplicitTemplate.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatViewProcessorTest.ExplicitTemplate.show.testp", p.getProperty("path"));
         assertEquals("post", p.getProperty("model"));
     }
 
@@ -104,7 +104,7 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatViewProcessorTest$ImplicitTemplate.index.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatViewProcessorTest.ImplicitTemplate.index.testp", p.getProperty("path"));
         assertEquals("ImplicitTemplate", p.getProperty("model"));
     }
 
@@ -132,17 +132,17 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
         Properties p = new Properties();
         p.load(r.get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatViewProcessorTest$ImplicitExplicitTemplate.index.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatViewProcessorTest.ImplicitExplicitTemplate.index.testp", p.getProperty("path"));
         assertEquals("ImplicitExplicitTemplate", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.post(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatViewProcessorTest$ImplicitExplicitTemplate.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatViewProcessorTest.ImplicitExplicitTemplate.show.testp", p.getProperty("path"));
         assertEquals("post", p.getProperty("model"));
 
         p = new Properties();
         p.load(r.path("sub").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatViewProcessorTest$ImplicitExplicitTemplate.show.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatViewProcessorTest.ImplicitExplicitTemplate.show.testp", p.getProperty("path"));
         assertEquals("get", p.getProperty("model"));
     }
 
@@ -164,7 +164,7 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
         Properties p = new Properties();
         p.load(r.accept("text/plain").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatViewProcessorTest$ImplicitWithGetTemplate.index.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatViewProcessorTest.ImplicitWithGetTemplate.index.testp", p.getProperty("path"));
         assertEquals("ImplicitWithGetTemplate", p.getProperty("model"));
 
         assertEquals("ImplicitWithGetTemplate", r.accept("application/foo").get(String.class));
@@ -189,7 +189,7 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
         Properties p = new Properties();
         p.load(r.accept("text/plain").get(InputStream.class));
-        assertEquals("/com.sun.jersey.impl.template.FlatViewProcessorTest$ImplicitWithSubResourceGetTemplate.sub.testp", p.getProperty("path"));
+        assertEquals("/com/sun/jersey/impl/template/FlatViewProcessorTest.ImplicitWithSubResourceGetTemplate.sub.testp", p.getProperty("path"));
         assertEquals("ImplicitWithSubResourceGetTemplate", p.getProperty("model"));
 
         assertEquals("ImplicitWithSubResourceGetTemplate", r.accept("application/foo").get(String.class));
