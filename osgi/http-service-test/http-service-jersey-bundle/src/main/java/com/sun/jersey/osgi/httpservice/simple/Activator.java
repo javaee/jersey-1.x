@@ -19,12 +19,14 @@ import org.osgi.service.http.NamespaceException;
 public class Activator implements BundleActivator {
 
     private BundleContext bc;
+    private boolean registered = false;
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     @Override
     public synchronized void start(BundleContext bundleContext) throws Exception {
         this.bc = bundleContext;
 
-        System.out.println("STARTING HTTP SERVICE BUNDLE");
+        logger.info("STARTING HTTP SERVICE BUNDLE");
 
         ServiceListener sl = new ServiceListener() {
 
@@ -38,9 +40,16 @@ public class Activator implements BundleActivator {
                         jerseyServletParams.put("com.sun.jersey.config.property.resourceConfigClass", ClassNamesResourceConfig.class.getName());
                         jerseyServletParams.put("com.sun.jersey.config.property.classnames", StatusResource.class.getName());
                         try {
-                            System.out.println("REGISTERING JERSEY SERVLET");
+                            //if (!"com.sun.grizzly.osgi.httpservice.HttpServiceImpl".equals(http.getClass().getName()) && !registered) {
+                            if (!registered) {
                             // TODO: make sure the registration occurs just once
-                            http.registerServlet("/jersey-http-service", new ServletContainer(), jerseyServletParams, null);
+                                logger.info("REGISTERING JERSEY SERVLET");
+                                logger.info("HTTP SERVICE = " + http.toString());
+                                logger.info("HTTP SERVICE CLASS NAME = " + http.getClass().getName());
+                                http.registerServlet("/non-jersey-http-service", new SimpleNonJerseyServlet(), null, null);
+                                http.registerServlet("/jersey-http-service", new ServletContainer(), jerseyServletParams, null);
+                                registered = true;
+                            }
                         } catch (ServletException ex) {
                             Logger.getLogger(Activator.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (NamespaceException ex) {
