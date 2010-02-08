@@ -46,9 +46,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
@@ -56,6 +54,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -142,12 +143,32 @@ public class MultipleFilters extends AbstractResourceTester {
 
     }
 
-    public void testWithString() {
+    public void testWithString1() {
         ResourceConfig rc = new DefaultResourceConfig(Resource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 FilterOne.class.getName() + ";" + FilterTwo.class.getName());
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
                 FilterOne.class.getName() + ";" + FilterTwo.class.getName());
+        initiateWebApplication(rc);
+        _test();
+    }
+
+    public void testWithString2() {
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                FilterOne.class.getName() + "," + FilterTwo.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                FilterOne.class.getName() + " " + FilterTwo.class.getName());
+        initiateWebApplication(rc);
+        _test();
+    }
+
+    public void testWithString3() {
+        ResourceConfig rc = new DefaultResourceConfig(Resource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                FilterOne.class.getName() + " " + FilterTwo.class.getName() + " ,;;, ");
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                FilterOne.class.getName() + ";" + FilterTwo.class.getName() + ",");
         initiateWebApplication(rc);
         _test();
     }
@@ -212,7 +233,7 @@ public class MultipleFilters extends AbstractResourceTester {
         _test();
     }
 
-    public void testWithListMxied() {
+    public void testWithListMixed() {
         ResourceConfig rc = new DefaultResourceConfig(Resource.class);
 
         List reql = new ArrayList();

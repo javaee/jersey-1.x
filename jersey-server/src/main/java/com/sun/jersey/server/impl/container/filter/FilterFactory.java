@@ -36,7 +36,6 @@
  */
 package com.sun.jersey.server.impl.container.filter;
 
-import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.core.spi.component.ProviderServices;
@@ -70,21 +69,24 @@ public final class FilterFactory {
 
     public void init(ResourceConfig resourceConfig) {
         // Initiate request filters
-        requestFilters.addAll(getRequestFilters(
-                resourceConfig.getProperty(
-                    ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS)));
+        requestFilters.addAll(
+            getFilters(ContainerRequestFilter.class,resourceConfig.getContainerRequestFilters())
+        );
+
         requestFilters.addAll(providerServices.getServices(ContainerRequestFilter.class));
 
         // Initiate response filters
-        responseFilters.addAll(getResponseFilters(
-                resourceConfig.getProperty(
-                    ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS)));
+        responseFilters.addAll(
+            getFilters(ContainerResponseFilter.class, resourceConfig.getContainerResponseFilters())
+        );
+
         responseFilters.addAll(providerServices.getServices(ContainerResponseFilter.class));
 
         // Initiate resource filter factories
-        resourceFilterFactories.addAll(getResourceFilterFactories(
-                resourceConfig.getProperty(
-                    ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES)));
+        resourceFilterFactories.addAll(
+            getFilters(ResourceFilterFactory.class, resourceConfig.getResourceFilterFactories())
+        );
+        
         resourceFilterFactories.addAll(providerServices.getServices(ResourceFilterFactory.class));
         resourceFilterFactories.add(new AnnotationResourceFilterFactory(this));
     }
@@ -114,7 +116,7 @@ public final class FilterFactory {
         return providerServices.getInstances(ResourceFilter.class, classes);
     }
 
-    public List<ContainerRequestFilter> getRequestFilters(List<ResourceFilter> resourceFilters) {
+    public static List<ContainerRequestFilter> getRequestFilters(List<ResourceFilter> resourceFilters) {
         final List<ContainerRequestFilter> filters = new LinkedList<ContainerRequestFilter>();
         for (ResourceFilter rf : resourceFilters) {
             ContainerRequestFilter crf = rf.getRequestFilter();
@@ -124,7 +126,7 @@ public final class FilterFactory {
         return filters;
     }
 
-    public List<ContainerResponseFilter> getResponseFilters(List<ResourceFilter> resourceFilters) {
+    public static List<ContainerResponseFilter> getResponseFilters(List<ResourceFilter> resourceFilters) {
         final List<ContainerResponseFilter> filters = new LinkedList<ContainerResponseFilter>();
         for (ResourceFilter rf : resourceFilters) {
             ContainerResponseFilter crf = rf.getResponseFilter();
@@ -134,55 +136,15 @@ public final class FilterFactory {
         return filters;
     }
 
-    private List<ContainerRequestFilter> getRequestFilters(Object o) {
-        return getFilters(ContainerRequestFilter.class, o);
-    }
-    
-    private List<ContainerResponseFilter> getResponseFilters(Object o) {
-        return getFilters(ContainerResponseFilter.class, o);        
-    }
-
-    private List<ResourceFilterFactory> getResourceFilterFactories(Object o) {
-        return getFilters(ResourceFilterFactory.class, o);
-    }
-
-    private <T> List<T> getFilters(Class<T> c, Object o) {
-        if (o == null)
-            return Collections.emptyList();
-        
-        if (o instanceof String) {
-            return getFilters(c, 
-                    DefaultResourceConfig.getElements(new String[] {(String)o}));
-        } else if (o instanceof String[]) {
-            return getFilters(c, 
-                    DefaultResourceConfig.getElements((String[])o));            
-        } else if (o instanceof List) {
-            return getFilters(c, (List)o);
-        } else {
-            LOGGER.severe("The filters, " + 
-                    o.getClass().getName() + 
-                    " declared for " + 
-                    c.getName() + 
-                    "MUST be of the type String[], String or List");
-            return Collections.emptyList();
-        }
-    }
-    
-    private <T> List<T> getFilters(Class<T> c, String[] classNames) {
-        List<T> f = new LinkedList<T>();
-        f.addAll(providerServices.getInstances(c, classNames));
-        return f;
-    }
-    
     private <T> List<T> getFilters(Class<T> c, List<?> l) {
         List<T> f = new LinkedList<T>();
         for (Object o : l) {
             if (o instanceof String) {
                 f.addAll(providerServices.getInstances(c,
-                        DefaultResourceConfig.getElements(new String[] {(String)o})));
+                        ResourceConfig.getElements(new String[] {(String)o}, ResourceConfig.COMMON_DELIMITERS)));
             } else if (o instanceof String[]) {
                 f.addAll(providerServices.getInstances(c,
-                        DefaultResourceConfig.getElements((String[])o)));
+                        ResourceConfig.getElements((String[])o, ResourceConfig.COMMON_DELIMITERS)));
             } else if (c.isInstance(o)) {
                 f.add(c.cast(o));
             } else if (o instanceof Class) {

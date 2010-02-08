@@ -38,6 +38,8 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.api.container.filter.LoggingFilter;
+import com.sun.jersey.api.uri.UriComponent;
+import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.spi.container.ContainerListener;
@@ -45,9 +47,11 @@ import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ResourceFilterFactory;
-import com.sun.jersey.api.uri.UriComponent;
 
-import com.sun.jersey.core.header.LanguageTag;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Provider;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,15 +59,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Provider;
+import java.util.regex.Pattern;
 
 
 /**
@@ -279,7 +281,8 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * the last entry in the list.
      * <p>
      * The instance may be a String[] or String that contains one or more fully 
-     * qualified class name of a request filter class separeted by ';'.
+     * qualified class name of a request filter class separated by ';', ','
+     * or ' ' (space).
      * Otherwise the instance may be List containing instances of String,
      * String[], Class&lt;? extends ContainerRequestFilter;&gt; or instances
      * of ContainerRequestFilter.
@@ -302,7 +305,8 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * the last entry in the list.
      * <p>
      * The instance may be a String[] or String that contains one or more fully
-     * qualified class name of a request filter class separeted by ';'.
+     * qualified class name of a request filter class separated by ';', ','
+     * or ' ' (space).
      * Otherwise the instance may be List containing instances of String,
      * String[], Class&lt;? extends ContainerResponseFilter;&gt; or instances
      * of ContainerResponseFilter.
@@ -325,7 +329,8 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * to last entry in the list.
      * <p>
      * The instance may be a String[] or String that contains one or more fully
-     * qualified class name of a response filter class separeted by ';'.
+     * qualified class name of a response filter class separated by ';', ','
+     * or ' ' (space).
      * Otherwise the instance may be List containing instances of String,
      * String[], Class&lt;? extends ResourceFilterFactory;&gt; or instances
      * of ResourceFilterFactory.
@@ -351,6 +356,11 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      */
     public static final String PROPERTY_WADL_GENERATOR_CONFIG = 
             "com.sun.jersey.config.property.WadlGeneratorConfig";
+
+    /**
+     * Common delimiters used by various properties.
+     */
+    public static final String COMMON_DELIMITERS = " ,;";
     
     /**
      * Get the map of features associated with the Web application.
@@ -865,5 +875,69 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
         that.getProperties().putAll(this.getProperties());
         
         return that;
+    }
+
+    /**
+     * Get a canonical array of String elements from a String array
+     * where each entry may contain zero or more elements separated by ';'.
+     *
+     * @param elements an array where each String entry may contain zero or more
+     *        ';' separated elements.
+     * @return the array of elements, each element is trimmed, the array will
+     *         not contain any empty or null entries.
+     */
+    public static String[] getElements(String[] elements) {
+        // keeping backwards compatibility
+        return getElements(elements, ";");
+    }
+
+    /**
+     * Get a canonical array of String elements from a String array
+     * where each entry may contain zero or more elements separated by characters
+     * in delimiters string.
+     *
+     * @param elements an array where each String entry may contain zero or more
+     *        delimiters separated elements.
+     * @param delimiters string with delimiters, every character represents one
+     *        delimiter.
+     * @return the array of elements, each element is trimmed, the array will
+     *         not contain any empty or null entries.
+     */
+    public static String[] getElements(String[] elements, String delimiters) {
+        List<String> es = new LinkedList<String>();
+        for (String element : elements) {
+            if (element == null) continue;
+            element = element.trim();
+            if (element.length() == 0) continue;
+            for (String subElement : getElements(element, delimiters)) {
+                if (subElement == null || subElement.length() == 0) continue;
+                es.add(subElement);
+            }
+        }
+        return es.toArray(new String[es.size()]);
+    }
+
+    /**
+     * Get a canonical array of String elements from a String
+     * that may contain zero or more elements separated by characters in
+     * delimiters string.
+     *
+     * @param elements a String that may contain zero or more
+     *        delimiters separated elements.
+     * @param delimiters string with delimiters, every character represents one
+     *        delimiter.
+     * @return the array of elements, each element is trimmed.
+     */
+    private static String[] getElements(String elements, String delimiters) {
+        String regex = "[";
+        for(char c : delimiters.toCharArray())
+            regex += Pattern.quote(String.valueOf(c));
+        regex += "]";
+
+        String[] es = elements.split(regex);
+        for (int i = 0; i < es.length; i++) {
+            es[i] = es[i].trim();
+        }
+        return es;
     }
 }

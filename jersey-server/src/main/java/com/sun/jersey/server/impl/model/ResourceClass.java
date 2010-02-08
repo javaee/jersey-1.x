@@ -45,44 +45,45 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.uri.UriPattern;
-import com.sun.jersey.server.impl.model.method.ResourceHeadWrapperMethod;
-import com.sun.jersey.server.impl.model.method.ResourceHttpMethod;
-import com.sun.jersey.server.impl.model.method.ResourceHttpOptionsMethod;
-import com.sun.jersey.server.impl.model.method.ResourceMethod;
-import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
-import com.sun.jersey.server.impl.uri.rules.SubLocatorRule;
-import com.sun.jersey.server.impl.uri.PathPattern;
-import com.sun.jersey.server.impl.uri.PathTemplate;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.api.view.ImplicitProduces;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentInjector;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
+import com.sun.jersey.server.impl.component.ResourceFactory;
+import com.sun.jersey.server.impl.container.filter.FilterFactory;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
+import com.sun.jersey.server.impl.model.method.ResourceHeadWrapperMethod;
+import com.sun.jersey.server.impl.model.method.ResourceHttpMethod;
+import com.sun.jersey.server.impl.model.method.ResourceHttpOptionsMethod;
+import com.sun.jersey.server.impl.model.method.ResourceMethod;
+import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.server.impl.template.ViewableRule;
+import com.sun.jersey.server.impl.uri.PathPattern;
+import com.sun.jersey.server.impl.uri.PathTemplate;
 import com.sun.jersey.server.impl.uri.rules.CombiningMatchingPatterns;
+import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.server.impl.uri.rules.PatternRulePair;
 import com.sun.jersey.server.impl.uri.rules.RightHandPathRule;
 import com.sun.jersey.server.impl.uri.rules.SequentialMatchingPatterns;
+import com.sun.jersey.server.impl.uri.rules.SubLocatorRule;
 import com.sun.jersey.server.impl.uri.rules.TerminatingRule;
 import com.sun.jersey.server.impl.uri.rules.UriRulesFactory;
 import com.sun.jersey.server.impl.wadl.WadlFactory;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
-import com.sun.jersey.server.impl.component.ResourceFactory;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.server.impl.container.filter.FilterFactory;
-import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
+
+import javax.ws.rs.HttpMethod;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.HttpMethod;
 
 /**
  *
@@ -164,8 +165,8 @@ public final class ResourceClass {
             List<ResourceFilter> resourceFilters = ff.getResourceFilters(method);
             ViewableRule r = new ViewableRule(
                     implictProduces,
-                    ff.getRequestFilters(resourceFilters),
-                    ff.getResponseFilters(resourceFilters));
+                    FilterFactory.getRequestFilters(resourceFilters),
+                    FilterFactory.getResponseFilters(resourceFilters));
             ComponentInjector<ViewableRule> ci = new ComponentInjector(injectableContext,
                     ViewableRule.class);
             ci.inject(r);
@@ -261,8 +262,8 @@ public final class ResourceClass {
                     t,
                     locator.getMethod(),
                     injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest),
-                    ff.getRequestFilters(resourceFilters),
-                    ff.getResponseFilters(resourceFilters));
+                    FilterFactory.getRequestFilters(resourceFilters),
+                    FilterFactory.getResponseFilters(resourceFilters));
 
             rulesMap.put(p, 
                     new RightHandPathRule(

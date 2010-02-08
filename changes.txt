@@ -1,4 +1,12 @@
 release 1.2 (03-2010)
+- Fixed issue 465
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=465
+  Refactored ResourceConfig; now its possible to use delimiters ';', ',' and ' '
+  (space) to separate class names in various init parameters like filters and
+  filter factories declaration, classpath, class and package names specification.
+  Intended consequence is that FilterFactory now uses ResourceConfig to get list
+  of filters/filter factories so its possible to programatically add filters
+  to ones defined in web.xml.
 - Modified the resolving of "flat-file" templates so the location is
     '/' + resourceClass.getName().replace('.', '/').replace('$', '.') + '.' + path
   Thus if there is a resource class named com.Foo and there is an index.html

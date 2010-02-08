@@ -38,6 +38,7 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.core.spi.scanning.FilesScanner;
+
 import java.io.File;
 import java.util.Map;
 import java.util.logging.Level;
@@ -56,7 +57,8 @@ import java.util.logging.Logger;
 public class ClasspathResourceConfig extends ScanningResourceConfig {
     /**
      * The property value MUST be an instance String or String[]. Each String
-     * instance represents one or more paths that MUST be separated by ';'. 
+     * instance represents one or more paths that MUST be separated by ';',
+     * ',' or ' ' (space). 
      * Each path MUST be an absolute or relative directory, or a Jar file. 
      * The contents of a directory, including Java class files, jars files 
      * and sub-directories (recusively) are scanned. The Java class files of 
@@ -147,9 +149,9 @@ public class ClasspathResourceConfig extends ScanningResourceConfig {
     
     private static String[] getPaths(Object param) {
         if (param instanceof String) {
-            return getElements(new String[] { (String)param });
+            return getElements(new String[] { (String)param }, ResourceConfig.COMMON_DELIMITERS);
         } else if (param instanceof String[]) {
-            return getElements((String[])param);
+            return getElements((String[])param, ResourceConfig.COMMON_DELIMITERS);
         } else {
             throw new IllegalArgumentException(PROPERTY_CLASSPATH + " must " +
                     "have a property value of type String or String[]");

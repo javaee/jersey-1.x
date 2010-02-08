@@ -38,6 +38,7 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.core.spi.scanning.PackageNamesScanner;
+
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -52,7 +53,8 @@ import java.util.logging.Logger;
 public class PackagesResourceConfig extends ScanningResourceConfig {
     /**
      * The property value MUST be an instance String or String[]. Each String
-     * instance represents one or more package names that MUST be separated by ';'.
+     * instance represents one or more package names that MUST be separated by
+     * ';', ',' or ' ' (space).
      */
     public static final String PROPERTY_PACKAGES
             = "com.sun.jersey.config.property.packages";
@@ -126,9 +128,9 @@ public class PackagesResourceConfig extends ScanningResourceConfig {
     
     private static String[] getPackages(Object param) {
         if (param instanceof String) {
-            return getElements(new String[] { (String)param });
+            return getElements(new String[] { (String)param }, ResourceConfig.COMMON_DELIMITERS);
         } else if (param instanceof String[]) {
-            return getElements((String[])param);
+            return getElements((String[])param, ResourceConfig.COMMON_DELIMITERS);
         } else {
             throw new IllegalArgumentException(PROPERTY_PACKAGES + " must " +
                     "have a property value of type String or String[]");

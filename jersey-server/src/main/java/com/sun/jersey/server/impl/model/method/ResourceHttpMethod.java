@@ -81,8 +81,8 @@ public final class ResourceHttpMethod extends ResourceMethod {
                 method.getSupportedOutputTypes(),
                 method.areInputTypesDeclared(),
                 df.getDispatcher(method),
-                ff.getRequestFilters(resourceFilters),
-                ff.getResponseFilters(resourceFilters));
+                FilterFactory.getRequestFilters(resourceFilters),
+                FilterFactory.getResponseFilters(resourceFilters));
 
         this.m = method.getMethod();
         

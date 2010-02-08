@@ -50,7 +50,8 @@ public class ClassNamesResourceConfig extends DefaultResourceConfig {
 
     /**
      * The property value MUST be an instance String or String[]. Each String
-     * instance represents one or more class names that MUST be separated by ';'.
+     * instance represents one or more class names that MUST be separated by ';',
+     * ',' or ' ' (space).
      */
     public static final String PROPERTY_CLASSNAMES = "com.sun.jersey.config.property.classnames";
 
@@ -121,9 +122,9 @@ public class ClassNamesResourceConfig extends DefaultResourceConfig {
     
     private static String[] _getClasses(Object param) {
         if (param instanceof String) {
-            return getElements(new String[] { (String)param });
+            return getElements(new String[] { (String)param }, ResourceConfig.COMMON_DELIMITERS);
         } else if (param instanceof String[]) {
-            return getElements((String[])param);
+            return getElements((String[])param, ResourceConfig.COMMON_DELIMITERS);
         } else {
             throw new IllegalArgumentException(PROPERTY_CLASSNAMES + " must " +
                     "have a property value of type String or String[]");
