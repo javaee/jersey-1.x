@@ -24,7 +24,9 @@ release 1.2 (03-2010)
   and what the client accepts.
 - Fixed issue 433
   https://jersey.dev.java.net/issues/show_bug.cgi?id=433
-  OAuth signature calculation works correctly with space characters in the URL.
+  OAuth signature calculation correctly encodes request parameters according
+  to the unreserved character set defined in the URI specifications.
+  RSA_SHA1 support correctly URL encodes the base64 encoding of the signature.
 - Fixed issue 468
   https://jersey.dev.java.net/issues/show_bug.cgi?id=468
   If URI canonicalization, and optionally URI normalization is set to true, but

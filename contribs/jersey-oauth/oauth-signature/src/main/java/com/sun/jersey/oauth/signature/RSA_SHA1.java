@@ -36,6 +36,7 @@
 
 package com.sun.jersey.oauth.signature;
 
+import com.sun.jersey.api.uri.UriComponent;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -148,7 +149,8 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
             throw new IllegalStateException(se);
         }
 
-        return new String(Base64.encode(rsasha1));
+        return UriComponent.encode(new String(Base64.encode(rsasha1)),
+                UriComponent.Type.UNRESERVED);
     }
 
     /**
@@ -195,7 +197,8 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
         byte[] decodedSignature;
 
         try {
-            decodedSignature = Base64.decode(signature);
+            decodedSignature = Base64.decode(
+                    UriComponent.decode(signature, UriComponent.Type.UNRESERVED));
         }
         catch (IOException ioe) {
             return false;

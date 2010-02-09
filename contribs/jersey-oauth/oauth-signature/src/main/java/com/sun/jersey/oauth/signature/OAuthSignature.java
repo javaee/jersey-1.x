@@ -145,9 +145,11 @@ public class OAuthSignature {
 
             String value = params.get(key);
 
-            // "...parameter names and values are escaped using RFC3986 percent-encoding..."
+            // Encode key and values as per section 5.1 http://oauth.net/core/1.0/#encoding_parameters
             if (value != null) {
-                list.add(UriComponent.encode(key, UriComponent.Type.QUERY) + '=' + UriComponent.encode(value, UriComponent.Type.QUERY));
+                list.add(UriComponent.encode(key, UriComponent.Type.UNRESERVED) + 
+                        '=' +
+                        UriComponent.encode(value, UriComponent.Type.UNRESERVED));
             }
         }
 
@@ -162,10 +164,12 @@ public class OAuthSignature {
             // the same parameter name can have multiple values
             List<String> values = request.getParameterValues(key);
 
-            // "... parameter names and values are escaped using RFC3986 percent-encoding..."
+            // Encode key and values as per section 5.1 http://oauth.net/core/1.0/#encoding_parameters
             if (values != null) {
                 for (String value : values) {
-                    list.add(UriComponent.encode(key, UriComponent.Type.QUERY) + '=' + UriComponent.encode(value, UriComponent.Type.QUERY));
+                    list.add(UriComponent.encode(key, UriComponent.Type.UNRESERVED) + 
+                            '=' +
+                            UriComponent.encode(value, UriComponent.Type.UNRESERVED));
                 }
             }
         }
@@ -221,16 +225,17 @@ public class OAuthSignature {
      */
     private static String elements(OAuthRequest request,
     OAuthParameters params) throws OAuthSignatureException {
+        // HTTP request method
         StringBuffer buf = new StringBuffer(request.getRequestMethod().toUpperCase());
-        URI uri = constructRequestURL(request);
-        String tp = uri.getScheme();
-        buf.append('&').append(UriComponent.encode(tp, UriComponent.Type.SCHEME));
-        tp = uri.getAuthority();
-        buf.append("%3A%2F%2F").append(UriComponent.encode(tp, UriComponent.Type.AUTHORITY));
-        tp = uri.getPath();
-        buf.append(UriComponent.encode(tp, UriComponent.Type.PATH_SEGMENT));
-        buf.append('&').append(UriComponent.encode(normalizeParameters(request, params), UriComponent.Type.QUERY_PARAM));
-        System.err.println("--->" + buf);
+
+        // request URL, see section 9.1.2 http://oauth.net/core/1.0/#sig_url
+        buf.append('&').append(UriComponent.encode(constructRequestURL(request).toASCIIString(),
+                UriComponent.Type.UNRESERVED));
+
+        // normalized request parameters, see section 9.1.1 http://oauth.net/core/1.0/#sig_norm_param
+        buf.append('&').append(UriComponent.encode(normalizeParameters(request, params),
+                UriComponent.Type.UNRESERVED));
+
         return buf.toString();
     }
 

@@ -36,6 +36,7 @@
 
 package com.sun.jersey.oauth.signature;
 
+import com.sun.jersey.api.uri.UriComponent;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -88,6 +89,8 @@ public class SignatureTest extends TestCase {
             "syGCH7wke8AUs3BpnwZJtAuEJkvQL2/9n4s5wUmUl4aCI4BwpraNx4RtEXMe5qg5" +
             "T1LVTGliMRpKasKsW//e+RinhejgCuzoH26dyF8iY2ZZ/5D1ilgeijhV/vBka5tw" +
             "t399mXwaYdCwFYE=";
+    private static final String RSA_SIGNATURE_ENCODED = UriComponent.encode(RSA_SIGNATURE,
+            UriComponent.Type.UNRESERVED);
     private static final String RSA_NONCE = "13917289812797014437";
     private static final String RSA_TIMESTAMP = "1196666512";
 
@@ -196,7 +199,7 @@ public class SignatureTest extends TestCase {
         catch (OAuthSignatureException se) {
             fail(se.getMessage());
         }
-        assertEquals(signature, RSA_SIGNATURE);
+        assertEquals(signature, RSA_SIGNATURE_ENCODED);
 
         OAuthParameters saved = (OAuthParameters)params.clone();
 
@@ -221,7 +224,7 @@ public class SignatureTest extends TestCase {
         assertEquals(params.getTimestamp(), RSA_TIMESTAMP);
         assertEquals(params.getNonce(), RSA_NONCE);
         assertEquals(params.getVersion(), VERSION);
-        assertEquals(params.getSignature(), RSA_SIGNATURE);
+        assertEquals(params.getSignature(), RSA_SIGNATURE_ENCODED);
 
         secrets = new OAuthSecrets().consumerSecret(RSA_CERTIFICATE);
         try {

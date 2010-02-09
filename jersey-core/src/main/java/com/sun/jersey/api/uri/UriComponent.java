@@ -65,6 +65,10 @@ public class UriComponent {
     public enum Type {
 
         /**
+         * ALPHA / DIGIT / "-" / "." / "_" / "~" characters
+         */
+        UNRESERVED,
+        /**
          * The URI scheme component type.
          */
         SCHEME,
@@ -337,7 +341,10 @@ public class UriComponent {
         tables[Type.SCHEME.ordinal()] = creatingEncodingTable(l);
 
         l.clear();
+
         l.addAll(Arrays.asList(UNRESERVED));
+        tables[Type.UNRESERVED.ordinal()] = creatingEncodingTable(l);
+
         l.addAll(Arrays.asList(SUB_DELIMS));
 
         tables[Type.HOST.ordinal()] = creatingEncodingTable(l);

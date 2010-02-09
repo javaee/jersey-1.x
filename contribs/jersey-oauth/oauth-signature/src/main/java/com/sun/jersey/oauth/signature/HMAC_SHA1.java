@@ -85,14 +85,14 @@ public class HMAC_SHA1 implements OAuthSignatureMethod {
         // null secrets are interpreted as blank per OAuth specification
         String secret = secrets.getConsumerSecret();
         if (secret != null) {
-            buf.append(UriComponent.encode(secret, UriComponent.Type.QUERY));
+            buf.append(UriComponent.encode(secret, UriComponent.Type.UNRESERVED));
         }
 
         buf.append('&');
 
         secret = secrets.getTokenSecret();
         if (secret != null) {
-            buf.append(UriComponent.encode(secret, UriComponent.Type.QUERY));
+            buf.append(UriComponent.encode(secret, UriComponent.Type.UNRESERVED));
         }
 
         byte[] key;

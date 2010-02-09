@@ -454,7 +454,8 @@ public class OAuthParameters extends HashMap<String, String> {
                 if (nv.length != 2) {
                     continue;
                 }
-                put(UriComponent.decode(nv[0].trim(), UriComponent.Type.QUERY), UriComponent.decode(dequote(nv[1].trim()), UriComponent.Type.QUERY));
+                put(UriComponent.decode(nv[0].trim(), UriComponent.Type.UNRESERVED),
+                        UriComponent.decode(dequote(nv[1].trim()), UriComponent.Type.UNRESERVED));
             }
         }
 
@@ -475,8 +476,8 @@ public class OAuthParameters extends HashMap<String, String> {
             if (value == null) {
                 continue;
             }
-            buf.append(comma ? ", " : " ").append(UriComponent.encode(key, UriComponent.Type.QUERY));
-            buf.append("=\"").append(UriComponent.encode(value, UriComponent.Type.QUERY)).append('"');
+            buf.append(comma ? ", " : " ").append(UriComponent.encode(key, UriComponent.Type.UNRESERVED));
+            buf.append("=\"").append(UriComponent.encode(value, UriComponent.Type.UNRESERVED)).append('"');
             comma = true;
         }
         request.addHeaderValue(AUTHORIZATION_HEADER, buf.toString());
