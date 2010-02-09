@@ -89,8 +89,11 @@ public class SignatureTest extends TestCase {
             "syGCH7wke8AUs3BpnwZJtAuEJkvQL2/9n4s5wUmUl4aCI4BwpraNx4RtEXMe5qg5" +
             "T1LVTGliMRpKasKsW//e+RinhejgCuzoH26dyF8iY2ZZ/5D1ilgeijhV/vBka5tw" +
             "t399mXwaYdCwFYE=";
-    private static final String RSA_SIGNATURE_ENCODED = UriComponent.encode(RSA_SIGNATURE,
-            UriComponent.Type.UNRESERVED);
+    private static final String RSA_SIGNATURE_ENCODED = 
+            "jvTp%2FwX1TYtByB1m%2BPbyo0lnCOLIsyGCH7wke8AUs3BpnwZJtAuEJkvQL2%2" +
+            "F9n4s5wUmUl4aCI4BwpraNx4RtEXMe5qg5T1LVTGliMRpKasKsW%2F%2Fe%2BRin" +
+            "hejgCuzoH26dyF8iY2ZZ%2F5D1ilgeijhV%2FvBka5twt399mXwaYdCwFYE%3D";
+
     private static final String RSA_NONCE = "13917289812797014437";
     private static final String RSA_TIMESTAMP = "1196666512";
 

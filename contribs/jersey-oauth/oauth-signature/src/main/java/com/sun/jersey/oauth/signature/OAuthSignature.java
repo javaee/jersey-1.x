@@ -145,7 +145,7 @@ public class OAuthSignature {
 
             String value = params.get(key);
 
-            // Encode key and values as per section 5.1 http://oauth.net/core/1.0/#encoding_parameters
+            // Encode key and values as per section 3.6 http://tools.ietf.org/html/draft-hammer-oauth-10#section-3.6
             if (value != null) {
                 list.add(UriComponent.encode(key, UriComponent.Type.UNRESERVED) + 
                         '=' +
@@ -164,7 +164,7 @@ public class OAuthSignature {
             // the same parameter name can have multiple values
             List<String> values = request.getParameterValues(key);
 
-            // Encode key and values as per section 5.1 http://oauth.net/core/1.0/#encoding_parameters
+            // Encode key and values as per section 3.6 http://tools.ietf.org/html/draft-hammer-oauth-10#section-3.6
             if (values != null) {
                 for (String value : values) {
                     list.add(UriComponent.encode(key, UriComponent.Type.UNRESERVED) + 
@@ -228,11 +228,11 @@ public class OAuthSignature {
         // HTTP request method
         StringBuffer buf = new StringBuffer(request.getRequestMethod().toUpperCase());
 
-        // request URL, see section 9.1.2 http://oauth.net/core/1.0/#sig_url
+        // request URL, see section 3.4.1.2 http://tools.ietf.org/html/draft-hammer-oauth-10#section-3.4.1.2
         buf.append('&').append(UriComponent.encode(constructRequestURL(request).toASCIIString(),
                 UriComponent.Type.UNRESERVED));
 
-        // normalized request parameters, see section 9.1.1 http://oauth.net/core/1.0/#sig_norm_param
+        // normalized request parameters, see section 3.4.1.3.2 http://tools.ietf.org/html/draft-hammer-oauth-10#section-3.4.1.3.2
         buf.append('&').append(UriComponent.encode(normalizeParameters(request, params),
                 UriComponent.Type.UNRESERVED));
 
