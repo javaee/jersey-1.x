@@ -66,18 +66,18 @@ class Client extends Assert {
         WebResource resource;
         String response;
 
-//        params.timestamp("1191242090").nonce("hsu94j3884jdopsl");
-//        resource = client.resource(base + "/request_token");
-//        resource.addFilter(filter);
-//        response = resource.post(String.class);
-//        assertEquals(response, "oauth_token=hh5s93j4hdidpola&oauth_token_secret=hdhd0244k9j7ao03");
-//
-//        secrets.tokenSecret("hdhd0244k9j7ao03");
-//        params.token("hh5s93j4hdidpola").timestamp("1191242092").nonce("dji430splmx33448");
-//        resource = client.resource(base + "/access_token");
-//        resource.addFilter(filter);
-//        response = resource.post(String.class);
-//        assertEquals(response, "oauth_token=nnch734d00sl2jdk&oauth_token_secret=pfkkdhi9sl3r4s00");
+        params.timestamp("1191242090").nonce("hsu94j3884jdopsl");
+        resource = client.resource(base + "/request_token");
+        resource.addFilter(filter);
+        response = resource.post(String.class);
+        assertEquals(response, "oauth_token=hh5s93j4hdidpola&oauth_token_secret=hdhd0244k9j7ao03");
+
+        secrets.tokenSecret("hdhd0244k9j7ao03");
+        params.token("hh5s93j4hdidpola").timestamp("1191242092").nonce("dji430splmx33448");
+        resource = client.resource(base + "/access_token");
+        resource.addFilter(filter);
+        response = resource.post(String.class);
+        assertEquals(response, "oauth_token=nnch734d00sl2jdk&oauth_token_secret=pfkkdhi9sl3r4s00");
 
         secrets.tokenSecret("pfkkdhi9sl3r4s00");
         params.token("nnch734d00sl2jdk").signatureMethod("HMAC-SHA1").timestamp("1191242096").
