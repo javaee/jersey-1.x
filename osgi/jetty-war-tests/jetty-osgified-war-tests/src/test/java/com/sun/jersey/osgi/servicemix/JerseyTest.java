@@ -123,7 +123,7 @@ public class JerseyTest {
 //                mavenBundle("org.springframework","spring-web","2.5.6.SEC01"),
 //                mavenBundle("org.springframework.osgi","spring-osgi-web","1.2.0"),
                 
-                mavenBundle("com.sun.jersey.osgi","jsr311-api","1.2-SNAPSHOT"),
+                mavenBundle("javax.ws.rs","jsr311-api","1.1.1"),
                 mavenBundle("com.sun.jersey.osgi","jersey-core","1.2-SNAPSHOT"),
         	mavenBundle("com.sun.jersey.osgi","jersey-server", "1.2-SNAPSHOT"),
         	mavenBundle("com.sun.jersey.osgi","jersey-client", "1.2-SNAPSHOT"),

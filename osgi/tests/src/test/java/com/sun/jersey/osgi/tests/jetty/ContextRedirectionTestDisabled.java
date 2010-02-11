@@ -53,9 +53,9 @@ import static org.junit.Assert.*;
  *
  * @author Jakub Podlesak (japod at sun dot com)
  */
-public class ContextRedirectionTest extends AbstractJettyWebContainerTester {
+public class ContextRedirectionTestDisabled extends AbstractJettyWebContainerTester {
 
-    public ContextRedirectionTest() {
+    public ContextRedirectionTestDisabled() {
         super("context");
     }
     

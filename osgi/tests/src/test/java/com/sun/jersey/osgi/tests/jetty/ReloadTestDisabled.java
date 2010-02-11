@@ -62,7 +62,7 @@ import static org.junit.Assert.*;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class ReloadTest extends AbstractJettyWebContainerTester {
+public class ReloadTestDisabled extends AbstractJettyWebContainerTester {
     @Path("/one")
     public static class One {
         @GET
@@ -86,6 +86,7 @@ public class ReloadTest extends AbstractJettyWebContainerTester {
             ls = new ArrayList<ContainerListener>();
         }
         
+        @Override
         public void addListener(ContainerListener l) {
             ls.add(l);
         }

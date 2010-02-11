@@ -81,6 +81,12 @@
             <version>20070405</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -151,6 +157,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Bundle-Activator>com.sun.jersey.server.osgi.Activator</Bundle-Activator>
+                        <Private-Package>com.sun.jersey.server.osgi</Private-Package>
                         <Export-Package>
                             com.sun.jersey.*, com.sun.research.ws.wadl
                         </Export-Package>

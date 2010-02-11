@@ -53,7 +53,7 @@ public abstract class AbstractHttpServiceTest {
                 , mavenBundle("org.ops4j.pax.logging", "pax-logging-service", "1.4")
                 , mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4")
                 , mavenBundle("org.apache.felix", "org.apache.felix.http.bundle", "2.0.4")
-                , mavenBundle("com.sun.jersey.osgi", "jsr311-api", "1.2-SNAPSHOT")
+                , mavenBundle("javax.ws.rs", "jsr311-api", "1.1.1")
                 , mavenBundle("com.sun.jersey.osgi", "jersey-core", "1.2-SNAPSHOT")
                 , mavenBundle("com.sun.jersey.osgi", "jersey-server", "1.2-SNAPSHOT")
                 , mavenBundle("com.sun.jersey.osgi", "jersey-client", "1.2-SNAPSHOT")

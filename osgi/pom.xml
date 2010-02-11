@@ -30,7 +30,6 @@
 
     <modules>
         <module>jsr250-api</module>
-        <module>jsr311-api</module>
         <module>jersey-core</module>
         <module>jersey-server</module>
         <module>jersey-client</module>
