@@ -92,10 +92,21 @@ public class Viewable {
     private final Class<?> resolvingClass;
 
     /**
+     * Construct a new viewable type with a template name.
+     * <p>
+     * The model will be set to <code>null</code>.
+     *
+     * @param templateName the template name, shall not be <code>null</code>.
+     */
+    public Viewable(String templateName) {
+        this(templateName, null, null);
+    }
+
+    /**
      * Construct a new viewable type with a template name and a model.
      * 
-     * @param templateName the template name, shall not be null.
-     * @param model the model, may be null.
+     * @param templateName the template name, shall not be <code>null</code>.
+     * @param model the model, may be <code>null</code>.
      */
     public Viewable(String templateName, Object model) {
         this(templateName, model, null);
@@ -105,12 +116,12 @@ public class Viewable {
      * Construct a new viewable type with a template name, a model
      * and a resolving class.
      *
-     * @param templateName the template name, shall not be null.
-     * @param model the model, may be null.
+     * @param templateName the template name, shall not be <code>null</code>.
+     * @param model the model, may be <code>null</code>.
      * @param resolvingClass the class to use to resolve the template name
-     *        if the template is not absolute, if null then the resolving
+     *        if the template is not absolute, if <code>null</code> then the resolving
      *        class will be obtained from the last matching resource.
-     * @throws IllegalArgumentException if the template name is null.
+     * @throws IllegalArgumentException if the template name is <code>null</code>.
      */
     public Viewable(String templateName, Object model, Class<?> resolvingClass) 
             throws IllegalArgumentException {
