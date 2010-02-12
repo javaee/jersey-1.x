@@ -67,7 +67,7 @@
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.8</version>
+            <version>1.9.18-i</version>
         </dependency>
     </dependencies>
     <build>

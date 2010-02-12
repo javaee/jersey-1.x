@@ -130,7 +130,6 @@ public class GrizzlyWebProviderLifecycleTest extends AbstractGrizzlyWebContainer
 
         stopServer();
 
-        // TODO uncomment this when grizzly is fixed
-        // assertFalse(f.exists());
+        assertFalse(f.exists());
     }
 }

@@ -163,10 +163,10 @@ and receive HTTP responses requires a dependency on the <ulink url="http://downl
 <section>
 <title>Grizzly HTTP Web server</title>
 
-<para>Maven developers, deploying an application using the Grizzly HTTP Web server, require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.pom">grizzly-servlet-webserver</ulink> module.</para>
+<para>Maven developers, deploying an application using the Grizzly HTTP Web server, require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.pom">grizzly-servlet-webserver</ulink> module.</para>
 
 <para>Non-maven developers require:
-<ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.jar">grizzly-servlet-webserver.jar</ulink>
+<ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.jar">grizzly-servlet-webserver.jar</ulink>
 </para>
 </section>
 

@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -51,7 +52,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import javax.servlet.ServletContext;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.servlet.ServletConfig;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
@@ -223,11 +226,24 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
     }
 
     public static class InjectApp extends DefaultResourceConfig {
-        public InjectApp(@Context ServletContext sc) {
+        private File f;
+
+        public InjectApp(@Context ServletConfig sc) {
             getClasses().add(ResourceInjectApp.class);
 
             assertNotNull(sc);
             getProperties().put("z", sc.getInitParameter("x"));
+        }
+
+        @PostConstruct
+        public void postConstruct() throws IOException {
+            f = File.createTempFile("jersey", null);
+            getProperties().put("file", f);
+        }
+
+        @PreDestroy
+        public void preDestroy() {
+            f.delete();
         }
     }
 
@@ -238,6 +254,13 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
         @Produces("text/plain")
         public String get(@Context ResourceConfig rc) {
             return rc.getProperty("z").toString();
+        }
+
+        @GET
+        @Path("file")
+        @Produces("text/plain")
+        public String getFile(@Context ResourceConfig rc) {
+            return rc.getProperty("file").toString();
         }
     }
 
@@ -252,6 +275,14 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
                 path("/").build());
 
         assertEquals("y", r.get(String.class));
+
+        String file = r.path("file").get(String.class);
+        File f = new File(file);
+        assertTrue(f.exists());
+        
+        stopServer();
+
+        assertFalse(f.exists());
     }
 
 
@@ -288,7 +319,7 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
     }
 
     public static class InjectAppProvider extends DefaultResourceConfig {
-        public InjectAppProvider(@Context ServletContext sc) {
+        public InjectAppProvider(@Context ServletConfig sc) {
             getClasses().add(ResourceInjectAppProvider.class);
             getClasses().add(SingletonTypeProvider.class);
             getClasses().add(ToUpperWriter.class);

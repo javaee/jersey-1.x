@@ -19,7 +19,7 @@ as described in <xref linkend="chapter_deps"/>
 
 <itemizedlist>
   <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.pom">jersey-server</ulink> module, </listitem>
-   <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.pom">grizzly-servlet-webserver</ulink> module </listitem>
+   <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.pom">grizzly-servlet-webserver</ulink> module </listitem>
    <listitem>and optionally for WADL support if using Java SE 5 the <ulink url="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.12.pom">jaxb-impl</ulink> module</listitem>
  </itemizedlist>
  </para>
@@ -33,7 +33,7 @@ as described in <xref linkend="chapter_deps"/>
 &lt;dependency&gt;
     &lt;groupId&gt;com.sun.grizzly&lt;/groupId&gt;
     &lt;artifactId&gt;grizzly-servlet-webserver&lt;/artifactId&gt;
-    &lt;version&gt;1.9.8&lt;/version&gt;
+    &lt;version&gt;1.9.18-i&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 <para>
 And the following repositories need to be added to the pom:
@@ -52,7 +52,7 @@ And the following repositories need to be added to the pom:
 <para>
 Non-maven developers require:
 <itemizedlist>
-<listitem><ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.8/grizzly-servlet-webserver-1.9.8.jar">grizzly-servlet-webserver.jar</ulink>,</listitem>
+<listitem><ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.jar">grizzly-servlet-webserver.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.jar">jersey-server.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/&version;/jersey-core-&version;.jar">jersey-core.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/&jsr311-version;/jsr311-api-&jsr311-version;.jar">jsr311-api.jar</ulink>,</listitem>
