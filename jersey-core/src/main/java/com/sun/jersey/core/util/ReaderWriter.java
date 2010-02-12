@@ -99,7 +99,7 @@ public final class ReaderWriter {
     }
 
     /**
-     * Reader bytes from an input stream and write then to an output stream.
+     * Read bytes from an input stream and write them to an output stream.
      *
      * @param in the input stream to read from.
      * @param out the output stream to write to.
@@ -113,7 +113,7 @@ public final class ReaderWriter {
     }
 
     /**
-     * Reader characters from an input stream and write then to an output stream.
+     * Read characters from an input stream and write them to an output stream.
      *
      * @param in the reader to read from.
      * @param out the writer to write to.
