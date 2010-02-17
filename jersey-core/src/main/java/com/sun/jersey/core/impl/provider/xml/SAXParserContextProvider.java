@@ -78,7 +78,7 @@ public class SAXParserContextProvider extends ThreadLocalSingletonContextProvide
             } catch (Exception ex) {
                 LOGGER.log(Level.WARNING, 
                         "JAXP feature XMLConstants.FEATURE_SECURE_PROCESSING cannot be set on a SAXParserFactory. " +
-                        "External general entity processing is disbaled but other potential securty related" +
+                        "External general entity processing is disabled but other potential security related" +
                         " features will not be enabled.", 
                         ex);
             }
