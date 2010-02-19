@@ -72,11 +72,24 @@
             <version>1.1.2</version>
         </dependency> -->
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-test-framework</artifactId>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-embedded-glassfish</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-external</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-grizzly</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency> <!--
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

@@ -59,8 +59,15 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-test-framework</artifactId>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-grizzly</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- for external testing -->
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-external</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

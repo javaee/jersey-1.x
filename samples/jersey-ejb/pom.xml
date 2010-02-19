@@ -46,20 +46,18 @@
     <name>Jersey EJB - Jersey Sample</name>
     <packaging>war</packaging>
     <profiles>
-
         <profile>
             <id>test</id>
         </profile>
-
-	<profile>
-		<id>skip-test</id>
-		<activation>
-                        <activeByDefault>true</activeByDefault>
-                </activation>
-		<properties>
-			<maven.test.skip>true</maven.test.skip>
-		</properties>
-	</profile>
+        <profile>
+            <id>skip-test</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
     </profiles>
     <dependencies>
         <dependency>
@@ -68,21 +66,18 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.ejb</artifactId>
             <version>3.0-b59</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-test-framework</artifactId>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-external</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
     <build>
         <finalName>jersey-ejb</finalName>

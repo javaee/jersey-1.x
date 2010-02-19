@@ -35,123 +35,110 @@
  only if the new code is made subject to such option by the copyright
  holder.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-project</artifactId>
-        <version>1.2-SNAPSHOT</version>
-    </parent>
+    <groupId>com.sun.jersey</groupId>
     <artifactId>jersey-test-framework</artifactId>
-    <packaging>jar</packaging>
+    <version>1.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>Jersey Test Framework</name>
-    <profiles>
-        <profile>
-            <id>EmbeddedGF</id>
-            <activation>
-                <property>
-                    <name>container.type</name>
-                    <value>EmbeddedGF</value>
-                </property>
-            </activation>
-            <dependencies>
-               <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.embedded</groupId>
-                    <artifactId>glassfish-embedded-all</artifactId>
-                    <version>3.0-Prelude-Embedded-b14</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.grizzly</groupId>
-                    <artifactId>grizzly-servlet-webserver</artifactId>
-                    <version>1.9.18-i</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.net.httpserver</groupId>
-                    <artifactId>http</artifactId>
-                    <version>20070405</version>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>jdk-1.5-default</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                 <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.grizzly</groupId>
-                    <artifactId>grizzly-servlet-webserver</artifactId>
-                    <version>1.9.18-i</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.embedded</groupId>
-                    <artifactId>glassfish-embedded-all</artifactId>
-                    <version>3.0-Prelude-Embedded-b14</version>
-                    <scope>compile</scope>
-                </dependency>                
-                <dependency>
-                    <groupId>com.sun.net.httpserver</groupId>
-                    <artifactId>http</artifactId>
-                    <version>20070405</version>
-                </dependency>
-            </dependencies>
-        </profile>
-       <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.grizzly</groupId>
-                    <artifactId>grizzly-servlet-webserver</artifactId>
-                    <version>1.9.18-i</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.glassfish.embedded</groupId>
-                    <artifactId>glassfish-embedded-all</artifactId>
-                    <version>3.0-Prelude-Embedded-b14</version>
-                    <scope>compile</scope>
-                </dependency>              
-            </dependencies>
-        </profile>
-    </profiles>
-    <dependencies>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.5</version>
-        </dependency>
-    </dependencies>
+    <description>
+        Jersey is the open source (under dual CDDL+GPL license) JAX-RS (JSR 311)
+        production quality Reference Implementation for building
+        RESTful Web services.
+    </description>
+    <url>https://jersey.dev.java.net/</url>
+    <organization>
+        <name>Sun Microsystems, Inc</name>
+        <url>http://www.sun.com/</url>
+    </organization>
+    <issueManagement>
+        <system>java.net</system>
+        <url>https://jersey.dev.java.net/servlets/ProjectIssues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Hudson</system>
+        <url>http://hudson.glassfish.org/job/Jersey/</url>
+    </ciManagement>
+    <scm>
+        <connection>scm:svn:https://jersey.dev.java.net/svn/jersey/trunk/jersey/</connection>
+        <developerConnection>scm:svn:https://jersey.dev.java.net/svn/jersey/trunk/jersey/</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://jersey.dev.java.net/source/browse/jersey/trunk/jersey/</url>
+    </scm>
+    <mailingLists>
+        <mailingList>
+            <name>Jersey Users List</name>
+            <archive>http://markmail.org/search/?q=list%3Anet.java.dev.jersey.users</archive>
+            <post>users@jersey.dev.java.net</post>
+            <otherArchives>
+                <otherArchive>http://n2.nabble.com/Jersey-f576304.html</otherArchive>
+                <otherArchive>https://jersey.dev.java.net/servlets/SummarizeList?listName=users</otherArchive>
+            </otherArchives>
+        </mailingList>
+        <mailingList>
+            <name>Jersey Dev List</name>
+            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=dev</archive>
+            <post>dev@jersey.dev.java.net</post>
+        </mailingList>
+    </mailingLists>
+    <licenses>
+        <license>
+            <name>
+                CDDL+GPL License
+            </name>
+            <url>https://jersey.dev.java.net/CDDL+GPL.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <modules>
+        <module>jersey-test-framework-core</module>
+        <module>jersey-test-framework-grizzly</module>
+        <module>jersey-test-framework-http</module>
+        <module>jersey-test-framework-external</module>
+        <module>jersey-test-framework-embedded-glassfish</module>
+        <module>jersey-test-framework-inmemory</module>
+    </modules>
     <build>
-        <finalName>jersey-test-framework</finalName>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Build-Id>${project.version} ${buildNumber}</Build-Id>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.0-beta-3</version>
+                <configuration>
+                    <format>{0,date,MM/dd/yyyy hh:mm aa}</format>
+                    <items>
+                        <item>timestamp</item>
+                    </items>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
@@ -160,58 +147,92 @@
                 </configuration>
             </plugin>
             <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>com/sun/jersey/test/framework/impl/container/http/*Test.java</exclude>
-                        <exclude>com/sun/jersey/test/framework/impl/container/http/testpackage/*Test.java</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/src.xml</descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                        <phase>package</phase> <!-- append to the packaging phase. -->
-                        <goals>
-                            <goal>attached</goal> <!-- goals == mojos -->
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
-                        <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/jersey/</link>
-                    </links>
-                    <excludePackageNames>com.sun.jersey.test.framework.impl</excludePackageNames>
-                    <notimestamp>true</notimestamp>
-                </configuration>
+                <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <!--version>2.5</version-->
+        </plugin>
+      </plugins>
+        <extensions>
+            <extension>
+                <groupId>org.jvnet.wagon-svn</groupId>
+                <artifactId>wagon-svn</artifactId>
+                <version>1.8</version>
+            </extension>
+        </extensions>
     </build>
+
+<!--
+    <reporting>
+       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.5</version>
+          <reportSets>
+            <reportSet>
+              <id>aggregate</id>
+              <configuration>
+                <excludePackageNames>com.sun.jersey.samples</excludePackageNames>
+              </configuration>
+            </reportSet>
+          </reportSets>
+        </plugin>
+      </plugins>
+    </reporting>
+-->
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/2/</url>
+            <layout>default</layout>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven-repository.dev.java.net</id>
+            <name>Java.net Maven 1 Repository (legacy)</name>
+            <url>http://download.java.net/maven/1</url>
+            <layout>legacy</layout>
+        </pluginRepository>
+    </pluginRepositories>
     <repositories>
         <repository>
-            <id>glassfish-repository</id>
-            <name>Java.net Repository for Glassfish</name>
-            <url>http://download.java.net/maven/glassfish</url>
+            <id>m1.dev.java.net</id>
+            <url>http://download.java.net/maven/1</url>
+            <layout>legacy</layout>
+        </repository>
+        <repository>
+            <id>m2.dev.java.net</id>
+            <url>http://download.java.net/maven/2</url>
+            <layout>default</layout>
         </repository>
     </repositories>
+
+    <!-- i believe this is not necessary -->
+    <!--
+    <properties>
+        <jersey-version>1.2-SNAPSHOT</jersey-version>
+    </properties>
+    -->
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>java.net-m2-dist-repository</id>
+            <name>java.net-m2-repository</name>
+            <url>java-net:/maven2-repository/trunk/repository/</url>
+        </repository>
+    </distributionManagement>
 </project>
