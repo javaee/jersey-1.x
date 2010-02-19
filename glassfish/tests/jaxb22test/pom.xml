@@ -54,10 +54,15 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-grizzly</artifactId>
-            <version>1.2-SNAPSHOT</version>
-            <!--version>${jersey-version}</version-->
+            <version>${jersey-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-external</artifactId>
+            <version>${jersey-version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

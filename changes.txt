@@ -1,4 +1,21 @@
 release 1.2 (03-2010)
+- Jersey Test Framework modularization
+  You can choose which container would be used for testing by depending on that
+  module. For example if you want to use InMemory container, specify dependency
+  like:
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-inmemory</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+  and it will be used. When you define multiple dependencies and grizzly module
+  (default) is present, tests will run on grizzly; otherwise (grizzly module is
+  not present) warning will be produced and tests will run on first discovered
+  module. This can be altered by specifying jersey.test.containerFactory property
+  and setting its value to TestContainer descendant (fully qualified java class
+  name).
 - Upgrade from Grizzly 1.9.8 to Grizzly 1.9.18-i
 - Fixed issue 465
   https://jersey.dev.java.net/issues/show_bug.cgi?id=465
