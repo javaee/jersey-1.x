@@ -1,4 +1,7 @@
 release 1.2 (03-2010)
+- Fixed issue 477
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=477
+  Added null check for value returned from ServletContext.getResourcePaths.
 - Jersey Test Framework modularization
   You can choose which container would be used for testing by depending on that
   module. For example if you want to use InMemory container, specify dependency

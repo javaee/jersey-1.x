@@ -36,15 +36,16 @@
  */
 package com.sun.jersey.spi.scanning;
 
-import com.sun.jersey.core.util.Closing;
 import com.sun.jersey.core.spi.scanning.JarFileScanner;
 import com.sun.jersey.core.spi.scanning.Scanner;
 import com.sun.jersey.core.spi.scanning.ScannerException;
 import com.sun.jersey.core.spi.scanning.ScannerListener;
+import com.sun.jersey.core.util.Closing;
+
+import javax.servlet.ServletContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Set;
-import javax.servlet.ServletContext;
 
 /**
  * A scanner that recursively scans resources within a Web application.
@@ -78,6 +79,8 @@ public class WebAppResourcesScanner implements Scanner {
 
     private void scan(final String root, final ScannerListener cfl) {
         final Set<String> resourcePaths = sc.getResourcePaths(root);
+        if(resourcePaths == null)
+            return;
         for (final String resourcePath : resourcePaths) {
             if (resourcePath.endsWith("/")) {
                 scan(resourcePath, cfl);
