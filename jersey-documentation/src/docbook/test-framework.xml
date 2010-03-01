@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+        "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
+        <!ENTITY % ents SYSTEM "jersey.ent" >
+        %ents;
+        ]>
+
+<chapter>
+    <title>Jersey Test Framework</title>
+
+    <para>This chapter will present how to write tests for your resources
+    using Jersey Test Framework and how to run them in various containers.
+    Additionally it will explain how to create new module for not yet
+    supported container.</para>
+
+    <para>Jersey currently provides following modules:
+
+        <itemizedlist>
+            <listitem>jersey-test-framework-grizzly</listitem>
+            <listitem>jersey-test-framework-http</listitem>
+            <listitem>jersey-test-framework-inmemory</listitem>
+            <listitem>jersey-test-framework-embedded-glassfish</listitem>
+            <listitem>jersey-test-framework-external</listitem>
+        </itemizedlist>
+    </para>
+
+    <section>
+        <title>Using test framework</title>
+        <para>When you want test your resources in maven-based project, you
+            need to add dependency on one of the Jersey Test Framework modules. You
+            can take a look at helloworld sample pom file. There is declared
+            dependency on:
+
+            <programlisting>
+
+                &lt;dependency&gt;
+                &lt;groupId&gt;com.sun.jersey.jersey-test-framework&lt;/groupId&gt;
+                &lt;artifactId&gt;jersey-test-framework-grizzly&lt;/artifactId&gt;
+                &lt;version&gt;${project.version}&lt;/version&gt;
+                &lt;scope&gt;test&lt;/scope&gt;
+                &lt;/dependency&gt;
+
+            </programlisting>
+
+            which means that Grizzly Web container will be used for testing.
+        </para>
+
+        <para>You can specify more than one module in dependencies and choose which
+        module will be used by <literal>jersey.test.containerFactory</literal> property.
+        Every module should contain at least one container factory.</para>
+
+        <glosslist>
+            <glossentry>
+                <glossterm>jersey-test-framework-grizzly</glossterm>
+                <glossdef>
+                    <para>
+                        <literal>com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory</literal>
+                        <literal>com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory</literal>
+                    </para>
+                </glossdef>
+            </glossentry>
+            <glossentry>
+                <glossterm>jersey-test-framework-http</glossterm>
+                <glossdef>
+                    <para>
+                        <literal>com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory</literal>
+                    </para>
+                </glossdef>
+            </glossentry>
+            <glossentry>
+                <glossterm>jersey-test-framework-inmemory</glossterm>
+                <glossdef>
+                    <para>
+                        <literal>com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory</literal>
+                    </para>
+                </glossdef>
+            </glossentry>
+            <glossentry>
+                <glossterm>jersey-test-framework-embedded-glassfish</glossterm>
+                <glossdef>
+                    <para>
+                        <literal>com.sun.jersey.test.framework.spi.container.embedded.glassfish.TestContainerFactory</literal>
+                    </para>
+                </glossdef>
+            </glossentry>
+            <glossentry>
+                <glossterm>jersey-test-framework-external</glossterm>
+                <glossdef>
+                    <para>
+                        <literal>com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory</literal>
+                    </para>
+                </glossdef>
+            </glossentry>
+        </glosslist>
+
+        <para>Basically you can just add dependency on single module and its container factory would be used. Problem
+        is when you specify module which has more than one container factory or multiple modules. If this happen, test
+        framework will choose factory using following rules:</para>
+
+        <programlisting>
+            if("jersey.test.containerFactory" not specified)
+                look for factories
+                if(factories.count == 1)
+                    use found factory
+                else
+                    if(GrizzlyWebTestContainerFactory is present)
+                        use it // current default jersey test container factory
+                    else
+                        use first found and log warning
+            else
+                use factory class specified in "jersey.test.containerFactory"
+
+        </programlisting>
+
+        <para>That means if your project depends on multiple test framework modules and you want to control which will
+        be used, you have to declare which one in property called "jersey.test.containerFactory", for example like this:
+
+            <literal>mvn clean install -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory</literal>
+        </para>
+
+    </section>
+
+    <section>
+        <title>Creating tests</title>
+
+        <para>Jersey Test Framework uses JUnit version 4.X, so if you can write standard unit tests, you can easily
+        create Jersey Test. Your test is a descendant of JerseyTest class.
+
+        <programlisting>
+            public class MainTest extends JerseyTest {
+
+                public MainTest()throws Exception {
+                    super("com.sun.jersey.samples.helloworld.resources");
+                }
+
+                @Test
+                public void testHelloWorld() {
+                    WebResource webResource = resource();
+                    String responseMsg = webResource.path("helloworld").get(String.class);
+                    assertEquals("Hello World", responseMsg);
+                }
+
+            }
+        </programlisting>
+
+        Note <literal>super</literal> call in constructor - it passes list of package names to scan (it really is a list,
+        JerseyTest constructor has variable argument count). Another useful method is
+        <literal>resource()</literal> which returns WebResource instance with URI set to base URI of your application.
+        You can get preconfigured Jersey Client instance similarly by calling <literal>client()</literal> method.</para>
+
+    </section>
+
+    <section>
+        <title>Creating own module</title>
+        <para>
+            TODO
+        </para>
+    </section>
+
+</chapter>

@@ -446,10 +446,10 @@ See the Java documentation <ulink url="https://jersey.dev.java.net/nonav/apidocs
 </para>
 <para>A developer may write tests using the Junit 4.x framework can extend from the abstract <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey-test-framework/com/sun/jersey/test/framework/JerseyTest.html">JerseyTest</ulink> class.
 </para>
-<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/&version;/jersey-test-framework-&version;.pom">jersey-test-framework</ulink> module. The following dependency needs to be added to the pom:
+<para>Maven developers require a dependency on the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly/&version;/jersey-test-framework-grizzly-&version;.pom">jersey-test-framework-grizzly</ulink> module. The following dependency needs to be added to the pom:
 <programlisting >&lt;dependency&gt;
-    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
-    &lt;artifactId&gt;jersey-test-framework&lt;/artifactId&gt;
+    &lt;groupId&gt;com.sun.jersey.jersey-test-framework&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-test-framework-grizzly&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
     &lt;scope&gt;test&lt;/scope&gt;
 &lt;/dependency&gt;</programlisting>
@@ -470,15 +470,15 @@ following test container factories:
 	</listitem>
 </itemizedlist>
 </para>
-<para>The system property <code>test.containerFactory</code> is utilized to declare the default test container factory that shall be used for testing, the value of which is the fully qualified class name of a test container factory class. If the property is not declared then the GrizzlyWebTestContainerFactory is utilized as default test container factory.
+<para>The system property <code>jersey.test.containerFactory</code> is utilized to declare the default test container factory that shall be used for testing, the value of which is the fully qualified class name of a test container factory class. If the property is not declared then the GrizzlyWebTestContainerFactory is utilized as default test container factory.
 </para>
 <para>To test a maven-based web project with an external container such as GlassFish, create the war file then deploy as follows (assuming that the pom file is set up for deployment):
 <programlisting >mvn clean package -Dmaven.test.skip=true
 </programlisting>
 Then execute the tests as follows:
-<programlisting >mvn test \ -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory \
+<programlisting ><![CDATA[mvn test \ -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.embedded.glassfish.external.ExternalTestContainerFactory \
 -DJERSEY_HTTP_PORT=&lt;HTTP_PORT&gt;
-</programlisting>
+]]></programlisting>
 </para>
 <para><emphasis>Breaking changes from 1.1.1-ea to 1.1.2-ea</emphasis>
 </para>

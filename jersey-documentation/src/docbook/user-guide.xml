@@ -26,6 +26,7 @@ More content to come soon...
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="client-api.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="json.xml" /> 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="hypermedia.xml" />
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="test-framework.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="dependencies.xml" />
 
 </book>
