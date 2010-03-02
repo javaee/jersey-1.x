@@ -35,34 +35,46 @@
  * holder.
  */
 
-package com.sun.jersey.server.osgi;
+package com.sun.jerseyosgird;
 
-import com.sun.jersey.server.impl.provider.RuntimeDelegateImpl;
-
-import javax.ws.rs.ext.RuntimeDelegate;
-
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-
-import java.util.logging.Logger;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  *
  * @author japod
  */
-public class Activator implements BundleActivator {
-
-    private static final Logger LOGGER = Logger.getLogger(Activator.class.getName());
+public class SimpleNonJerseyServlet extends HttpServlet {
+   
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        response.setContentType("text/plain");
+        PrintWriter out = response.getWriter();
+        try {
+            out.print("raw servlet");
+        } finally { 
+            out.close();
+        }
+    } 
 
     @Override
-    public void start(BundleContext bc) throws Exception {
-        LOGGER.config("jersey-server bundle activator registers JAX-RS RuntimeDelegate instance");
-        RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        processRequest(request, response);
+    } 
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws ServletException, IOException {
+        processRequest(request, response);
     }
 
     @Override
-    public void stop(BundleContext bc) throws Exception {
-        // TODO: what now brown cow?
+    public String getServletInfo() {
+        return "Simple non-Jersey servlet for test purpose";
     }
-
 }

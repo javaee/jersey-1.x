@@ -35,12 +35,13 @@
  * holder.
  */
 
-package com.sun.jersey.server.osgi;
+package com.sun.jersey.client.osgi;
 
-import com.sun.jersey.server.impl.provider.RuntimeDelegateImpl;
+import com.sun.ws.rs.ext.RuntimeDelegateImpl;
 
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -56,13 +57,28 @@ public class Activator implements BundleActivator {
 
     @Override
     public void start(BundleContext bc) throws Exception {
-        LOGGER.config("jersey-server bundle activator registers JAX-RS RuntimeDelegate instance");
-        RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
+
+        Bundle jerseyServerBundle = getJerseyServerBundle(bc);
+
+        if (jerseyServerBundle == null) {
+            LOGGER.config("jersey-client bundle registers JAX-RS RuntimeDelegate");
+            RuntimeDelegate.setInstance(new RuntimeDelegateImpl());
+        } else {
+            jerseyServerBundle.start();
+        }
+    }
+
+    private Bundle getJerseyServerBundle(BundleContext bc) {
+        for (Bundle b : bc.getBundles()) {
+            if (b.getSymbolicName().endsWith("jersey-server")) {
+                return b;
+            }
+        }
+        return null;
     }
 
     @Override
     public void stop(BundleContext bc) throws Exception {
         // TODO: what now brown cow?
     }
-
 }

@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import javax.ws.rs.ext.RuntimeDelegate;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;

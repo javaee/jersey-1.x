@@ -37,6 +37,7 @@
         <module>tests</module>
         <module>jetty-war-tests</module>
         <module>http-service-test</module>
+        <module>runtime-delegate-tests</module>
     </modules>
    
 </project>

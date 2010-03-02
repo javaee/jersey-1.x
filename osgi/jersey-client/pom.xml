@@ -27,6 +27,12 @@
             <version>2.1</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
    </dependencies>
 
     <build>
@@ -86,9 +92,10 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Bundle-Activator>com.sun.jersey.client.osgi.Activator</Bundle-Activator>
                         <Import-Package>javax.mail.*;resolution:=optional, *</Import-Package>
+                        <Private-Package>com.sun.ws.rs.ext, com.sun.jersey.client.osgi</Private-Package>
                         <Export-Package>com.sun.jersey.api.client.*,com.sun.jersey.client.*</Export-Package>
-                        <Private-Package>com.sun.ws.rs.ext</Private-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
