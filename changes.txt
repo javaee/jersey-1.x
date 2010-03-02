@@ -1,4 +1,8 @@
 release 1.2 (03-2010)
+- Fixed issue 479
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=479
+  Fixed package scanning for applications deployed to the WebLogic application
+  server.
 - Fixed issue 477
   https://jersey.dev.java.net/issues/show_bug.cgi?id=477
   Added null check for value returned from ServletContext.getResourcePaths.
