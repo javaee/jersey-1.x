@@ -47,6 +47,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitial
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -88,10 +89,16 @@ public class IoCComponentProcessorTest extends TestCase {
 
         @Context ClientConfig cc;
 
+        @Context FeaturesAndProperties fap;
+
+        @Context Client c;
+
         public void postConstruct() {
             assertNotNull(p);
             assertNotNull(mbw);
             assertNotNull(cc);
+            assertNotNull(fap);
+            assertNotNull(c);
         }
 
         public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
