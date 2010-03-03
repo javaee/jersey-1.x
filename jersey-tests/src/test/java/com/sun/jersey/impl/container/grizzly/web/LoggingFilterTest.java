@@ -66,6 +66,12 @@ public class LoggingFilterTest extends AbstractGrizzlyWebContainerTester {
         public Response get304() {
             return Response.notModified().header("X-FOO", "foo").build();
         }
+        
+        @Path("bytes")
+        @GET
+        public byte[] getBytes() {
+            return "GET".getBytes();
+        }
     }
     
     public LoggingFilterTest(String testName) {
@@ -86,6 +92,40 @@ public class LoggingFilterTest extends AbstractGrizzlyWebContainerTester {
         WebResource r = c.resource(getUri().build()).path("200");
 
         assertEquals("GET", r.get(String.class));
+    }
+
+    public void testGetBytes() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(initParams, Resource.class);
+
+        Client c = Client.create();
+        WebResource r = c.resource(getUri().build()).path("bytes");
+        
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertNotNull(cr.getHeaders().getFirst("Content-Length"));
+        assertEquals("3", cr.getHeaders().getFirst("Content-Length"));
+    }
+    
+    public void testGetBytesDisableEntity() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                LoggingFilter.class.getName());
+        initParams.put(LoggingFilter.FEATURE_LOGGING_DISABLE_ENTITY,
+                "true");
+        startServer(initParams, Resource.class);
+
+        Client c = Client.create();
+        WebResource r = c.resource(getUri().build()).path("bytes");
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertNotNull(cr.getHeaders().getFirst("Content-Length"));
+        assertEquals("3", cr.getHeaders().getFirst("Content-Length"));
     }
 
     public void testGet304() {

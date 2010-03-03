@@ -1,4 +1,8 @@
 release 1.2 (03-2010)
+- Fixed issue 471
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=471
+  LoggingFilter should not have side-effects on the response and retain
+  content length information.
 - Allow injection of the Client instance onto client-managed provider
   classes.
 - Fixed issue 475

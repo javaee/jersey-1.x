@@ -203,6 +203,8 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 
         private final boolean disableEntity;
 
+        private long contentLength;
+
         private ContainerResponse response;
 
         private ByteArrayOutputStream baos;
@@ -220,8 +222,9 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
 
             if (disableEntity) {
                 logger.info(b.toString());
-                return crw.writeStatusAndHeaders(-1, response);
+                return crw.writeStatusAndHeaders(contentLength, response);
             } else {
+                this.contentLength = contentLength;
                 this.response = response;
                 return this.baos = new ByteArrayOutputStream();
             }
@@ -236,7 +239,7 @@ public class LoggingFilter implements ContainerRequestFilter, ContainerResponseF
                 logger.info(b.toString());
 
                 // Write out the headers and buffered entity
-                OutputStream out = crw.writeStatusAndHeaders(-1, response);
+                OutputStream out = crw.writeStatusAndHeaders(contentLength, response);
                 out.write(entity);
             }
             crw.finish();
