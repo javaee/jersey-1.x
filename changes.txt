@@ -1,4 +1,10 @@
 release 1.2 (03-2010)
+- Allow injection of the Client instance onto client-managed provider
+  classes.
+- Fixed issue 475
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=475
+  A registered application can return null for getClasses and getSingletons
+  which has the same meaning as returning an empty set.
 - Fixed issue 479
   https://jersey.dev.java.net/issues/show_bug.cgi?id=479
   Fixed package scanning for applications deployed to the WebLogic application

@@ -48,7 +48,9 @@ public class ApplicationAdapter extends DefaultResourceConfig {
      * @param ac the application
      */
     public ApplicationAdapter(Application ac) {
-        getClasses().addAll(ac.getClasses());
-        getSingletons().addAll(ac.getSingletons());
+        if (ac.getClasses() != null)
+            getClasses().addAll(ac.getClasses());
+        if (ac.getSingletons() != null)
+            getSingletons().addAll(ac.getSingletons());
     }
 }

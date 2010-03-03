@@ -75,7 +75,8 @@ public class DeferredResourceConfig extends DefaultResourceConfig {
         }
         Application app = (Application)cp.getInstance();
         
-        if (app.getClasses().isEmpty() && app.getSingletons().isEmpty()) {
+        if ((app.getClasses() == null || app.getClasses().isEmpty()) &&
+                (app.getSingletons() == null || app.getSingletons().isEmpty())) {
             LOGGER.info("Instantiating the Application class, named " +
                     appClass.getName() +
                     ". The following root resource and provider classes are registered: " + defaultClasses);

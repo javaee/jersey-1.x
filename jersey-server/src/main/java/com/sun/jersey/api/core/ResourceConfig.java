@@ -825,8 +825,10 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * @param app the application.
      */
     public void add(Application app) {
-        addAllFirst(getClasses(), app.getClasses());
-        addAllFirst(getSingletons(), app.getSingletons());
+        if (app.getClasses() != null)
+            addAllFirst(getClasses(), app.getClasses());
+        if (app.getSingletons() != null)
+            addAllFirst(getSingletons(), app.getSingletons());
         
         if (app instanceof ResourceConfig) {
             ResourceConfig rc = (ResourceConfig)app;

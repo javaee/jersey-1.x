@@ -222,9 +222,13 @@ public class Client extends Filterable implements ClientHandler {
         injectableFactory.add(new ContextInjectableProvider<FeaturesAndProperties>(
                 FeaturesAndProperties.class, config));
 
-        // Allow injection of resource config
+        // Allow injection of client config
         injectableFactory.add(new ContextInjectableProvider<ClientConfig>(
                 ClientConfig.class, config));
+
+        // Allow injection of client
+        injectableFactory.add(new ContextInjectableProvider<Client>(
+                Client.class, this));
 
         injectableFactory.configure(providerServices);
 

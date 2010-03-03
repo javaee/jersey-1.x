@@ -38,7 +38,9 @@
 package com.sun.jersey.impl.container.grizzly.web;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
@@ -48,6 +50,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -164,6 +167,58 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
         assertEquals("test", r.get(String.class));
     }
 
+
+    public static class NullSingletonApp extends Application {
+        @Override
+        public Set<Class<?>> getClasses() {
+            return new HashSet(Arrays.asList(Resource.class));
+        }
+
+        @Override
+        public Set<Object> getSingletons() {
+            return null;
+        }
+    }
+
+    public void testNullSingletonApp() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put("javax.ws.rs.Application", NullSingletonApp.class.getName());
+        initParams.put("property", "test");
+        initParams.put("feature", "true");
+
+        startServer(initParams);
+
+        WebResource r = Client.create().resource(getUri().
+                path("/").build());
+        
+        assertEquals("test", r.get(String.class));
+    }
+
+    public static class NullClassApp extends Application {
+        @Override
+        public Set<Class<?>> getClasses() {
+            return null;
+        }
+
+        @Override
+        public Set<Object> getSingletons() {
+            return new HashSet(Arrays.asList(new Resource()));
+        }
+    }
+
+    public void testNullClassApp() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put("javax.ws.rs.Application", NullClassApp.class.getName());
+        initParams.put("property", "test");
+        initParams.put("feature", "true");
+
+        startServer(initParams);
+
+        WebResource r = Client.create().resource(getUri().
+                path("/").build());
+
+        assertEquals("test", r.get(String.class));
+    }
 
     public static class OverridePropertyApp extends DefaultResourceConfig {
         public OverridePropertyApp() {
