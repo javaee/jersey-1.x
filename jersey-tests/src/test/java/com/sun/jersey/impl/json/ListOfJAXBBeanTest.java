@@ -72,22 +72,27 @@ public class ListOfJAXBBeanTest extends AbstractResourceTester {
         super(testName);
     }
 
+    private static boolean unwrappingOn = true;
+
     @Provider
     public static class JAXBContextResolver implements ContextResolver<JAXBContext> {
-        private JAXBContext context;
+        private JAXBContext unwrappingContext;
+        private JAXBContext wrappingContext;
         private final Class[] cTypes = {Dog.class};
         private final Set<Class> types;
         public JAXBContextResolver() {
             try {
                 this.types = new HashSet<Class>(Arrays.asList(cTypes));
-                this.context = new JSONJAXBContext(JSONConfiguration.natural().rootUnwrapping(true).build(), cTypes);
+                this.unwrappingContext = new JSONJAXBContext(JSONConfiguration.natural().rootUnwrapping(true).build(), cTypes);
+                this.wrappingContext = new JSONJAXBContext(JSONConfiguration.natural().rootUnwrapping(false).build(), cTypes);
             } catch (JAXBException ex) {
                 throw new RuntimeException(ex);
             }
         }
         
         public JAXBContext getContext(Class<?> c) {
-            return types.contains(c) ? context : null;
+            JAXBContext myContext = unwrappingOn ? unwrappingContext : wrappingContext;
+            return types.contains(c) ? myContext : null;
         }
     }
     
@@ -99,7 +104,18 @@ public class ListOfJAXBBeanTest extends AbstractResourceTester {
         }
     }
     
-    public void testDogsResource() throws Exception {
+
+    public void testDogsResourceUnwrappingOn() throws Exception {
+        unwrappingOn = true;
+        rawTestDogsResource();
+    }
+    
+    public void disabledTestDogsResourceUnwrappingOff() throws Exception {
+        unwrappingOn = false;
+        rawTestDogsResource();
+    }
+
+    private void rawTestDogsResource() throws Exception {
         JAXBContextResolver cr = new JAXBContextResolver();
         ResourceConfig rc = new DefaultResourceConfig(DogsResource.class);
         rc.getSingletons().add(cr);
