@@ -75,7 +75,7 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.osgi</groupId>
+            <groupId>com.sun.jersey.osgi.runtime-delegate-tests</groupId>
             <artifactId>runtime-delegate-test-bundle</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>

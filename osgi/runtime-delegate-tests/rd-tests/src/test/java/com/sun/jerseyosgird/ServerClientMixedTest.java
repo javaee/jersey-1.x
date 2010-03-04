@@ -171,7 +171,7 @@ public class ServerClientMixedTest {
                 mavenBundle("com.sun.jersey.osgi","jersey-core","1.2-SNAPSHOT"),
         	mavenBundle("com.sun.jersey.osgi","jersey-client", "1.2-SNAPSHOT"),
         	mavenBundle("com.sun.jersey.osgi","jersey-server", "1.2-SNAPSHOT"),
-        	mavenBundle("com.sun.jersey.osgi","runtime-delegate-test-bundle", "1.2-SNAPSHOT"),
+        	mavenBundle("com.sun.jersey.osgi.runtime-delegate-tests","runtime-delegate-test-bundle", "1.2-SNAPSHOT"),
 
                 mavenBundle("com.sun.grizzly", "grizzly-servlet-webserver", "1.9.18-i"),
 
