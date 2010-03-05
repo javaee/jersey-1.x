@@ -60,6 +60,7 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
         }
     }
 
+    @Override
     public synchronized void start(BundleContext bundleContext) throws Exception {
         this.bundleContext = bundleContext;
         debugPrintln("activating");
@@ -75,6 +76,7 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
         debugPrintln("activated");
     }
 
+    @Override
     public synchronized void stop(BundleContext bundleContext) throws Exception {
         debugPrintln("deactivating");
         bundleContext.removeBundleListener(this);
@@ -85,6 +87,7 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
         this.bundleContext = null;
     }
 
+    @Override
     public void bundleChanged(BundleEvent event) {
         if (event.getType() == BundleEvent.RESOLVED) {
             register(event.getBundle());
@@ -141,6 +144,7 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
             this.bundle = bundle;
         }
 
+        @Override
         public List<Class> call() throws Exception {
             try {
                 debugPrintln("creating factories for key: " + factoryId);
