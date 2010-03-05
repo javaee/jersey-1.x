@@ -47,6 +47,7 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -65,17 +66,21 @@ public abstract class BaseFormProvider<T extends MultivaluedMap<String, String>>
 
         final StringTokenizer tokenizer = new StringTokenizer(encoded, "&");
         String token;
-        while (tokenizer.hasMoreTokens()) {
-            token = tokenizer.nextToken();
-            int idx = token.indexOf('=');
-            if (idx < 0) {
-                map.add(URLDecoder.decode(token, charsetName), null);
-            } else if (idx > 0) {
-                map.add(URLDecoder.decode(token.substring(0, idx), charsetName),
-                        URLDecoder.decode(token.substring(idx+1), charsetName));
+        try {
+            while (tokenizer.hasMoreTokens()) {
+                token = tokenizer.nextToken();
+                int idx = token.indexOf('=');
+                if (idx < 0) {
+                    map.add(URLDecoder.decode(token, charsetName), null);
+                } else if (idx > 0) {
+                    map.add(URLDecoder.decode(token.substring(0, idx), charsetName),
+                            URLDecoder.decode(token.substring(idx+1), charsetName));
+                }
             }
+            return map;
+        } catch (IllegalArgumentException ex) {
+            throw new WebApplicationException(ex, 400);
         }
-        return map;
     }
 
     public void writeTo(

@@ -1,4 +1,8 @@
 release 1.2 (03-2010)
+- Fixed issue 480
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=480
+  An error in the decoding of "application/x-www-form-urlencoded" information
+  will result in a 400 (Client error) response.
 - Fixed issue 471
   https://jersey.dev.java.net/issues/show_bug.cgi?id=471
   LoggingFilter should not have side-effects on the response and retain
