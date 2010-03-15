@@ -20,10 +20,18 @@
            <param-name>com.sun.jersey.config.property.packages</param-name>
            <param-value>com.sun.jersey.samples.bookstore.resources</param-value>
        </init-param>
+       <!-- pass to next filter if Jersey/App returns 404 -->
+       <init-param>
+           <param-name>com.sun.jersey.config.feature.FilterForwardOn404</param-name>
+           <param-value>true</param-value>
+       </init-param>
+       <!-- match regex to determine if Jersey/App is invoked or pass to next filter -->
+       <!--
        <init-param>
            <param-name>com.sun.jersey.config.property.WebPageContentRegex</param-name>
            <param-value>/(images|css|jsp)/.*</param-value>
        </init-param>
+       -->
    </filter>
    <filter-mapping>
        <filter-name>Jersey Filter</filter-name>

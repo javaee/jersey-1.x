@@ -1,4 +1,10 @@
 release 1.2 (03-2010)
+- Fixed issue 485
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=485
+  When a ServletContainer is used as a servlet filter and the feature
+  ServletContainer.FEATURE_FILTER_FORWARD_ON_404 is set to true then enable the
+  next filter in the chain to be invoked if Jersey or the application returns a
+  404 with no entity body.
 - Fixed issue 361
   https://jersey.dev.java.net/issues/show_bug.cgi?id=361
   Introduced new feature (FeaturesAndProperties.FEATURE_XMLROOTELEMENT_PROCESSING)

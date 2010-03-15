@@ -52,6 +52,27 @@ import javax.servlet.ServletException;
 public interface WebConfig {
 
     /**
+     * The web configuration type.
+     */
+    public static enum ConfigType {
+        /**
+         * A configuration type of servlet configuration.
+         */
+        ServletConfig,
+        /**
+         * A configuration type of filter configuration.
+         */
+        FilterConfig
+    };
+    
+    /**
+     * Get the configuration type of this config.
+     * 
+     * @return the configuration type.
+     */
+    ConfigType getConfigType();
+
+    /**
      * Get the name of the Web component.
      *
      * @return the name of the Web component.

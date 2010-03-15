@@ -76,9 +76,10 @@ import javax.ws.rs.core.UriBuilder;
  * A {@link Servlet} or {@link Filter} for deploying root resource classes.
  * <p>
  * If this class is declared as a filter and the initialization parameter
- * {@link #PROPERTY_WEB_PAGE_CONTENT_REGEX} is not set, then the filter must be
- * declared at the last position in the filter chain as the filter will not
- * forward any request to a next filter (if any) in the chain.
+ * {@link #PROPERTY_WEB_PAGE_CONTENT_REGEX} is not set
+ * or {@link #FEATURE_FILTER_FORWARD_ON_404} is not set to true then the filter
+ * must be declared at the last position in the filter chain as the filter will
+ * not forward any request to a next filter (if any) in the chain.
  * <p>
  * The following sections make reference to initialization parameters. Unless
  * otherwise specified the initialization parameters apply to both server
@@ -138,8 +139,8 @@ import javax.ws.rs.core.UriBuilder;
  * annotated with {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, 
  * {@link HttpServletResponse}, {@link ServletContext}, and {@link ServletConfig}.
  * If this class is used as a Servlet then the {@link ServletConfig} class may be
- * injected. If this class is used as a Filter then the {@link FilterConfig} class may be
- * injected.
+ * injected. If this class is used as a Filter then the {@link FilterConfig} 
+ * class may be injected.
  * 
  * <p>
  * A {@link IoCComponentProviderFactory} instance may be registered by extending this class
@@ -184,7 +185,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * regular expression.
      * <p>
      * This property is only applicable when this class is used as a
-     * {@link Filter}, otherwise this property will be ingored and not
+     * {@link Filter}, otherwise this property will be ignored and not
      * processed.
      * <p>
      * If a servlet path matches this regular expression then the filter
@@ -194,12 +195,35 @@ public class ServletContainer extends HttpServlet implements Filter {
      * <p>
      * For example if you set the value to
      * <code>/(image|css)/.*</code>
-     * then you can serve up images and CSS files for your Implicit or Explicit Views
-     * while still processing your JAX-RS resources.
+     * then you can serve up images and CSS files for your Implicit or Explicit 
+     * Views while still processing your JAX-RS resources.
      */
     public static final String PROPERTY_WEB_PAGE_CONTENT_REGEX
             = "com.sun.jersey.config.property.WebPageContentRegex";
 
+    /**
+     * If true and a 404 response with no entity body is returned from either
+     * the runtime or the application then the runtime forwards the request to
+     * the next filter in the filter chain. This enables another filter or
+     * the underlying servlet engine to process the request
+     * <p>
+     * This property is only applicable when this class is used as a
+     * {@link Filter}, otherwise this property will be ignored and not
+     * processed.
+     * <p>
+     * Application code, such as methods corresponding to sub-resource locators
+     * may be invoked when this feature is enabled.
+     * <p>
+     * This feature is an alternative to setting 
+     * {@link #PROPERTY_WEB_PAGE_CONTENT_REGEX} and requires less configuration.
+     * However, application code, such as methods corresponding to sub-resource
+     * locators, may be invoked when this feature is enabled.
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_FILTER_FORWARD_ON_404
+            = "com.sun.jersey.config.feature.FilterForwardOn404";
+    
     /**
      * A helper class for creating an injectable provider that supports
      * {@link Context} with a type and constant value.
@@ -225,6 +249,8 @@ public class ServletContainer extends HttpServlet implements Filter {
     private transient FilterConfig filterConfig;
 
     private transient Pattern staticContentPattern;
+
+    private transient boolean forwardOn404;
 
     private class InternalWebComponent extends WebComponent {
 
@@ -469,6 +495,10 @@ public class ServletContainer extends HttpServlet implements Filter {
     public void init() throws ServletException {
         init(new WebConfig() {
 
+            public WebConfig.ConfigType getConfigType() {
+                return WebConfig.ConfigType.ServletConfig;
+            }
+            
             public String getName() {
                 return ServletContainer.this.getServletName();
             }
@@ -640,6 +670,10 @@ public class ServletContainer extends HttpServlet implements Filter {
 
         init(new WebConfig() {
 
+            public WebConfig.ConfigType getConfigType() {
+                return WebConfig.ConfigType.FilterConfig;
+            }
+
             public String getName() {
                 return ServletContainer.this.filterConfig.getFilterName();
             }
@@ -710,6 +744,8 @@ public class ServletContainer extends HttpServlet implements Filter {
                         ", associated with the initialization parameter " + PROPERTY_WEB_PAGE_CONTENT_REGEX, ex);
             }
         }
+
+        forwardOn404 = rc.getFeature(FEATURE_FILTER_FORWARD_ON_404);
     }
     
     /**
@@ -775,8 +811,8 @@ public class ServletContainer extends HttpServlet implements Filter {
 
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             String requestURI, String servletPath, String queryString) throws IOException, ServletException {
-        // if we match the static content regular expression lets delegate to the filter chain
-        // to use the default container servlets & handlers
+        // if we match the static content regular expression lets delegate to 
+        // the filter chain to use the default container servlets & handlers
         final Pattern p = getStaticContentPattern();
         if (p != null && p.matcher(servletPath).matches()) {
             chain.doFilter(request, response);
@@ -795,5 +831,12 @@ public class ServletContainer extends HttpServlet implements Filter {
                 build();
 
         service(baseUri, requestUri, request, response);
+
+        // If forwarding is configured and response is a 404 with no entity
+        // body then call the next filter in the chain
+        if (forwardOn404 && response.getStatus() == 404 && !response.isCommitted()) {
+            chain.doFilter(request, response);
+            return;
+        }
     }
 }

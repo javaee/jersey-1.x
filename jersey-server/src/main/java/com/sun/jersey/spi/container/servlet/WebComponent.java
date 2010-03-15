@@ -149,6 +149,8 @@ public class WebComponent implements ContainerListener {
 
     private ResourceConfig resourceConfig;
 
+    private boolean useSendError;
+
     private WebApplication application;
 
     public WebComponent() {
@@ -198,6 +200,14 @@ public class WebComponent implements ContainerListener {
         if (resourceConfig == null)
             resourceConfig = createResourceConfig(config);
 
+        if (config.getConfigType() == WebConfig.ConfigType.FilterConfig) {
+            if (resourceConfig.getFeature(ServletContainer.FEATURE_FILTER_FORWARD_ON_404)) {
+                useSendError = false;
+            }
+        } else {
+            useSendError = true;
+        }
+
         load();
 
         Object o = resourceConfig.getProperties().get(
@@ -220,6 +230,8 @@ public class WebComponent implements ContainerListener {
     private final static class Writer extends OutputStream implements ContainerResponseWriter {
         final HttpServletResponse response;
 
+        final boolean useSendError;
+
         ContainerResponse cResponse;
 
         long contentLength;
@@ -228,7 +240,8 @@ public class WebComponent implements ContainerListener {
 
         boolean statusAndHeadersWritten = false;
 
-        Writer(HttpServletResponse response) {
+        Writer(boolean useSendError, HttpServletResponse response) {
+            this.useSendError = useSendError;
             this.response = response;
         }
 
@@ -249,8 +262,8 @@ public class WebComponent implements ContainerListener {
             // modification of the response headers will have no effect
             // after the invocation of sendError.
             writeHeaders();
-            
-            if (cResponse.getStatus() >= 400)
+
+            if (useSendError && cResponse.getStatus() >= 400)
                 response.sendError(cResponse.getStatus());
             else
                 response.setStatus(cResponse.getStatus());
@@ -381,7 +394,7 @@ public class WebComponent implements ContainerListener {
             requestInvoker.set(request);
             responseInvoker.set(response);
 
-            _application.handleRequest(cRequest, new Writer(response));
+            _application.handleRequest(cRequest, new Writer(useSendError, response));
         } catch (MappableContainerException ex) {
             traceOnException(cRequest, response);
             throw new ServletException(ex.getCause());
