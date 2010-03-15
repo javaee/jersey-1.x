@@ -267,9 +267,6 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     }
 
     protected final String getRootElementName(Class<?> elementType) {
-        XmlRootElement xreTMP = elementType.getAnnotation(XmlRootElement.class);
-        System.out.println("##### xreTMP: " + elementType + " " + xreTMP);
-
         if(isXmlRootElementProcessing()) {
             String name = elementType.getName();
 
