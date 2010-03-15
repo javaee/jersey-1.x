@@ -38,18 +38,7 @@
 package com.sun.jersey.core.provider.jaxb;
 
 import com.sun.jersey.core.impl.provider.entity.Inflector;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -62,6 +51,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -133,7 +134,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
 
         final Class listClass = (Class)pt.getActualTypeArguments()[0];
 
-        return listClass.isAnnotationPresent(XmlRootElement.class) || 
+        return listClass.isAnnotationPresent(XmlRootElement.class) ||
                 listClass.isAnnotationPresent(XmlType.class);        
     }
     
@@ -266,6 +267,19 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     }
 
     protected final String getRootElementName(Class<?> elementType) {
-        return convertToXmlName(inflector.decapitalize(inflector.pluralize(inflector.demodulize(elementType.getName()))));
+        XmlRootElement xreTMP = elementType.getAnnotation(XmlRootElement.class);
+        System.out.println("##### xreTMP: " + elementType + " " + xreTMP);
+
+        if(isXmlRootElementProcessing()) {
+            String name = elementType.getName();
+
+            XmlRootElement xre = elementType.getAnnotation(XmlRootElement.class);
+            if(xre != null && !xre.name().equals("##default"))
+                name = xre.name();
+
+            return convertToXmlName(inflector.pluralize(inflector.demodulize(name)));
+        } else {
+            return convertToXmlName(inflector.decapitalize(inflector.pluralize(inflector.demodulize(elementType.getName()))));
+        }
     }    
 }

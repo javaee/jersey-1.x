@@ -101,7 +101,7 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             throws JAXBException {
 
         JSONMarshaller jsonMarshaller = JSONJAXBContext.getJSONMarshaller(m);
-        if(getFormattedOutput())
+        if(isFormattedOutput())
             jsonMarshaller.setProperty(JSONMarshaller.FORMATTED, true);
         jsonMarshaller.marshallToJSON(t, new OutputStreamWriter(entityStream, c));
     }

@@ -39,9 +39,8 @@ package com.sun.jersey.core.provider.jaxb;
 
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import com.sun.jersey.core.util.FeaturesAndProperties;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.WeakHashMap;
+import org.xml.sax.InputSource;
+
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -52,7 +51,9 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-import org.xml.sax.InputSource;
+import java.io.InputStream;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * A base class for implementing JAXB-based readers and writers.
@@ -74,6 +75,8 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     private final ContextResolver<Marshaller> mtMarshaller;
 
     private boolean formattedOutput = false;
+
+    private boolean xmlRootElementProcessing = false;
 
     public AbstractJAXBProvider(Providers ps) {
         this(ps, null);
@@ -97,6 +100,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     @Context
     public void setConfiguration(FeaturesAndProperties fp) {
         formattedOutput = fp.getFeature(FeaturesAndProperties.FEATURE_FORMATTED);
+        xmlRootElementProcessing = fp.getFeature(FeaturesAndProperties.FEATURE_XMLROOTELEMENT_PROCESSING);
     }
 
     protected boolean isSupported(MediaType m) {
@@ -195,7 +199,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         }
     }
 
-    protected boolean getFormattedOutput() {
+    protected boolean isFormattedOutput() {
         return formattedOutput;
+    }
+
+    protected boolean isXmlRootElementProcessing() {
+        return xmlRootElementProcessing;
     }
 }

@@ -70,6 +70,16 @@ public interface FeaturesAndProperties {
             = "com.sun.jersey.config.feature.Formatted";
 
     /**
+     * If true then XML root element tag name for lists
+     * will be derived from @XmlRootElement annotation
+     * and won't be decapitalized.
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_XMLROOTELEMENT_PROCESSING
+            = "com.sun.jersey.config.feature.XmlRootElementProcessing";
+
+    /**
      * Get the map of features associated with the client.
      *
      * @return the features.

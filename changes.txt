@@ -1,4 +1,10 @@
 release 1.2 (03-2010)
+- Fixed issue 361
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=361
+  Introduced new feature (FeaturesAndProperties.FEATURE_XMLROOTELEMENT_PROCESSING)
+  which enables getting XmlRootElement annotations and deriving name for list
+  from its name property. First letter "decapitalization" is not done
+  when this feature is enabled.
 - Fixed issue 480
   https://jersey.dev.java.net/issues/show_bug.cgi?id=480
   An error in the decoding of "application/x-www-form-urlencoded" information
