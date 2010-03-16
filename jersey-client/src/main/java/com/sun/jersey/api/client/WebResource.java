@@ -40,8 +40,6 @@ package com.sun.jersey.api.client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
-import com.sun.jersey.core.hypermedia.HypermediaController;
-import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;

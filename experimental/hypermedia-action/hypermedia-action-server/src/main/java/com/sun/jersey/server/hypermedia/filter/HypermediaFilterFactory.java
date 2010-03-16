@@ -34,15 +34,19 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.api.container.filter;
+package com.sun.jersey.server.hypermedia.filter;
 
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.core.header.LinkHeader;
 import com.sun.jersey.core.hypermedia.Action;
+import com.sun.jersey.core.hypermedia.ContextualActionSet;
 import com.sun.jersey.core.hypermedia.HypermediaController;
 import com.sun.jersey.core.hypermedia.HypermediaController.LinkType;
+import com.sun.jersey.core.reflection.AnnotatedMethod;
+import com.sun.jersey.core.reflection.MethodList;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -92,7 +96,7 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
 
         private void prepare() {
             AbstractResource ar = abstractMethod.getResource();
-            List<Method> methods = ar.getContextualActionSetMethods();
+            List<Method> methods = getContextualActionSetMethods(ar);
             if (!methods.isEmpty()) {
                 contextualActionSetMethod = methods.get(0);
             }
@@ -104,6 +108,19 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
                     actionMethods.put(action.value(), m);
                 }
             }
+        }
+
+        private List<Method> getContextualActionSetMethods(AbstractResource resource) {
+            final MethodList methodList = new MethodList(resource.getResourceClass(), true);
+            final List<Method> contextualActionSetMethods = new ArrayList<Method>();
+            for (AnnotatedMethod m : methodList.
+                    hasAnnotation(ContextualActionSet.class).
+                    hasNumParams(0).
+                    hasReturnType(Set.class)) {
+                ReflectionHelper.setAccessibleMethod(m.getMethod());
+                contextualActionSetMethods.add(m.getMethod());
+            }
+            return contextualActionSetMethods;
         }
 
         // ResourceFilter

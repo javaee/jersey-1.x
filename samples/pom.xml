@@ -76,7 +76,6 @@
         <module>sparklines</module>
         <module>spring-annotations</module>
         <module>storage-service</module>
-        <module>hypermedia</module>
     </modules>
     <build>
         <plugins>

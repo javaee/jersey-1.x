@@ -40,13 +40,12 @@ import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.ClientFilter;
-import com.sun.jersey.client.hypermedia.HypermediaProxy;
+import com.sun.jersey.client.proxy.WebResourceProxy;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
-import com.sun.jersey.core.hypermedia.HypermediaController;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentScope;
@@ -116,7 +115,7 @@ public class Client extends Filterable implements ClientHandler {
 
     private Map<String, Object> properties;
 
-    private HypermediaProxy hypermediaProxy;
+    private Set<WebResourceProxy> proxies;
 
     private static class ContextInjectableProvider<T> extends
             SingletonTypeInjectableProvider<Context, T> {
@@ -203,20 +202,8 @@ public class Client extends Filterable implements ClientHandler {
                 config.getClasses(),
                 config.getSingletons());
 
-        // Get first service provider for HypermediaProxy (if any)
-        Set<HypermediaProxy> proxySet = providerServices.getServices(HypermediaProxy.class);
-        final int size = proxySet.size();
-        if (size > 0) {
-            // Cache instance of hypermedia proxy
-            hypermediaProxy = proxySet.iterator().next();
-            
-            // Log if more than one provider found
-            if (size > 1 && LOGGER.isLoggable(Level.INFO)) {
-                LOGGER.log(Level.INFO, "Found multiple providers for "
-                        + HypermediaProxy.class.getName() + ", using "
-                        + hypermediaProxy.getClass().getName());
-            }
-        }
+        // Get the set of WebResourceProxy
+        proxies = providerServices.getServices(WebResourceProxy.class);
 
         // Allow injection of features and properties
         injectableFactory.add(new ContextInjectableProvider<FeaturesAndProperties>(
@@ -396,19 +383,13 @@ public class Client extends Filterable implements ClientHandler {
 
     public <T> T proxy(WebResource r, Class<T> c) throws UniformInterfaceException {
         // Check if jersey-client-hypermedia is in classpath
-        if (hypermediaProxy == null) {
-            throw new RuntimeException("Unable to find provider for "
-                    + HypermediaProxy.class.getName()
-                    + ". Is jersey-client-hypermedia in your classpath?");
+        for (WebResourceProxy wrp : proxies) {
+            if (wrp.supports(c)) {
+                return (T) wrp.proxy(r, c, "GET", this);
+            }
         }
-        // Check if class is client-side hypermedia controller
-        HypermediaController ctrl = c.getAnnotation(HypermediaController.class);
-        if (ctrl != null) {
-            return (T) hypermediaProxy.handleController(r, ctrl.model(), c,
-                    "GET", this);
-        }
-        throw new IllegalArgumentException("Class '" + c.getName() +
-                "' must have @HypermediaController annotation");
+        throw new IllegalArgumentException("A web resource proxy is not " +
+                "available for the class '" + c.getName() + "'");
     }
 
     /**
