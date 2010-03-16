@@ -54,13 +54,31 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.el.PropertyNotFoundException;
 
 /**
  * Describes an entity in terms of its fields, bean properties and {@link Link}
  * annotated fields.
  * @author mh124079
  */
-class EntityDescriptor {
+public class EntityDescriptor {
+
+    // Maintains an internal static cache to optimize processing
+
+    private static Map<Class<?>, EntityDescriptor> descriptors
+        = new HashMap<Class<?>, EntityDescriptor>();
+
+    public static synchronized EntityDescriptor getInstance(Class<?> entityClass) {
+        if (descriptors.containsKey(entityClass)) {
+            return descriptors.get(entityClass);
+        } else {
+            EntityDescriptor descriptor = new EntityDescriptor(entityClass);
+            descriptors.put(entityClass, descriptor);
+            return descriptor;
+        }
+    }
+
+    // instance
 
     private Map<String, FieldDescriptor> nonLinkFields;
     private Map<String, LinkFieldDescriptor> linkFields;
@@ -70,7 +88,7 @@ class EntityDescriptor {
      * Construct an new descriptor by inspecting the supplied class.
      * @param entityClass
      */
-    public EntityDescriptor(Class<?> entityClass) {
+    private EntityDescriptor(Class<?> entityClass) {
 
         // create a list of field names
         this.nonLinkFields = new HashMap<String, FieldDescriptor>();
@@ -92,6 +110,7 @@ class EntityDescriptor {
     public Collection<FieldDescriptor> getNonLinkFields() {
         return nonLinkFields.values();
     }
+
     /**
      * Get a map of bean property names to values
      * @param parameterNames
@@ -102,24 +121,29 @@ class EntityDescriptor {
         Map<String, Object> valueMap = new HashMap<String, Object>();
         Set<String> parameterNameSet = new HashSet<String>(parameterNames);
         for (String parameterName: parameterNameSet) {
-            // bean getters take precedence over similarly named fields
-            if (beanPropertyGetters.containsKey(parameterName)) {
-                Method getter = beanPropertyGetters.get(parameterName);
-                try {
-                    valueMap.put(parameterName, getter.invoke(entity));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(EntityDescriptor.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IllegalArgumentException ex) {
-                    Logger.getLogger(EntityDescriptor.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(EntityDescriptor.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else if (nonLinkFields.containsKey(parameterName)) {
-                FieldDescriptor desc = nonLinkFields.get(parameterName);
-                valueMap.put(parameterName, desc.getFieldValue(entity));
-            }
+            valueMap.put(parameterName, getValue(parameterName, entity));
         }
         return valueMap;
+    }
+
+    public Object getValue(String parameterName, Object entity) {
+        // bean getters take precedence over similarly named fields
+        if (beanPropertyGetters.containsKey(parameterName)) {
+            Method getter = beanPropertyGetters.get(parameterName);
+            try {
+                Object value = getter.invoke(entity);
+                return value;
+            } catch (Exception ex) {
+                Logger.getLogger(EntityDescriptor.class.getName()).log(Level.SEVERE, null, ex);
+                throw new PropertyNotFoundException(parameterName, ex);
+            }
+        } else if (nonLinkFields.containsKey(parameterName)) {
+            FieldDescriptor desc = nonLinkFields.get(parameterName);
+            Object value = desc.getFieldValue(entity);
+            return value;
+        } else {
+            throw new PropertyNotFoundException(parameterName);
+        }
     }
 
     /**

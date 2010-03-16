@@ -68,7 +68,7 @@ public class EntityDescriptorTest extends TestCase {
      */
     public void testDeclaredProperties() {
         System.out.println("Declared properties");
-        EntityDescriptor instance = new EntityDescriptor(TestClassA.class);
+        EntityDescriptor instance = EntityDescriptor.getInstance(TestClassA.class);
         assertEquals(2, instance.getLinkFields().size());
         assertEquals(1, instance.getNonLinkFields().size());
     }
@@ -83,7 +83,7 @@ public class EntityDescriptorTest extends TestCase {
      */
     public void testInheritedProperties() {
         System.out.println("Inherited properties");
-        EntityDescriptor instance = new EntityDescriptor(TestClassB.class);
+        EntityDescriptor instance = EntityDescriptor.getInstance(TestClassB.class);
         assertEquals(2, instance.getLinkFields().size());
         assertEquals(1, instance.getNonLinkFields().size());
     }
@@ -101,7 +101,7 @@ public class EntityDescriptorTest extends TestCase {
 
     public void testResourceLink() {
         System.out.println("Resource class link");
-        EntityDescriptor instance = new EntityDescriptor(TestClassC.class);
+        EntityDescriptor instance = EntityDescriptor.getInstance(TestClassC.class);
         assertEquals(1, instance.getLinkFields().size());
         assertEquals(0, instance.getNonLinkFields().size());
         LinkFieldDescriptor linkDesc = instance.getLinkFields().iterator().next();
@@ -118,7 +118,7 @@ public class EntityDescriptorTest extends TestCase {
 
     public void testStringLink() {
         System.out.println("String link");
-        EntityDescriptor instance = new EntityDescriptor(TestClassD.class);
+        EntityDescriptor instance = EntityDescriptor.getInstance(TestClassD.class);
         assertEquals(2, instance.getLinkFields().size());
         assertEquals(0, instance.getNonLinkFields().size());
         Iterator<LinkFieldDescriptor> i = instance.getLinkFields().iterator();
@@ -130,7 +130,7 @@ public class EntityDescriptorTest extends TestCase {
 
     public void testSetLink() {
         System.out.println("Set link");
-        EntityDescriptor instance = new EntityDescriptor(TestClassD.class);
+        EntityDescriptor instance = EntityDescriptor.getInstance(TestClassD.class);
         Iterator<LinkFieldDescriptor> i = instance.getLinkFields().iterator();
         TestClassD testClass = new TestClassD();
         while (i.hasNext()) {

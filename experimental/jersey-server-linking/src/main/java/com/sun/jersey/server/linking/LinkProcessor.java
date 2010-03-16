@@ -38,13 +38,14 @@
 package com.sun.jersey.server.linking;
 
 import com.sun.jersey.api.uri.UriTemplateParser;
+import com.sun.jersey.server.linking.el.LinkELContext;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import javax.el.ExpressionFactory;
+import javax.el.ValueExpression;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -55,33 +56,13 @@ import javax.ws.rs.core.UriInfo;
  */
 public class LinkProcessor<T> {
 
-    // Maintains an internal static cache to optimize processing
-
-    private static Map<Class<?>, LinkProcessor> processors
-            = new HashMap<Class<?>, LinkProcessor>();
-
-    /**
-     * Get a LinkProcessor for the supplied class. An internal cache is
-     * maintained to prevent repeated inpection of the same class.
-     * @param c
-     * @return
-     */
-    public static synchronized <T> LinkProcessor<T> getInstance(Class<T> c) {
-        if (processors.containsKey(c)) {
-            return processors.get(c);
-        } else {
-            LinkProcessor processor = new LinkProcessor(c);
-            processors.put(c, processor);
-            return processor;
-        }
-    }
-
-    // Members
-
     private EntityDescriptor entityDescriptor;
+    private static ExpressionFactory expressionFactory =
+            ExpressionFactory.newInstance();
 
-    private LinkProcessor(Class<T> c) {
-        entityDescriptor = new EntityDescriptor(c);
+
+    public LinkProcessor(Class<T> c) {
+        entityDescriptor = EntityDescriptor.getInstance(c);
     }
 
     /**
@@ -110,6 +91,14 @@ public class LinkProcessor<T> {
         // Process any @Link annotated fields in entity
         for (LinkFieldDescriptor d: entityDescriptor.getLinkFields()) {
             String template = d.getLinkTemplate();
+
+            // first process any embedded EL expressions
+            LinkELContext context = new LinkELContext(entity, null);
+            ValueExpression expr = expressionFactory.createValueExpression(context,
+                    template, String.class);
+            template = expr.getValue(context).toString();
+
+            // now process any embedded URI template parameters
             UriBuilder ub=applyLinkStyle(template, d.getLinkStyle(), uriInfo);
             UriTemplateParser parser = new UriTemplateParser(template);
             List<String> parameterNames = parser.getNames();
@@ -139,7 +128,7 @@ public class LinkProcessor<T> {
 
     private void processMember(Object member, Set<Object> processed, UriInfo uriInfo) {
         if (member != null) {
-            LinkProcessor proc = LinkProcessor.getInstance(member.getClass());
+            LinkProcessor proc = new LinkProcessor(member.getClass());
             proc.processLinks(member, processed, uriInfo);
         }
     }

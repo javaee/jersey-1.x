@@ -35,31 +35,47 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.el;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import javax.el.BeanELResolver;
+import javax.el.CompositeELResolver;
+import javax.el.ELContext;
+import javax.el.ELResolver;
+import javax.el.FunctionMapper;
+import javax.el.VariableMapper;
 
 /**
- * Filter that processes {@link Link} annotated fields in returned response
- * entities.
+ * An ELContext that encapsulates the response information for use by the
+ * expression evaluator.
+ *
  * @author mh124079
  */
-public class LinkFilter implements ContainerResponseFilter {
+public class LinkELContext extends ELContext {
 
-    @Context UriInfo uriInfo;
+    private Object entity;
+    private Object resource;
 
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        Object entity  = response.getEntity();
-        if (entity != null) {
-            Class<?> entityClass = entity.getClass();
-            LinkProcessor p = new LinkProcessor(entityClass);
-            p.processLinks(entity, uriInfo);
-        }
-        return response;
+    public LinkELContext(Object entity, Object resource) {
+        this.entity = entity;
+        this.resource = resource;
+    }
+
+    @Override
+    public ELResolver getELResolver() {
+        CompositeELResolver resolver = new CompositeELResolver();
+        resolver.add(new ResponseContextResolver(entity, resource));
+        resolver.add(new BeanELResolver(true));
+        return resolver;
+    }
+
+    @Override
+    public FunctionMapper getFunctionMapper() {
+        return null;
+    }
+
+    @Override
+    public VariableMapper getVariableMapper() {
+        return null;
     }
 
 }

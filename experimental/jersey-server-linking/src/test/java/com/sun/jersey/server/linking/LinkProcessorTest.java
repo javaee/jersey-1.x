@@ -143,7 +143,7 @@ public class LinkProcessorTest extends TestCase {
 
     public void testProcessLinks() {
         System.out.println("Links");
-        LinkProcessor<TestClassD> instance = LinkProcessor.getInstance(TestClassD.class);
+        LinkProcessor<TestClassD> instance = new LinkProcessor(TestClassD.class);
         TestClassD testClass = new TestClassD();
         instance.processLinks(testClass, mockUriInfo);
         assertEquals(TEMPLATE_A, testClass.res1);
@@ -165,7 +165,7 @@ public class LinkProcessorTest extends TestCase {
 
     public void testProcessLinksWithFields() {
         System.out.println("Links from field values");
-        LinkProcessor<TestClassE> instance = LinkProcessor.getInstance(TestClassE.class);
+        LinkProcessor<TestClassE> instance = new LinkProcessor(TestClassE.class);
         TestClassE testClass = new TestClassE("10");
         instance.processLinks(testClass, mockUriInfo);
         assertEquals("widgets/10", testClass.link);
@@ -186,7 +186,7 @@ public class LinkProcessorTest extends TestCase {
 
     public void testNesting() {
         System.out.println("Nesting");
-        LinkProcessor<TestClassF> instance = LinkProcessor.getInstance(TestClassF.class);
+        LinkProcessor<TestClassF> instance = new LinkProcessor(TestClassF.class);
         TestClassE nested = new TestClassE("10");
         TestClassF testClass = new TestClassF("20", nested);
         instance.processLinks(testClass, mockUriInfo);
@@ -196,7 +196,7 @@ public class LinkProcessorTest extends TestCase {
 
     public void testArray() {
         System.out.println("Array");
-        LinkProcessor<TestClassE[]> instance = LinkProcessor.getInstance(TestClassE[].class);
+        LinkProcessor<TestClassE[]> instance = new LinkProcessor(TestClassE[].class);
         TestClassE item1 = new TestClassE("10");
         TestClassE item2 = new TestClassE("20");
         TestClassE array[] = {item1, item2};
@@ -207,7 +207,7 @@ public class LinkProcessorTest extends TestCase {
 
     public void testCollection() {
         System.out.println("Collection");
-        LinkProcessor<List> instance = LinkProcessor.getInstance(List.class);
+        LinkProcessor<List> instance = new LinkProcessor(List.class);
         TestClassE item1 = new TestClassE("10");
         TestClassE item2 = new TestClassE("20");
         List<TestClassE> list = Arrays.asList(item1, item2);
@@ -238,7 +238,7 @@ public class LinkProcessorTest extends TestCase {
 
     public void testLinkStyles() {
         System.out.println("Link styles");
-        LinkProcessor<TestClassG> instance = LinkProcessor.getInstance(TestClassG.class);
+        LinkProcessor<TestClassG> instance = new LinkProcessor(TestClassG.class);
         TestClassG testClass = new TestClassG("10");
         instance.processLinks(testClass, mockUriInfo);
         assertEquals("widgets/10", testClass.relativePath);
@@ -258,9 +258,44 @@ public class LinkProcessorTest extends TestCase {
 
     public void testComputedProperty() {
         System.out.println("Computed property");
-        LinkProcessor<TestClassH> instance = LinkProcessor.getInstance(TestClassH.class);
+        LinkProcessor<TestClassH> instance = new LinkProcessor(TestClassH.class);
         TestClassH testClass = new TestClassH();
         instance.processLinks(testClass, mockUriInfo);
         assertEquals("/application/resources/widgets/10", testClass.link);
     }
+
+    public static class TestClassI {
+        @Link("widgets/${entity.id}")
+        private String link;
+
+        public String getId() {
+            return "10";
+        }
+    }
+
+    public void testEL() {
+        System.out.println("EL link");
+        LinkProcessor<TestClassI> instance = new LinkProcessor(TestClassI.class);
+        TestClassI testClass = new TestClassI();
+        instance.processLinks(testClass, mockUriInfo);
+        assertEquals("/application/resources/widgets/10", testClass.link);
+    }
+
+    public static class TestClassJ {
+        @Link("widgets/${entity.id}/widget/{id}")
+        private String link;
+
+        public String getId() {
+            return "10";
+        }
+    }
+
+    public void testMixed() {
+        System.out.println("Mixed EL and template vars link");
+        LinkProcessor<TestClassJ> instance = new LinkProcessor(TestClassJ.class);
+        TestClassJ testClass = new TestClassJ();
+        instance.processLinks(testClass, mockUriInfo);
+        assertEquals("/application/resources/widgets/10/widget/10", testClass.link);
+    }
+
 }
