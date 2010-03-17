@@ -51,7 +51,7 @@ import javax.el.PropertyNotWritableException;
  * 
  * @author mh124079
  */
-class ResponseContextResolver extends ELResolver {
+public class ResponseContextResolver extends ELResolver {
 
     private Map<String, Object> responseObjects;
     public final static String ENTITY_OBJECT = "entity";

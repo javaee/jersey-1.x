@@ -95,7 +95,7 @@ public class EntityDescriptorTest extends TestCase {
     }
 
     public static class TestClassC {
-        @Link(resource=TestResourceA.class)
+        @Link(resource=TestResourceA.class, bindings={@Binding(name="bar", value="baz")})
         String res;
     }
 
@@ -106,6 +106,7 @@ public class EntityDescriptorTest extends TestCase {
         assertEquals(0, instance.getNonLinkFields().size());
         LinkFieldDescriptor linkDesc = instance.getLinkFields().iterator().next();
         assertEquals(TEMPLATE_A, linkDesc.getLinkTemplate());
+        assertEquals("baz", linkDesc.getBinding("bar"));
     }
 
     public static class TestClassD {

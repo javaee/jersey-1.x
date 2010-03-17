@@ -39,10 +39,13 @@ package com.sun.jersey.server.linking;
 
 import com.sun.jersey.api.uri.UriTemplateParser;
 import com.sun.jersey.server.linking.el.LinkELContext;
+import com.sun.jersey.server.linking.el.ResponseContextResolver;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
@@ -92,8 +95,8 @@ public class LinkProcessor<T> {
         processed.add(instance);
 
         // Process any @Link annotated fields in entity
-        for (LinkFieldDescriptor d: instanceDescriptor.getLinkFields()) {
-            String template = d.getLinkTemplate();
+        for (LinkFieldDescriptor linkField: instanceDescriptor.getLinkFields()) {
+            String template = linkField.getLinkTemplate();
 
             // first process any embedded EL expressions
             LinkELContext context = new LinkELContext(entity, resource, instance);
@@ -102,11 +105,12 @@ public class LinkProcessor<T> {
             template = expr.getValue(context).toString();
 
             // now process any embedded URI template parameters
-            UriBuilder ub=applyLinkStyle(template, d.getLinkStyle(), uriInfo);
+            UriBuilder ub=applyLinkStyle(template, linkField.getLinkStyle(), uriInfo);
             UriTemplateParser parser = new UriTemplateParser(template);
             List<String> parameterNames = parser.getNames();
-            URI uri = ub.buildFromMap(instanceDescriptor.getValueMap(parameterNames, instance));
-            d.setPropertyValue(instance, uri);
+            Map<String, Object> valueMap = getParameterValues(parameterNames, linkField, context);
+            URI uri = ub.buildFromMap(valueMap);
+            linkField.setPropertyValue(instance, uri);
         }
 
         // If entity is an array or collection then process members
@@ -151,6 +155,31 @@ public class LinkProcessor<T> {
                 break;
         }
         return ub;
+    }
+
+    private Map<String, Object> getParameterValues(List<String> parameterNames, LinkFieldDescriptor linkField, LinkELContext context) {
+        Map<String, Object> values = new HashMap<String, Object>();
+        for (String name: parameterNames) {
+            String elExpression = getEL(name, linkField);
+            ValueExpression expr = expressionFactory.createValueExpression(context,
+                    elExpression, String.class);
+            Object value = expr.getValue(context);
+            values.put(name, value);
+        }
+        return values;
+    }
+
+    private String getEL(String name, LinkFieldDescriptor linkField) {
+        String binding = linkField.getBinding(name);
+        if (binding != null)
+            return binding;
+        StringBuilder builder = new StringBuilder();
+        builder.append("${");
+        builder.append(ResponseContextResolver.INSTANCE_OBJECT);
+        builder.append(".");
+        builder.append(name);
+        builder.append("}");
+        return builder.toString();
     }
 
 }

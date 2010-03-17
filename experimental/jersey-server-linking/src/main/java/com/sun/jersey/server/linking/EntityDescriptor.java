@@ -37,24 +37,12 @@
 
 package com.sun.jersey.server.linking;
 
-import com.sun.jersey.core.reflection.AnnotatedMethod;
-import com.sun.jersey.core.reflection.MethodList;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.el.PropertyNotFoundException;
 
 /**
  * Describes an entity in terms of its fields, bean properties and {@link Link}
@@ -82,7 +70,6 @@ public class EntityDescriptor {
 
     private Map<String, FieldDescriptor> nonLinkFields;
     private Map<String, LinkFieldDescriptor> linkFields;
-    private Map<String, Method> beanPropertyGetters;
 
     /**
      * Construct an new descriptor by inspecting the supplied class.
@@ -96,11 +83,6 @@ public class EntityDescriptor {
         findFields(entityClass);
         this.nonLinkFields = Collections.unmodifiableMap(this.nonLinkFields);
         this.linkFields = Collections.unmodifiableMap(this.linkFields);
-
-        // create map of bean property names to getter methods
-        beanPropertyGetters = new HashMap<String, Method>();
-        findGetters(entityClass);
-        beanPropertyGetters = Collections.unmodifiableMap(beanPropertyGetters);
     }
 
     public Collection<LinkFieldDescriptor> getLinkFields() {
@@ -109,62 +91,6 @@ public class EntityDescriptor {
 
     public Collection<FieldDescriptor> getNonLinkFields() {
         return nonLinkFields.values();
-    }
-
-    /**
-     * Get a map of bean property names to values
-     * @param parameterNames
-     * @param entity
-     * @return
-     */
-    public Map<String, Object> getValueMap(List<String> parameterNames, Object entity) {
-        Map<String, Object> valueMap = new HashMap<String, Object>();
-        Set<String> parameterNameSet = new HashSet<String>(parameterNames);
-        for (String parameterName: parameterNameSet) {
-            valueMap.put(parameterName, getValue(parameterName, entity));
-        }
-        return valueMap;
-    }
-
-    public Object getValue(String parameterName, Object entity) {
-        // bean getters take precedence over similarly named fields
-        if (beanPropertyGetters.containsKey(parameterName)) {
-            Method getter = beanPropertyGetters.get(parameterName);
-            try {
-                Object value = getter.invoke(entity);
-                return value;
-            } catch (Exception ex) {
-                Logger.getLogger(EntityDescriptor.class.getName()).log(Level.SEVERE, null, ex);
-                throw new PropertyNotFoundException(parameterName, ex);
-            }
-        } else if (nonLinkFields.containsKey(parameterName)) {
-            FieldDescriptor desc = nonLinkFields.get(parameterName);
-            Object value = desc.getFieldValue(entity);
-            return value;
-        } else {
-            throw new PropertyNotFoundException(parameterName);
-        }
-    }
-
-    /**
-     * Find and cache bean property getter methods. Only public methods are
-     * used.
-     * @param entityClass
-     */
-    private void findGetters(Class<?> entityClass) {
-        Iterator<AnnotatedMethod> beanProperties = new MethodList(entityClass).nameStartsWith("get").hasNumParams(0).iterator();
-        while (beanProperties.hasNext()) {
-            AnnotatedMethod computedProperty = beanProperties.next();
-            Method getter = computedProperty.getMethod();
-            int flags = getter.getModifiers();
-            String beanPropertyName = getter.getName().substring(3);
-            if (Modifier.isPublic(flags) && beanPropertyName.length() > 0) {
-                beanPropertyName = beanPropertyName.substring(0, 1).toLowerCase() + beanPropertyName.substring(1);
-                if (!beanPropertyGetters.containsKey(beanPropertyName)) {
-                    beanPropertyGetters.put(beanPropertyName, getter);
-                }
-            }
-        }
     }
 
     /**

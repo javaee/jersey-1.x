@@ -39,6 +39,8 @@ package com.sun.jersey.server.linking;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.Path;
@@ -51,11 +53,16 @@ public class LinkFieldDescriptor extends FieldDescriptor {
 
     private Link link;
     private Class<?> type;
+    private Map<String, String> bindings;
 
     public LinkFieldDescriptor(Field f, Link l, Class<?> t) {
         super(f);
         link = l;
         type = t;
+        bindings = new HashMap<String, String>();
+        for (Binding binding: l.bindings()) {
+            bindings.put(binding.name(), binding.value());
+        }
     }
     
     public void setPropertyValue(Object instance, URI value) {
@@ -83,5 +90,9 @@ public class LinkFieldDescriptor extends FieldDescriptor {
             template = link.value();
         }
         return template;
+    }
+
+    public String getBinding(String name) {
+        return bindings.get(name);
     }
 }

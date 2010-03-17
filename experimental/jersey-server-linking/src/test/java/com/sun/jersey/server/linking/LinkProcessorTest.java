@@ -163,6 +163,10 @@ public class LinkProcessorTest extends TestCase {
         public TestClassE(String id) {
             this.id = id;
         }
+
+        public String getId() {
+            return id;
+        }
     }
 
     public void testProcessLinksWithFields() {
@@ -183,6 +187,10 @@ public class LinkProcessorTest extends TestCase {
         public TestClassF(String id, TestClassE e) {
             this.id = id;
             this.nested = e;
+        }
+
+        public String getId() {
+            return id;
         }
     }
 
@@ -235,6 +243,10 @@ public class LinkProcessorTest extends TestCase {
 
         public TestClassG(String id) {
             this.id = id;
+        }
+
+        public String getId() {
+            return id;
         }
     }
 
@@ -324,6 +336,23 @@ public class LinkProcessorTest extends TestCase {
         instance.processLinks(testClass, mockUriInfo);
         assertEquals("/application/resources/inner", testClass.inner.innerUri);
         assertEquals("/application/resources/outer", testClass.inner.outerUri);
+    }
+
+    public static class BoundLinkBean {
+        @Link(value="{id}", bindings={@Binding(name="id", value="${instance.name}")})
+        public String uri;
+
+        public String getName() {
+            return "name";
+        }
+    }
+
+    public void testELBinding() {
+        System.out.println("EL binding");
+        LinkProcessor<BoundLinkBean> instance = new LinkProcessor(BoundLinkBean.class);
+        BoundLinkBean testClass = new BoundLinkBean();
+        instance.processLinks(testClass, mockUriInfo);
+        assertEquals("/application/resources/name", testClass.uri);
     }
 
 }
