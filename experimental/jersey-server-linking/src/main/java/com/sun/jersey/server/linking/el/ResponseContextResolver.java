@@ -56,11 +56,13 @@ class ResponseContextResolver extends ELResolver {
     private Map<String, Object> responseObjects;
     public final static String ENTITY_OBJECT = "entity";
     public final static String RESOURCE_OBJECT = "resource";
+    public final static String INSTANCE_OBJECT = "instance";
 
-    public ResponseContextResolver(Object entity, Object resource) {
+    public ResponseContextResolver(Object entity, Object resource, Object instance) {
         responseObjects = new HashMap<String, Object>();
         responseObjects.put(ENTITY_OBJECT, entity);
         responseObjects.put(RESOURCE_OBJECT, resource);
+        responseObjects.put(INSTANCE_OBJECT, instance);
     }
 
     private boolean isHandled(ELContext elc, Object base, Object property) {

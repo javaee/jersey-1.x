@@ -56,17 +56,18 @@ public @interface Binding {
     /**
      * Specifies the value of a URI template parameter. The value is an EL
      * expression using immediate evaluation syntax. E.g.:
-     * <pre>${Representation.widgetId}</pre>
+     * <pre>${instance.widgetId}</pre>
      * In the above example the value is taken from the <code>widgetId</code>
-     * property of the implicit <code>Representation</code> bean.
+     * property of the implicit <code>instance</code> bean.
      * <p>Three implicit beans are supported:</p>
      * <dl>
-     * <dt><code>Representation</code></dt><dd>The object that contains the 
-     * {@link Link} annotation. This is either the resource method return value
+     * <dt><code>instance</code></dt><dd>The object whose class contains the
+     * {@link Link} annotation.</dd>
+     * <dt><code>entity</code></dt><dd>The entity returned by the resource 
+     * class method. This is either the resource method return value
      * or the entity property for a resource method that returns Response.</dd>
-     * <dt><code>Resource</code></dt><dd>The resource class instance that 
+     * <dt><code>resource</code></dt><dd>The resource class instance that
      * returned the object that contains the {@link Link} annotation.</dd>
-     * <dt><code>UriInfo</code></dt><dd>The UriInfo instance for the request.
      * </dd>
      * </dl>
      */

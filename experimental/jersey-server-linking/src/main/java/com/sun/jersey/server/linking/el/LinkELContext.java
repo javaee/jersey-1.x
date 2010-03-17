@@ -54,16 +54,39 @@ public class LinkELContext extends ELContext {
 
     private Object entity;
     private Object resource;
+    private Object instance;
 
+    /**
+     * Convenience constructor for the common case where a context where
+     * the entity and instance are the same. Equivalent to
+     * <code>LinkELContext(entity, resource, entity)</code>
+     *
+     * @param entity
+     * @param resource
+     */
     public LinkELContext(Object entity, Object resource) {
         this.entity = entity;
         this.resource = resource;
+        this.instance = entity;
+    }
+
+    /**
+     * Construct a new context
+     * @param entity the entity returned from the resource method
+     * @param resource the resource class instance that returned the entity
+     * @param instance the instance that contains the entity, e.g. the value of
+     * a field within an entity class.
+     */
+    public LinkELContext(Object entity, Object resource, Object instance) {
+        this.entity = entity;
+        this.resource = resource;
+        this.instance = instance;
     }
 
     @Override
     public ELResolver getELResolver() {
         CompositeELResolver resolver = new CompositeELResolver();
-        resolver.add(new ResponseContextResolver(entity, resource));
+        resolver.add(new ResponseContextResolver(entity, resource, instance));
         resolver.add(new BeanELResolver(true));
         return resolver;
     }

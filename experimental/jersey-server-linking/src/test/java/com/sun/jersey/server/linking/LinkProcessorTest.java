@@ -39,6 +39,7 @@ package com.sun.jersey.server.linking;
 
 import java.net.URI;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
@@ -125,7 +126,8 @@ public class LinkProcessorTest extends TestCase {
             }
 
             public List<Object> getMatchedResources() {
-                throw new UnsupportedOperationException("Not supported yet.");
+                Object dummyResource = new Object(){};
+                return Collections.singletonList(dummyResource);
             }
 
         };
@@ -296,6 +298,32 @@ public class LinkProcessorTest extends TestCase {
         TestClassJ testClass = new TestClassJ();
         instance.processLinks(testClass, mockUriInfo);
         assertEquals("/application/resources/widgets/10/widget/10", testClass.link);
+    }
+
+    public static class DependentInnerBean {
+        @Link("${entity.id}")
+        public String outerUri;
+        @Link("${instance.id}")
+        public String innerUri;
+        public String getId() {
+            return "inner";
+        }
+    }
+
+    public static class OuterBean {
+        public DependentInnerBean inner = new DependentInnerBean();
+        public String getId() {
+            return "outer";
+        }
+    }
+
+    public void testELScopes() {
+        System.out.println("EL scopes");
+        LinkProcessor<OuterBean> instance = new LinkProcessor(OuterBean.class);
+        OuterBean testClass = new OuterBean();
+        instance.processLinks(testClass, mockUriInfo);
+        assertEquals("/application/resources/inner", testClass.inner.innerUri);
+        assertEquals("/application/resources/outer", testClass.inner.outerUri);
     }
 
 }

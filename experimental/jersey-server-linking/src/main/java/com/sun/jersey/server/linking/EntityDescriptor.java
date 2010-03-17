@@ -182,7 +182,7 @@ public class EntityDescriptor {
                         linkFields.put(f.getName(), new LinkFieldDescriptor(f, a, t));
                     }
                 } else {
-                    // unsupported type
+                    // TODO unsupported type
                 }
             } else {
                 nonLinkFields.put(f.getName(), new FieldDescriptor(f));

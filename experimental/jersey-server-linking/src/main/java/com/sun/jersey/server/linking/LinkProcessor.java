@@ -56,44 +56,47 @@ import javax.ws.rs.core.UriInfo;
  */
 public class LinkProcessor<T> {
 
-    private EntityDescriptor entityDescriptor;
+    private EntityDescriptor instanceDescriptor;
     private static ExpressionFactory expressionFactory =
             ExpressionFactory.newInstance();
 
 
     public LinkProcessor(Class<T> c) {
-        entityDescriptor = EntityDescriptor.getInstance(c);
+        instanceDescriptor = EntityDescriptor.getInstance(c);
     }
 
     /**
-     * Inject any {@link Link} annotated fields in the supplied entity.
-     * @param entity
-     * @param uriInfo
+     * Inject any {@link Link} annotated fields in the supplied entity and
+     * recursively process its fields.
+     * @param entity the entity object returned by the resource method
+     * @param uriInfo the uriInfo for the request
      */
     public void processLinks(T entity, UriInfo uriInfo) {
         Set<Object> processed = new HashSet<Object>();
-        processLinks(entity, processed, uriInfo);
+        Object resource = uriInfo.getMatchedResources().get(0);
+        processLinks(entity, resource, entity, processed, uriInfo);
     }
 
     /**
-     * Inject any {@link Link} annotated fields in the supplied entity.
+     * Inject any {@link Link} annotated fields in the supplied instance. Called
+     * once for the entity and then recursively for each member and field.
      * @param entity
      * @param processed a list of already processed objects, used to break
      * recursion when processing circular references.
      * @param uriInfo
      */
-    private void processLinks(Object entity, Set<Object> processed,
-            UriInfo uriInfo) {
-        if (entity==null || processed.contains(entity))
+    private void processLinks(Object entity, Object resource, Object instance, 
+            Set<Object> processed, UriInfo uriInfo) {
+        if (instance==null || processed.contains(instance))
             return; // ignore null properties and defeat circular references
-        processed.add(entity);
+        processed.add(instance);
 
         // Process any @Link annotated fields in entity
-        for (LinkFieldDescriptor d: entityDescriptor.getLinkFields()) {
+        for (LinkFieldDescriptor d: instanceDescriptor.getLinkFields()) {
             String template = d.getLinkTemplate();
 
             // first process any embedded EL expressions
-            LinkELContext context = new LinkELContext(entity, null);
+            LinkELContext context = new LinkELContext(entity, resource, instance);
             ValueExpression expr = expressionFactory.createValueExpression(context,
                     template, String.class);
             template = expr.getValue(context).toString();
@@ -102,34 +105,34 @@ public class LinkProcessor<T> {
             UriBuilder ub=applyLinkStyle(template, d.getLinkStyle(), uriInfo);
             UriTemplateParser parser = new UriTemplateParser(template);
             List<String> parameterNames = parser.getNames();
-            URI uri = ub.buildFromMap(entityDescriptor.getValueMap(parameterNames, entity));
-            d.setPropertyValue(entity, uri);
+            URI uri = ub.buildFromMap(instanceDescriptor.getValueMap(parameterNames, instance));
+            d.setPropertyValue(instance, uri);
         }
 
         // If entity is an array or collection then process members
-        Class<?> entityClass = entity.getClass();
-        if (entityClass.isArray() && Object[].class.isAssignableFrom(entityClass)) {
-            Object array[] = (Object[])entity;
+        Class<?> instanceClass = instance.getClass();
+        if (instanceClass.isArray() && Object[].class.isAssignableFrom(instanceClass)) {
+            Object array[] = (Object[])instance;
             for (Object member: array) {
-                processMember(member, processed, uriInfo);
+                processMember(entity, resource, member, processed, uriInfo);
             }
-        } else if (entity instanceof Collection) {
-            Collection collection = (Collection)entity;
+        } else if (instance instanceof Collection) {
+            Collection collection = (Collection)instance;
             for (Object member: collection) {
-                processMember(member, processed, uriInfo);
+                processMember(entity, resource, member, processed, uriInfo);
             }
         }
 
         // Recursively process all member fields
-        for (FieldDescriptor member: entityDescriptor.getNonLinkFields()) {
-            processMember(member.getFieldValue(entity), processed, uriInfo);
+        for (FieldDescriptor member: instanceDescriptor.getNonLinkFields()) {
+            processMember(entity, resource, member.getFieldValue(instance), processed, uriInfo);
         }
     }
 
-    private void processMember(Object member, Set<Object> processed, UriInfo uriInfo) {
+    private void processMember(Object entity, Object resource, Object member, Set<Object> processed, UriInfo uriInfo) {
         if (member != null) {
             LinkProcessor proc = new LinkProcessor(member.getClass());
-            proc.processLinks(member, processed, uriInfo);
+            proc.processLinks(entity, resource, member, processed, uriInfo);
         }
     }
 

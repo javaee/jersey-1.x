@@ -82,16 +82,16 @@ public @interface Link {
     /**
      * Specifies a URI template that will be used to build the injected URI. The
      * template may contain both URI template parameters (e.g. {id}) and EL
-     * expressions (e.g. ${Representation.id}) using the same implicit beans as
+     * expressions (e.g. ${instance.id}) using the same implicit beans as
      * {@link Binding#value()}. URI template parameter values are resolved as
      * described in {@link #resource()}. E.g. the following three alternatives
      * are equivalent:
      * <pre>
      * &#64;Link(template="{id}")
      * &#64;Link(template="{id}", bindings={
-     *   &#64;Binding(name="id" value="${Representation.id}"}
+     *   &#64;Binding(name="id" value="${instance.id}"}
      * )
-     * &#64;Link(template="${Representation.id}")
+     * &#64;Link(template="${instance.id}")
      * </pre>
      */
     String value() default "";
@@ -105,7 +105,7 @@ public @interface Link {
      * specification for the parameter then that is used</li>
      * <li>Otherwise an implicit binding is used that extracts the value
      * of a bean property by the same name as the URI template from the
-     * implicit <code>Representation</code> bean (see {@link Binding}).</li>
+     * implicit <code>instance</code> bean (see {@link Binding}).</li>
      * </ol>
      * <p>E.g. assuming a resource class <code>SomeResource</code> with the
      * following <code>@Path("{id}")</code> annotation, the following two
@@ -113,7 +113,7 @@ public @interface Link {
      * <pre>
      * &#64;Link(resource=SomeResource.class)
      * &#64;Link(resource=SomeResource.class, bindings={
-     *   &#64;Binding(name="id" value="${Representation.id}"}
+     *   &#64;Binding(name="id" value="${instance.id}"}
      * )
      * </pre>
      */
@@ -121,6 +121,7 @@ public @interface Link {
 
     /**
      * Specifies the bindings for embedded URI template parameters.
+     * @see Binding
      */
     Binding[] bindings() default {};
 }
