@@ -93,6 +93,20 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    <profiles>
+        <profile>
+            <id>release</id>
+        </profile>
+        <profile>
+            <id>non-release</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>experimental</module>
+            </modules>
+        </profile>
+    </profiles>
     <modules>
         <module>contribs</module>
         <module>samples</module>
