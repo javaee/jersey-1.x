@@ -79,6 +79,8 @@ public abstract class HttpHeaderReader {
 
     public abstract Event next(boolean skipWhiteSpace) throws ParseException;
     
+    public abstract String nextSeparatedString(char startSeparator, char endSeparator) throws ParseException;
+    
     public abstract Event getEvent();
     
     public abstract String getEventValue();

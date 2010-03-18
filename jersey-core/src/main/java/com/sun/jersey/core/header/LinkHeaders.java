@@ -43,19 +43,23 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
+ * A map of Link headers where each header can be retrieved using the
+ * relationship type as the key.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class LinkHeaders {
     private final Map<String, LinkHeader> map;
 
-    public LinkHeaders(MultivaluedMap<String, String> headers) {
+    public LinkHeaders(MultivaluedMap<String, String> headers) throws IllegalArgumentException {
         List<String> ls = headers.get("Link");
         if (ls != null) {
             map = new HashMap<String, LinkHeader>();
             for (String l : ls) {
-                LinkHeader lh = new LinkHeader(l);
-                map.put(lh.getRel(), lh);
+                LinkHeader lh = LinkHeader.valueOf(l);
+                for (String rel : lh.getRel()) {
+                    map.put(rel, lh);
+                }
             }
         } else {
             map = Collections.emptyMap();

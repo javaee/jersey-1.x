@@ -52,7 +52,7 @@ public class LinkHeaderProvider implements HeaderDelegateProvider<LinkHeader> {
     }
 
     public LinkHeader fromString(String value) throws IllegalArgumentException {
-        return new LinkHeader(value);
+        return LinkHeader.valueOf(value);
     }
 
     public String toString(LinkHeader value) {

@@ -109,6 +109,7 @@ import java.text.ParseException;
 
         return table;
     }
+    
     private String header;
 
     private boolean processComments;
@@ -148,6 +149,28 @@ import java.text.ParseException;
         char c = header.charAt(index);
         return (EVENT_TABLE[c] == SEPARATOR)
                 ? c == separator : false;
+    }
+
+    public String nextSeparatedString(char startSeparator, char endSeparator) throws ParseException {
+        nextSeparator(startSeparator);
+        final int start = index;
+        for (; index < length; index++) {
+            if (header.charAt(index) == endSeparator) {
+                break;
+            }
+        }
+
+        if (start == index) {
+            // no token between separators
+            throw new ParseException("No characters between the separators " +
+                    "'" + startSeparator + "' and '" + endSeparator + "'", index);
+        } else if (index == length) {
+            // no end separator
+            throw new ParseException("No end separator '" + endSeparator + "'", index);
+        }
+
+        event = Event.Token;
+        return value = header.substring(start, index++);
     }
 
     public Event next() throws ParseException {

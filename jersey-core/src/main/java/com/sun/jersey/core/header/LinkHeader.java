@@ -36,168 +36,262 @@
  */
 package com.sun.jersey.core.header;
 
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+import com.sun.jersey.core.header.reader.HttpHeaderReader.Event;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.net.URI;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.StringTokenizer;
+import java.util.Set;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * LinkHeader class.
- *
- * TODO: Verify if this simple parser obeys formal grammar
+ * A Link header.
  *
  * @author Santiago.PericasGeertsen@sun.com
+ * @author Paul.Sandoz@sun.com
  */
 public class LinkHeader {
 
     private URI uri;
 
-    private final MultivaluedMap<String, String> params;
+    private Set<String> rels;
 
-    public LinkHeader(String header) throws IllegalArgumentException {
-        if (header == null)
-            throw new IllegalArgumentException("header parameter MUST NOT be null");
+    private MediaType type;
+    
+    private MultivaluedMap<String, String> parameters;
 
-        params = parseHeader(new StringTokenizer(header, " <>;=\"", true));
+    public LinkHeader(String header) throws ParseException, IllegalArgumentException {
+        this(HttpHeaderReader.newInstance(header));
     }
 
-    protected LinkHeader(URI uri, MultivaluedMap<String, String> params) {
-        this.uri = uri;
-        this.params = params;
+    public LinkHeader(HttpHeaderReader reader) throws ParseException, IllegalArgumentException {
+        uri = URI.create(reader.nextSeparatedString('<', '>'));
+
+        if (reader.hasNext())
+            parseParameters(reader);
     }
 
-    public static LinkHeader valueOf(String header) {
-        return new LinkHeader(header);
+    protected LinkHeader(LinkHeaderBuilder builder) {
+        this.uri = builder.uri;
+
+        if (builder.rels != null) {
+            if (builder.rels.size() == 1) {
+                this.rels = builder.rels;
+            } else {
+                this.rels = Collections.unmodifiableSet(new HashSet<String>(builder.rels));
+            }
+        }
+
+        this.type = builder.type;
+        
+        if (builder.parameters != null) {
+            this.parameters = new MultivaluedMapImpl(builder.parameters);
+        }
+    }
+
+    public static LinkHeader valueOf(String header) throws IllegalArgumentException {
+        try {
+            return new LinkHeader(HttpHeaderReader.newInstance(header));
+        } catch (ParseException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<").append(uri.toASCIIString()).append(">");
-        for (Entry<String, List<String>> e : params.entrySet()) {
-            for (String value : e.getValue()) {
-                sb.append(";").append(e.getKey()).append("=").append(value);
+
+        sb.append('<').append(uri.toASCIIString()).append('>');
+
+        if (rels != null) {
+            sb.append(';').append("rel=");
+            if (rels.size() == 1) {
+                sb.append(rels.iterator().next());
+            } else {
+                sb.append('\"');
+                boolean first = true;
+                for (String rel : rels) {
+                    if (!first)
+                        sb.append(' ');
+                    sb.append(rel);
+                    first = false;
+                }
+                sb.append('\"');
+            }
+        }
+
+        if (parameters != null) {
+            for (Entry<String, List<String>> e : parameters.entrySet()) {
+                for (String value : e.getValue()) {
+                    sb.append(";").append(e.getKey()).append("=").append(value);
+                }
             }
         }
         return sb.toString();
     }
 
     public MultivaluedMap<String, String> getParams() {
-        return params;
+        checkNull();
+        return parameters;
     }
 
     public URI getUri() {
         return uri;
     }
 
-    public String getRel() {
-        return params.getFirst("rel");
+    public Set<String> getRel() {
+        if (rels == null) {
+            rels = Collections.emptySet();
+        }
+        return rels;
     }
 
-    public String getOp() {
-        return params.getFirst("op");
+    public MediaType getType() {
+        return type;
     }
     
-    private MultivaluedMap<String, String> parseHeader(StringTokenizer st) {
-        String token = st.nextToken();
-        if (token.charAt(0) != '<') {
-            throw new RuntimeException("Unexpected token '" +
-                    token + "' in link header");
+    public String getOp() {
+        if (parameters != null) {
+            return parameters.getFirst("op");
+        } else {
+            return null;
         }
-        uri = URI.create(st.nextToken());
-        token = st.nextToken();
-        if (token.charAt(0) != '>') {
-            throw new RuntimeException("Unexpected token '" +
-                    token + "' in link header");
-        }
-        return parseParams(st);
     }
 
-    private static MultivaluedMap<String, String> parseParams(StringTokenizer st) {
-        String name = null;
-        boolean inQuotes = false;
-        boolean parsingValue = false;
-        StringBuilder value = new StringBuilder();
+    private void parseParameters(HttpHeaderReader reader) throws ParseException {
+        while (reader.hasNext()) {
+            reader.nextSeparator(';');
+            while(reader.hasNextSeparator(';', true))
+                reader.next();
 
-        MultivaluedMap params = new MultivaluedMapImpl();
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            switch (token.charAt(0)) {
-                case '=':
-                    parsingValue = true;
-                    break;
-                case ';':
-                    if (parsingValue) {
-                        params.add(name, value.toString());
-                        value.setLength(0);
-                        parsingValue = false;
-                    }
-                    break;
-                case '"':
-                    assert parsingValue;
-                    if (inQuotes) {
-                        params.add(name, value.toString());
-                        value.setLength(0);
-                    } else {
-                        inQuotes = true;
-                    }
-                case ' ':
-                    if (inQuotes) {
-                        value.append(' ');
-                    } else if (parsingValue) {
-                        params.add(name, value.toString());
-                        value.setLength(0);
-                    }
-                    break;
-                default:
-                    if (!parsingValue) {
-                        name = token;
-                    } else {
-                        value.append(token);
-                    }
-                    break;
+            // Ignore a ';' with no parameters
+            if (!reader.hasNext())
+                break;
+
+            // Get the parameter name
+            String name = reader.nextToken().toLowerCase();
+            reader.nextSeparator('=');
+
+            if (name.equals("rel")) {
+                String value = reader.nextTokenOrQuotedString();
+                if (reader.getEvent() == Event.Token) {
+                    rels = Collections.singleton(value);
+                } else {
+                    String[] values = value.split(" ");
+                    rels = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(values)));
+                }
+            } else if (name.equals("hreflang")) {
+                add(name, reader.nextTokenOrQuotedString());
+            } else if (name.equals("media")) {
+                if (!containsKey("media")) {
+                    add(name, reader.nextQuotedString());
+                }
+            } else if (name.equals("title")) {
+                if (!containsKey("title")) {
+                    add(name, reader.nextQuotedString());
+                }
+            } else if (name.equals("title*")) {
+                add(name, reader.nextQuotedString());
+            } else if (name.equals("type")) {
+                String typeName = reader.nextToken();
+                reader.nextSeparator('/');
+                String subTypeName = reader.nextToken();
+                type = new MediaType(typeName, subTypeName);
+            } else {
+                add(name, reader.nextTokenOrQuotedString());
             }
+
+            // Get the parameter value
         }
+    }
 
-        // Last parameter parsed
-        params.add(name, value.toString());
+    private void checkNull() {
+        if (parameters == null)
+            parameters = new MultivaluedMapImpl();
+    }
 
-        return params;
+    private boolean containsKey(String key) {
+        checkNull();
+        return parameters.containsKey(key);
+    }
+
+    private void add(String key, String value) {
+        checkNull();
+        parameters.add(key, value);
     }
 
     public static LinkHeaderBuilder uri(URI uri) {
         return new LinkHeaderBuilder(uri);
     }
 
+    /**
+     * A Link header builder.
+     * 
+     */
     public static class LinkHeaderBuilder<T extends LinkHeaderBuilder, V extends LinkHeader> {
         protected URI uri;
 
-        protected MultivaluedMap<String, String> params;
+        protected Set<String> rels;
+
+        protected MediaType type;
+        
+        protected MultivaluedMap<String, String> parameters;
 
         LinkHeaderBuilder(URI uri) {
             this.uri = uri;
         }
 
         public T rel(String rel) {
-            addParam("rel", rel);
+            if (rel == null)
+                throw new IllegalArgumentException("rel parameter cannot be null");
+
+            rel = rel.trim();
+            if (rel.length() == 0)
+                throw new IllegalArgumentException("rel parameter cannot an empty string or just white space");
+
+            if (rels == null) {
+                rels = Collections.singleton(rel);
+            } else if (rels.size() == 1 && !rels.contains(rel)) {
+                rels = new HashSet<String>(rels);
+                rels.add(rel);
+            } else {
+                rels.add(rel);
+            }
+            
             return (T)this;
         }
 
+        public T type(MediaType type) {
+            this.type = type;
+            return (T)this;
+        }
+        
         public T op(String op) {
-            addParam("op", op);
+            parameter("op", op);
             return (T)this;
         }
 
-        private void addParam(String key, String value) {
-            if (params == null)
-                params = new MultivaluedMapImpl();
-            params.add(key, value);
+        public T parameter(String key, String value) {
+            if (key.equals("rel")) {
+                return rel(value);
+            } else if (key.equals("type")) {
+                return type(MediaType.valueOf(value));
+            }
+            
+            if (parameters == null)
+                parameters = new MultivaluedMapImpl();
+            parameters.add(key, value);
+            return (T)this;
         }
 
         public V build() {
-            LinkHeader lh = new LinkHeader(uri, new MultivaluedMapImpl(params));
+            LinkHeader lh = new LinkHeader(this);
             return (V)lh;
         }
     }

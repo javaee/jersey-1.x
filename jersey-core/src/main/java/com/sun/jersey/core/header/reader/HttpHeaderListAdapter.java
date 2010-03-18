@@ -99,6 +99,18 @@ import java.text.ParseException;
         return reader.next(skipWhiteSpace);
     }
 
+    public String nextSeparatedString(char startSeparator, char endSeparator) throws ParseException {
+        if (isTerminated)
+            throw new ParseException("End of header", getIndex());
+
+        if (reader.hasNextSeparator(',', true)) {
+            isTerminated = true;
+            throw new ParseException("End of header", getIndex());
+        }
+
+        return reader.nextSeparatedString(startSeparator, endSeparator);
+    }
+
     public HttpHeaderReader.Event getEvent() {
         return reader.getEvent();
     }
