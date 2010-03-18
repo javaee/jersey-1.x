@@ -49,7 +49,7 @@ import javax.ws.rs.Path;
  * Utility class for working with {@link Link} annotated fields
  * @author mh124079
  */
-public class LinkFieldDescriptor extends FieldDescriptor {
+public class LinkFieldDescriptor extends FieldDescriptor implements LinkDescriptor {
 
     private Link link;
     private Class<?> type;
@@ -66,9 +66,9 @@ public class LinkFieldDescriptor extends FieldDescriptor {
     }
     
     public void setPropertyValue(Object instance, URI value) {
-        setAccessibleField(f);
+        setAccessibleField(field);
         try {
-            f.set(instance, type.equals(URI.class) ? value : value.toString());
+            field.set(instance, type.equals(URI.class) ? value : value.toString());
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(LinkFieldDescriptor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
@@ -76,10 +76,12 @@ public class LinkFieldDescriptor extends FieldDescriptor {
         }
     }
 
+    @Override
     public Link.Style getLinkStyle() {
         return link.style();
     }
 
+    @Override
     public String getLinkTemplate() {
         String template = null;
         if (!link.resource().equals(Class.class)) {
@@ -92,6 +94,7 @@ public class LinkFieldDescriptor extends FieldDescriptor {
         return template;
     }
 
+    @Override
     public String getBinding(String name) {
         return bindings.get(name);
     }

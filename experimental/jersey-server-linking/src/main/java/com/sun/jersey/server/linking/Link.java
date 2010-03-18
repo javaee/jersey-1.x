@@ -47,7 +47,7 @@ import java.lang.annotation.Target;
  * used on fields of type String or URI. One of {@link #value()} or
  * {@link #resource()} must be specified.
  */
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Link {
     /**

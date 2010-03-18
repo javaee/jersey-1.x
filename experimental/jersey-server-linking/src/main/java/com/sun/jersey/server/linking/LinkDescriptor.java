@@ -37,31 +37,28 @@
 
 package com.sun.jersey.server.linking;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-
 /**
- * Filter that processes {@link Link} annotated fields in returned response
- * entities.
+ * Utility for working with @Link annotations
  * @author mh124079
  */
-public class LinkFilter implements ContainerResponseFilter {
+public interface LinkDescriptor {
+    /**
+     * Get the style
+     * @return the style
+     */
+    Link.Style getLinkStyle();
 
-    @Context UriInfo uriInfo;
+    /**
+     * Get the link template, either directly from the value() or from the
+     * @Path of the class referenced in resource()
+     * @return the link template
+     */
+    String getLinkTemplate();
 
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        Object entity  = response.getEntity();
-        if (entity != null) {
-            Class<?> entityClass = entity.getClass();
-            LinkHeaderProcessor lhp = new LinkHeaderProcessor(entityClass);
-            lhp.processLinkHeaders(entity, uriInfo, response.getHttpHeaders());
-            LinkProcessor lp = new LinkProcessor(entityClass);
-            lp.processLinks(entity, uriInfo);
-        }
-        return response;
-    }
-
+    /**
+     * Get the binding as an EL expression for a particular URI template parameter
+     * @param name
+     * @return the EL binding
+     */
+    String getBinding(String name);
 }

@@ -39,9 +39,11 @@ package com.sun.jersey.server.linking;
 
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,12 +72,17 @@ public class EntityDescriptor {
 
     private Map<String, FieldDescriptor> nonLinkFields;
     private Map<String, LinkFieldDescriptor> linkFields;
+    private List<LinkHeaderDescriptor> linkHeaders;
 
     /**
      * Construct an new descriptor by inspecting the supplied class.
      * @param entityClass
      */
     private EntityDescriptor(Class<?> entityClass) {
+        // create a list of link headers
+        this.linkHeaders = new ArrayList<LinkHeaderDescriptor>();
+        findLinkHeaders(entityClass);
+        this.linkHeaders = Collections.unmodifiableList(linkHeaders);
 
         // create a list of field names
         this.nonLinkFields = new HashMap<String, FieldDescriptor>();
@@ -91,6 +98,10 @@ public class EntityDescriptor {
 
     public Collection<FieldDescriptor> getNonLinkFields() {
         return nonLinkFields.values();
+    }
+
+    public List<LinkHeaderDescriptor> getLinkHeaders() {
+        return linkHeaders;
     }
 
     /**
@@ -124,6 +135,30 @@ public class EntityDescriptor {
         // look for nonLinkFields in interfaces
         for (Class<?> ic : entityClass.getInterfaces()) {
             findFields(ic);
+        }
+    }
+
+    private void findLinkHeaders(Class<?> entityClass) {
+        LinkHeader linkHeaderAnnotation = entityClass.getAnnotation(LinkHeader.class);
+        if (linkHeaderAnnotation != null) {
+            linkHeaders.add(new LinkHeaderDescriptor(linkHeaderAnnotation));
+        }
+        LinkHeaders linkHeadersAnnotation = entityClass.getAnnotation(LinkHeaders.class);
+        if (linkHeadersAnnotation != null) {
+            for (LinkHeader linkHeader: linkHeadersAnnotation.value()) {
+                linkHeaders.add(new LinkHeaderDescriptor(linkHeader));
+            }
+        }
+
+        // look in superclasses
+        Class<?> sc = entityClass.getSuperclass();
+        if (sc != null && sc != Object.class) {
+            findLinkHeaders(sc);
+        }
+
+        // look in interfaces
+        for (Class<?> ic : entityClass.getInterfaces()) {
+            findLinkHeaders(ic);
         }
     }
 }

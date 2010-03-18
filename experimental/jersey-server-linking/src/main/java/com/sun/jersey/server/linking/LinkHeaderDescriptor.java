@@ -37,31 +37,54 @@
 
 package com.sun.jersey.server.linking;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import com.sun.jersey.server.linking.Link.Style;
+import java.util.HashMap;
+import java.util.Map;
+import javax.ws.rs.Path;
 
 /**
- * Filter that processes {@link Link} annotated fields in returned response
- * entities.
+ * Utility class for working with {@link LinkHeader} annotations
  * @author mh124079
  */
-public class LinkFilter implements ContainerResponseFilter {
+public class LinkHeaderDescriptor implements LinkDescriptor {
 
-    @Context UriInfo uriInfo;
+    private LinkHeader linkHeader;
+    private LinkFieldDescriptor linkField;
+    private Map<String, String> bindings;
 
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        Object entity  = response.getEntity();
-        if (entity != null) {
-            Class<?> entityClass = entity.getClass();
-            LinkHeaderProcessor lhp = new LinkHeaderProcessor(entityClass);
-            lhp.processLinkHeaders(entity, uriInfo, response.getHttpHeaders());
-            LinkProcessor lp = new LinkProcessor(entityClass);
-            lp.processLinks(entity, uriInfo);
+    LinkHeaderDescriptor(LinkHeader linkHeader) {
+        this.linkHeader = linkHeader;
+        bindings = new HashMap<String, String>();
+        for (Binding binding: linkHeader.value().bindings()) {
+            bindings.put(binding.name(), binding.value());
         }
-        return response;
+    }
+
+    public LinkHeader getLinkHeader() {
+        return linkHeader;
+    }
+
+    @Override
+    public String getLinkTemplate() {
+        String template = null;
+        if (!linkHeader.value().resource().equals(Class.class)) {
+            // extract template from specified class' @Path annotation
+            Path path = linkHeader.value().resource().getAnnotation(Path.class);
+            template = path==null ? "" : path.value();
+        } else {
+            template = linkHeader.value().value();
+        }
+        return template;
+    }
+
+    @Override
+    public Style getLinkStyle() {
+        return linkHeader.value().style();
+    }
+
+    @Override
+    public String getBinding(String name) {
+        return bindings.get(name);
     }
 
 }

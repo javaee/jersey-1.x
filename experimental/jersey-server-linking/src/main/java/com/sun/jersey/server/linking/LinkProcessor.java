@@ -37,19 +37,11 @@
 
 package com.sun.jersey.server.linking;
 
-import com.sun.jersey.api.uri.UriTemplateParser;
-import com.sun.jersey.server.linking.el.LinkELContext;
-import com.sun.jersey.server.linking.el.ResponseContextResolver;
+import com.sun.jersey.server.linking.el.LinkBuilder;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import javax.el.ExpressionFactory;
-import javax.el.ValueExpression;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -60,9 +52,6 @@ import javax.ws.rs.core.UriInfo;
 public class LinkProcessor<T> {
 
     private EntityDescriptor instanceDescriptor;
-    private static ExpressionFactory expressionFactory =
-            ExpressionFactory.newInstance();
-
 
     public LinkProcessor(Class<T> c) {
         instanceDescriptor = EntityDescriptor.getInstance(c);
@@ -96,20 +85,7 @@ public class LinkProcessor<T> {
 
         // Process any @Link annotated fields in entity
         for (LinkFieldDescriptor linkField: instanceDescriptor.getLinkFields()) {
-            String template = linkField.getLinkTemplate();
-
-            // first process any embedded EL expressions
-            LinkELContext context = new LinkELContext(entity, resource, instance);
-            ValueExpression expr = expressionFactory.createValueExpression(context,
-                    template, String.class);
-            template = expr.getValue(context).toString();
-
-            // now process any embedded URI template parameters
-            UriBuilder ub=applyLinkStyle(template, linkField.getLinkStyle(), uriInfo);
-            UriTemplateParser parser = new UriTemplateParser(template);
-            List<String> parameterNames = parser.getNames();
-            Map<String, Object> valueMap = getParameterValues(parameterNames, linkField, context);
-            URI uri = ub.buildFromMap(valueMap);
+            URI uri = LinkBuilder.buildURI(linkField, entity, resource, instance, uriInfo);
             linkField.setPropertyValue(instance, uri);
         }
 
@@ -138,48 +114,6 @@ public class LinkProcessor<T> {
             LinkProcessor proc = new LinkProcessor(member.getClass());
             proc.processLinks(entity, resource, member, processed, uriInfo);
         }
-    }
-
-    private UriBuilder applyLinkStyle(String template, Link.Style style, UriInfo uriInfo) {
-        UriBuilder ub=null;
-        switch (style) {
-            case ABSOLUTE:
-                ub = uriInfo.getBaseUriBuilder().path(template);
-                break;
-            case ABSOLUTE_PATH:
-                String basePath = uriInfo.getBaseUri().getPath();
-                ub = UriBuilder.fromPath(basePath).path(template);
-                break;
-            case RELATIVE_PATH:
-                ub = UriBuilder.fromPath(template);
-                break;
-        }
-        return ub;
-    }
-
-    private Map<String, Object> getParameterValues(List<String> parameterNames, LinkFieldDescriptor linkField, LinkELContext context) {
-        Map<String, Object> values = new HashMap<String, Object>();
-        for (String name: parameterNames) {
-            String elExpression = getEL(name, linkField);
-            ValueExpression expr = expressionFactory.createValueExpression(context,
-                    elExpression, String.class);
-            Object value = expr.getValue(context);
-            values.put(name, value);
-        }
-        return values;
-    }
-
-    private String getEL(String name, LinkFieldDescriptor linkField) {
-        String binding = linkField.getBinding(name);
-        if (binding != null)
-            return binding;
-        StringBuilder builder = new StringBuilder();
-        builder.append("${");
-        builder.append(ResponseContextResolver.INSTANCE_OBJECT);
-        builder.append(".");
-        builder.append(name);
-        builder.append("}");
-        return builder.toString();
     }
 
 }

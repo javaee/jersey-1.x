@@ -50,17 +50,17 @@ import java.util.logging.Logger;
  */
 public class FieldDescriptor {
 
-    protected Field f;
+    protected Field field;
 
     FieldDescriptor(Field f) {
-        this.f = f;
+        this.field = f;
     }
 
     public Object getFieldValue(Object instance) {
-        setAccessibleField(f);
+        setAccessibleField(field);
         Object value = null;
         try {
-            value = f.get(instance);
+            value = field.get(instance);
         } catch (IllegalArgumentException ex) {
             Logger.getLogger(FieldDescriptor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
@@ -70,7 +70,7 @@ public class FieldDescriptor {
     }
 
     public String getFieldName() {
-        return f.getName();
+        return field.getName();
     }
 
     protected static void setAccessibleField(final Field f) {
@@ -96,7 +96,7 @@ public class FieldDescriptor {
             return false;
         }
         final FieldDescriptor other = (FieldDescriptor) obj;
-        if (this.f != other.f && (this.f == null || !this.f.equals(other.f))) {
+        if (this.field != other.field && (this.field == null || !this.field.equals(other.field))) {
             return false;
         }
         return true;
@@ -105,7 +105,7 @@ public class FieldDescriptor {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 83 * hash + (this.f != null ? this.f.hashCode() : 0);
+        hash = 83 * hash + (this.field != null ? this.field.hashCode() : 0);
         return hash;
     }
 

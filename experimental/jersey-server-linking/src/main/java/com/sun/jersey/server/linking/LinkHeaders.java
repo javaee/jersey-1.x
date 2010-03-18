@@ -37,31 +37,22 @@
 
 package com.sun.jersey.server.linking;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Filter that processes {@link Link} annotated fields in returned response
- * entities.
- * @author mh124079
+ * Used to request the addition of a set of Link headers in the returned HTTP headers.
  */
-public class LinkFilter implements ContainerResponseFilter {
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface LinkHeaders {
 
-    @Context UriInfo uriInfo;
-
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        Object entity  = response.getEntity();
-        if (entity != null) {
-            Class<?> entityClass = entity.getClass();
-            LinkHeaderProcessor lhp = new LinkHeaderProcessor(entityClass);
-            lhp.processLinkHeaders(entity, uriInfo, response.getHttpHeaders());
-            LinkProcessor lp = new LinkProcessor(entityClass);
-            lp.processLinks(entity, uriInfo);
-        }
-        return response;
-    }
+    /**
+     * Container for a set of {@link LinkHeader} annotations
+     * @return
+     */
+    LinkHeader[] value() default {};
 
 }
