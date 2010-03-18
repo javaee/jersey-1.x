@@ -41,6 +41,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.WebResourceLinkHeaders;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.LinkHeader;
 import com.sun.jersey.core.hypermedia.Action;
@@ -75,8 +76,6 @@ import org.jvnet.ws.wadl2java.ast.MethodNode;
 import org.jvnet.ws.wadl2java.ast.RepresentationNode;
 import org.jvnet.ws.wadl2java.ast.ResourceNode;
 
-import static javax.ws.rs.core.MediaType.*;
-
 /**
  * ControllerInvocationHandler class.
  *
@@ -94,13 +93,13 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
 
     private ClientResponse response;
 
-    private Map<String, LinkHeader> actionHeaders;
+    private WebResourceLinkHeaders actionHeaders;
 
     private Object entity;
 
     private MultivaluedMapImpl queryParams;
 
-    private Map<String, MethodNode> wadlMetadataCache;
+    private Map<URI, MethodNode> wadlMetadataCache;
 
     public ControllerInvocationHandler(Client client, T instance,
             ClientResponse response, Class<?> ctrlClass)
@@ -116,7 +115,6 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
         this.modelClass = instance.getClass();
         this.ctrlClass = ctrlClass;
 
-        actionHeaders = new HashMap<String, LinkHeader>();
         updateActionHeaders();
         queryParams = new MultivaluedMapImpl();
     }
@@ -155,7 +153,7 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
         }
 
         // Check if action is available in current context
-        LinkHeader h = actionHeaders.get(action.value());
+        LinkHeader h = actionHeaders.getLink(action.value());
         if (h == null) {
              throw new RuntimeException(
                     "Action '" + action.value() + "' is not available"
@@ -250,14 +248,7 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
      * Parses action headers and updates internal map.
      */
     private void updateActionHeaders() {
-        actionHeaders.clear();
-        List<String> actionHeadersList = response.getHeaders().get("Link");
-        if (actionHeadersList != null) {
-            for (String ah : actionHeadersList) {
-                LinkHeader linkHeader = new LinkHeader(ah);
-                actionHeaders.put(linkHeader.getRel(), linkHeader);
-            }
-        }
+        actionHeaders = response.getLinks();
     }
 
     /**
@@ -394,7 +385,7 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
             ClientRequest.Builder rb)
     {
         Action action = method.getAnnotation(Action.class);
-        LinkHeader h = actionHeaders.get(action.value());
+        LinkHeader h = actionHeaders.getLink(action.value());
         MethodNode methodNode = getWadlMetadata(h);
         if (methodNode == null) {
             throw new RuntimeException("Unable to find WADL meta-data to " +
@@ -478,7 +469,7 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
      */
     private String getContentTypeFromWadl(Action action, Method method) {
         // Get WADL method node for this action
-        LinkHeader h = actionHeaders.get(action.value());
+        LinkHeader h = actionHeaders.getLink(action.value());
         MethodNode methodNode = getWadlMetadata(h);
         if (methodNode == null) {
             throw new RuntimeException("Unable to find WADL meta-data to " +
@@ -506,7 +497,7 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
 
         // Meta-data in cache?
         if (wadlMetadataCache == null) {
-            wadlMetadataCache = new HashMap<String, MethodNode>();
+            wadlMetadataCache = new HashMap<URI, MethodNode>();
         } else {
             result = wadlMetadataCache.get(h.getUri());
         }
@@ -519,7 +510,7 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
                 InputStream is = r.options(InputStream.class);
 
                 // Requires WadlFragmentGetFilter on server side
-                List<ResourceNode> rs = wm.process(new URI(h.getUri()), is);
+                List<ResourceNode> rs = wm.process(h.getUri(), is);
                 ResourceNode rn = rs.get(0).getChildResources().get(0);
                 
                 // Find method whose operation matches the link header's

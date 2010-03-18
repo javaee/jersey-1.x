@@ -176,10 +176,8 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
                         uri = uri.substring(0, k);
                     }
                     UriBuilder uriBuilder = UriBuilder.fromUri(uri);
-                    LinkHeader lh = new LinkHeader();
-                    lh.setUri(uriBuilder.path(rm.getMethod()).build().toString());
-                    lh.setRel(action);
-                    lh.setOp(rm.getHttpMethod());
+                    LinkHeader lh = LinkHeader.uri(uriBuilder.path(rm.getMethod()).build()).
+                            rel(action).op(rm.getHttpMethod()).build();
                     response.getHttpHeaders().add("Link", lh);
                 }
             }

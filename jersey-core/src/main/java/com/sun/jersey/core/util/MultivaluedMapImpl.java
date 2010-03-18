@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -55,7 +56,15 @@ public class MultivaluedMapImpl
         implements MultivaluedMap<String, String> {
     
     static final long serialVersionUID = -6052320403766368902L;
-    
+
+    public MultivaluedMapImpl() { }
+
+    public MultivaluedMapImpl(MultivaluedMap<String, String> that) {
+        for (Map.Entry<String, List<String>> e : that.entrySet()) {
+            this.put(e.getKey(), new ArrayList(e.getValue()));
+        }
+    }
+
     // MultivaluedMap
     
     public final void putSingle(String key, String value) {

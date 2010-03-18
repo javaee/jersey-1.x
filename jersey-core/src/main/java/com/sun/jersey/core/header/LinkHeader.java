@@ -34,13 +34,14 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.core.header;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import java.net.URI;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * LinkHeader class.
@@ -51,17 +52,20 @@ import java.util.StringTokenizer;
  */
 public class LinkHeader {
 
-    private String uri;
+    private URI uri;
 
-    private Map<String, String> params = new HashMap<String, String>();
+    private final MultivaluedMap<String, String> params;
 
-    public LinkHeader() {
+    public LinkHeader(String header) throws IllegalArgumentException {
+        if (header == null)
+            throw new IllegalArgumentException("header parameter MUST NOT be null");
+
+        params = parseHeader(new StringTokenizer(header, " <>;=\"", true));
     }
 
-    public LinkHeader(String header) {
-        assert header != null;
-        StringTokenizer st = new StringTokenizer(header, " <>;=\"", true);
-        parseHeader(st);
+    protected LinkHeader(URI uri, MultivaluedMap<String, String> params) {
+        this.uri = uri;
+        this.params = params;
     }
 
     public static LinkHeader valueOf(String header) {
@@ -71,62 +75,53 @@ public class LinkHeader {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("<").append(uri).append(">");
-        for (Entry<String, String> e : params.entrySet()) {
-            sb.append(";").append(e.getKey()).append("=").append(e.getValue());
+        sb.append("<").append(uri.toASCIIString()).append(">");
+        for (Entry<String, List<String>> e : params.entrySet()) {
+            for (String value : e.getValue()) {
+                sb.append(";").append(e.getKey()).append("=").append(value);
+            }
         }
         return sb.toString();
     }
 
-    public Map<String, String> getParams() {
+    public MultivaluedMap<String, String> getParams() {
         return params;
     }
 
-    public String getUri() {
+    public URI getUri() {
         return uri;
     }
 
     public String getRel() {
-        return params.get("rel");
+        return params.getFirst("rel");
     }
 
     public String getOp() {
-        return params.get("op");
+        return params.getFirst("op");
     }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-
-    public void setRel(String s) {
-        params.put("rel", s);
-    }
-
-    public void setOp(String s) {
-        params.put("op", s);
-    }
-
-    private void parseHeader(StringTokenizer st) {
+    
+    private MultivaluedMap<String, String> parseHeader(StringTokenizer st) {
         String token = st.nextToken();
         if (token.charAt(0) != '<') {
             throw new RuntimeException("Unexpected token '" +
                     token + "' in link header");
         }
-        uri = st.nextToken();
+        uri = URI.create(st.nextToken());
         token = st.nextToken();
         if (token.charAt(0) != '>') {
             throw new RuntimeException("Unexpected token '" +
                     token + "' in link header");
         }
-        parseParams(st);
+        return parseParams(st);
     }
 
-    private void parseParams(StringTokenizer st) {
+    private static MultivaluedMap<String, String> parseParams(StringTokenizer st) {
         String name = null;
         boolean inQuotes = false;
         boolean parsingValue = false;
         StringBuilder value = new StringBuilder();
 
+        MultivaluedMap params = new MultivaluedMapImpl();
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             switch (token.charAt(0)) {
@@ -135,7 +130,7 @@ public class LinkHeader {
                     break;
                 case ';':
                     if (parsingValue) {
-                        params.put(name, value.toString());
+                        params.add(name, value.toString());
                         value.setLength(0);
                         parsingValue = false;
                     }
@@ -143,7 +138,7 @@ public class LinkHeader {
                 case '"':
                     assert parsingValue;
                     if (inQuotes) {
-                        params.put(name, value.toString());
+                        params.add(name, value.toString());
                         value.setLength(0);
                     } else {
                         inQuotes = true;
@@ -152,7 +147,7 @@ public class LinkHeader {
                     if (inQuotes) {
                         value.append(' ');
                     } else if (parsingValue) {
-                        params.put(name, value.toString());
+                        params.add(name, value.toString());
                         value.setLength(0);
                     }
                     break;
@@ -167,7 +162,43 @@ public class LinkHeader {
         }
 
         // Last parameter parsed
-        params.put(name, value.toString());
+        params.add(name, value.toString());
+
+        return params;
     }
 
+    public static LinkHeaderBuilder uri(URI uri) {
+        return new LinkHeaderBuilder(uri);
+    }
+
+    public static class LinkHeaderBuilder<T extends LinkHeaderBuilder, V extends LinkHeader> {
+        protected URI uri;
+
+        protected MultivaluedMap<String, String> params;
+
+        LinkHeaderBuilder(URI uri) {
+            this.uri = uri;
+        }
+
+        public T rel(String rel) {
+            addParam("rel", rel);
+            return (T)this;
+        }
+
+        public T op(String op) {
+            addParam("op", op);
+            return (T)this;
+        }
+
+        private void addParam(String key, String value) {
+            if (params == null)
+                params = new MultivaluedMapImpl();
+            params.add(key, value);
+        }
+
+        public V build() {
+            LinkHeader lh = new LinkHeader(uri, new MultivaluedMapImpl(params));
+            return (V)lh;
+        }
+    }
 }

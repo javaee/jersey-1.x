@@ -484,9 +484,14 @@ public class Client extends Filterable implements ClientHandler {
 
     // ClientHandler
 
-    public ClientResponse handle(ClientRequest cr) throws ClientHandlerException {
-        cr.getProperties().putAll(properties);
-        return getHeadHandler().handle(cr);
+    public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
+        request.getProperties().putAll(properties);
+        request.getProperties().put(Client.class.getName(), this);
+
+        final ClientResponse response = getHeadHandler().handle(request);
+        
+        response.getProperties().put(Client.class.getName(), this);
+        return response;
     }
 
     /**

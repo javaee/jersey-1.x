@@ -335,6 +335,15 @@ public class ClientResponse {
     }
 
     /**
+     * Get the client.
+     * 
+     * @return the client.
+     */
+    public Client getClient() {
+        return (Client)getProperties().get(Client.class.getName());
+    }
+
+    /**
      * Get the map of response properties.
      * <p>
      * A response property is an application-defined property that may be
@@ -589,7 +598,7 @@ public class ClientResponse {
      * @return the media type.
      */
     public MediaType getType() {
-        String ct = getMetadata().getFirst("Content-Type");
+        String ct = getHeaders().getFirst("Content-Type");
         return (ct != null) ? MediaType.valueOf(ct) : null;
     }
     
@@ -599,7 +608,7 @@ public class ClientResponse {
      * @return the location, otherwise <code>null</code> if not present.
      */
     public URI getLocation() {
-        String l = getMetadata().getFirst("Location");        
+        String l = getHeaders().getFirst("Location");
         return (l != null) ? URI.create(l) : null;
     }
     
@@ -609,7 +618,7 @@ public class ClientResponse {
      * @return the entity tag, otherwise <code>null</code> if not present.
      */
     public EntityTag getEntityTag() {
-        String t = getMetadata().getFirst("ETag");
+        String t = getHeaders().getFirst("ETag");
         
         return (t != null) ? entityTagDelegate.fromString(t) : null;
     }
@@ -620,7 +629,7 @@ public class ClientResponse {
      * @return the last modified date, otherwise <code>null</code> if not present.
      */
     public Date getLastModified() {
-        String d = getMetadata().getFirst("Last-Modified");
+        String d = getHeaders().getFirst("Last-Modified");
         
         return (d != null) ? dateDelegate.fromString(d) : null;
     }
@@ -631,7 +640,7 @@ public class ClientResponse {
      * @return the server side response date, otherwise <code>null</code> if not present.
      */
     public Date getResponseDate() {
-        String d = getMetadata().getFirst("Date");
+        String d = getHeaders().getFirst("Date");
 
         return (d != null) ? dateDelegate.fromString(d) : null;
     }
@@ -642,7 +651,7 @@ public class ClientResponse {
      * @return the language, otherwise <code>null</code> if not present.
      */
     public String getLanguage() {
-        return getMetadata().getFirst("Content-Language");
+        return getHeaders().getFirst("Content-Language");
     }
 
     /**
@@ -654,7 +663,7 @@ public class ClientResponse {
     public int getLength() {
         int size = -1;
 
-        String sizeStr = getMetadata().getFirst("Content-Length");
+        String sizeStr = getHeaders().getFirst("Content-Length");
         if (sizeStr == null)
             return -1;
         
@@ -673,7 +682,7 @@ public class ClientResponse {
      * @return the cookies.
      */
     public List<NewCookie> getCookies() {
-        List<String> hs = getMetadata().get("Set-Cookie");
+        List<String> hs = getHeaders().get("Set-Cookie");
         if (hs == null) return Collections.emptyList();
         
         List<NewCookie> cs = new ArrayList<NewCookie>();
@@ -705,6 +714,10 @@ public class ClientResponse {
                 allowedMethods.add(m.toUpperCase());
         }
         return allowedMethods;
+    }
+
+    public WebResourceLinkHeaders getLinks() {
+        return new WebResourceLinkHeaders(getClient(), getHeaders());
     }
 
     @Override
