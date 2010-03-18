@@ -44,8 +44,8 @@ import java.lang.annotation.Target;
 
 /**
  * Specifies a link injection target in a returned representation bean. May be
- * used on fields or bean setters for properties of type String or URI. One of
- * {@link #value()} or {@link #resource()} must be specified.
+ * used on fields of type String or URI. One of {@link #value()} or
+ * {@link #resource()} must be specified.
  */
 @Target({ElementType.FIELD, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
