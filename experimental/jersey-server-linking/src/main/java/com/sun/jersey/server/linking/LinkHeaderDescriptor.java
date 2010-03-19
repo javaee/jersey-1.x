@@ -64,7 +64,6 @@ public class LinkHeaderDescriptor implements LinkDescriptor {
         return linkHeader;
     }
 
-    @Override
     public String getLinkTemplate() {
         String template = null;
         if (!linkHeader.value().resource().equals(Class.class)) {
@@ -77,12 +76,10 @@ public class LinkHeaderDescriptor implements LinkDescriptor {
         return template;
     }
 
-    @Override
     public Style getLinkStyle() {
         return linkHeader.value().style();
     }
 
-    @Override
     public String getBinding(String name) {
         return bindings.get(name);
     }

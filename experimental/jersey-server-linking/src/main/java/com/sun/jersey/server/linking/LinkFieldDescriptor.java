@@ -76,12 +76,10 @@ public class LinkFieldDescriptor extends FieldDescriptor implements LinkDescript
         }
     }
 
-    @Override
     public Link.Style getLinkStyle() {
         return link.style();
     }
 
-    @Override
     public String getLinkTemplate() {
         String template = null;
         if (!link.resource().equals(Class.class)) {
@@ -94,7 +92,6 @@ public class LinkFieldDescriptor extends FieldDescriptor implements LinkDescript
         return template;
     }
 
-    @Override
     public String getBinding(String name) {
         return bindings.get(name);
     }
