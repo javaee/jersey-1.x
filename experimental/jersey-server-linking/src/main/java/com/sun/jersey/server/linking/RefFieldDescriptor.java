@@ -46,16 +46,16 @@ import java.util.logging.Logger;
 import javax.ws.rs.Path;
 
 /**
- * Utility class for working with {@link Link} annotated fields
+ * Utility class for working with {@link Ref} annotated fields
  * @author mh124079
  */
-public class LinkFieldDescriptor extends FieldDescriptor implements LinkDescriptor {
+public class RefFieldDescriptor extends FieldDescriptor implements RefDescriptor {
 
-    private Link link;
+    private Ref link;
     private Class<?> type;
     private Map<String, String> bindings;
 
-    public LinkFieldDescriptor(Field f, Link l, Class<?> t) {
+    public RefFieldDescriptor(Field f, Ref l, Class<?> t) {
         super(f);
         link = l;
         type = t;
@@ -70,13 +70,13 @@ public class LinkFieldDescriptor extends FieldDescriptor implements LinkDescript
         try {
             field.set(instance, type.equals(URI.class) ? value : value.toString());
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(LinkFieldDescriptor.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RefFieldDescriptor.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(LinkFieldDescriptor.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(RefFieldDescriptor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public Link.Style getLinkStyle() {
+    public Ref.Style getLinkStyle() {
         return link.style();
     }
 

@@ -37,8 +37,8 @@
 
 package com.sun.jersey.server.linking;
 
+import com.sun.jersey.server.linking.Link.Extension;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
@@ -52,11 +52,11 @@ import junit.framework.TestCase;
  * @author mh124079
  */
 public class LinkProcessorTest extends TestCase {
-    
+
     UriInfo mockUriInfo;
 
-    public LinkProcessorTest(String testName) {
-        super(testName);
+    public LinkProcessorTest(String name) {
+        super(name);
         mockUriInfo = new UriInfo() {
 
             private final static String baseURI = "http://example.com/application/resources";
@@ -133,226 +133,108 @@ public class LinkProcessorTest extends TestCase {
         };
     }
 
-    private final static String TEMPLATE_A = "foo";
-
-    public static class TestClassD {
-        @Link(value=TEMPLATE_A, style=Link.Style.RELATIVE_PATH)
-        private String res1;
-
-        @Link(value=TEMPLATE_A, style=Link.Style.RELATIVE_PATH)
-        private URI res2;
+    @Link(@Ref(value="A"))
+    public static class EntityA {
     }
 
-    public void testProcessLinks() {
-        System.out.println("Links");
-        LinkProcessor<TestClassD> instance = new LinkProcessor(TestClassD.class);
-        TestClassD testClass = new TestClassD();
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals(TEMPLATE_A, testClass.res1);
-        assertEquals(TEMPLATE_A, testClass.res2.toString());
+    public void testLiteral() {
+        System.out.println("Literal");
+        LinkProcessor<EntityA> instance = new LinkProcessor(EntityA.class);
+        EntityA testClass = new EntityA();
+        List<String> headerValues = instance.getLinkHeaderValues(testClass, mockUriInfo);
+        assertEquals(1, headerValues.size());
+        String headerValue = headerValues.get(0);
+        assertEquals("</application/resources/A>", headerValue);
     }
 
-    private final static String TEMPLATE_B = "widgets/{id}";
-
-    public static class TestClassE {
-        @Link(value=TEMPLATE_B, style=Link.Style.RELATIVE_PATH)
-        private String link;
-
-        private String id;
-
-        public TestClassE(String id) {
-            this.id = id;
-        }
-
+    @Link(@Ref(value="${entity.id}"))
+    public static class EntityB {
         public String getId() {
-            return id;
-        }
-    }
-
-    public void testProcessLinksWithFields() {
-        System.out.println("Links from field values");
-        LinkProcessor<TestClassE> instance = new LinkProcessor(TestClassE.class);
-        TestClassE testClass = new TestClassE("10");
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals("widgets/10", testClass.link);
-    }
-
-    public static class TestClassF {
-        @Link(value=TEMPLATE_B, style=Link.Style.RELATIVE_PATH)
-        private String thelink;
-
-        private String id;
-        private TestClassE nested;
-
-        public TestClassF(String id, TestClassE e) {
-            this.id = id;
-            this.nested = e;
-        }
-
-        public String getId() {
-            return id;
-        }
-    }
-
-    public void testNesting() {
-        System.out.println("Nesting");
-        LinkProcessor<TestClassF> instance = new LinkProcessor(TestClassF.class);
-        TestClassE nested = new TestClassE("10");
-        TestClassF testClass = new TestClassF("20", nested);
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals("widgets/20", testClass.thelink);
-        assertEquals("widgets/10", testClass.nested.link);
-    }
-
-    public void testArray() {
-        System.out.println("Array");
-        LinkProcessor<TestClassE[]> instance = new LinkProcessor(TestClassE[].class);
-        TestClassE item1 = new TestClassE("10");
-        TestClassE item2 = new TestClassE("20");
-        TestClassE array[] = {item1, item2};
-        instance.processLinks(array, mockUriInfo);
-        assertEquals("widgets/10", array[0].link);
-        assertEquals("widgets/20", array[1].link);
-    }
-
-    public void testCollection() {
-        System.out.println("Collection");
-        LinkProcessor<List> instance = new LinkProcessor(List.class);
-        TestClassE item1 = new TestClassE("10");
-        TestClassE item2 = new TestClassE("20");
-        List<TestClassE> list = Arrays.asList(item1, item2);
-        instance.processLinks(list, mockUriInfo);
-        assertEquals("widgets/10", list.get(0).link);
-        assertEquals("widgets/20", list.get(1).link);
-    }
-
-    public static class TestClassG {
-        @Link(value=TEMPLATE_B, style=Link.Style.RELATIVE_PATH)
-        private String relativePath;
-
-        @Link(value=TEMPLATE_B, style=Link.Style.ABSOLUTE_PATH)
-        private String absolutePath;
-
-        @Link(value=TEMPLATE_B, style=Link.Style.ABSOLUTE)
-        private String absolute;
-
-        @Link(TEMPLATE_B)
-        private String defaultStyle;
-
-        private String id;
-
-        public TestClassG(String id) {
-            this.id = id;
-        }
-
-        public String getId() {
-            return id;
-        }
-    }
-
-    public void testLinkStyles() {
-        System.out.println("Link styles");
-        LinkProcessor<TestClassG> instance = new LinkProcessor(TestClassG.class);
-        TestClassG testClass = new TestClassG("10");
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals("widgets/10", testClass.relativePath);
-        assertEquals("/application/resources/widgets/10", testClass.absolutePath);
-        assertEquals("/application/resources/widgets/10", testClass.defaultStyle);
-        assertEquals("http://example.com/application/resources/widgets/10", testClass.absolute);
-    }
-
-    public static class TestClassH {
-        @Link(TEMPLATE_B)
-        private String link;
-
-        public String getId() {
-            return "10";
-        }
-    }
-
-    public void testComputedProperty() {
-        System.out.println("Computed property");
-        LinkProcessor<TestClassH> instance = new LinkProcessor(TestClassH.class);
-        TestClassH testClass = new TestClassH();
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals("/application/resources/widgets/10", testClass.link);
-    }
-
-    public static class TestClassI {
-        @Link("widgets/${entity.id}")
-        private String link;
-
-        public String getId() {
-            return "10";
+            return "B";
         }
     }
 
     public void testEL() {
-        System.out.println("EL link");
-        LinkProcessor<TestClassI> instance = new LinkProcessor(TestClassI.class);
-        TestClassI testClass = new TestClassI();
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals("/application/resources/widgets/10", testClass.link);
+        System.out.println("EL");
+        LinkProcessor<EntityB> instance = new LinkProcessor(EntityB.class);
+        EntityB testClass = new EntityB();
+        List<String> headerValues = instance.getLinkHeaderValues(testClass, mockUriInfo);
+        assertEquals(1, headerValues.size());
+        String headerValue = headerValues.get(0);
+        assertEquals("</application/resources/B>", headerValue);
     }
 
-    public static class TestClassJ {
-        @Link("widgets/${entity.id}/widget/{id}")
-        private String link;
-
+    @Link(@Ref(value="{id}"))
+    public static class EntityC {
         public String getId() {
-            return "10";
+            return "C";
         }
     }
 
-    public void testMixed() {
-        System.out.println("Mixed EL and template vars link");
-        LinkProcessor<TestClassJ> instance = new LinkProcessor(TestClassJ.class);
-        TestClassJ testClass = new TestClassJ();
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals("/application/resources/widgets/10/widget/10", testClass.link);
+    public void testTemplateLiteral() {
+        System.out.println("Template Literal");
+        LinkProcessor<EntityC> instance = new LinkProcessor(EntityC.class);
+        EntityC testClass = new EntityC();
+        List<String> headerValues = instance.getLinkHeaderValues(testClass, mockUriInfo);
+        assertEquals(1, headerValues.size());
+        String headerValue = headerValues.get(0);
+        assertEquals("</application/resources/C>", headerValue);
     }
 
-    public static class DependentInnerBean {
-        @Link("${entity.id}")
-        public String outerUri;
-        @Link("${instance.id}")
-        public String innerUri;
-        public String getId() {
-            return "inner";
+    @Links({
+        @Link(@Ref(value="A")),
+        @Link(@Ref(value="B"))
+    })
+    public static class EntityD {
+    }
+
+    public void testMultiple() {
+        System.out.println("Multiple Literal");
+        LinkProcessor<EntityD> instance = new LinkProcessor(EntityD.class);
+        EntityD testClass = new EntityD();
+        List<String> headerValues = instance.getLinkHeaderValues(testClass, mockUriInfo);
+        assertEquals(2, headerValues.size());
+        // not sure if annotation order is supposed to be preserved but it seems
+        // to work as expected
+        String headerValue = headerValues.get(0);
+        assertEquals("</application/resources/A>", headerValue);
+        headerValue = headerValues.get(1);
+        assertEquals("</application/resources/B>", headerValue);
+    }
+
+    @Link(
+        value=@Ref(value="E"),
+        rel="relE",
+        rev="revE",
+        type="type/e",
+        title="titleE",
+        anchor="anchorE",
+        media="mediaE",
+        hreflang="en-E",
+        extensions={
+            @Extension(name="e1", value="v1"),
+            @Extension(name="e2", value="v2")
         }
+    )
+    public static class EntityE {
     }
 
-    public static class OuterBean {
-        public DependentInnerBean inner = new DependentInnerBean();
-        public String getId() {
-            return "outer";
-        }
+    public void testParameters() {
+        System.out.println("Parameters");
+        LinkProcessor<EntityE> instance = new LinkProcessor(EntityE.class);
+        EntityE testClass = new EntityE();
+        List<String> headerValues = instance.getLinkHeaderValues(testClass, mockUriInfo);
+        assertEquals(1, headerValues.size());
+        String headerValue = headerValues.get(0);
+        assertTrue(headerValue.contains("</application/resources/E>"));
+        assertTrue(headerValue.contains(";rel=relE"));
+        assertTrue(headerValue.contains(";rev=\"revE\""));
+        assertTrue(headerValue.contains(";type=type/e"));
+        assertTrue(headerValue.contains(";title=\"titleE\""));
+        assertTrue(headerValue.contains(";anchor=\"anchorE\""));
+        assertTrue(headerValue.contains(";media=\"mediaE\""));
+        assertTrue(headerValue.contains(";hreflang=en-E"));
+        assertTrue(headerValue.contains(";e1=\"v1\""));
+        assertTrue(headerValue.contains(";e2=\"v2\""));
     }
-
-    public void testELScopes() {
-        System.out.println("EL scopes");
-        LinkProcessor<OuterBean> instance = new LinkProcessor(OuterBean.class);
-        OuterBean testClass = new OuterBean();
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals("/application/resources/inner", testClass.inner.innerUri);
-        assertEquals("/application/resources/outer", testClass.inner.outerUri);
-    }
-
-    public static class BoundLinkBean {
-        @Link(value="{id}", bindings={@Binding(name="id", value="${instance.name}")})
-        public String uri;
-
-        public String getName() {
-            return "name";
-        }
-    }
-
-    public void testELBinding() {
-        System.out.println("EL binding");
-        LinkProcessor<BoundLinkBean> instance = new LinkProcessor(BoundLinkBean.class);
-        BoundLinkBean testClass = new BoundLinkBean();
-        instance.processLinks(testClass, mockUriInfo);
-        assertEquals("/application/resources/name", testClass.uri);
-    }
-
 }

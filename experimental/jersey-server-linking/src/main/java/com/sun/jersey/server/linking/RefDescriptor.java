@@ -37,22 +37,28 @@
 
 package com.sun.jersey.server.linking;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Used to request the addition of a set of Link headers in the returned HTTP headers.
+ * Utility for working with @Ref annotations
+ * @author mh124079
  */
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface LinkHeaders {
+public interface RefDescriptor {
+    /**
+     * Get the style
+     * @return the style
+     */
+    Ref.Style getLinkStyle();
 
     /**
-     * Container for a set of {@link LinkHeader} annotations
-     * @return
+     * Get the link template, either directly from the value() or from the
+     * @Path of the class referenced in resource()
+     * @return the link template
      */
-    LinkHeader[] value() default {};
+    String getLinkTemplate();
 
+    /**
+     * Get the binding as an EL expression for a particular URI template parameter
+     * @param name
+     * @return the EL binding
+     */
+    String getBinding(String name);
 }

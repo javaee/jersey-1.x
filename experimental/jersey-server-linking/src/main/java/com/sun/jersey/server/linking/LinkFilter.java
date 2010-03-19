@@ -56,9 +56,9 @@ public class LinkFilter implements ContainerResponseFilter {
         Object entity  = response.getEntity();
         if (entity != null) {
             Class<?> entityClass = entity.getClass();
-            LinkHeaderProcessor lhp = new LinkHeaderProcessor(entityClass);
+            LinkProcessor lhp = new LinkProcessor(entityClass);
             lhp.processLinkHeaders(entity, uriInfo, response.getHttpHeaders());
-            LinkProcessor lp = new LinkProcessor(entityClass);
+            RefProcessor lp = new RefProcessor(entityClass);
             lp.processLinks(entity, uriInfo);
         }
         return response;

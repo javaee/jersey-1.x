@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Describes an entity in terms of its fields, bean properties and {@link Link}
+ * Describes an entity in terms of its fields, bean properties and {@link Ref}
  * annotated fields.
  * @author mh124079
  */
@@ -71,8 +71,8 @@ public class EntityDescriptor {
     // instance
 
     private Map<String, FieldDescriptor> nonLinkFields;
-    private Map<String, LinkFieldDescriptor> linkFields;
-    private List<LinkHeaderDescriptor> linkHeaders;
+    private Map<String, RefFieldDescriptor> linkFields;
+    private List<LinkDescriptor> linkHeaders;
 
     /**
      * Construct an new descriptor by inspecting the supplied class.
@@ -80,19 +80,19 @@ public class EntityDescriptor {
      */
     private EntityDescriptor(Class<?> entityClass) {
         // create a list of link headers
-        this.linkHeaders = new ArrayList<LinkHeaderDescriptor>();
+        this.linkHeaders = new ArrayList<LinkDescriptor>();
         findLinkHeaders(entityClass);
         this.linkHeaders = Collections.unmodifiableList(linkHeaders);
 
         // create a list of field names
         this.nonLinkFields = new HashMap<String, FieldDescriptor>();
-        this.linkFields = new HashMap<String, LinkFieldDescriptor>();
+        this.linkFields = new HashMap<String, RefFieldDescriptor>();
         findFields(entityClass);
         this.nonLinkFields = Collections.unmodifiableMap(this.nonLinkFields);
         this.linkFields = Collections.unmodifiableMap(this.linkFields);
     }
 
-    public Collection<LinkFieldDescriptor> getLinkFields() {
+    public Collection<RefFieldDescriptor> getLinkFields() {
         return linkFields.values();
     }
 
@@ -100,7 +100,7 @@ public class EntityDescriptor {
         return nonLinkFields.values();
     }
 
-    public List<LinkHeaderDescriptor> getLinkHeaders() {
+    public List<LinkDescriptor> getLinkHeaders() {
         return linkHeaders;
     }
 
@@ -111,12 +111,12 @@ public class EntityDescriptor {
      */
     private void findFields(Class<?> entityClass) {
         for (Field f: entityClass.getDeclaredFields()) {
-            Link a = f.getAnnotation(Link.class);
+            Ref a = f.getAnnotation(Ref.class);
             if (a != null) {
                 Class<?> t = f.getType();
                 if (t.equals(String.class) || t.equals(URI.class)) {
                     if (!linkFields.containsKey(f.getName())) {
-                        linkFields.put(f.getName(), new LinkFieldDescriptor(f, a, t));
+                        linkFields.put(f.getName(), new RefFieldDescriptor(f, a, t));
                     }
                 } else {
                     // TODO unsupported type
@@ -139,14 +139,14 @@ public class EntityDescriptor {
     }
 
     private void findLinkHeaders(Class<?> entityClass) {
-        LinkHeader linkHeaderAnnotation = entityClass.getAnnotation(LinkHeader.class);
+        Link linkHeaderAnnotation = entityClass.getAnnotation(Link.class);
         if (linkHeaderAnnotation != null) {
-            linkHeaders.add(new LinkHeaderDescriptor(linkHeaderAnnotation));
+            linkHeaders.add(new LinkDescriptor(linkHeaderAnnotation));
         }
-        LinkHeaders linkHeadersAnnotation = entityClass.getAnnotation(LinkHeaders.class);
+        Links linkHeadersAnnotation = entityClass.getAnnotation(Links.class);
         if (linkHeadersAnnotation != null) {
-            for (LinkHeader linkHeader: linkHeadersAnnotation.value()) {
-                linkHeaders.add(new LinkHeaderDescriptor(linkHeader));
+            for (Link linkHeader: linkHeadersAnnotation.value()) {
+                linkHeaders.add(new LinkDescriptor(linkHeader));
             }
         }
 

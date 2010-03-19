@@ -43,85 +43,76 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Specifies a link injection target in a returned representation bean. May be
- * used on fields of type String or URI. One of {@link #value()} or
- * {@link #resource()} must be specified.
+ * Used to request the addition of a Ref header in the returned HTTP headers.
+ * One of {@link #value()} of {@link #resource()} must be specified.
  */
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Link {
+
     /**
-     * Styles of URI supported
+     * Specifies the link value of the Ref header
      */
-    public enum Style {
+    Ref value();
+
+    /**
+     * Specifies a boolean EL expression whose value determines whether a Ref
+     * header is added (true) or not (false). Omission of a condition will
+     * always insert a header.
+     */
+    String condition() default "";
+
+    /**
+     * Specifies the relationship.
+     */
+    String rel() default "";
+
+    /**
+     * Specifies the reverse relationship.
+     */
+    String rev() default "";
+
+    /**
+     * Specifies the media type.
+     */
+    String type() default "";
+
+    /**
+     * Specifies the title.
+     */
+    String title() default "";
+
+    /**
+     * Specifies the anchor
+     */
+    String anchor() default "";
+
+    /**
+     * Specifies the media
+     */
+    String media() default "";
+
+    /**
+     * Specifies the lang of the referenced resource
+     */
+    String hreflang() default "";
+
+    /**
+     * Specifies extension parameters as name-value pairs.
+     */
+    Extension[] extensions() default {};
+
+    @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface Extension {
         /**
-         * An absolute URI. The URI template will be prefixed with the
-         * absolute base URI of the application.
+         * Specifies the name of the extension parameter
          */
-        ABSOLUTE,
-        
-        /**
-         * An absolute path. The URI template will be prefixed with the
-         * absolute base path of the application.
-         */
-        ABSOLUTE_PATH,
+        String name();
 
         /**
-         * A relative path. The URI template will be converted to a relative
-         * path with no prefix.
+         * Specifies the value of the extension parameter
          */
-        RELATIVE_PATH
-
-    };
-
-    /**
-     * The style of URI to inject
-     */
-    Style style() default Style.ABSOLUTE_PATH;
-
-    /**
-     * Specifies a URI template that will be used to build the injected URI. The
-     * template may contain both URI template parameters (e.g. {id}) and EL
-     * expressions (e.g. ${instance.id}) using the same implicit beans as
-     * {@link Binding#value()}. URI template parameter values are resolved as
-     * described in {@link #resource()}. E.g. the following three alternatives
-     * are equivalent:
-     * <pre>
-     * &#64;Link(template="{id}")
-     * &#64;Link(template="{id}", bindings={
-     *   &#64;Binding(name="id" value="${instance.id}"}
-     * )
-     * &#64;Link(template="${instance.id}")
-     * </pre>
-     */
-    String value() default "";
-
-    /**
-     * Specifies a resource class whose @Path URI template will be used to build
-     * the injected URI. Embedded URI template parameter values are resolved as
-     * follows:
-     * <ol>
-     * <li>If the {@link #bindings()} property contains a binding
-     * specification for the parameter then that is used</li>
-     * <li>Otherwise an implicit binding is used that extracts the value
-     * of a bean property by the same name as the URI template from the
-     * implicit <code>instance</code> bean (see {@link Binding}).</li>
-     * </ol>
-     * <p>E.g. assuming a resource class <code>SomeResource</code> with the
-     * following <code>@Path("{id}")</code> annotation, the following two
-     * alternatives are therefore equivalent:</p>
-     * <pre>
-     * &#64;Link(resource=SomeResource.class)
-     * &#64;Link(resource=SomeResource.class, bindings={
-     *   &#64;Binding(name="id" value="${instance.id}"}
-     * )
-     * </pre>
-     */
-    Class<?> resource() default Class.class;
-
-    /**
-     * Specifies the bindings for embedded URI template parameters.
-     * @see Binding
-     */
-    Binding[] bindings() default {};
+        String value();
+    }
 }

@@ -37,28 +37,51 @@
 
 package com.sun.jersey.server.linking;
 
+import com.sun.jersey.server.linking.Ref.Style;
+import java.util.HashMap;
+import java.util.Map;
+import javax.ws.rs.Path;
+
 /**
- * Utility for working with @Link annotations
+ * Utility class for working with {@link Link} annotations
  * @author mh124079
  */
-public interface LinkDescriptor {
-    /**
-     * Get the style
-     * @return the style
-     */
-    Link.Style getLinkStyle();
+public class LinkDescriptor implements RefDescriptor {
 
-    /**
-     * Get the link template, either directly from the value() or from the
-     * @Path of the class referenced in resource()
-     * @return the link template
-     */
-    String getLinkTemplate();
+    private Link linkHeader;
+    private RefFieldDescriptor linkField;
+    private Map<String, String> bindings;
 
-    /**
-     * Get the binding as an EL expression for a particular URI template parameter
-     * @param name
-     * @return the EL binding
-     */
-    String getBinding(String name);
+    LinkDescriptor(Link linkHeader) {
+        this.linkHeader = linkHeader;
+        bindings = new HashMap<String, String>();
+        for (Binding binding: linkHeader.value().bindings()) {
+            bindings.put(binding.name(), binding.value());
+        }
+    }
+
+    public Link getLinkHeader() {
+        return linkHeader;
+    }
+
+    public String getLinkTemplate() {
+        String template = null;
+        if (!linkHeader.value().resource().equals(Class.class)) {
+            // extract template from specified class' @Path annotation
+            Path path = linkHeader.value().resource().getAnnotation(Path.class);
+            template = path==null ? "" : path.value();
+        } else {
+            template = linkHeader.value().value();
+        }
+        return template;
+    }
+
+    public Style getLinkStyle() {
+        return linkHeader.value().style();
+    }
+
+    public String getBinding(String name) {
+        return bindings.get(name);
+    }
+
 }

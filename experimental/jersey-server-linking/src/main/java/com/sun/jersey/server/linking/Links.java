@@ -43,82 +43,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to request the addition of a Link header in the returned HTTP headers.
- * One of {@link #value()} of {@link #resource()} must be specified.
+ * Used to request the addition of a set of Link headers in the returned HTTP headers.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface LinkHeader {
+public @interface Links {
 
     /**
-     * Specifies the link value of the Link header
+     * Container for a set of {@link Link} annotations
+     * @return
      */
-    Link value();
+    Link[] value() default {};
 
-    /**
-     * Specifies a boolean EL expression whose value determines whether a Link
-     * header is added (true) or not (false). Omission of a condition will
-     * always insert a header.
-     */
-    String condition() default "";
-
-    /**
-     * Specifies the relationship.
-     */
-    String rel() default "";
-
-    /**
-     * Specifies the reverse relationship.
-     */
-    String rev() default "";
-
-    /**
-     * Specifies the media type.
-     */
-    String type() default "";
-
-    /**
-     * Specifies the title.
-     */
-    String title() default "";
-
-    /**
-     * Specifies the anchor
-     */
-    String anchor() default "";
-
-    /**
-     * Specifies the media
-     */
-    String media() default "";
-
-    /**
-     * Specifies the lang of the referenced resource
-     */
-    String hreflang() default "";
-
-    /**
-     * Specifies extension parameters as name-value pairs.
-     */
-    Extension[] extensions() default {};
-
-    @Target(ElementType.TYPE)
-    @Retention(RetentionPolicy.RUNTIME)
-    public @interface Extension {
-        /**
-         * Specifies the name of the extension parameter
-         */
-        String name();
-
-        /**
-         * Specifies the value of the extension parameter
-         */
-        String value();
-        
-        /**
-         * Specifies whether the value should be quote (true) or not (false)
-         * in the corresponding header
-         */
-        boolean quoteValue() default true;
-    }
 }

@@ -38,8 +38,8 @@
 package com.sun.jersey.server.linking.el;
 
 import com.sun.jersey.api.uri.UriTemplateParser;
-import com.sun.jersey.server.linking.Link;
-import com.sun.jersey.server.linking.LinkDescriptor;
+import com.sun.jersey.server.linking.Ref;
+import com.sun.jersey.server.linking.RefDescriptor;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
@@ -58,7 +58,7 @@ public class LinkBuilder {
     private static ExpressionFactory expressionFactory =
             ExpressionFactory.newInstance();
 
-    public static URI buildURI(LinkDescriptor link, Object entity, Object resource, Object instance,
+    public static URI buildURI(RefDescriptor link, Object entity, Object resource, Object instance,
             UriInfo uriInfo) {
         String template = link.getLinkTemplate();
 
@@ -77,7 +77,7 @@ public class LinkBuilder {
         return uri;
     }
 
-    private static UriBuilder applyLinkStyle(String template, Link.Style style, UriInfo uriInfo) {
+    private static UriBuilder applyLinkStyle(String template, Ref.Style style, UriInfo uriInfo) {
         UriBuilder ub=null;
         switch (style) {
             case ABSOLUTE:
@@ -94,7 +94,7 @@ public class LinkBuilder {
         return ub;
     }
 
-    private static Map<String, Object> getParameterValues(List<String> parameterNames, LinkDescriptor linkField, LinkELContext context) {
+    private static Map<String, Object> getParameterValues(List<String> parameterNames, RefDescriptor linkField, LinkELContext context) {
         Map<String, Object> values = new HashMap<String, Object>();
         for (String name: parameterNames) {
             String elExpression = getEL(name, linkField);
@@ -106,7 +106,7 @@ public class LinkBuilder {
         return values;
     }
 
-    private static String getEL(String name, LinkDescriptor linkField) {
+    private static String getEL(String name, RefDescriptor linkField) {
         String binding = linkField.getBinding(name);
         if (binding != null)
             return binding;

@@ -37,20 +37,22 @@
 
 package com.sun.jersey.server.linking;
 
+import com.sun.jersey.core.header.LinkHeader;
+import com.sun.jersey.core.header.LinkHeader.LinkHeaderBuilder;
 import com.sun.jersey.server.linking.el.LinkBuilder;
 import java.net.URI;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 /**
- * Utility class that can inject links into {@link Link} annotated fields in
- * an entity.
+ * Processes @Link and @LinkHeaders annotations on entity classes and
+ * adds appropriate HTTP Link headers.
  * @author mh124079
  */
 public class LinkProcessor<T> {
-
     private EntityDescriptor instanceDescriptor;
 
     public LinkProcessor(Class<T> c) {
@@ -58,62 +60,50 @@ public class LinkProcessor<T> {
     }
 
     /**
-     * Inject any {@link Link} annotated fields in the supplied entity and
-     * recursively process its fields.
+     * Process any {@link Link} annotations on the supplied entity.
      * @param entity the entity object returned by the resource method
      * @param uriInfo the uriInfo for the request
+     * @param headers the map into which the headers will be added
      */
-    public void processLinks(T entity, UriInfo uriInfo) {
-        Set<Object> processed = new HashSet<Object>();
+    public void processLinkHeaders(T entity, UriInfo uriInfo, MultivaluedMap<String, Object> headers) {
+        List<String> headerValues = getLinkHeaderValues(entity, uriInfo);
+        for (String headerValue: headerValues) {
+            headers.add("Link", headerValue);
+        }
+    }
+
+    List<String> getLinkHeaderValues(Object entity, UriInfo uriInfo) {
         Object resource = uriInfo.getMatchedResources().get(0);
-        processLinks(entity, resource, entity, processed, uriInfo);
+        List<String> headerValues = new ArrayList<String>();
+        for (LinkDescriptor desc: instanceDescriptor.getLinkHeaders()) {
+            String headerValue = getLinkHeaderValue(desc, entity, resource, uriInfo);
+            headerValues.add(headerValue);
+        }
+        return headerValues;
     }
 
-    /**
-     * Inject any {@link Link} annotated fields in the supplied instance. Called
-     * once for the entity and then recursively for each member and field.
-     * @param entity
-     * @param processed a list of already processed objects, used to break
-     * recursion when processing circular references.
-     * @param uriInfo
-     */
-    private void processLinks(Object entity, Object resource, Object instance, 
-            Set<Object> processed, UriInfo uriInfo) {
-        if (instance==null || processed.contains(instance))
-            return; // ignore null properties and defeat circular references
-        processed.add(instance);
-
-        // Process any @Link annotated fields in entity
-        for (LinkFieldDescriptor linkField: instanceDescriptor.getLinkFields()) {
-            URI uri = LinkBuilder.buildURI(linkField, entity, resource, instance, uriInfo);
-            linkField.setPropertyValue(instance, uri);
+    static String getLinkHeaderValue(LinkDescriptor desc, Object entity, Object resource, UriInfo uriInfo) {
+        URI uri = LinkBuilder.buildURI(desc, entity, resource, entity, uriInfo);
+        Link header = desc.getLinkHeader();
+        LinkHeaderBuilder builder = LinkHeader.uri(uri);
+        if (!header.rel().isEmpty())
+            builder = builder.rel(header.rel());
+        if (!header.rev().isEmpty())
+            builder = builder.parameter("rev", header.rev());
+        if (!header.type().isEmpty())
+            builder = builder.type(MediaType.valueOf(header.type()));
+        if (!header.title().isEmpty())
+            builder = builder.parameter("title", header.title());
+        if (!header.anchor().isEmpty())
+            builder = builder.parameter("anchor", header.anchor());
+        if (!header.media().isEmpty())
+            builder = builder.parameter("media", header.media());
+        if (!header.hreflang().isEmpty())
+            builder = builder.parameter("hreflang", header.hreflang());
+        for (Link.Extension ext: header.extensions()) {
+            builder = builder.parameter(ext.name(), ext.value());
         }
-
-        // If entity is an array or collection then process members
-        Class<?> instanceClass = instance.getClass();
-        if (instanceClass.isArray() && Object[].class.isAssignableFrom(instanceClass)) {
-            Object array[] = (Object[])instance;
-            for (Object member: array) {
-                processMember(entity, resource, member, processed, uriInfo);
-            }
-        } else if (instance instanceof Collection) {
-            Collection collection = (Collection)instance;
-            for (Object member: collection) {
-                processMember(entity, resource, member, processed, uriInfo);
-            }
-        }
-
-        // Recursively process all member fields
-        for (FieldDescriptor member: instanceDescriptor.getNonLinkFields()) {
-            processMember(entity, resource, member.getFieldValue(instance), processed, uriInfo);
-        }
-    }
-
-    private void processMember(Object entity, Object resource, Object member, Set<Object> processed, UriInfo uriInfo) {
-        if (member != null) {
-            LinkProcessor proc = new LinkProcessor(member.getClass());
-            proc.processLinks(entity, resource, member, processed, uriInfo);
-        }
+        return builder.build().toString();
     }
 
 }

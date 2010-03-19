@@ -54,10 +54,10 @@ public class EntityDescriptorTest extends TestCase {
     }
 
     public static class TestClassA {
-        @Link
+        @Ref
         protected String foo;
 
-        @Link
+        @Ref
         private String bar;
 
         public String baz;
@@ -74,7 +74,7 @@ public class EntityDescriptorTest extends TestCase {
     }
 
     public static class TestClassB extends TestClassA {
-        @Link
+        @Ref
         private String bar;
     }
 
@@ -95,7 +95,7 @@ public class EntityDescriptorTest extends TestCase {
     }
 
     public static class TestClassC {
-        @Link(resource=TestResourceA.class, bindings={@Binding(name="bar", value="baz")})
+        @Ref(resource=TestResourceA.class, bindings={@Binding(name="bar", value="baz")})
         String res;
     }
 
@@ -104,16 +104,16 @@ public class EntityDescriptorTest extends TestCase {
         EntityDescriptor instance = EntityDescriptor.getInstance(TestClassC.class);
         assertEquals(1, instance.getLinkFields().size());
         assertEquals(0, instance.getNonLinkFields().size());
-        LinkFieldDescriptor linkDesc = instance.getLinkFields().iterator().next();
+        RefFieldDescriptor linkDesc = instance.getLinkFields().iterator().next();
         assertEquals(TEMPLATE_A, linkDesc.getLinkTemplate());
         assertEquals("baz", linkDesc.getBinding("bar"));
     }
 
     public static class TestClassD {
-        @Link(value=TEMPLATE_A, style=Link.Style.RELATIVE_PATH)
+        @Ref(value=TEMPLATE_A, style=Ref.Style.RELATIVE_PATH)
         private String res1;
 
-        @Link(value=TEMPLATE_A, style=Link.Style.RELATIVE_PATH)
+        @Ref(value=TEMPLATE_A, style=Ref.Style.RELATIVE_PATH)
         private URI res2;
     }
 
@@ -122,9 +122,9 @@ public class EntityDescriptorTest extends TestCase {
         EntityDescriptor instance = EntityDescriptor.getInstance(TestClassD.class);
         assertEquals(2, instance.getLinkFields().size());
         assertEquals(0, instance.getNonLinkFields().size());
-        Iterator<LinkFieldDescriptor> i = instance.getLinkFields().iterator();
+        Iterator<RefFieldDescriptor> i = instance.getLinkFields().iterator();
         while (i.hasNext()) {
-            LinkFieldDescriptor linkDesc = i.next();
+            RefFieldDescriptor linkDesc = i.next();
             assertEquals(TEMPLATE_A, linkDesc.getLinkTemplate());
         }
     }
@@ -132,10 +132,10 @@ public class EntityDescriptorTest extends TestCase {
     public void testSetLink() {
         System.out.println("Set link");
         EntityDescriptor instance = EntityDescriptor.getInstance(TestClassD.class);
-        Iterator<LinkFieldDescriptor> i = instance.getLinkFields().iterator();
+        Iterator<RefFieldDescriptor> i = instance.getLinkFields().iterator();
         TestClassD testClass = new TestClassD();
         while (i.hasNext()) {
-            LinkFieldDescriptor linkDesc = i.next();
+            RefFieldDescriptor linkDesc = i.next();
             URI value = UriBuilder.fromPath(linkDesc.getLinkTemplate()).build();
             linkDesc.setPropertyValue(testClass, value);
         }
