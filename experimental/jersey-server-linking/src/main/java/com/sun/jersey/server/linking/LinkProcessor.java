@@ -76,8 +76,10 @@ public class LinkProcessor<T> {
         Object resource = uriInfo.getMatchedResources().get(0);
         List<String> headerValues = new ArrayList<String>();
         for (LinkDescriptor desc: instanceDescriptor.getLinkHeaders()) {
-            String headerValue = getLinkHeaderValue(desc, entity, resource, uriInfo);
-            headerValues.add(headerValue);
+            if (LinkBuilder.evaluateCondition(desc.getCondition(), entity, resource, entity)) {
+                String headerValue = getLinkHeaderValue(desc, entity, resource, uriInfo);
+                headerValues.add(headerValue);
+            }
         }
         return headerValues;
     }

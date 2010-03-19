@@ -124,4 +124,12 @@ public @interface Ref {
      * @see Binding
      */
     Binding[] bindings() default {};
+
+    /**
+     * Specifies a boolean EL expression whose value determines whether a Ref
+     * is set (true) or not (false). Omission of a condition will
+     * always insert a ref.
+     */
+    String condition() default "";
+
 }

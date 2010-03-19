@@ -355,4 +355,33 @@ public class RefProcessorTest extends TestCase {
         assertEquals("/application/resources/name", testClass.uri);
     }
 
+    public static class ConditionalLinkBean {
+        @Ref(value="{id}", condition="${entity.uri1Enabled}")
+        public String uri1;
+
+        @Ref(value="{id}", condition="${entity.uri2Enabled}")
+        public String uri2;
+
+        public String getId() {
+            return "name";
+        }
+
+        public boolean isUri1Enabled() {
+            return true;
+        }
+
+        public boolean isUri2Enabled() {
+            return false;
+        }
+    }
+
+    public void testCondition() {
+        System.out.println("EL binding");
+        RefProcessor<ConditionalLinkBean> instance = new RefProcessor(ConditionalLinkBean.class);
+        ConditionalLinkBean testClass = new ConditionalLinkBean();
+        instance.processLinks(testClass, mockUriInfo);
+        assertEquals("/application/resources/name", testClass.uri1);
+        assertEquals(null, testClass.uri2);
+    }
+
 }

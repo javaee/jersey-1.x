@@ -61,4 +61,10 @@ public interface RefDescriptor {
      * @return the EL binding
      */
     String getBinding(String name);
+
+    /**
+     * Get the condition.
+     * @return the condition
+     */
+    String getCondition();
 }

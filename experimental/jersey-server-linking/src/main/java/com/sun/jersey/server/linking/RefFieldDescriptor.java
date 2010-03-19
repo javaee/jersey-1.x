@@ -95,4 +95,8 @@ public class RefFieldDescriptor extends FieldDescriptor implements RefDescriptor
     public String getBinding(String name) {
         return bindings.get(name);
     }
+
+    public String getCondition() {
+        return link.condition();
+    }
 }

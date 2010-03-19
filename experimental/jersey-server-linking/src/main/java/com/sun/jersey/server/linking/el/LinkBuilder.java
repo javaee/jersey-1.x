@@ -58,6 +58,17 @@ public class LinkBuilder {
     private static ExpressionFactory expressionFactory =
             ExpressionFactory.newInstance();
 
+    public static boolean evaluateCondition(String condition, Object entity,
+            Object resource, Object instance) {
+        if (condition==null || condition.length()==0)
+            return true;
+        LinkELContext context = new LinkELContext(entity, resource, instance);
+        ValueExpression expr = expressionFactory.createValueExpression(context,
+                condition, boolean.class);
+        Object result = expr.getValue(context).toString();
+        return result.equals("true");
+    }
+
     public static URI buildURI(RefDescriptor link, Object entity, Object resource, Object instance,
             UriInfo uriInfo) {
         String template = link.getLinkTemplate();

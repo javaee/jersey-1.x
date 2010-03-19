@@ -56,13 +56,6 @@ public @interface Link {
     Ref value();
 
     /**
-     * Specifies a boolean EL expression whose value determines whether a Ref
-     * header is added (true) or not (false). Omission of a condition will
-     * always insert a header.
-     */
-    String condition() default "";
-
-    /**
      * Specifies the relationship.
      */
     String rel() default "";

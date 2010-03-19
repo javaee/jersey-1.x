@@ -85,8 +85,10 @@ public class RefProcessor<T> {
 
         // Process any @Link annotated fields in entity
         for (RefFieldDescriptor linkField: instanceDescriptor.getLinkFields()) {
-            URI uri = LinkBuilder.buildURI(linkField, entity, resource, instance, uriInfo);
-            linkField.setPropertyValue(instance, uri);
+            if (LinkBuilder.evaluateCondition(linkField.getCondition(), entity, resource, instance)) {
+                URI uri = LinkBuilder.buildURI(linkField, entity, resource, instance, uriInfo);
+                linkField.setPropertyValue(instance, uri);
+            }
         }
 
         // If entity is an array or collection then process members

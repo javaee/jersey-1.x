@@ -56,7 +56,17 @@ public class LinkELContextTest extends TestCase {
         ExpressionFactory factory = ExpressionFactory.newInstance();
         assertNotNull(factory);
     }
-    
+
+    public void testLiteralExpression() {
+        System.out.println("Literal expression");
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        LinkELContext context = new LinkELContext(new BooleanBean(), null);
+        ValueExpression expr = factory.createValueExpression(context,
+                "${1+2}", int.class);
+        Object value = expr.getValue(context);
+        assertEquals(3, value);
+    }
+
     public final static String ID = "10";
     public final static String NAME = "TheName";
     public static class EntityBean {
@@ -118,6 +128,35 @@ public class LinkELContextTest extends TestCase {
                 "${entity.inner.id}", String.class);
         Object value = expr.getValue(context);
         assertEquals(ID, value);
+    }
+
+    public static class BooleanBean {
+
+        public boolean getEnabled() {
+            return true;
+        }
+
+        public boolean getValue(boolean value) {
+            return value;
+        }
+    }
+
+    public void testBooleanExpression() {
+        System.out.println("Boolean expression");
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        LinkELContext context = new LinkELContext(new BooleanBean(), null);
+        ValueExpression expr = factory.createValueExpression(context,
+                "${entity.enabled}", boolean.class);
+        Object value = expr.getValue(context);
+        assertEquals(true, value);
+        expr = factory.createValueExpression(context,
+                "${entity.getValue(true)}", boolean.class);
+        value = expr.getValue(context);
+        assertEquals(true, value);
+        expr = factory.createValueExpression(context,
+                "${entity.getValue(false)}", boolean.class);
+        value = expr.getValue(context);
+        assertEquals(false, value);
     }
 
 }

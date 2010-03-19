@@ -237,4 +237,34 @@ public class LinkProcessorTest extends TestCase {
         assertTrue(headerValue.contains(";e1=\"v1\""));
         assertTrue(headerValue.contains(";e2=\"v2\""));
     }
+
+    @Links({
+        @Link(@Ref(value="${entity.id1}", condition="${entity.id1Enabled}")),
+        @Link(@Ref(value="${entity.id2}", condition="${entity.id2Enabled}"))
+    })
+    public static class EntityF {
+        public boolean isId1Enabled() {
+            return true;
+        }
+        public String getId1() {
+            return "1";
+        }
+        public boolean isId2Enabled() {
+            return false;
+        }
+        public String getId2() {
+            return "2";
+        }
+    }
+
+    public void testConditional() {
+        System.out.println("EL");
+        LinkProcessor<EntityF> instance = new LinkProcessor(EntityF.class);
+        EntityF testClass = new EntityF();
+        List<String> headerValues = instance.getLinkHeaderValues(testClass, mockUriInfo);
+        assertEquals(1, headerValues.size());
+        String headerValue = headerValues.get(0);
+        assertEquals("</application/resources/1>", headerValue);
+    }
+
 }

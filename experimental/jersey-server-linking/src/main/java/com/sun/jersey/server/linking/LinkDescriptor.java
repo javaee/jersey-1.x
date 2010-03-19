@@ -84,4 +84,8 @@ public class LinkDescriptor implements RefDescriptor {
         return bindings.get(name);
     }
 
+    public String getCondition() {
+        return linkHeader.value().condition();
+    }
+
 }
