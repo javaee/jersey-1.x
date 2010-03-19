@@ -153,6 +153,46 @@ public class LinkTest extends TestCase {
                 lh);
     }
 
+    public void testToStringParams() {
+        LinkHeader lh = LinkHeader.uri(URI.create("http://x@host:8080/a/v/%2F?a=c#frag")).
+                rel("abc").
+                parameter("hreflang", "en").
+                parameter("hreflang", "en-US").
+                build();
+        _check(LinkHeader.valueOf("<http://x@host:8080/a/v/%2F?a=c#frag>;rel=abc;hreflang=en;hreflang=en-US"),
+                lh);
+
+        lh = LinkHeader.uri(URI.create("http://x@host:8080/a/v/%2F?a=c#frag")).
+                rel("abc").
+                parameter("title", "abc").
+                parameter("title", "abcefg").
+                build();
+        _check(LinkHeader.valueOf("<http://x@host:8080/a/v/%2F?a=c#frag>;rel=abc;title=\"abc\""),
+                lh);
+
+
+        lh = LinkHeader.uri(URI.create("http://x@host:8080/a/v/%2F?a=c#frag")).
+                rel("abc").
+                parameter("title*", "abc").
+                parameter("title*", "abcefg").
+                build();
+        _check(LinkHeader.valueOf("<http://x@host:8080/a/v/%2F?a=c#frag>;rel=abc;title*=\"abc\";title*=\"abcefg\""),
+                lh);
+
+        lh = LinkHeader.uri(URI.create("http://x@host:8080/a/v/%2F?a=c#frag")).
+                rel("abc").
+                parameter("media", "abc").
+                build();
+        _check(LinkHeader.valueOf("<http://x@host:8080/a/v/%2F?a=c#frag>;rel=abc;media=abc"),
+                lh);
+        lh = LinkHeader.uri(URI.create("http://x@host:8080/a/v/%2F?a=c#frag")).
+                rel("abc").
+                parameter("media", "a b c").
+                build();
+        _check(LinkHeader.valueOf("<http://x@host:8080/a/v/%2F?a=c#frag>;rel=abc;media=\"a b c\""),
+                lh);
+    }
+
     private void _check(LinkHeader v1, LinkHeader v2) {
         assertEquals(v1.toString(), v2.toString());
     }

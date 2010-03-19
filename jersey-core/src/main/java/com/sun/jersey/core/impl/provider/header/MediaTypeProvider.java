@@ -62,7 +62,7 @@ public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
             b.append(';').
                 append(e.getKey()).
                 append('=');
-            WriterUtil.appendQuotedMediaType(b, e.getValue());
+            WriterUtil.appendQuotedIfWhiteSpaceOrQuote(b, e.getValue());
         }
         return b.toString();
     }

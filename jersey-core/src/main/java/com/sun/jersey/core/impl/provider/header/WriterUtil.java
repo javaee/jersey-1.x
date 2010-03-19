@@ -44,13 +44,13 @@ import java.util.regex.Pattern;
  *
  * @author Marc.Hadley@Sun.Com
  */
-/* package */ class WriterUtil {
+public class WriterUtil {
     
     private static Pattern whitespace = Pattern.compile("\\s");
 
     private static Pattern whitespaceOrQuote = Pattern.compile("[\\s\"]");
     
-    public static void appendQuotedMediaType(StringBuilder b, String value) {
+    public static void appendQuotedIfWhiteSpaceOrQuote(StringBuilder b, String value) {
         if (value==null)
             return;
         Matcher m = whitespaceOrQuote.matcher(value);

@@ -38,6 +38,7 @@ package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.core.header.reader.HttpHeaderReader.Event;
+import com.sun.jersey.core.impl.provider.header.WriterUtil;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.net.URI;
 import java.text.ParseException;
@@ -126,13 +127,33 @@ public class LinkHeader {
             }
         }
 
+        if (type != null) {
+            sb.append(';').append("type=").
+                    append(type.getType()).append('/').append(type.getSubtype());
+        }
+
         if (parameters != null) {
             for (Entry<String, List<String>> e : parameters.entrySet()) {
-                for (String value : e.getValue()) {
-                    sb.append(";").append(e.getKey()).append("=").append(value);
+                String key = e.getKey();
+                List<String> values = e.getValue();
+
+                if (key.equals("anchor") || key.equals("title")) {
+                    sb.append(";").append(key).append("=");
+                    WriterUtil.appendQuoted(sb, values.get(0));
+                } else if (key.equals("hreflang")) {
+                    for (String value : e.getValue()) {
+                        sb.append(";").append(e.getKey()).append("=").
+                                append(value);
+                    }
+                } else {
+                    for (String value : e.getValue()) {
+                        sb.append(";").append(e.getKey()).append("=");                    
+                        WriterUtil.appendQuoted(sb, value);
+                    }                    
                 }
             }
         }
+        
         return sb.toString();
     }
 
@@ -190,7 +211,7 @@ public class LinkHeader {
                 add(name, reader.nextTokenOrQuotedString());
             } else if (name.equals("media")) {
                 if (!containsKey("media")) {
-                    add(name, reader.nextQuotedString());
+                    add(name, reader.nextTokenOrQuotedString());
                 }
             } else if (name.equals("title")) {
                 if (!containsKey("title")) {
