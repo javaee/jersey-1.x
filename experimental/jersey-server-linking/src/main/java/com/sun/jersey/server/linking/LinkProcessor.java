@@ -88,19 +88,19 @@ public class LinkProcessor<T> {
         URI uri = LinkBuilder.buildURI(desc, entity, resource, entity, uriInfo);
         Link header = desc.getLinkHeader();
         LinkHeaderBuilder builder = LinkHeader.uri(uri);
-        if (!header.rel().isEmpty())
+        if (header.rel().length() != 0)
             builder = builder.rel(header.rel());
-        if (!header.rev().isEmpty())
+        if (header.rev().length() != 0)
             builder = builder.parameter("rev", header.rev());
-        if (!header.type().isEmpty())
+        if (header.type().length() != 0)
             builder = builder.type(MediaType.valueOf(header.type()));
-        if (!header.title().isEmpty())
+        if (header.title().length() != 0)
             builder = builder.parameter("title", header.title());
-        if (!header.anchor().isEmpty())
+        if (header.anchor().length() != 0)
             builder = builder.parameter("anchor", header.anchor());
-        if (!header.media().isEmpty())
+        if (header.media().length() != 0)
             builder = builder.parameter("media", header.media());
-        if (!header.hreflang().isEmpty())
+        if (header.hreflang().length() != 0)
             builder = builder.parameter("hreflang", header.hreflang());
         for (Link.Extension ext: header.extensions()) {
             builder = builder.parameter(ext.name(), ext.value());
