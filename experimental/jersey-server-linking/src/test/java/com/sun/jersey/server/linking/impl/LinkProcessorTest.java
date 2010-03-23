@@ -35,9 +35,13 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.impl;
 
+import com.sun.jersey.server.linking.Link;
+import com.sun.jersey.server.linking.impl.LinkProcessor;
 import com.sun.jersey.server.linking.Link.Extension;
+import com.sun.jersey.server.linking.Links;
+import com.sun.jersey.server.linking.Ref;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;

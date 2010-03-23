@@ -39,7 +39,7 @@ package com.sun.jersey.server.linking.el;
 
 import com.sun.jersey.api.uri.UriTemplateParser;
 import com.sun.jersey.server.linking.Ref;
-import com.sun.jersey.server.linking.RefDescriptor;
+import com.sun.jersey.server.linking.impl.RefDescriptor;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;

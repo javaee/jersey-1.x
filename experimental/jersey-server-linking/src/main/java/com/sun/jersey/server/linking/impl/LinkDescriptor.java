@@ -35,33 +35,49 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.impl;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
+import com.sun.jersey.server.linking.Binding;
+import com.sun.jersey.server.linking.Link;
+import com.sun.jersey.server.linking.Ref.Style;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Filter that processes {@link Link} annotated fields in returned response
- * entities.
+ * Utility class for working with {@link Link} annotations
  * @author mh124079
  */
-public class LinkFilter implements ContainerResponseFilter {
+public class LinkDescriptor implements RefDescriptor {
 
-    @Context UriInfo uriInfo;
+    private Link linkHeader;
+    private Map<String, String> bindings;
 
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        Object entity  = response.getEntity();
-        if (entity != null) {
-            Class<?> entityClass = entity.getClass();
-            LinkProcessor lhp = new LinkProcessor(entityClass);
-            lhp.processLinkHeaders(entity, uriInfo, response.getHttpHeaders());
-            RefProcessor lp = new RefProcessor(entityClass);
-            lp.processLinks(entity, uriInfo);
+    LinkDescriptor(Link linkHeader) {
+        this.linkHeader = linkHeader;
+        bindings = new HashMap<String, String>();
+        for (Binding binding: linkHeader.value().bindings()) {
+            bindings.put(binding.name(), binding.value());
         }
-        return response;
+    }
+
+    public Link getLinkHeader() {
+        return linkHeader;
+    }
+
+    public String getLinkTemplate() {
+        return RefFieldDescriptor.getLinkTemplate(linkHeader.value());
+    }
+
+    public Style getLinkStyle() {
+        return linkHeader.value().style();
+    }
+
+    public String getBinding(String name) {
+        return bindings.get(name);
+    }
+
+    public String getCondition() {
+        return linkHeader.value().condition();
     }
 
 }

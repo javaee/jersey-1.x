@@ -35,8 +35,12 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.impl;
 
+import com.sun.jersey.server.linking.Binding;
+import com.sun.jersey.server.linking.Ref;
+import com.sun.jersey.server.linking.impl.RefFieldDescriptor;
+import com.sun.jersey.server.linking.impl.EntityDescriptor;
 import java.net.URI;
 import java.util.Iterator;
 import javax.ws.rs.Path;

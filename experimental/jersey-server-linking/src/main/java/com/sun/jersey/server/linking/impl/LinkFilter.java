@@ -35,36 +35,33 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.impl;
+
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 /**
- * Utility for working with @Ref annotations
+ * Filter that processes {@link Link} annotated fields in returned response
+ * entities.
  * @author mh124079
  */
-public interface RefDescriptor {
-    /**
-     * Get the style
-     * @return the style
-     */
-    Ref.Style getLinkStyle();
+public class LinkFilter implements ContainerResponseFilter {
 
-    /**
-     * Get the link template, either directly from the value() or from the
-     * @Path of the class referenced in resource()
-     * @return the link template
-     */
-    String getLinkTemplate();
+    @Context UriInfo uriInfo;
 
-    /**
-     * Get the binding as an EL expression for a particular URI template parameter
-     * @param name
-     * @return the EL binding
-     */
-    String getBinding(String name);
+    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
+        Object entity  = response.getEntity();
+        if (entity != null) {
+            Class<?> entityClass = entity.getClass();
+            LinkProcessor lhp = new LinkProcessor(entityClass);
+            lhp.processLinkHeaders(entity, uriInfo, response.getHttpHeaders());
+            RefProcessor lp = new RefProcessor(entityClass);
+            lp.processLinks(entity, uriInfo);
+        }
+        return response;
+    }
 
-    /**
-     * Get the condition.
-     * @return the condition
-     */
-    String getCondition();
 }

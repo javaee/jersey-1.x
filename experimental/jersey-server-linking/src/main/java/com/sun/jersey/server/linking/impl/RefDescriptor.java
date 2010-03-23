@@ -35,47 +35,38 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.impl;
 
-import com.sun.jersey.server.linking.Ref.Style;
-import java.util.HashMap;
-import java.util.Map;
+import com.sun.jersey.server.linking.Ref;
 
 /**
- * Utility class for working with {@link Link} annotations
+ * Utility for working with @Ref annotations
  * @author mh124079
  */
-public class LinkDescriptor implements RefDescriptor {
+public interface RefDescriptor {
+    /**
+     * Get the style
+     * @return the style
+     */
+    Ref.Style getLinkStyle();
 
-    private Link linkHeader;
-    private Map<String, String> bindings;
+    /**
+     * Get the link template, either directly from the value() or from the
+     * @Path of the class referenced in resource()
+     * @return the link template
+     */
+    String getLinkTemplate();
 
-    LinkDescriptor(Link linkHeader) {
-        this.linkHeader = linkHeader;
-        bindings = new HashMap<String, String>();
-        for (Binding binding: linkHeader.value().bindings()) {
-            bindings.put(binding.name(), binding.value());
-        }
-    }
+    /**
+     * Get the binding as an EL expression for a particular URI template parameter
+     * @param name
+     * @return the EL binding
+     */
+    String getBinding(String name);
 
-    public Link getLinkHeader() {
-        return linkHeader;
-    }
-
-    public String getLinkTemplate() {
-        return RefFieldDescriptor.getLinkTemplate(linkHeader.value());
-    }
-
-    public Style getLinkStyle() {
-        return linkHeader.value().style();
-    }
-
-    public String getBinding(String name) {
-        return bindings.get(name);
-    }
-
-    public String getCondition() {
-        return linkHeader.value().condition();
-    }
-
+    /**
+     * Get the condition.
+     * @return the condition
+     */
+    String getCondition();
 }

@@ -35,10 +35,12 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.impl;
 
 import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
+import com.sun.jersey.server.linking.Binding;
+import com.sun.jersey.server.linking.Ref;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.HashMap;

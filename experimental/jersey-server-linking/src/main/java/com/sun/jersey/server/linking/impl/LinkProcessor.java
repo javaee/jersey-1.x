@@ -35,10 +35,11 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.impl;
 
 import com.sun.jersey.core.header.LinkHeader;
 import com.sun.jersey.core.header.LinkHeader.LinkHeaderBuilder;
+import com.sun.jersey.server.linking.Link;
 import com.sun.jersey.server.linking.el.LinkBuilder;
 import java.net.URI;
 import java.util.ArrayList;

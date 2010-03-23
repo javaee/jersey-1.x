@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking;
+package com.sun.jersey.server.linking.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
