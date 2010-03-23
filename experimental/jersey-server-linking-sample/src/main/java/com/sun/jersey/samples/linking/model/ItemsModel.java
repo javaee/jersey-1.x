@@ -41,7 +41,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Models a three entry list of items and provides a simple means of navigating
+ * the list.
  * @author mh124079
  */
 public class ItemsModel {
@@ -63,15 +64,27 @@ public class ItemsModel {
         items.add(new ItemModel("Item 2"));
     }
 
-    public boolean hasNext(int currentItem) {
-        return currentItem < items.size()-1;
+    public boolean hasNext(String currentId) {
+        return getIndex(currentId) < items.size()-1;
     }
 
-    public boolean hasPrev(int currentItem) {
-        return currentItem > 0;
+    public boolean hasPrev(String currentId) {
+        return getIndex(currentId) > 0;
     }
 
-    public ItemModel getItem(int index) {
-        return items.get(index);
+    public ItemModel getItem(String id) {
+        return items.get(getIndex(id));
+    }
+
+    public String getNextId(String id) {
+        return Integer.toString(getIndex(id)+1);
+    }
+
+    public String getPrevId(String id) {
+        return Integer.toString(getIndex(id)-1);
+    }
+    
+    private int getIndex(String id) {
+        return Integer.parseInt(id);
     }
 }

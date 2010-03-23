@@ -50,7 +50,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
+ * JAXB representation of an item
  * @author mh124079
  */
 @XmlAccessorType(XmlAccessType.NONE)
@@ -61,7 +61,7 @@ import javax.xml.bind.annotation.XmlRootElement;
             resource=ItemResource.class,
             style = Style.ABSOLUTE,
             condition="${resource.next}",
-            bindings=@Binding(name="index", value="${entity.index+1}")
+            bindings=@Binding(name="id", value="${resource.nextId}")
         ),
         rel="next"
     ),
@@ -70,7 +70,7 @@ import javax.xml.bind.annotation.XmlRootElement;
             resource=ItemResource.class,
             style = Style.ABSOLUTE,
             condition="${resource.prev}",
-            bindings=@Binding(name="index", value="${entity.index-1}")
+            bindings=@Binding(name="id", value="${resource.prevId}")
         ),
         rel="prev"
     )
@@ -78,14 +78,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class ItemRepresentation {
 
     @XmlElement
-    String name;
-
-    int index;
+    private String name;
 
     @Ref(
         resource=ItemResource.class,
         style = Style.ABSOLUTE,
-        condition="${resource.next}"
+        bindings=@Binding(name="id", value="${resource.id}")
     )
     @XmlElement
     URI self;
@@ -94,7 +92,7 @@ public class ItemRepresentation {
         resource=ItemResource.class,
         style = Style.ABSOLUTE,
         condition="${resource.next}",
-        bindings=@Binding(name="index", value="${entity.index+1}")
+        bindings=@Binding(name="id", value="${resource.nextId}")
     )
     @XmlElement
     URI next;
@@ -103,23 +101,17 @@ public class ItemRepresentation {
         resource=ItemResource.class,
         style = Style.ABSOLUTE,
         condition="${resource.prev}",
-        bindings=@Binding(name="index", value="${entity.index-1}")
+        bindings=@Binding(name="id", value="${resource.prevId}")
     )
     @XmlElement
     URI prev;
 
     public ItemRepresentation() {
-        this.index = 0;
         this.name = "";
     }
 
-    public ItemRepresentation(int index, String name) {
-        this.index = index;
+    public ItemRepresentation(String name) {
         this.name = name;
-    }
-
-    public int getIndex() {
-        return index;
     }
 
 }

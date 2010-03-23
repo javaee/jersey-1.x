@@ -48,20 +48,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
+ * Resource that provides access to one item from a set of items managed
+ * by ItemsModel
  * @author mh124079
  */
-@Path("{index}")
+@Path("{id}")
 @Produces(MediaType.APPLICATION_XML)
 public class ItemResource {
 
+    private ItemsModel itemsModel;
     private ItemModel itemModel;
-    private int index;
+    private String id;
 
-    public ItemResource(@PathParam("index") int index) {
-        this.index = index;
+    public ItemResource(@PathParam("id") String id) {
+        this.id = id;
+        itemsModel = ItemsModel.getInstance();
         try {
-            itemModel = ItemsModel.getInstance().getItem(index);
+            itemModel = itemsModel.getItem(id);
         } catch (IndexOutOfBoundsException ex) {
             throw new NotFoundException();
         }
@@ -69,14 +72,34 @@ public class ItemResource {
 
     @GET
     public ItemRepresentation get() {
-        return new ItemRepresentation(index, itemModel.getName());
+        return new ItemRepresentation(itemModel.getName());
     }
 
+    /**
+     * Determines whether there is a next item.
+     * @return
+     */
     public boolean isNext() {
-        return ItemsModel.getInstance().hasNext(index);
+        return itemsModel.hasNext(id);
     }
 
+    /**
+     * Determines whether there is a previous item
+     * @return
+     */
     public boolean isPrev() {
-        return ItemsModel.getInstance().hasPrev(index);
+        return itemsModel.hasPrev(id);
+    }
+
+    public String getNextId() {
+        return itemsModel.getNextId(id);
+    }
+
+    public String getPrevId() {
+        return itemsModel.getPrevId(id);
+    }
+
+    public String getId() {
+        return id;
     }
 }
