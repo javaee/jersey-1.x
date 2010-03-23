@@ -40,7 +40,8 @@ import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.ClientFilter;
-import com.sun.jersey.client.proxy.WebResourceProxy;
+import com.sun.jersey.client.proxy.ViewProxy;
+import com.sun.jersey.client.proxy.ViewProxyProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderFactory;
@@ -64,6 +65,7 @@ import com.sun.jersey.spi.service.ServiceFinder;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -115,7 +117,7 @@ public class Client extends Filterable implements ClientHandler {
 
     private Map<String, Object> properties;
 
-    private Set<WebResourceProxy> proxies;
+    private Set<ViewProxyProvider> vpps;
 
     private static class ContextInjectableProvider<T> extends
             SingletonTypeInjectableProvider<Context, T> {
@@ -203,7 +205,7 @@ public class Client extends Filterable implements ClientHandler {
                 config.getSingletons());
 
         // Get the set of WebResourceProxy
-        proxies = providerServices.getServices(WebResourceProxy.class);
+        vpps = providerServices.getServices(ViewProxyProvider.class);
 
         // Allow injection of features and properties
         injectableFactory.add(new ContextInjectableProvider<FeaturesAndProperties>(
@@ -373,25 +375,61 @@ public class Client extends Filterable implements ClientHandler {
         return new WebResource(this, u);
     }
 
-    public <T> T proxy(String u, Class<T> c) throws UniformInterfaceException {
-        return proxy(new WebResource(this, URI.create(u)), c);
+    public ViewResource viewResource(String u) {
+        return viewResource(URI.create(u));
     }
 
-    public <T> T proxy(URI u, Class<T> c) throws UniformInterfaceException {
-        return proxy(new WebResource(this, u), c);
+    public ViewResource viewResource(URI u) {
+        return new ViewResource(this, u);
     }
 
-    public <T> T proxy(WebResource r, Class<T> c) throws UniformInterfaceException {
-        // Check if jersey-client-hypermedia is in classpath
-        for (WebResourceProxy wrp : proxies) {
-            if (wrp.supports(c)) {
-                return (T) wrp.proxy(r, c, "GET", this);
+    public <T> T view(URI uri, Class<T> type) {
+        ViewResource vr = viewResource(uri);
+        return vr.get(type);
+    }
+
+    public <T> T view(URI uri, T t) {
+        ViewResource vr = viewResource(uri);
+        return vr.get(t);
+    }
+
+    public <T> T view(String u, Class<T> type) {
+        ViewResource vr = viewResource(u);
+        return vr.get(type);
+    }
+
+    public <T> T view(String u, T t) {
+        ViewResource vr = viewResource(u);
+        return vr.get(t);
+    }
+
+    public <T> T view(Class<T> c, ClientRequest request, ClientHandler handler) {
+        return getViewProxy(c).view(c, request, handler);
+    }
+
+    public <T> T view(T t, ClientRequest request, ClientHandler handler) {
+        return getViewProxy((Class<T>)t.getClass()).view(t, request, handler);
+    }
+
+    public <T> T view(Class<T> c, ClientResponse response) {
+        return getViewProxy(c).view(c, response);
+    }
+
+    public <T> T view(T t, ClientResponse response) {
+        return getViewProxy((Class<T>)t.getClass()).view(t, response);
+    }
+
+    private <T> ViewProxy<T> getViewProxy(Class<T> c) {
+        for (ViewProxyProvider vpp : vpps) {
+            ViewProxy<T> vp = vpp.proxy(this, c);
+            if (vp != null) {
+                return vp;
             }
         }
-        throw new IllegalArgumentException("A web resource proxy is not " +
+        throw new IllegalArgumentException("A view proxy is not " +
                 "available for the class '" + c.getName() + "'");
     }
-
+  
     /**
      * Create an asynchronous Web resource from the client.
      *

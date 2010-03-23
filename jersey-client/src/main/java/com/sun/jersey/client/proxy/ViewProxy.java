@@ -35,53 +35,23 @@
  * holder.
  */
 
-package com.sun.jersey.client.hypermedia;
+package com.sun.jersey.client.proxy;
 
-import com.sun.jersey.client.proxy.WebResourceProxy;
-import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.client.impl.ClientRequestImpl;
-import com.sun.jersey.core.hypermedia.HypermediaController;
-import java.lang.reflect.Proxy;
 
 /**
- * Hypermedia Proxy implementation class.
- * 
- * @author Santiago.PericasGeertsen@sun.com
+ *
+ * @author Paul.Sandoz@Sun.Com
  */
-public class HypermediaProxyImpl implements WebResourceProxy {
+public interface ViewProxy<T> {
 
-    public boolean supports(Class<?> c) {
-        return c.isAnnotationPresent(HypermediaController.class);
-    }
+    T view(Class<T> type, ClientRequest request, ClientHandler handler);
 
-    public <R> R proxy(WebResource wr, Class<R> ctlr,
-            String method, Client client) throws UniformInterfaceException {
+    T view(T v, ClientRequest request, ClientHandler handler);
 
-        HypermediaController ctrl = ctlr.getAnnotation(HypermediaController.class);
-        Class<?> c = ctrl.model();
+    T view(Class<T> type, ClientResponse response);
 
-        ClientRequest ro = new ClientRequestImpl(wr.getURI(), method);
-        ClientResponse r = wr.getHeadHandler().handle(ro);
-        Object instance;
-
-        if (c == ClientResponse.class) {
-            instance = c.cast(r);
-        } else if (r.getStatus() < 300) {
-            instance = r.getEntity(c);
-        } else {
-            throw new UniformInterfaceException(r,
-                ro.getPropertyAsFeature(
-                    ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
-        }
-
-        return (R) Proxy.newProxyInstance(ctlr.getClassLoader(),
-                new Class[] { ctlr },
-                new ControllerInvocationHandler(client, instance, r, ctlr));
-    }
-
+    T view(T v, ClientResponse cr);
 }

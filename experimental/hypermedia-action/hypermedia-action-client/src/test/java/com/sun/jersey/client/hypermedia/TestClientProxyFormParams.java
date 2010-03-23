@@ -38,6 +38,7 @@
 package com.sun.jersey.client.hypermedia;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ViewResource;
 import com.sun.jersey.api.client.WebResource;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -137,8 +138,8 @@ public class TestClientProxyFormParams extends AbstractGrizzlyServerTester {
         startServer(drc);
 
         Client c = Client.create();
-        WebResource r = c.resource(getUri().path("strings").path("1").build());
-        StringController sc = c.proxy(r, StringController.class);
+        ViewResource r = c.viewResource(getUri().path("strings").path("1").build());
+        StringController sc =r.get(StringController.class);
 
         // Test static annotation @FormParam
         Form f = new Form();

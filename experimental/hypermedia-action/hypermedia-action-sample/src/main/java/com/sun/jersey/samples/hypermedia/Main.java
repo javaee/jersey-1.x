@@ -50,7 +50,7 @@ public class Main {
             client.addFilter(new LoggingFilter());
 
             // Create proxy for order 1
-            OrderController orderCtrl = client.proxy(
+            OrderController orderCtrl = client.view(
                     "http://localhost:9998/orders/1",
                     OrderController.class);
 
@@ -61,7 +61,7 @@ public class Main {
             orderCtrl.refresh();
 
             // Create proxy for customer in order 1
-            CustomerController customerCtrl = client.proxy(
+            CustomerController customerCtrl = client.view(
                     orderCtrl.getModel().getCustomer(),
                     CustomerController.class);
 

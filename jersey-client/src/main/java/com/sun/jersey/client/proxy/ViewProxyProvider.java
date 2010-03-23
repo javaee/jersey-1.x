@@ -38,19 +38,12 @@
 package com.sun.jersey.client.proxy;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 
 /**
- * Web Proxy interface.
  *
- * @author Santiago.PericasGeertsen@sun.com
+ * @author Paul.Sandoz@Sun.Com
  */
-public interface WebResourceProxy {
-
-    public boolean supports(Class<?> c);
-
-    public <R> R proxy(WebResource wr, Class<R> ctlr,
-        String method, Client client) throws UniformInterfaceException;
-
+public interface ViewProxyProvider {
+    
+    <T> ViewProxy<T> proxy(Client client, Class<T> c);
 }

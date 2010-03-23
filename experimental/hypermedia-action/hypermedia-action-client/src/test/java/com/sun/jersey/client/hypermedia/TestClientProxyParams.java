@@ -38,7 +38,7 @@
 package com.sun.jersey.client.hypermedia;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.ViewResource;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -144,8 +144,8 @@ public class TestClientProxyParams extends AbstractGrizzlyServerTester {
         startServer(drc);
 
         Client c = Client.create();
-        WebResource r = c.resource(getUri().path("strings").path("1").build());
-        StringController sc = c.proxy(r, StringController.class);
+        ViewResource r = c.viewResource(getUri().path("strings").path("1").build());
+        StringController sc = r.get(StringController.class);
         Cookie cookie = new Cookie("p", "foo");
 
         // Test static annotations @QueryParam, @HeaderParam and @CookieParam
