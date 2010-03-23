@@ -54,6 +54,7 @@
     </description>
     <modules>
         <module>jersey-server-linking</module>
+        <module>jersey-server-linking-sample</module>
         <module>hypermedia-action</module>
     </modules>
 </project>
