@@ -41,6 +41,8 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
@@ -376,12 +378,34 @@ public class RefProcessorTest extends TestCase {
     }
 
     public void testCondition() {
-        System.out.println("EL binding");
+        System.out.println("Condition");
         RefProcessor<ConditionalLinkBean> instance = new RefProcessor(ConditionalLinkBean.class);
         ConditionalLinkBean testClass = new ConditionalLinkBean();
         instance.processLinks(testClass, mockUriInfo);
         assertEquals("/application/resources/name", testClass.uri1);
         assertEquals(null, testClass.uri2);
+    }
+
+    @Path("a")
+    public static class SubResource {
+        @Path("b")
+        @GET
+        public String getB() {
+            return "hello world";
+        }
+    }
+
+    public static class SubResourceBean {
+        @Ref(resource=SubResource.class, method="getB")
+        public String uri;
+    }
+
+    public void testSubresource() {
+        System.out.println("Subresource");
+        RefProcessor<SubResourceBean> instance = new RefProcessor(SubResourceBean.class);
+        SubResourceBean testClass = new SubResourceBean();
+        instance.processLinks(testClass, mockUriInfo);
+        assertEquals("/application/resources/a/b", testClass.uri);
     }
 
 }

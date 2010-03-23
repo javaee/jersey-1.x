@@ -37,9 +37,12 @@
 
 package com.sun.jersey.server.linking;
 
+import com.sun.jersey.core.reflection.AnnotatedMethod;
+import com.sun.jersey.core.reflection.MethodList;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -81,11 +84,35 @@ public class RefFieldDescriptor extends FieldDescriptor implements RefDescriptor
     }
 
     public String getLinkTemplate() {
+        return getLinkTemplate(link);
+    }
+
+    public static String getLinkTemplate(Ref link) {
         String template = null;
         if (!link.resource().equals(Class.class)) {
             // extract template from specified class' @Path annotation
             Path path = link.resource().getAnnotation(Path.class);
             template = path==null ? "" : path.value();
+            if (link.method().length() > 0) {
+                // append value of method's @Path annotation
+                MethodList methods = new MethodList(link.resource());
+                methods = methods.hasAnnotation(Path.class);
+                Iterator<AnnotatedMethod> iterator = methods.iterator();
+                while (iterator.hasNext()) {
+                    AnnotatedMethod method = iterator.next();
+                    if (!method.getMethod().getName().equals(link.method()))
+                        continue;
+                    Path methodPath = method.getAnnotation(Path.class);
+                    String methodTemplate = methodPath.value();
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(template);
+                    if (!(template.endsWith("/") || methodTemplate.startsWith("/")))
+                        builder.append("/");
+                    builder.append(methodTemplate);
+                    template = builder.toString();
+                    break;
+                }
+            }
         } else {
             template = link.value();
         }

@@ -120,6 +120,14 @@ public @interface Ref {
     Class<?> resource() default Class.class;
 
     /**
+     * Used in conjunction with {@link #resource()} to specify a subresource
+     * locator or method. The value is the name of the method. The value of
+     * the method's @Path annotation will be appended to the value of the
+     * class-level @Path annotation separated by '/' if necessary.
+     */
+    String method() default "";
+
+    /**
      * Specifies the bindings for embedded URI template parameters.
      * @see Binding
      */

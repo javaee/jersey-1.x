@@ -40,7 +40,6 @@ package com.sun.jersey.server.linking;
 import com.sun.jersey.server.linking.Ref.Style;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.Path;
 
 /**
  * Utility class for working with {@link Link} annotations
@@ -49,7 +48,6 @@ import javax.ws.rs.Path;
 public class LinkDescriptor implements RefDescriptor {
 
     private Link linkHeader;
-    private RefFieldDescriptor linkField;
     private Map<String, String> bindings;
 
     LinkDescriptor(Link linkHeader) {
@@ -65,15 +63,7 @@ public class LinkDescriptor implements RefDescriptor {
     }
 
     public String getLinkTemplate() {
-        String template = null;
-        if (!linkHeader.value().resource().equals(Class.class)) {
-            // extract template from specified class' @Path annotation
-            Path path = linkHeader.value().resource().getAnnotation(Path.class);
-            template = path==null ? "" : path.value();
-        } else {
-            template = linkHeader.value().value();
-        }
-        return template;
+        return RefFieldDescriptor.getLinkTemplate(linkHeader.value());
     }
 
     public Style getLinkStyle() {
