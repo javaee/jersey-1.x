@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.sun.jersey.test.osgi.http-service-tests</groupId>
+    <artifactId>jersey-osgi-project-http-service-tests</artifactId>
+    <version>1.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>jersey-project : osgified : HttpService test</name>
+
+    <modules>
+        <module>http-service-test-bundle</module>
+        <!-- needs to be kept at the bottom of the list: -->
+        <module>http-service-test</module>
+    </modules>
+   
+</project>

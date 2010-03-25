@@ -124,12 +124,12 @@ public class JerseyTest {
 //                mavenBundle("org.springframework.osgi","spring-osgi-web","1.2.0"),
                 
                 mavenBundle("javax.ws.rs","jsr311-api","1.1.1"),
-                mavenBundle("com.sun.jersey.osgi","jersey-core","1.2-SNAPSHOT"),
-        	mavenBundle("com.sun.jersey.osgi","jersey-server", "1.2-SNAPSHOT"),
-        	mavenBundle("com.sun.jersey.osgi","jersey-client", "1.2-SNAPSHOT"),
+                mavenBundle("com.sun.jersey","jersey-core","1.2-SNAPSHOT"),
+        	mavenBundle("com.sun.jersey","jersey-server", "1.2-SNAPSHOT"),
+        	mavenBundle("com.sun.jersey","jersey-client", "1.2-SNAPSHOT"),
                 //mavenBundle("org.codehaus.jackson","jackson-core-asl","1.2.0"),
 		//mavenBundle("org.codehaus.jettison","jettison","1.1"),
-		//mavenBundle("com.sun.jersey.osgi","jersey-json","1.1.5-ea-SNAPSHOT"),
+		//mavenBundle("com.sun.jersey","jersey-json","1.1.5-ea-SNAPSHOT"),
 //		provision(wrappedBundle(mavenBundle().groupId("com.sun.jersey.contribs").artifactId("jersey-spring").version("1.1.5-ea-SNAPSHOT"))),
 				
 //			    mavenBundle("org.apache.servicemix.specs","org.apache.servicemix.specs.activation-api-1.1","1.4.0"),

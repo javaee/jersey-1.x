@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
+import java.lang.reflect.ReflectPermission;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -80,6 +81,12 @@ import java.util.logging.Logger;
  * only requirement enforced here is that provider classes must have a
  * zero-argument constructor so that they may be instantiated during lookup.
  * <p/>
+ * <p>The default service provider registration/lookup mechanism based
+ * on <tt>META-INF/services</tt> files is described below.
+ * For environments, where the basic mechanism is not suitable, clients
+ * can enforce a different approach by setting their custom <tt>ServiceIteratorProvider</tt>
+ * by calling <tt>setIteratorProvider</tt>. The call must be made prior to any lookup attempts.
+ * </p>
  * <p> A service provider identifies itself by placing a provider-configuration
  * file in the resource directory <tt>META-INF/services</tt>.  The file's name
  * should consist of the fully-qualified name of the abstract service class.
@@ -137,15 +144,13 @@ import java.util.logging.Logger;
  * class from within a privileged security context.
  *
  * @param <T> the type of the service instance.
- * @author Mark Reinhold
- * @version 1.11, 03/12/19
- * @since 1.3
+ * @author Mark Reinhold, Jakub Podlesak
  */
 public final class ServiceFinder<T> implements Iterable<T> {
     private static final Logger LOGGER = Logger.getLogger(ServiceFinder.class.getName());
     
     private static final String PREFIX = "META-INF/services/";
-    
+
     private final Class<T> serviceClass;
     private final String serviceName;
     private final ClassLoader classLoader;
@@ -178,13 +183,13 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @param <T> the type of the service instance.
      * @return the service finder
      */
-    public static <T> ServiceFinder<T> find(Class<T> service, ClassLoader loader) 
+    public static <T> ServiceFinder<T> find(Class<T> service, ClassLoader loader)
             throws ServiceConfigurationError {
-        return find(service, 
-                loader, 
+        return find(service,
+                loader,
                 false);
     }
-    
+
     /**
      * Locates and incrementally instantiates the available providers of a
      * given service using the given class loader.
@@ -285,6 +290,18 @@ public final class ServiceFinder<T> implements Iterable<T> {
         return new ServiceFinder(Object.class, serviceName, Thread.currentThread().getContextClassLoader(), false);
     }
 
+    /**
+     * Gives you a chance to change the default lookup mechanism, by registering a custom
+     * <tt>ServiceIteratorProvider</tt>. The call has to be made prior to any lookup attempts,
+     * otherwise the default method would be used.
+     *
+     * @param sip
+     * @throws SecurityException
+     */
+    public static void setIteratorProvider(ServiceIteratorProvider sip) throws SecurityException {
+        ServiceIteratorProvider.setInstance(sip);
+    }
+
 
     private ServiceFinder(
             Class<T> service,
@@ -314,11 +331,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      *         be found and instantiated.
      */
     public Iterator<T> iterator() {
-        return new LazyObjectIterator<T>(
-                serviceClass,
-                serviceName,
-                classLoader,
-                ignoreOnClassNotFound);
+        return ServiceIteratorProvider.getInstance().createIterator(serviceClass, serviceName, classLoader, ignoreOnClassNotFound);
     }
     
     /**
@@ -330,12 +343,8 @@ public final class ServiceFinder<T> implements Iterable<T> {
      *         file violates the specified format or if a provider class cannot
      *         be found.
      */
-    public Iterator<Class<T>> classIterator() {
-        return new LazyClassIterator<T>(
-                serviceClass,
-                serviceName,
-                classLoader,
-                ignoreOnClassNotFound);
+    private Iterator<Class<T>> classIterator() {
+        return ServiceIteratorProvider.getInstance().createClassIterator(serviceClass, serviceName, classLoader, ignoreOnClassNotFound);
     }
     
     /**
@@ -697,4 +706,76 @@ public final class ServiceFinder<T> implements Iterable<T> {
             return t;
         }
     }
+
+
+    /**
+     * Should you need to change the default service provider lookup method,
+     * you could simply implement your own <tt>ServiceIteratorProvider</tt>
+     * and register it with the <tt>ServiceFinder</tt> class.
+     *
+     * @see ServiceFinder#setIteratorProvider(com.sun.jersey.spi.service.ServiceFinder.ServiceIteratorProvider)
+     *
+     * @param <T> serviceClass
+     */
+    public static abstract class ServiceIteratorProvider<T> {
+
+        private static volatile ServiceIteratorProvider sip;
+
+        private static ServiceIteratorProvider getInstance() {
+            // Double-check idiom for lazy initialization of fields.
+            ServiceIteratorProvider result = sip;
+            if (result == null) { // First check (no locking)
+                synchronized (ServiceIteratorProvider.class) {
+                    result = sip;
+                    if (result == null) { // Second check (with locking)
+                        sip = result = new DefaultServiceIteratorProvider();
+                    }
+                }
+            }
+            return result;
+        }
+
+        private static void setInstance(ServiceIteratorProvider sip) throws SecurityException {
+            SecurityManager security = System.getSecurityManager();
+            if (security != null) {
+                ReflectPermission rp = new ReflectPermission("suppressAccessChecks");
+                security.checkPermission(rp);
+            }
+            synchronized (ServiceIteratorProvider.class) {
+                ServiceIteratorProvider.sip = sip;
+            }
+        }
+
+        /**
+         * Should create an iterator over instances of all the service provider classes found
+         */
+        public abstract Iterator<T> createIterator(Class<T> service, String serviceName, ClassLoader loader, boolean ignoreOnClassNotFound);
+
+        /**
+         * Should create an iterator over all the service provider classes found
+         */
+        public abstract Iterator<Class<T>> createClassIterator(Class<T> service, String serviceName, ClassLoader loader, boolean ignoreOnClassNotFound);
+    }
+
+
+    /**
+     * This class takes care of the default service provider lookup method implementation.
+     * It has been made public to give you a chance to fall back to the default,
+     * when implementing your own lookup method by setting your own ServiceIteratorProvider.
+     *
+     * @see ServiceFinder#setIteratorProvider(com.sun.jersey.spi.service.ServiceFinder.ServiceIteratorProvider)
+     */
+    public static final class DefaultServiceIteratorProvider<T> extends ServiceIteratorProvider<T> {
+
+        @Override
+        public Iterator<T> createIterator(Class<T> service, String serviceName, ClassLoader loader, boolean ignoreOnClassNotFound) {
+            return new LazyObjectIterator(service, serviceName, loader, ignoreOnClassNotFound);
+        }
+
+        @Override
+        public Iterator<Class<T>> createClassIterator(Class<T> service, String serviceName, ClassLoader loader, boolean ignoreOnClassNotFound) {
+            return new LazyClassIterator(service, serviceName, loader, ignoreOnClassNotFound);
+        }
+    }
+
 }

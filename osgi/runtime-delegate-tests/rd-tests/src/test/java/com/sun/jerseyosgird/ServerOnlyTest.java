@@ -162,9 +162,9 @@ public class ServerOnlyTest {
                 mavenBundle("org.ops4j.pax.url","pax-url-war","1.1.2"),
                 
                 mavenBundle("javax.ws.rs","jsr311-api","1.1.1"),
-                mavenBundle("com.sun.jersey.osgi","jersey-core","1.2-SNAPSHOT"),
-        	mavenBundle("com.sun.jersey.osgi","jersey-server", "1.2-SNAPSHOT"),
-        	mavenBundle("com.sun.jersey.osgi.runtime-delegate-tests","runtime-delegate-test-bundle", "1.2-SNAPSHOT"),
+                mavenBundle("com.sun.jersey","jersey-core","1.2-SNAPSHOT"),
+        	mavenBundle("com.sun.jersey","jersey-server", "1.2-SNAPSHOT"),
+        	mavenBundle("com.sun.jersey.test.osgi.runtime-delegate-tests","runtime-delegate-test-bundle", "1.2-SNAPSHOT"),
 
                 mavenBundle("com.sun.grizzly", "grizzly-servlet-webserver", "1.9.18-i"),
 

@@ -42,10 +42,9 @@
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
         <version>1.2-SNAPSHOT</version>
-      <!--relativePath>../pom.xml</relativePath-->
     </parent>
     <artifactId>jersey-server</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>jersey-server</name>
     <dependencies>
         <dependency>
@@ -119,6 +118,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
@@ -138,11 +143,24 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.1</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>com.sun.tools.xjc.maven2</groupId>
                 <artifactId>maven-jaxb-plugin</artifactId>
-		        <version>1.1.1</version>
+    		        <version>1.1.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -159,6 +177,43 @@
                     </schemaIncludes>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.4.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>com.sun.jersey.server.osgi.Activator</Bundle-Activator>
+                        <Private-Package>com.sun.jersey.server.osgi</Private-Package>
+                        <Export-Package>
+                            com.sun.jersey.*, com.sun.research.ws.wadl
+                        </Export-Package>
+                        <Import-Package>
+                            com.sun.grizzly.*;resolution:="optional",
+                            com.sun.net.httpserver;resolution:="optional",
+                            javax.ejb;version="3.1";resolution:="optional",
+                            javax.interceptor;version="3.1";resolution:="optional",
+                            javax.mail.*;resolution:="optional",
+                            javax.persistence;resolution:="optional",
+                            javax.servlet.*;resolution:="optional",
+                            javax.xml.bind.*;resolution:="optional",
+                            javax.xml.namespace;resolution:="optional",
+                            javax.xml.transform.*;resolution:="optional",
+                            org.apache.tools.ant.*;resolution:="optional",
+                            org.objectweb.asm.*;resolution:="optional",
+                            javax.mail.*;resolution:=optional,
+                            javax.annotation.*;resolution:=optional,
+                            javax.enterprise.*;resolution:=optional,
+                            org.apache.servicemix.specs.locator;resolution:=optional,
+                            *
+                        </Import-Package>
+                    </instructions>
+                    <unpackBundle>true</unpackBundle>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -177,6 +232,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

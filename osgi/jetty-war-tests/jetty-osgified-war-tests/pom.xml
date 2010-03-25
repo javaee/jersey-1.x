@@ -52,7 +52,7 @@
 			<version>${osgi-version}</version>
 		</dependency>
     <dependency>
-      <groupId>com.sun.jersey.osgi</groupId>
+      <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-client</artifactId>
       <scope>test</scope>
       <version>${project.version}</version>

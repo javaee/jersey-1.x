@@ -47,7 +47,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.sun.jersey.osgi</groupId>
+            <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
@@ -89,7 +89,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
+                    <manifestLocation>${project.build.directory}/META-INF</manifestLocation>
                     <supportedProjectTypes>
                         <supportedProjectType>bundle</supportedProjectType>
                         <supportedProjectType>war</supportedProjectType>
@@ -113,7 +113,7 @@
                 <configuration>
                     <attachClasses>true</attachClasses>
                     <archive>
-                        <manifestFile>META-INF/MANIFEST.MF</manifestFile>
+                        <manifestFile>${project.build.directory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
 		</configuration>
             </plugin>

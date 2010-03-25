@@ -40,12 +40,17 @@
 
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.osgi</groupId>
+    <groupId>com.sun.jersey.test.osgi.aux</groupId>
     <artifactId>jsr250-api</artifactId>
     <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging> 
     <name>JSR250 API library repackaged as OSGi bundle</name>
-    <description>JSR250 API library repackaged as OSGi bundle</description>
+    <description>
+JSR250 API library repackaged as OSGi bundle is intended for test purpose only.
+It should not be deployed to a public maven repository to avoid confusion.
+When deploying Jersey, the release profile (-Prelease command line option) has to be switched on
+to avoid including this module and related tests.
+    </description>
     <build>
         <plugins>
             <plugin>

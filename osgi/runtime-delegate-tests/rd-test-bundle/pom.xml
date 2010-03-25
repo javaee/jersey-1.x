@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.sun.jersey.osgi.runtime-delegate-tests</groupId>
+    <groupId>com.sun.jersey.test.osgi.runtime-delegate-tests</groupId>
     <artifactId>runtime-delegate-test-bundle</artifactId>
     <version>1.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
@@ -11,7 +11,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.sun.jersey.osgi</groupId>
+            <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -18,7 +18,7 @@ public class Activator implements BundleActivator {
 
 			System.out.println("Activator.start()");
 
-			gws = new GrizzlyWebServer(8080);
+			gws = new GrizzlyWebServer(8765);
 
 			ServletAdapter jerseyAdapter = new ServletAdapter();
 			jerseyAdapter.addInitParameter("com.sun.jersey.config.property.classnames",

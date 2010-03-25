@@ -3,11 +3,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.osgi.runtime-delegate-tests</groupId>
+    <groupId>com.sun.jersey.test.osgi.runtime-delegate-tests</groupId>
     <artifactId>jersey-osgi-project-runtime-delegate-tests</artifactId>
     <version>1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>jersey-project : osgified : RuntimeDelegate config test</name>
+    <name>jersey-project : osgified : RuntimeDelegate config tests</name>
 
     <modules>
         <module>rd-test-bundle</module>

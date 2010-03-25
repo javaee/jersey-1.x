@@ -38,14 +38,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
         <version>1.2-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-client</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>jersey-client</name>
+
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -64,9 +66,44 @@
             <version>20070405</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi_R4_core</artifactId>
+            <version>1.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
+
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.1</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.4.1</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>com.sun.jersey.client.osgi.Activator</Bundle-Activator>
+                        <Import-Package>javax.mail.*;resolution:=optional, *</Import-Package>
+                        <Private-Package>com.sun.ws.rs.ext, com.sun.jersey.client.osgi</Private-Package>
+                        <Export-Package>com.sun.jersey.api.client.*,com.sun.jersey.client.*</Export-Package>
+                    </instructions>
+                    <unpackBundle>true</unpackBundle>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -85,7 +122,8 @@
                     </execution>
                 </executions>
             </plugin>
-	</plugins>
+
+        </plugins>
     </build>
 </project>
 
