@@ -123,6 +123,7 @@ public class ServerClientMixedCreateEndpointTest {
                         "http://repository.apache.org/content/groups/snapshots-group",
                         "http://repository.ops4j.org/maven2",
                         "http://svn.apache.org/repos/asf/servicemix/m2-repo",
+                        "http://download.java.net/maven/2",
                         "http://repository.springsource.com/maven/bundles/release",
                         "http://repository.springsource.com/maven/bundles/external"
                    ),
