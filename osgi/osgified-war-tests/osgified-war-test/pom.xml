@@ -85,6 +85,13 @@
 	</plugins>
 	</build>
 
+    <repositories>
+        <repository>
+            <id>m2-djn</id>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+    </repositories>
+
 </project>
 
 
