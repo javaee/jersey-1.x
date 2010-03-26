@@ -306,7 +306,8 @@ public abstract class JerseyTest {
     private static TestContainerFactory getDefaultTestContainerFactory() {
         
         if (defaultTestContainerFactoryClass == null) {
-            if (System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME) == null) {
+            if ((System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME) == null) &&
+                    (System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY) == null)) {
 
                 TestContainerFactory[] resultArray = ServiceFinder.find(TestContainerFactory.class).toArray();
 
@@ -335,7 +336,10 @@ public abstract class JerseyTest {
                     return resultArray[0];
                 }
             } else {
-                String tcfClassName = System.getProperty("jersey.test.containerFactory",
+                String tcfClassName = System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME);
+
+                if(tcfClassName == null)
+                    tcfClassName = System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY,
                         DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME);
 
                 try {
@@ -370,6 +374,10 @@ public abstract class JerseyTest {
     private static final String DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME =
             "com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory";
 
+    @Deprecated
+    private static final String TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY =
+            "test.containerFactory";
+    
     private static final String TEST_CONTAINER_FACTORY_PROPERTY_NAME =
             "jersey.test.containerFactory";
 
@@ -416,7 +424,15 @@ public abstract class JerseyTest {
      * @return The HTTP port of the URI
      */
     protected int getPort(int defaultPort) {
-        String port = System.getProperty("JERSEY_HTTP_PORT");
+        String port = System.getProperty("jersey.test.port");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+
+        port = System.getProperty("JERSEY_HTTP_PORT");
         if (null != port) {
             try {
                 return Integer.parseInt(port);

@@ -52,7 +52,7 @@ import java.net.URI;
  * Glassfish v2 or v3 application server.
  * <P>
  * If you would like to run your tests on a staging server, just set the machine's
- * IP address or fully-qualified domain name to the System Property <I>JERSEY_HOST_NAME</I>.
+ * IP address or fully-qualified domain name to the System Property <I>jersey.test.host</I>.
  * 
  * @author Srinivas.Bhimisetty@Sun.COM
  */
@@ -71,7 +71,13 @@ public class ExternalTestContainerFactory implements TestContainerFactory {
     }
 
     private URI getBaseURI(URI baseUri) {
-        String stagingHostName = System.getProperty("JERSEY_HOST_NAME");
+        String stagingHostName = System.getProperty("jersey.test.host");
+        if (stagingHostName != null) {
+            return UriBuilder.fromUri(baseUri)
+                .host(stagingHostName).build();
+        }
+        
+        stagingHostName = System.getProperty("JERSEY_HOST_NAME");
         if (stagingHostName != null) {
             return UriBuilder.fromUri(baseUri)
                 .host(stagingHostName).build();
