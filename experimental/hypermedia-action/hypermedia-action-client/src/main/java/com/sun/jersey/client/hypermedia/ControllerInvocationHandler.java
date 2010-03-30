@@ -71,7 +71,9 @@ import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
+import org.jvnet.ws.wadl.Application;
 import org.jvnet.ws.wadl.Param;
+import org.jvnet.ws.wadl2java.Wadl2Java;
 import org.jvnet.ws.wadl2java.ast.MethodNode;
 import org.jvnet.ws.wadl2java.ast.RepresentationNode;
 import org.jvnet.ws.wadl2java.ast.ResourceNode;
@@ -504,13 +506,14 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
 
         // Attempt to fetch meta-data from server
         if (result == null) {
-            WadlModeller wm = new WadlModeller();
+            Wadl2Java wm = new Wadl2Java(null, null, false);
             try {
                 WebResource r = client.resource(h.getUri());
                 InputStream is = r.options(InputStream.class);
 
                 // Requires WadlFragmentGetFilter on server side
-                List<ResourceNode> rs = wm.process(h.getUri(), is);
+                Application a = wm.processDescription(h.getUri(), is);
+                List<ResourceNode> rs = wm.buildAst(a, h.getUri());
                 ResourceNode rn = rs.get(0).getChildResources().get(0);
                 
                 // Find method whose operation matches the link header's
