@@ -178,9 +178,13 @@ public class WadlBuilder {
             }
             else if ( p.getAnnotation().annotationType() == FormParam.class ) {
                 // Use application/x-www-form-urlencoded if no @Consumes
-                if (m.getSupportedInputTypes().size() == 0) {
-                    m.getSupportedInputTypes().add(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+                List<MediaType> supportedInputTypes = m.getSupportedInputTypes();
+                if (supportedInputTypes.size() == 0 ||
+                        ((supportedInputTypes.size() == 1) && (supportedInputTypes.get(0).equals(MediaType.WILDCARD_TYPE)))) {
+                    supportedInputTypes.clear();
+                    supportedInputTypes.add(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
                 }
+
                 for ( MediaType mediaType: m.getSupportedInputTypes() ) {
                     final RepresentationType wadlRepresentation = setRepresentationForMediaType( r, m, mediaType, wadlRequest );
                     if ( getParamByName( wadlRepresentation.getParam(), p.getSourceName() ) == null ) {

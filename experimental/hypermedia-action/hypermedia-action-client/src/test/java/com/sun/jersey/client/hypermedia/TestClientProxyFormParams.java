@@ -40,6 +40,7 @@ package com.sun.jersey.client.hypermedia;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ViewResource;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -148,11 +149,11 @@ public class TestClientProxyFormParams extends AbstractGrizzlyServerTester {
         assert(sc.action1("foo", "bar").equals("foobar"));
         assert(sc.action2("foo", "bar", f).equals("foobar"));
 
-//        // Test @Name mapped dynamically using WADL
-//        f = new Form();
-//        f.add("p3", "boo");
-//        assert(sc.action11("foo", "bar").equals("foobar"));
-//        assert(sc.action21("foo", "bar",f).equals("foobar"));
+        // Test @Name mapped dynamically using WADL
+        f = new Form();
+        f.add("p3", "boo");
+        assert(sc.action11("foo", "bar").equals("foobar"));
+        assert(sc.action21("foo", "bar",f).equals("foobar"));
     }
 
     // Method used for manual testing (re-directing)
