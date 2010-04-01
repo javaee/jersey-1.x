@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * 
  * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,30 +34,59 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.api.client;
 
-package com.sun.jersey.client.proxy;
-
-import com.sun.jersey.api.client.ClientHandler;
-import com.sun.jersey.api.client.ClientRequest;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.async.AsyncClientHandler;
 import java.util.concurrent.Future;
 
-/**
- *
- * @author Paul.Sandoz@Sun.Com
- */
-public interface ViewProxy<T> {
+public interface AsyncViewUniformInterface {
+    
+    <T> Future<T> head(Class<T> c);
+    
+    <T> Future<T> head(T c);
 
-    T view(Class<T> type, ClientRequest request, ClientHandler handler);
 
-    T view(T v, ClientRequest request, ClientHandler handler);
+    <T> Future<T> options(Class<T> c);
+    
+    <T> Future<T> options(T c);
 
-    Future<T> asyncView(Class<T> type, ClientRequest request, AsyncClientHandler handler);
+    
+    <T> Future<T> get(Class<T> c);
+            
+    <T> Future<T> get(T c);
 
-    Future<T> asyncView(T v, ClientRequest request, AsyncClientHandler handler);
 
-    T view(Class<T> type, ClientResponse response);
+    <T> Future<T> put(Class<T> c);
 
-    T view(T v, ClientResponse cr);
+    <T> Future<T> put(T c);
+
+    <T> Future<T> put(Class<T> c, Object requestEntity);
+    
+    <T> Future<T> put(T c, Object requestEntity);
+
+
+    <T> Future<T> post(Class<T> c);
+
+    <T> Future<T> post(T c);
+
+    <T> Future<T> post(Class<T> c, Object requestEntity);
+
+    <T> Future<T> post(T c, Object requestEntity);
+
+    
+    <T> Future<T> delete(Class<T> c);
+
+    <T> Future<T> delete(T c);
+
+    <T> Future<T> delete(Class<T> c, Object requestEntity);
+
+    <T> Future<T> delete(T c, Object requestEntity);
+
+
+    <T> Future<T> method(String method, Class<T> c);
+
+    <T> Future<T> method(String method, T c);
+
+    <T> Future<T> method(String method, Class<T> c, Object requestEntity);
+
+    <T> Future<T> method(String method, T c, Object requestEntity);
 }

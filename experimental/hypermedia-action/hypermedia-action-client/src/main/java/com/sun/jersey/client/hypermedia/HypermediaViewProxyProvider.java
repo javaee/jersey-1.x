@@ -42,12 +42,14 @@ import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.async.AsyncClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.client.impl.ClientRequestImpl;
+import com.sun.jersey.client.impl.async.FutureClientResponseListener;
 import com.sun.jersey.client.proxy.ViewProxy;
 import com.sun.jersey.client.proxy.ViewProxyProvider;
 import com.sun.jersey.core.hypermedia.HypermediaController;
 import java.lang.reflect.Proxy;
+import java.util.concurrent.Future;
 
 /**
  * Hypermedia View Proxy Provider.
@@ -63,30 +65,47 @@ public class HypermediaViewProxyProvider implements ViewProxyProvider {
 
         return new ViewProxy<T>() {
 
-            public T view(Class<T> type, ClientRequest request, ClientHandler handler) {
+            private T process(ClientRequest request, ClientResponse response) {
                 HypermediaController ctrl = ctlr.getAnnotation(HypermediaController.class);
                 Class<?> c = ctrl.model();
-
-                ClientRequest ro = new ClientRequestImpl(request.getURI(), request.getMethod());
-                ClientResponse r = handler.handle(ro);
                 Object instance;
-
                 if (c == ClientResponse.class) {
-                    instance = c.cast(r);
-                } else if (r.getStatus() < 300) {
-                    instance = r.getEntity(c);
+                    instance = c.cast(response);
+                } else if (response.getStatus() < 300) {
+                    instance = response.getEntity(c);
                 } else {
-                    throw new UniformInterfaceException(r,
-                        ro.getPropertyAsFeature(
+                    throw new UniformInterfaceException(response,
+                        request.getPropertyAsFeature(
                             ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
                 }
 
                 return (T) Proxy.newProxyInstance(ctlr.getClassLoader(),
                         new Class[] { ctlr },
-                        new ControllerInvocationHandler(client, instance, r, ctlr));
+                        new ControllerInvocationHandler(client, instance, response, ctlr));
+            }
+
+            public T view(Class<T> type, ClientRequest request, ClientHandler handler) {                
+                ClientResponse response = handler.handle(request);
+                return process(request, response);
             }
 
             public T view(T v, ClientRequest request, ClientHandler handler) {
+                throw new UnsupportedOperationException();
+            }
+
+            public Future<T> asyncView(Class<T> type, final ClientRequest request, AsyncClientHandler handler) {
+
+                final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
+                    protected T get(ClientResponse response) {
+                        return process(request, response);
+                    }
+                };
+
+                ftw.setCancelableFuture(handler.handle(request, ftw));
+                return ftw;
+            }
+
+            public Future<T> asyncView(T v, ClientRequest request, AsyncClientHandler handler) {
                 throw new UnsupportedOperationException();
             }
 
@@ -97,6 +116,7 @@ public class HypermediaViewProxyProvider implements ViewProxyProvider {
             public T view(T v, ClientResponse cr) {
                 throw new UnsupportedOperationException();
             }
+
         };
     }
 }

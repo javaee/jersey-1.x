@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.api.client.async.AsyncClientHandler;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -70,6 +71,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
@@ -375,61 +377,6 @@ public class Client extends Filterable implements ClientHandler {
         return new WebResource(this, u);
     }
 
-    public ViewResource viewResource(String u) {
-        return viewResource(URI.create(u));
-    }
-
-    public ViewResource viewResource(URI u) {
-        return new ViewResource(this, u);
-    }
-
-    public <T> T view(URI uri, Class<T> type) {
-        ViewResource vr = viewResource(uri);
-        return vr.get(type);
-    }
-
-    public <T> T view(URI uri, T t) {
-        ViewResource vr = viewResource(uri);
-        return vr.get(t);
-    }
-
-    public <T> T view(String u, Class<T> type) {
-        ViewResource vr = viewResource(u);
-        return vr.get(type);
-    }
-
-    public <T> T view(String u, T t) {
-        ViewResource vr = viewResource(u);
-        return vr.get(t);
-    }
-
-    public <T> T view(Class<T> c, ClientRequest request, ClientHandler handler) {
-        return getViewProxy(c).view(c, request, handler);
-    }
-
-    public <T> T view(T t, ClientRequest request, ClientHandler handler) {
-        return getViewProxy((Class<T>)t.getClass()).view(t, request, handler);
-    }
-
-    public <T> T view(Class<T> c, ClientResponse response) {
-        return getViewProxy(c).view(c, response);
-    }
-
-    public <T> T view(T t, ClientResponse response) {
-        return getViewProxy((Class<T>)t.getClass()).view(t, response);
-    }
-
-    private <T> ViewProxy<T> getViewProxy(Class<T> c) {
-        for (ViewProxyProvider vpp : vpps) {
-            ViewProxy<T> vp = vpp.proxy(this, c);
-            if (vp != null) {
-                return vp;
-            }
-        }
-        throw new IllegalArgumentException("A view proxy is not " +
-                "available for the class '" + c.getName() + "'");
-    }
-  
     /**
      * Create an asynchronous Web resource from the client.
      *
@@ -450,6 +397,81 @@ public class Client extends Filterable implements ClientHandler {
         return new AsyncWebResource(this, u);
     }
 
+    public ViewResource viewResource(String u) {
+        return viewResource(URI.create(u));
+    }
+
+    public ViewResource viewResource(URI u) {
+        return new ViewResource(this, u);
+    }
+
+    public AsyncViewResource asyncViewResource(String u) {
+        return asyncViewResource(URI.create(u));
+    }
+
+    public AsyncViewResource asyncViewResource(URI u) {
+        return new AsyncViewResource(this, u);
+    }
+
+    public <T> T view(String u, Class<T> type) {
+        ViewResource vr = viewResource(u);
+        return vr.get(type);
+    }
+
+    public <T> T view(URI uri, Class<T> type) {
+        ViewResource vr = viewResource(uri);
+        return vr.get(type);
+    }
+
+    public <T> T view(String u, T t) {
+        ViewResource vr = viewResource(u);
+        return vr.get(t);
+    }
+    
+    public <T> T view(URI uri, T t) {
+        ViewResource vr = viewResource(uri);
+        return vr.get(t);
+    }
+
+    public <T> Future<T> asyncView(String u, Class<T> type) {
+        AsyncViewResource vr = asyncViewResource(u);
+        return vr.get(type);
+    }
+
+    public <T> Future<T> asyncView(URI uri, Class<T> type) {
+        AsyncViewResource vr = asyncViewResource(uri);
+        return vr.get(type);
+    }
+
+    public <T> Future<T> asyncView(String u, T t) {
+        AsyncViewResource vr = asyncViewResource(u);
+        return vr.get(t);
+    }
+    
+    public <T> Future<T> asyncView(URI uri, T t) {
+        AsyncViewResource vr = asyncViewResource(uri);
+        return vr.get(t);
+    }
+    
+    public <T> T view(Class<T> c, ClientResponse response) {
+        return getViewProxy(c).view(c, response);
+    }
+
+    public <T> T view(T t, ClientResponse response) {
+        return getViewProxy((Class<T>)t.getClass()).view(t, response);
+    }
+
+    public <T> ViewProxy<T> getViewProxy(Class<T> c) {
+        for (ViewProxyProvider vpp : vpps) {
+            ViewProxy<T> vp = vpp.proxy(this, c);
+            if (vp != null) {
+                return vp;
+            }
+        }
+        throw new IllegalArgumentException("A view proxy is not " +
+                "available for the class '" + c.getName() + "'");
+    }
+  
     /**
      * Get the mutable property bag.
      *

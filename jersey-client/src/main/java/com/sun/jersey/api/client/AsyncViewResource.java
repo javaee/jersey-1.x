@@ -37,31 +37,41 @@
 
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.api.client.async.AsyncClientHandler;
+import com.sun.jersey.api.client.async.FutureListener;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 
-public class ViewResource extends Filterable implements 
-        RequestBuilder<ViewResource.Builder>,
-        ViewUniformInterface {
+public class AsyncViewResource extends Filterable implements
+        RequestBuilder<AsyncViewResource.Builder>,
+        AsyncViewUniformInterface,
+        AsyncClientHandler {
+    private static final Logger LOGGER = Logger.getLogger(AsyncWebResource.class.getName());
+    
     private final Client client;
 
     private final URI u;
         
-    /* package */ ViewResource(Client c, URI u) {
+    /* package */ AsyncViewResource(Client c, URI u) {
         super((ClientHandler)c);
         this.client = c;
         this.u = u;
     }
 
-    private ViewResource(ViewResource that, UriBuilder ub) {
+    private AsyncViewResource(AsyncViewResource that, UriBuilder ub) {
         super(that);
         this.client = that.client;
         this.u = ub.build();
@@ -129,8 +139,8 @@ public class ViewResource extends Filterable implements
     public boolean equals(Object obj) {
         if (this == obj) return true;
 
-        if (obj instanceof ViewResource) {
-            final ViewResource that = (ViewResource) obj;
+        if (obj instanceof AsyncViewResource) {
+            final AsyncViewResource that = (AsyncViewResource) obj;
             return that.u.equals(this.u);
         }
         return false;
@@ -138,97 +148,97 @@ public class ViewResource extends Filterable implements
 
     // ViewUniformInterface
     
-    public <T> T head(Class<T> c) {
+    public <T> Future<T> head(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "HEAD"));
     }
 
-    public <T> T head(T t) {
+    public <T> Future<T> head(T t) {
         return handle(t, new ClientRequestImpl(getURI(), "HEAD"));
     }
 
         
-    public <T> T options(Class<T> c) {
+    public <T> Future<T> options(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
 
-    public <T> T options(T t) {
+    public <T> Future<T> options(T t) {
         return handle(t, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
 
 
-    public <T> T get(Class<T> c) {
+    public <T> Future<T> get(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "GET"));
     }
 
-    public <T> T get(T t) {
+    public <T> Future<T> get(T t) {
         return handle(t, new ClientRequestImpl(getURI(), "GET"));
     }
 
     
-    public <T> T put(Class<T> c) {
+    public <T> Future<T> put(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "PUT"));
     }
 
-    public <T> T put(T t) {
+    public <T> Future<T> put(T t) {
         return handle(t, new ClientRequestImpl(getURI(), "PUT"));
     }
 
-    public <T> T put(Class<T> c, Object requestEntity) {
+    public <T> Future<T> put(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
 
-    public <T> T put(T t, Object requestEntity) {
+    public <T> Future<T> put(T t, Object requestEntity) {
         return handle(t, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
         
         
-    public <T> T post(Class<T> c) {
+    public <T> Future<T> post(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "POST"));
     }
 
-    public <T> T post(T t) {
+    public <T> Future<T> post(T t) {
         return handle(t, new ClientRequestImpl(getURI(), "POST"));
     }
 
-    public <T> T post(Class<T> c, Object requestEntity) {
+    public <T> Future<T> post(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
 
-    public <T> T post(T t, Object requestEntity) {
+    public <T> Future<T> post(T t, Object requestEntity) {
         return handle(t, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
 
 
-    public <T> T delete(Class<T> c) {
+    public <T> Future<T> delete(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "DELETE"));
     }
 
-    public <T> T delete(T t) {
+    public <T> Future<T> delete(T t) {
         return handle(t, new ClientRequestImpl(getURI(), "DELETE"));
     }
 
-    public <T> T delete(Class<T> c, Object requestEntity) {
+    public <T> Future<T> delete(Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
 
-    public <T> T delete(T t, Object requestEntity) {
+    public <T> Future<T> delete(T t, Object requestEntity) {
         return handle(t, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
 
 
-    public <T> T method(String method, Class<T> c) {
+    public <T> Future<T> method(String method, Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), method));
     }
 
-    public <T> T method(String method, T t) {
+    public <T> Future<T> method(String method, T t) {
         return handle(t, new ClientRequestImpl(getURI(), method));
     }
 
-    public <T> T method(String method, Class<T> c, Object requestEntity) {
+    public <T> Future<T> method(String method, Class<T> c, Object requestEntity) {
         return handle(c, new ClientRequestImpl(getURI(), method, requestEntity));
     }
 
-    public <T> T method(String method, T t, Object requestEntity) {
+    public <T> Future<T> method(String method, T t, Object requestEntity) {
         return handle(t, new ClientRequestImpl(getURI(), method, requestEntity));
     }
     
@@ -292,8 +302,8 @@ public class ViewResource extends Filterable implements
      * 
      * @return the new web resource.
      */
-    public ViewResource path(String path) {
-        return new ViewResource(this, getUriBuilder().path(path));
+    public AsyncViewResource path(String path) {
+        return new AsyncViewResource(this, getUriBuilder().path(path));
     }
 
     /**
@@ -312,7 +322,7 @@ public class ViewResource extends Filterable implements
      * @param uri the URI.
      * @return the new web resource.
      */
-    public ViewResource uri(URI uri) {
+    public AsyncViewResource uri(URI uri) {
         UriBuilder b = getUriBuilder();
         String path = uri.getRawPath();
         if (path != null && path.length() > 0) {
@@ -326,7 +336,7 @@ public class ViewResource extends Filterable implements
         if (query != null && query.length() > 0) {
             b.replaceQuery(query);        
         }
-        return new ViewResource(this, b);
+        return new AsyncViewResource(this, b);
     }
 
     /**
@@ -337,10 +347,10 @@ public class ViewResource extends Filterable implements
      * @param value the query parameter value
      * @return the new web resource.
      */
-    public ViewResource queryParam(String key, String value) {
+    public AsyncViewResource queryParam(String key, String value) {
         UriBuilder b = getUriBuilder();
         b.queryParam(key, value);
-        return new ViewResource(this, b);
+        return new AsyncViewResource(this, b);
     }
 
     /**
@@ -350,13 +360,13 @@ public class ViewResource extends Filterable implements
      * @param params the query parameters.
      * @return the new web resource.
      */
-    public ViewResource queryParams(MultivaluedMap<String, String> params) {
+    public AsyncViewResource queryParams(MultivaluedMap<String, String> params) {
         UriBuilder b = getUriBuilder();
         for (Map.Entry<String, List<String>> e : params.entrySet()) {
             for (String value : e.getValue())
                 b.queryParam(e.getKey(), value);
         }
-        return new ViewResource(this, b);
+        return new AsyncViewResource(this, b);
     }
 
     // Builder that builds client request and handles it
@@ -367,7 +377,7 @@ public class ViewResource extends Filterable implements
      * of the {@link UniformInterface} are the build methods of the builder.
      */
     public final class Builder extends PartialRequestBuilder<Builder> 
-            implements ViewUniformInterface {
+            implements AsyncViewUniformInterface {
 
 
         private Builder() {
@@ -389,107 +399,132 @@ public class ViewResource extends Filterable implements
         
         // ViewUniformInterface
 
-        public <T> T head(Class<T> c) {
+        public <T> Future<T> head(Class<T> c) {
             return handle(c, build("HEAD"));
         }
 
-        public <T> T head(T t) {
+        public <T> Future<T> head(T t) {
             return handle(t, build("HEAD"));
         }
 
 
-        public <T> T options(Class<T> c) {
+        public <T> Future<T> options(Class<T> c) {
             return handle(c, build("OPTIONS"));
         }
 
-        public <T> T options(T t) {
+        public <T> Future<T> options(T t) {
             return handle(t, build("OPTIONS"));
         }
 
 
-        public <T> T get(Class<T> c) {
+        public <T> Future<T> get(Class<T> c) {
             return handle(c, build("GET"));
         }
 
-        public <T> T get(T t) {
+        public <T> Future<T> get(T t) {
             return handle(t, build("GET"));
         }
 
 
-        public <T> T put(Class<T> c) {
+        public <T> Future<T> put(Class<T> c) {
             return handle(c, build("PUT"));
         }
 
-        public <T> T put(T t) {
+        public <T> Future<T> put(T t) {
             return handle(t, build("PUT"));
         }
 
-        public <T> T put(Class<T> c, Object requestEntity) {
+        public <T> Future<T> put(Class<T> c, Object requestEntity) {
             return handle(c, build("PUT", requestEntity));
         }
 
-        public <T> T put(T t, Object requestEntity) {
+        public <T> Future<T> put(T t, Object requestEntity) {
             return handle(t, build("PUT", requestEntity));
         }
 
 
-        public <T> T post(Class<T> c) {
+        public <T> Future<T> post(Class<T> c) {
             return handle(c, build("POST"));
         }
 
-        public <T> T post(T t) {
+        public <T> Future<T> post(T t) {
             return handle(t, build("POST"));
         }
 
-        public <T> T post(Class<T> c, Object requestEntity) {
+        public <T> Future<T> post(Class<T> c, Object requestEntity) {
             return handle(c, build("POST", requestEntity));
         }
 
-        public <T> T post(T t, Object requestEntity) {
+        public <T> Future<T> post(T t, Object requestEntity) {
             return handle(t, build("POST", requestEntity));
         }
 
 
-        public <T> T delete(Class<T> c) {
+        public <T> Future<T> delete(Class<T> c) {
             return handle(c, build("DELETE"));
         }
 
-        public <T> T delete(T t) {
+        public <T> Future<T> delete(T t) {
             return handle(t, build("DELETE"));
         }
 
-        public <T> T delete(Class<T> c, Object requestEntity) {
+        public <T> Future<T> delete(Class<T> c, Object requestEntity) {
             return handle(c, build("DELETE", requestEntity));
         }
 
-        public <T> T delete(T t, Object requestEntity) {
+        public <T> Future<T> delete(T t, Object requestEntity) {
             return handle(t, build("DELETE", requestEntity));
         }
 
 
-        public <T> T method(String method, Class<T> c) {
+        public <T> Future<T> method(String method, Class<T> c) {
             return handle(c, build(method));
         }
 
-        public <T> T method(String method, T t) {
+        public <T> Future<T> method(String method, T t) {
             return handle(t, build(method));
         }
 
-        public <T> T method(String method, Class<T> c, Object requestEntity) {
+        public <T> Future<T> method(String method, Class<T> c, Object requestEntity) {
             return handle(c, build(method, requestEntity));
         }
 
-        public <T> T method(String method, T t, Object requestEntity) {
+        public <T> Future<T> method(String method, T t, Object requestEntity) {
             return handle(t, build(method, requestEntity));
         }
     }
 
 
-    private <T> T handle(Class<T> c, ClientRequest ro) {
-        return client.getViewProxy(c).view(c, ro, getHeadHandler());
+    private <T> Future<T> handle(Class<T> c, ClientRequest ro) {
+        return client.getViewProxy(c).asyncView(c, ro, this);
     }
 
-    private <T> T handle(T t, ClientRequest ro) {
-        return client.getViewProxy((Class<T>)t.getClass()).view(t, ro, getHeadHandler());
+    private <T> Future<T> handle(T t, ClientRequest ro) {
+        return client.getViewProxy((Class<T>)t.getClass()).asyncView(t, ro, this);
+    }
+
+    // AsyncClientHandler
+
+    public Future<ClientResponse> handle(final ClientRequest request, final FutureListener<ClientResponse> l) {
+        Callable c = new Callable() {
+            public Object call() throws Exception {
+                return getHeadHandler().handle(request);
+            }
+        };
+        FutureTask<ClientResponse> ft = new FutureTask<ClientResponse>(c) {
+            @Override
+            protected void done() {
+                try {
+                    l.onComplete(this);
+                } catch (Throwable t) {
+                    LOGGER.log(Level.SEVERE,
+                            "Throwable caught on call to ClientResponseListener.onComplete",
+                            t);
+                }
+            }
+        };
+
+        new Thread(ft).start();
+        return ft;
     }
 }
