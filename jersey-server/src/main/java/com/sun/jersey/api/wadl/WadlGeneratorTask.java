@@ -42,7 +42,6 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.wadl.WadlBuilder;
-import com.sun.research.ws.wadl.Resources;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -136,9 +135,7 @@ public class WadlGeneratorTask extends Task {
         
         try {
             Application a = createApplication(classpath.list());
-            for (Resources rs : a.getResources()) {
-                rs.setBase(baseUri);
-            }
+            a.getResources().setBase(baseUri);
             JAXBContext c = JAXBContext.newInstance("com.sun.research.ws.wadl", 
                     this.getClass().getClassLoader());
             Marshaller m = c.createMarshaller();

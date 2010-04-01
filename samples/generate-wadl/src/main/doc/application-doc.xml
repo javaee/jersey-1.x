@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<applicationDocs targetNamespace="http://wadl.dev.java.net/2009/02">
+<applicationDocs targetNamespace="http://research.sun.com/wadl/2006/10">
     
     <doc xml:lang="en" title="The doc for your API">
         This is a paragraph that is added to the start of the generated application.wadl

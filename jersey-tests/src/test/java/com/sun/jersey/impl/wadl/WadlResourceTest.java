@@ -181,7 +181,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
         XPath xp = XPathFactory.newInstance().newXPath();
-        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         // check base URI
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
         assertEquals(val,BASE_URI.toString());
@@ -231,7 +231,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
         XPath xp = XPathFactory.newInstance().newXPath();
-        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
 
         // check base URI
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
@@ -299,7 +299,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
         XPath xp = XPathFactory.newInstance().newXPath();
-        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         // check base URI
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
         assertEquals(val,BASE_URI.toString());
@@ -328,7 +328,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
         XPath xp = XPathFactory.newInstance().newXPath();
-        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
         assertEquals(val,BASE_URI.toString());
         // check total number of resources is 1
@@ -384,7 +384,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
         XPath xp = XPathFactory.newInstance().newXPath();
-        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
         assertEquals(val,BASE_URI.toString());
         // check only one resource with for 'root/loc'
@@ -403,7 +403,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         d = b.parse(tmpFile);
         printSource(new DOMSource(d));
         xp = XPathFactory.newInstance().newXPath();
-        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
         assertEquals(val,BASE_URI.toString());
         // check only one resource with for 'root/loc'
@@ -442,7 +442,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         printSource(new DOMSource(d));
 
         XPath xp = XPathFactory.newInstance().newXPath();
-        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
         String val = (String)xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
         assertEquals(val,BASE_URI.toString());
         // check only one resource with for 'root/loc'
@@ -458,11 +458,12 @@ public class WadlResourceTest extends AbstractResourceTester {
     public static class FormResource {
 
         @POST
-        @Consumes( "multipart/form-data" )
+        @Consumes( "application/x-www-form-urlencoded" )
         public void post(
                 @FormParam( "a" ) String a,
                 @FormParam( "b" ) String b,
                 @FormParam( "c" ) JAXBBean c,
+                @FormParam( "c" ) FormDataContentDisposition cdc,
                 Form form ) {
         }
 
@@ -481,7 +482,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
         XPath xp = XPathFactory.newInstance().newXPath();
-        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
 
         final String requestPath = "//wadl:resource[@path='form']/wadl:method[@name='POST']/wadl:request";
         final String representationPath = requestPath + "/wadl:representation";

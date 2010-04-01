@@ -40,7 +40,6 @@ package com.sun.jersey.server.impl.wadl;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.research.ws.wadl.Application;
-import com.sun.research.ws.wadl.Resources;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
@@ -77,10 +76,8 @@ public final class WadlResource {
     @GET
     public synchronized Response getWadl(@Context UriInfo uriInfo) {
         if (wadlXmlRepresentation == null) {
-            for (Resources rs : application.getResources()) {
-                if (rs.getBase() == null) {
-                    rs.setBase(uriInfo.getBaseUri().toString());
-                }
+            if (application.getResources().getBase() == null) {
+                application.getResources().setBase(uriInfo.getBaseUri().toString());
             }
             try {
                 final Marshaller marshaller = wadlContext.getJAXBContext().createMarshaller();

@@ -57,7 +57,7 @@ import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
-import com.sun.research.ws.wadl.Representation;
+import com.sun.research.ws.wadl.RepresentationType;
 import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
@@ -182,7 +182,7 @@ public class WadlGeneratorConfigTest extends TestCase {
             return null;
         }
 
-        public Representation createRequestRepresentation(
+        public RepresentationType createRequestRepresentation(
                 AbstractResource r, AbstractResourceMethod m,
                 MediaType mediaType ) {
             return null;
@@ -266,7 +266,7 @@ public class WadlGeneratorConfigTest extends TestCase {
             return null;
         }
 
-        public Representation createRequestRepresentation(
+        public RepresentationType createRequestRepresentation(
                 AbstractResource r, AbstractResourceMethod m,
                 MediaType mediaType ) {
             return null;
