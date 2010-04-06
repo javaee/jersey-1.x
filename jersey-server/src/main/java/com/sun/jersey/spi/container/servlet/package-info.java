@@ -87,8 +87,8 @@
  *   import ...
  * 
  *   public class MyApplicaton extends Application {
- *       public Set<Class<?>> getClasses() {
- *           Set<Class<?>> s = new HashSet<Class<?>>();
+ *       public Set&lt;Class&lt;?&gt;&gt; getClasses() {
+ *           Set&lt;Class&lt;?&gt;&gt; s = new HashSet&lt;Class&lt;?&gt;&gt;();
  *           s.add(HelloWorldResource.class);
  *           return s;
  *       }

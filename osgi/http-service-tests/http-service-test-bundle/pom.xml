@@ -37,7 +37,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Private-Package>com.sun.jersey.osgi.httpservice.simple</Private-Package>
+                        <Export-Package>com.sun.jersey.osgi.httpservice.simple</Export-Package>
                         <Import-Package>*</Import-Package>
                         <Bundle-Activator>com.sun.jersey.osgi.httpservice.simple.Activator</Bundle-Activator>
                         <Implementation-Title>jersey-http-service-test</Implementation-Title>

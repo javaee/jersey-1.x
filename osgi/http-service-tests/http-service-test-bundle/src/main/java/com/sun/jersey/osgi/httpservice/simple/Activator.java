@@ -1,6 +1,5 @@
 package com.sun.jersey.osgi.httpservice.simple;
 
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.util.Dictionary;
 import java.util.Hashtable;
@@ -37,15 +36,13 @@ public class Activator implements BundleActivator {
                     case ServiceEvent.REGISTERED: {
                         HttpService http = (HttpService) bc.getService(sr);
                         Dictionary<String, String> jerseyServletParams = new Hashtable<String, String>();
-                        jerseyServletParams.put("com.sun.jersey.config.property.resourceConfigClass", ClassNamesResourceConfig.class.getName());
-                        jerseyServletParams.put("com.sun.jersey.config.property.classnames", StatusResource.class.getName());
+                        jerseyServletParams.put("javax.ws.rs.Application", JerseyApplication.class.getName());
                         try {
-                            //if (!"com.sun.grizzly.osgi.httpservice.HttpServiceImpl".equals(http.getClass().getName()) && !registered) {
                             if (!registered) {
-                            // TODO: make sure the registration occurs just once
                                 logger.info("REGISTERING JERSEY SERVLET");
                                 logger.info("HTTP SERVICE = " + http.toString());
                                 logger.info("HTTP SERVICE CLASS NAME = " + http.getClass().getName());
+                                Thread.dumpStack();
                                 http.registerServlet("/non-jersey-http-service", new SimpleNonJerseyServlet(), null, null);
                                 http.registerServlet("/jersey-http-service", new ServletContainer(), jerseyServletParams, null);
                                 registered = true;
