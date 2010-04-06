@@ -56,28 +56,63 @@ public class OutBoundHeadersTest extends TestCase {
     
     public void testGet() {
         OutBoundHeaders h = new OutBoundHeaders();
-        
+
         h.add("Content-Type", "value");
-        
+
         Object s = h.getFirst("content-type");
         assertEquals("value", s);
         s = h.getFirst("cONTENT-tYPE");
         assertEquals("value", s);
     }
-    
+
     public void testPut() {
         OutBoundHeaders h = new OutBoundHeaders();
-        
+
         h.add("Content-Type", "value");
 
         h.get("CONTENT-TYPE").set(0, "value1");
-        
+
         Object s = h.getFirst("content-type");
         assertEquals("value1", s);
         s = h.getFirst("cONTENT-tYPE");
         assertEquals("value1", s);
     }
-    
+
+    public void testRemove() {
+        OutBoundHeaders h = new OutBoundHeaders();
+
+        h.add("Content-Type", "value");
+        h.remove("Content-Type");
+
+        assertEquals(0, h.size());
+    }
+
+    public void testRemoveAdd() {
+        OutBoundHeaders h = new OutBoundHeaders();
+
+        h.add("Content-Type", "value");
+        h.remove("Content-Type");
+        assertEquals(0, h.size());
+
+        int i = 0;
+        for (Map.Entry<String, List<Object>> e : h.entrySet()) {
+            i++;
+        }
+        assertEquals(0, i);
+
+        h.add("Content-Type", "value");
+
+        List<Object> l = h.get("Content-Type");
+        assertNotNull(1);
+        assertEquals(1, l.size());
+
+        i = 0;
+        for (Map.Entry<String, List<Object>> e : h.entrySet()) {
+            i++;
+        }
+        assertEquals(1, i);
+    }
+
     public void testOrder() {
         OutBoundHeaders h = new OutBoundHeaders();
 
@@ -91,24 +126,24 @@ public class OutBoundHeadersTest extends TestCase {
             i++;
         }
     }
-    
+
     public void testMoreGet() {
         OutBoundHeaders h = new OutBoundHeaders();
-        
+
         for (int i = 0; i < 100; i++) {
             String key = generate(i);
             String value = key;
-            
+
             h.add(key, value);
             assertEquals(value, h.getFirst(key));
 
             value = value + "NEW";
-            
+
             h.get(key).set(0, value);
             assertEquals(value, h.getFirst(key));
         }
     }
-    
+
     private String generate(int size) {
         StringBuilder b = new StringBuilder();
         char c = 'A';
@@ -117,7 +152,7 @@ public class OutBoundHeadersTest extends TestCase {
             b.append(Character.toUpperCase(c));
             c++;
         }
-        
+
         return b.toString();
     }
     

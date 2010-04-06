@@ -37,13 +37,10 @@
 
 package com.sun.jersey.core.spi.factory;
 
+import com.sun.jersey.core.header.OutBoundHeaders;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import javax.ws.rs.core.CacheControl;
@@ -61,28 +58,26 @@ import javax.ws.rs.core.Variant;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResponseBuilderImpl extends Response.ResponseBuilder {    
-    private static final Object[] EMPTY_VALUES = new Object[0];
-    
+
     private int status = 204;
 
+    private OutBoundHeaders headers;
+
     private Object entity;
-    
+
     private Type entityType;
-    
-    private Object[] values;
-    
-    private List<Object> nameValuePairs;
 
     public ResponseBuilderImpl() { }
-        
+
     private ResponseBuilderImpl(ResponseBuilderImpl that) {
         this.status = that.status;
         this.entity = that.entity;
+        if (that.headers != null) {
+            this.headers = new OutBoundHeaders(that.headers);
+        } else {
+            this.headers = null;
+        }
         this.entityType = that.entityType;
-        if (that.values != null)
-            this.values = that.values.clone();
-        if (that.nameValuePairs != null)
-            this.nameValuePairs = new ArrayList<Object>(that.nameValuePairs);    
     }
 
     public Response.ResponseBuilder entityWithType(Object entity, Type entityType) {
@@ -90,32 +85,37 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         this.entityType = entityType;
         return this;
     }
-   
+
+    private OutBoundHeaders getHeaders() {
+        if (headers == null)
+            headers = new OutBoundHeaders();
+        return headers;
+    }
+
     // Response.Builder
-    
+
     public Response build() {
         Response r = new ResponseImpl(
                 status,
+                getHeaders(),
                 entity,
-                entityType,
-                (values != null) ? values : EMPTY_VALUES, 
-                (nameValuePairs != null) ? nameValuePairs : Collections.emptyList());
+                entityType);
         reset();
         return r;
     }
-    
+
     private void reset() {
         status = 204;
+        headers = null;
         entity = null;
-        values = null;
-        nameValuePairs = null;
+        entityType = null;
     }
 
     @Override
     public ResponseBuilder clone() {
         return new ResponseBuilderImpl(this);
     }
-    
+
     public Response.ResponseBuilder status(int status) {
         this.status = status;
         return this;
@@ -127,36 +127,32 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         return this;
     }
 
+
     public Response.ResponseBuilder type(MediaType type) {
-        set(ResponseBuilderHeaders.CONTENT_TYPE, type);
+        headerSingle(HttpHeaders.CONTENT_TYPE, type);
         return this;
     }
 
     public Response.ResponseBuilder type(String type) {
-        if (type != null)
-            set(ResponseBuilderHeaders.CONTENT_TYPE, MediaType.valueOf(type));
-        else
-            set(ResponseBuilderHeaders.CONTENT_TYPE, null);
-        return this;
+        return type(type == null ? null : MediaType.valueOf(type));
     }
 
     public Response.ResponseBuilder variant(Variant variant) {
         if (variant == null) {
             type((MediaType)null);
             language((String)null);
-            header(HttpHeaders.CONTENT_ENCODING, null);
+            encoding(null);
             return this;
         }
-        
+
         type(variant.getMediaType());
         // TODO set charset
         language(variant.getLanguage());
-        if (variant.getEncoding() != null)
-            header(HttpHeaders.CONTENT_ENCODING, variant.getEncoding());
-        
+        encoding(variant.getEncoding());
+
         return this;
     }
-    
+
     public Response.ResponseBuilder variants(List<Variant> variants) {
         if (variants == null) {
             header(HttpHeaders.VARY, null);
@@ -165,13 +161,13 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
 
         if (variants.isEmpty())
             return this;
-        
+
         MediaType accept = variants.get(0).getMediaType();
         boolean vAccept = false;
-        
+
         Locale acceptLanguage = variants.get(0).getLanguage();
         boolean vAcceptLanguage = false;
-        
+
         String acceptEncoding = variants.get(0).getEncoding();
         boolean vAcceptEncoding = false;
 
@@ -180,139 +176,114 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
             vAcceptLanguage |= !vAcceptLanguage && vary(v.getLanguage(), acceptLanguage);
             vAcceptEncoding |= !vAcceptEncoding && vary(v.getEncoding(), acceptEncoding);
         }
-        
+
         StringBuilder vary = new StringBuilder();
         append(vary, vAccept, HttpHeaders.ACCEPT);
         append(vary, vAcceptLanguage, HttpHeaders.ACCEPT_LANGUAGE);
         append(vary, vAcceptEncoding, HttpHeaders.ACCEPT_ENCODING);
-        
+
         if (vary.length() > 0)
             header(HttpHeaders.VARY, vary.toString());
         return this;
     }
-        
+
     private boolean vary(MediaType v, MediaType vary) {
         return v != null && !v.equals(vary);
     }
-    
+
     private boolean vary(Locale v, Locale vary) {
         return v != null && !v.equals(vary);
     }
-    
+
     private boolean vary(String v, String vary) {
         return v != null && !v.equalsIgnoreCase(vary);
     }
-    
+
     private void append(StringBuilder sb, boolean v, String s) {
         if (v) {
             if (sb.length() > 0)
                 sb.append(',');
             sb.append(s);
-        }        
+        }
     }
-    
+
     public Response.ResponseBuilder language(String language) {
-        set(ResponseBuilderHeaders.CONTENT_LANGUAGE, language);
+        headerSingle(HttpHeaders.CONTENT_LANGUAGE, language);
         return this;
     }
-    
+
     public Response.ResponseBuilder language(Locale language) {
-        if (language != null)
-            set(ResponseBuilderHeaders.CONTENT_LANGUAGE, language);
-        else
-            set(ResponseBuilderHeaders.CONTENT_LANGUAGE, null);
+        headerSingle(HttpHeaders.CONTENT_LANGUAGE, language);
         return this;
     }
 
     public Response.ResponseBuilder location(URI location) {
-        set(ResponseBuilderHeaders.LOCATION, location);
+        headerSingle(HttpHeaders.LOCATION, location);
         return this;
     }
 
     public Response.ResponseBuilder contentLocation(URI location) {
-        set(ResponseBuilderHeaders.CONTENT_LOCATION, location);
+        headerSingle(HttpHeaders.CONTENT_LOCATION, location);
+        return this;
+    }
+
+    public Response.ResponseBuilder encoding(String encoding) {
+        headerSingle(HttpHeaders.CONTENT_ENCODING, encoding);
         return this;
     }
 
     public Response.ResponseBuilder tag(EntityTag tag) {
-        set(ResponseBuilderHeaders.ETAG, tag);
+        headerSingle(HttpHeaders.ETAG, tag);
         return this;
     }
 
     public Response.ResponseBuilder tag(String tag) {
-        if (tag != null)
-            set(ResponseBuilderHeaders.ETAG, new EntityTag(tag));
-        else
-            set(ResponseBuilderHeaders.ETAG, null);
-        return this;
+        return tag(tag == null ? null : new EntityTag(tag));
     }
 
     public Response.ResponseBuilder lastModified(Date lastModified) {
-        set(ResponseBuilderHeaders.LAST_MODIFIED, lastModified);
+        headerSingle(HttpHeaders.LAST_MODIFIED, lastModified);
         return this;
     }
 
     public Response.ResponseBuilder cacheControl(CacheControl cacheControl) {
-        set(ResponseBuilderHeaders.CACHE_CONTROL, cacheControl);
+        headerSingle(HttpHeaders.CACHE_CONTROL, cacheControl);
         return this;
     }
 
-    public ResponseBuilder expires(Date expires) {
-        add(HttpHeaders.EXPIRES, expires);
+    public Response.ResponseBuilder expires(Date expires) {
+        headerSingle(HttpHeaders.EXPIRES, expires);
         return this;
     }
-    
+
     public Response.ResponseBuilder cookie(NewCookie... cookies) {
         if (cookies != null) {
             for (NewCookie cookie : cookies)
-                add(HttpHeaders.SET_COOKIE, cookie);
+                header(HttpHeaders.SET_COOKIE, cookie);
         } else {
-            remove(HttpHeaders.SET_COOKIE);
+            header(HttpHeaders.SET_COOKIE, null);
         }
-        return this;
-    }
-    
-    public Response.ResponseBuilder header(String name, Object value) {
-        Integer id = ResponseBuilderHeaders.getIdFromName(name);
-        if (id != null)
-            set(id, value);
-        else 
-            add(name, value);
         return this;
     }
 
-    
-    private void add(String name, Object value) {
+    public Response.ResponseBuilder header(String name, Object value) {
+        return header(name, value, false);
+    }
+
+    public Response.ResponseBuilder headerSingle(String name, Object value) {
+        return header(name, value, true);
+    }
+
+    public Response.ResponseBuilder header(String name, Object value, boolean single) {
         if (value != null) {
-            if (nameValuePairs == null)
-                nameValuePairs = new LinkedList<Object>();
-            
-            nameValuePairs.add(name);
-            nameValuePairs.add(value);
-        } else {
-            remove(name);
-        }
-    }
-    
-    private void remove(String name) {
-        if (nameValuePairs == null) return;
-        
-        Iterator<Object> i = nameValuePairs.iterator();
-        while(i.hasNext()) {
-            if (i.next().toString().equalsIgnoreCase(name)) {
-                i.remove();
-                i.next();
-                i.remove();
+            if (single) {
+                getHeaders().putSingle(name, value);
             } else {
-                i.next();
+                getHeaders().add(name, value);
             }
+        } else {
+            getHeaders().remove(name);
         }
-    }
-    
-    private void set(int id, Object value) {
-        if (values == null)
-            values = new Object[ResponseBuilderHeaders.getSize()];
-        
-        values[id] = value;
+        return this;
     }
 }

@@ -49,4 +49,11 @@ import com.sun.jersey.core.util.StringKeyObjectValueIgnoreCaseMultivaluedMap;
  */
 public class OutBoundHeaders 
         extends StringKeyObjectValueIgnoreCaseMultivaluedMap {
+    public OutBoundHeaders() {
+        super();
+    }
+
+    public OutBoundHeaders(OutBoundHeaders that) {
+        super(that);
+    }
 }

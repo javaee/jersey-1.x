@@ -37,7 +37,6 @@
 package com.sun.jersey.core.util;
 
 import java.util.ConcurrentModificationException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -269,7 +268,8 @@ public class KeyComparatorLinkedHashMap<K, V>
             }
         }
 
-        void recordRemoval(HashMap<K, V> m) {
+        @Override
+        void recordRemoval(KeyComparatorHashMap<K,V> m) {
             remove();
         }
     }

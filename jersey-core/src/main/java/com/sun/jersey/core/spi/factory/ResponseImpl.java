@@ -39,79 +39,65 @@ package com.sun.jersey.core.spi.factory;
 
 import com.sun.jersey.core.header.OutBoundHeaders;
 import java.lang.reflect.Type;
-import java.util.Iterator;
-import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  * An implementation of {@link Response}.
+ * <p>
+ * This implementation supports the declaration of an entity type that will be
+ * utilized when a {@link MessageBodyWriter} is selected to write out the
+ * entity.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResponseImpl extends Response {
+public class ResponseImpl extends Response {
     private final int status;
+
+    private final MultivaluedMap<String, Object> headers;
 
     private final Object entity;
 
     private final Type entityType;
-    
-    private final Object[] values;
-    
-    private final List<Object> nameValuePairs;
-    
-    private MultivaluedMap<String, Object> headers;
-    
-    ResponseImpl(int status, Object entity, Type entityType,
-            Object[] values, List<Object> nameValuePairs) {
+
+    /**
+     * Construct given a status, entity and metadata.
+     *
+     * @param status the status
+     * @param headers the metadata, it is the callers responsibility to copy
+     *        the metadata if necessary.
+     * @param entity the entity
+     * @param entityType the entity type, it is the callers responsiblity to
+     *        ensure the entity type is compatible with the entity.
+     */
+    protected ResponseImpl(int status, OutBoundHeaders headers, Object entity, Type entityType) {
         this.status = status;
+        this.headers = headers;
         this.entity = entity;
         this.entityType = entityType;
-        this.values = values;
-        this.nameValuePairs = nameValuePairs;
     }
 
-    public Object[] getValues() {
-        return values;
-    }
-
-    public List<Object> getNameValuePairs() {
-        return nameValuePairs;
-    }
-    
+    /**
+     * Get the entity type.
+     *
+     * @return the entity type.
+     */
     public Type getEntityType() {
         return entityType;
     }
 
-    public boolean isMetatadataSet() {
-        return headers != null;
-    }
-    
     // Response 
     
-    public Object getEntity() {
-        return entity;
-    }
-
     public int getStatus() {
         return status;
     }
 
     public MultivaluedMap<String, Object> getMetadata() {
-        if (headers != null)
-            return headers;
-        
-        headers = new OutBoundHeaders();
-        
-        for (int i = 0; i < values.length; i++)
-            if (values[i] != null)
-                headers.putSingle(ResponseBuilderHeaders.getNameFromId(i), values[i]);
-
-        Iterator i = nameValuePairs.iterator();
-        while (i.hasNext()) {
-            headers.add((String)i.next(), i.next());
-        }
-        
         return headers;
+    }
+
+    public Object getEntity() {
+        return entity;
     }
 }

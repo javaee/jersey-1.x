@@ -51,6 +51,14 @@ import javax.ws.rs.core.MultivaluedMap;
 public class StringKeyStringValueIgnoreCaseMultivaluedMap
         extends StringKeyIgnoreCaseMultivaluedMap<String> {
         
+    public StringKeyStringValueIgnoreCaseMultivaluedMap() {
+        super();
+    }
+
+    public StringKeyStringValueIgnoreCaseMultivaluedMap(StringKeyStringValueIgnoreCaseMultivaluedMap that) {
+        super(that);
+    }
+
     public void putSingleObject(String key, Object value) {
         List<String> l = getList(key);
 

@@ -37,6 +37,7 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
+import com.sun.jersey.api.JResponse;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
@@ -44,6 +45,7 @@ import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
@@ -65,13 +67,15 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
 
     public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
         
-        InjectableValuesProvider pp = getInjectableValuesProvider(abstractResourceMethod);
+        final InjectableValuesProvider pp = getInjectableValuesProvider(abstractResourceMethod);
         if (pp == null)
             return null;
 
-        Class<?> returnType = abstractResourceMethod.getReturnType();
+        final Class<?> returnType = abstractResourceMethod.getReturnType();
         if (Response.class.isAssignableFrom(returnType)) {
             return new ResponseOutInvoker(abstractResourceMethod, pp);
+        } else if (JResponse.class.isAssignableFrom(returnType)) {
+            return new JResponseOutInvoker(abstractResourceMethod, pp);
         } else if (returnType != void.class) {
             if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
                 return new ObjectOutInvoker(abstractResourceMethod, pp);
@@ -146,7 +150,7 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
-            Object o = method.invoke(resource, params);
+            final Object o = method.invoke(resource, params);
             if (o != null) {
                 Response r = new ResponseBuilderImpl().
                         entityWithType(o, t).status(200).build();
@@ -165,9 +169,43 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
-            Response r = (Response)method.invoke(resource, params);
+            final Response r = (Response)method.invoke(resource, params);
             if (r != null) {
                 context.getResponse().setResponse(r);
+            }
+        }
+    }
+
+    private static final class JResponseOutInvoker extends EntityParamInInvoker {
+        private final Type t;
+
+        JResponseOutInvoker(AbstractResourceMethod abstractResourceMethod,
+                InjectableValuesProvider pp) {
+            super(abstractResourceMethod, pp);
+            final Type jResponseType = abstractResourceMethod.getGenericReturnType();
+            if (jResponseType instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType)jResponseType;
+                if (pt.getRawType().equals(JResponse.class)) {
+                    t = ((ParameterizedType)jResponseType).getActualTypeArguments()[0];
+                } else {
+                    t = null;
+                }
+            } else {
+                t = null;
+            }
+        }
+
+        public void _dispatch(Object resource, HttpContext context)
+        throws IllegalAccessException, InvocationTargetException {
+            final Object[] params = getParams(context);
+
+            final JResponse<?> r = (JResponse<?>)method.invoke(resource, params);
+            if (r != null) {
+                if (t == null) {
+                    context.getResponse().setResponse(r.toResponse());
+                } else {
+                    context.getResponse().setResponse(r.toResponse(t));
+                }
             }
         }
     }
@@ -182,13 +220,14 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
-            Object o = method.invoke(resource, params);
+            final Object o = method.invoke(resource, params);
 
             if (o instanceof Response) {
-                Response r = (Response)o;
-                context.getResponse().setResponse(r);
+                context.getResponse().setResponse((Response)o);
+            } else if (o instanceof JResponse) {
+                context.getResponse().setResponse(((JResponse)o).toResponse());
             } else if (o != null) {
-                Response r = new ResponseBuilderImpl().status(200).entity(o).build();
+                final Response r = new ResponseBuilderImpl().status(200).entity(o).build();
                 context.getResponse().setResponse(r);
             }
         }

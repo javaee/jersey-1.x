@@ -37,8 +37,10 @@
 
 package com.sun.jersey.core.util;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
@@ -54,6 +56,13 @@ public class StringKeyIgnoreCaseMultivaluedMap<V>
         
     public StringKeyIgnoreCaseMultivaluedMap() {
         super(StringIgnoreCaseKeyComparator.SINGLETON);
+    }
+
+    public StringKeyIgnoreCaseMultivaluedMap(StringKeyIgnoreCaseMultivaluedMap<V> that) {
+        super(StringIgnoreCaseKeyComparator.SINGLETON);
+        for (Map.Entry<String, List<V>> e : that.entrySet()) {
+            this.put(e.getKey(), new ArrayList(e.getValue()));
+        }
     }
 
     // MultivaluedMap

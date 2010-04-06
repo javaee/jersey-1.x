@@ -1,4 +1,10 @@
 release 1.2 (03-2010)
+- Added com.sun.jersey.api.JResponse, which is a type safe alternative to
+  javax.ws.rs.core.Response that preserves the type information of response
+  entity thus it is not necessary to utilize javax.ws.rs.core.GenericEntity.
+  It provides equivalent functonality to Response.
+  JResponse may be extended in combination with JResponse.AJResponseBuilder
+  specialization when building responses.
 - Fixed issue 485
   https://jersey.dev.java.net/issues/show_bug.cgi?id=485
   When a ServletContainer is used as a servlet filter and the feature

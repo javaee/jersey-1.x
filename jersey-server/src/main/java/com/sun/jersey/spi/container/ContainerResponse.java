@@ -42,7 +42,6 @@ import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.core.spi.factory.ResponseBuilderHeaders;
 import com.sun.jersey.core.spi.factory.ResponseImpl;
 import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -53,8 +52,6 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
-import java.util.Iterator;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
@@ -257,8 +254,9 @@ public class ContainerResponse implements HttpResponseContext {
                 entity.getClass(), entityType, 
                 annotations, contentType);
         if (p == null) {
-            LOGGER.severe("A message body writer for Java type, " + entity.getClass() +
-                    ", and MIME media type, " + contentType + ", was not found");
+            LOGGER.severe("A message body writer for Java class " + entity.getClass().getName() +
+                    ", and Java type " + entityType +
+                    ", and MIME media type " + contentType + " was not found");
             
             if (request.getMethod().equals("HEAD")) {
                 isCommitted = true;
@@ -499,7 +497,7 @@ public class ContainerResponse implements HttpResponseContext {
     
     public Response getResponse() {
         if (response == null) {
-            setResponse(null);
+            setResponse((Response)null);
         }
         
         return response;
@@ -511,12 +509,13 @@ public class ContainerResponse implements HttpResponseContext {
         this.response = response = (response != null) ? response : Responses.noContent().build();
         this.mappedThrowable = null;
         
-        this.status = response.getStatus();
-        
+        setStatus(response.getStatus());
+        setHeaders(response.getMetadata());
         if (response instanceof ResponseImpl) {
-            this.headers = setResponseOptimal((ResponseImpl)response);
+            final ResponseImpl responseImpl = (ResponseImpl)response;
+            setEntity(responseImpl.getEntity(), responseImpl.getEntityType());
         } else {
-            this.headers = setResponseNonOptimal(response);
+            setEntity(response.getEntity());
         }
     }
     
@@ -549,18 +548,19 @@ public class ContainerResponse implements HttpResponseContext {
     }
 
     public void setEntity(Object entity) {
-        this.originalEntity = this.entity = entity;
-        if (this.entity instanceof GenericEntity) {
-            final GenericEntity ge = (GenericEntity)this.entity;
-            this.entityType = ge.getType();                
-            this.entity = ge.getEntity();            
-        } else if (entity != null) {
-            this.entityType = this.entity.getClass();
-        }        
-        
-        checkStatusAndEntity();
+        setEntity(entity, entity.getClass());
     }
     
+    public void setEntity(Object entity, Type entityType) {
+        this.originalEntity = this.entity = entity;
+        this.entityType = entityType;
+        if (this.entity instanceof GenericEntity) {
+            final GenericEntity ge = (GenericEntity)this.entity;
+            this.entity = ge.getEntity();
+            this.entityType = ge.getType();
+        }
+    }
+
     public Annotation[] getAnnotations() {
         return annotations;
     }
@@ -600,72 +600,9 @@ public class ContainerResponse implements HttpResponseContext {
     
     //
 
-    private void checkStatusAndEntity() {
-        if (status == 204 && entity != null) status = 200;
-        else if (status == 200 && entity == null) status = 204;
-    }
-    
-    private MultivaluedMap<String, Object> setResponseOptimal(ResponseImpl r) {
-        if (r.isMetatadataSet())
-            return setResponseNonOptimal(r);
-        
-        this.originalEntity = this.entity = r.getEntity();
-        this.entityType = r.getEntityType();
-        if (entity instanceof GenericEntity) {
-            final GenericEntity ge = (GenericEntity)this.entity;
-            this.entityType = ge.getType();                
-            this.entity = ge.getEntity();
-        }
-        
-        return getMetadataOptimal(r.getValues(), r.getNameValuePairs());
-    }
-
-    private MultivaluedMap<String, Object> getMetadataOptimal(Object[] values,
-            List<Object> nameValuePairs) {
-
-        MultivaluedMap<String, Object> _headers = new OutBoundHeaders();
-
-        for (int i = 0; i < values.length; i++) {
-            if (i != ResponseBuilderHeaders.LOCATION) {
-                if (values[i] != null)
-                    _headers.putSingle(ResponseBuilderHeaders.getNameFromId(i), values[i]);
-            } else {
-                Object location = values[i];
-                if (location != null) {
-                    if (location instanceof URI) {
-                        final URI locationUri = (URI)location;
-                        if (!locationUri.isAbsolute()) {
-                            final URI base = (status == 201)
-                                    ? request.getAbsolutePath()
-                                    : request.getBaseUri();
-                            location = UriBuilder.fromUri(base).
-                                    path(locationUri.getRawPath()).
-                                    replaceQuery(locationUri.getRawQuery()).
-                                    fragment(locationUri.getRawFragment()).
-                                    build();
-                        }
-                    }
-                    _headers.putSingle(HttpHeaders.LOCATION, location);
-                }
-            }
-        }
-
-        if (nameValuePairs.size() > 0) {
-            Iterator i = nameValuePairs.iterator();
-            while (i.hasNext()) {
-                _headers.add((String)i.next(), i.next());
-            }
-        }
-
-        return _headers;
-    }
-
-    private MultivaluedMap<String, Object> setResponseNonOptimal(Response r) {
-        setEntity(r.getEntity());
-        
-        MultivaluedMap<String, Object> _headers = r.getMetadata();
-        
-        Object location = _headers.getFirst(HttpHeaders.LOCATION);
+    private void setHeaders(MultivaluedMap<String, Object> headers) {
+        this.headers = headers;
+        Object location = headers.getFirst(HttpHeaders.LOCATION);
         if (location != null) {
             if (location instanceof URI) {
                 final URI locationUri = (URI)location;
@@ -679,10 +616,9 @@ public class ContainerResponse implements HttpResponseContext {
                             fragment(locationUri.getRawFragment()).
                             build();
                 }
-                _headers.putSingle(HttpHeaders.LOCATION, location);
+                headers.putSingle(HttpHeaders.LOCATION, location);
             }
         }
-
-        return _headers;
     }
+
 }

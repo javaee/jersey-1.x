@@ -50,6 +50,14 @@ import javax.ws.rs.core.MultivaluedMap;
 public class StringKeyObjectValueIgnoreCaseMultivaluedMap
         extends StringKeyIgnoreCaseMultivaluedMap<Object> {
         
+    public StringKeyObjectValueIgnoreCaseMultivaluedMap() {
+        super();
+    }
+
+    public StringKeyObjectValueIgnoreCaseMultivaluedMap(StringKeyObjectValueIgnoreCaseMultivaluedMap that) {
+        super(that);
+    }
+
     @SuppressWarnings("unchecked")
     public <A> List<A> get(String key, Class<A> type) {
         ArrayList<A> l = null;
