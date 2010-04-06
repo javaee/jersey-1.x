@@ -16,3 +16,4 @@ SimpleBean
 PureCharDataBean
 AttrAndCharDataBean
 RegisterMessage
+IntArray
