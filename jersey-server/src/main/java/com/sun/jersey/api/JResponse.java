@@ -116,7 +116,7 @@ public class JResponse<E> {
      * @param b the builder.
      */
     protected JResponse(AJResponseBuilder<E, ?> b) {
-        this(b.getStatus(), b.getMetadata(), b.getEntty());
+        this(b.getStatus(), b.getMetadata(), b.getEntity());
     }
 
     /**
@@ -617,7 +617,7 @@ public class JResponse<E> {
          *
          * @return the response entity.
          */
-        protected E getEntty() {
+        protected E getEntity() {
             return entity;
         }
 
