@@ -23,14 +23,14 @@ public class GrizzlyHttpServiceTest extends AbstractHttpServiceTest {
         return options;
     }
 
-    //@Override @Test
-    public void disabledTestJerseyServlet() throws Exception {
-        super.defaultJerseyServletTest();
+    @Test
+    public void testJerseyServlet() throws Exception {
+        super.defaultJerseyServletTestMethod();
     }
 
     @Test
     public void testNonJerseyServlet() throws Exception {
-        super.defaultNonJerseyServletTest();
+        super.defaultNonJerseyServletTestMethod();
     }
 
 }

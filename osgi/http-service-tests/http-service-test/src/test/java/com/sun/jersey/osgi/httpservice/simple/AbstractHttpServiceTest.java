@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 public abstract class AbstractHttpServiceTest {
 
     private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
+    private static final int timeToSleep = getEnvVariable("JERSEY_HTTP_SLEEP", 0);
     private static final String CONTEXT = "/jersey-http-service";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
 
@@ -58,19 +59,53 @@ public abstract class AbstractHttpServiceTest {
                 , mavenBundle("com.sun.jersey", "jersey-server", "1.2-SNAPSHOT")
                 , mavenBundle("com.sun.jersey", "jersey-client", "1.2-SNAPSHOT")
                 , mavenBundle("com.sun.jersey.test.osgi.http-service-tests", "http-service-test-bundle", "1.2-SNAPSHOT")
-                , felix());
+                );
 
         Option[] customOptions = httpServiceProviderConfiguration();
         
-        Option[] allOptions = new Option[basicOptions.length + customOptions.length];
+        Option[] allOptions = new Option[basicOptions.length + customOptions.length + 1];
         System.arraycopy(basicOptions, 0, allOptions, 0, basicOptions.length);
         System.arraycopy(customOptions, 0, allOptions, basicOptions.length, customOptions.length);
+
+        allOptions[allOptions.length -1] = felix();
 
         return allOptions;
     }
 
     public abstract Option[] httpServiceProviderConfiguration();
 
+
+    protected void defaultJerseyServletTestMethod() throws Exception {
+
+        timeout();
+
+        WebResource r = resource().path("/status");
+        String result = r.get(String.class);
+        System.out.println("RESULT = " + result);
+        assertEquals("active", result);
+    }
+    
+
+    protected void defaultNonJerseyServletTestMethod() throws Exception {
+
+        timeout();
+
+        WebResource r = resource().path("../non-jersey-http-service/status");
+        String result = r.get(String.class);
+        System.out.println("RESULT = " + result);
+        assertEquals("also active", result);
+    }
+
+    private void timeout() {
+        if (timeToSleep > 0) {
+            System.out.println("Sleeping for " + timeToSleep + " ms");
+            try {
+                Thread.sleep(timeToSleep);
+            } catch (InterruptedException ex) {
+                System.out.println("Sleeping interrupted: " + ex.getLocalizedMessage());
+            }
+        }
+    }
     public static int getEnvVariable(final String varName, int defaultValue) {
         if (null == varName) {
             return defaultValue;
@@ -94,17 +129,4 @@ public abstract class AbstractHttpServiceTest {
         return rootResource;
     }
 
-    protected void defaultJerseyServletTest() throws Exception {
-        WebResource r = resource().path("/status");
-        String result = r.get(String.class);
-        System.out.println("RESULT = " + result);
-        assertEquals("active", result);
-    }
-
-    protected void defaultNonJerseyServletTest() throws Exception {
-        WebResource r = resource().path("../non-jersey-http-service/status");
-        String result = r.get(String.class);
-        System.out.println("RESULT = " + result);
-        assertEquals("also active", result);
-    }
 }
