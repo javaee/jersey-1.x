@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
@@ -14,6 +15,7 @@ import org.osgi.util.tracker.ServiceTracker;
 public class Activator implements BundleActivator {
 
     private BundleContext bc;
+    private ServiceTracker tracker;
     private HttpService httpService = null;
     private Logger logger = Logger.getLogger(getClass().getName());
 
@@ -22,34 +24,40 @@ public class Activator implements BundleActivator {
         this.bc = bundleContext;
 
         logger.info("STARTING HTTP SERVICE BUNDLE");
-        new Thread(
-                new Runnable() {
 
-                    @Override
-                    public void run() {
-                        registerServlets(bc);
-                    }
-                }).start();
+        this.tracker = new ServiceTracker(this.bc, HttpService.class.getName(), null) {
+
+          @Override
+          public Object addingService(ServiceReference serviceRef) {
+             httpService = (HttpService)super.addingService(serviceRef);
+             registerServlets();
+             return httpService;
+          }
+
+          @Override
+            public void removedService(ServiceReference ref, Object service) {
+                if (httpService == service) {
+                    unregisterServlets();
+                    httpService = null;
+                }
+                super.removedService(ref, service);
+            }
+        };
+
+        this.tracker.open();
+
         logger.info("HTTP SERVICE BUNDLE STARTED");
     }
 
 
     @Override
     public synchronized void stop(BundleContext bundleContext) throws Exception {
-
-        if (this.httpService != null) {
-                logger.info("JERSEY BUNDLE: UNREGISTERING SERVLETS");
-
-                httpService.unregister("/jersey-http-service");
-                httpService.unregister("/non-jersey-http-service");
-
-                logger.info("JERSEY BUNDLE: SERVLETS UNREGISTERED");
-        }
+        this.tracker.close();
     }
 
-    private void registerServlets(final BundleContext bundleContext) {
+    private void registerServlets() {
         try {
-            rawRegisterServlets(bundleContext);
+            rawRegisterServlets();
         } catch (InterruptedException ie) {
             throw new RuntimeException(ie);
         } catch (ServletException se) {
@@ -59,11 +67,7 @@ public class Activator implements BundleActivator {
         }
     }
 
-    private void rawRegisterServlets(final BundleContext bundleContext) throws ServletException, NamespaceException, InterruptedException {
-        final ServiceTracker st = new ServiceTracker(bundleContext, HttpService.class.getName(), null);
-        st.open();
-        this.httpService = (HttpService) st.waitForService(0);
-
+    private void rawRegisterServlets() throws ServletException, NamespaceException, InterruptedException {
         logger.info("JERSEY BUNDLE: REGISTERING SERVLETS");
         logger.info("JERSEY BUNDLE: HTTP SERVICE = " + httpService.toString());
 
@@ -71,6 +75,15 @@ public class Activator implements BundleActivator {
         httpService.registerServlet("/non-jersey-http-service", new SimpleNonJerseyServlet(), null, null);
 
         logger.info("JERSEY BUNDLE: SERVLETS REGISTERED");
+    }
+
+    private void unregisterServlets() {
+        if (this.httpService != null) {
+            logger.info("JERSEY BUNDLE: UNREGISTERING SERVLETS");
+            httpService.unregister("/jersey-http-service");
+            httpService.unregister("/non-jersey-http-service");
+            logger.info("JERSEY BUNDLE: SERVLETS UNREGISTERED");
+        }
     }
 
     private Dictionary<String, String> getJerseyServletParams() {
