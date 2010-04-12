@@ -63,17 +63,7 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>aopalliance</groupId>
-            <artifactId>aopalliance</artifactId>
-            <version>1.0</version>
-        </dependency>        
-        <dependency>
-            <groupId>org.guiceyfruit</groupId>
-            <artifactId>guice-all</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.guiceyfruit</groupId>
+            <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-servlet</artifactId>
             <version>2.0</version>
         </dependency>
@@ -120,12 +110,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <repositories>
-        <repository>
-            <id>guice-maven</id>
-            <name>guice maven</name>
-            <url>http://guiceyfruit.googlecode.com/svn/repo/releases</url>
-        </repository>
-    </repositories>
 </project>
