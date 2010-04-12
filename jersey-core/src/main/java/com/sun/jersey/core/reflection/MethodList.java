@@ -176,11 +176,11 @@ public class MethodList implements Iterable<AnnotatedMethod> {
         });
     }
     
-    private interface Filter {
+    public interface Filter {
         boolean keep(AnnotatedMethod m);
     }
-    
-    private MethodList filter(Filter f) {
+
+    public MethodList filter(Filter f) {
         List<AnnotatedMethod> r = new ArrayList<AnnotatedMethod>();
         for (AnnotatedMethod m : methods)
             if (f.keep(m))
