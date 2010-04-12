@@ -1,7 +1,7 @@
 release 1.2 (03-2010)
 - Fixed issue 484
   https://jersey.dev.java.net/issues/show_bug.cgi?id=484
-  Change the Guice dependences to depend on Guice from the maven central
+  Change the Guice dependency to depend on Guice from the maven central
   repository rather than GuiceyFruit.
 - Added com.sun.jersey.api.JResponse, which is a type safe alternative to
   javax.ws.rs.core.Response that preserves the type information of response
