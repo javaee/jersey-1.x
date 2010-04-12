@@ -59,4 +59,11 @@ public class WebResourceLinkHeaders extends LinkHeaders {
             return null;
         return c.resource(lh.getUri());
     }
+
+    public ViewResource viewResource(String rel) {
+        LinkHeader lh = getLink(rel);
+        if (lh == null)
+            return null;
+        return c.viewResource(lh.getUri());
+    }
 }
