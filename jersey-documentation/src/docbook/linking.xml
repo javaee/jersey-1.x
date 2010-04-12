@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE chapter SYSTEM "http://www.docbook.org/xml/4.4/docbookx.dtd"[
+<!ENTITY % ents SYSTEM "jersey.ent" >
+%ents;
+<!ENTITY jaxrs-javadoc
+"https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/">
+]>
+<chapter>
+    <title>Declarative Hyperlinking (Experimental)</title>
+    <para><ulink url="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">RESTful
+            APIs must be hypertext-driven</ulink>. JAX-RS currently offers <ulink
+            url="&jaxrs-javadoc;core/UriBuilder.html">UriBuilder</ulink> to simplify URI
+        creation but Jersey adds an additional annotation-based alternative that is described
+        here.</para>
+    <section>
+        <title>Links in Representations</title>
+        <para>Links are added to representations using the <literal>@Ref</literal> annotation on
+            entity class fields. The Jersey runtime is responsible for injecting the appropriate URI
+            into the field prior to serialization by a message body writer. E.g. consider the
+            following resource and entity classes:</para>
+        <programlisting>@Path("widgets")
+public class WidgetsResource {
+  @GET
+  public Widgets get() {
+    return new Widgets();
+  }
+}
+        
+public class Widgets {
+  @Ref(resource=WidgetsResource.class)
+  URI u;
+}</programlisting>
+        <para>After a call to <literal>WidgetsResource#get</literal>, the Jersey runtime will inject
+            the value "/context/widgets"<footnote>
+                <para>Where <literal>/context</literal> is the application deployment
+                    context.</para>
+            </footnote> into the returned <literal>Widgets</literal> instance. If an absolute URI is
+            desired instead of an absolute path then the annotation can be changed to
+                <literal>@Ref(resource=WidgetsResource.class, style=ABSOLUTE)</literal>.</para>
+        <para>The above usage works nicely when there's already a URI template on a class that you
+            want to reuse. If there's no such template available then you can use a literal value
+            instead of a reference. E.g. the following is equivalent to the earlier example:
+                <literal>@Ref(value="widgets", style=ABSOLUTE)</literal>.</para>
+    </section>
+    <section>
+        <title>Binding Template Parameters</title>
+        <para>Referenced or literal templates may contain parameters. Two forms of parameters are
+            supported:</para>
+        <itemizedlist>
+            <listitem>
+                <para>URI template parameters, e.g. <literal>widgets/{id}</literal> where
+                        <literal>{id}</literal> represents a variable part of the URI.</para>
+            </listitem>
+            <listitem>
+                <para>EL expressions, e.g. <literal>widgets/${instance.id}</literal> where
+                        <literal>${instance.id}</literal> is an EL expression.</para>
+            </listitem>
+        </itemizedlist>
+        <para>Parameter values can be extracted from three implicit beans:</para>
+        <variablelist>
+            <varlistentry>
+                <term>
+                    <literal>instance</literal>
+                </term>
+                <listitem>
+                    <para>Represents the instance of the class that contains the annotated
+                        field.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>
+                    <literal>entity</literal>
+                </term>
+                <listitem>
+                    <para>Represents the entity class instance returned by the resource
+                        method.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>
+                    <literal>resource</literal>
+                </term>
+                <listitem>
+                    <para>Represents the resource class instance that returned the entity.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+
+        <para>By default URI template parameter values are extracted from the implicit
+                <literal>instance</literal> bean, i.e. the following two annotations are
+            equivalent:</para>
+        <programlisting>@Ref("widgets/{id}")
+@Ref("widgets/${instance.id}")</programlisting>
+        <para>The source for URI template parameter values can be changed using the
+                <literal>@Binding</literal> annotation, E.g. the following two annotations are
+            equivalent:</para>
+        <programlisting>@Ref(value="widgets/{id}", bindings={
+  @Binding(name="id" value="${resource.id}"}
+)
+@Ref("widgets/${resource.id}")</programlisting>
+
+    </section>
+
+    <section>
+        <title>Conditional Link Injection</title>
+        <para>Link value injection can be made conditional by use of the
+                <literal>condition</literal> property. The value of this property is a boolean EL
+            expression and a link will only be injected if the condition expression evaluates to
+            true. E.g.:</para>
+        <programlisting>@Ref(value="widgets/${instance.id}/offers",
+  condition="${instance.offers}")
+URI offers;</programlisting>
+        <para>In the above, a URI will only be injected into the <literal>offers</literal> field if
+            the <literal>offers</literal> property of the instance is <literal>true</literal>.
+        </para>
+    </section>
+
+
+    <section>
+        <title>Link Headers</title>
+        <para><ulink url="http://tools.ietf.org/html/draft-nottingham-http-link-header-09">HTTP Link
+                headers</ulink> can also be added to responses using annotations. Instead of
+            annotating the fields of an entity class with <literal>@Ref</literal>, you instead
+            annotate the entity class itself with <literal>@Link</literal>. E.g.:</para>
+        <programlisting>@Link(
+  value=@Ref("widgets/${resource.nextId}"),
+  rel="next"
+)</programlisting>
+        <para>The above would insert a HTTP Link header into any response whose entity was thus
+            annotated. The <literal>@Link</literal> annotation contains properties that map to the
+            parameters of the HTTP Link header. The above specifies the link relation as
+                <literal>next</literal>. All properties of the <literal>@Ref</literal> annotation
+            may be used as described above. </para>
+        <para>Multiple link headers can be added by use of the <literal>@Links</literal> annotation
+            which can contain multiple <literal>@Link</literal> annotations.</para>
+    </section>
+    
+    <section>
+        <title>Configuration</title>
+        <para>Declarative hyperlinking support is provided in the form of a filter. First, the application
+            must declare a dependency on the <literal>jersey-server-linking</literal> module:</para>
+        <programlisting>&lt;dependency&gt;
+  &lt;groupId&gt;com.sun.jersey.experimental&lt;/groupId&gt;
+  &lt;artifactId&gt;jersey-server-linking&lt;/artifactId&gt;
+  &lt;version&gt;${project.version}&lt;/version&gt;
+&lt;/dependency&gt;</programlisting>
+        <para>Second the filter needs to be installed in the application either programmatically by
+            adding:</para>
+        <programlisting>com.sun.jersey.server.linking.impl.LinkFilter</programlisting>
+        <para>to the list defined by:</para>
+        <programlisting>com.sun.jersey.spi.container.ContainerResponseFilters</programlisting>
+        <para>or using a <literal>web.xml</literal> init parameter:</para>
+        <programlisting>&lt;init-param&gt;
+  &lt;param-name&gt;com.sun.jersey.spi.container.ContainerResponseFilters&lt;/param-name&gt;
+  &lt;param-value&gt;com.sun.jersey.server.linking.impl.LinkFilter&lt;/param-value&gt;
+&lt;/init-param&gt;
+</programlisting>
+    </section>
+    
+    
+</chapter>
