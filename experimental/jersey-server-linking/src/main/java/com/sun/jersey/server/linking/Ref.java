@@ -87,11 +87,11 @@ public @interface Ref {
      * described in {@link #resource()}. E.g. the following three alternatives
      * are equivalent:
      * <pre>
-     * &#64;Ref(template="{id}")
-     * &#64;Ref(template="{id}", bindings={
+     * &#64;Ref("{id}")
+     * &#64;Ref(value="{id}", bindings={
      *   &#64;Binding(name="id" value="${instance.id}"}
      * )
-     * &#64;Ref(template="${instance.id}")
+     * &#64;Ref("${instance.id}")
      * </pre>
      */
     String value() default "";
