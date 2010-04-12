@@ -68,19 +68,18 @@ public class JettyHttpServiceTest {
         assertEquals("active", result);
     }
 
-//    @Test
-//    public void testNonJerseyServlet() throws Exception {
-//        startJerseyHttpServiceBundle();
-//        WebResource r = resource().path("../non-jersey-http-service/status");
-//        String result = r.get(String.class);
-//        System.out.println("RESULT = " + result);
-//        assertEquals("also active", result);
-//    }
+    @Test
+    public void testNonJerseyServlet() throws Exception {
+        startJerseyHttpServiceBundle();
+        WebResource r = resource().path("../non-jersey-http-service/status");
+        String result = r.get(String.class);
+        System.out.println("RESULT = " + result);
+        assertEquals("also active", result);
+    }
 
     private void startJerseyHttpServiceBundle() throws Exception {
         final Bundle httpServiceBundle = bc.installBundle("mvn:com.sun.jersey.test.osgi.http-service-tests/http-service-test-bundle/1.2-SNAPSHOT");
         httpServiceBundle.start();
-        Thread.sleep(getEnvVariable("JERSEY_HTTP_SLEEP", 0));
     }
 
     public static int getEnvVariable(final String varName, int defaultValue) {
