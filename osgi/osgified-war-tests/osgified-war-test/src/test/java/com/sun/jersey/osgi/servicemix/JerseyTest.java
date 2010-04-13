@@ -87,7 +87,7 @@ public class JerseyTest {
         	mavenBundle("com.sun.jersey","jersey-client", "1.2-SNAPSHOT"),
 		        
 	        // And finally the WAR
-		provision("file:../osgified-webapp/target/osgified-webapp.war"),
+		mavenBundle().groupId("com.sun.jersey.test.osgi.osgified-war-tests").artifactId("osgified-webapp").type("war").version("1.2-SNAPSHOT"),
 
                 // start felix framework
                 felix());
