@@ -1,4 +1,7 @@
 release 1.2 (03-2010)
+- Fixed issue 504
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=504
+  Upgrade Simple HTTP server to 4.1.20.
 - Fixed issue 484
   https://jersey.dev.java.net/issues/show_bug.cgi?id=484
   Change the Guice dependency to depend on Guice from the maven central
