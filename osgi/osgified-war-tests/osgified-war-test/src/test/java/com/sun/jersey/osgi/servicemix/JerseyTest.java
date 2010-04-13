@@ -36,21 +36,17 @@ public class JerseyTest {
     protected BundleContext bundleContext;
 
     @Test
-    public void testHello() throws Exception {
-        WebResource r = resource().path("/webresources/helloworld");
-        String result = r.get(String.class);
+    public void testWebResources() throws Exception {
+        WebResource r = resource();
+        String result = r.path("/webresources/helloworld").get(String.class);
 
-        System.out.println("RESULT = " + result);
+        System.out.println("HELLO RESULT = " + result);
         assertEquals("Hello World", result);
-    }
 
-    @Test
-    public void testAnother() throws Exception {
-        WebResource r = resource().path("/webresources/another");
-        String result = r.get(String.class);
+        String result2 = r.path("/webresources/another").get(String.class);
 
-        System.out.println("RESULT = " + result);
-        assertEquals("Another", result);
+        System.out.println("ANOTHER RESULT = " + result2);
+        assertEquals("Another", result2);
     }
 
     @Configuration
@@ -116,6 +112,5 @@ public class JerseyTest {
         }
         return defaultValue;
     }
-
 }
 
