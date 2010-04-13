@@ -17,6 +17,7 @@ import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.provision;
 
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
@@ -53,7 +54,7 @@ public class JettyHttpServiceTest {
                 , mavenBundle("com.sun.jersey", "jersey-core", "1.2-SNAPSHOT")
                 , mavenBundle("com.sun.jersey", "jersey-server", "1.2-SNAPSHOT")
                 , mavenBundle("com.sun.jersey", "jersey-client", "1.2-SNAPSHOT")
-                //, mavenBundle("com.sun.jersey.test.osgi.http-service-tests", "http-service-test-bundle", "1.2-SNAPSHOT")
+                , provision(mavenBundle("com.sun.jersey.test.osgi.http-service-tests", "http-service-test-bundle", "1.2-SNAPSHOT"))
                 ,felix());
 
         return options;
@@ -61,7 +62,6 @@ public class JettyHttpServiceTest {
 
     @Test
     public void testJerseyServlet() throws Exception {
-        startJerseyHttpServiceBundle();
         final WebResource r = resource().path("/status");
         String result = r.get(String.class);
         System.out.println("RESULT = " + result);
@@ -70,16 +70,10 @@ public class JettyHttpServiceTest {
 
     @Test
     public void testNonJerseyServlet() throws Exception {
-        startJerseyHttpServiceBundle();
         WebResource r = resource().path("../non-jersey-http-service/status");
         String result = r.get(String.class);
         System.out.println("RESULT = " + result);
         assertEquals("also active", result);
-    }
-
-    private void startJerseyHttpServiceBundle() throws Exception {
-        final Bundle httpServiceBundle = bc.installBundle("mvn:com.sun.jersey.test.osgi.http-service-tests/http-service-test-bundle/1.2-SNAPSHOT");
-        httpServiceBundle.start();
     }
 
     public static int getEnvVariable(final String varName, int defaultValue) {

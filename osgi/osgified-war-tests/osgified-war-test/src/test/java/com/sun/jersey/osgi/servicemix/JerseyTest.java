@@ -20,7 +20,6 @@ import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
 import org.osgi.framework.BundleContext;
 
 import static org.junit.Assert.assertEquals;
@@ -28,8 +27,8 @@ import static org.junit.Assert.assertEquals;
 @RunWith(JUnit4TestRunner.class)
 public class JerseyTest {
 
-    private static MavenArtifactProvisionOption execUrl;
     private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
+    private static final int rmiPort = getEnvVariable("JERSEY_RMI_PORT", 1099);
     private static final String CONTEXT = "/osgified-webapp";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
 
@@ -61,6 +60,7 @@ public class JerseyTest {
         		
 //                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
+                systemProperty("org.ops4j.pax.exam.rbc.rmi.port").value(String.valueOf(rmiPort)),
                 
                 // define maven repository
                 repositories(
@@ -87,7 +87,7 @@ public class JerseyTest {
         	mavenBundle("com.sun.jersey","jersey-client", "1.2-SNAPSHOT"),
 		        
 	        // And finally the WAR
-		mavenBundle().groupId("com.sun.jersey.test.osgi.osgified-war-tests").artifactId("osgified-webapp").type("war").version("1.2-SNAPSHOT"),
+		provision(mavenBundle().groupId("com.sun.jersey.test.osgi.osgified-war-tests").artifactId("osgified-webapp").type("war").version("1.2-SNAPSHOT")),
 
                 // start felix framework
                 felix());
