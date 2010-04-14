@@ -203,6 +203,24 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
         }
     }
 
+    public void testFourBiz() {
+        WebResource.Builder builder = client.resource(getUri())
+                .path("multipart/four").accept("text/plain").header("Content-Type", "multipart/mixed");
+        try {
+            MultiPartBean bean = new MultiPartBean("myname", "myvalue");
+            MultiPart entity = new MultiPart().
+              bodyPart("This is the first segment", new MediaType("text", "plain")).
+              bodyPart(bean, new MediaType("x-application", "x-format"));
+            String response = builder.put(String.class, entity);
+            if (!response.startsWith("SUCCESS:")) {
+                fail("Response is '" + response + "'");
+            }
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
     // Test sending a completely empty MultiPart
     public void testSix() {
         WebResource.Builder builder = client.resource(getUri())

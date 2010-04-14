@@ -1,4 +1,8 @@
 release 1.2 (03-2010)
+- Fixed issue 505
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=505
+  Fixed error in the multipart message body writer when the
+  Content-Type header value is explicitly set and the value is a string.
 - Fixed issue 504
   https://jersey.dev.java.net/issues/show_bug.cgi?id=504
   Upgrade Simple HTTP server to 4.1.20.

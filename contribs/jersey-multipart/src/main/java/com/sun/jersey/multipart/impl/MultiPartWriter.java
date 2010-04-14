@@ -126,23 +126,22 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
         Writer writer = new BufferedWriter(new OutputStreamWriter(stream)); // FIXME - charset???
 
         // Determine the boundary string to be used, creating one if needed
-        MediaType entityMediaType = (MediaType) headers.getFirst("Content-Type");
-        if (entityMediaType == null) {
+        if (mediaType == null) {
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("boundary", createBoundary());
-            entityMediaType = new MediaType("multipart", "mixed", parameters);
-            headers.putSingle("Content-Type", entityMediaType);
+            mediaType = new MediaType("multipart", "mixed", parameters);
+            headers.putSingle("Content-Type", mediaType);
         }
-        String boundaryString = entityMediaType.getParameters().get("boundary");
+        String boundaryString = mediaType.getParameters().get("boundary");
         if (boundaryString == null) {
             boundaryString = createBoundary();
             Map<String, String> parameters = new HashMap<String, String>();
-            parameters.putAll(entityMediaType.getParameters());
+            parameters.putAll(mediaType.getParameters());
             parameters.put("boundary", boundaryString);
-            entityMediaType = new MediaType(entityMediaType.getType(),
-                    entityMediaType.getSubtype(),
+            mediaType = new MediaType(mediaType.getType(),
+                    mediaType.getSubtype(),
                     parameters);
-            headers.putSingle("Content-Type", entityMediaType);
+            headers.putSingle("Content-Type", mediaType);
         }
 
         // Iterate through the body parts for this message
