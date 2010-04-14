@@ -276,7 +276,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         } else if (strMethod.equals("PUT")) {
             return new PutMethod(uri);
         } else if (strMethod.equals("DELETE")) {
-            return new DeleteMethod(uri);
+            return new CustomMethod("DELETE", uri);
         } else if (strMethod.equals("HEAD")) {
             return new HeadMethod(uri);
         } else if (strMethod.equals("OPTIONS")) {
@@ -286,7 +286,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         }
     }
 
-    private static class CustomMethod extends PostMethod {
+    private static class CustomMethod extends EntityEnclosingMethod {
         private String method;
 
         CustomMethod(String method, String uri) {

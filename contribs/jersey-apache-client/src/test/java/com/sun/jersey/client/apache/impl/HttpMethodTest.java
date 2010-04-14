@@ -47,8 +47,13 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.core.Response;
@@ -58,6 +63,12 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public class HttpMethodTest extends AbstractGrizzlyServerTester {
+    @Target({ElementType.METHOD})
+    @Retention(RetentionPolicy.RUNTIME)
+    @HttpMethod("PATCH")
+    public @interface PATCH {
+    }
+
     @Path("/test")
     public static class HttpMethodResource {
         @GET
@@ -80,6 +91,12 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
             return "DELETE";
         }
 
+        @DELETE
+        @Path("withentity")
+        public String delete(String entity) {
+            return entity;
+        }
+
         @POST
         @Path("noproduce")
         public void postNoProduce(String entity) {
@@ -88,6 +105,11 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         @POST
         @Path("noconsumeproduce")
         public void postNoConsumeProduce() {
+        }
+
+        @PATCH
+        public String patch(String entity) {
+            return entity;
         }
     }
 
@@ -203,6 +225,28 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("DELETE", r.delete(String.class));
 
         ClientResponse cr = r.delete(ClientResponse.class);
+        assertTrue(cr.hasEntity());
+        cr.close();
+    }
+
+    public void testDeleteWithEntity() {
+        startServer(HttpMethodResource.class);
+        WebResource r = createClient().resource(getUri().path("test/withentity").build());
+        r.addFilter(new com.sun.jersey.api.client.filter.LoggingFilter());
+        assertEquals("DELETE with entity", r.delete(String.class, "DELETE with entity"));
+
+        ClientResponse cr = r.delete(ClientResponse.class, "DELETE with entity");
+        assertTrue(cr.hasEntity());
+        cr.close();
+    }
+
+    public void testPatch() {
+        startServer(HttpMethodResource.class);
+        WebResource r = createClient().resource(getUri().path("test").build());
+        r.addFilter(new com.sun.jersey.api.client.filter.LoggingFilter());
+        assertEquals("PATCH", r.method("PATCH", String.class, "PATCH"));
+
+        ClientResponse cr = r.method("PATCH", ClientResponse.class, "PATCH");
         assertTrue(cr.hasEntity());
         cr.close();
     }

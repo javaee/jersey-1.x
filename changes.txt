@@ -1,4 +1,7 @@
 release 1.2 (03-2010)
+- Fixed issue 507
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=507
+  Support DELETE with request entities for the Apache HTTP client.
 - Fixed issue 505
   https://jersey.dev.java.net/issues/show_bug.cgi?id=505
   Fixed error in the multipart message body writer when the
