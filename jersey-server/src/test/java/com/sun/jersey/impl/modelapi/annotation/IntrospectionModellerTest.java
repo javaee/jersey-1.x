@@ -46,9 +46,11 @@ import java.util.logging.LogRecord;
 import junit.framework.*;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.modelapi.annotation.IntrospectionModellerTest.TestSubResourceOne;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -65,7 +67,12 @@ import javax.ws.rs.core.MediaType;
  * @author japod
  */
 public class IntrospectionModellerTest extends TestCase {
-    
+
+    @Target(ElementType.PARAMETER)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ApplicationAnnotation {
+    }
+
     @Path("/one")
     public class TestRootResourceOne {
         
@@ -90,7 +97,13 @@ public class IntrospectionModellerTest extends TestCase {
         public String putSubResourceMethod(String entityParam) {
             return "Hi there, here is a subresource method!";
         }
-        
+
+        @PUT
+        @Path("/subres-method2")
+        public String putSubResourceMethod2(/*@ApplicationAnnotation*/ String entityParam) {
+            return "Hi there, here is a subresource method!";
+        }
+
         @GET
         @Produces("text/plain")
         @Path("/with-params/{one}")
@@ -169,7 +182,7 @@ public class IntrospectionModellerTest extends TestCase {
         assertEquals("/one", rootResource.getPath().getValue());
         assertEquals(1, rootResource.getResourceMethods().size());
         assertEquals(1 ,rootResource.getSubResourceLocators().size());
-        assertEquals(2 ,rootResource.getSubResourceMethods().size());
+        assertEquals(3 ,rootResource.getSubResourceMethods().size());
         
         AbstractResourceMethod resourceMethod = rootResource.getResourceMethods().get(0);
 //        @HttpMethod
@@ -204,35 +217,47 @@ public class IntrospectionModellerTest extends TestCase {
         assertEquals(Parameter.Source.HEADER, locator.getParameters().get(2).getSource());
         assertEquals("p3", locator.getParameters().get(2).getSourceName());
 
-        AbstractSubResourceMethod subResMethod1 = rootResource.getSubResourceMethods().get(0);
-        AbstractSubResourceMethod subResMethod2 = null;
-        if("putSubResourceMethod".equals(subResMethod1.getMethod().getName())) {
-            subResMethod2 = rootResource.getSubResourceMethods().get(1);
-        } else {
-            subResMethod2 = subResMethod1;
-            subResMethod1 = rootResource.getSubResourceMethods().get(1);
+        AbstractSubResourceMethod putSubResMethod1 = null;
+        AbstractSubResourceMethod putSubResMethod2 = null;
+        AbstractSubResourceMethod getSubResMethod = null;
+        for (AbstractSubResourceMethod m: rootResource.getSubResourceMethods()) {
+            if (m.getMethod().getName().equals("putSubResourceMethod"))
+                putSubResMethod1 = m;
+            else if (m.getMethod().getName().equals("putSubResourceMethod2"))
+                putSubResMethod2 = m;
+            else if (m.getMethod().getName().equals("getSubResourceMethodWithParams"))
+                getSubResMethod = m;
         }
 //        @PUT
 //        @Path("/subres-method")
 //        public String getSubResourceMethod(String entityParam) {
 //            return "Hi there, here is a subresource method!";
 //        }
-        assertEquals("/subres-method", subResMethod1.getPath().getValue());
-        assertEquals("PUT", subResMethod1.getHttpMethod());
-        assertEquals(1, subResMethod1.getParameters().size());
-        assertEquals(Parameter.Source.ENTITY, subResMethod1.getParameters().get(0).getSource());
+        assertEquals("/subres-method", putSubResMethod1.getPath().getValue());
+        assertEquals("PUT", putSubResMethod1.getHttpMethod());
+        assertEquals(1, putSubResMethod1.getParameters().size());
+        assertEquals(Parameter.Source.ENTITY, putSubResMethod1.getParameters().get(0).getSource());
+//        @PUT
+//        @Path("/subres-method2")
+//        public String getSubResourceMethod(@ApplicationAnnotation String entityParam) {
+//            return "Hi there, here is a subresource method!";
+//        }
+        assertEquals("/subres-method2", putSubResMethod2.getPath().getValue());
+        assertEquals("PUT", putSubResMethod2.getHttpMethod());
+        assertEquals(1, putSubResMethod2.getParameters().size());
+        assertEquals(Parameter.Source.ENTITY, putSubResMethod2.getParameters().get(0).getSource());
 //        @HttpMethod
 //        @Path("/with-params/{one}")
 //        @Produces("text/plain")
 //        public String getSubResourceMethodWithParams(@PathParam("one") String paramOne) {
 //            return "Hi there, here is a subresource method!";
 //        }
-        assertEquals("/with-params/{one}", subResMethod2.getPath().getValue());
-        assertEquals("GET", subResMethod2.getHttpMethod());
-        assertEquals(1, subResMethod2.getParameters().size());
-        assertEquals(Parameter.Source.PATH, subResMethod2.getParameters().get(0).getSource());
-        assertEquals("one", subResMethod2.getParameters().get(0).getSourceName());
-        assertEquals("text/plain", subResMethod2.getSupportedOutputTypes().get(0).toString());
+        assertEquals("/with-params/{one}", getSubResMethod.getPath().getValue());
+        assertEquals("GET", getSubResMethod.getHttpMethod());
+        assertEquals(1, getSubResMethod.getParameters().size());
+        assertEquals(Parameter.Source.PATH, getSubResMethod.getParameters().get(0).getSource());
+        assertEquals("one", getSubResMethod.getParameters().get(0).getSourceName());
+        assertEquals("text/plain", getSubResMethod.getSupportedOutputTypes().get(0).toString());
     }
 
     public void testSubResource() {
