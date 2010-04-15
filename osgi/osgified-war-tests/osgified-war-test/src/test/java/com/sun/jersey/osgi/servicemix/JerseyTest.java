@@ -34,7 +34,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(JUnit4TestRunner.class)
 public class JerseyTest {
 
-    public static class WebEventHandler implements EventHandler {
+    public class WebEventHandler implements EventHandler {
 
         @Override
         public void handleEvent(Event event) {
@@ -56,7 +56,7 @@ public class JerseyTest {
     private static final String CONTEXT = "/osgified-webapp";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
 
-    final static Semaphore semaphore = new Semaphore(0);
+    final Semaphore semaphore = new Semaphore(0);
 
     @Inject
     protected BundleContext bundleContext;
@@ -103,7 +103,7 @@ public class JerseyTest {
                 "http://repository.springsource.com/maven/bundles/external"),
                 // felix config admin
                 mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4"),
-                // felix config admin
+                // felix event admin
                 mavenBundle("org.apache.felix", "org.apache.felix.eventadmin", "1.2.2"),
                 // load PAX Web bundles
                 mavenBundle("org.ops4j.pax.web", "pax-web-jetty-bundle", "0.7.1"),

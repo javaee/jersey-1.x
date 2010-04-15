@@ -92,7 +92,7 @@
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.sun.jersey.test.osgi.aux</groupId>
+                    <groupId>com.sun.jersey.test.osgi.3rd</groupId>
                     <artifactId>jsr250-api</artifactId>
                     <version>${project.version}</version>
                     <scope>provided</scope>
