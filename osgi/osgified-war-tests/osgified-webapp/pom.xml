@@ -58,6 +58,18 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>4.2.0</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.compendium</artifactId>
+            <version>4.2.0</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -101,6 +113,7 @@
                         <Export-Package>com.sun.jersey.osgi.samples.helloworld</Export-Package>
                         <Import-Package>com.sun.jersey.api.core,com.sun.jersey.spi.container.servlet,*</Import-Package>
                         <Webapp-Context>${pom.artifactId}</Webapp-Context>
+                        <Bundle-Activator>com.sun.jersey.osgi.samples.helloworld.WebAppContextListener</Bundle-Activator>
                     </instructions>
                 </configuration>
 
@@ -149,4 +162,6 @@
         </repository>
     </repositories>
 </project>
+
+
 
