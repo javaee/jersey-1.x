@@ -38,10 +38,11 @@ package com.sun.jersey.client.urlconnection;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientRequest;
-import java.security.NoSuchAlgorithmException;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * HTTPS properties for SSL configuration of a {@link HttpsURLConnection}.
@@ -95,9 +96,12 @@ public class HTTPSProperties {
      * Construct with a {@link HostnameVerifier} and a {@link SSLContext}.
      * 
      * @param hv the HostnameVerifier.
-     * @param c the SSLContext.
+     * @param c the SSLContext. Must not be null.
      */
     public HTTPSProperties(HostnameVerifier hv, SSLContext c) {
+        if(c == null)
+            throw new IllegalArgumentException("SSLContext must not be null");
+
         this.hostnameVerifier = hv;
         this.sslContext = c;
     }
