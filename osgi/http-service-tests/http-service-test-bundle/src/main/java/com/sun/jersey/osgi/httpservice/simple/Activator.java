@@ -2,12 +2,15 @@ package com.sun.jersey.osgi.httpservice.simple;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventAdmin;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.osgi.util.tracker.ServiceTracker;
@@ -74,7 +77,22 @@ public class Activator implements BundleActivator {
         httpService.registerServlet("/jersey-http-service", new ServletContainer(), getJerseyServletParams(), null);
         httpService.registerServlet("/non-jersey-http-service", new SimpleNonJerseyServlet(), null, null);
 
+        sendAdminEvent();
         logger.info("JERSEY BUNDLE: SERVLETS REGISTERED");
+    }
+
+    private void sendAdminEvent() {
+        ServiceReference eaRef = bc.getServiceReference(EventAdmin.class.getName());
+        if (eaRef != null) {
+            EventAdmin ea = (EventAdmin) bc.getService(eaRef);
+            ea.sendEvent(new Event("jersey/test/DEPLOYED", new HashMap<String, String>() {
+
+                {
+                    put("context-path", "/");
+                }
+            }));
+            bc.ungetService(eaRef);
+        }
     }
 
     private void unregisterServlets() {

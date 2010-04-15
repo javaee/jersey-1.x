@@ -3,21 +3,27 @@ package com.sun.jersey.osgi.httpservice.simple;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import java.net.URI;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.concurrent.Semaphore;
 import javax.ws.rs.core.UriBuilder;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+
+import org.osgi.service.event.Event;
+import org.osgi.service.event.EventConstants;
+import org.osgi.service.event.EventHandler;
 
 import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.provision;
 
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
@@ -27,12 +33,31 @@ import static org.junit.Assert.assertEquals;
 @RunWith(JUnit4TestRunner.class)
 public class JettyHttpServiceTest {
 
+    public class WebEventHandler implements EventHandler {
+
+        @Override
+        public void handleEvent(Event event) {
+            semaphore.release();
+        }
+
+        public WebEventHandler(String handlerName) {
+            this.handlerName = handlerName;
+        }
+        private final String handlerName;
+
+        protected String getHandlerName() {
+            return handlerName;
+        }
+    }
+
+    final Semaphore semaphore = new Semaphore(0);
+
     private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
     private static final String CONTEXT = "/jersey-http-service";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
 
     @Inject
-    BundleContext bc;
+    BundleContext bundleContext;
 
     @Configuration
     public Option[] configuration() {
@@ -49,31 +74,38 @@ public class JettyHttpServiceTest {
                 , mavenBundle("org.ops4j.pax.url", "pax-url-mvn")
 
                 , mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4")
+                , mavenBundle("org.apache.felix", "org.apache.felix.eventadmin", "1.2.2")
                 , mavenBundle("org.ops4j.pax.web", "pax-web-jetty-bundle", "0.7.1")
                 , mavenBundle("javax.ws.rs", "jsr311-api", "1.1.1")
                 , mavenBundle("com.sun.jersey", "jersey-core", "1.2-SNAPSHOT")
                 , mavenBundle("com.sun.jersey", "jersey-server", "1.2-SNAPSHOT")
                 , mavenBundle("com.sun.jersey", "jersey-client", "1.2-SNAPSHOT")
-                , provision(mavenBundle("com.sun.jersey.test.osgi.http-service-tests", "http-service-test-bundle", "1.2-SNAPSHOT"))
                 ,felix());
 
         return options;
     }
 
-    @Test
-    public void testJerseyServlet() throws Exception {
-        final WebResource r = resource().path("/status");
-        String result = r.get(String.class);
-        System.out.println("RESULT = " + result);
-        assertEquals("active", result);
+    @Before
+    public void registerEventHandler() {
+        bundleContext.registerService(EventHandler.class.getName(), new WebEventHandler("Deploy Handler"), getHandlerServiceProperties("jersey/test/DEPLOYED"));
     }
 
     @Test
-    public void testNonJerseyServlet() throws Exception {
-        WebResource r = resource().path("../non-jersey-http-service/status");
-        String result = r.get(String.class);
-        System.out.println("RESULT = " + result);
-        assertEquals("also active", result);
+    public void testServlets() throws Exception {
+
+        bundleContext.installBundle("mvn:com.sun.jersey.test.osgi.http-service-tests/http-service-test-bundle/1.2-SNAPSHOT").start();
+
+        semaphore.acquire();
+
+        final WebResource r = resource();
+
+        String result = r.path("/status").get(String.class);
+        System.out.println("JERSEY RESULT = " + result);
+        assertEquals("active", result);
+
+        String result2 = r.path("../non-jersey-http-service/status").get(String.class);
+        System.out.println("NON-JERSEY RESULT = " + result2);
+        assertEquals("also active", result2);
     }
 
     public static int getEnvVariable(final String varName, int defaultValue) {
@@ -97,5 +129,10 @@ public class JettyHttpServiceTest {
         return rootResource;
     }
 
+    private Dictionary getHandlerServiceProperties(String... topics) {
+         Dictionary result = new Hashtable();
+         result.put(EventConstants.EVENT_TOPIC, topics);
+         return result;
+     }
 }
 
