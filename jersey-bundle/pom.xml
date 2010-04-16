@@ -361,7 +361,7 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Export-Package>com.sun.jersey.*</Export-Package>
+                        <Export-Package>com.sun.jersey.*,com.sun.research.ws.wadl,com.sun.ws.rs.ext</Export-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
