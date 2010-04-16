@@ -41,7 +41,7 @@
     <version>1.2-SNAPSHOT</version>
     <artifactId>osgified-webapp</artifactId>
 
-    <name>Helloworld WebApp - Jersey Sample OSGified</name>
+    <name>Helloworld OSGi WebApp - Jersey Sample</name>
 
     <packaging>war</packaging>
 
@@ -147,6 +147,7 @@
             <layout>legacy</layout>
         </pluginRepository>
     </pluginRepositories>
+    
     <repositories>
         <repository>
             <id>maven-repository.dev.java.net</id>
