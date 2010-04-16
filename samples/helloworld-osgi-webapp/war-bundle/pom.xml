@@ -74,7 +74,6 @@
     </dependencies>
 
     <build>
-        <finalName>osgified-webapp</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

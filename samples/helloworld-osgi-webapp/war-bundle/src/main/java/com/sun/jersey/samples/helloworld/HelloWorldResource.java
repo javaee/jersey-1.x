@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.osgi.samples.helloworld;
+package com.sun.jersey.samples.helloworld;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;

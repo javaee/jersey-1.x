@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.osgi.samples.helloworld;
+package com.sun.jersey.samples.helloworld;
 
 import java.util.HashMap;
 import javax.servlet.ServletContextEvent;

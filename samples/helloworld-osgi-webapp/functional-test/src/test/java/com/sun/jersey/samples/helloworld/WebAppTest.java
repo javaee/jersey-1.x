@@ -1,4 +1,4 @@
-package com.sun.jersey.osgi.servicemix;
+package com.sun.jersey.samples.helloworld;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
@@ -32,7 +32,7 @@ import org.osgi.service.event.EventHandler;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4TestRunner.class)
-public class JerseyTest {
+public class WebAppTest {
 
     public class WebEventHandler implements EventHandler {
 
