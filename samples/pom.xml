@@ -48,14 +48,15 @@
         <module>atompub-contacts-client</module>
         <module>atompub-contacts-models</module>
         <module>atompub-contacts-server</module>
-        <module>bookmark</module>
         <module>bookmark-em</module>
+        <module>bookmark</module>
         <module>bookstore</module>
         <module>entity-provider</module>
         <module>extended-wadl-webapp</module>
         <module>generate-wadl</module>
         <module>groovy</module>
         <module>helloworld</module>
+        <module>helloworld-osgi-webapp</module>
         <module>helloworld-webapp</module>
         <module>https-clientserver-grizzly</module>
         <module>https-server-glassfish</module>
