@@ -110,10 +110,10 @@
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                         <!-- TODO: remove this ugly workaround, which makes the plugin generate the Export-Package instruction bellow -->
                         <Bundle-ClassPath>.,WEB-INF/classes,classes</Bundle-ClassPath>
-                        <Export-Package>com.sun.jersey.osgi.samples.helloworld</Export-Package>
+                        <Export-Package>com.sun.jersey.samples.helloworld</Export-Package>
                         <Import-Package>com.sun.jersey.api.core,com.sun.jersey.spi.container.servlet,*</Import-Package>
                         <Webapp-Context>helloworld</Webapp-Context>
-                        <Bundle-Activator>com.sun.jersey.osgi.samples.helloworld.WebAppContextListener</Bundle-Activator>
+                        <Bundle-Activator>com.sun.jersey.samples.helloworld.WebAppContextListener</Bundle-Activator>
                     </instructions>
                 </configuration>
 

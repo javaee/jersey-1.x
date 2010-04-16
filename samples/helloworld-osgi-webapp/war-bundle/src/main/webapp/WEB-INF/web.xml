@@ -12,7 +12,7 @@
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.classnames</param-name>
-            <param-value>com.sun.jersey.osgi.samples.helloworld.HelloWorldResource;com.sun.jersey.osgi.samples.helloworld.AnotherResource</param-value>
+            <param-value>com.sun.jersey.samples.helloworld.HelloWorldResource;com.sun.jersey.samples.helloworld.AnotherResource</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

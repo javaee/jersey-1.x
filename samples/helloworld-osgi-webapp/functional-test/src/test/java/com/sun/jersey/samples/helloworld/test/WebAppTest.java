@@ -1,4 +1,4 @@
-package com.sun.jersey.samples.helloworld;
+package com.sun.jersey.samples.helloworld.test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
