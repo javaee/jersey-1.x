@@ -53,7 +53,7 @@ public class JerseyTest {
     
     private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
     private static final int rmiPort = getEnvVariable("JERSEY_RMI_PORT", 1099);
-    private static final String CONTEXT = "/osgified-webapp";
+    private static final String CONTEXT = "/helloworld";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
 
     final Semaphore semaphore = new Semaphore(0);
@@ -69,7 +69,7 @@ public class JerseyTest {
     @Test
     public void testWebResources() throws Exception {
 
-        final Bundle httpServiceBundle = bundleContext.installBundle("mvn:com.sun.jersey.test.osgi.osgified-war-tests/osgified-webapp/1.2-SNAPSHOT/war");
+        final Bundle httpServiceBundle = bundleContext.installBundle("mvn:com.sun.jersey.samples.helloworld-osgi-webapp/war-bundle/1.2-SNAPSHOT/war");
         httpServiceBundle.start();
 
         semaphore.acquire();

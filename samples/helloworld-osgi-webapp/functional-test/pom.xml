@@ -3,12 +3,12 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.sun.jersey.test.osgi.osgified-war-tests</groupId>
-	<artifactId>osgified-war-test</artifactId>
+	<groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
+	<artifactId>functional-test</artifactId>
 	<version>1.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Jersey : OSGified WAR Test</name>
+	<name>Helloworld OSGi WebApp - Jersey Sample Test</name>
 
 	<!-- we can use full maven properties incl. inheritance ! -->
 	<properties>
@@ -51,12 +51,19 @@
 			<scope>test</scope>
 			<version>${osgi-version}</version>
 		</dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
-      <scope>test</scope>
-      <version>${project.version}</version>
-    </dependency>
+    		<dependency>
+      			<groupId>com.sun.jersey</groupId>
+      			<artifactId>jersey-client</artifactId>
+      			<scope>test</scope>
+      			<version>${project.version}</version>
+    		</dependency>
+    		<dependency>
+      			<groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
+      			<artifactId>war-bundle</artifactId>
+      			<type>war</type>
+      			<scope>test</scope>
+      			<version>${project.version}</version>
+    		</dependency>
 	</dependencies>
 
 	<build>
@@ -93,10 +100,3 @@
     </repositories>
 
 </project>
-
-
-
-
-
-
-

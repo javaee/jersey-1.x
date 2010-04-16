@@ -37,11 +37,12 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.test.osgi.osgified-war-tests</groupId>
-    <version>1.2-SNAPSHOT</version>
-    <artifactId>osgified-webapp</artifactId>
 
-    <name>Helloworld OSGi WebApp - Jersey Sample</name>
+    <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
+    <version>1.2-SNAPSHOT</version>
+    <artifactId>war-bundle</artifactId>
+
+    <name>Helloworld OSGi WebApp - Jersey Sample WAR</name>
 
     <packaging>war</packaging>
 
@@ -112,7 +113,7 @@
                         <Bundle-ClassPath>.,WEB-INF/classes,classes</Bundle-ClassPath>
                         <Export-Package>com.sun.jersey.osgi.samples.helloworld</Export-Package>
                         <Import-Package>com.sun.jersey.api.core,com.sun.jersey.spi.container.servlet,*</Import-Package>
-                        <Webapp-Context>${pom.artifactId}</Webapp-Context>
+                        <Webapp-Context>helloworld</Webapp-Context>
                         <Bundle-Activator>com.sun.jersey.osgi.samples.helloworld.WebAppContextListener</Bundle-Activator>
                     </instructions>
                 </configuration>
