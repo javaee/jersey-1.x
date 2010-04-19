@@ -123,6 +123,20 @@ public class AdaptingContainerRequest extends ContainerRequest {
         return acr.getMessageBodyWorkers();
     }
 
+    // Traceable
+
+    @Override
+    public boolean isTracingEnabled() {
+        return acr.isTracingEnabled();
+    }
+
+    @Override
+    public void trace(String message) {
+        acr.trace(message);
+    }
+
+    // HttpRequestContext
+    
     @Override
     public URI getBaseUri() {
         return acr.getBaseUri();

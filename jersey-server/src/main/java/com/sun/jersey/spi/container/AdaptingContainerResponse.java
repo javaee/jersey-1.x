@@ -36,11 +36,14 @@
  */
 package com.sun.jersey.spi.container;
 
+import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
@@ -67,6 +70,7 @@ public class AdaptingContainerResponse extends ContainerResponse {
         this.acr = acr;
     }
 
+
     @Override
     public void write() throws IOException {
         acr.write();
@@ -86,62 +90,94 @@ public class AdaptingContainerResponse extends ContainerResponse {
     public void setContainerRequest(ContainerRequest request) {
         acr.setContainerRequest(request);
     }
-    
+
     @Override
     public ContainerResponseWriter getContainerResponseWriter() {
         return acr.getContainerResponseWriter();
     }
-    
+
     @Override
     public void setContainerResponseWriter(ContainerResponseWriter responseWriter) {
         acr.setContainerResponseWriter(responseWriter);
     }
-    
+
     @Override
     public MessageBodyWorkers getMessageBodyWorkers() {
         return acr.getMessageBodyWorkers();
     }
 
     @Override
+    public void mapMappableContainerException(MappableContainerException e) {
+        acr.mapMappableContainerException(e);
+    }
+
+    @Override
+    public void mapWebApplicationException(WebApplicationException e) {
+        acr.mapWebApplicationException(e);
+    }
+
+    @Override
+    public boolean mapException(Throwable e) {
+        return acr.mapException(e);
+    }
+
+    // HttpResponseContext
+
+    @Override
     public Response getResponse() {
         return acr.getResponse();
     }
-    
+
     @Override
     public void setResponse(Response response) {
         acr.setResponse(response);
     }
-    
+
     @Override
     public boolean isResponseSet() {
         return acr.isResponseSet();
     }
-    
+
+    @Override
+    public Throwable getMappedThrowable() {
+        return acr.getMappedThrowable();
+    }
+
     @Override
     public int getStatus() {
         return acr.getStatus();
     }
-    
+
     @Override
     public void setStatus(int status) {
         acr.setStatus(status);
     }
-    
+
     @Override
     public Object getEntity() {
         return acr.getEntity();
     }
-    
+
     @Override
     public Type getEntityType() {
         return acr.getEntityType();
     }
-    
+
+    @Override
+    public Object getOriginalEntity() {
+        return acr.getOriginalEntity();
+    }
+
     @Override
     public void setEntity(Object entity) {
         acr.setEntity(entity);
     }
-    
+
+    @Override
+    public void setEntity(Object entity, Type entityType) {
+        acr.setEntity(entity, entityType);
+    }
+
     @Override
     public Annotation[] getAnnotations() {
         return acr.getAnnotations();
@@ -151,17 +187,22 @@ public class AdaptingContainerResponse extends ContainerResponse {
     public void setAnnotations(Annotation[] annotations) {
         acr.setAnnotations(annotations);
     }
-    
+
     @Override
     public MultivaluedMap<String, Object> getHttpHeaders() {
         return acr.getHttpHeaders();
     }
-    
+
+    @Override
+    public MediaType getMediaType() {
+        return acr.getMediaType();
+    }
+
     @Override
     public OutputStream getOutputStream() throws IOException {
         return acr.getOutputStream();
     }
-    
+
     @Override
     public boolean isCommitted() {
         return acr.isCommitted();
