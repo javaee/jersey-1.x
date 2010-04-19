@@ -45,9 +45,9 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>com.sun.jersey.osgi.httpservice.simple</Export-Package>
+                        <Export-Package>com.sun.jersey.samples.osgihttpservice</Export-Package>
                         <Import-Package>*</Import-Package>
-                        <Bundle-Activator>com.sun.jersey.osgi.httpservice.simple.Activator</Bundle-Activator>
+                        <Bundle-Activator>com.sun.jersey.samples.osgihttpservice.Activator</Bundle-Activator>
                         <Implementation-Title>jersey-osgi-http-service-bundle</Implementation-Title>
                         <Implementation-Version>${project.version}</Implementation-Version>
                     </instructions>

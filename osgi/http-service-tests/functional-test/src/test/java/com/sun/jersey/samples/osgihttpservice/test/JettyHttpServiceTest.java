@@ -95,17 +95,13 @@ public class JettyHttpServiceTest {
 
         bundleContext.installBundle("mvn:com.sun.jersey.samples.osgi-http-service/bundle/1.2-SNAPSHOT").start();
 
-        semaphore.acquire();
+        semaphore.acquire();  // wait till the servlet gets really registered
 
         final WebResource r = resource();
 
         String result = r.path("/status").get(String.class);
         System.out.println("JERSEY RESULT = " + result);
         assertEquals("active", result);
-
-        String result2 = r.path("../non-jersey-http-service/status").get(String.class);
-        System.out.println("NON-JERSEY RESULT = " + result2);
-        assertEquals("also active", result2);
     }
 
     public static int getEnvVariable(final String varName, int defaultValue) {

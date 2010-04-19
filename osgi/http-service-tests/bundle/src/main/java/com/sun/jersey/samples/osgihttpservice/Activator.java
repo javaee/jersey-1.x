@@ -75,7 +75,6 @@ public class Activator implements BundleActivator {
         logger.info("JERSEY BUNDLE: HTTP SERVICE = " + httpService.toString());
 
         httpService.registerServlet("/jersey-http-service", new ServletContainer(), getJerseyServletParams(), null);
-        httpService.registerServlet("/non-jersey-http-service", new SimpleNonJerseyServlet(), null, null);
 
         sendAdminEvent();
         logger.info("JERSEY BUNDLE: SERVLETS REGISTERED");
@@ -99,7 +98,6 @@ public class Activator implements BundleActivator {
         if (this.httpService != null) {
             logger.info("JERSEY BUNDLE: UNREGISTERING SERVLETS");
             httpService.unregister("/jersey-http-service");
-            httpService.unregister("/non-jersey-http-service");
             logger.info("JERSEY BUNDLE: SERVLETS UNREGISTERED");
         }
     }
@@ -109,5 +107,4 @@ public class Activator implements BundleActivator {
         jerseyServletParams.put("javax.ws.rs.Application", JerseyApplication.class.getName());
         return jerseyServletParams;
     }
-
 }
