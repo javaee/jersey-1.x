@@ -3,12 +3,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.sun.jersey.test.osgi.http-service-tests</groupId>
-    <artifactId>http-service-test</artifactId>
+    <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
+    <artifactId>functional-test</artifactId>
     <version>1.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Jersey OSGified - Jersey Based HttpService Test</name>
+    <name>OSGi HttpService - Jersey Sample Test</name>
 
     <!-- we can use full maven properties incl. inheritance ! -->
     <properties>
@@ -58,8 +58,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.test.osgi.http-service-tests</groupId>
-            <artifactId>http-service-test-bundle</artifactId>
+            <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
+            <artifactId>bundle</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
@@ -111,6 +111,3 @@
     </repositories>
 
 </project>
-
-
-

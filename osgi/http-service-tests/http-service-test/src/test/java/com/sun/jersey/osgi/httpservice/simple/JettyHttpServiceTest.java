@@ -93,7 +93,7 @@ public class JettyHttpServiceTest {
     @Test
     public void testServlets() throws Exception {
 
-        bundleContext.installBundle("mvn:com.sun.jersey.test.osgi.http-service-tests/http-service-test-bundle/1.2-SNAPSHOT").start();
+        bundleContext.installBundle("mvn:com.sun.jersey.samples.osgi-http-service/bundle/1.2-SNAPSHOT").start();
 
         semaphore.acquire();
 

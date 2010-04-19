@@ -2,17 +2,39 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.sun.jersey.test.osgi.http-service-tests</groupId>
-    <artifactId>jersey-osgi-project-http-service-tests</artifactId>
+
+    <parent>
+        <groupId>com.sun.jersey.samples</groupId>
+        <artifactId>jersey-samples</artifactId>
+        <version>1.2-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>osgi-http-service</artifactId>
+    <name>OSGi HttpService - Jersey Sample</name>
+
     <version>1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>jersey-project : osgified : HttpService test</name>
 
     <modules>
         <module>http-service-test-bundle</module>
-        <!-- needs to be kept at the bottom of the list: -->
         <module>http-service-test</module>
     </modules>
    
-</project>
+    <repositories>
+        <repository>
+            <id>maven-repository.dev.java.net</id>
+            <name>Java.net Maven 1 Repository (legacy)</name>
+            <url>http://download.java.net/maven/1</url>
+            <layout>legacy</layout>
+        </repository>
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/2</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
+ </project>

@@ -3,11 +3,13 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.sun.jersey.test.osgi.http-service-tests</groupId>
-    <artifactId>http-service-test-bundle</artifactId>
+    <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
+    <artifactId>bundle</artifactId>
     <version>1.2-SNAPSHOT</version>
+
+    <name>OSGi HttpService - Jersey Sample Bundle</name>
+
     <packaging>bundle</packaging>
-    <name>jersey http service - osgi bundle</name>
 
     <dependencies>
         <dependency>
@@ -46,7 +48,7 @@
                         <Export-Package>com.sun.jersey.osgi.httpservice.simple</Export-Package>
                         <Import-Package>*</Import-Package>
                         <Bundle-Activator>com.sun.jersey.osgi.httpservice.simple.Activator</Bundle-Activator>
-                        <Implementation-Title>jersey-http-service-test</Implementation-Title>
+                        <Implementation-Title>jersey-osgi-http-service-bundle</Implementation-Title>
                         <Implementation-Version>${project.version}</Implementation-Version>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
