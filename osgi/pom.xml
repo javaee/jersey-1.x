@@ -81,7 +81,6 @@
 
      <modules>
         <module>functional-tests</module>
-        <module>http-service-tests</module>
         <module>runtime-delegate-tests</module>
     </modules>
    
