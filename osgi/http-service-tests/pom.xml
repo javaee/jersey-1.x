@@ -18,8 +18,8 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>http-service-test-bundle</module>
-        <module>http-service-test</module>
+        <module>bundle</module>
+        <module>functional-test</module>
     </modules>
    
     <repositories>
