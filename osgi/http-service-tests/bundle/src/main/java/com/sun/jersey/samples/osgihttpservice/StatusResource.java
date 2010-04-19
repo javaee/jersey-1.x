@@ -1,5 +1,5 @@
 
-package com.sun.jersey.osgi.httpservice.simple;
+package com.sun.jersey.samples.osgihttpservice;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

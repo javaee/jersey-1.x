@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package com.sun.jersey.osgi.httpservice.simple;
+package com.sun.jersey.samples.osgihttpservice;
 
 import java.io.IOException;
 import java.io.PrintWriter;

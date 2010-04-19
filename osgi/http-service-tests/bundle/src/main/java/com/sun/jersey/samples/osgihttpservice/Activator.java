@@ -1,4 +1,4 @@
-package com.sun.jersey.osgi.httpservice.simple;
+package com.sun.jersey.samples.osgihttpservice;
 
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.util.Dictionary;

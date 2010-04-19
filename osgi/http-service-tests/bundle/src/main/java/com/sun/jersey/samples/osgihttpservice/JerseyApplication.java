@@ -1,4 +1,4 @@
-package com.sun.jersey.osgi.httpservice.simple;
+package com.sun.jersey.samples.osgihttpservice;
 
 import java.util.HashSet;
 import java.util.Set;

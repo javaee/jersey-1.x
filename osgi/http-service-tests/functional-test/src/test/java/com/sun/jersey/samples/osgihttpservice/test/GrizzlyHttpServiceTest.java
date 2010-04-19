@@ -1,4 +1,4 @@
-package com.sun.jersey.osgi.httpservice.simple;
+package com.sun.jersey.samples.osgihttpservice.test;
 
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
