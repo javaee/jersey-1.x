@@ -152,6 +152,7 @@
                     <instructions>
                         <Export-Package>com.sun.jersey.*;-split-package:=merge-first</Export-Package>
                         <Import-Package>javax.mail.*;resolution:=optional, *</Import-Package>
+                        <DynamicImport-Package>*</DynamicImport-Package>
                         <Private-Package>org.apache.servicemix.specs.locator;-split-package:=merge-first</Private-Package>
                         <Bundle-Activator>org.apache.servicemix.specs.locator.Activator</Bundle-Activator>
                         <Implementation-Title>jersey-core osgi</Implementation-Title>
