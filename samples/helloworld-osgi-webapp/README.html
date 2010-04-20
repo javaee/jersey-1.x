@@ -42,5 +42,71 @@
       <h2>Running the Example</h2>
       <p>To run the example, you would need to build the WAR file 
       and install it to an OSGi runtime (e.g. Apache Felix) together with other OSGi modules.
-      Look at the attached <tt>functional-test</tt> module for details on the runtime configuration</p> 
- </body></html>
+      Look at the attached <tt>functional-test</tt> module for details on the programatical runtime configuration.</p>
+
+      <p>After <a href="ftp://www.ibiblio.org/pub/mirrors/apache/felix/org.apache.felix.main.distribution-2.0.4.zip">downloading</a> 
+      and installing <a href="http://felix.apache.org/site/index.html">Felix</a>, you can also deploy the WAR manually as shown bellow: 
+<pre>      
+%java -jar bin/felix.jar
+
+Welcome to Felix
+================
+
+-> ps
+START LEVEL 1
+   ID   State         Level  Name
+[   0] [Active     ] [    0] System Bundle (2.0.4)
+[   1] [Active     ] [    1] Apache Felix Bundle Repository (1.4.3)
+[   2] [Active     ] [    1] Apache Felix Shell Service (1.4.2)
+[   3] [Active     ] [    1] Apache Felix Shell TUI (1.4.1)
+-> install ftp://www.ibiblio.org/pub/mirrors/apache/felix/org.apache.felix.configadmin-1.2.4.jar
+Bundle ID: 4
+-> install ftp://www.ibiblio.org/pub/mirrors/apache/felix/org.apache.felix.eventadmin-1.2.2.jar
+Bundle ID: 5
+-> install http://repo2.maven.org/maven2/org/ops4j/pax/web/pax-web-jetty-bundle/0.7.1/pax-web-jetty-bundle-0.7.1.jar
+Bundle ID: 6
+-> install http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar
+Bundle ID: 7
+-> install http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.2-SNAPSHOT/jersey-core-1.2-SNAPSHOT.jar
+Bundle ID: 8
+-> install http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.2-SNAPSHOT/jersey-server-1.2-SNAPSHOT.jar
+Bundle ID: 9
+-> install http://repo2.maven.org/maven2/org/ops4j/pax/web/pax-web-extender-war/0.7.1/pax-web-extender-war-0.7.1.jar
+Bundle ID: 10
+-> ps
+START LEVEL 1
+   ID   State         Level  Name
+[   0] [Active     ] [    0] System Bundle (2.0.4)
+[   1] [Active     ] [    1] Apache Felix Bundle Repository (1.4.3)
+[   2] [Active     ] [    1] Apache Felix Shell Service (1.4.2)
+[   3] [Active     ] [    1] Apache Felix Shell TUI (1.4.1)
+[   4] [Installed  ] [    1] Apache Felix Configuration Admin Service (1.2.4)
+[   5] [Installed  ] [    1] Apache Felix EventAdmin (1.2.2)
+[   6] [Installed  ] [    1] OPS4J Pax Web - Jetty Bundle (0.7.1)
+[   7] [Installed  ] [    1] jsr311-api (1.1.1)
+[   8] [Installed  ] [    1] jersey-core (1.2.0.SNAPSHOT)
+[   9] [Installed  ] [    1] jersey-server (1.2.0.SNAPSHOT)
+[  10] [Installed  ] [    1] OPS4J Pax Web - Extender - WAR (0.7.1)
+-> start 4 5 6 7 8 9 10
+DEBUG: EventAdmin: org.apache.felix.eventadmin.CacheSize=30
+DEBUG: EventAdmin: org.apache.felix.eventadmin.ThreadPoolSize=20
+DEBUG: EventAdmin: org.apache.felix.eventadmin.Timeout=5000
+DEBUG: EventAdmin: org.apache.felix.eventadmin.RequireTopic=true
+DEBUG: EventAdmin: org.apache.felix.eventadmin.CacheSize=30
+DEBUG: EventAdmin: org.apache.felix.eventadmin.ThreadPoolSize=20
+DEBUG: EventAdmin: org.apache.felix.eventadmin.Timeout=5000
+DEBUG: EventAdmin: org.apache.felix.eventadmin.RequireTopic=true
+-> install file:war-bundle-1.2-SNAPSHOT.war
+Bundle ID: 11
+-> start 11
+Apr 20, 2010 12:15:37 PM com.sun.jersey.server.impl.application.WebApplicationImpl initiate
+INFO: Initiating Jersey application, version 'Jersey: 1.2-SNAPSHOT 04/16/2010 05:49 PM'
+</pre>
+
+Now both Jersey resources should become available at:
+<ul>
+<li><a href="http://localhost:8080/helloworld/webresources/helloworld">http://localhost:8080/helloworld/webresources/helloworld</a></li>
+<li><a href="http://localhost:8080/helloworld/webresources/another">http://localhost:8080/helloworld/webresources/another</a></li>
+</ul>
+</p>
+</body></html>
