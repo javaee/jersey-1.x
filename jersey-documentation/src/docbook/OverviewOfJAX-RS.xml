@@ -298,8 +298,18 @@ public void postClichedMessage(String message) {
     implements <ulink url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Application.html">Application</ulink>
     may be declared instead of a servlet class in
     <literal>&lt;servlet-class&gt;</literal> element of a
-    <literal>web.xml</literal>, but as of writing this is not currently
-    supported for Jersey. Instead it is necessary to declare the Jersey
+    <literal>web.xml</literal>. This is supported for a Web container implementing Servlet 3.0 as follows:</para>
+    <para><example>
+<title>Deployment of your application using <literal>web.xml</literal> with Servlet 3.0</title>
+<programlisting  linenumbering="numbered">&lt;web-app&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;gt;MyApplication&lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+    ....</programlisting></example></para>
+
+    <para>
+    If using Servlet 2.x then instead it is necessary to declare the Jersey
     specific servlet and the <ulink url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Application.html">Application</ulink>
     class as follows:</para>
 
