@@ -1,0 +1,230 @@
+/*
+ *
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
+ * or jersey/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at jersey/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
+
+package com.sun.jersey.samples.exceptions;
+
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.WebAppDescriptor;
+import org.junit.Test;
+
+import javax.ws.rs.WebApplicationException;
+
+import static org.junit.Assert.assertTrue;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: pavel
+ * Date: Apr 23, 2010
+ * Time: 9:59:55 AM
+ * To change this template use File | Settings | File Templates.
+ */
+public class ExceptionsTest extends JerseyTest {
+    
+    public ExceptionsTest() {
+        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.exceptions").contextPath("exceptions").build());
+    }
+
+    @Test
+    public void Test0() {
+        WebResource webResource = resource();
+        String responseMsg = webResource.path("myresource").get(String.class);
+        System.out.println(responseMsg);
+    }
+
+    @Test
+    public void Test1a() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/runtime").queryParam("ex", "java.lang.SecurityException").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            assertTrue(exception.getResponse().getStatus() == 500);
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test1b() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/runtime").queryParam("ex", "java.lang.IllegalArgumentException").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            assertTrue(exception.getResponse().getStatus() == 500);
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+
+    @Test
+    public void Test2() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/checked/ioexception").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            assertTrue(exception.getResponse().getStatus() == 500);
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test3() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/checked/myexception").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            assertTrue(exception.getResponse().getStatus() == 500);
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test4() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/checked/mymappedexception").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test5() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/checked/mymappedruntimeexception").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test6() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/checked/mymappedthrowingexception").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test7a() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/webapplicationexception/404").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            assertTrue(exception.getResponse().getStatus() == 404);
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test7b() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/webapplicationexception/505").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            assertTrue(exception.getResponse().getStatus() == 505);
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test7c() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/webapplicationexception/404").queryParam("r", "404").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            assertTrue(exception.getResponse().getStatus() == 404);
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+    @Test
+    public void Test7d() {
+        WebResource webResource = resource();
+        Boolean caught = false;
+        try {
+            webResource.path("myresource/webapplicationexception/505").queryParam("r", "505").get(String.class);
+        } catch (UniformInterfaceException exception) {
+            assertTrue(exception.getResponse().getStatus() == 505);
+            caught = true;
+        }
+
+        assertTrue(caught);
+    }
+
+
+    @Test
+    public void Test7e() {
+        WebResource webResource = resource();
+        String responseMsg = webResource.path("myresource/webapplicationexception/200").get(String.class);
+        System.out.println(responseMsg);
+    }
+
+}
