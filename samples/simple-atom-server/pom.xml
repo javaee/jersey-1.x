@@ -39,7 +39,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.3-SNAPSHOT</version>
     </parent>
     <artifactId>simple-atom-server</artifactId>
     <name>Simple Atom Server - Jersey sample</name>

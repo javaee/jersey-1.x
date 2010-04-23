@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
         <artifactId>bill-burke-book-examples</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.3-SNAPSHOT</version>
     </parent>
     <artifactId>ex11_2</artifactId>
     <packaging>war</packaging>

@@ -39,7 +39,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.archetypes</groupId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1.3-SNAPSHOT</version>
     <artifactId>jersey-archetypes</artifactId>
     <packaging>pom</packaging>
     <name>All Jersey Archetypes</name>

@@ -5,7 +5,7 @@
 
 	<groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
 	<artifactId>functional-test</artifactId>
-	<version>1.2-SNAPSHOT</version>
+	<version>1.3-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>Helloworld OSGi WebApp - Jersey Sample Test</name>
