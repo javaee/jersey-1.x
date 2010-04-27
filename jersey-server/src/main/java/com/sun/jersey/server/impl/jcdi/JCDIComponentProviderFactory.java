@@ -48,6 +48,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import java.lang.annotation.Annotation;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -243,9 +244,39 @@ public class JCDIComponentProviderFactory implements
         try {
             return bm.resolve(bs);
         } catch(AmbiguousResolutionException ex) {
-            LOGGER.log(Level.SEVERE, null, ex);
+            // Check if there is a shared base class of c
+            // If so reduce the set of beans whose class equals c and resolve
+            if (isSharedBaseClass(c, bs)) {
+                try {
+                    return bm.resolve(getBaseClassSubSet(c, bs));
+                } catch (AmbiguousResolutionException ex2) {
+                    // Attempt to resolve set by finding common
+                    LOGGER.log(Level.SEVERE, "Cannnot resolve class " + c.getName(), ex);
+                    return null;
+                }
+            }
+            // Attempt to resolve set by finding common
+            LOGGER.log(Level.SEVERE, "Cannnot resolve class " + c.getName(), ex);
             return null;
         }
+    }
+
+    private boolean isSharedBaseClass(Class<?> c, Set<Bean<?>> bs) {
+        for (Bean<?> b : bs) {
+            if (!c.isAssignableFrom(b.getBeanClass())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Set<Bean<?>> getBaseClassSubSet(Class<?> c, Set<Bean<?>> bs) {
+        for (Bean<?> b : bs) {
+            if (c == b.getBeanClass()) {
+                return Collections.<Bean<?>>singleton(b);
+            }
+        }
+        return bs;
     }
 
     private <T> T getRef(Class<T> c) {

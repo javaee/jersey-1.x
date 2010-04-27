@@ -548,7 +548,7 @@ public class ContainerResponse implements HttpResponseContext {
     }
 
     public void setEntity(Object entity) {
-        setEntity(entity, entity.getClass());
+        setEntity(entity, (entity == null) ? null : entity.getClass());
     }
     
     public void setEntity(Object entity, Type entityType) {

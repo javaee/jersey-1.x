@@ -1,4 +1,10 @@
-release 1.2 (03-2010)
+release 1.2 (04-2010)
+- Fixed issue 516
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=516
+  Changed resolving algorithm for finding a CDI Bean from a Class such
+  that inheritence hierarchies are supported.
+  BeanManager.resolve does not resolve a set of Bean to one Bean if all
+  members extend from a common concrete case class.
 - Fixed issue 507
   https://jersey.dev.java.net/issues/show_bug.cgi?id=507
   Support DELETE with request entities for the Apache HTTP client.

@@ -116,6 +116,20 @@ public class JCDIBeanWebAppTest extends JerseyTest {
 
     @Test
     public void testDependentExceptionMapper() throws Exception {
+        WebResource webResource = resource().path("/inherited");
+
+        String responseMsg = webResource.path("a").get(String.class);
+        assertEquals("inherited/a", responseMsg);
+
+        responseMsg = webResource.path("b").get(String.class);
+        assertEquals("inherited/b", responseMsg);
+
+        responseMsg = webResource.path("a/c").get(String.class);
+        assertEquals("inherited/a/c", responseMsg);
+    }
+
+    @Test
+    public void testInherited() throws Exception {
         WebResource webResource = resource().path("/jcdibean/dependent/singleton/exception");
 
         ClientResponse cr = webResource.get(ClientResponse.class);
