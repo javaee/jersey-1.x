@@ -429,6 +429,8 @@ public abstract class JerseyTest {
             try {
                 return Integer.parseInt(port);
             } catch (NumberFormatException e) {
+                throw new TestContainerException("jersey.test.port with a " +
+                        "value of \"" + port +"\" is not a valid integer.", e);
             }
         }
 
@@ -437,6 +439,8 @@ public abstract class JerseyTest {
             try {
                 return Integer.parseInt(port);
             } catch (NumberFormatException e) {
+                throw new TestContainerException("JERSEY_HTTP_PORT with a " +
+                        "value of \"" + port +"\" is not a valid integer.", e);
             }
         }
         return defaultPort;
