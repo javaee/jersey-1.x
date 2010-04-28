@@ -111,9 +111,9 @@ public abstract class AbstractHttpServiceTest {
                 mavenBundle("org.apache.felix", "org.apache.felix.eventadmin", "1.2.2"),
                 mavenBundle("org.osgi", "org.osgi.compendium", "4.1.0"), 
                 mavenBundle("javax.ws.rs", "jsr311-api", "1.1.1"),
-                mavenBundle("com.sun.jersey", "jersey-core", "1.2-SNAPSHOT"),
-                mavenBundle("com.sun.jersey", "jersey-server", "1.2-SNAPSHOT"),
-                mavenBundle("com.sun.jersey", "jersey-client", "1.2-SNAPSHOT"),
+                mavenBundle("com.sun.jersey", "jersey-core", "1.3-SNAPSHOT"),
+                mavenBundle("com.sun.jersey", "jersey-server", "1.3-SNAPSHOT"),
+                mavenBundle("com.sun.jersey", "jersey-client", "1.3-SNAPSHOT"),
                 httpServiceProviderBundle(),
                 felix());
 
@@ -126,7 +126,7 @@ public abstract class AbstractHttpServiceTest {
 
     public void defaultHttpServiceTestMethod() throws Exception {
 
-        bundleContext.installBundle("mvn:com.sun.jersey.samples.osgi-http-service/bundle/1.2-SNAPSHOT").start();
+        bundleContext.installBundle("mvn:com.sun.jersey.samples.osgi-http-service/bundle/1.3-SNAPSHOT").start();
 
         semaphore.acquire();  // wait till the servlet gets really registered
 
