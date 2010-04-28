@@ -137,8 +137,8 @@ public class ClientOnlyTest {
                 mavenBundle("org.ops4j.pax.url","pax-url-war","1.1.2"),
                 
                 mavenBundle("javax.ws.rs","jsr311-api","1.1.1"),
-                mavenBundle("com.sun.jersey","jersey-core","1.3-SNAPSHOT"),
-        	mavenBundle("com.sun.jersey","jersey-client", "1.3-SNAPSHOT"),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
+        	mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
 
                 mavenBundle("com.sun.grizzly", "grizzly-servlet-webserver", "1.9.18-i"),
 
