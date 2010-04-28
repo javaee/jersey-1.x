@@ -129,7 +129,7 @@ public abstract class AbstractHttpServiceTest {
 
     public void defaultHttpServiceTestMethod() throws Exception {
 
-        bundleContext.installBundle(System.getProperty("jersey.bundle.location")).start();
+        bundleContext.installBundle(System.getProperty(BundleLocationProperty)).start();
 
         semaphore.acquire();  // wait till the servlet gets really registered
 
