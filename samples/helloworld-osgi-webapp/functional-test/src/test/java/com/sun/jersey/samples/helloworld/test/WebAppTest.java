@@ -1,3 +1,40 @@
+/*
+ *
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms of either the GNU
+ * General Public License Version 2 only ("GPL") or the Common Development
+ * and Distribution License("CDDL") (collectively, the "License").  You
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
+ * or jersey/legal/LICENSE.txt.  See the License for the specific
+ * language governing permissions and limitations under the License.
+ *
+ * When distributing the software, include this License Header Notice in each
+ * file and include the License file at jersey/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
+ *
+ * Contributor(s):
+ *
+ * If you wish your version of this file to be governed by only the CDDL or
+ * only the GPL Version 2, indicate your decision by adding "[Contributor]
+ * elects to include this software in this distribution under the [CDDL or GPL
+ * Version 2] license."  If you don't indicate a single choice of license, a
+ * recipient has the option to distribute your version of this file under
+ * either the CDDL, the GPL Version 2 or to extend the choice of license to
+ * its licensees as provided above.  However, if you add GPL Version 2 code
+ * and therefore, elected the GPL Version 2 license, then the option applies
+ * only if the new code is made subject to such option by the copyright
+ * holder.
+ */
+
 package com.sun.jersey.samples.helloworld.test;
 
 import com.sun.jersey.api.client.Client;
@@ -55,6 +92,7 @@ public class WebAppTest {
     private static final int rmiPort = getEnvVariable("JERSEY_RMI_PORT", 1099);
     private static final String CONTEXT = "/helloworld";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
+    private static final String BundleLocationProperty = "jersey.bundle.location";
 
     final Semaphore semaphore = new Semaphore(0);
 
@@ -69,7 +107,7 @@ public class WebAppTest {
     @Test
     public void testWebResources() throws Exception {
 
-        final Bundle httpServiceBundle = bundleContext.installBundle("mvn:com.sun.jersey.samples.helloworld-osgi-webapp/war-bundle/1.3-SNAPSHOT/war");
+        final Bundle httpServiceBundle = bundleContext.installBundle(System.getProperty(BundleLocationProperty));
         httpServiceBundle.start();
 
         semaphore.acquire();
@@ -89,10 +127,12 @@ public class WebAppTest {
     @Configuration
     public static Option[] configuration() {
 
+        String bundleLocation = mavenBundle().groupId("com.sun.jersey.samples.helloworld-osgi-webapp").artifactId("war-bundle").type("war").versionAsInProject().getURL().toString();
+
         Option[] options = options(
                 //                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
-                systemProperty("org.ops4j.pax.exam.rbc.rmi.port").value(String.valueOf(rmiPort)),
+                systemProperty(BundleLocationProperty).value(bundleLocation),
                 // define maven repository
                 repositories(
                 "http://repo1.maven.org/maven2",
@@ -110,10 +150,10 @@ public class WebAppTest {
                 mavenBundle("org.ops4j.pax.web", "pax-web-extender-war", "0.7.1"),
                 mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
                 // load Jersey bundles
-                mavenBundle("javax.ws.rs", "jsr311-api", "1.1.1"),
-                mavenBundle("com.sun.jersey", "jersey-core", "1.3-SNAPSHOT"),
-                mavenBundle("com.sun.jersey", "jersey-server", "1.3-SNAPSHOT"),
-                mavenBundle("com.sun.jersey", "jersey-client", "1.3-SNAPSHOT"),
+                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
                 // start felix framework
                 felix());
 
