@@ -92,13 +92,16 @@ public abstract class AbstractHttpServiceTest {
     private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
     private static final String CONTEXT = "/jersey-http-service";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
+    private static final String BundleLocationProperty = "jersey.bundle.location";
 
     @Inject BundleContext bundleContext;
 
     @Configuration
     public Option[] configuration() {
+        String bundleLocation = mavenBundle().groupId("com.sun.jersey.samples.osgi-http-service").artifactId("bundle").versionAsInProject().getURL().toString();
         Option[] options = options(
-                systemProperty("org.osgi.service.http.port").value(String.valueOf(port)), 
+                systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
+                systemProperty(BundleLocationProperty).value(bundleLocation),
                 repositories("http://repo1.maven.org/maven2",
                                 "http://repository.apache.org/content/groups/snapshots-group",
                                 "http://repository.ops4j.org/maven2",
@@ -110,10 +113,10 @@ public abstract class AbstractHttpServiceTest {
                 mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4"),
                 mavenBundle("org.apache.felix", "org.apache.felix.eventadmin", "1.2.2"),
                 mavenBundle("org.osgi", "org.osgi.compendium", "4.1.0"), 
-                mavenBundle("javax.ws.rs", "jsr311-api", "1.1.1"),
-                mavenBundle("com.sun.jersey", "jersey-core", "1.3-SNAPSHOT"),
-                mavenBundle("com.sun.jersey", "jersey-server", "1.3-SNAPSHOT"),
-                mavenBundle("com.sun.jersey", "jersey-client", "1.3-SNAPSHOT"),
+                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
                 httpServiceProviderBundle(),
                 felix());
 
@@ -126,7 +129,7 @@ public abstract class AbstractHttpServiceTest {
 
     public void defaultHttpServiceTestMethod() throws Exception {
 
-        bundleContext.installBundle("mvn:com.sun.jersey.samples.osgi-http-service/bundle/1.3-SNAPSHOT").start();
+        bundleContext.installBundle(System.getProperty("jersey.bundle.location")).start();
 
         semaphore.acquire();  // wait till the servlet gets really registered
 
