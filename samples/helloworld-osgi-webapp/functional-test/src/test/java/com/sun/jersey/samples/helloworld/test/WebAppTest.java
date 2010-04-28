@@ -69,7 +69,7 @@ public class WebAppTest {
     @Test
     public void testWebResources() throws Exception {
 
-        final Bundle httpServiceBundle = bundleContext.installBundle("mvn:com.sun.jersey.samples.helloworld-osgi-webapp/war-bundle/1.2-SNAPSHOT/war");
+        final Bundle httpServiceBundle = bundleContext.installBundle("mvn:com.sun.jersey.samples.helloworld-osgi-webapp/war-bundle/1.3-SNAPSHOT/war");
         httpServiceBundle.start();
 
         semaphore.acquire();
@@ -111,9 +111,9 @@ public class WebAppTest {
                 mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
                 // load Jersey bundles
                 mavenBundle("javax.ws.rs", "jsr311-api", "1.1.1"),
-                mavenBundle("com.sun.jersey", "jersey-core", "1.2-SNAPSHOT"),
-                mavenBundle("com.sun.jersey", "jersey-server", "1.2-SNAPSHOT"),
-                mavenBundle("com.sun.jersey", "jersey-client", "1.2-SNAPSHOT"),
+                mavenBundle("com.sun.jersey", "jersey-core", "1.3-SNAPSHOT"),
+                mavenBundle("com.sun.jersey", "jersey-server", "1.3-SNAPSHOT"),
+                mavenBundle("com.sun.jersey", "jersey-client", "1.3-SNAPSHOT"),
                 // start felix framework
                 felix());
 
