@@ -42,6 +42,7 @@ import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 
 import com.sun.grizzly.http.embed.GrizzlyWebServer;
 import com.sun.grizzly.http.servlet.ServletAdapter;
+import com.sun.jersey.spring.tests.util.TestHelper;
 import java.net.URI;
 import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
@@ -60,27 +61,11 @@ public class AbstractTest {
     private GrizzlyWebServer ws ;
 
     /**
-     * Get the HTTP port for the Web application.
-     * @param defaultPort the default HTTP port to use.
-     * @return the HTTP port.
-     */
-    private static int getPort(int defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
-        if (null != port) {
-            try {
-                return Integer.parseInt(port);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return defaultPort;
-    }
-
-    /**
      * Get the base URI for the Web application.
      * @return the base URI.
      */
     private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/spring").port(getPort(9998)).build();
+        return UriBuilder.fromUri("http://localhost/spring").port(TestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9998)).build();
     }
 
     /**
