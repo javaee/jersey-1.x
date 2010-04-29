@@ -153,8 +153,8 @@
                         <Export-Package>com.sun.jersey.*;-split-package:=merge-first</Export-Package>
                         <Import-Package>javax.mail.*;resolution:=optional, *</Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Private-Package>org.apache.servicemix.specs.locator;-split-package:=merge-first</Private-Package>
-                        <Bundle-Activator>org.apache.servicemix.specs.locator.Activator</Bundle-Activator>
+                        <Private-Package>com.sun.jersey.core.osgi;-split-package:=merge-first</Private-Package>
+                        <Bundle-Activator>com.sun.jersey.core.osgi.Activator</Bundle-Activator>
                         <Implementation-Title>jersey-core osgi</Implementation-Title>
                         <Implementation-Version>${project.version}</Implementation-Version>
                     </instructions>

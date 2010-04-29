@@ -206,7 +206,7 @@
                             javax.mail.*;resolution:=optional,
                             javax.annotation.*;resolution:=optional,
                             javax.enterprise.*;resolution:=optional,
-                            org.apache.servicemix.specs.locator;resolution:=optional,
+                            com.sun.jersey.core.osgi;resolution:=optional,
                             *
                         </Import-Package>
                     </instructions>

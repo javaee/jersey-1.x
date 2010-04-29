@@ -14,7 +14,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.apache.servicemix.specs.locator;
+package com.sun.jersey.core.osgi;
 
 import com.sun.jersey.impl.SpiMessages;
 import com.sun.jersey.spi.service.ServiceConfigurationError;
