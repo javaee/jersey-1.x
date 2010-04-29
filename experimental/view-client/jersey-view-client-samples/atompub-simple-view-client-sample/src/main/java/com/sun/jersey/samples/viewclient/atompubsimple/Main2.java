@@ -106,16 +106,16 @@ public class Main2 {
 			}
 
 
-
 			EntryStateView esv = client.view(
 					BASE_URI.toASCIIString() + "entries/22",
 					EntryStateView.class);
 
 
 			esv.refresh();
+			System.out.println("Entry view refreshed");
 
 			CollectionStateView csv = client.view(
-					BASE_URI.toASCIIString() + "collections/22",
+					BASE_URI.toASCIIString() + "collections/entries",
 					CollectionStateView.class);
 
 			csv.iterateEntries(new EntryHandler() {
@@ -126,16 +126,16 @@ public class Main2 {
 					this.count++;
 					System.out.println("ENTRY:" + entry.getTitle());
 
-					EntryStateView esv = client.view(entry.getLink("self").
-							getHref().
-							toASCIIString(), EntryStateView.class);
-
-					System.out.println("got view");
-
-
-
-					esv.update(esv.getEntry());
-					System.out.println("sent update");
+//					EntryStateView esv = client.view(entry.getLink("self").
+//							getHref().
+//							toASCIIString(), EntryStateView.class);
+//
+//					System.out.println("got view");
+//
+//
+//
+//					esv.update(esv.getEntry());
+//					System.out.println("sent update");
 
 
 
