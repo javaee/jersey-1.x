@@ -51,6 +51,8 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -124,7 +126,14 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         if (i == null) {
             // If an @Inject is explicitly declared
             if (!isImplicitGuiceComponent(clazz)) {
-                return null;
+                // we get errors with JSPTemplateProcessor if we don't do this only
+                // for objects with a field/method injection using @Inject
+                if (isGuiceFieldOrMethodInjected(clazz)) {
+                    ComponentScope componentScope = getComponentScope(key, injector);
+                    return new GuiceManagedComponentProvider(injector, componentScope, clazz);
+                } else {
+                    return null;
+                }
             }
 
             try {
@@ -145,6 +154,14 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
         }
 
+        ComponentScope componentScope = getComponentScope(key, i);
+        LOGGER.info("Binding " + clazz.getName() +
+                " to GuiceManagedComponentProvider with the scope \"" +
+                componentScope + "\"");
+        return new GuiceManagedComponentProvider(i, componentScope, clazz);
+    }
+
+    private ComponentScope getComponentScope(Key<?> key, Injector i) {
         final Scope[] scope = new Scope[1];
         i.getBinding(key).acceptScopingVisitor(new BindingScopingVisitor<Void>() {
 
@@ -169,12 +186,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
             }
         });
         assert (scope[0] != null);
-
-        ComponentScope componentScope = getComponentScope(scope[0]);
-        LOGGER.info("Binding " + clazz.getName() +
-                " to GuiceManagedComponentProvider with the scope \"" +
-                componentScope + "\"");
-        return new GuiceManagedComponentProvider(i, componentScope, clazz);
+        return getComponentScope(scope[0]);
     }
 
     private Injector findInjector(Key<?> key) {
@@ -214,6 +226,30 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
         return false;
     }
+
+    /**
+     * Determine if a class uses field or method injection via Guice 
+     * using the {@link Inject} annotation
+     * 
+     * @param c the class.
+     * @return true if the class is an implicit Guice component.
+     */
+    public boolean isGuiceFieldOrMethodInjected(Class<?> c) {
+        for (Method m : c.getDeclaredMethods()) {
+            if (m.isAnnotationPresent(Inject.class))
+                return true;
+        }
+        for (Field f : c.getDeclaredFields()) {
+            if (f.isAnnotationPresent(Inject.class))
+                return true;
+        }
+        if (!c.equals(Object.class)) {
+            return isGuiceFieldOrMethodInjected(c.getSuperclass());
+        }
+        return false;
+    }
+
+
 
     /**
      * Maps a Guice scope to a Jersey scope.
@@ -261,6 +297,10 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         public Object getInstance() {
             return injector.getInstance(clazz);
         }
+        
+        protected Injector getInjector() {
+          return injector;
+        }
     }
 
     /**
@@ -287,6 +327,11 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
         public ComponentScope getScope() {
             return scope;
+        }
+        
+        public Object getInjectableInstance(Object o) {
+            getInjector().injectMembers(o);
+            return o;
         }
     }
 }

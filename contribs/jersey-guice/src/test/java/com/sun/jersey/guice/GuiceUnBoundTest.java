@@ -61,7 +61,8 @@ public class GuiceUnBoundTest extends AbstractGuiceGrizzlyTest {
             return new JerseyServletModule().
                     path("*").
                     initParam(ServletContainer.APPLICATION_CONFIG_CLASS, ClassNamesResourceConfig.class.getName()).
-                    initParam(ClassNamesResourceConfig.PROPERTY_CLASSNAMES, UnBoundPerRequestResource.class.getName()).
+                    initParam(ClassNamesResourceConfig.PROPERTY_CLASSNAMES, UnBoundPerRequestResource.class.getName() + 
+                    ";" + FieldInjectResource.class.getName()).
                     bindClass(GuiceManagedClass.class);
         }
     }
@@ -70,6 +71,34 @@ public class GuiceUnBoundTest extends AbstractGuiceGrizzlyTest {
         startServer(TestServletConfig.class);
 
         WebResource r = resource().path("/unbound/perrequest").queryParam("x", "x");
+        String s = r.get(String.class);
+        assertEquals(s, "GuiceManagedClass");
+    }
+
+    @Path("fieldinject")
+    public static class FieldInjectResource {
+
+        @Context UriInfo ui;
+        
+        @QueryParam("x") String x;
+
+        @Inject
+        GuiceManagedClass gmc;
+
+        @GET
+        @Produces("text/plain")
+        public String getIt() {
+            assertEquals("fieldinject", ui.getPath());
+            assertEquals("x", x);
+
+            return gmc.toString();
+        }
+    }
+
+    public void testFieldInjectResource() {
+        startServer(TestServletConfig.class);
+
+        WebResource r = resource().path("/fieldinject").queryParam("x", "x");
         String s = r.get(String.class);
         assertEquals(s, "GuiceManagedClass");
     }
