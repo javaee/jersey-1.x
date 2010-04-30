@@ -40,6 +40,7 @@ package com.sun.jersey.osgi.tests.grizzly;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.jersey.osgi.tests.util.Helper;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.io.IOException;
 import java.net.URI;
@@ -62,7 +63,7 @@ public abstract class AbstractGrizzlyWebContainerTester {
 
     private SelectorThread selectorThread;
 
-    private int port = getEnvVariable("JERSEY_HTTP_PORT", 9997);
+    private int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
     
     private String contextPath;
 
@@ -134,7 +135,7 @@ public abstract class AbstractGrizzlyWebContainerTester {
         }
         System.out.println("Started GrizzlyServer");
 
-        int timeToSleep = getEnvVariable("JERSEY_HTTP_SLEEP", 0);
+        int timeToSleep = Helper.getEnvVariable("JERSEY_HTTP_SLEEP", 0);
         if (timeToSleep > 0) {
             System.out.println("Sleeping for " + timeToSleep + " ms");
             try {
@@ -159,20 +160,5 @@ public abstract class AbstractGrizzlyWebContainerTester {
     @After
     public void tearDown() {
         stopServer();
-    }
-
-    private static int getEnvVariable(final String varName, int defaultValue) {
-        if (null == varName) {
-            return defaultValue;
-        }
-        String varValue = System.getenv(varName);
-        if (null != varValue) {
-            try {
-                return Integer.parseInt(varValue);
-            }catch (NumberFormatException e) {
-                // will return default value bellow
-            }
-        }
-        return defaultValue;
     }
 }

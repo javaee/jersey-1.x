@@ -44,14 +44,12 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.osgi.rdtestbundle.SimpleResource;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import java.io.ByteArrayOutputStream;
+import com.sun.jerseyosgird.util.Helper;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.ws.rs.core.UriBuilder;
 
 import java.net.URI;
-import java.net.URLConnection;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
@@ -74,7 +72,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(JUnit4TestRunner.class)
 public class ServerClientMixedClientFirstTest {
 
-    private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
+    private static final int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 8080);
     private static final String CONTEXT = "/jersey";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
 
@@ -188,38 +186,5 @@ public class ServerClientMixedClientFirstTest {
 
         return options;
     }
-
-    public static int getEnvVariable(final String varName, int defaultValue) {
-        if (null == varName) {
-            return defaultValue;
-        }
-        String varValue = System.getenv(varName);
-        if (null != varValue) {
-            try {
-                return Integer.parseInt(varValue);
-            }catch (NumberFormatException e) {
-                // will return default value bellow
-            }
-        }
-        return defaultValue;
-    }
-
-    
-    private String getResponseFromOpenedConnection(URLConnection connection) throws IOException {
-
-        final InputStream is = connection.getInputStream();
-        final byte[] buf = new byte[4096];
-        final ByteArrayOutputStream result = new ByteArrayOutputStream();
-
-        try {
-            for (int bytesRead = is.read(buf); bytesRead >= 0 ; bytesRead = is.read(buf)) {
-                result.write(buf, 0, bytesRead);
-            }
-            return result.toString();
-        } finally {
-            is.close();
-        }
-    }
-
 }
 

@@ -41,6 +41,7 @@ import com.sun.grizzly.http.embed.GrizzlyWebServer;
 import com.sun.grizzly.http.servlet.ServletAdapter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jerseyosgird.util.Helper;
 
 import javax.ws.rs.core.UriBuilder;
 
@@ -65,7 +66,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(JUnit4TestRunner.class)
 public class ClientOnlyTest {
 
-    private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
+    private static final int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 8080);
     private static final String CONTEXT = "/jersey";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
 
@@ -151,22 +152,6 @@ public class ClientOnlyTest {
         final Client c = Client.create();
         final WebResource rootResource = c.resource(baseUri);
         return rootResource;
-    }
-
-
-    public static int getEnvVariable(final String varName, int defaultValue) {
-        if (null == varName) {
-            return defaultValue;
-        }
-        String varValue = System.getenv(varName);
-        if (null != varValue) {
-            try {
-                return Integer.parseInt(varValue);
-            }catch (NumberFormatException e) {
-                // will return default value bellow
-            }
-        }
-        return defaultValue;
     }
 }
 

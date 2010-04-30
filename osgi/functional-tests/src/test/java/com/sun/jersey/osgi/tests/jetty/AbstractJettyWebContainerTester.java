@@ -40,6 +40,7 @@ package com.sun.jersey.osgi.tests.jetty;
 
 
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
+import com.sun.jersey.osgi.tests.util.Helper;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.net.URI;
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public abstract class AbstractJettyWebContainerTester {
 
     private Server server;
 
-    private int port = getEnvVariable("JERSEY_HTTP_PORT", 9997);
+    private int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
     
     private String contextPath;
 
@@ -146,7 +147,7 @@ public abstract class AbstractJettyWebContainerTester {
 
         System.out.println("Started Jetty");
 
-        int timeToSleep = getEnvVariable("JERSEY_HTTP_SLEEP", 0);
+        int timeToSleep = Helper.getEnvVariable("JERSEY_HTTP_SLEEP", 0);
         if (timeToSleep > 0) {
             System.out.println("Sleeping for " + timeToSleep + " ms");
             try {
@@ -175,20 +176,5 @@ public abstract class AbstractJettyWebContainerTester {
     @After
     public void tearDown() {
         stopServer();
-    }
-
-    private static int getEnvVariable(final String varName, int defaultValue) {
-        if (null == varName) {
-            return defaultValue;
-        }
-        String varValue = System.getenv(varName);
-        if (null != varValue) {
-            try {
-                return Integer.parseInt(varValue);
-            }catch (NumberFormatException e) {
-                // will return default value bellow
-            }
-        }
-        return defaultValue;
     }
 }
