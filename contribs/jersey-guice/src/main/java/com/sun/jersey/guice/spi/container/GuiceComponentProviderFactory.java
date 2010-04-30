@@ -50,6 +50,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -125,33 +126,40 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         // If there is no explicit binding
         if (i == null) {
             // If an @Inject is explicitly declared
-            if (!isImplicitGuiceComponent(clazz)) {
-                // we get errors with JSPTemplateProcessor if we don't do this only
-                // for objects with a field/method injection using @Inject
-                if (isGuiceFieldOrMethodInjected(clazz)) {
-                    ComponentScope componentScope = getComponentScope(key, injector);
-                    return new GuiceManagedComponentProvider(injector, componentScope, clazz);
+            if (isGuiceConstructorInjected(clazz)) {
+                try {
+                    // If a binding is possible
+                    if (injector.getBinding(key) != null) {
+                        LOGGER.info("Binding " + clazz.getName() + " to GuiceInstantiatedComponentProvider");
+                        return new GuiceInstantiatedComponentProvider(injector, clazz);
+                    }
+                } catch (ConfigurationException e) {
+                    // The class cannot be injected.
+                    // For example, the constructor might contain parameters that
+                    // cannot be injected
+                    LOGGER.log(Level.INFO, "Cannot bind " + clazz.getName(), e);
+                    // Guice should have picked this up. We fail-fast to prevent
+                    // Jersey from trying to handle injection.
+                    throw e;
+                }
+            } else if (isGuiceFieldOrMethodInjected(clazz)) {
+                // If there is a constructor with arguments then let Jersey
+                // instantiate and manage the scope, let Guice inject
+                if (hasConstructorWithArguments(clazz)) {
+                    LOGGER.info("Binding " + clazz.getName() + " to GuiceInjectedComponentProvider");
+                    return new GuiceInjectedComponentProvider(injector);
                 } else {
-                    return null;
+                    // TODO should Jersey manage or Guice manage, perhaps it
+                    // depends if the component is not in the Guice NO_SCOPE ?
+                    ComponentScope componentScope = getComponentScope(key, injector);
+                    LOGGER.info("Binding " + clazz.getName() +
+                            " to GuiceManagedComponentProvider with the scope \"" +
+                            componentScope + "\"");
+                    return new GuiceManagedComponentProvider(injector, componentScope, clazz);
                 }
+            } else {
+                return null;
             }
-
-            try {
-                // If a binding is possible
-                if (injector.getBinding(key) != null) {
-                    LOGGER.info("Binding " + clazz.getName() + " to GuiceInstantiatedComponentProvider");
-                    return new GuiceInstantiatedComponentProvider(injector, clazz);
-                }
-            } catch (ConfigurationException e) {
-                // The class cannot be injected. 
-                // For example, the constructor might contain parameters that
-                // cannot be injected
-                LOGGER.log(Level.INFO, "Cannot bind " + clazz.getName(), e);
-                // Guice should have picked this up. We fail-fast to prevent 
-                // Jersey from trying to handle injection.
-                throw e;
-            }
-
         }
 
         ComponentScope componentScope = getComponentScope(key, i);
@@ -214,11 +222,24 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
     /**
      * Determine if a class is an implicit Guice component that can be
      * instatiated by Guice and the life-cycle managed by Jersey.
+     *
+     * @param c the class.
+     * @return true if the class is an implicit Guice component.
+     * @deprecated see {@link #isGuiceConstructorInjected(java.lang.Class) }
+     */
+    @Deprecated
+    public boolean isImplicitGuiceComponent(Class<?> c) {
+        return isGuiceConstructorInjected(c);
+    }
+
+    /**
+     * Determine if a class is an implicit Guice component that can be
+     * instatiated by Guice and the life-cycle managed by Jersey.
      * 
      * @param c the class.
      * @return true if the class is an implicit Guice component.
      */
-    public boolean isImplicitGuiceComponent(Class<?> c) {
+    public boolean isGuiceConstructorInjected(Class<?> c) {
         for (Constructor<?> con : c.getConstructors()) {
             if (con.isAnnotationPresent(Inject.class))
                 return true;
@@ -249,7 +270,15 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         return false;
     }
 
+    private boolean hasConstructorWithArguments(Class<?> c) {
+        for (Constructor cons : c.getConstructors()) {
+            if (cons.getParameterTypes().length > 0) {
+                return true;
+            }
+        }
 
+        return false;
+    }
 
     /**
      * Maps a Guice scope to a Jersey scope.
@@ -261,6 +290,26 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         result.put(Scopes.SINGLETON, ComponentScope.Singleton);
         result.put(Scopes.NO_SCOPE, ComponentScope.PerRequest);
         return result;
+    }
+
+    private static class GuiceInjectedComponentProvider
+            implements IoCProxiedComponentProvider {
+
+        private final Injector injector;
+
+        public GuiceInjectedComponentProvider(Injector injector) {
+            this.injector = injector;
+        }
+
+        public Object getInstance() {
+            throw new IllegalStateException();
+        }
+
+        public Object proxy(Object o) {
+            injector.injectMembers(o);
+            return o;
+        }
+
     }
 
     /**
@@ -290,16 +339,13 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         }
 
         // IoCInstantiatedComponentProvider
+        
         public Object getInjectableInstance(Object o) {
             return o;
         }
 
         public Object getInstance() {
             return injector.getInstance(clazz);
-        }
-        
-        protected Injector getInjector() {
-          return injector;
         }
     }
 
@@ -327,11 +373,6 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
         public ComponentScope getScope() {
             return scope;
-        }
-        
-        public Object getInjectableInstance(Object o) {
-            getInjector().injectMembers(o);
-            return o;
         }
     }
 }
