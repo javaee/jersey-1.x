@@ -1,5 +1,3 @@
-package com.sun.jersey.spi;
-
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -36,11 +34,12 @@ package com.sun.jersey.spi;
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
+package com.sun.jersey.spi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -55,6 +54,40 @@ import javax.ws.rs.ext.MessageBodyWriter;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface MessageBodyWorkers {
+    /**
+     * Get the map of media type to list of message body writers that are
+     * compatible with a media type.
+     * 
+     * @param mediaType the compatible media type.
+     * @return the map of media type to list of message body writers.
+     */
+    public Map<MediaType, List<MessageBodyReader>> getReaders(MediaType mediaType);
+
+    /**
+     * Get the map of media type to list of message body writers that are
+     * compatible with a media type.
+     *
+     * @param mediaType the compatible media type.
+     * @return the map of media type to list of message body writers.
+     */
+    public Map<MediaType, List<MessageBodyWriter>> getWriters(MediaType mediaType);
+
+    /**
+     * Convert a map media type to list of message body readers to a string.
+     * 
+     * @param readers the map media type to list of message body readers
+     * @return the string representation.
+     */
+    public String readersToString(Map<MediaType, List<MessageBodyReader>> readers);
+
+    /**
+     * Convert a map media type to list of message body writers to a string.
+     *
+     * @param writers the map media type to list of message body readers
+     * @return the string representation.
+     */
+    public String writersToString(Map<MediaType, List<MessageBodyWriter>> writers);
+
     /**
      * Get a message body reader that matches a set of criteria.
      * 
@@ -161,7 +194,7 @@ public interface MessageBodyWorkers {
      *        occurring first first.
      * @return the best media types
      */
-	<T> MediaType getMessageBodyWriterMediaType(
+    <T> MediaType getMessageBodyWriterMediaType(
             Class<T> type,
             Type genericType,
 			Annotation[] annotations,

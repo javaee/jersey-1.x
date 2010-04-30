@@ -52,6 +52,8 @@ import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
@@ -257,6 +259,10 @@ public class ContainerResponse implements HttpResponseContext {
             LOGGER.severe("A message body writer for Java class " + entity.getClass().getName() +
                     ", and Java type " + entityType +
                     ", and MIME media type " + contentType + " was not found");
+            Map<MediaType, List<MessageBodyWriter>> m = getMessageBodyWorkers().
+                    getWriters(contentType);
+            LOGGER.severe("The registered message body writers compatible with the MIME media type are:\n" +
+                    getMessageBodyWorkers().writersToString(m));
             
             if (request.getMethod().equals("HEAD")) {
                 isCommitted = true;

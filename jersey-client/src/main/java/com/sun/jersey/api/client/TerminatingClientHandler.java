@@ -41,8 +41,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.net.ProtocolException;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
@@ -60,6 +61,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class TerminatingClientHandler implements ClientHandler {
+    private static final Logger LOGGER = Logger.getLogger(TerminatingClientHandler.class.getName());
+
     protected static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
     /**
@@ -167,9 +170,16 @@ public abstract class TerminatingClientHandler implements ClientHandler {
                     entityClass, entityType,
                     EMPTY_ANNOTATIONS, mediaType);
             if (bw == null) {
-                throw new ClientHandlerException(
-                        "A message body writer for Java type, " + entity.getClass() +
-                        ", and MIME media type, " + mediaType + ", was not found");
+                String message = "A message body writer for Java class " +
+                        entity.getClass().getName() +
+                        ", and Java type " + entityType +
+                        ", and MIME media type " + mediaType + " was not found";
+                LOGGER.severe(message);
+                Map<MediaType, List<MessageBodyWriter>> m = workers.getWriters(mediaType);
+                LOGGER.severe("The registered message body writers compatible with the MIME media type are:\n" +
+                        workers.writersToString(m));
+
+                throw new ClientHandlerException(message);
             }
 
             this.size = bw.getSize(

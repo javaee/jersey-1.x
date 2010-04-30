@@ -43,7 +43,10 @@ import com.sun.jersey.core.reflection.ReflectionHelper.DeclaringClassInterfacePa
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.core.util.KeyComparator;
 import com.sun.jersey.core.util.KeyComparatorHashMap;
+import com.sun.jersey.core.util.KeyComparatorLinkedHashMap;
 import com.sun.jersey.spi.MessageBodyWorkers;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -200,7 +203,45 @@ public class MessageBodyFactory implements MessageBodyWorkers {
     
     // MessageBodyWorkers
     
-    @SuppressWarnings("unchecked")
+    public Map<MediaType, List<MessageBodyReader>> getReaders(MediaType mediaType) {
+        Map<MediaType, List<MessageBodyReader>> subSet =
+                new KeyComparatorLinkedHashMap<MediaType, List<MessageBodyReader>>(
+                MEDIA_TYPE_COMPARATOR);
+
+        getCompatibleReadersWritersMap(mediaType, readerProviders, subSet);
+        return subSet;
+    }
+
+    public Map<MediaType, List<MessageBodyWriter>> getWriters(MediaType mediaType) {
+        Map<MediaType, List<MessageBodyWriter>> subSet =
+                new KeyComparatorLinkedHashMap<MediaType, List<MessageBodyWriter>>(
+                MEDIA_TYPE_COMPARATOR);
+
+        getCompatibleReadersWritersMap(mediaType, writerProviders, subSet);
+        return subSet;
+    }
+
+    public String readersToString(Map<MediaType, List<MessageBodyReader>> readers) {
+        return toString(readers);
+    }
+
+    public String writersToString(Map<MediaType, List<MessageBodyWriter>> writers) {
+        return toString(writers);
+    }
+
+    private <T> String toString(Map<MediaType, List<T>> set) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        for (Map.Entry<MediaType, List<T>> e : set.entrySet()) {
+            pw.append(e.getKey().toString()).println(" ->");
+            for (T t : e.getValue()) {
+                pw.append("  ").println(t.getClass().getName());
+            }
+        }
+        pw.flush();
+        return sw.toString();
+    }
+
     public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
             Annotation[] as, 
             MediaType mediaType) {        
@@ -216,9 +257,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
         
         return p;
     }
-
     
-    @SuppressWarnings("unchecked")
     private <T> MessageBodyReader<T> _getMessageBodyReader(Class<T> c, Type t, 
             Annotation[] as, 
             MediaType mediaType, MediaType lookup) {
@@ -232,7 +271,6 @@ public class MessageBodyFactory implements MessageBodyWorkers {
         return null;
     }
     
-    @SuppressWarnings("unchecked")
     public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> c, Type t,
             Annotation[] as,
             MediaType mediaType) {        
@@ -249,7 +287,6 @@ public class MessageBodyFactory implements MessageBodyWorkers {
         return p;
     }
     
-    @SuppressWarnings("unchecked")
     private <T> MessageBodyWriter<T> _getMessageBodyWriter(Class<T> c, Type t,
             Annotation[] as,
             MediaType mediaType, MediaType lookup) {        
@@ -263,7 +300,34 @@ public class MessageBodyFactory implements MessageBodyWorkers {
 
         return null;
     }
-    
+
+    private <T> void getCompatibleReadersWritersMap(MediaType mediaType,
+            Map<MediaType, List<T>> set,
+            Map<MediaType, List<T>> subSet) {
+        if (mediaType.isWildcardType()) {
+            getCompatibleReadersWritersList(mediaType, set, subSet);
+        } else if (mediaType.isWildcardSubtype()) {
+            getCompatibleReadersWritersList(mediaType, set, subSet);
+            getCompatibleReadersWritersList(MediaTypes.GENERAL_MEDIA_TYPE, set, subSet);
+        } else {
+            getCompatibleReadersWritersList(mediaType, set, subSet);
+            getCompatibleReadersWritersList(
+                    new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD),
+                    set, subSet);
+            getCompatibleReadersWritersList(MediaTypes.GENERAL_MEDIA_TYPE, set, subSet);
+        }
+
+    }
+
+    private <T> void getCompatibleReadersWritersList(MediaType mediaType,
+            Map<MediaType, List<T>> set,
+            Map<MediaType, List<T>> subSet) {
+        List<T> readers = set.get(mediaType);
+        if (readers != null) {
+            subSet.put(mediaType, Collections.unmodifiableList(readers));
+        }
+    }
+
     public <T> List<MediaType> getMessageBodyWriterMediaTypes(Class<T> c, Type t,
             Annotation[] as) {
         List<MediaType> mtl = new ArrayList<MediaType>();

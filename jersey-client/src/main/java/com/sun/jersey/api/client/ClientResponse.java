@@ -57,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Logger;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -74,6 +75,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ClientResponse {
+    private static final Logger LOGGER = Logger.getLogger(ClientResponse.class.getName());
 
     /**
      * Status codes defined by HTTP, see
@@ -532,9 +534,15 @@ public class ClientResponse {
                 EMPTY_ANNOTATIONS, mediaType);
         if (br == null) {
             close();
-            throw new ClientHandlerException(
-                    "A message body reader for Java type, " + c +
-                    ", and MIME media type, " + mediaType + ", was not found");
+            String message = "A message body reader for Java class " + c.getName() +
+                    ", and Java type " + type +
+                    ", and MIME media type " + mediaType + " was not found";
+            LOGGER.severe(message);
+            Map<MediaType, List<MessageBodyReader>> m = workers.getReaders(mediaType);
+            LOGGER.severe("The registered message body readers compatible with the MIME media type are:\n" +
+                    workers.readersToString(m));
+
+            throw new ClientHandlerException(message);
         }
         
         try {

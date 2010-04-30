@@ -426,9 +426,13 @@ public class ContainerRequest implements HttpRequestContext {
                 type, genericType,
                 as, mediaType);
         if (bw == null) {
-            LOGGER.severe("A message body reader for Java type, " + type +
-                    ", and MIME media type, " + mediaType + ", was not found");
-
+            LOGGER.severe("A message body reader for Java class " + type.getName() +
+                    ", and Java type " + genericType +
+                    ", and MIME media type " + mediaType + " was not found");
+            Map<MediaType, List<MessageBodyReader>> m = getMessageBodyWorkers().
+                    getReaders(mediaType);
+            LOGGER.severe("The registered message body readers compatible with the MIME media type are:\n" +
+                    getMessageBodyWorkers().readersToString(m));
             throw new WebApplicationException(
                     Responses.unsupportedMediaType().build());
         }
