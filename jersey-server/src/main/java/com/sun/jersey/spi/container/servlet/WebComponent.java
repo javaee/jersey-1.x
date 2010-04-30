@@ -343,13 +343,14 @@ public class WebComponent implements ContainerListener {
      * @param response the {@link HttpServletResponse} object that
      *        contains the response the Web component returns
      *        to the client.
+     * @return the status code of the response.
      * @exception IOException if an input or output error occurs
      *            while the Web component is handling the
      *            HTTP request.
      * @exception ServletException if the HTTP request cannot
      *            be handled.
      */
-    public void service(URI baseUri, URI requestUri,
+    public int service(URI baseUri, URI requestUri,
             final HttpServletRequest request,
             final HttpServletResponse response)
             throws ServletException, IOException {
@@ -394,7 +395,9 @@ public class WebComponent implements ContainerListener {
             requestInvoker.set(request);
             responseInvoker.set(response);
 
-            _application.handleRequest(cRequest, new Writer(useSendError, response));
+            final Writer w = new Writer(useSendError, response);
+            _application.handleRequest(cRequest, w);
+            return w.cResponse.getStatus();
         } catch (MappableContainerException ex) {
             traceOnException(cRequest, response);
             throw new ServletException(ex.getCause());

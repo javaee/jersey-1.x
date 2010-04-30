@@ -466,15 +466,16 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @param response the {@link HttpServletResponse} object that
      *        contains the response the Web component returns
      *        to the client.
+     * @return the status code of the response.
      * @exception IOException if an input or output error occurs
      *            while the Web component is handling the
      *            HTTP request.
      * @exception ServletException if the HTTP request cannot
      *            be handled.
      */
-    public void service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
+    public int service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        webComponent.service(baseUri, requestUri, request, response);
+        return webComponent.service(baseUri, requestUri, request, response);
     }
 
     /**
@@ -830,11 +831,11 @@ public class ServletContainer extends HttpServlet implements Filter {
                 replaceQuery(queryString).
                 build();
 
-        service(baseUri, requestUri, request, response);
+        final int status = service(baseUri, requestUri, request, response);
 
         // If forwarding is configured and response is a 404 with no entity
         // body then call the next filter in the chain
-        if (forwardOn404 && response.getStatus() == 404 && !response.isCommitted()) {
+        if (forwardOn404 && status == 404 && !response.isCommitted()) {
             chain.doFilter(request, response);
             return;
         }

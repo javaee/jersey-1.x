@@ -32,12 +32,19 @@ release 1.2 (04-2010)
   It provides equivalent functonality to Response.
   JResponse may be extended in combination with JResponse.AJResponseBuilder
   specialization when building responses.
-- Fixed issue 485
+- Fixed issue 485, 519
   https://jersey.dev.java.net/issues/show_bug.cgi?id=485
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=519
   When a ServletContainer is used as a servlet filter and the feature
   ServletContainer.FEATURE_FILTER_FORWARD_ON_404 is set to true then enable the
   next filter in the chain to be invoked if Jersey or the application returns a
   404 with no entity body.
+  *Breaking changes* in order to support Servlet 2.4 and Servlet 3.0 it was
+  necessary to change the return type of ServletContainer#service(
+    URI baseUri, URI requestUri,
+    final HttpServletRequest request, HttpServletResponse response)
+  from "void" to "int" such that it returns the state code of the response.
+  HttpServletResponse.getStatusCode only exists for Servlet 3.0.
 - Fixed issue 361
   https://jersey.dev.java.net/issues/show_bug.cgi?id=361
   Introduced new feature (FeaturesAndProperties.FEATURE_XMLROOTELEMENT_PROCESSING)
