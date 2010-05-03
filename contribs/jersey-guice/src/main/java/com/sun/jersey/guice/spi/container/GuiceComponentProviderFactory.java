@@ -125,7 +125,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         Injector i = findInjector(key);
         // If there is no explicit binding
         if (i == null) {
-            // If an @Inject is explicitly declared
+            // If @Inject is explicitly declared on constructor
             if (isGuiceConstructorInjected(clazz)) {
                 try {
                     // If a binding is possible
@@ -137,26 +137,15 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
                     // The class cannot be injected.
                     // For example, the constructor might contain parameters that
                     // cannot be injected
-                    LOGGER.log(Level.INFO, "Cannot bind " + clazz.getName(), e);
+                    LOGGER.log(Level.SEVERE, "Cannot bind " + clazz.getName(), e);
                     // Guice should have picked this up. We fail-fast to prevent
                     // Jersey from trying to handle injection.
                     throw e;
                 }
+            // If @Inject is declared on field or method
             } else if (isGuiceFieldOrMethodInjected(clazz)) {
-                // If there is a constructor with arguments then let Jersey
-                // instantiate and manage the scope, let Guice inject
-                if (hasConstructorWithArguments(clazz)) {
-                    LOGGER.info("Binding " + clazz.getName() + " to GuiceInjectedComponentProvider");
-                    return new GuiceInjectedComponentProvider(injector);
-                } else {
-                    // TODO should Jersey manage or Guice manage, perhaps it
-                    // depends if the component is not in the Guice NO_SCOPE ?
-                    ComponentScope componentScope = getComponentScope(key, injector);
-                    LOGGER.info("Binding " + clazz.getName() +
-                            " to GuiceManagedComponentProvider with the scope \"" +
-                            componentScope + "\"");
-                    return new GuiceManagedComponentProvider(injector, componentScope, clazz);
-                }
+                LOGGER.info("Binding " + clazz.getName() + " to GuiceInjectedComponentProvider");
+                return new GuiceInjectedComponentProvider(injector);
             } else {
                 return null;
             }
@@ -267,16 +256,6 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         if (!c.equals(Object.class)) {
             return isGuiceFieldOrMethodInjected(c.getSuperclass());
         }
-        return false;
-    }
-
-    private boolean hasConstructorWithArguments(Class<?> c) {
-        for (Constructor cons : c.getConstructors()) {
-            if (cons.getParameterTypes().length > 0) {
-                return true;
-            }
-        }
-
         return false;
     }
 
