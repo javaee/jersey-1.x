@@ -158,5 +158,15 @@
  * <li>the class is registered using a Jersey based registration mechanism,
  *     for example using package scanning registration.
  * </ol>
+ * <p>
+ * In other cases it is convienient to let Jersey instantiate and manage
+ * the life-cycle and let Guice perform injection. This behaviour can be
+ * enabled for a resource or provider class as follows:
+ * <ol>
+ * <li>a field or method is annotated with {@link com.google.inject.Inject};
+ * <li>the class is not explicitly bound in Guice; and
+ * <li>the class is registered using a Jersey based registration mechanism,
+ *     for example using package scanning registration.
+ * </ol>
  */
 package com.sun.jersey.guice.spi.container.servlet;

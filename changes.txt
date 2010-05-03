@@ -1,4 +1,10 @@
 release 1.3 (05/06-2010)
+- Fixed issue 520
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=520
+  When Guice support is configured enable Guice injection of resource
+  or provider classes that have fields or methods annotated with @Inject
+  but have no constructor annotated with @Inject. In this case Jersey
+  instiaties and manages and lets Guice inject.
 - Fixed issue 449
   https://jersey.dev.java.net/issues/show_bug.cgi?id=449
   When a message body reader or writer cannot be found for a media type
