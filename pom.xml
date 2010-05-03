@@ -123,6 +123,8 @@
         <module>archive</module>
         <module>jersey-documentation</module>
         <module>ri</module>
+        <module>glassfish</module>
+        <module>osgi</module>
     </modules>
     <build>
         <plugins>
@@ -165,8 +167,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
              <plugin>
