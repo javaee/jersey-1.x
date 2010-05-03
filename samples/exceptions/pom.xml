@@ -58,6 +58,22 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+            <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
+             <plugin>
+                 <groupId>org.codehaus.mojo</groupId>
+                 <artifactId>exec-maven-plugin</artifactId>
+                 <version>1.1</version>
+                 <executions>
+                     <execution>
+                         <goals>
+                             <goal>java</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+                 <configuration>                        
+                     <mainClass>com.sun.jersey.samples.exceptions.Main</mainClass>
+                 </configuration>
+             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -87,7 +103,7 @@
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-grizzly</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <!--<scope>test</scope>-->
         </dependency>
     </dependencies>
     <repositories>

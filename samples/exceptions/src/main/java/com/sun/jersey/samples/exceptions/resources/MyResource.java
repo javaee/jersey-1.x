@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.samples.exceptions;
+package com.sun.jersey.samples.exceptions.resources;
 
 import com.sun.jersey.api.container.MappableContainerException;
 import java.io.IOException;
