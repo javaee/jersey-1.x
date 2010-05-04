@@ -42,7 +42,6 @@
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
         <version>1.3-SNAPSHOT</version>
-      <!--relativePath>../pom.xml</relativePath-->
     </parent>
     <artifactId>jersey-fastinfoset</artifactId>
     <packaging>jar</packaging>
@@ -86,14 +85,10 @@
                 <configuration>
                     <excludePackageNames>com.sun.jersey.fastinfoset.impl</excludePackageNames>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
