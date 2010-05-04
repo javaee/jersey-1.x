@@ -1,4 +1,9 @@
 release 1.3 (05/06-2010)
+- Fixed issue 509
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=509
+  The stack trace is no longer included as the response entity for an
+  unmapped WebApplicationException with a status code of 500 and no response
+  entity.
 - Fixed issue 521
   https://jersey.dev.java.net/issues/show_bug.cgi?id=520
   Support matching when quality of source, qs, values are less than 1.

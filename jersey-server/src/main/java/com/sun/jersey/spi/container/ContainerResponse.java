@@ -451,24 +451,14 @@ public class ContainerResponse implements HttpResponseContext {
     }
 
     private void onException(Throwable e, Response r, boolean mapped) {
-        if (!mapped) {
-            // Log the stack trace
-            if (r.getStatus() >= 500 || request.isTracingEnabled()) {
+        if (request.isTracingEnabled()) {
+            traceException(e, r);
+        } else if (!mapped) {
+            // Always log the stack trace if the exception is not mapped
+            // and status >= 500
+            if (r.getStatus() >= 500) {
                 traceException(e, r);
             }
-
-            if (r.getStatus() >= 500 && r.getEntity() == null) {
-                // Write out the exception to a string
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                pw.flush();
-
-                r = Response.status(r.getStatus()).entity(sw.toString()).
-                        type(MediaType.TEXT_PLAIN).build();
-            }
-        } else if (request.isTracingEnabled()) {
-            traceException(e, r);
         }
 
         setResponse(r);
@@ -486,6 +476,12 @@ public class ContainerResponse implements HttpResponseContext {
     }
 
     private void traceException(Throwable e, Response r) {
+        if (request.isTracingEnabled()) {
+            request.trace(String.format("mapped exception to response: %s -> %d",
+                    ReflectionHelper.objectToString(e),
+                    r.getStatus()));
+        }
+
         Response.Status s = Response.Status.fromStatusCode(r.getStatus());
         Level l = (r.getStatus() >= 500) ? Level.SEVERE : Level.INFO;
         if (s != null) {
