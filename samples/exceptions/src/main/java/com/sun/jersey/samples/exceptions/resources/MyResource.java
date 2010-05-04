@@ -63,9 +63,7 @@ public class MyResource {
     public String runtimeException(@QueryParam("ex") String className) 
             throws ClassNotFoundException, InstantiationException, IllegalAccessException {
         Class c = Class.forName(className, true, this.getClass().getClassLoader());
-        RuntimeException re = (RuntimeException)c.newInstance();
-        if (true) throw re;
-        return "Hi there!";
+        throw (RuntimeException)c.newInstance();
     }
 
     @Path("checked/ioexception")
@@ -83,8 +81,7 @@ public class MyResource {
     @GET
     @Produces("text/plain")
     public String checkedMyException() throws MyException {
-        if (true) throw new MyException();
-        return "Hi there!";
+        throw new MyException();
     }
 
 
@@ -102,8 +99,7 @@ public class MyResource {
     @GET
     @Produces("text/plain")
     public String checkedMyMappedException() throws MyMappedException {
-        if (true) throw new MyMappedException();
-        return "Hi there!";
+        throw new MyMappedException();
     }
 
 
@@ -121,8 +117,7 @@ public class MyResource {
     @GET
     @Produces("text/plain")
     public String checkedMyMappedRuntimeException() {
-        if (true) throw new MyMappedRuntimeException();
-        return "Hi there!";
+        throw new MyMappedRuntimeException();
     }
 
 
@@ -141,11 +136,8 @@ public class MyResource {
     @GET
     @Produces("text/plain")
     public String checkedMyMappedThrowingException() throws MyMappedThrowingException {
-        if (true) throw new MyMappedThrowingException();
-        return "Hi there!";
+        throw new MyMappedThrowingException();
     }
-
-
 
     @Path("webapplicationexception/{status}")
     @GET
@@ -153,13 +145,10 @@ public class MyResource {
     public String webApplicationException(
             @PathParam("status") int status,
             @QueryParam("r") String r) {
-        if (true) {
-            Response resp = (r == null)
-                ? Response.status(status).header("X-FOO", "foo").build()
-                : Response.status(status).entity(r).build();
+        Response resp = (r == null)
+            ? Response.status(status).header("X-FOO", "foo").build()
+            : Response.status(status).entity(r).build();
 
-            throw new WebApplicationException(resp);
-        }
-        return "Hi there!";
+        throw new WebApplicationException(resp);
     }
 }

@@ -39,11 +39,10 @@ package com.sun.jersey.samples.exceptions;
 
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import org.junit.Test;
-
-import javax.ws.rs.WebApplicationException;
 
 import static org.junit.Assert.assertTrue;
 

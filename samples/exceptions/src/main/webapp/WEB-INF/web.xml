@@ -7,6 +7,10 @@
             <param-name>com.sun.jersey.config.property.packages</param-name>
             <param-value>com.sun.jersey.samples.exceptions</param-value>
         </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.feature.Trace</param-name>
+            <param-value>true</param-value>
+        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
@@ -26,7 +30,7 @@
         <location>/CheckedException.jsp</location>
     </error-page>
     <error-page>
-        <exception-type>com.sun.jersey.samples.exceptions.MyResource$MyException</exception-type>
+        <exception-type>com.sun.jersey.samples.exceptions.resources.MyResource$MyException</exception-type>
         <location>/CheckedException.jsp</location>
     </error-page>
     <error-page>
