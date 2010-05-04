@@ -78,6 +78,7 @@
         <module>sparklines</module>
         <module>spring-annotations</module>
         <module>storage-service</module>
+        <module>exceptions</module>
     </modules>
     <build>
         <plugins>
