@@ -55,7 +55,7 @@ public class QualitySourceTest extends AbstractResourceTester {
     }
 
     @Path("/")
-    public static class Resource {
+    public static class QSGreaterThanOne {
         @Produces("application/baz")
         @GET
         public String doGetBaz() {
@@ -76,7 +76,7 @@ public class QualitySourceTest extends AbstractResourceTester {
     }
 
     public void testAcceptGet() throws IOException {
-        initiateWebApplication(Resource.class);
+        initiateWebApplication(QSGreaterThanOne.class);
         WebResource r = resource("/");
 
         String s = r.accept("application/foo").get(String.class);
@@ -105,7 +105,7 @@ public class QualitySourceTest extends AbstractResourceTester {
     }
 
     public void testAcceptWithQualityGet() throws IOException {
-        initiateWebApplication(Resource.class);
+        initiateWebApplication(QSGreaterThanOne.class);
         WebResource r = resource("/");
 
         String s = r.accept("application/bar, application/foo;q=0.8").get(String.class);
@@ -126,7 +126,7 @@ public class QualitySourceTest extends AbstractResourceTester {
 
     // TODO test is failing
     public void testWildCard() throws IOException {
-        initiateWebApplication(Resource.class);
+        initiateWebApplication(QSGreaterThanOne.class);
         WebResource r = resource("/");
 
         String s = r.accept("*/*").get(String.class);
@@ -135,4 +135,59 @@ public class QualitySourceTest extends AbstractResourceTester {
         s = r.accept("application/*").get(String.class);
         assertEquals("foo", s);
     }
+
+    @Path("/")
+    public static class QSLessThanOne {
+        @Produces("application/baz")
+        @GET
+        public String doGetBaz() {
+            return "baz";
+        }
+
+        @Produces("application/bar;qs=0.5")
+        @GET
+        public String doGetBar() {
+            return "bar";
+        }
+
+        @Produces("application/foo")
+        @GET
+        public String doGetFoo() {
+            return "foo";
+        }
+    }
+
+    public void testAcceptGetQSLessThanOne() throws IOException {
+        initiateWebApplication(QSLessThanOne.class);
+        WebResource r = resource("/");
+
+        String s = r.accept("application/foo").get(String.class);
+        assertEquals("foo", s);
+
+        s = r.accept("application/bar").get(String.class);
+        assertEquals("bar", s);
+
+        s = r.accept("application/baz").get(String.class);
+        assertEquals("baz", s);
+
+        s = r.accept("application/bar, application/foo").get(String.class);
+        assertEquals("foo", s);
+
+        s = r.accept("application/foo, application/bar").get(String.class);
+        assertEquals("foo", s);
+
+        s = r.accept("application/baz, application/bar, application/foo").get(String.class);
+        assertEquals("baz", s);
+
+        s = r.accept("application/foo, application/bar, application/baz").get(String.class);
+        assertEquals("baz", s);
+
+        s = r.accept("application/baz, application/bar").get(String.class);
+        assertEquals("baz", s);
+
+        s = r.accept("application/bar, application/baz").get(String.class);
+        assertEquals("baz", s);
+    }
+
+
 }

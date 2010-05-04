@@ -735,7 +735,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * @return the list of container request filters.
      *         An empty list will be returned if no filters are present.
      */
-    public List<?> getContainerRequestFilters() {
+    public List getContainerRequestFilters() {
         return getFilterList(PROPERTY_CONTAINER_REQUEST_FILTERS);
     }
 
@@ -749,7 +749,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * @return the list of container response filters.
      *         An empty list will be returned if no filters are present.
      */
-    public List<?> getContainerResponseFilters() {
+    public List getContainerResponseFilters() {
         return getFilterList(PROPERTY_CONTAINER_RESPONSE_FILTERS);
     }
 
@@ -763,11 +763,11 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * @return the list of resource filter factories.
      *         An empty list will be returned if no filters are present.
      */
-    public List<?> getResourceFilterFactories() {
+    public List getResourceFilterFactories() {
         return getFilterList(PROPERTY_RESOURCE_FILTER_FACTORIES);
     }
 
-    private List<?> getFilterList(String propertyName) {
+    private List getFilterList(String propertyName) {
         final Object o = getProperty(propertyName);
         if (o == null) {
             final List l = new ArrayList();

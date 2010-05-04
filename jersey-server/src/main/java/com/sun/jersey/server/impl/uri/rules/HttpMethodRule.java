@@ -105,27 +105,29 @@ public final class HttpMethodRule implements UriRule {
             List<QualitySourceMediaType> pmts = new LinkedList<QualitySourceMediaType>();
             for (ResourceMethod m : normal) {
                 for (MediaType mt : m.getProduces()) {
-                    QualitySourceMediaType qsmt = get(mt);
-                    if (qsmt != null) {
-                        if (qsmt.getQualitySource() > QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR) {
-                            pmts.add(qsmt);
-                        }
-                    }
+                    pmts.add(get(mt));
                 }
             }
 
             Collections.sort(pmts, MediaTypes.QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR);
-            priorityMediaTypes = pmts.isEmpty() ? null : pmts;
+            priorityMediaTypes = retain(pmts) ? pmts : null;
         }
 
         QualitySourceMediaType get(MediaType mt) {
             if (mt instanceof QualitySourceMediaType) {
                 return (QualitySourceMediaType)mt;
-            } else if (mt.getParameters().containsKey("qs")) {
-                return new QualitySourceMediaType(mt);
             } else {
-                return null;
+                return new QualitySourceMediaType(mt);
             }
+        }
+
+        boolean retain(List<QualitySourceMediaType> pmts) {
+            for (QualitySourceMediaType mt : pmts) {
+                if (mt.getQualitySource() != QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         boolean correctOrder(List<ResourceMethod> normal) {

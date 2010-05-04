@@ -162,7 +162,7 @@ public class IntrospectionModeller {
         
         resourceMethod.setAreInputTypesDeclared(produceMimeAnnotation != null);
         resourceMethod.getSupportedOutputTypes().addAll(
-                MediaTypes.createMediaTypes(produceMimeAnnotation));
+                MediaTypes.createQualitySourceMediaTypes(produceMimeAnnotation));
     }
 
     private static final void workOutConstructorsList(
