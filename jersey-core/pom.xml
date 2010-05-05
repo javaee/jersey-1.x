@@ -161,7 +161,7 @@
                     <links>
                         <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
                     </links>
-                    <excludePackageNames>com.sun.jersey.core.impl</excludePackageNames>
+                    <excludePackageNames>com.sun.jersey.core.impl:com.sun.jersey.impl</excludePackageNames>
                 </configuration>
             </plugin>
 

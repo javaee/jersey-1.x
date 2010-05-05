@@ -4,21 +4,6 @@
     <groupId>${groupId}</groupId>
     <artifactId>${artifactId}</artifactId>
     <packaging>jar</packaging>
-    <profiles>
-        <profile>
-            <id>jdk-1.5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency> <!-- depend on JAXB to enable WADL support -->
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1.12</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
     <version>${version}</version>
     <name>${artifactId}</name>
     <dependencies>

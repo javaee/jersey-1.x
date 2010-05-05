@@ -8,21 +8,6 @@
     </parent>
     <artifactId>hypermedia-action-sample</artifactId>
     <packaging>jar</packaging>
-    <profiles>
-        <profile>
-            <id>jdk-1.5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency> <!-- depend on JAXB to enable WADL support -->
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1.12</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
     <name>hypermedia-action-sample</name>
     <dependencies>
         <dependency>
@@ -52,12 +37,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>

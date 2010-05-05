@@ -2,9 +2,9 @@
 <!--
 
  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- 
+
  Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
- 
+
  The contents of this file are subject to the terms of either the GNU
  General Public License Version 2 only ("GPL") or the Common Development
  and Distribution License("CDDL") (collectively, the "License").  You
@@ -12,7 +12,7 @@
  a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  or jersey/legal/LICENSE.txt.  See the License for the specific
  language governing permissions and limitations under the License.
- 
+
  When distributing the software, include this License Header Notice in each
  file and include the License file at jersey/legal/LICENSE.txt.
  Sun designates this particular file as subject to the "Classpath" exception
@@ -21,9 +21,9 @@
  Header, with the fields enclosed by brackets [] replaced by your own
  identifying information: "Portions Copyrighted [year]
  [name of copyright owner]"
- 
+
  Contributor(s):
- 
+
  If you wish your version of this file to be governed by only the CDDL or
  only the GPL Version 2, indicate your decision by adding "[Contributor]
  elects to include this software in this distribution under the [CDDL or GPL
@@ -46,10 +46,10 @@
     <artifactId>jersey-bundle</artifactId>
     <packaging>jar</packaging>
     <name>jersey-bundle</name>
-    <description>A bundle containing code of all jar-based modules that provide 
+    <description>A bundle containing code of all jar-based modules that provide
         JAX-RS and Jersey-related features. Such a bundle is *only intended* for
         developers that do not use Maven's dependency system.
-        The bundle does not include code for contributes, tests and samples.</description>
+    The bundle does not include code for contributes, tests and samples.</description>
     <dependencies>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -164,7 +164,7 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.2</version>
@@ -185,7 +185,18 @@
             </resource>
         </resources>
         <plugins>
-         <plugin> <!-- want to unpack sources from individual modules -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
+            <plugin> <!-- want to unpack sources from individual modules -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -256,6 +267,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin> <!-- want to compile META-INF/services registry from individual modules -->
                 <groupId>com.sun.istack</groupId>
                 <artifactId>maven-istack-commons-plugin</artifactId>
@@ -317,6 +329,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin> <!-- generate javadoc from sources unpacked above -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -328,34 +341,28 @@
                     <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl com.sun.jersey.atom.rome.impl com.sun.jersey.fastinfoset.impl com.sun.jersey.json.impl</excludePackageNames>
                     <notimestamp>true</notimestamp>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.1</version>
                 <executions>
                     <execution>
-                        <id>attach-javadocs</id>
+                        <id>add-test-source</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>add-test-source</goal>
                         </goals>
+                        <configuration>
+                            <sources>
+                                <source>src-test</source>
+                            </sources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <version>1.1</version>
-            <executions>
-              <execution>
-                <id>add-test-source</id>
-                <phase>generate-sources</phase>
-                <goals>
-                  <goal>add-test-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src-test</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
+
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -375,17 +382,18 @@
                     </execution>
                 </executions>
             </plugin>
-           <plugin> <!-- remove the generated src dir-->
+
+            <plugin> <!-- remove the generated src dir-->
                 <artifactId>maven-clean-plugin</artifactId>
                 <configuration>
-                  <filesets>
-                    <fileset>
-                      <directory>src</directory>
-                    </fileset>
-                  </filesets>  
+                    <filesets>
+                        <fileset>
+                            <directory>src</directory>
+                        </fileset>
+                    </filesets>
                 </configuration>
             </plugin>
-         </plugins>
+        </plugins>
     </build>
 
     <repositories>
@@ -395,7 +403,7 @@
             <url>http://maven.glassfish.org/content/groups/glassfish</url>
         </repository>
     </repositories>
-    
+
     <properties>
         <gen-src-dir>${basedir}/src/main/java</gen-src-dir>
     </properties>

@@ -45,21 +45,6 @@
     <artifactId>atompub-simple-view-client-sample</artifactId>
     <name>AtomPub Simple View-Client - Jersey sample</name>
     <packaging>jar</packaging>
-    <profiles>
-        <profile>
-            <id>jdk-1.5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency> <!-- enabling WADL support -->
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -92,6 +77,11 @@
         <plugins>
            <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1</version>
@@ -106,15 +96,7 @@
                     <mainClass>com.sun.jersey.samples.viewclient.atompubsimple.Main</mainClass>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
+            
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
