@@ -56,10 +56,13 @@
     </organization>
     <licenses>
         <license>
-            <name>
-                CDDL+GPL License
-            </name>
-            <url>https://jersey.dev.java.net/CDDL+GPL.html</url>
+            <name>CDDL 1.0</name>
+            <url>https://glassfish.dev.java.net/public/CDDL+GPL.html</url>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>GPL2 w/ CPE</name>
+            <url>https://glassfish.dev.java.net/public/CDDL+GPL.html</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
