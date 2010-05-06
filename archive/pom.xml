@@ -68,6 +68,7 @@
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-contribs</artifactId>
             <version>${project.version}</version>
+            <type>pom</type>
         </dependency>
     </dependencies>
     <build>
