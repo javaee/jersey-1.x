@@ -1,4 +1,7 @@
 release 1.3 (05/06-2010)
+- Fixed issue 529
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=529
+  Close input stream when reading properties file to obtain the Build ID.
 - Fixed issue 509
   https://jersey.dev.java.net/issues/show_bug.cgi?id=509
   The stack trace is no longer included as the response entity for an

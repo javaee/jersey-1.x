@@ -34,55 +34,25 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.server.impl;
 
-import java.io.InputStream;
-import java.util.Properties;
+package com.sun.jersey.impl;
+
+import com.sun.jersey.server.impl.BuildId;
+import junit.framework.TestCase;
+
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class BuildId {
-    private static String buildId = _initiateBuildId();
+public class BuildIdTest extends TestCase {
     
-    private static String _initiateBuildId() {
-        String id = "Jersey";
-
-        final InputStream in = getIntputStream();
-        if (in != null) {
-            try {
-                Properties p = new Properties();
-                p.load(in);
-                String _id = p.getProperty("Build-Id");
-                if (_id != null)
-                    id = id + ": " + _id;
-            } catch (Exception e){
-                // Ignore
-            } finally {
-                close(in);
-            }
-        }
-        return id;
+    public void testBuildId() {
+        String s = BuildId.getBuildId();
+        assertFalse(s.equals("Jersey"));
+        // buildNumber is the maven property that should be replaced
+        // with the jersey version and date
+        assertFalse(s.contains("buildNumber"));
     }
 
-    private static void close(InputStream in) {
-        try {
-            in.close();
-        } catch (Exception ex) {
-            // Ignore
-        }
-    }
-    
-    private static InputStream getIntputStream() {
-        try {
-            return BuildId.class.getResourceAsStream("build.properties");
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    public static final String getBuildId() {
-        return buildId;
-    }
 }
