@@ -20,6 +20,9 @@ release 1.3 (05/06-2010)
   media type.
 
 release 1.2 (05-2010)
+- Fixed issue 457
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=457
+  Jersey WAR project cannot be deployed on OSGI platform
 - Fixed issue 275
   https://jersey.dev.java.net/issues/show_bug.cgi?id=275
   Jersey-core, jersey-server, jersey-client and jersey-json modules 
