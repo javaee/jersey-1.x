@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
+<!ENTITY % ents SYSTEM "jersey.ent" >
+%ents;
+]>
+
+<chapter>
+  <title>Building and testing Jersey</title>
+
+<section>
+<title>Checking out the source</title>
+<para>
+The Jersey source code is available from the Subversion repository located at
+<ulink url="https://jersey.dev.java.net/svn/jersey">https://jersey.dev.java.net/svn/jersey</ulink>.
+</para>
+<para>
+To check out the trunk where active development on the next release occurs use
+the following command:
+<programlisting>
+svn checkout https://jersey.dev.java.net/svn/jersey/trunk/jersey jersey -username &lt;username&gt;
+</programlisting>
+</para>
+<para>
+Stable releases of Jersey are tagged in the location
+<ulink url="https://jersey.dev.java.net/svn/jersey/tags">https://jersey.dev.java.net/svn/jersey/tags</ulink>.
+</para>
+<para>
+The source code may be browsed using
+<ulink url="http://fisheye4.atlassian.com/browse/jersey">FishEye</ulink>.
+</para>
+</section>
+
+<section>
+<title>Building using Maven</title>
+<para>
+Java SE 6 or greater is required. Maven 2.2.1 or greater is recommended.
+</para>
+<para>
+It is recommended to build the whole of Jersey after you have initially checked
+out the source code.
+To build all of Jersey use the following command from the checked out
+<literal>jersey</literal> directory:
+<programlisting>
+mvn clean install
+</programlisting>
+To skip all the tests do:
+<programlisting>
+mvn -Dmaven.test.skip=true clean install
+</programlisting>
+The following maven options are recommended:
+<programlisting>
+-Xmx1048m -XX:PermSize=64M -XX:MaxPermSize=128M
+</programlisting>
+</para>
+</section>
+
+<section>
+<title>Testing</title>
+<para>
+Jersey contains many unit tests. Most of these are not really unit tests per-say
+and are functional tests using the JUnit test framework because it is very
+convientient for execution and reporting.
+</para>
+<para>
+Some modules have specific tests but most tests associated with testing the
+jersey-core, jersey-client and jersey-server modules are located in the
+jersey-test module. This module can take some time to execute all the tests so
+it is recommended that you pick the appropriate tests to run related to the
+particular area that is being investigated. For example,
+using:
+<programlisting>
+mvn -Dtest=&lt;pattern&gt; test
+</programlisting>
+where <literal>pattern</literal> may be a comma separated set of names matching
+tests.
+</para>
+</section>
+<section>
+<title>Continuous building and testing with Hudson</title>
+<para>
+Jersey is built, tested and deployed on Solaris, Windows and Linux using an
+interal Hudson server. The Jersey Hudson jobs are available publically
+at <ulink url="http://hudson.glassfish.org/job/Jersey-trunk-multiplatform/">
+    http://hudson.glassfish.org/job/Jersey-trunk-multiplatform/</ulink>.
+</para>
+</section>
+
+<section>
+<title>Using NetBeans</title>
+<para>
+NetBeans 6.8 or greater has excellent maven support. The Jersey maven
+modules can be loaded, built and tested in NetBeans without any additional
+project-specific requirements.
+</para>
+</section>
+
+</chapter>

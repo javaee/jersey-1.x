@@ -12,12 +12,10 @@
     <preface>
         <title>Preface</title>
         <para>
-This doc is yet in a very early state. We want to create here sort
-of a user guide for jersey users, which will get versioned together 
-with jersey code base. 
-        </para>
-        <para>
-More content to come soon...
+The user guide is not complete (see the JavaDoc API for all details) and will
+be added to on a continual basis. If you want to contribute to the guide please
+email <ulink
+  url="mailto:users@jersey.dev.java.net">users@jersey.dev.java.net</ulink>.
         </para>
     </preface>
   
@@ -30,5 +28,6 @@ More content to come soon...
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="test-framework.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="dependencies.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="glassfish.xml" />
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="how-to-build.xml" />
 
 </book>
