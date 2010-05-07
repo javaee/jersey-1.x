@@ -38,6 +38,7 @@
 package com.sun.jersey.spi.uri.rules;
 
 import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
@@ -122,6 +123,13 @@ public interface UriRuleContext extends HttpContext, UriMatchResultContext {
      */
     void pushResource(Object resource);
 
+    /**
+     * Push the matching resource method.
+     *
+     * @param arm the matching resource method.
+     */
+    void pushMethod(AbstractResourceMethod arm);
+    
     /**
      * Push the right hand path length to calculate the entry for
      * the list of matching (ancestor) URI paths.

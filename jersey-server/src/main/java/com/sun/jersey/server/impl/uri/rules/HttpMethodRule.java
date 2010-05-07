@@ -262,6 +262,8 @@ public final class HttpMethodRule implements UriRule {
                 }
             }
 
+            context.pushMethod(method.getAbstractResourceMethod());
+            
             // Dispatch to the resource method
             try {
                 method.getDispatcher().dispatch(resource, context);

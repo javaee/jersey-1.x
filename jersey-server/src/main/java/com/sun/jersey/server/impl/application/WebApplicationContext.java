@@ -40,6 +40,7 @@ import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.TraceInformation;
+import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
@@ -143,9 +144,14 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     // UriRuleContext
 
     private final LinkedList<Object> resources = new LinkedList<Object>();
+
     private final LinkedList<MatchResult> matchResults = new LinkedList<MatchResult>();
+
     private final LinkedList<String> paths = new LinkedList<String>();
+
     private final LinkedList<UriTemplate> templates = new LinkedList<UriTemplate>();
+
+    private AbstractResourceMethod arm;
 
     public ContainerRequest getContainerRequest() {
         return request;
@@ -212,6 +218,10 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         resources.addFirst(resource);
     }
 
+    public void pushMethod(AbstractResourceMethod arm) {
+        this.arm = arm;
+    }
+
     public void pushRightHandPathLength(int rhpathlen) {
         final String ep = request.getPath(false);
         paths.addFirst(ep.substring(0,
@@ -222,6 +232,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     // UriInfo, defer to HttpRequestContext
 
     private MultivaluedMapImpl encodedTemplateValues;
+    
     private MultivaluedMapImpl decodedTemplateValues;
 
     public URI getBaseUri() {
@@ -317,6 +328,14 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     
     // ExtendedUriInfo
     
+    public AbstractResourceMethod getMatchedMethod() {
+        return arm;
+    }
+
+    public Throwable getMappedThrowable() {
+        return response.getMappedThrowable();
+    }
+
     public List<MatchResult> getMatchedResults() {
         return matchResults;
     }

@@ -1,4 +1,8 @@
 release 1.3 (05/06-2010)
+- Fixed issue 526
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=526
+  Provide access to the matching AbstractResourceMethod that was invoked
+  on a resource class, see ExtendedUriInfo.getMatchedMethod().
 - Fixed issue 529
   https://jersey.dev.java.net/issues/show_bug.cgi?id=529
   Close input stream when reading properties file to obtain the Build ID.

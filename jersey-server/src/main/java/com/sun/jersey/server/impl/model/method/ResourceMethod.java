@@ -37,6 +37,7 @@
 
 package com.sun.jersey.server.impl.model.method;
 
+import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
@@ -183,5 +184,18 @@ public abstract class ResourceMethod {
             return false;
         
         return produceMime.equals(that.produceMime);
+    }
+
+    /**
+     * Get the abstract resource method.
+     * <p>
+     * Extending classes may override this method to return an associated
+     * abstract resource method.
+     * 
+     * @return the abstract resource method, otherwise null if there is no
+     *         abstract resource method assocaiated with the resource method.
+     */
+    public AbstractResourceMethod getAbstractResourceMethod() {
+        return null;
     }
 }

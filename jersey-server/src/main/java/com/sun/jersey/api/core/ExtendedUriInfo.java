@@ -37,7 +37,9 @@
 
 package com.sun.jersey.api.core;
 
+import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.spi.container.ContainerResponse;
 import java.util.List;
 import java.util.regex.MatchResult;
 import javax.ws.rs.core.PathSegment;
@@ -49,6 +51,28 @@ import javax.ws.rs.core.UriInfo;
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ExtendedUriInfo extends UriInfo {
+    /**
+     * Get get matched resource method that was invoked.
+     *
+     * @return the matched resource method, otherwise null if no resource
+     *         method was invoked.
+     */
+    AbstractResourceMethod getMatchedMethod();
+
+    /**
+     * Get the throwable that was mapped to a response.
+     * <p>
+     * A response filter or a message body writer may utilize this method to
+     * determine if a resource method was invoked but did not return a
+     * response because an exception was thrown from the resource method, or
+     * the resource method returned but a response filter threw an exception.
+     *
+     * @return the throwable that was mapped to a response, otherwise null
+     *         if no throwable was mapped to a response.
+     * @see ContainerResponse#getMappedThrowable
+     */
+    Throwable getMappedThrowable();
+
     /**
      * Get a read-only list of {@link MatchResult} for matched resources. 
      * Entries are ordered in reverse request URI matching order, with the 
@@ -71,9 +95,9 @@ public interface ExtendedUriInfo extends UriInfo {
     List<UriTemplate> getMatchedTemplates();
     
     /**
-     * Get a path segmenst that contains a template variable.
+     * Get the path segments that contains a template variable.
      * All sequences of escaped octets are decoded,
-     * equivalent to <code>getPathSegment(true)</code>.
+     * equivalent to <code>getPathSegments(true)</code>.
      * 
      * @param name the template variable name
      * @return the path segments, the list will be empty the matching path does
@@ -82,7 +106,7 @@ public interface ExtendedUriInfo extends UriInfo {
     List<PathSegment> getPathSegments(String name);
     
     /**
-     * Get a path segments that contains a template variable.
+     * Get the path segments that contains a template variable.
      * 
      * @param name the template variable name
      * @param decode controls whether sequences of escaped octets are decoded

@@ -52,21 +52,21 @@ import java.util.List;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceHttpMethod extends ResourceMethod {
-    private final Method m;
-
+    private final AbstractResourceMethod arm;
+    
     public ResourceHttpMethod(
             ResourceMethodDispatcherFactory df,
             FilterFactory ff,
-            AbstractResourceMethod method) {
-        this(df, ff, UriTemplate.EMPTY, method);
+            AbstractResourceMethod arm) {
+        this(df, ff, UriTemplate.EMPTY, arm);
     }
     
     public ResourceHttpMethod(
             ResourceMethodDispatcherFactory df,
             FilterFactory ff,
             UriTemplate template,
-            AbstractResourceMethod method) {
-        this(df, ff, ff.getResourceFilters(method), template, method);
+            AbstractResourceMethod arm) {
+        this(df, ff, ff.getResourceFilters(arm), template, arm);
     }
 
     public ResourceHttpMethod(
@@ -74,27 +74,35 @@ public final class ResourceHttpMethod extends ResourceMethod {
             FilterFactory ff,
             List<ResourceFilter> resourceFilters,
             UriTemplate template,
-            AbstractResourceMethod method) {
-        super(method.getHttpMethod(),
+            AbstractResourceMethod arm) {
+        super(arm.getHttpMethod(),
                 template,
-                method.getSupportedInputTypes(), 
-                method.getSupportedOutputTypes(),
-                method.areInputTypesDeclared(),
-                df.getDispatcher(method),
+                arm.getSupportedInputTypes(),
+                arm.getSupportedOutputTypes(),
+                arm.areInputTypesDeclared(),
+                df.getDispatcher(arm),
                 FilterFactory.getRequestFilters(resourceFilters),
                 FilterFactory.getResponseFilters(resourceFilters));
 
-        this.m = method.getMethod();
+        this.arm = arm;
         
         if (getDispatcher() == null) {
+            Method m = arm.getMethod();
+
             String msg = ImplMessages.NOT_VALID_HTTPMETHOD(m,
-                    method.getHttpMethod(), m.getDeclaringClass());
+                    arm.getHttpMethod(), m.getDeclaringClass());
             throw new ContainerException(msg);
         }
     }
     
     @Override
+    public AbstractResourceMethod getAbstractResourceMethod() {
+        return arm;
+    }
+
+    @Override
     public String toString() {
+        Method m = arm.getMethod();
         return ImplMessages.RESOURCE_METHOD(m.getDeclaringClass(), m.getName());
     }
 }
