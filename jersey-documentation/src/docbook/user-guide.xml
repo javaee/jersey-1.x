@@ -29,5 +29,6 @@ More content to come soon...
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="linking.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="test-framework.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="dependencies.xml" />
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="glassfish.xml" />
 
 </book>
