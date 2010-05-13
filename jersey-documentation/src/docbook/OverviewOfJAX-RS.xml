@@ -102,7 +102,7 @@ public class UserResource {
       particular regular expression, which overrides the default regular
       expression, "[^/]+?", for example:</para>
 
-      <para><programlisting>@Path("users/{username: [a-zA-Z][a-zA-Z_0-9]}")</programlisting>In
+      <para><programlisting>@Path("users/{username: [a-zA-Z][a-zA-Z_0-9]*}")</programlisting>In
       this type of example the username variable will only match user names
       that begin with one upper or lower case letter and zero or more alpha
       numeric characters and the underscore character. If a user name does not
@@ -429,9 +429,10 @@ public Response smooth(
       </listitem>
 
       <listitem>
-        <para>Have a static method named <literal>valueOf</literal> that
-        accepts a single <literal>String</literal> argument (see, for example,
-        <literal>Integer.valueOf(String)</literal>); or</para>
+        <para>Have a static method named <literal>valueOf</literal> or <literal>fromString</literal>
+        that accepts a single <literal>String</literal> argument (see, for example,
+        <literal>Integer.valueOf(String)</literal> and <literal>java.util.UUID.fromString(String)</literal>);
+        or</para>
       </listitem>
 
       <listitem>
@@ -517,7 +518,7 @@ public void post(MultivaluedMap&lt;String, String&gt; formParams) {
   </section>
 
   <section>
-    <title>Represetations and Java Types</title>
+    <title>Representations and Java Types</title>
 
     <para>Previous sections on <ulink url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
     and <ulink url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Consumes.html">@Consumes</ulink>
@@ -962,7 +963,7 @@ public class EntityNotFoundMapper implements
 
     <para>Jersey supports two further life-cycles using Jersey specific
     annotations. If a root resource class is annotated with @Singleton then
-    only one instance is created per-web applcation. If a root resource class
+    only one instance is created per-web application. If a root resource class
     is annotated with @PerSession then one instance is created per web session
     and stored as a session attribute.</para>
   </section>
