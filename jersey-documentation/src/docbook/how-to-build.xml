@@ -53,6 +53,24 @@ The following maven options are recommended:
 -Xmx1048m -XX:PermSize=64M -XX:MaxPermSize=128M
 </programlisting>
 </para>
+
+<para>
+Building the whole Jersey project including tests could take about an hour, depending on your system 
+performance of course. Even if you have a pretty fast performant machine, this could be quite annoying.
+Especially if you just want to experiment with a limited amount of code.
+To avoid building the whole Jersey project tree, you can easily utilize the maven reactor plugin.
+</para>
+<para>
+To build only the modules needed for the helloworld example, you can launch:
+<programlisting>
+mvn reactor:make -Dmake.goals=clean,install -Dmake.folders=samples/helloworld
+</programlisting> 
+which takes less then 2 minutes on my machine. To switch testing off, when building the same
+set of modules, you will use:
+<programlisting>
+mvn reactor:make -Dmake.goals=-Dmaven.test.skip,clean,install -Dmake.folders=samples/helloworld
+</programlisting> 
+</para>
 </section>
 
 <section>
