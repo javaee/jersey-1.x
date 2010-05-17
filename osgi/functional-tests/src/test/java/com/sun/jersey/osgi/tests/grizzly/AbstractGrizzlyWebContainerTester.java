@@ -59,6 +59,7 @@ import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.options;
@@ -97,16 +98,10 @@ public abstract class AbstractGrizzlyWebContainerTester {
                 "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                 "http://repository.springsource.com/maven/bundles/release",
                 "http://repository.springsource.com/maven/bundles/external"),
-                // felix config admin
-                //mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4"),
-                // felix event admin
-                //mavenBundle("org.apache.felix", "org.apache.felix.eventadmin", "1.2.2"),
-                // load PAX Web bundles
-                //mavenBundle("org.ops4j.pax.web", "pax-web-jetty-bundle", "0.7.1"),
-                //mavenBundle("org.ops4j.pax.web", "pax-web-extender-war", "0.7.1"),
-                //mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
-//                // tiny bundle
-//                mavenBundle().groupId("org.ops4j.pax.swissbox").artifactId("pax-swissbox-tinybundles").versionAsInProject(),
+
+                // load jsr250-api jar
+                wrappedBundle(mavenBundle().groupId("javax.annotation").artifactId("jsr250-api").versionAsInProject()),
+
                 // load grizzly bundle
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
                 // load Jersey bundles
