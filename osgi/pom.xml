@@ -67,21 +67,6 @@
         </license>
     </licenses>
 
-    <profiles>
-        <profile>
-            <id>release</id>
-        </profile>
-        <profile>
-            <id>non-release</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <modules>
-                <module>jsr250-api</module>
-            </modules>
-        </profile>
-    </profiles>
-
      <modules>
         <module>functional-tests</module>
         <module>runtime-delegate-tests</module>
