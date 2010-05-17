@@ -1,4 +1,4 @@
-package com.sun.jersey.osgi.tests;
+package com.sun.jersey.osgifunctionaltests;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

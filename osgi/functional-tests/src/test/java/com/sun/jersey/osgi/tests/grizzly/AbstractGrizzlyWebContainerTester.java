@@ -43,6 +43,7 @@ import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import com.sun.jersey.osgi.tests.util.Helper;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,24 +51,87 @@ import javax.servlet.Servlet;
 import javax.ws.rs.core.UriBuilder;
 import org.junit.After;
 import org.junit.Before;
+
 import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.junit.MavenConfiguredJUnit4TestRunner;
+import org.ops4j.pax.exam.Customizer;
+import org.ops4j.pax.exam.Option;
+import org.ops4j.pax.exam.junit.Configuration;
+import org.ops4j.pax.exam.junit.JUnit4TestRunner;
+
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.options;
+
+import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
+
+import static org.ops4j.pax.swissbox.tinybundles.core.TinyBundles.*;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@RunWith(MavenConfiguredJUnit4TestRunner.class)
+@RunWith(JUnit4TestRunner.class)
 public abstract class AbstractGrizzlyWebContainerTester {
     public static final String CONTEXT = "";
 
     private SelectorThread selectorThread;
 
-    private int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
+    private static int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
     
     private String contextPath;
 
     private Class<? extends Servlet> sc;
+
+    @Configuration
+    public static Option[] configuration() {
+
+        Option[] options = options(
+                //                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
+                systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
+                // define maven repository
+                repositories(
+                "http://repo1.maven.org/maven2",
+                "http://repository.apache.org/content/groups/snapshots-group",
+                "http://repository.ops4j.org/maven2",
+                "http://svn.apache.org/repos/asf/servicemix/m2-repo",
+                "http://repository.springsource.com/maven/bundles/release",
+                "http://repository.springsource.com/maven/bundles/external"),
+                // felix config admin
+                //mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4"),
+                // felix event admin
+                //mavenBundle("org.apache.felix", "org.apache.felix.eventadmin", "1.2.2"),
+                // load PAX Web bundles
+                //mavenBundle("org.ops4j.pax.web", "pax-web-jetty-bundle", "0.7.1"),
+                //mavenBundle("org.ops4j.pax.web", "pax-web-extender-war", "0.7.1"),
+                //mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
+//                // tiny bundle
+//                mavenBundle().groupId("org.ops4j.pax.swissbox").artifactId("pax-swissbox-tinybundles").versionAsInProject(),
+                // load grizzly bundle
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
+                // load Jersey bundles
+                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
+
+                // customize the export header
+
+                new Customizer() {
+
+                    @Override
+                    public InputStream customizeTestProbe(InputStream testProbe)
+                            throws IOException {
+                        return modifyBundle(testProbe).set("Export-Package", this.getClass().getPackage().getName()).build();
+                    }
+                },
+
+                // start felix framework
+                felix());
+
+        return options;
+    }
+
 
     public AbstractGrizzlyWebContainerTester() {
         this(CONTEXT);

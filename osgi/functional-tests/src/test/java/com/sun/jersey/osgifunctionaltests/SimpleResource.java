@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package com.sun.jersey.osgi.tests;
+package com.sun.jersey.osgifunctionaltests;
 
 
 import javax.ws.rs.*;

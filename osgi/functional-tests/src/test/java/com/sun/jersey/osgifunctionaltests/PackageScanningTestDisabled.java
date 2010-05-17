@@ -1,10 +1,9 @@
-package com.sun.jersey.osgi.tests;
+package com.sun.jersey.osgifunctionaltests;
 
 import com.sun.grizzly.http.embed.GrizzlyWebServer;
 import com.sun.grizzly.http.servlet.ServletAdapter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.osgi.tests.util.Helper;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.net.URI;
@@ -15,13 +14,10 @@ import java.util.logging.Logger;
 import javax.ws.rs.core.UriBuilder;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.ops4j.pax.exam.junit.MavenConfiguredJUnit4TestRunner;
 
 
-@RunWith(MavenConfiguredJUnit4TestRunner.class)
-public class BasicOsgiIntegrationTest {
-    private static final Logger LOGGER = Logger.getLogger(BasicOsgiIntegrationTest.class.getName());
+public class PackageScanningTestDisabled {
+    private static final Logger LOGGER = Logger.getLogger(PackageScanningTestDisabled.class.getName());
 
     private static final int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 8080);
     private static final String CONTEXT = "/jersey";
@@ -33,10 +29,10 @@ public class BasicOsgiIntegrationTest {
         GrizzlyWebServer gws = new GrizzlyWebServer(port);
 
         ServletAdapter jerseyAdapter = new ServletAdapter();
-        jerseyAdapter.addInitParameter("com.sun.jersey.config.property.classnames",
-                "com.sun.jersey.osgi.tests.SimpleResource");
-        jerseyAdapter.addInitParameter("com.sun.jersey.config.property.resourceConfigClass",
-                ClassNamesResourceConfig.class.getName());
+        jerseyAdapter.addInitParameter("com.sun.jersey.config.property.packages",
+                "com.sun.jersey.osgi.tests com/sun/jersey com.sun.jersey.osgi com/sun/jersey/osgi");
+        //jerseyAdapter.addInitParameter("com.sun.jersey.config.property.resourceConfigClass",
+        //        ClassNamesResourceConfig.class.getName());
         jerseyAdapter.setContextPath("/jersey");
         jerseyAdapter.setServletInstance(new ServletContainer());
 
