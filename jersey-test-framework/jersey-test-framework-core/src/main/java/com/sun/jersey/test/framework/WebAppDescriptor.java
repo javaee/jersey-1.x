@@ -2,24 +2,22 @@ package com.sun.jersey.test.framework;
 
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-//import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
-//import com.sun.jersey.test.framework.spi.container.embedded.glassfish.external.ExternalTestContainerFactory;
-//import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
+
+import javax.servlet.Filter;
+import javax.servlet.ServletContextAttributeListener;
+import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRequestAttributeListener;
+import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpSessionActivationListener;
+import javax.servlet.http.HttpSessionAttributeListener;
+import javax.servlet.http.HttpSessionListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.Filter;
-import javax.servlet.ServletContextAttributeListener;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletRequestAttributeListener;
-import javax.servlet.ServletRequestListener;
-import javax.servlet.http.HttpSessionListener;
-import javax.servlet.http.HttpSessionActivationListener;
-import javax.servlet.http.HttpSessionAttributeListener;
-import javax.servlet.http.HttpServlet;
 
 /**
  * A Web-based application descriptor.
@@ -70,7 +68,7 @@ public class WebAppDescriptor extends AppDescriptor {
 
         protected Class<? extends HttpServlet> servletClass = ServletContainer.class;
 
-        protected Class<? extends Filter> filterClass;
+        protected List<FilterDescriptor> filters;
 
         protected List<Class<? extends EventListener>> listeners;
 
@@ -177,7 +175,7 @@ public class WebAppDescriptor extends AppDescriptor {
                 throw new IllegalArgumentException("The servlet class must not be null");
 
             this.servletClass = servletClass;
-            this.filterClass = null;
+            this.filters = null;
             return this;
         }
 
@@ -195,8 +193,29 @@ public class WebAppDescriptor extends AppDescriptor {
             if (filterClass == null)
                 throw new IllegalArgumentException("The filter class must not be null");
 
-            this.filterClass = filterClass;
+            this.filters = new ArrayList<FilterDescriptor>();
+            this.filters.add(new FilterDescriptor(filterClass, "jerseyfilter", null));
             this.servletClass = null;
+            return this;
+        }
+
+        /**
+         * Adds filter class.
+         *
+         * <p> Adding a filter class DOES NOT reset the servlet or filter classes
+         *
+         * @param filterClass filter class. Must not be null.
+         * @param filterName filter name. Must not be null.
+         * @param initParams filter init params. When null, servlet init params will be used
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>filterClass</code> or <code>filterName</code> is null.
+         */
+        public Builder addFilter(Class<? extends Filter> filterClass, String filterName,
+                                 Map<String, String> initParams) throws IllegalArgumentException {
+            if(this.filters == null)
+                this.filters = new ArrayList<FilterDescriptor>();
+
+            this.filters.add(new FilterDescriptor(filterClass, filterName, initParams));
             return this;
         }
 
@@ -386,10 +405,34 @@ public class WebAppDescriptor extends AppDescriptor {
             this.initParams = null;
             this.contextParams = null;
             this.servletClass = ServletContainer.class;
-            this.filterClass = null;
+            this.filters = null;
             this.listeners = null;
             this.contextPath = "";
             this.servletPath = "";
+        }
+    }
+
+    public static class FilterDescriptor {
+        private Class<? extends Filter> filterClass;
+        private String filterName;
+        private Map<String, String> initParams;
+
+        FilterDescriptor(Class<? extends Filter> filterClass, String filterName, Map<String, String> initParams) {
+            this.filterClass = filterClass;
+            this.filterName = filterName;
+            this.initParams = initParams;
+        }
+
+        public Class<? extends Filter> getFilterClass() {
+            return filterClass;
+        }
+
+        public String getFilterName() {
+            return filterName;
+        }
+
+        public Map<String, String> getInitParams() {
+            return initParams;
         }
     }
 
@@ -399,7 +442,7 @@ public class WebAppDescriptor extends AppDescriptor {
 
     private final Class<? extends HttpServlet> servletClass;
 
-    private final Class<? extends Filter> filterClass;
+    private final List<FilterDescriptor> filters;
 
     private final List<Class<? extends EventListener>> listeners;
     
@@ -410,7 +453,7 @@ public class WebAppDescriptor extends AppDescriptor {
     /**
      * Creates an instance of {@link WebAppDescriptor} from the passed {@link Builder}
      * instance.
-     * @param {@link Builder} instance
+     * @param b {@link Builder} instance
      */
     private WebAppDescriptor(Builder b) {
         super(b);
@@ -422,7 +465,7 @@ public class WebAppDescriptor extends AppDescriptor {
             ? new HashMap<String, String>()
             : b.contextParams;
         this.servletClass = b.servletClass;
-        this.filterClass = b.filterClass;
+        this.filters = b.filters;
         this.contextPath = b.contextPath;
         this.servletPath = b.servletPath;
         if (b.listeners == null) {
@@ -454,8 +497,7 @@ public class WebAppDescriptor extends AppDescriptor {
     /**
      * Get the servlet class.
      * 
-     * @return the servlet class. If <code>null</code> then the filter
-     *         class will not be <code>null</code>.
+     * @return the servlet classes.
      */
     public Class<? extends HttpServlet> getServletClass() {
         return servletClass;
@@ -464,11 +506,10 @@ public class WebAppDescriptor extends AppDescriptor {
     /**
      * Get the filter class.
      *
-     * @return the filter class. If <code>null</code> then the servlet
-     *         class will not be <code>null</code>.
+     * @return the filter classes.
      */
-    public Class<? extends Filter> getFilterClass() {
-        return filterClass;
+    public List<FilterDescriptor> getFilters() {
+        return filters;
     }
 
     /**

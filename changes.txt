@@ -1,4 +1,7 @@
 release 1.3 (05/06-2010)
+- Jersey Test Framework
+  Adding support for setting servlet and concurrent filter(s) with possibility
+  to set up filter name and init params per filter
 - Fixed issue 526
   https://jersey.dev.java.net/issues/show_bug.cgi?id=526
   Provide access to the matching AbstractResourceMethod that was invoked

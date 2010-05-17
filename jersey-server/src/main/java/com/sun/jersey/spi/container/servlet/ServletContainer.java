@@ -837,7 +837,6 @@ public class ServletContainer extends HttpServlet implements Filter {
         // body then call the next filter in the chain
         if (forwardOn404 && status == 404 && !response.isCommitted()) {
             chain.doFilter(request, response);
-            return;
         }
     }
 }

@@ -44,16 +44,15 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+
+import javax.servlet.Servlet;
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.Filter;
-import javax.servlet.Servlet;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * A Web-based test container factory for creating test container instances
@@ -92,7 +91,7 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         final Class servletClass;
 
-        final Class filterClass;
+        List<WebAppDescriptor.FilterDescriptor> filters = null;
 
         final List<Class<? extends EventListener>> eventListeners;
 
@@ -104,8 +103,8 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         /**
          * Creates an instance of {@link GrizzlyWebTestContainer}
-         * @param Base URI of the application
-         * @param An instance of {@link WebAppDescriptor}
+         * @param baseUri URI of the application
+         * @param ad An instance of {@link WebAppDescriptor}
          */
         private GrizzlyWebTestContainer(URI baseUri, WebAppDescriptor ad) {
             this.baseUri = UriBuilder.fromUri(baseUri)
@@ -117,7 +116,7 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             this.contextPath = ad.getContextPath();
             this.servletPath = ad.getServletPath();
             this.servletClass = ad.getServletClass();
-            this.filterClass = ad.getFilterClass();
+            this.filters = ad.getFilters();
             this.initParams = ad.getInitParams();
             this.contextParams = ad.getContextParams();
             this.eventListeners = ad.getListeners();
@@ -174,9 +173,12 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             }
          
             // Filter support
-            if ( filterClass!=null ) {
+            if ( filters!=null ) {
                 try {
-                    sa.addFilter((Filter) filterClass.newInstance(), "jerseyfilter", initParams);                    
+                    for(WebAppDescriptor.FilterDescriptor d : this.filters) {
+                        sa.addFilter(d.getFilterClass().newInstance(), d.getFilterName(),
+                                (d.getInitParams() == null ? initParams : d.getInitParams() ));
+                    }
                 } catch (InstantiationException ex) {                    
                     throw new TestContainerException(ex);
                 } catch (IllegalAccessException ex) {                    

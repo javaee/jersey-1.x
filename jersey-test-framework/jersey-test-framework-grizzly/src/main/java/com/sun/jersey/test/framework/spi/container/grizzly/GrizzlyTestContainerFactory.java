@@ -130,8 +130,8 @@ public class GrizzlyTestContainerFactory implements TestContainerFactory {
 
         /**
          * Creates an instance of {@link SelectorThread}
-         * @param The application base URI
-         * @param An instance of {@link Adapter}
+         * @param u The application base URI
+         * @param adapter An instance of {@link Adapter}
          * @return A {@link SelectorThread} instance
          * @throws IOException
          * @throws IllegalArgumentException
