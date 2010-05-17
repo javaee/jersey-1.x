@@ -205,7 +205,7 @@ public class WebAppDescriptor extends AppDescriptor {
          * <p> Adding a filter class DOES NOT reset the servlet or filter classes
          *
          * @param filterClass filter class. Must not be null.
-         * @param filterName filter name. Must not be null.
+         * @param filterName filter name. Must not be null or empty string.
          * @param initParams filter init params. When null, servlet init params will be used
          * @return this builder.
          * @throws IllegalArgumentException if <code>filterClass</code> or <code>filterName</code> is null.
@@ -214,6 +214,12 @@ public class WebAppDescriptor extends AppDescriptor {
                                  Map<String, String> initParams) throws IllegalArgumentException {
             if(this.filters == null)
                 this.filters = new ArrayList<FilterDescriptor>();
+
+            if(filterClass == null)
+                throw new IllegalArgumentException("The filter class must not be null");
+
+            if((filterName == null) || (filterName.isEmpty()))
+                throw new IllegalArgumentException("The filter name must not be null or empty string");
 
             this.filters.add(new FilterDescriptor(filterClass, filterName, initParams));
             return this;
@@ -497,7 +503,7 @@ public class WebAppDescriptor extends AppDescriptor {
     /**
      * Get the servlet class.
      * 
-     * @return the servlet classes.
+     * @return the servlet class.
      */
     public Class<? extends HttpServlet> getServletClass() {
         return servletClass;
