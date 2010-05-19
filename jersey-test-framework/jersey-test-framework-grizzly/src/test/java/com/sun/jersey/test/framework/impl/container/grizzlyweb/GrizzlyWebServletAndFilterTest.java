@@ -86,8 +86,8 @@ public class GrizzlyWebServletAndFilterTest extends JerseyTest {
 
     public GrizzlyWebServletAndFilterTest() {
         super(new WebAppDescriptor.Builder().servletClass(MyServlet.class)
-                .addFilter(MyFilter1.class, "myFilter", null)
-                .addFilter(MyFilter2.class, "myFilter", null)
+                .addFilter(MyFilter1.class, "myFilter1")
+                .addFilter(MyFilter2.class, "myFilter2")
                 .initParam(PackagesResourceConfig.PROPERTY_PACKAGES, "com.sun.jersey.test.framework.impl.container.grizzlyweb").build());
     }
 

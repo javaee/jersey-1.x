@@ -176,8 +176,7 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             if ( filters!=null ) {
                 try {
                     for(WebAppDescriptor.FilterDescriptor d : this.filters) {
-                        sa.addFilter(d.getFilterClass().newInstance(), d.getFilterName(),
-                                (d.getInitParams() == null ? initParams : d.getInitParams() ));
+                        sa.addFilter(d.getFilterClass().newInstance(), d.getFilterName(), d.getInitParams());
                     }
                 } catch (InstantiationException ex) {                    
                     throw new TestContainerException(ex);

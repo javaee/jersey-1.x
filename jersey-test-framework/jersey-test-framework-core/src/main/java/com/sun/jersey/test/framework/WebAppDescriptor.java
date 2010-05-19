@@ -202,13 +202,29 @@ public class WebAppDescriptor extends AppDescriptor {
         /**
          * Adds filter class.
          *
+         * <p> Adding a filter class DOES NOT reset the servlet or filter classes.
+         * Filter will be instanciated without initialization parameters.
+         *
+         * @param filterClass filter class. Must not be null.
+         * @param filterName filter name. Must not be null or empty string.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>filterClass</code> or <code>filterName</code> is null.
+         */
+        public Builder addFilter(Class<? extends Filter> filterClass, String filterName) throws IllegalArgumentException {
+            return addFilter(filterClass, filterName, Collections.<String, String>emptyMap());
+        }
+
+
+        /**
+         * Adds filter class.
+         *
          * <p> Adding a filter class DOES NOT reset the servlet or filter classes
          *
          * @param filterClass filter class. Must not be null.
          * @param filterName filter name. Must not be null or empty string.
-         * @param initParams filter init params. When null, servlet init params will be used
+         * @param initParams filter init parameters. Must not be null.
          * @return this builder.
-         * @throws IllegalArgumentException if <code>filterClass</code> or <code>filterName</code> is null.
+         * @throws IllegalArgumentException if <code>filterClass</code>, <code>filterName</code> or <code>initParams</code> is null.
          */
         public Builder addFilter(Class<? extends Filter> filterClass, String filterName,
                                  Map<String, String> initParams) throws IllegalArgumentException {
@@ -220,6 +236,9 @@ public class WebAppDescriptor extends AppDescriptor {
 
             if((filterName == null) || (filterName.isEmpty()))
                 throw new IllegalArgumentException("The filter name must not be null or empty string");
+
+            if(initParams == null)
+                throw new IllegalArgumentException("Provided initParams are invalid; initParams must not be null");
 
             this.filters.add(new FilterDescriptor(filterClass, filterName, initParams));
             return this;

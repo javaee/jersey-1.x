@@ -24,9 +24,7 @@ public class GrizzlyWebInjectionTest extends JerseyTest {
     public static class TestResource {
 
         @Context ServletConfig servletConfig;
-
         @Context ServletContext servletContext;
-
 
         @GET
         public String get() {
