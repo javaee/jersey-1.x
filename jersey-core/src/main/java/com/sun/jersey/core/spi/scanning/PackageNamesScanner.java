@@ -43,7 +43,9 @@ import com.sun.jersey.core.spi.scanning.uri.FileSchemeScanner;
 import com.sun.jersey.core.spi.scanning.uri.JarZipSchemeScanner;
 import com.sun.jersey.core.spi.scanning.uri.UriSchemeScanner;
 import com.sun.jersey.core.spi.scanning.uri.VfsSchemeScanner;
+import com.sun.jersey.spi.service.ServiceFinder;
 import java.io.IOException;
+import java.lang.reflect.ReflectPermission;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -103,7 +105,10 @@ public class PackageNamesScanner implements Scanner {
         add(new JarZipSchemeScanner());
         add(new FileSchemeScanner());
         add(new VfsSchemeScanner());
-        // TODO use META-INF/services to register additional URI scheme scanners
+
+        for (UriSchemeScanner s : ServiceFinder.find(UriSchemeScanner.class)) {
+            add(s);
+        }
     }
 
     private void add(final UriSchemeScanner ss) {
@@ -115,7 +120,7 @@ public class PackageNamesScanner implements Scanner {
     public void scan(final ScannerListener cfl) {
         for (final String p : packages) {
             try {
-                final Enumeration<URL> urls = classloader.getResources(p.replace('.', '/'));
+                final Enumeration<URL> urls = PackageURLProvider.getInstance().getPackageURLs(classloader, p.replace('.', '/'));
                 while (urls.hasMoreElements()) {
                     try {
                         scan(toURI(urls.nextElement()), cfl);
@@ -128,6 +133,63 @@ public class PackageNamesScanner implements Scanner {
             }
         }
     }
+
+    public static abstract class PackageURLProvider {
+
+        private static volatile PackageURLProvider provider;
+
+        private static PackageURLProvider getInstance() {
+            // Double-check idiom for lazy initialization
+            PackageURLProvider result = provider;
+
+            if (result == null) { // first check without locking
+                synchronized (PackageURLProvider.class) {
+                    result = provider;
+                    if (result == null) { // second check with locking
+                        provider = result = new PackageURLProvider() {
+
+                            @Override
+                            public Enumeration<URL> getPackageURLs(ClassLoader cl, String pkgName) throws IOException {
+                                return cl.getResources(pkgName);
+                            }
+                        };
+
+                    }
+                }
+
+            }
+            return result;
+        }
+
+        private static void setInstance(PackageURLProvider provider) throws SecurityException {
+            SecurityManager security = System.getSecurityManager();
+            if (security != null) {
+                ReflectPermission rp = new ReflectPermission("suppressAccessChecks");
+                security.checkPermission(rp);
+            }
+            synchronized (PackageURLProvider.class) {
+                PackageURLProvider.provider = provider;
+            }
+        }
+
+        /*
+         * creates an enumeration of URLs, where the package with given pkgName could be found
+         */
+        public abstract Enumeration<URL> getPackageURLs(ClassLoader cl, String pkgName) throws IOException;
+    }
+
+    /**
+     * Gives you a chance to change the default package URL lookup mechanism, by registering a custom
+     * <tt>PackageURLProvider</tt>. The call has to be made prior to any lookup attempts,
+     * otherwise the default method would be used.
+     *
+     * @param provider
+     * @throws SecurityException
+     */
+    public static void setPackageURLProvider(PackageURLProvider provider) throws SecurityException {
+        PackageURLProvider.setInstance(provider);
+    }
+
 
     private void scan(final URI u, final ScannerListener cfl) {
         final UriSchemeScanner ss = scanners.get(u.getScheme().toLowerCase());

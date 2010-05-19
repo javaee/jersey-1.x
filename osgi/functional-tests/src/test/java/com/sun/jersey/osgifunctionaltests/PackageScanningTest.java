@@ -4,19 +4,11 @@ import com.sun.grizzly.http.embed.GrizzlyWebServer;
 import com.sun.grizzly.http.servlet.ServletAdapter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.osgi.tests.util.Helper;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-
-import java.util.logging.Logger;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
-import javax.ws.rs.core.UriBuilder;
-import org.junit.Test;
 
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Customizer;
@@ -36,16 +28,21 @@ import org.osgi.framework.BundleContext;
 import static org.junit.Assert.assertEquals;
 import static org.ops4j.pax.swissbox.tinybundles.core.TinyBundles.*;
 
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.UriBuilder;
+
+import org.junit.Test;
 
 
 @RunWith(JUnit4TestRunner.class)
-public class BasicOsgiIntegrationTest {
+public class PackageScanningTest {
+    private static final Logger LOGGER = Logger.getLogger(PackageScanningTest.class.getName());
 
-    private static final Logger LOGGER = Logger.getLogger(BasicOsgiIntegrationTest.class.getName());
     private static final int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 8080);
     private static final String CONTEXT = "/jersey";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
-
+    
     @Inject
     protected BundleContext bundleContext;
 
@@ -63,6 +60,9 @@ public class BasicOsgiIntegrationTest {
                 "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                 "http://repository.springsource.com/maven/bundles/release",
                 "http://repository.springsource.com/maven/bundles/external"),
+
+                // asm bundle
+                mavenBundle().groupId("asm").artifactId("asm-all").versionAsInProject(),
                 // load grizzly bundle
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
                 // load Jersey bundles
@@ -88,33 +88,22 @@ public class BasicOsgiIntegrationTest {
         return options;
     }
 
-    @Path("/super-simple")
-    public static class SuperSimpleResource {
-
-        @GET
-        public String getMe() {
-            return "OK";
-        }
-    }
-
     @Test
     public void testSimpleResource() throws Exception {
 
         GrizzlyWebServer gws = new GrizzlyWebServer(port);
 
         ServletAdapter jerseyAdapter = new ServletAdapter();
-        jerseyAdapter.addInitParameter("com.sun.jersey.config.property.classnames",
-                SuperSimpleResource.class.getName());
-        jerseyAdapter.addInitParameter("com.sun.jersey.config.property.resourceConfigClass",
-                ClassNamesResourceConfig.class.getName());
+        jerseyAdapter.addInitParameter("com.sun.jersey.config.property.packages",
+                this.getClass().getPackage().getName());
         jerseyAdapter.setContextPath("/jersey");
         jerseyAdapter.setServletInstance(new ServletContainer());
 
-        gws.addGrizzlyAdapter(jerseyAdapter, new String[]{"/jersey"});
+        gws.addGrizzlyAdapter(jerseyAdapter, new String[] {"/jersey"});
 
         gws.start();
 
-        WebResource r = resource().path("/super-simple");
+        WebResource r = resource().path("/simple");
         String result = r.get(String.class);
 
         System.out.println("RESULT = " + result);
@@ -122,9 +111,6 @@ public class BasicOsgiIntegrationTest {
 
 
         gws.stop();
-
-
-        assertEquals("one", "one");
     }
 
     public WebResource resource() {

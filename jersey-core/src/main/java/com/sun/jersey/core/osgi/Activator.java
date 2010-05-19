@@ -16,16 +16,22 @@
  */
 package com.sun.jersey.core.osgi;
 
+import com.sun.jersey.core.spi.scanning.PackageNamesScanner;
+import com.sun.jersey.core.spi.scanning.uri.BundleSchemeScanner;
+import com.sun.jersey.core.spi.scanning.uri.UriSchemeScanner;
 import com.sun.jersey.impl.SpiMessages;
 import com.sun.jersey.spi.service.ServiceConfigurationError;
 import com.sun.jersey.spi.service.ServiceFinder;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -131,10 +137,36 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
         }
     }
 
-    //@Override
-    public synchronized void start(BundleContext bundleContext) throws Exception {
+    @Override
+    public synchronized void start(final BundleContext bundleContext) throws Exception {
         this.bundleContext = bundleContext;
         debugPrintln("activating");
+        debugPrintln("changing package names scanner URL lookup mechanism");
+        PackageNamesScanner.setPackageURLProvider(new PackageNamesScanner.PackageURLProvider() {
+
+            @Override
+            public Enumeration<URL> getPackageURLs(ClassLoader cl, String pkgName) throws IOException {
+                List<URL> result = new LinkedList<URL>();
+                for (Bundle b : bundleContext.getBundles()) {
+                    Enumeration<URL> e = (Enumeration<URL>)b.findEntries(pkgName, "*", false);
+                    if (e != null) {
+                        result.addAll(Collections.list(e));
+                    }
+                }
+                return Collections.enumeration(result);
+            }
+        });
+        // register BundleSchemeScanner
+        OsgiLocator.register(UriSchemeScanner.class.getName(), new Callable<List<Class>>(){
+
+            @Override
+            public List<Class> call() throws Exception {
+                List<Class> result = new LinkedList<Class>();
+                result.add(BundleSchemeScanner.class);
+                return result;
+            }
+
+        });
         debugPrintln("changing the default ServiceFinder lookup mechanism");
         ServiceFinder.setIteratorProvider(new OsgiServiceFinder());
         debugPrintln("adding bundle listener");
