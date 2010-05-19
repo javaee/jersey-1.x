@@ -1,4 +1,7 @@
 release 1.3 (05/06-2010)
+- Fixed issue 527
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=527
+  Package name resource config does not work in OSGi environment
 - Jersey Test Framework
   Adding support for setting servlet and concurrent filter(s) with possibility
   to set up filter name and init params per filter
