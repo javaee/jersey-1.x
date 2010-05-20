@@ -69,7 +69,7 @@ import org.osgi.service.event.EventHandler;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(JUnit4TestRunner.class)
-public class WebAppTest {
+public class WebAppFelixTest {
 
     public class WebEventHandler implements EventHandler {
 
@@ -89,7 +89,6 @@ public class WebAppTest {
     }
     
     private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
-    private static final int rmiPort = getEnvVariable("JERSEY_RMI_PORT", 1099);
     private static final String CONTEXT = "/helloworld";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
     private static final String BundleLocationProperty = "jersey.bundle.location";
