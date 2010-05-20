@@ -38,7 +38,6 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.sun.jersey.api.wadl.config;
 
 import com.sun.jersey.api.model.AbstractMethod;
@@ -71,52 +70,49 @@ import com.sun.research.ws.wadl.Response;
  * @version $Id$
  */
 public class WadlGeneratorConfigTest extends TestCase {
-    
+
     public WadlGeneratorConfigTest(String testName) {
         super(testName);
     }
-    
+
     public void testBuildWadlGeneratorFromGenerators() {
         final MyWadlGenerator generator = new MyWadlGenerator();
         final MyWadlGenerator2 generator2 = new MyWadlGenerator2();
-        WadlGeneratorConfig config = WadlGeneratorConfig
-            .generator( generator )
-            .generator( generator2 )
-            .build();
-        
+        WadlGeneratorConfig config = WadlGeneratorConfig.
+                generator(generator).
+                generator(generator2).
+                build();
+
         WadlGenerator wadlGenerator = config.getWadlGenerator();
 
-        assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
-        assertEquals( MyWadlGenerator.class, ( (MyWadlGenerator2)wadlGenerator ).getDelegate().getClass() );
+        assertEquals(MyWadlGenerator2.class, wadlGenerator.getClass());
+        assertEquals(MyWadlGenerator.class, ((MyWadlGenerator2) wadlGenerator).getDelegate().getClass());
     }
-    
+
     public void testBuildWadlGeneratorFromDescriptions() {
         final String propValue = "bar";
-        WadlGeneratorConfig config = WadlGeneratorConfig
-            .generator( MyWadlGenerator.class )
-            .prop( "foo", propValue )
-            .build();
+        WadlGeneratorConfig config = WadlGeneratorConfig.generator(MyWadlGenerator.class).
+                prop("foo", propValue).
+                build();
         WadlGenerator wadlGenerator = config.getWadlGenerator();
-        assertEquals( MyWadlGenerator.class, wadlGenerator.getClass() );
-        assertEquals( ((MyWadlGenerator)wadlGenerator).getFoo(), propValue );
+        assertEquals(MyWadlGenerator.class, wadlGenerator.getClass());
+        assertEquals(((MyWadlGenerator) wadlGenerator).getFoo(), propValue);
 
         final String propValue2 = "baz";
-        config = WadlGeneratorConfig
-            .generator( MyWadlGenerator.class )
-            .prop( "foo", propValue )
-            .generator( MyWadlGenerator2.class )
-            .prop( "bar", propValue2 )
-            .build();
+        config = WadlGeneratorConfig.generator(MyWadlGenerator.class).
+                prop("foo", propValue).generator(MyWadlGenerator2.class).
+                prop("bar", propValue2).
+                build();
         wadlGenerator = config.getWadlGenerator();
-        assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
-        final MyWadlGenerator2 wadlGenerator2 = (MyWadlGenerator2)wadlGenerator;
-        assertEquals( wadlGenerator2.getBar(), propValue2 );
-        
-        assertEquals( MyWadlGenerator.class, wadlGenerator2.getDelegate().getClass() );
-        assertEquals( ((MyWadlGenerator)wadlGenerator2.getDelegate()).getFoo(), propValue );
-        
+        assertEquals(MyWadlGenerator2.class, wadlGenerator.getClass());
+        final MyWadlGenerator2 wadlGenerator2 = (MyWadlGenerator2) wadlGenerator;
+        assertEquals(wadlGenerator2.getBar(), propValue2);
+
+        assertEquals(MyWadlGenerator.class, wadlGenerator2.getDelegate().getClass());
+        assertEquals(((MyWadlGenerator) wadlGenerator2.getDelegate()).getFoo(), propValue);
+
     }
-    
+
     public void testCustomWadlGeneratorConfig() {
 
         final String propValue = "someValue";
@@ -125,29 +121,77 @@ public class WadlGeneratorConfigTest extends TestCase {
 
             @Override
             public List<WadlGeneratorDescription> configure() {
-                return generator( MyWadlGenerator.class )
-                .prop( "foo", propValue )
-                .generator( MyWadlGenerator2.class )
-                .prop( "bar", propValue2 )
-                .descriptions();
+                return generator(MyWadlGenerator.class).
+                        prop("foo", propValue).
+                        generator(MyWadlGenerator2.class).
+                        prop("bar", propValue2).descriptions();
             }
-            
         }
-        
+
         WadlGeneratorConfig config = new MyWadlGeneratorConfig();
         WadlGenerator wadlGenerator = config.getWadlGenerator();
-        
-        assertEquals( MyWadlGenerator2.class, wadlGenerator.getClass() );
-        final MyWadlGenerator2 wadlGenerator2 = (MyWadlGenerator2)wadlGenerator;
-        assertEquals( wadlGenerator2.getBar(), propValue2 );
-        
-        assertEquals( MyWadlGenerator.class, wadlGenerator2.getDelegate().getClass() );
-        assertEquals( ((MyWadlGenerator)wadlGenerator2.getDelegate()).getFoo(), propValue );
-        
+
+        assertEquals(MyWadlGenerator2.class, wadlGenerator.getClass());
+        final MyWadlGenerator2 wadlGenerator2 = (MyWadlGenerator2) wadlGenerator;
+        assertEquals(wadlGenerator2.getBar(), propValue2);
+
+        assertEquals(MyWadlGenerator.class, wadlGenerator2.getDelegate().getClass());
+        assertEquals(((MyWadlGenerator) wadlGenerator2.getDelegate()).getFoo(), propValue);
+
     }
-    
-    static class MyWadlGenerator implements WadlGenerator {
-        
+
+    static abstract class BaseWadlGenerator implements WadlGenerator {
+
+        public Application createApplication() {
+            return null;
+        }
+
+        public Method createMethod(AbstractResource r, AbstractResourceMethod m) {
+            return null;
+        }
+
+        public Request createRequest(AbstractResource r,
+                AbstractResourceMethod m) {
+            return null;
+        }
+
+        public Param createParam(AbstractResource r,
+                AbstractMethod m, Parameter p) {
+            return null;
+        }
+
+        public RepresentationType createRequestRepresentation(
+                AbstractResource r, AbstractResourceMethod m,
+                MediaType mediaType) {
+            return null;
+        }
+
+        public Resource createResource(AbstractResource r, String path) {
+            return null;
+        }
+
+        public Resources createResources() {
+            return null;
+        }
+
+        public Response createResponse(AbstractResource r,
+                AbstractResourceMethod m) {
+            return null;
+        }
+
+        public String getRequiredJaxbContextPath() {
+            return null;
+        }
+
+        public void init() throws Exception {
+        }
+
+        public void setWadlGeneratorDelegate(WadlGenerator delegate) {
+        }
+    }
+
+    static class MyWadlGenerator extends BaseWadlGenerator {
+
         private String _foo;
 
         /**
@@ -160,72 +204,15 @@ public class WadlGeneratorConfigTest extends TestCase {
         /**
          * @param foo the foo to set
          */
-        public void setFoo( String foo ) {
+        public void setFoo(String foo) {
             _foo = foo;
         }
-
-        public Application createApplication() {
-            return null;
-        }
-
-        public Method createMethod( AbstractResource r, AbstractResourceMethod m ) {
-            return null;
-        }
-
-        public Request createRequest( AbstractResource r,
-                AbstractResourceMethod m ) {
-            return null;
-        }
-
-        public Param createParam( AbstractResource r,
-                AbstractMethod m, Parameter p ) {
-            return null;
-        }
-
-        public RepresentationType createRequestRepresentation(
-                AbstractResource r, AbstractResourceMethod m,
-                MediaType mediaType ) {
-            return null;
-        }
-
-        public Resource createResource( AbstractResource r, String path ) {
-            return null;
-        }
-
-        public Resources createResources() {
-            return null;
-        }
-
-        public Response createResponse( AbstractResource r,
-                AbstractResourceMethod m ) {
-            return null;
-        }
-
-        public String getRequiredJaxbContextPath() {
-            return null;
-        }
-
-        public void init() throws Exception {
-            
-        }
-
-        public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
-        }
-        
     }
-    
-    static class MyWadlGenerator2 implements WadlGenerator {
-        
+
+    static class MyWadlGenerator2 extends BaseWadlGenerator {
+
         private String _bar;
         private WadlGenerator _delegate;
-
-        public void init() throws Exception {
-            
-        }
-
-        public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
-            _delegate = delegate;
-        }
 
         /**
          * @return the delegate
@@ -244,51 +231,57 @@ public class WadlGeneratorConfigTest extends TestCase {
         /**
          * @param foo the foo to set
          */
-        public void setBar( String foo ) {
+        public void setBar(String foo) {
             _bar = foo;
         }
 
-        public Application createApplication() {
-            return null;
+        public void setWadlGeneratorDelegate(WadlGenerator delegate) {
+            _delegate = delegate;
         }
-
-        public Method createMethod( AbstractResource r, AbstractResourceMethod m ) {
-            return null;
-        }
-
-        public Request createRequest( AbstractResource r,
-                AbstractResourceMethod m ) {
-            return null;
-        }
-
-        public Param createParam( AbstractResource r,
-                AbstractMethod m, Parameter p ) {
-            return null;
-        }
-
-        public RepresentationType createRequestRepresentation(
-                AbstractResource r, AbstractResourceMethod m,
-                MediaType mediaType ) {
-            return null;
-        }
-
-        public Resource createResource( AbstractResource r, String path ) {
-            return null;
-        }
-
-        public Resources createResources() {
-            return null;
-        }
-
-        public Response createResponse( AbstractResource r,
-                AbstractResourceMethod m ) {
-            return null;
-        }
-
-        public String getRequiredJaxbContextPath() {
-            return null;
-        }
-        
     }
-    
+
+    static class Foo {
+
+        String s;
+
+        public Foo(String s) {
+            this.s = s;
+        }
+    }
+
+    static class Bar {
+    }
+
+    static class MyWadlGenerator3 extends BaseWadlGenerator {
+
+        Foo foo;
+        Bar bar;
+
+        /**
+         * @param foo the foo to set
+         */
+        public void setFoo(Foo foo) {
+            this.foo = foo;
+        }
+
+        public void setBar(Bar bar) {
+            this.bar = bar;
+        }
+    }
+
+    public void testBuildWadlGeneratorFromDescriptionsWithTypes() {
+        final String propValue = "bar";
+        WadlGeneratorConfig config = WadlGeneratorConfig.
+                generator(MyWadlGenerator3.class).
+                prop("foo", "string").
+                prop("bar", new Bar()).build();
+        WadlGenerator wadlGenerator = config.getWadlGenerator();
+
+        assertEquals(MyWadlGenerator3.class, wadlGenerator.getClass());
+
+        MyWadlGenerator3 g = (MyWadlGenerator3) wadlGenerator;
+        assertNotNull(g.foo);
+        assertEquals(g.foo.s, "string");
+        assertNotNull(g.bar);
+    }
 }
