@@ -5,7 +5,7 @@
 %ents;
 ]>
 <chapter>
-    <title>Hypermedia</title>
+    <title>Hypermedia (Experimental)</title>
     <section>
         <title>Introduction</title>
         <para>It is generally understood that, in order to follow the REST style, URIs should be
