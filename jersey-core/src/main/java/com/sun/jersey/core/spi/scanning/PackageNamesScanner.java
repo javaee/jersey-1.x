@@ -57,24 +57,32 @@ import java.util.Map;
  * A scanner that recursively scans URI-based resources present in a set of
  * package names, and sub-package names of that set.
  * <p>
- * The URIs for a package name are obtained by invoking
+ * The URIs for a package name are obtained, by default, by invoking
  * {@link ClassLoader#getResources(java.lang.String) } with the parameter that
- * is the package name with "." replaced by "/".
+ * is the package name with "." replaced by "/". The obtaining of the resources
+ * with a given name may be overridden by registering an implementation of
+ * {@link ResourcesProvider} using the method
+ * {@link #setResourcesProvider(com.sun.jersey.core.spi.scanning.PackageNamesScanner.ResourcesProvider) }.
  * <p>
  * Each URI is then scanned using a registered {@link UriSchemeScanner} that
  * supports the URI scheme.
  * <p>
- * The following are registered.
+ * The following are registered by default.
  * The {@link FileSchemeScanner} for "file" URI schemes.
  * The {@link JarZipSchemeScanner} for "jar" or "zip" URI schemes to jar
  * resources.
  * The {@link VfsSchemeScanner} for the JBoss-based "vfsfile" and "vfszip"
  * URI schemes.
  * <p>
+ * Further schemes may be registered by registering an implementation of
+ * {@link UriSchemeScanner} in the META-INF/services file whose name is the
+ * the fully qualified class name of {@link UriSchemeScanner}.
+ * <p>
  * If a URI scheme is not supported a {@link ScannerException} will be thrown
  * and package scanning deployment will fail.
  * 
  * @author Paul.Sandoz@Sun.Com
+ * @author Jakub.Podlesak@Sun.Com
  */
 public class PackageNamesScanner implements Scanner {
 
@@ -117,10 +125,12 @@ public class PackageNamesScanner implements Scanner {
         }
     }
 
+    @Override
     public void scan(final ScannerListener cfl) {
         for (final String p : packages) {
             try {
-                final Enumeration<URL> urls = PackageURLProvider.getInstance().getPackageURLs(classloader, p.replace('.', '/'));
+                final Enumeration<URL> urls = ResourcesProvider.getInstance().
+                        getResources(p.replace('.', '/'), classloader);
                 while (urls.hasMoreElements()) {
                     try {
                         scan(toURI(urls.nextElement()), cfl);
@@ -134,23 +144,27 @@ public class PackageNamesScanner implements Scanner {
         }
     }
 
-    public static abstract class PackageURLProvider {
+    /**
+     * Find resources with a given name and class loader.
+     */
+    public static abstract class ResourcesProvider {
 
-        private static volatile PackageURLProvider provider;
+        private static volatile ResourcesProvider provider;
 
-        private static PackageURLProvider getInstance() {
+        private static ResourcesProvider getInstance() {
             // Double-check idiom for lazy initialization
-            PackageURLProvider result = provider;
+            ResourcesProvider result = provider;
 
             if (result == null) { // first check without locking
-                synchronized (PackageURLProvider.class) {
+                synchronized (ResourcesProvider.class) {
                     result = provider;
                     if (result == null) { // second check with locking
-                        provider = result = new PackageURLProvider() {
+                        provider = result = new ResourcesProvider() {
 
                             @Override
-                            public Enumeration<URL> getPackageURLs(ClassLoader cl, String pkgName) throws IOException {
-                                return cl.getResources(pkgName);
+                            public Enumeration<URL> getResources(String name, ClassLoader cl)
+                                    throws IOException {
+                                return cl.getResources(name);
                             }
                         };
 
@@ -161,33 +175,42 @@ public class PackageNamesScanner implements Scanner {
             return result;
         }
 
-        private static void setInstance(PackageURLProvider provider) throws SecurityException {
+        private static void setInstance(ResourcesProvider provider) throws SecurityException {
             SecurityManager security = System.getSecurityManager();
             if (security != null) {
                 ReflectPermission rp = new ReflectPermission("suppressAccessChecks");
                 security.checkPermission(rp);
             }
-            synchronized (PackageURLProvider.class) {
-                PackageURLProvider.provider = provider;
+            synchronized (ResourcesProvider.class) {
+                ResourcesProvider.provider = provider;
             }
         }
 
-        /*
-         * creates an enumeration of URLs, where the package with given pkgName could be found
+        /**
+         * Find all resources with the given name using a class loader.
+         *
+         * @param cl the class loader use to find the resources
+         * @param name the resource name
+         * @return An enumeration of URL objects for the resource.
+         *         If no resources could be found, the enumeration will be empty.
+         *         Resources that the class loader doesn't have access to will
+         *         not be in the enumeration.
+         * @throws IOException if I/O errors occur
          */
-        public abstract Enumeration<URL> getPackageURLs(ClassLoader cl, String pkgName) throws IOException;
+        public abstract Enumeration<URL> getResources(String name, ClassLoader cl) throws IOException;
     }
 
     /**
-     * Gives you a chance to change the default package URL lookup mechanism, by registering a custom
-     * <tt>PackageURLProvider</tt>. The call has to be made prior to any lookup attempts,
-     * otherwise the default method would be used.
+     * Set the {@link ResourcesProvider} implementation to find resources.
+     * <p>
+     * This method should be invoked before any package scanning is performed
+     * otherwise the functionality method will be utilized.
      *
-     * @param provider
-     * @throws SecurityException
+     * @param provider the resources provider.
+     * @throws SecurityException if the resources provider cannot be set.
      */
-    public static void setPackageURLProvider(PackageURLProvider provider) throws SecurityException {
-        PackageURLProvider.setInstance(provider);
+    public static void setResourcesProvider(ResourcesProvider provider) throws SecurityException {
+        ResourcesProvider.setInstance(provider);
     }
 
 

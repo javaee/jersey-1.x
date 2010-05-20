@@ -142,13 +142,12 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
         this.bundleContext = bundleContext;
         debugPrintln("activating");
         debugPrintln("changing package names scanner URL lookup mechanism");
-        PackageNamesScanner.setPackageURLProvider(new PackageNamesScanner.PackageURLProvider() {
-
+        PackageNamesScanner.setResourcesProvider(new PackageNamesScanner.ResourcesProvider() {
             @Override
-            public Enumeration<URL> getPackageURLs(ClassLoader cl, String pkgName) throws IOException {
+            public Enumeration<URL> getResources(String name, ClassLoader cl) throws IOException {
                 List<URL> result = new LinkedList<URL>();
                 for (Bundle b : bundleContext.getBundles()) {
-                    Enumeration<URL> e = (Enumeration<URL>)b.findEntries(pkgName, "*", false);
+                    Enumeration<URL> e = (Enumeration<URL>)b.findEntries(name, "*", false);
                     if (e != null) {
                         result.addAll(Collections.list(e));
                     }
