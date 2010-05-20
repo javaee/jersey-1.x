@@ -131,17 +131,16 @@ import javax.ws.rs.core.UriBuilder;
  * <p>
  * All initialization parameters are added as properties of the created
  * {@link ResourceConfig}.
- *
  * <p>
  * A new {@link WebApplication} instance will be created and configured such
- * that the following classes may be injected onto the field of a root 
- * resource class or a parameter of a method of root resource class that is 
- * annotated with {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, 
- * {@link HttpServletResponse}, {@link ServletContext}, and {@link ServletConfig}.
- * If this class is used as a Servlet then the {@link ServletConfig} class may be
- * injected. If this class is used as a Filter then the {@link FilterConfig} 
- * class may be injected.
- * 
+ * that the following classes may be injected onto a root resource, provider
+ * and {@link Application} classes using {@link javax.ws.rs.core.Context}:
+ * {@link HttpServletRequest}, {@link HttpServletResponse},
+ * {@link ServletContext}, {@link ServletConfig} and {@link WebConfig}.
+ * If this class is used as a Servlet then the {@link ServletConfig} class may 
+ * be injected. If this class is used as a Filter then the {@link FilterConfig}
+ * class may be injected. {@link WebConfig} may be injected to abstract
+ * servlet or filter deployment.
  * <p>
  * A {@link IoCComponentProviderFactory} instance may be registered by extending this class
  * and overriding the method {@link #initiate(ResourceConfig, WebApplication)}
