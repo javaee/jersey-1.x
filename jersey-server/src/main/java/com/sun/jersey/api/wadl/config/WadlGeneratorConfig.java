@@ -238,28 +238,48 @@ public abstract class WadlGeneratorConfig {
         /**
          * Specify the property value for the current {@link WadlGenerator}.
          * <p>
-         * The {@link WadlGenerator} property can be of type {@link String}, {@link File}, {@link InputStream}
-         * or any type that provides a {@link String} constructor.
+         * The {@link WadlGenerator} property type can be of any type with
+         * the following contraints:
+         * <p>
+         * If the {@link WadlGenerator} property type is equal to the
+         * property value type then the property value is set as the
+         * {@link WadlGenerator} property value.
          * </p>
          * <p>
-         * If the {@link WadlGenerator} property is of type {@link File}, then the specified property value can start with the
-         * prefix <em>classpath:</em> to denote, that the File shall be loaded from the classpath like this:
+         * If the {@link WadlGenerator} property type has a constructor with
+         * a single {@link String} parameter type and the property value is a
+         * {@link String} then an instance of the property type is constructed
+         * with the property value and that instance is set as the
+         * {@link WadlGenerator} property value.
+         * </p>
+         * <p>
+         * If the {@link WadlGenerator} property type is of type {@link File},
+         * then the specified property value must be a {@link String} starting
+         * with the prefix <em>classpath:</em> to denote, that the File shall
+         * be loaded from the classpath like this:
          * <pre><code>new File( generator.getClass().getResource( strippedFilename ).toURI() )</code></pre>
-         * Notice that the file is loaded as a resource from the classpath in this case, therefore <em>classpath:test.xml</em>
-         * refers to a file in the package of the specified <code>&lt;classname&gt;</code>. The
-         * file reference <em>classpath:/test.xml</em> refers to a file that is in the root of the classpath.
+         * Notice that the file is loaded as a resource from the classpath
+         * in this case, therefore <em>classpath:test.xml</em>
+         * refers to a file in the package of the specified 
+         * <code>&lt;classname&gt;</code>. The file reference
+         * <em>classpath:/test.xml</em> refers to a file that is in the root
+         * of the classpath.
          * </p>
          * <p>
-         * If the {@link WadlGenerator} property is of type {@link InputStream}, then the specified property value
-         * is loaded with {@link ClassLoader#getResourceAsStream(String)} using the current threads context classloader.
-         * The {@link InputStream} will be closed after {@link WadlGenerator#init()} was called and therefore must not be closed
-         * by the {@link WadlGenerator} using this stream.
+         * If the {@link WadlGenerator} property type is of type
+         * {@link InputStream}, then the specified property value must be a
+         * {@link String} and the instance of {@link InputStream} is obtained
+         * with {@link ClassLoader#getResourceAsStream(String)} using the
+         * current threads context classloader.
+         * The {@link InputStream} will be closed after
+         * {@link WadlGenerator#init()} was called and therefore must not be
+         * closed by the {@link WadlGenerator} using this stream.
          * </p>
          * @param propName the property name
          * @param propValue the stringified property value
          * @return this builder instance
          */
-        public WadlGeneratorConfigDescriptionBuilder prop( String propName, String propValue ) {
+        public WadlGeneratorConfigDescriptionBuilder prop( String propName, Object propValue ) {
             if ( _description.getProperties() == null ) {
                 _description.setProperties( new Properties() );
             }
