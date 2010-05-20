@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -46,9 +48,11 @@ import org.osgi.framework.SynchronousBundleListener;
 
 public class Activator implements BundleActivator, SynchronousBundleListener {
 
-    private static boolean debug = false;
-    private ConcurrentMap<Long, Map<String, Callable<List<Class>>>> factories = new ConcurrentHashMap<Long, Map<String, Callable<List<Class>>>>();
+    private static final Logger LOGGER = Logger.getLogger(Activator.class.getName());
+
     private BundleContext bundleContext;
+
+    private ConcurrentMap<Long, Map<String, Callable<List<Class>>>> factories = new ConcurrentHashMap<Long, Map<String, Callable<List<Class>>>>();
 
     private static final class OsgiServiceFinder<T> extends ServiceFinder.ServiceIteratorProvider<T> {
 
@@ -62,12 +66,12 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
 
                     Iterator<Class> it = providerClasses.iterator();
 
-                    //@Override
+                    @Override
                     public boolean hasNext() {
                         return it.hasNext();
                     }
 
-                    //@Override
+                    @Override
                     public T next() {
                         Class<T> nextClass = it.next();
                         try {
@@ -80,7 +84,7 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
                         }
                     }
 
-                    //@Override
+                    @Override
                     public void remove() {
                         throw new UnsupportedOperationException();
                     }
@@ -97,18 +101,18 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
 
                     Iterator<Class> it = providerClasses.iterator();
 
-                    //@Override
+                    @Override
                     public boolean hasNext() {
                         return it.hasNext();
                     }
 
                     @SuppressWarnings("unchecked")
-                    //@Override
+                    @Override
                     public Class<T> next() {
                         return it.next();
                     }
 
-                    //@Override
+                    @Override
                     public void remove() {
                         throw new UnsupportedOperationException();
                     }
@@ -118,31 +122,36 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
         }
     }
 
-    static {
-        try {
-            String prop = System.getProperty("org.apache.servicemix.specs.debug");
-            debug = prop != null && !"false".equals(prop);
-        } catch (Throwable t) {
-        }
-    }
-
-    /**
-     * <p>Output debugging messages.</p>
-     *
-     * @param msg <code>String</code> to print to <code>stderr</code>.
-     */
-    protected void debugPrintln(String msg) {
-        if (debug) {
-            System.err.println("Spec(" + bundleContext.getBundle().getBundleId() + "): " + msg);
-        }
-    }
 
     @Override
     public synchronized void start(final BundleContext bundleContext) throws Exception {
+        LOGGER.log(Level.FINE, "Activating Jersey core bundle...");
+
         this.bundleContext = bundleContext;
-        debugPrintln("activating");
-        debugPrintln("changing package names scanner URL lookup mechanism");
-        PackageNamesScanner.setResourcesProvider(new PackageNamesScanner.ResourcesProvider() {
+        
+        setOSGiPackageScannerResourceProvider();
+        registerBundleSchemeScanner();
+        setOSGiServiceFinderIteratorProvider();
+
+        bundleContext.addBundleListener(this);
+        registerExistingBundles();
+
+        LOGGER.log(Level.FINE, "Jersey core bundle activated");
+    }
+
+
+    private void registerExistingBundles() {
+        for (Bundle bundle : bundleContext.getBundles()) {
+            if (bundle.getState() == Bundle.RESOLVED || bundle.getState() == Bundle.STARTING
+                    || bundle.getState() == Bundle.ACTIVE || bundle.getState() == Bundle.STOPPING) {
+                register(bundle);
+            }
+        }
+    }
+
+    private void setOSGiPackageScannerResourceProvider() {
+           PackageNamesScanner.setResourcesProvider(new PackageNamesScanner.ResourcesProvider() {
+
             @Override
             public Enumeration<URL> getResources(String name, ClassLoader cl) throws IOException {
                 List<URL> result = new LinkedList<URL>();
@@ -155,43 +164,36 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
                 return Collections.enumeration(result);
             }
         });
-        // register BundleSchemeScanner
-        OsgiLocator.register(UriSchemeScanner.class.getName(), new Callable<List<Class>>(){
+    }
 
+    private void setOSGiServiceFinderIteratorProvider() {
+        ServiceFinder.setIteratorProvider(new OsgiServiceFinder());
+    }
+
+    private void registerBundleSchemeScanner() {
+        OsgiLocator.register(UriSchemeScanner.class.getName(), new Callable<List<Class>>(){
             @Override
             public List<Class> call() throws Exception {
                 List<Class> result = new LinkedList<Class>();
                 result.add(BundleSchemeScanner.class);
                 return result;
             }
-
         });
-        debugPrintln("changing the default ServiceFinder lookup mechanism");
-        ServiceFinder.setIteratorProvider(new OsgiServiceFinder());
-        debugPrintln("adding bundle listener");
-        bundleContext.addBundleListener(this);
-        debugPrintln("checking existing bundles");
-        for (Bundle bundle : bundleContext.getBundles()) {
-            if (bundle.getState() == Bundle.RESOLVED || bundle.getState() == Bundle.STARTING
-                    || bundle.getState() == Bundle.ACTIVE || bundle.getState() == Bundle.STOPPING) {
-                register(bundle);
-            }
-        }
-        debugPrintln("activated");
     }
 
-    //@Override
+    @Override
     public synchronized void stop(BundleContext bundleContext) throws Exception {
-        debugPrintln("deactivating");
+        LOGGER.log(Level.FINE, "Deactivating Jersey core bundle...");
+
         bundleContext.removeBundleListener(this);
         while (!factories.isEmpty()) {
             unregister(factories.keySet().iterator().next());
         }
-        debugPrintln("deactivated");
+        LOGGER.log(Level.FINE, "Jersey core bundle deactivated");
         this.bundleContext = null;
     }
 
-    //@Override
+    @Override
     public void bundleChanged(BundleEvent event) {
         if (event.getType() == BundleEvent.RESOLVED) {
             register(event.getBundle());
@@ -201,7 +203,9 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
     }
 
     protected void register(final Bundle bundle) {
-        debugPrintln("checking bundle " + bundle.getBundleId());
+        if (LOGGER.isLoggable(Level.FINEST)) {
+            LOGGER.log(Level.FINEST, "checking bundle " + bundle.getBundleId());
+        }
         Map<String, Callable<List<Class>>> map = factories.get(bundle.getBundleId());
         Enumeration e = bundle.findEntries("META-INF/services/", "*", false);
         if (e != null) {
@@ -221,7 +225,9 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
         }
         if (map != null) {
             for (Map.Entry<String, Callable<List<Class>>> entry : map.entrySet()) {
-                debugPrintln("registering service for key " + entry.getKey() + "with value " + entry.getValue());
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.log(Level.FINEST, "registering service for key " + entry.getKey() + "with value " + entry.getValue());
+                }
                 OsgiLocator.register(entry.getKey(), entry.getValue());
             }
         }
@@ -231,7 +237,9 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
         Map<String, Callable<List<Class>>> map = factories.remove(bundleId);
         if (map != null) {
             for (Map.Entry<String, Callable<List<Class>>> entry : map.entrySet()) {
-                debugPrintln("unregistering service for key " + entry.getKey() + "with value " + entry.getValue());
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.log(Level.FINEST, "unregistering service for key " + entry.getKey() + "with value " + entry.getValue());
+                }
                 OsgiLocator.unregister(entry.getKey(), entry.getValue());
             }
         }
@@ -249,10 +257,12 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
             this.bundle = bundle;
         }
 
-        //@Override
+        @Override
         public List<Class> call() throws Exception {
             try {
-                debugPrintln("creating factories for key: " + factoryId);
+                if (LOGGER.isLoggable(Level.FINEST)) {
+                    LOGGER.log(Level.FINEST, "creating factories for key: " + factoryId);
+                }
                 BufferedReader br = new BufferedReader(new InputStreamReader(u.openStream(), "UTF-8"));
                 String factoryClassName;
                 List<Class> factoryClasses = new ArrayList<Class>();
@@ -260,16 +270,18 @@ public class Activator implements BundleActivator, SynchronousBundleListener {
                     if (factoryClassName.trim().length() == 0) {
                         continue;
                     }
-                    debugPrintln("factory implementation: " + factoryClassName);
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        LOGGER.log(Level.FINEST, "factory implementation: " + factoryClassName);
+                    }
                     factoryClasses.add(bundle.loadClass(factoryClassName));
                 }
                 br.close();
                 return factoryClasses;
             } catch (Exception e) {
-                debugPrintln("exception caught while creating factories: " + e);
+                LOGGER.log(Level.WARNING, "exception caught while creating factories: " + e);
                 throw e;
             } catch (Error e) {
-                debugPrintln("error caught while creating factories: " + e);
+                LOGGER.log(Level.WARNING, "error caught while creating factories: " + e);
                 throw e;
             }
         }
