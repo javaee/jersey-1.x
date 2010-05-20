@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.samples.helloworld;
+package com.sun.jersey.samples.helloworld.itest;
 
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
@@ -64,7 +64,7 @@ public class HelloWorldWebAppTest extends JerseyTest {
     public void testHelloWorld() throws Exception {
         WebResource webResource = resource();
         String responseMsg = webResource.path("helloworld").get(String.class);
-        Assert.assertEquals("Hello World", responseMsg);        
+        Assert.assertEquals("Hello World", responseMsg);
     }
 
     @Test
@@ -74,6 +74,5 @@ public class HelloWorldWebAppTest extends JerseyTest {
                 accept(MediaTypes.WADL).get(String.class);
 
         Assert.assertTrue(serviceWadl.length() > 0);
-    }    
-
+    }
 }
