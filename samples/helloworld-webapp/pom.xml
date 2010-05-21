@@ -51,11 +51,11 @@
             <id>hudson</id>
             <activation>
                 <property>
-                    <name>JERSEY_HTTP_PORT</name>
+                    <name>env.JERSEY_HTTP_PORT</name>
                 </property>
             </activation>
             <properties>
-                <my.gf.port>${JERSEY_HTTP_PORT}</my.gf.port>
+                <my.gf.port>${env.JERSEY_HTTP_PORT}</my.gf.port>
             </properties>
         </profile>
         <profile>
@@ -100,6 +100,7 @@
                             <goal>test</goal>
                         </goals>
                         <configuration>
+                            <argLine>-Djersey.test.port=${my.gf.port}</argLine>
                             <excludes>
                                 <exclude>none</exclude>
                             </excludes>
