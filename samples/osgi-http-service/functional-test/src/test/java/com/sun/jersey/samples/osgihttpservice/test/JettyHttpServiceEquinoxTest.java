@@ -47,16 +47,16 @@ import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 
 
 @RunWith(JUnit4TestRunner.class)
-public class GrizzlyHttpServiceTest extends AbstractHttpServiceTest {
+public class JettyHttpServiceEquinoxTest extends AbstractHttpServiceTest {
 
     @Override
     public List<Option> osgiRuntimeOptions() {
-        return felixOptions();
+        return equinoxOptions();
     }
 
     @Override
     public List<Option> httpServiceProviderOptions() {
-        return grizzlyOptions();
+        return jettyOptions();
     }
 
     @Before
