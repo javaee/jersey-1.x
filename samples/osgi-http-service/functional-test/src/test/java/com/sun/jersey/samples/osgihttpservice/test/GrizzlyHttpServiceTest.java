@@ -37,22 +37,26 @@
 
 package com.sun.jersey.samples.osgihttpservice.test;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 
-import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
-
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 
 @RunWith(JUnit4TestRunner.class)
 public class GrizzlyHttpServiceTest extends AbstractHttpServiceTest {
 
     @Override
-    public MavenArtifactProvisionOption httpServiceProviderBundle() {
-        return mavenBundle("com.sun.grizzly.osgi", "grizzly-httpservice-bundle", "1.9.19-beta1");
+    public List<Option> osgiRuntimeOptions() {
+        return felixOptions();
+    }
+
+    @Override
+    public List<Option> httpServiceProviderOptions() {
+        return grizzlyOptions();
     }
 
     @Before

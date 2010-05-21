@@ -37,24 +37,26 @@
 
 package com.sun.jersey.samples.osgihttpservice.test;
 
+import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
 import org.junit.runner.RunWith;
+import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-
-import org.ops4j.pax.exam.options.MavenArtifactProvisionOption;
-
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 
 
 @RunWith(JUnit4TestRunner.class)
 public class JettyHttpServiceTest extends AbstractHttpServiceTest {
 
+    @Override
+    public List<Option> osgiRuntimeOptions() {
+        return felixOptions();
+    }
 
     @Override
-    public MavenArtifactProvisionOption httpServiceProviderBundle() {
-        return mavenBundle("org.ops4j.pax.web", "pax-web-jetty-bundle", "0.7.1");
+    public List<Option> httpServiceProviderOptions() {
+        return jettyOptions();
     }
 
     @Before
