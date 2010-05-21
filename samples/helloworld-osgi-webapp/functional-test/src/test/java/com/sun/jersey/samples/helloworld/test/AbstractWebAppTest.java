@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.samples.osgihttpservice.test;
+package com.sun.jersey.samples.helloworld.test;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
@@ -50,6 +50,7 @@ import javax.ws.rs.core.UriBuilder;
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
@@ -69,15 +70,13 @@ import static org.junit.Assert.assertEquals;
  *
  * @author japod
  */
-public abstract class AbstractHttpServiceTest {
+public abstract class AbstractWebAppTest {
 
-    public abstract List<Option> httpServiceProviderOptions();
     public abstract List<Option> osgiRuntimeOptions();
-
 
     public List<Option> genericOsgiOptions() {
 
-        String bundleLocation = mavenBundle().groupId("com.sun.jersey.samples.osgi-http-service").artifactId("bundle").versionAsInProject().getURL().toString();
+        String bundleLocation = mavenBundle().groupId("com.sun.jersey.samples.helloworld-osgi-webapp").artifactId("war-bundle").type("war").versionAsInProject().getURL().toString();
 
         return Arrays.asList(options(
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
@@ -110,14 +109,10 @@ public abstract class AbstractHttpServiceTest {
                 equinox()));
     }
 
-    public List<Option> grizzlyOptions() {
-        return Arrays.asList(options(
-                mavenBundle().groupId("com.sun.grizzly.osgi").artifactId("grizzly-httpservice-bundle").versionAsInProject()));
-    }
-
     public List<Option> jettyOptions() {
         return Arrays.asList(options(
-                mavenBundle().groupId("org.ops4j.pax.web").artifactId("pax-web-jetty-bundle").versionAsInProject()));
+                mavenBundle().groupId("org.ops4j.pax.web").artifactId("pax-web-jetty-bundle").versionAsInProject(),
+                mavenBundle().groupId("org.ops4j.pax.web").artifactId("pax-web-extender-war").versionAsInProject()));
     }
 
     public class WebEventHandler implements EventHandler {
@@ -140,7 +135,7 @@ public abstract class AbstractHttpServiceTest {
     final Semaphore semaphore = new Semaphore(0);
 
     private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
-    private static final String CONTEXT = "/jersey-http-service";
+    private static final String CONTEXT = "/helloworld";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
     private static final String BundleLocationProperty = "jersey.bundle.location";
 
@@ -152,7 +147,7 @@ public abstract class AbstractHttpServiceTest {
         List<Option> options = new LinkedList<Option>();
 
         options.addAll(genericOsgiOptions());
-        options.addAll(httpServiceProviderOptions());
+        options.addAll(jettyOptions());
         options.addAll(osgiRuntimeOptions());
 
         return options.toArray(new Option[0]);
@@ -162,17 +157,23 @@ public abstract class AbstractHttpServiceTest {
         bundleContext.registerService(EventHandler.class.getName(), new WebEventHandler("Deploy Handler"), getHandlerServiceProperties("jersey/test/DEPLOYED"));
     }
 
-    public void defaultHttpServiceTestMethod() throws Exception {
+    public void defaultWebAppTestMethod() throws Exception {
 
-        bundleContext.installBundle(System.getProperty(BundleLocationProperty)).start();
+        final Bundle warBundle = bundleContext.installBundle(System.getProperty(BundleLocationProperty));
+        warBundle.start();
 
-        semaphore.acquire();  // wait till the servlet gets really registered
+        semaphore.acquire();
 
-        final WebResource r = resource();
+        WebResource r = resource();
+        String result = r.path("/webresources/helloworld").get(String.class);
 
-        String result = r.path("/status").get(String.class);
-        System.out.println("JERSEY RESULT = " + result);
-        assertEquals("active", result);
+        System.out.println("HELLO RESULT = " + result);
+        assertEquals("Hello World", result);
+
+        String result2 = r.path("/webresources/another").get(String.class);
+
+        System.out.println("ANOTHER RESULT = " + result2);
+        assertEquals("Another", result2);
     }
 
     public static int getEnvVariable(final String varName, int defaultValue) {
