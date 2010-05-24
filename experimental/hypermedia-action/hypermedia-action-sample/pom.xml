@@ -73,7 +73,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>com.mycompany.hypermediasamplegrizzly.Main</mainClass>
+                    <mainClass>com.sun.jersey.samples.hypermedia.Main</mainClass>
                 </configuration>
             </plugin>
         </plugins>
