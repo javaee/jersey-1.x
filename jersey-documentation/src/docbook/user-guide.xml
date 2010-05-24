@@ -23,8 +23,7 @@ email <ulink
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="OverviewOfJAX-RS.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="client-api.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="json.xml" /> 
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="hypermedia.xml" />
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="linking.xml" />
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="experimental.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="test-framework.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="dependencies.xml" />
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="glassfish.xml" />

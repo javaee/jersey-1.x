@@ -4,8 +4,8 @@
 <!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
 ]>
-<chapter>
-    <title>Hypermedia (Experimental)</title>
+<section>
+    <title>Hypermedia Actions</title>
     <section>
         <title>Introduction</title>
         <para>It is generally understood that, in order to follow the REST style, URIs should be
@@ -56,8 +56,8 @@
             be constructed.</para>
         <para>Rather than presenting all these extensions abstractly, we shall illustrate their use
             via an example. The complete example can found in <ulink
-                url="http://download.java.net/maven/2/com/sun/jersey/samples/hypermedia"
-                >samples/hypermedia</ulink>. The <emphasis>Purchase Ordering System</emphasis>
+                url="http://download.java.net/maven/2/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample/"
+                >hypermedia-action-sample</ulink>. The <emphasis>Purchase Ordering System</emphasis>
             exemplifies a system in which customers can submit orders and where orders are guided by
             a workflow that includes states like <literal>REVIEWED</literal>,
             <literal>PAYED</literal> and <literal>SHIPPED</literal>. The system's model is comprised
@@ -82,8 +82,8 @@
             JAXB beans and the <literal>@XmlJavaTypeAdapter</literal> annotation. An
                 <literal>XmlAdapter</literal> is capable of mapping an object reference in the model
             to a URI. Refer to <ulink
-                url="http://download.java.net/maven/2/com/sun/jersey/samples/hypermedia"
-                >samples/hypermedia</ulink> for more information on how this mapping is
+                url="http://download.java.net/maven/2/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample/"
+                >hypermedia-action-sample</ulink> for more information on how this mapping is
         implemented.</para>
     </section>
     <section>
@@ -272,11 +272,11 @@
     Client client = new Client();
         
     // Create proxy for order and retrieve model
-    OrderController orderCtrl = client.proxy(
+    OrderController orderCtrl = client.view(
         "http://.../orders/1", OrderController.class);
         
     // Create proxy for customer in order 1
-    CustomerController customerCtrl = client.proxy(
+    CustomerController customerCtrl = client.view(
         orderCtrl.getModel().getCustomer(),
         CustomerController.class);
         
@@ -330,26 +330,31 @@
     <section>
         <title>Configuring Hypermedia in Jersey</title>
         <para>There are a few configuration options in  <ulink
-            url="http://download.java.net/maven/2/com/sun/jersey/samples/hypermedia"
-            >samples/hypermedia</ulink> that are worth highlighting. First, a
+            url="http://download.java.net/maven/2/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample/"
+            >hypermedia-action-sample</ulink> that are worth highlighting. First, a
             special filter factory <literal>HypermediaFilterFactory</literal> must
             be enabled. This can be done programmatically by adding
-            <programlisting>com.sun.jersey.api.container.filter.HypermediaFilterFactory</programlisting> to the list defined by
+            <programlisting>com.sun.jersey.server.hypermedia.filter.HypermediaFilterFactory</programlisting> to the list defined by
             <programlisting>com.sun.jersey.spi.container.ResourceFilters</programlisting> or
-            declaratively in the application's <literal>web.xml</literal> file. Refer to
-            <literal>Main.java</literal> in the hypermedia sample for an example of how
-            to do this using Grizzly. Second, hypermedia applications must included the
-            following Maven runtime dependency:
-            <programlisting><![CDATA[    <dependency>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-client-hypermedia</artifactId>
-        <version>${jersey-version}</version>
-        <scope>runtime</scope>
-    </dependency>]]></programlisting> in addition to a compile-time
-            dependency with Jersey's client api (<literal>jersey-client</literal> module).
+            declaratively in the application's <literal>web.xml</literal> file. Refer to the Java class
+            <literal>com.sun.jersey.samples.hypermedia.Main</literal> in the hypermedia sample for an example of how
+            to do this using Grizzly (which can be executed with <literal>mvn install exec:java</literal>). Second, hypermedia applications must included the
+            following Maven runtime dependencies:
+            <programlisting><![CDATA[
+        <dependency>
+            <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
+            <artifactId>hypermedia-action-server</artifactId>
+            <version>${jersey-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
+            <artifactId>hypermedia-action-client</artifactId>
+            <version>${jersey-version}</version>
+        </dependency>]]></programlisting></para>
+        <para>
             Last, even though the annotation <literal>@HypermediaController</literal> has
             a <literal>linkType</literal> element, only the <literal>LinkType.LINK_HEADERS</literal>
             option is currently supported and must be used by both clients and servers.
         </para>
     </section>
-</chapter>
+</section>

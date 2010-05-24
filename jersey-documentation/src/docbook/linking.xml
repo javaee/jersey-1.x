@@ -5,8 +5,8 @@
 <!ENTITY jaxrs-javadoc
 "https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/">
 ]>
-<chapter>
-    <title>Declarative Hyperlinking (Experimental)</title>
+<section>
+    <title>Declarative Hyperlinking</title>
     <para><ulink url="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">RESTful
             APIs must be hypertext-driven</ulink>. JAX-RS currently offers <ulink
             url="&jaxrs-javadoc;core/UriBuilder.html">UriBuilder</ulink> to simplify URI
@@ -142,7 +142,7 @@ URI offers;</programlisting>
         <programlisting>&lt;dependency&gt;
   &lt;groupId&gt;com.sun.jersey.experimental&lt;/groupId&gt;
   &lt;artifactId&gt;jersey-server-linking&lt;/artifactId&gt;
-  &lt;version&gt;${project.version}&lt;/version&gt;
+  &lt;version&gt;${jersey-version}&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
         <para>Second the filter needs to be installed in the application either programmatically by
             adding:</para>
@@ -155,7 +155,10 @@ URI offers;</programlisting>
   &lt;param-value&gt;com.sun.jersey.server.linking.impl.LinkFilter&lt;/param-value&gt;
 &lt;/init-param&gt;
 </programlisting>
+<para>See the <ulink
+            url="http://download.java.net/maven/2/com/sun/jersey/experimental/jersey-server-linking-sample/"
+            >jersey-server-linking-sample</ulink> for more details.</para>
     </section>
     
     
-</chapter>
+</section>
