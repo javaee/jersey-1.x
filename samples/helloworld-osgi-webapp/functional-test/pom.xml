@@ -40,9 +40,14 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+      <groupId>com.sun.jersey.samples</groupId>
+      <artifactId>helloworld-osgi-webapp</artifactId>
+      <version>1.3-SNAPSHOT</version>
+    </parent>
+
     <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
     <artifactId>functional-test</artifactId>
-    <version>1.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Helloworld OSGi WebApp - Jersey Sample Test</name>
@@ -161,6 +166,17 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*EquinoxTest.java</exclude>
+                    </excludes>
+                    <forkMode>always</forkMode>
+                    <enableAssertions>false</enableAssertions>
+                    <!--skipTests>true</skipTests-->
                 </configuration>
             </plugin>
         </plugins>

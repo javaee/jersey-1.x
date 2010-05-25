@@ -164,7 +164,17 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*EquinoxTest.java</exclude>
+                    </excludes>
+                    <forkMode>always</forkMode>
+                    <enableAssertions>false</enableAssertions>
+                    <!--skipTests>true</skipTests-->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
