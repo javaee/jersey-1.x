@@ -132,13 +132,19 @@ public class ContextResolverFactory {
                 // TODO check if concrete type
                 
                 final ContextResolver cr = getResolver(ic, type);
-                if (cr == null) return null;
-                
-                return new Injectable() {
-                    public Object getValue() {
-                        return cr;
-                    }
-                };
+                if (cr == null) {
+                    return new Injectable() {
+                        public Object getValue() {
+                            return null;
+                        }                    
+                    };
+                } else {
+                    return new Injectable() {
+                        public Object getValue() {
+                            return cr;
+                        }
+                    };
+                }
             }
             
             ContextResolver getResolver(ComponentContext ic, Type type) {

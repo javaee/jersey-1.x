@@ -43,14 +43,14 @@ import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.Errors;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -113,6 +113,16 @@ public class ResourceComponentConstructor {
     public ResourceComponentConstructor(ServerInjectableProviderContext sipc,
             ComponentScope scope, AbstractResource ar) {
         this.c = ar.getResourceClass();
+
+        final int modifiers = c.getModifiers();
+        if (!Modifier.isPublic(modifiers)) {
+            Errors.nonPublicClass(c);
+        }
+
+        if (c.getEnclosingClass() != null && !Modifier.isStatic(modifiers)) {
+            Errors.innerClass(c);
+        }
+
         this.rci = new ResourceComponentInjector(
                 sipc,
                 scope,
@@ -129,23 +139,16 @@ public class ResourceComponentConstructor {
             this.constructor = null;
             this.injectables = null;
         } else {
-            this.constructor = cip.con;
-            this.injectables = AbstractHttpContextInjectable.transform(cip.is);
-
-            Class<?>[] types = this.constructor.getParameterTypes();
-            for (int i = 0; i < this.injectables.size(); i++) {
-                if (this.injectables.get(i) == null) {
-                    final Object defaultValue = DEFAULT_VALUES.get(types[i]);
-                    if (defaultValue != null) {
-                        this.injectables.set(i, new AbstractHttpContextInjectable() {
-                            @Override
-                            public Object getValue(HttpContext c) {
-                                return defaultValue;
-                            }
-                        });
+            if (cip.is.contains(null)) {
+                // Missing dependency
+                for (int i = 0; i < cip.is.size(); i++) {
+                    if (cip.is.get(i) == null) {
+                        Errors.missingDependency(cip.con, i);
                     }
                 }
             }
+            this.constructor = cip.con;
+            this.injectables = AbstractHttpContextInjectable.transform(cip.is);
         }
     }
 
@@ -204,22 +207,7 @@ public class ResourceComponentConstructor {
             List<Injectable> is = sipc.getInjectable(arc.getParameters(), scope);
             cs.add(new ConstructorInjectablePair(arc.getCtor(), is));
         }
-                
+
         return cs.first();        
-    }
-
-    private static final Map<Class, Object> DEFAULT_VALUES = createDefaultValues();
-
-    private static Map<Class, Object> createDefaultValues() {
-        Map<Class, Object> defaultValues = new HashMap<Class, Object>();
-        defaultValues.put(byte.class, (byte) 0);
-        defaultValues.put(short.class, (short) 0);
-        defaultValues.put(int.class, 0);
-        defaultValues.put(long.class, (long) 0);
-        defaultValues.put(float.class, (float)0.0);
-        defaultValues.put(double.class, 0.0);
-        defaultValues.put(char.class, '\0');
-        defaultValues.put(boolean.class, Boolean.FALSE);
-        return defaultValues;
     }
  }

@@ -49,7 +49,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -186,6 +185,16 @@ public class InjectableProviderFactory implements InjectableProviderContext {
     
     // InjectableProviderContext
 
+    public boolean isAnnotationRegistered(Class<? extends Annotation> ac,
+            Class<?> cc) {
+        for (MetaInjectableProvider i : getList(ac)) {
+            if (i.cc.isAssignableFrom(cc)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isInjectableProviderRegistered(Class<? extends Annotation> ac,
             Class<?> cc,
             ComponentScope s) {
@@ -220,16 +229,6 @@ public class InjectableProviderFactory implements InjectableProviderContext {
             }
         }
         
-        // TODO log warnings if injection cannot be performed
-        // This is a little tricky for the following:
-        // - injection of ContextResolver<JAXBContext> as it is meant to be null
-        //   or an aggregation.
-        // - injection for Parameter instance. If an injection provider for a
-        //   Parameter instance cannot be found an injection provider for the
-        //   Parameter instance type is obtained (if registered).
-        // Seems that this will require warnings be logged the the caller of
-        // this method
-        // LOGGER.warning(ic.getAccesibleObject().toString());
         return null;
     }
 

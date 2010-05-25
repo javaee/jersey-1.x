@@ -51,14 +51,15 @@ import java.util.List;
  */
 public final class ServerInjectableProviderFactory extends InjectableProviderFactory
             implements ServerInjectableProviderContext {
-    
-    public Injectable getInjectable(Parameter p, ComponentScope s) {
-        InjectableScopePair isp = getInjectableiWithScope(p, s);
-        if (isp == null)
-            return null;
-        return isp.i;
+
+    public boolean isParameterTypeRegistered(Parameter p) {
+        if (p.getAnnotation() == null) return false;
+
+        if (isAnnotationRegistered(p.getAnnotation().annotationType(), p.getClass())) return true;
+
+        return isAnnotationRegistered(p.getAnnotation().annotationType(), p.getParameterType().getClass());
     }
-    
+
     public InjectableScopePair getInjectableiWithScope(Parameter p, ComponentScope s) {
         if (p.getAnnotation() == null) return null;
 
@@ -66,8 +67,12 @@ public final class ServerInjectableProviderFactory extends InjectableProviderFac
 
         if (s == ComponentScope.PerRequest) {
             // Find a per request injectable with Parameter
-            Injectable i = getInjectable(p.getAnnotation().annotationType(), ic, p.getAnnotation(),
-                    p, ComponentScope.PerRequest);
+            Injectable i = getInjectable(
+                    p.getAnnotation().annotationType(),
+                    ic,
+                    p.getAnnotation(),
+                    p,
+                    ComponentScope.PerRequest);
             if (i != null) return new InjectableScopePair(i, ComponentScope.PerRequest);
 
             // Find a per request, undefined or singleton injectable with parameter Type
@@ -88,6 +93,13 @@ public final class ServerInjectableProviderFactory extends InjectableProviderFac
                     ComponentScope.UNDEFINED_SINGLETON
                     );
         }
+    }
+
+    public Injectable getInjectable(Parameter p, ComponentScope s) {
+        InjectableScopePair isp = getInjectableiWithScope(p, s);
+        if (isp == null)
+            return null;
+        return isp.i;
     }
 
     public List<Injectable> getInjectable(List<Parameter> ps, ComponentScope s) {

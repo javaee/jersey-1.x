@@ -36,7 +36,6 @@
  */
 package com.sun.jersey.api.client;
 
-import com.sun.jersey.api.client.async.AsyncClientHandler;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -272,6 +271,8 @@ public class Client extends Filterable implements ClientHandler {
                                     a,
                                     pt.getActualTypeArguments()[0],
                                     ComponentScope.PERREQUEST_UNDEFINED_SINGLETON);
+                            if (i == null)
+                                return null;
                             return new Injectable<Injectable>() {
                                 public Injectable getValue() {
                                     return i;

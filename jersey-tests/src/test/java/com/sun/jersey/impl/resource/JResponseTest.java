@@ -431,7 +431,7 @@ public class JResponseTest extends AbstractResourceTester {
     static public class ExtendedResponseResource {
         @GET
         public ExtendedResponse<String> get() {
-            return ExtendedResponse.item("a").build();
+            return ExtendedResponse.<String>item("a").build();
         }
     }
 

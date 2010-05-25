@@ -147,7 +147,7 @@ public class StringReaderTest extends AbstractResourceTester {
     }
 
 
-    public abstract class BaseExceptionMapper<T extends ParamException> implements ExceptionMapper<T> {
+    public static abstract class BaseExceptionMapper<T extends ParamException> implements ExceptionMapper<T> {
         public Response toResponse(T exception, String entity) {
             assertEquals("x", exception.getParameterName());
             if (exception.getParameterType() != PathParam.class) {
@@ -156,49 +156,50 @@ public class StringReaderTest extends AbstractResourceTester {
             return Response.fromResponse(exception.getResponse()).entity(entity).build();
         }
     }
-    public class ParamExceptionMapper extends BaseExceptionMapper<ParamException> {
+
+    public static class ParamExceptionMapper extends BaseExceptionMapper<ParamException> {
         public Response toResponse(ParamException exception) {
             return toResponse(exception, "param");
         }
     }
 
-    public class URIExceptionMapper extends BaseExceptionMapper<URIParamException> {
+    public static class URIExceptionMapper extends BaseExceptionMapper<URIParamException> {
         public Response toResponse(URIParamException exception) {
             return toResponse(exception, "uri");
         }
     }
 
-    public class PathExceptionMapper extends BaseExceptionMapper<PathParamException> {
+    public static class PathExceptionMapper extends BaseExceptionMapper<PathParamException> {
         public Response toResponse(PathParamException exception) {
             return toResponse(exception, "path");
         }
     }
 
-    public class MatrixExceptionMapper extends BaseExceptionMapper<MatrixParamException> {
+    public static class MatrixExceptionMapper extends BaseExceptionMapper<MatrixParamException> {
         public Response toResponse(MatrixParamException exception) {
             return toResponse(exception, "matrix");
         }
     }
 
-    public class QueryExceptionMapper extends BaseExceptionMapper<QueryParamException> {
+    public static class QueryExceptionMapper extends BaseExceptionMapper<QueryParamException> {
         public Response toResponse(QueryParamException exception) {
             return toResponse(exception, "query");
         }
     }
 
-    public class CookieExceptionMapper extends BaseExceptionMapper<CookieParamException> {
+    public static class CookieExceptionMapper extends BaseExceptionMapper<CookieParamException> {
         public Response toResponse(CookieParamException exception) {
             return toResponse(exception, "cookie");
         }
     }
 
-    public class HeaderExceptionMapper extends BaseExceptionMapper<HeaderParamException> {
+    public static class HeaderExceptionMapper extends BaseExceptionMapper<HeaderParamException> {
         public Response toResponse(HeaderParamException exception) {
             return toResponse(exception, "header");
         }
     }
 
-    public class FormExceptionMapper extends BaseExceptionMapper<FormParamException> {
+    public static class FormExceptionMapper extends BaseExceptionMapper<FormParamException> {
         public Response toResponse(FormParamException exception) {
             return toResponse(exception, "form");
         }

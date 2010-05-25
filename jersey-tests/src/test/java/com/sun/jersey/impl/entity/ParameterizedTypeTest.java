@@ -99,7 +99,7 @@ public class ParameterizedTypeTest extends AbstractResourceTester {
     }
     
     @Path("/")
-    public class ListResource {
+    public static class ListResource {
         @POST public String post(List<String> ls) {
             assertEquals(4, ls.size());
             assertEquals(Arrays.asList("a", "b", "c", "d"), ls);

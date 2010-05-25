@@ -44,6 +44,7 @@ import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
+import com.sun.jersey.spi.inject.Errors;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -68,8 +69,19 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
     public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
         
         final InjectableValuesProvider pp = getInjectableValuesProvider(abstractResourceMethod);
-        if (pp == null)
+        if (pp == null) {
             return null;
+        }
+        
+        if (pp.getInjectables().contains(null)) {
+            // Missing dependency
+            for (int i = 0; i < pp.getInjectables().size(); i++) {
+                if (pp.getInjectables().get(i) == null) {
+                    Errors.missingDependency(abstractResourceMethod.getMethod(), i);
+                }
+            }
+            return null;
+        }
 
         final Class<?> returnType = abstractResourceMethod.getReturnType();
         if (Response.class.isAssignableFrom(returnType)) {

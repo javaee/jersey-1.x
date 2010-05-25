@@ -151,12 +151,10 @@ public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider
                     is.add(new FormEntityInjectable(p.getParameterClass(),
                             p.getParameterType(), p.getAnnotations()));
                 } else
-                    return null;
+                    is.add(null);
             } else {
                 Injectable injectable = getInjectableProviderContext().
                         getInjectable(p, ComponentScope.PerRequest);
-                if (injectable == null)
-                    return null;
                 is.add(injectable);
             }
         }

@@ -41,10 +41,12 @@ import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
+import com.sun.jersey.spi.inject.Errors;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -138,6 +140,15 @@ public class ComponentConstructor<T> {
     public T getInstance()
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
+        final int modifiers = c.getModifiers();
+        if (!Modifier.isPublic(modifiers)) {
+            Errors.nonPublicClass(c);
+        }
+
+        if (c.getEnclosingClass() != null && !Modifier.isStatic(modifiers)) {
+            Errors.innerClass(c);
+        }
+
         final T t = _getInstance();
         ci.inject(t);
         if (postConstruct != null)
@@ -152,6 +163,15 @@ public class ComponentConstructor<T> {
         if (cip == null || cip.is.size() == 0) {
             return c.newInstance();
         } else {
+            if (cip.is.contains(null)) {
+                // Missing dependency
+                for (int i = 0; i < cip.is.size(); i++) {
+                    if (cip.is.get(i) == null) {
+                        Errors.missingDependency(cip.con, i);
+                    }
+                }
+            }
+
             Object[] params = new Object[cip.is.size()];
             int i = 0;
             for (Injectable injectable : cip.is) {

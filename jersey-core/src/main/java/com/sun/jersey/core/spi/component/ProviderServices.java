@@ -39,6 +39,8 @@ package com.sun.jersey.core.spi.component;
 
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
+import com.sun.jersey.spi.inject.ConstrainedTo;
+import com.sun.jersey.spi.inject.ConstrainedToType;
 import com.sun.jersey.spi.service.ServiceFinder;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -56,6 +58,8 @@ import java.util.logging.Logger;
  */
 public class ProviderServices {
     private static final Logger LOGGER = Logger.getLogger(ProviderServices.class.getName());
+
+    private final Class<? extends ConstrainedToType> constraintToType;
     
     private final ProviderFactory componentProviderFactory;
     
@@ -74,6 +78,23 @@ public class ProviderServices {
             ProviderFactory componentProviderFactory,
             Set<Class<?>> providers,
             Set<?> providerInstances) {
+        this(ConstrainedToType.class, componentProviderFactory, providers, providerInstances);
+    }
+
+    /**
+     * Create the provider services.
+     *
+     * @param constraintToType 
+     * @param componentProviderFactory
+     * @param providers
+     * @param providerInstances
+     */
+    public ProviderServices(
+            Class<? extends ConstrainedToType> constraintToType,
+            ProviderFactory componentProviderFactory,
+            Set<Class<?>> providers,
+            Set<?> providerInstances) {
+        this.constraintToType = constraintToType;
         this.componentProviderFactory = componentProviderFactory;
         this.providers = providers;
         this.providerInstances = providerInstances;
@@ -236,7 +257,7 @@ public class ProviderServices {
     private <T> Set<T> getProviderInstances(Class<T> service) {
         Set<T> sp = new LinkedHashSet<T>();
         for (Object p : providerInstances) {
-            if (service.isInstance(p))
+            if (service.isInstance(p) && constrainedTo(p.getClass()))
                 sp.add(service.cast(p));
         }
 
@@ -246,7 +267,7 @@ public class ProviderServices {
     private Set<Class> getProviderClasses(Class<?> service) {
         Set<Class> sp = new LinkedHashSet<Class>();
         for (Class p : providers) {
-            if (service.isAssignableFrom(p))
+            if (service.isAssignableFrom(p) && constrainedTo(p))
                 sp.add(p);
         }
         
@@ -292,11 +313,23 @@ public class ProviderServices {
         // Get the service-defined provider classes that implement serviceClass
         LOGGER.log(Level.CONFIG, "Searching for providers that implement: " + service);
         Class<?>[] pca = ServiceFinder.find(service, true).toClassArray();
-        for (Class pc : pca)
-            LOGGER.log(Level.CONFIG, "    Provider found: " + pc);
-        
+        for (Class pc : pca) {
+            if (constrainedTo(pc)) {
+                LOGGER.log(Level.CONFIG, "    Provider found: " + pc);
+            }
+        }
         // Add service-defined providers to the set after application-defined
-        for (Class pc : pca)
-            sp.add(new ProviderClass(pc, true));
+        for (Class pc : pca) {
+            if (constrainedTo(pc)) {
+                sp.add(new ProviderClass(pc, true));
+            }
+        }
+    }
+
+    private boolean constrainedTo(Class<?> p) {
+        final ConstrainedTo ct = p.getAnnotation(ConstrainedTo.class);
+        return (ct != null)
+                ? ct.value().isAssignableFrom(constraintToType)
+                : true;
     }
 }

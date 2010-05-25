@@ -347,14 +347,14 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
     public static class SingletonTypeTwo {
     }
 
-    public class SingletonTypeProvider extends SingletonTypeInjectableProvider<Context, SingletonTypeOne> {
+    public static class SingletonTypeProvider extends SingletonTypeInjectableProvider<Context, SingletonTypeOne> {
         public SingletonTypeProvider() {
             super(SingletonTypeOne.class, new SingletonTypeOne());
         }
     }
 
     @Produces("text/plain")
-    public class ToUpperWriter implements MessageBodyWriter<String> {
+    public static class ToUpperWriter implements MessageBodyWriter<String> {
 
         public boolean isWriteable(Class<?> type, Type genericType,
                 Annotation[] annotations, MediaType mediaType) {

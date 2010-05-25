@@ -44,7 +44,6 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.server.impl.model.ResourceClass;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -183,13 +182,11 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     }
 
     public Object getResource(Class resourceClass) {
-        final ResourceClass rc = app.getResourceClass(resourceClass);
-        return rc.rcProvider.getInstance(this);
+        return app.getResourceComponentProvider(resourceClass).getInstance(this);
     }
 
     public UriRules<UriRule> getRules(Class resourceClass) {
-        final ResourceClass rc = app.getResourceClass(resourceClass);
-        return rc.getRules();
+        return app.getResourceClass(resourceClass).getRules();
     }
 
     public void pushMatch(UriTemplate template, List<String> names) {

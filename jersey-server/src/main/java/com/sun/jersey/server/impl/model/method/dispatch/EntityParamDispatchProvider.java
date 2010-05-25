@@ -63,9 +63,6 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
 
         List<Injectable> is = processParameters(abstractResourceMethod,
                 requireNoEntityParameter);
-        if (is == null)
-            return null;
-
         return new InjectableValuesProvider(is);
     }
 
@@ -93,18 +90,10 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
             }
         }
 
-        if (is.contains(null)) {
-            int n = 0;
-            for (Injectable i : is)
-                if (i == null) n++;
+        if (hasEntity)
+            return is;
 
-            // If there is more than one null injectable or
-            // if there is only one null injectable but there is an entity
-            // injectable then return null
-            if (n > 1 || hasEntity)
-                return null;
-
-            // Otherwise create the entity injectable
+        if (Collections.frequency(is, null) == 1) {
             for (int i = 0; i < is.size(); i++) {
                 if (is.get(i) == null) {
                     Injectable ij = processEntityParameter(
@@ -115,10 +104,8 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
                     break;
                 }
             }
-
-            if (is.contains(null))
-                return null;
         }
+
         return is;
     }
 

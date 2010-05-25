@@ -48,6 +48,7 @@ import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.spi.inject.InjectableProviderContext.InjectableScopePair;
+import com.sun.jersey.spi.inject.Errors;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
@@ -120,6 +121,9 @@ public final class ResourceComponentInjector {
                 } else {
                     singletons.put(af.getField(), isp.i);
                 }
+            } else if (ipc.isParameterTypeRegistered(p)) {
+                // Missing dependency
+                Errors.missingDependency(af.getField());
             }
         }
         
@@ -161,6 +165,7 @@ public final class ResourceComponentInjector {
         Map<Method, Injectable<?>> perRequest = new HashMap<Method, Injectable<?>>();
         
         AccessibleObjectContext aoc = new AccessibleObjectContext();
+        int methodIndex = 0;
         for (AbstractSetterMethod sm : setterMethods) {
             Parameter p = sm.getParameters().get(0);
             aoc.setAccesibleObject(sm.getMethod(), p.getAnnotations());
@@ -172,7 +177,11 @@ public final class ResourceComponentInjector {
                 } else {
                     singletons.put(sm.getMethod(), isp.i);
                 }
+            } else if (ipc.isParameterTypeRegistered(p)) {
+                // Missing dependency
+                Errors.missingDependency(sm.getMethod(), methodIndex);
             }
+            methodIndex++;
         }
                 
         int size = singletons.entrySet().size();

@@ -39,7 +39,8 @@ package com.sun.jersey.impl.entity;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -55,6 +56,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 /**
@@ -77,19 +80,17 @@ public class InjectedProviderTest extends AbstractResourceTester {
     }
 
     @Provider
-    public static class InjectedBeanProvider extends AbstractMessageReaderWriterProvider<Bean> {
-        @Context UriInfo uriInfo;
-        
+    public static class BeanReader implements MessageBodyReader<Bean> {
         public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return type == Bean.class;
         }
 
         public Bean readFrom(
-                Class<Bean> type, 
-                Type genericType, 
+                Class<Bean> type,
+                Type genericType,
                 Annotation annotations[],
-                MediaType mediaType, 
-                MultivaluedMap<String, String> httpHeaders, 
+                MediaType mediaType,
+                MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             ObjectInputStream oin = new ObjectInputStream(entityStream);
             try {
@@ -100,17 +101,22 @@ public class InjectedProviderTest extends AbstractResourceTester {
                 throw effect;
             }
         }
+    }
+
+    @Provider
+    public static class InjectedBeanReaderWriter extends BeanReader implements MessageBodyWriter<Bean> {
+        @Context UriInfo uriInfo;
 
         public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
             return type == Bean.class;
         }
-    
+
         public void writeTo(
-                Bean t, 
-                Class<?> type, 
-                Type genericType, 
-                Annotation annotations[], 
-                MediaType mediaType, 
+                Bean t,
+                Class<?> type,
+                Type genericType,
+                Annotation annotations[],
+                MediaType mediaType,
                 MultivaluedMap<String, Object> httpHeaders,
                 OutputStream entityStream) throws IOException {
             t.setString(uriInfo.getRequestUri().toString());
@@ -118,8 +124,12 @@ public class InjectedProviderTest extends AbstractResourceTester {
             out.writeObject(t);
             out.flush();
         }
+
+        public long getSize(Bean t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return -1;
+        }
     }
-    
+        
     @Path("/one/two/three")
     public static class BeanResource {
         @GET
@@ -133,9 +143,11 @@ public class InjectedProviderTest extends AbstractResourceTester {
     }
     
     public void testBean() throws Exception {
-        initiateWebApplication(BeanResource.class, InjectedBeanProvider.class);
-                
-        WebResource r = resource("/one/two/three");
+        initiateWebApplication(BeanResource.class, InjectedBeanReaderWriter.class);
+
+        ClientConfig cc = new DefaultClientConfig();
+        cc.getClasses().add(BeanReader.class);
+        WebResource r = resource("/one/two/three", cc);
         Bean b = r.get(Bean.class);
         String requestUri = UriBuilder.fromUri(BASE_URI).
                 path(BeanResource.class).build().toString();

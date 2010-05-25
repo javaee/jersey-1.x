@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -35,60 +35,55 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.template;
+package com.sun.jersey.spi.inject;
 
-import com.sun.jersey.spi.template.ResolvedViewable;
-import com.sun.jersey.spi.template.TemplateContext;
-import com.sun.jersey.api.view.Viewable;
-import com.sun.jersey.server.spi.component.ServerSide;
-import com.sun.jersey.spi.inject.ConstrainedTo;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import javax.ws.rs.ext.MessageBodyWriter;
-import java.io.IOException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 /**
+ * Tests:
+ *   com.sun.jersey.impl.inject.InjectAnnotationInjectableTest
+ *
+ * TODO errors should have a push and pop context and when the last context
+ * is popped off the stack if there are errors then all errors for all contexts
+ * are logged and an exception is thrown.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@ConstrainedTo(ServerSide.class)
-public final class ViewableMessageBodyWriter implements MessageBodyWriter<Viewable> {
+public class Errors {
 
-    @Context UriInfo ui;
-    
-    @Context TemplateContext tc;
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return Viewable.class.isAssignableFrom(type);
-    }
+    private static final Logger LOGGER = Logger.getLogger(Errors.class.getName());
 
-    public void writeTo(Viewable v, 
-            Class<?> type, Type genericType, Annotation[] annotations, 
-            MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
-            OutputStream entityStream) throws IOException {
-        final ResolvedViewable rv = resolve(v);
-        if (rv == null)
-            throw new IOException("The template name, " +
-                    v.getTemplateName() +
-                    ", could not be resolved to a fully qualified template name");
-
-        rv.writeTo(entityStream);
-    }
-
-    private ResolvedViewable resolve(Viewable v) {
-        if (v instanceof ResolvedViewable) {
-            return (ResolvedViewable)v;
-        } else {
-            return tc.resolveViewable(v, ui);
-        }
+    public static void innerClass(Class c) {
+        LOGGER.warning("The inner class " + c.getName() + " is not a static inner class and cannot be instantiated.");
     }
     
-    public long getSize(Viewable t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return -1;
+    public static void nonPublicClass(Class c) {
+        LOGGER.warning("The class " + c.getName() + " is a not a public class and cannot be instantiated.");
     }
+
+    public static void missingDependency(Constructor ctor, int i) {
+//        Class[] parameterTypes = ctor.getParameterTypes();
+//        Type[] genericParameterTypes = ctor.getGenericParameterTypes();
+//        // Workaround bug http://bugs.sun.com/view_bug.do?bug_id=5087240
+//        if (parameterTypes.length != genericParameterTypes.length) {
+//            Type[] _genericParameterTypes = new Type[parameterTypes.length];
+//            _genericParameterTypes[0] = parameterTypes[0];
+//            System.arraycopy(genericParameterTypes, 0, _genericParameterTypes, 1, genericParameterTypes.length);
+//            genericParameterTypes = _genericParameterTypes;
+//        }
+
+        LOGGER.warning("Missing dependency for constructor " + ctor + " at parameter index " + i);
+    }
+
+    public static void missingDependency(Field f) {
+        LOGGER.warning("Missing dependency for field: " + f.toGenericString());
+    }
+
+    public static void missingDependency(Method m, int i) {
+        LOGGER.warning("Missing dependency for method " + m + " at parameter at index " + i);
+    }
+
 }

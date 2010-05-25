@@ -40,6 +40,7 @@ import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
+import com.sun.jersey.spi.inject.Errors;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -85,13 +86,23 @@ public class ComponentInjector<T> {
 
                 aoc.setAccesibleObject(f);
                 final Annotation[] as = f.getAnnotations();
+                boolean missingDependency = false;
                 for (Annotation a : as) {
                     Injectable i = ipc.getInjectable(
                             a.annotationType(), aoc, a, f.getGenericType(),
                             ComponentScope.UNDEFINED_SINGLETON);
                     if (i != null) {
+                        missingDependency = false;
                         setFieldValue(t, f, i.getValue());
+                        break;
+                    } else if (ipc.isAnnotationRegistered(a.annotationType(), f.getGenericType().getClass())) {
+                        missingDependency = true;
                     }
+                }
+
+                if (missingDependency) {
+                    // Missing dependency
+                    Errors.missingDependency(f);
                 }
 
             }
@@ -99,6 +110,7 @@ public class ComponentInjector<T> {
         }
 
         MethodList ml = new MethodList(c.getMethods());
+        int methodIndex = 0;
         for (AnnotatedMethod m : ml.
                 hasNotMetaAnnotation(HttpMethod.class).
                 hasNotAnnotation(Path.class).
@@ -108,14 +120,27 @@ public class ComponentInjector<T> {
             final Annotation[] as = m.getAnnotations();
             aoc.setAccesibleObject(m.getMethod(), as);
             final Type gpt = m.getGenericParameterTypes()[0];
+
+            boolean missingDependency = false;
             for (Annotation a : as) {
                 Injectable i = ipc.getInjectable(
                         a.annotationType(), aoc, a, gpt,
                         ComponentScope.UNDEFINED_SINGLETON);
                 if (i != null) {
+                    missingDependency = false;
                     setMethodValue(t, m, i.getValue());
+                    break;
+                } else if (ipc.isAnnotationRegistered(a.annotationType(), gpt.getClass())) {
+                    missingDependency = true;
                 }
             }
+
+            if (missingDependency) {
+                // Missing dependency
+                Errors.missingDependency(m.getMethod(), methodIndex);
+            }
+
+            methodIndex++;
         }
     }
     

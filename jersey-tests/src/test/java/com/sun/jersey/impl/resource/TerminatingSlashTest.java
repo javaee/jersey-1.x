@@ -107,7 +107,7 @@ public class TerminatingSlashTest extends AbstractResourceTester {
     }   
         
     @Path("/")
-    public class TerminatingSlashWithParameter {
+    public static class TerminatingSlashWithParameter {
         @GET
         @Path("/abc/")
         public String get() {

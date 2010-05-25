@@ -34,57 +34,18 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spi.inject;
 
-package com.sun.jersey.server.impl.inject;
 
-import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.InjectableProviderContext;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import java.util.List;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * The server context to obtain {@link Injectable} instances.
- * 
- * @author Paul.Sandoz@Sun.Com
- */
-public interface ServerInjectableProviderContext extends InjectableProviderContext {
-    /**
-     * Check if a parameter type is registered for injection.
-     *
-     * @param p the parameter, from which the parameter type is obtained.
-     * @return if reigstered, otherwise false.
-     */
-    public boolean isParameterTypeRegistered(Parameter p);
-
-    /**
-     * Get an injectable given a parameter.
-     * 
-     * @param p the parameter.
-     * @param s the scope for which the injectable will be used
-     * @return the injectable, otherwise null if an injectable could
-     *         not be found.
-     */
-    Injectable getInjectable(Parameter p, ComponentScope s);
-    
-    /**
-     * Get an injectable given a parameter.
-     *
-     * @param p the parameter.
-     * @param s the scope for which the injectable will be used
-     * @return the injectable and scope, otherwise null if an injectable could
-     *         not be found.
-     */
-    InjectableScopePair getInjectableiWithScope(Parameter p, ComponentScope s);
-
-    /**
-     * Get a list of injectable given a list of parameter.
-     * 
-     * @param ps the list of parameter.
-     * @param s the scope for which the injectable will be used
-     * @return the list of injectable, if an injectable for a parameter
-     *         could not be found the corresponding element in the 
-     *         list will be null.
-     */
-    List<Injectable> getInjectable(List<Parameter> ps, ComponentScope s);
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface ConstrainedTo {
+    Class<? extends ConstrainedToType> value();
 }

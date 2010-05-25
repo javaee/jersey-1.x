@@ -37,7 +37,6 @@
 
 package com.sun.jersey.server.impl.model;
 
-import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractImplicitViewMethod;
 import com.sun.jersey.api.model.AbstractResource;
@@ -49,11 +48,9 @@ import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.api.view.ImplicitProduces;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
-import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
-import com.sun.jersey.server.impl.component.ResourceFactory;
 import com.sun.jersey.server.impl.container.filter.FilterFactory;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.model.method.ResourceHeadWrapperMethod;
@@ -73,8 +70,9 @@ import com.sun.jersey.server.impl.uri.rules.SubLocatorRule;
 import com.sun.jersey.server.impl.uri.rules.TerminatingRule;
 import com.sun.jersey.server.impl.uri.rules.UriRulesFactory;
 import com.sun.jersey.server.impl.wadl.WadlFactory;
-import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.spi.container.ResourceFilter;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 
@@ -92,14 +90,6 @@ import java.util.Map;
 public final class ResourceClass {
     private final UriRules<UriRule> rules;
     
-    private final ResourceConfig config;
-
-    private final WadlFactory wadlFactory;
-    
-    public final AbstractResource resource;
-    
-    public ResourceComponentProvider rcProvider;
-    
     public ResourceClass(
             ResourceConfig config,
             ResourceMethodDispatcherFactory df,
@@ -108,12 +98,6 @@ public final class ResourceClass {
             WadlFactory wadlFactory,
             AbstractResource resource
             ) {
-        this.resource = resource;
-
-        this.config = config;
-        
-        this.wadlFactory = wadlFactory;
-
         final boolean implicitViewables = config.getFeature(
                 ResourceConfig.FEATURE_IMPLICIT_VIEWABLES);
         List<QualitySourceMediaType> implictProduces = null;
@@ -126,12 +110,12 @@ public final class ResourceClass {
 
         RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
 
-        processSubResourceLocators(ff, injectableContext, rulesMap);
+        processSubResourceLocators(resource, config, ff, injectableContext, rulesMap);
 
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
-                processSubResourceMethods(implictProduces, df, ff);
+                processSubResourceMethods(resource, implictProduces, df, ff, wadlFactory);
 
-        final ResourceMethodMap methodMap = processMethods(implictProduces, df, ff);
+        final ResourceMethodMap methodMap = processMethods(resource, implictProduces, df, ff, wadlFactory);
 
         // Create the rules for the sub-resource HTTP methods
         for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
@@ -198,41 +182,6 @@ public final class ResourceClass {
         this.rules = combiningRules;
     }
         
-    public void init(ResourceFactory rcpFactory) {
-        init(rcpFactory, null);
-    }
-
-    public void init(ResourceFactory rcpFactory, ComponentContext cc) {
-        this.rcProvider = rcpFactory.getComponentProvider(cc, resource.getResourceClass());
-        rcProvider.init(resource);
-    }
-
-    public void initSingleton(final Object resource) {
-        this.rcProvider = new ResourceComponentProvider() {
-            public void init(AbstractResource abstractResource) {
-            }
-
-            public ComponentScope getScope() {
-                return ComponentScope.Singleton;
-            }
-
-            public Object getInstance(HttpContext hc) {
-                return getInstance();
-            }
-
-            public void destroy() {
-            }
-
-            public Object getInstance() {
-                return resource;
-            }
-        };
-    }
-
-    public void destroy() {
-        rcProvider.destroy();
-    }
-
     public UriRules<UriRule> getRules() {
         return rules;
     }
@@ -250,6 +199,8 @@ public final class ResourceClass {
     }
 
     private void processSubResourceLocators(
+            AbstractResource resource,
+            ResourceConfig config,
             FilterFactory ff,
             ServerInjectableProviderContext injectableContext,
             RulesMap<UriRule> rulesMap) {
@@ -258,10 +209,20 @@ public final class ResourceClass {
             PathPattern p = new PathPattern(t);
 
             List<ResourceFilter> resourceFilters = ff.getResourceFilters(locator);
+
+            List<Injectable> is = injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest);
+            if (is.contains(null)) {
+                // Missing dependency
+                for (int i = 0; i < is.size(); i++) {
+                    if (is.get(i) == null) {
+                        Errors.missingDependency(locator.getMethod(), i);
+                    }
+                }
+            }
             UriRule r = new SubLocatorRule(
                     t,
                     locator.getMethod(),
-                    injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest),
+                    is,
                     FilterFactory.getRequestFilters(resourceFilters),
                     FilterFactory.getResponseFilters(resourceFilters));
 
@@ -274,12 +235,14 @@ public final class ResourceClass {
     }
 
     private Map<PathPattern, ResourceMethodMap> processSubResourceMethods(
+            AbstractResource resource,
             List<QualitySourceMediaType> implictProduces,
             ResourceMethodDispatcherFactory df,
-            FilterFactory ff) {
+            FilterFactory ff,
+            WadlFactory wadlFactory) {
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
                 new HashMap<PathPattern, ResourceMethodMap>();
-        for (final AbstractSubResourceMethod method : this.resource.getSubResourceMethods()) {
+        for (final AbstractSubResourceMethod method : resource.getSubResourceMethods()) {
 
             UriTemplate t = new PathTemplate(method.getPath().getValue());
             PathPattern p = new PathPattern(t, "(/)?");
@@ -297,18 +260,20 @@ public final class ResourceClass {
             }
 
             processHead(e.getValue());
-            processOptions(e.getValue(), this.resource, e.getKey());            
+            processOptions(e.getValue(), resource, e.getKey(), wadlFactory);
         }
 
         return patternMethodMap;
     }
 
-    private ResourceMethodMap processMethods(            
+    private ResourceMethodMap processMethods(
+            AbstractResource resource,
             List<QualitySourceMediaType> implictProduces,
             ResourceMethodDispatcherFactory df,
-            FilterFactory ff) {
+            FilterFactory ff,
+            WadlFactory wadlFactory) {
         final ResourceMethodMap methodMap = new ResourceMethodMap();
-        for (final AbstractResourceMethod resourceMethod : this.resource.getResourceMethods()) {
+        for (final AbstractResourceMethod resourceMethod : resource.getResourceMethods()) {
             ResourceMethod rm = new ResourceHttpMethod(df, ff, resourceMethod);
             methodMap.put(rm);
         }
@@ -321,7 +286,7 @@ public final class ResourceClass {
         }
 
         processHead(methodMap);
-        processOptions(methodMap, this.resource, null);
+        processOptions(methodMap, resource, null, wadlFactory);
 
         return methodMap;
     }
@@ -365,14 +330,17 @@ public final class ResourceClass {
         return false;
     }
 
-    private void processOptions(ResourceMethodMap methodMap, 
-            AbstractResource resource, PathPattern p) {
+    private void processOptions(
+            ResourceMethodMap methodMap,
+            AbstractResource resource,
+            PathPattern p,
+            WadlFactory wadlFactory) {
         List<ResourceMethod> l = methodMap.get("OPTIONS");
         if (l != null) {
             return;
         }
 
-        ResourceMethod optionsMethod = this.wadlFactory.createWadlOptionsMethod(methodMap, resource, p);
+        ResourceMethod optionsMethod = wadlFactory.createWadlOptionsMethod(methodMap, resource, p);
         if (optionsMethod == null)
             optionsMethod = new ResourceHttpOptionsMethod(methodMap);
         methodMap.put(optionsMethod);

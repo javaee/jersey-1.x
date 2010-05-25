@@ -27,6 +27,10 @@ public class InjectableValuesProvider {
         this.is = AbstractHttpContextInjectable.transform(is);
     }
 
+    public List<AbstractHttpContextInjectable> getInjectables() {
+        return is;
+    }
+
     /**
      * Get the injectable values.
      *

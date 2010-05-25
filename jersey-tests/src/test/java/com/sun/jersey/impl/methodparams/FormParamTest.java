@@ -477,7 +477,7 @@ public class FormParamTest extends AbstractResourceTester {
         assertEquals("POST", b);
     }
 
-    public class ParamBean {
+    public static class ParamBean {
         @FormParam("a") String a;
 
         @FormParam("b") String b;
