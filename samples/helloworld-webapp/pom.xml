@@ -35,8 +35,7 @@
  only if the new code is made subject to such option by the copyright
  holder.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
@@ -46,34 +45,19 @@
     <artifactId>helloworld-webapp</artifactId>
     <name>Helloworld WebApp - Jersey Sample</name>
     <packaging>war</packaging>
-    <profiles>
-        <profile>
-            <id>hudson</id>
-            <activation>
-                <property>
-                    <name>env.JERSEY_HTTP_PORT</name>
-                </property>
-            </activation>
-            <properties>
-                <gf.port>${env.JERSEY_HTTP_PORT}</gf.port>
-            </properties>
-        </profile>
-        <profile>
-            <id>non-hudson</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <gf.port>8080</gf.port>
-            </properties>
-        </profile>
-    </profiles>
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-grizzly</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- for external testing -->
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-external</artifactId>
@@ -84,34 +68,6 @@
     <build>
         <finalName>helloworld-webapp</finalName>
         <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>**/itest/**</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-
-                    <execution>
-                        <id>surefire-itest</id>
-                        <phase>integration-test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <argLine>-Djersey.test.port=${gf.port}</argLine>
-                            <excludes>
-                                <exclude>none</exclude>
-                            </excludes>
-                            <includes>
-                                <include>**/itest/**</include>
-                            </includes>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <inherited>true</inherited>
@@ -129,82 +85,29 @@
                     <goalPrefix>embedded-glassfish</goalPrefix>
                     <app>${basedir}/target/helloworld-webapp.war</app>
                     <autoDelete>true</autoDelete>
-                    <port>${gf.port}</port>
-                    <instanceRoot>./target/gbembeddedtmp</instanceRoot>
+                    <port>8080</port>
                 </configuration>
-
-                <executions>
-                    <execution>
-                        <id>start-glassfish</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>glassfish-deploy</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>glassfish-undeploy</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>undeploy</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>stop-glassfish</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
-
-                <dependencies>
-                    <dependency>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-server</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-core</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-client</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
-
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
                 <executions>
-                    <execution>
-                        <id>update-gf-deps</id>
-                        <phase>package</phase>
-                        <!-- append to the packaging phase. -->
+                	<execution>
+                		<id>update-gf-deps</id>
+                        <phase>package</phase> <!-- append to the packaging phase. -->
                         <goals>
-                            <goal>transform</goal>
-                            <!-- goals == mojos -->
+                            <goal>transform</goal> <!-- goals == mojos -->
                         </goals>
-                        <configuration>
-                            <xslFile>src/main/xslt/gf.xsl</xslFile>
-                            <srcDir>.</srcDir>
-                            <srcIncludes>pom.xml</srcIncludes>
-                            <destDir>target/gf-pom-file</destDir>
-                        </configuration>
-                    </execution>
+                 		<configuration>
+                			<xslFile>src/main/xslt/gf.xsl</xslFile>
+                			<srcDir>.</srcDir>
+                			<srcIncludes>pom.xml</srcIncludes>
+                			<destDir>target/gf-pom-file</destDir>
+                		</configuration>
+                	</execution>
                 </executions>
             </plugin>
-            <plugin>
+             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
@@ -214,13 +117,10 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id>
-                        <!-- this is used for inheritance merges -->
-                        <phase>package</phase>
-                        <!-- append to the packaging phase. -->
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- append to the packaging phase. -->
                         <goals>
-                            <goal>attached</goal>
-                            <!-- goals == mojos -->
+                            <goal>attached</goal> <!-- goals == mojos -->
                         </goals>
                     </execution>
                 </executions>
@@ -247,7 +147,7 @@
         </pluginRepository>
     </pluginRepositories>
     <repositories>
-        <repository>
+       <repository>
             <id>maven-repository.dev.java.net</id>
             <name>Java.net Maven 1 Repository (legacy)</name>
             <url>http://download.java.net/maven/1</url>
@@ -264,7 +164,7 @@
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
         </repository>
-    </repositories>
+     </repositories>
     <properties>
         <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
     </properties>

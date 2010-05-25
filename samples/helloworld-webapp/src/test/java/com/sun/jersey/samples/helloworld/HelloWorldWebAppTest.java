@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.samples.helloworld.itest;
+package com.sun.jersey.samples.helloworld;
 
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
