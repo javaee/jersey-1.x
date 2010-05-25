@@ -40,29 +40,15 @@
     <formats>
         <format>zip</format>
     </formats>
-    <moduleSets>
-        <moduleSet>
-            <sources>
-                <fileSets>
-                    <fileSet>
-                        <useDefaultExcludes>true</useDefaultExcludes>
-                        <excludes>
-                            <exclude>**/target/**</exclude>
-                            <exclude>**/generated/**</exclude>
-                        </excludes>
-                    </fileSet>
-                </fileSets>
-            </sources>
-        </moduleSet>
-    </moduleSets>
     <fileSets>
         <fileSet>
             <directory></directory>
-            <useDefaultExcludes>true</useDefaultExcludes>
-            <includes>
-                <include>pom.xml</include>
-                <include>assembly.xml</include>
-            </includes>
+            <useDefaultExcludes>false</useDefaultExcludes>
+            <excludes>
+                <exclude>**/target/**</exclude>
+                <exclude>**/generated/**</exclude>
+                <exclude>**/.svn/**</exclude>
+            </excludes>
         </fileSet>
     </fileSets>
 </assembly>
