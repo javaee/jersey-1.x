@@ -58,6 +58,7 @@ import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
@@ -110,9 +111,9 @@ public class Client extends Filterable implements ClientHandler {
 
     private static final Logger LOGGER = Logger.getLogger(Client.class.getName());
 
-    private final ProviderFactory componentProviderFactory;
+    private ProviderFactory componentProviderFactory;
 
-    private final Providers providers;
+    private Providers providers;
 
     private boolean destroyed = false;
 
@@ -166,10 +167,23 @@ public class Client extends Filterable implements ClientHandler {
      * @param config the client configuration.
      * @param provider the IoC component provider factory.
      */
-    public Client(ClientHandler root, ClientConfig config,
-            IoCComponentProviderFactory provider) {
+    public Client(final ClientHandler root, final ClientConfig config,
+            final IoCComponentProviderFactory provider) {
         // Defer instantiation of root to component provider
         super(root);
+
+        Errors.processWithErrors(new Errors.Closure<Void>() {
+            @Override
+            public Void f() {
+                Errors.setReportMissingDependentFieldOrMethod(false);
+                init(root, config, provider);
+                return null;
+            }
+        });
+    }
+
+    private void init(ClientHandler root, ClientConfig config,
+            IoCComponentProviderFactory provider) {
 
         Class<?>[] components = ServiceFinder.find("jersey-client-components").toClassArray();
         if (components.length > 0) {
@@ -180,7 +194,7 @@ public class Client extends Filterable implements ClientHandler {
                         b.append('\n').append("  ").append(c);
                 LOGGER.log(Level.INFO, b.toString());
             }
-            
+
             config = new ComponentsClientConfig(config, components);
         }
 
@@ -294,6 +308,7 @@ public class Client extends Filterable implements ClientHandler {
 
 
         // Inject on all components
+        Errors.setReportMissingDependentFieldOrMethod(true);
         componentProviderFactory.injectOnAllComponents();
         componentProviderFactory.injectOnProviderInstances(config.getSingletons());
         componentProviderFactory.injectOnProviderInstance(root);
