@@ -70,26 +70,6 @@ import junit.framework.TestCase;
  */
 public class BasicValidatorTest extends TestCase {
 
-    @Path("rootNoCtor")
-    public static class TestRootResourceWithoutPublicConstructor {
-
-        private TestRootResourceWithoutPublicConstructor() { }
-
-        @GET
-        public String getIt() {
-            return "it";
-        }
-    }
-
-    public void testRootResourceWithoutPublicConstructor() throws Exception {
-        System.out.println("---\nAn issue should be reported if a public ctor is missing at a root resource:");
-        AbstractResource ar = IntrospectionModeller.createResource(TestRootResourceWithoutPublicConstructor.class);
-        BasicValidator validator = new BasicValidator();
-        validator.validate(ar);
-        printIssueList(validator);
-        assertTrue(validator.fatalIssuesFound());
-    }
-
     @Path("rootNonAmbigCtors")
     public static class TestRootResourceNonAmbigCtors {
 

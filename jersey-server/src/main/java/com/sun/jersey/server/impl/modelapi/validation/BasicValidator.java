@@ -91,13 +91,6 @@ public class BasicValidator extends AbstractModelValidator {
                     ImplMessages.ERROR_RES_URI_PATH_INVALID(resource.getResourceClass(), resource.getPath()),
                     true)); // TODO: is it really a fatal issue?
         }
-        // root resource should have at least one public contructor
-        if (resource.isRootResource() && resource.getConstructors().isEmpty()) {
-            issueList.add(new ResourceModelIssue(
-                    resource,
-                    ImplMessages.ROOT_RES_NO_PUBLIC_CTOR(resource.getResourceClass()),
-                    true));
-        }
         // check sub-resource locators for ambiguities
         Map<UriTemplate, String> srlUriTemplates = new HashMap<UriTemplate, String>();
         Map<UriTemplate, String> srlUriTemplatesWithSlash = new HashMap<UriTemplate, String>();

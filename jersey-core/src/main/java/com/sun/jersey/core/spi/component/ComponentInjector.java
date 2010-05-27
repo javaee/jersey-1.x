@@ -101,7 +101,6 @@ public class ComponentInjector<T> {
                 }
 
                 if (missingDependency) {
-                    // Missing dependency
                     Errors.missingDependency(f);
                 }
 
@@ -136,7 +135,6 @@ public class ComponentInjector<T> {
             }
 
             if (missingDependency) {
-                // Missing dependency
                 Errors.missingDependency(m.getMethod(), methodIndex);
             }
 

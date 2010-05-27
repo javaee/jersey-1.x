@@ -34,56 +34,215 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.spi.inject;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * Tests:
- *   com.sun.jersey.impl.inject.InjectAnnotationInjectableTest
+ * TODO do not use static thread local?
  *
- * TODO errors should have a push and pop context and when the last context
- * is popped off the stack if there are errors then all errors for all contexts
- * are logged and an exception is thrown.
- *
+ * TODO turn back on exception reporting when deploying to war, class loader
+ * delegation set to false, with an older version of Jersey is shipped with GF
+ * works correctly.
+ * 
+ * TODO inner classes reports a missing dependency for the constructor parameter
+ * corresponding to the enclosing class, ignore that?
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class Errors {
+public final class Errors {
+
+    public static class ErrorMessagesException extends RuntimeException {
+        public final List<ErrorMessage> messages;
+        
+        private ErrorMessagesException(List<ErrorMessage> messages) {
+            this.messages = messages;
+        }
+    }
+
+    public static class ErrorMessage {
+        
+        final String message;
+
+        final boolean isFatal;
+
+        private ErrorMessage(String message, boolean isFatal) {
+            this.message = message;
+            this.isFatal = isFatal;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 37 * hash + (this.message != null ? this.message.hashCode() : 0);
+            hash = 37 * hash + (this.isFatal ? 1 : 0);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final ErrorMessage other = (ErrorMessage) obj;
+            if ((this.message == null) ? (other.message != null) : !this.message.equals(other.message)) {
+                return false;
+            }
+            if (this.isFatal != other.isFatal) {
+                return false;
+            }
+            return true;
+        }
+        public int hashcode() {return 0;}
+
+    }
+
+    private final ArrayList<ErrorMessage> messages = new ArrayList<ErrorMessage>(0);
+
+    private int stack = 0;
+
+    private boolean fieldReporting = true;
+
+    private void preProcess() {
+        stack++;
+    }
+
+    private void postProcess(boolean throwException) {
+        stack--;
+        fieldReporting = true;
+
+        if (stack == 0 && !messages.isEmpty()) {
+            try {
+                processErrorMessages(throwException, messages);
+            } finally {
+                errors.remove();
+            }
+        }
+    }
 
     private static final Logger LOGGER = Logger.getLogger(Errors.class.getName());
 
-    public static void innerClass(Class c) {
-        LOGGER.warning("The inner class " + c.getName() + " is not a static inner class and cannot be instantiated.");
+    private static void processErrorMessages(boolean throwException, List<ErrorMessage> messages) {
+        final StringBuilder sb = new StringBuilder();
+        boolean isFatal = false;
+        for (ErrorMessage em : messages) {
+            if (sb.length() > 0) {
+                sb.append("\n");
+            }
+
+            sb.append("  ");
+
+            if (em.isFatal) {
+                sb.append("SEVERE: ");
+            } else {
+                sb.append("WARNING: ");
+            }
+            isFatal |= em.isFatal;
+
+            sb.append(em.message);
+        }
+
+        final String message = sb.toString();
+        if (isFatal) {
+            LOGGER.severe("The following errors have been detected with resource and/or provider classes:\n" + message);
+//            if (throwException) {
+//                throw new ErrorMessagesException(new ArrayList<ErrorMessage>(messages));
+//            }
+        } else {
+            LOGGER.warning("The following errors have been detected with resource and/or provider classes:\n" + message);
+        }
     }
-    
+
+    private static ThreadLocal<Errors> errors = new ThreadLocal<Errors>() {
+        protected synchronized Errors initialValue() {
+            return new Errors();
+        }
+    };
+
+    private static Errors getInstance() {
+        return errors.get();
+    }
+
+    public static interface Closure<T> {
+        public T f();
+    }
+
+    public static <T> T processWithErrors(Closure<T> c) {
+        Errors e = Errors.getInstance();
+        e.preProcess();
+
+        RuntimeException caught = null;
+        try {
+            return c.f();
+        } catch (RuntimeException re) {
+            // If a runtime exception is caught then report errors and
+            // rethrow
+            caught = re;
+        } finally {
+            e.postProcess(caught == null);
+        }
+
+        throw caught;
+    }
+
+    public static void error(String message) {
+        error(message, true);
+    }
+
+    public static void error(String message, boolean isFatal) {
+        final ErrorMessage em = new ErrorMessage(message, isFatal);
+        getInstance().messages.add(em);
+    }
+
+    public static void innerClass(Class c) {
+        error("The inner class " + c.getName() + " is not a static inner class and cannot be instantiated.");
+    }
+
     public static void nonPublicClass(Class c) {
-        LOGGER.warning("The class " + c.getName() + " is a not a public class and cannot be instantiated.");
+        error("The class " + c.getName() + " is a not a public class and cannot be instantiated.");
+    }
+
+    public static void nonPublicConstructor(Class c) {
+        error("The class " + c.getName() + " does not have a public constructor and cannot be instantiated.");
+    }
+
+    public static void abstractClass(Class c) {
+        error("The class " + c.getName() + " is an abstract class and cannot be instantiated.");
+    }
+
+    public static void interfaceClass(Class c) {
+        error("The class " + c.getName() + " is an interface and cannot be instantiated.");
     }
 
     public static void missingDependency(Constructor ctor, int i) {
-//        Class[] parameterTypes = ctor.getParameterTypes();
-//        Type[] genericParameterTypes = ctor.getGenericParameterTypes();
-//        // Workaround bug http://bugs.sun.com/view_bug.do?bug_id=5087240
-//        if (parameterTypes.length != genericParameterTypes.length) {
-//            Type[] _genericParameterTypes = new Type[parameterTypes.length];
-//            _genericParameterTypes[0] = parameterTypes[0];
-//            System.arraycopy(genericParameterTypes, 0, _genericParameterTypes, 1, genericParameterTypes.length);
-//            genericParameterTypes = _genericParameterTypes;
-//        }
+        error("Missing dependency for constructor " + ctor + " at parameter index " + i);
+    }
 
-        LOGGER.warning("Missing dependency for constructor " + ctor + " at parameter index " + i);
+    public static void setReportMissingDependentFieldOrMethod(boolean fieldReporting) {
+        getInstance().fieldReporting = fieldReporting;
+    }
+
+    public static boolean getReportMissingDependentFieldOrMethod() {
+        return getInstance().fieldReporting;
     }
 
     public static void missingDependency(Field f) {
-        LOGGER.warning("Missing dependency for field: " + f.toGenericString());
+        if (getReportMissingDependentFieldOrMethod()) {
+            error("Missing dependency for field: " + f.toGenericString());
+        }
     }
-
+    
     public static void missingDependency(Method m, int i) {
-        LOGGER.warning("Missing dependency for method " + m + " at parameter at index " + i);
+        if (getReportMissingDependentFieldOrMethod()) {
+            error("Missing dependency for method " + m + " at parameter at index " + i);
+        }
     }
-
 }

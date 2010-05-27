@@ -73,7 +73,7 @@ public class MultipartMixedWithApacheClientTest extends AbstractGrizzlyServerTes
     }
 
     @Path("/")
-    public class ProducesFormDataUsingMultiPart {
+    public static class ProducesFormDataUsingMultiPart {
 
         @POST
         @Consumes("multipart/mixed")

@@ -79,7 +79,7 @@ import com.sun.jersey.core.spi.component.ProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.server.impl.ThreadLocalHttpContext;
-import com.sun.jersey.server.impl.model.ResourceClass;
+import com.sun.jersey.server.impl.model.ResourceUriRules;
 import com.sun.jersey.server.impl.model.RulesMap;
 import com.sun.jersey.server.impl.model.parameter.CookieParamInjectableProvider;
 import com.sun.jersey.server.impl.model.parameter.HeaderParamInjectableProvider;
@@ -133,9 +133,11 @@ import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ServerSide;
 import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.container.ExceptionMapperContext;
+import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
+import com.sun.jersey.spi.uri.rules.UriRules;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -160,10 +162,10 @@ public final class WebApplicationImpl implements WebApplication {
     private final Map<Class, AbstractResource> abstractResourceMap =
             new HashMap<Class, AbstractResource>();
 
-    private final ConcurrentMap<Class, ResourceClass> metaClassMap =
-            new ConcurrentHashMap<Class, ResourceClass>();
+    private final ConcurrentMap<Class, UriRules<UriRule>> rulesMap =
+            new ConcurrentHashMap<Class, UriRules<UriRule>>();
 
-    private final ConcurrentMap<Class, ResourceComponentProvider> providerClassMap =
+    private final ConcurrentMap<Class, ResourceComponentProvider> providerMap =
             new ConcurrentHashMap<Class, ResourceComponentProvider>();
 
     private static class ClassAnnotationKey {
@@ -210,7 +212,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    private final ConcurrentMap<ClassAnnotationKey, ResourceComponentProvider> providerClassAnnotationKeyMap =
+    private final ConcurrentMap<ClassAnnotationKey, ResourceComponentProvider> providerWithAnnotationKeyMap =
             new ConcurrentHashMap<ClassAnnotationKey, ResourceComponentProvider>();
 
     private final ThreadLocalHttpContext context;
@@ -407,20 +409,25 @@ public final class WebApplicationImpl implements WebApplication {
             return rcpFactory.getScope(c);
         }
         
-        public IoCComponentProcessor get(Class c, ComponentScope scope) {
+        public IoCComponentProcessor get(final Class c, final ComponentScope scope) {
             IoCComponentProcessor cp = componentProcessorMap.get(c);
             if (cp != null) {
                 return (cp == NULL_COMPONENT_PROCESSOR) ? null : cp;
             }
 
-            synchronized (metaClassMap) {
+            synchronized (abstractResourceMap) {
                 cp = componentProcessorMap.get(c);
                 if (cp != null) {
                     return (cp == NULL_COMPONENT_PROCESSOR) ? null : cp;
                 }
 
-                final ResourceComponentInjector rci = new ResourceComponentInjector(
+                final ResourceComponentInjector rci = Errors.processWithErrors(new Errors.Closure<ResourceComponentInjector>() {
+                    public ResourceComponentInjector f() {
+                        return new ResourceComponentInjector(
                         injectableFactory, scope, getAbstractResource(c));
+                    }
+                });
+
                 if (rci.hasInjectableArtifacts()) {
                     cp = new ComponentProcessorImpl(rci);
                     componentProcessorMap.put(c, cp);
@@ -444,13 +451,13 @@ public final class WebApplicationImpl implements WebApplication {
         return wa;
     }
 
-    public ResourceClass getResourceClass(final Class c) {
+    public UriRules<UriRule> getUriRules(final Class c) {
         assert c != null;
 
         // Try the non-blocking read, the most common opertaion
-        ResourceClass rc = metaClassMap.get(c);
-        if (rc != null) {
-            return rc;
+        UriRules<UriRule> r = rulesMap.get(c);
+        if (r != null) {
+            return r;
         }
 
         // Not present use a synchronized block to ensure that only one
@@ -458,22 +465,26 @@ public final class WebApplicationImpl implements WebApplication {
         synchronized (abstractResourceMap) {
             // One or more threads may have been blocking on the synchronized
             // block, re-check the map
-            rc = metaClassMap.get(c);
-            if (rc != null) {
-                return rc;
+            r = rulesMap.get(c);
+            if (r != null) {
+                return r;
             }
 
-            rc = newResourceClass(getAbstractResource(c));            
-            metaClassMap.put(c, rc);
+            r = Errors.processWithErrors(new Errors.Closure<ResourceUriRules>() {
+                public ResourceUriRules f() {
+                    return newResourceUriRules(getAbstractResource(c));
+                }
+            }).getRules();
+            rulesMap.put(c, r);
         }
-        return rc;
+        return r;
     }
 
     public ResourceComponentProvider getResourceComponentProvider(final Class c) {
         assert c != null;
 
         // Try the non-blocking read, the most common opertaion
-        ResourceComponentProvider rcp = providerClassMap.get(c);
+        ResourceComponentProvider rcp = providerMap.get(c);
         if (rcp != null) {
             return rcp;
         }
@@ -483,14 +494,20 @@ public final class WebApplicationImpl implements WebApplication {
         synchronized (abstractResourceMap) {
             // One or more threads may have been blocking on the synchronized
             // block, re-check the map
-            rcp = providerClassMap.get(c);
+            rcp = providerMap.get(c);
             if (rcp != null) {
                 return rcp;
             }
 
-            rcp = rcpFactory.getComponentProvider(null, c);
-            rcp.init(getAbstractResource(c));
-            providerClassMap.put(c, rcp);
+            final ResourceComponentProvider _rcp = rcp = rcpFactory.getComponentProvider(null, c);
+            Errors.processWithErrors(new Errors.Closure<Void>() {
+                public Void f() {
+                    _rcp.init(getAbstractResource(c));
+                    return null;
+                }
+            });
+
+            providerMap.put(c, rcp);
         }
         return rcp;
     }
@@ -517,7 +534,7 @@ public final class WebApplicationImpl implements WebApplication {
                 cc.getAnnotations());
 
         // Try the non-blocking read, the most common opertaion
-        ResourceComponentProvider rcp = providerClassAnnotationKeyMap.get(cak);
+        ResourceComponentProvider rcp = providerWithAnnotationKeyMap.get(cak);
         if (rcp != null) {
             return rcp;
         }
@@ -527,30 +544,36 @@ public final class WebApplicationImpl implements WebApplication {
         synchronized (abstractResourceMap) {
             // One or more threads may have been blocking on the synchronized
             // block, re-check the map
-            rcp = providerClassAnnotationKeyMap.get(cak);
+            rcp = providerWithAnnotationKeyMap.get(cak);
             if (rcp != null) {
                 return rcp;
             }
 
-            rcp = rcpFactory.getComponentProvider(cc, c);
-            rcp.init(getAbstractResource(c));
-            providerClassAnnotationKeyMap.put(cak, rcp);
+            final ResourceComponentProvider _rcp = rcp = rcpFactory.getComponentProvider(cc, c);
+            Errors.processWithErrors(new Errors.Closure<Void>() {
+                public Void f() {
+                    _rcp.init(getAbstractResource(c));
+                    return null;
+                }
+            });
+
+            providerWithAnnotationKeyMap.put(cak, rcp);
         }
         return rcp;
     }
 
     private void initiateResource(AbstractResource ar) {
         final Class c = ar.getResourceClass();
-        getResourceClass(c);
+        getUriRules(c);
         getResourceComponentProvider(c);
     }
 
     private void initiateResource(AbstractResource ar, final Object resource) {
         final Class c = ar.getResourceClass();
-        getResourceClass(c);
+        getUriRules(c);
 
-        if (!providerClassMap.containsKey(c)) {
-            providerClassMap.put(c, new ResourceComponentProvider() {
+        if (!providerMap.containsKey(c)) {
+            providerMap.put(c, new ResourceComponentProvider() {
                 public void init(AbstractResource abstractResource) {
                 }
 
@@ -572,28 +595,15 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    private ResourceClass newResourceClass(final AbstractResource ar) {
+    private ResourceUriRules newResourceUriRules(final AbstractResource ar) {
         assert null != ar;
+        
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
-        boolean fatalIssueFound = false;
         for (ResourceModelIssue issue : validator.getIssueList()) {
-            if (issue.isFatal()) {
-                fatalIssueFound = true;
-                if (LOGGER.isLoggable(Level.SEVERE)) {
-                    LOGGER.severe(issue.getMessage());
-                }
-            } else {
-                if (LOGGER.isLoggable(Level.WARNING)) {
-                    LOGGER.warning(issue.getMessage());
-                }
-            }
-        } // eof model validation
-        if (fatalIssueFound) {
-            LOGGER.severe(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
-            throw new ContainerException(ImplMessages.FATAL_ISSUES_FOUND_AT_RES_CLASS(ar.getResourceClass().getName()));
+            Errors.error(issue.getMessage(), issue.isFatal());
         }
-        return new ResourceClass(
+        return new ResourceUriRules(
                 resourceConfig,
                 dispatcherFactory,
                 injectableFactory,
@@ -632,6 +642,16 @@ public final class WebApplicationImpl implements WebApplication {
     }
     
     public void initiate(final ResourceConfig rc, final IoCComponentProviderFactory _provider) {
+        Errors.processWithErrors(new Errors.Closure<Void>() {
+            public Void f() {
+                Errors.setReportMissingDependentFieldOrMethod(false);
+                _initiate(rc, _provider);
+                return null;
+            }
+        });
+    }
+
+    public void _initiate(final ResourceConfig rc, final IoCComponentProviderFactory _provider) {
         if (rc == null) {
             throw new IllegalArgumentException("ResourceConfig instance MUST NOT be null");
         }
@@ -948,6 +968,7 @@ public final class WebApplicationImpl implements WebApplication {
 
 
         // Inject on all components
+        Errors.setReportMissingDependentFieldOrMethod(true);
         cpFactory.injectOnAllComponents();
         cpFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
         
@@ -990,11 +1011,11 @@ public final class WebApplicationImpl implements WebApplication {
     }
 
     public void destroy() {
-        for (ResourceComponentProvider rcp : providerClassMap.values()) {
+        for (ResourceComponentProvider rcp : providerMap.values()) {
             rcp.destroy();
         }
 
-        for (ResourceComponentProvider rcp : providerClassAnnotationKeyMap.values()) {
+        for (ResourceComponentProvider rcp : providerWithAnnotationKeyMap.values()) {
             rcp.destroy();
         }
 
@@ -1262,7 +1283,7 @@ public final class WebApplicationImpl implements WebApplication {
             return;
         
         // Configure meta-data
-        getResourceClass(WadlResource.class);
+        getUriRules(WadlResource.class);
         getResourceComponentProvider(WadlResource.class);
         
         rulesMap.put(p, new RightHandPathRule(

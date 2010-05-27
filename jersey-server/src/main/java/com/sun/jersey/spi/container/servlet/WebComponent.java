@@ -224,7 +224,8 @@ public class WebComponent implements ContainerListener {
      * This will destroy the Web application created by this this Web component.
      */
     public void destroy() {
-        application.destroy();
+        if (application != null)
+            application.destroy();
     }
     
     private final static class Writer extends OutputStream implements ContainerResponseWriter {

@@ -36,15 +36,14 @@
  */
 package com.sun.jersey.impl.inject;
 
-
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.inject.Errors;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-
+import java.util.List;
 import javax.ws.rs.Path;
-
-import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -61,19 +60,24 @@ public class NonPublicNonStaticTest extends AbstractResourceTester {
         super( testName );
     }
 
-    public void testDummy() {
+    private Errors.ErrorMessagesException catches(Closure c) {
+        return catches(c, Errors.ErrorMessagesException.class);
     }
-
 
     @Path("/")
     public class NonStaticResource {
     }
 
-//    public void testNonStaticResource() {
-//        initiateWebApplication(NonStaticResource.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testNonStaticResource() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(NonStaticResource.class);
+            }
+        }).messages;
+
+        assertEquals(2, messages.size());
+    }
 
 
     @Path("/")
@@ -85,22 +89,34 @@ public class NonPublicNonStaticTest extends AbstractResourceTester {
       }
     }
 
-//    public void testNonStaticResourceSubResource() {
-//        initiateWebApplication(NonStaticResourceSubResource.class);
-//
-//        assertEquals("class", resource("/class").get(String.class));
-//    }
+    public void testNonStaticResourceSubResource() {
+        initiateWebApplication(NonStaticResourceSubResource.class);
+
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                resource("/class").get(String.class);
+            }
+        }).messages;
+
+        assertEquals(2, messages.size());
+    }
 
 
     @Path("/")
     static class NonPublicResource {
     }
 
-//    public void testNonPublicResource() {
-//        initiateWebApplication(NonPublicResource.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testNonPublicResource() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(NonPublicResource.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
 
 
     @Path("/")
@@ -112,11 +128,96 @@ public class NonPublicNonStaticTest extends AbstractResourceTester {
       }
     }
 
-//    public void testNonPublicSubResource() {
-//        initiateWebApplication(NonPublicResourceSubResource.class);
-//
-//        assertEquals("foo", resource("/class").get(String.class));
-//    }
+    public void testNonPublicSubResource() {
+        initiateWebApplication(NonPublicResourceSubResource.class);
+
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                resource("/class").get(String.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+
+    @Path("/")
+    static public abstract class AbstractResource {
+    }
+
+    public void testAbstractResource() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(AbstractResource.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+
+    @Path("/")
+    public static class AbstractResourceSubResource {
+
+      @Path("class")
+      public Class<AbstractResource> getClazz() {
+          return AbstractResource.class;
+      }
+    }
+
+    public void testAbstractResourceSubResource() {
+        initiateWebApplication(AbstractResourceSubResource.class);
+
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                resource("/class").get(String.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+
+    @Path("/")
+    static public interface InterfaceResource {
+    }
+
+    public void testInterfaceResource() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(InterfaceResource.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+
+    @Path("/")
+    public static class InterfaceResourceSubResource {
+
+      @Path("class")
+      public Class<InterfaceResource> getClazz() {
+          return InterfaceResource.class;
+      }
+    }
+
+    public void testInterfaceResourceSubResource() {
+        initiateWebApplication(InterfaceResourceSubResource.class);
+
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                resource("/class").get(String.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
 
 
     @Path("/")
@@ -124,11 +225,16 @@ public class NonPublicNonStaticTest extends AbstractResourceTester {
         public NonPublicResourceWithConstructor() {}
     }
 
-//    public void testNonPublicResourceWithConstructor() {
-//        initiateWebApplication(NonPublicResourceWithConstructor.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testNonPublicResourceWithConstructor() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(NonPublicResourceWithConstructor.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
 
 
     @Path("/")
@@ -140,11 +246,36 @@ public class NonPublicNonStaticTest extends AbstractResourceTester {
       }
     }
 
-//    public void testNonPublicResourceSubResourceWithConstructor() {
-//        initiateWebApplication(NonPublicResourceSubResourceWithConstructor.class);
-//
-//        assertEquals("foo", resource("/class").get(String.class));
-//    }
+    public void testNonPublicResourceSubResourceWithConstructor() {
+        initiateWebApplication(NonPublicResourceSubResourceWithConstructor.class);
+
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                resource("/class").get(String.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+
+    @Path("/")
+    public static class PublicResourceWithPrivateConstructor {
+        private PublicResourceWithPrivateConstructor() {}
+    }
+
+    public void testPublicResourceWithPrivateConstructor() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(PublicResourceWithPrivateConstructor.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
 
 
     @Path("/")
@@ -171,11 +302,16 @@ public class NonPublicNonStaticTest extends AbstractResourceTester {
         }
     }
 
-//    public void testNonStaticProvider() throws IOException {
-//        initiateWebApplication(ProviderResource.class, NonStaticProvider.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testNonStaticProvider() throws IOException {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(ProviderResource.class, NonStaticProvider.class);
+            }
+        }).messages;
+
+        assertEquals(2, messages.size());
+    }
 
     @Provider
     static class NonPublicProvider implements MessageBodyWriter<String> {
@@ -197,11 +333,16 @@ public class NonPublicNonStaticTest extends AbstractResourceTester {
         }
     }
 
-//    public void testNonPublicProvider() {
-//        initiateWebApplication(ProviderResource.class, NonPublicProvider.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testNonPublicProvider() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(ProviderResource.class, NonPublicProvider.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
 
     @Provider
     static class NonPublicProviderWithConstructor implements MessageBodyWriter<String> {
@@ -225,9 +366,93 @@ public class NonPublicNonStaticTest extends AbstractResourceTester {
         }
     }
 
-//    public void testNonPublicProviderWithConstructor() {
-//        initiateWebApplication(ProviderResource.class, NonPublicProviderWithConstructor.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testNonPublicProviderWithConstructor() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(ProviderResource.class, NonPublicProviderWithConstructor.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+    @Provider
+    public static class PublicProviderWithPrivateConstructor implements MessageBodyWriter<String> {
+
+        private PublicProviderWithPrivateConstructor() {}
+
+        @Override
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return type == String.class;
+        }
+
+        @Override
+        public long getSize(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return -1;
+        }
+
+        @Override
+        public void writeTo(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+                MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+            entityStream.write(t.getBytes());
+        }
+    }
+
+    public void testPublicProviderWithPrivateConstructor() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(ProviderResource.class, PublicProviderWithPrivateConstructor.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+    @Provider
+    public static abstract class AbstractProvider implements MessageBodyWriter<String> {
+
+        @Override
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return type == String.class;
+        }
+
+        @Override
+        public long getSize(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+            return -1;
+        }
+
+        @Override
+        public void writeTo(String t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType,
+                MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
+            entityStream.write(t.getBytes());
+        }
+    }
+
+    public void testAbstractProvider() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(ProviderResource.class, AbstractProvider.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+    @Provider
+    public static interface InterfaceProvider extends MessageBodyWriter<String> {
+    }
+
+    public void testInterfaceProvider() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(ProviderResource.class, InterfaceProvider.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
 }

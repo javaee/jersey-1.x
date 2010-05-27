@@ -186,7 +186,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     }
 
     public UriRules<UriRule> getRules(Class resourceClass) {
-        return app.getResourceClass(resourceClass).getRules();
+        return app.getUriRules(resourceClass);
     }
 
     public void pushMatch(UriTemplate template, List<String> names) {

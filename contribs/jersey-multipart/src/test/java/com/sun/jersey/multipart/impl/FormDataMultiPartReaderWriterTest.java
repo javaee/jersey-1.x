@@ -102,7 +102,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
 
 
     @Path("/")
-    public class ProducesFormDataUsingMultiPart {
+    public static class ProducesFormDataUsingMultiPart {
 
         @GET
         @Produces("multipart/form-data")
@@ -160,7 +160,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
 
 
     @Path("/")
-    public class ProducesFormDataResource {
+    public static class ProducesFormDataResource {
 
         // Test "multipart/form-data" the easy way (with subclasses)
         @GET
@@ -201,7 +201,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class ProducesFormDataCharsetResource {
+    public static class ProducesFormDataCharsetResource {
 
         // Test "multipart/form-data" the easy way (with subclasses)
         @GET
@@ -236,7 +236,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class ConsumesFormDataResource {
+    public static class ConsumesFormDataResource {
 
         @PUT
         @Consumes("multipart/form-data")
@@ -291,7 +291,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class ConsumesFormDataParamResource {
+    public static class ConsumesFormDataParamResource {
 
         @PUT
         @Consumes("multipart/form-data")
@@ -347,7 +347,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class FormDataTypesResource {
+    public static class FormDataTypesResource {
 
         @PUT
         @Consumes("multipart/form-data")
@@ -393,7 +393,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class FormDataListTypesResource {
+    public static class FormDataListTypesResource {
 
         @PUT
         @Consumes("multipart/form-data")
@@ -438,7 +438,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class FormDataCollectionTypesResource {
+    public static class FormDataCollectionTypesResource {
 
         @PUT
         @Consumes("multipart/form-data")
@@ -483,7 +483,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class PrimitivesFormDataParamResource {
+    public static class PrimitivesFormDataParamResource {
 
         @PUT
         @Consumes("multipart/form-data")
@@ -531,7 +531,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class DefaultFormDataParamResource {
+    public static class DefaultFormDataParamResource {
 
         @PUT
         @Consumes("multipart/form-data")
@@ -570,7 +570,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class NonContentTypeForPartResource {
+    public static class NonContentTypeForPartResource {
 
         @PUT
         @Consumes("multipart/form-data")
@@ -605,7 +605,7 @@ public class FormDataMultiPartReaderWriterTest extends AbstractGrizzlyServerTest
     }
 
     @Path("/")
-    public class MediaTypeWithBoundaryResource {
+    public static class MediaTypeWithBoundaryResource {
 
         @PUT
         @Consumes("multipart/form-data")

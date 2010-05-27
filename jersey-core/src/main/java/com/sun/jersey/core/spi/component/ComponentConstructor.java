@@ -145,10 +145,24 @@ public class ComponentConstructor<T> {
             Errors.nonPublicClass(c);
         }
 
+        if (Modifier.isAbstract(modifiers)) {
+            if (Modifier.isInterface(modifiers)) {
+                Errors.interfaceClass(c);
+            } else {
+                Errors.abstractClass(c);
+            }
+        }
+
         if (c.getEnclosingClass() != null && !Modifier.isStatic(modifiers)) {
             Errors.innerClass(c);
         }
 
+        if (Modifier.isPublic(modifiers) && !Modifier.isAbstract(modifiers)) {
+            if (c.getConstructors().length == 0) {
+                Errors.nonPublicConstructor(c);
+            }
+        }
+        
         final T t = _getInstance();
         ci.inject(t);
         if (postConstruct != null)

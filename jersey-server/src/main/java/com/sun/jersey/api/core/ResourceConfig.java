@@ -52,7 +52,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -491,25 +490,6 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
                             " is ignored as an instance is registered in the set of singletons");                    
                 }
             }            
-        }
-
-
-        // Remove any classes that cannot be instantiated
-        i = getClasses().iterator();
-        while (i.hasNext()) {
-            Class<?> c = i.next();
-            int modifiers = c.getModifiers();
-            if (Modifier.isAbstract(modifiers) && !Modifier.isInterface(modifiers)) {
-                LOGGER.warning("The abstract " + c + ", registered as a root resource class " +
-                        "of the ResourceConfig cannot be instantiated" +
-                        ". This class will be ignored");
-                i.remove();
-            } else if (Modifier.isInterface(modifiers)) {
-                LOGGER.warning("The " + c + ", registered as a root resource class " +
-                        "of the ResourceConfig cannot be instantiated" +
-                        ". This interface will be ignored");
-                i.remove();
-            }
         }
         
         // Find conflicts

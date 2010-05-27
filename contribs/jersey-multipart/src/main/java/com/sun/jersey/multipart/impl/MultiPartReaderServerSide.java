@@ -35,62 +35,45 @@
  * holder.
  */
 
-package com.sun.jersey.impl.resource;
+package com.sun.jersey.multipart.impl;
 
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.ClientResponse;
-import javax.ws.rs.Path;
+import com.sun.jersey.multipart.MultiPart;
+import com.sun.jersey.multipart.MultiPartConfig;
+import com.sun.jersey.spi.CloseableService;
 import java.io.IOException;
-import javax.ws.rs.GET;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.Providers;
+import org.jvnet.mimepull.MIMEParsingException;
 
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * <p>{@link Provider} {@link MessageBodyReader} implementation for
+ * {@link MultiPart} entities.</p>
  */
-public class RootResourceTest extends AbstractResourceTester {
-    
-    public RootResourceTest(String testName) {
-        super(testName);
+public class MultiPartReaderServerSide extends MultiPartReader {
+
+    private final CloseableService closeableService;
+
+    public MultiPartReaderServerSide(@Context Providers providers, @Context MultiPartConfig config,
+            @Context CloseableService closeableService) {
+        super(providers, config);
+        
+        this.closeableService = closeableService;
     }
 
-    @Path("/concrete")
-    public static class Resource {
-        @GET
-        public String get() {
-            return "get";
-        }
-        
+    protected MultiPart readMultiPart(Class<MultiPart> type, Type genericType,
+                              Annotation[] annotations, MediaType mediaType,
+                              MultivaluedMap<String, String> headers,
+                              InputStream stream) throws IOException, MIMEParsingException {
+        MultiPart mp = super.readMultiPart(type, genericType, annotations, mediaType, headers, stream);
+        closeableService.add(mp);
+        return mp;
     }
 
-    @Path("/abstract")
-    public static abstract class AbstractResource {
-        @GET
-        public String get() {
-            return "get";
-        }
-        
-    }
-    
-    public void testAbstractResource() throws IOException {
-        initiateWebApplication(AbstractResource.class, Resource.class);
-        WebResource r = resource("/abstract", false);
-        
-        ClientResponse res = r.get(ClientResponse.class);
-        assertEquals(404, res.getStatus());
-    }   
-    
-    @Path("/interface")
-    public static interface InterfaceResource {
-        @GET
-        public String get();        
-    }
-    
-    public void testInterfaceResource() throws IOException {
-        initiateWebApplication(InterfaceResource.class, Resource.class);
-        WebResource r = resource("/interface", false);
-        
-        ClientResponse res = r.get(ClientResponse.class);
-        assertEquals(404, res.getStatus());
-    }   
 }

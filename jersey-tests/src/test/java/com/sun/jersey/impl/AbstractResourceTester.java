@@ -146,7 +146,24 @@ public abstract class AbstractResourceTester extends TestCase implements Contain
         
         return r;
     }
-    
+
+    protected interface Closure {
+        void f();
+    }
+
+    protected <T extends RuntimeException> T catches(Closure c, Class<T> rex) {
+        T t = null;
+        try {
+            c.f();
+        } catch(RuntimeException ex) {
+            assertTrue(ex.getClass().getName() + " is not assignable to runtime exception " + rex.getName(),
+                    ex.getClass().isAssignableFrom(rex));
+            t = rex.cast(ex);
+        }
+        assertNotNull("No exception was caught of class " + rex.getName(), t);
+        return t;
+    }
+
     private URI createCompleteUri(URI baseUri, String relativeUri) {
         if (relativeUri.startsWith("/"))
             relativeUri = relativeUri.substring(1);

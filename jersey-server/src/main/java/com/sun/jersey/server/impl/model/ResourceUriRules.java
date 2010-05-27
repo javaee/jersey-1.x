@@ -87,10 +87,10 @@ import java.util.Map;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceClass {
+public final class ResourceUriRules {
     private final UriRules<UriRule> rules;
     
-    public ResourceClass(
+    public ResourceUriRules(
             ResourceConfig config,
             ResourceMethodDispatcherFactory df,
             ServerInjectableProviderContext injectableContext,

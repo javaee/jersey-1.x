@@ -44,7 +44,6 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartConfig;
-import com.sun.jersey.spi.CloseableService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -69,7 +68,6 @@ import org.jvnet.mimepull.MIMEPart;
  * <p>{@link Provider} {@link MessageBodyReader} implementation for
  * {@link MultiPart} entities.</p>
  */
-//@Provider
 @Consumes("multipart/*")
 public class MultiPartReader implements MessageBodyReader<MultiPart> {
 
@@ -84,24 +82,19 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
      */
     private final MultiPartConfig config;
 
-    private final CloseableService closeableService;
-
     private final MIMEConfig mimeConfig;
 
     /**
      * <p>Accept constructor injection of the configuration parameters for this
      * application.</p>
      */
-    public MultiPartReader(@Context Providers providers, @Context MultiPartConfig config, 
-            @Context CloseableService closeableService) {
+    public MultiPartReader(@Context Providers providers, @Context MultiPartConfig config) {
         this.providers = providers;
         
         if (config == null) {
             throw new IllegalArgumentException("The MultiPartConfig instance we expected is not present.  Have you registered the MultiPartConfigProvider class?");
         }
         this.config = config;
-
-        this.closeableService = closeableService;
 
         mimeConfig = new MIMEConfig();
         mimeConfig.setMemoryThreshold(config.getBufferThreshold());
@@ -136,71 +129,76 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
                               InputStream stream) throws IOException, WebApplicationException {
 
         try {
-            MIMEMessage mm = new MIMEMessage(stream, 
-                    mediaType.getParameters().get("boundary"),
-                    mimeConfig);
-
-            boolean formData = false;
-            MultiPart multiPart = null;
-            if (MediaTypes.typeEquals(mediaType, MediaType.MULTIPART_FORM_DATA_TYPE)) {
-                multiPart = new FormDataMultiPart();
-                formData = true;
-            } else {
-                multiPart = new MultiPart();
-            }
-
-            multiPart.setProviders(providers);
-
-            MultivaluedMap<String,String> mpHeaders = multiPart.getHeaders();
-            for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
-                List<String> values = entry.getValue();
-                for (String value : values) {
-                    mpHeaders.add(entry.getKey(), value);
-                }
-            }
-
-            if (!formData) {
-                multiPart.setMediaType(mediaType);
-            }
-
-            for (MIMEPart mp : mm.getAttachments()) {
-                BodyPart bodyPart = null;
-                if (formData) {
-                    bodyPart = new FormDataBodyPart();
-                } else {
-                    bodyPart = new BodyPart();
-                }
-                
-                // Configure providers
-                bodyPart.setProviders(providers);
-                                
-                // Copy headers
-                for (Header h : mp.getAllHeaders()) {
-                    bodyPart.getHeaders().add(h.getName(), h.getValue());
-                }
-
-                try {
-                    String contentType = bodyPart.getHeaders().getFirst("Content-Type");
-                    if (contentType != null)
-                        bodyPart.setMediaType(MediaType.valueOf(contentType));
-
-                    bodyPart.getContentDisposition();
-                } catch (IllegalArgumentException ex) {
-                    throw new WebApplicationException(ex, 400);
-                }
-                
-                // Copy data into a BodyPartEntity structure
-                bodyPart.setEntity(new BodyPartEntity(mp));
-                // Add this BodyPart to our MultiPart
-                multiPart.getBodyParts().add(bodyPart);                
-            }
-
-            if (closeableService != null)
-                closeableService.add(multiPart);
-            
-            return multiPart;
+            return readMultiPart(type, genericType, annotations, mediaType, headers, stream);
         } catch (MIMEParsingException ex) {
             throw new WebApplicationException(ex, 400);
         }
+    }
+
+
+    protected MultiPart readMultiPart(Class<MultiPart> type, Type genericType,
+                              Annotation[] annotations, MediaType mediaType,
+                              MultivaluedMap<String, String> headers,
+                              InputStream stream) throws IOException, MIMEParsingException {
+        MIMEMessage mm = new MIMEMessage(stream,
+                mediaType.getParameters().get("boundary"),
+                mimeConfig);
+
+        boolean formData = false;
+        MultiPart multiPart = null;
+        if (MediaTypes.typeEquals(mediaType, MediaType.MULTIPART_FORM_DATA_TYPE)) {
+            multiPart = new FormDataMultiPart();
+            formData = true;
+        } else {
+            multiPart = new MultiPart();
+        }
+
+        multiPart.setProviders(providers);
+
+        MultivaluedMap<String,String> mpHeaders = multiPart.getHeaders();
+        for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
+            List<String> values = entry.getValue();
+            for (String value : values) {
+                mpHeaders.add(entry.getKey(), value);
+            }
+        }
+
+        if (!formData) {
+            multiPart.setMediaType(mediaType);
+        }
+
+        for (MIMEPart mp : mm.getAttachments()) {
+            BodyPart bodyPart = null;
+            if (formData) {
+                bodyPart = new FormDataBodyPart();
+            } else {
+                bodyPart = new BodyPart();
+            }
+
+            // Configure providers
+            bodyPart.setProviders(providers);
+
+            // Copy headers
+            for (Header h : mp.getAllHeaders()) {
+                bodyPart.getHeaders().add(h.getName(), h.getValue());
+            }
+
+            try {
+                String contentType = bodyPart.getHeaders().getFirst("Content-Type");
+                if (contentType != null)
+                    bodyPart.setMediaType(MediaType.valueOf(contentType));
+
+                bodyPart.getContentDisposition();
+            } catch (IllegalArgumentException ex) {
+                throw new WebApplicationException(ex, 400);
+            }
+
+            // Copy data into a BodyPartEntity structure
+            bodyPart.setEntity(new BodyPartEntity(mp));
+            // Add this BodyPart to our MultiPart
+            multiPart.getBodyParts().add(bodyPart);
+        }
+        
+        return multiPart;
     }
 }

@@ -93,7 +93,7 @@ public class FormDataMultiPartBufferTest extends AbstractGrizzlyServerTester {
         client = null;
     }
 
-    public class MyFilter implements ContainerRequestFilter {
+    public static class MyFilter implements ContainerRequestFilter {
 
         @Override
         public ContainerRequest filter(ContainerRequest request) {
@@ -135,7 +135,7 @@ public class FormDataMultiPartBufferTest extends AbstractGrizzlyServerTester {
         
     }
     @Path("/")
-    public class ConsumesFormDataResource {
+    public static class ConsumesFormDataResource {
 
         @Context HttpContext hc;
         

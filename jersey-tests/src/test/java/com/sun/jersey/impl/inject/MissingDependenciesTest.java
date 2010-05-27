@@ -36,17 +36,16 @@
  */
 package com.sun.jersey.impl.inject;
 
-
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.inject.Errors;
+import com.sun.jersey.spi.resource.Singleton;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-
+import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.spi.resource.Singleton;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -65,7 +64,8 @@ public class MissingDependenciesTest extends AbstractResourceTester {
         super( testName );
     }
 
-    public void testDummy() {
+    private Errors.ErrorMessagesException catches(Closure c) {
+        return catches(c, Errors.ErrorMessagesException.class);
     }
 
     @Path("/")
@@ -92,11 +92,16 @@ public class MissingDependenciesTest extends AbstractResourceTester {
 
     }
 
-//    public void testMissingDependenciesResource() {
-//        initiateWebApplication(MissingDependenciesResource.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testMissingDependenciesResource() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(MissingDependenciesResource.class);
+            }
+        }).messages;
+
+        assertEquals(7, messages.size());
+    }
 
 
     @Path("/")
@@ -112,17 +117,31 @@ public class MissingDependenciesTest extends AbstractResourceTester {
       }
     }
 
-//    public void testMissingDependenciesSubResourceInstance() {
-//        initiateWebApplication(MissingDependenciesSubResource.class);
-//
-//        assertEquals("instance", resource("/instance").get(String.class));
-//    }
+    public void testMissingDependenciesSubResourceInstance() {
+        initiateWebApplication(MissingDependenciesSubResource.class);
+
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            public void f() {
+                resource("/instance").get(String.class);
+            }        
+        }).messages;
+
+
+        assertEquals(4, messages.size());
+    }
     
-//    public void testMissingDependenciesSubResourceClass() {
-//        initiateWebApplication(MissingDependenciesSubResource.class);
-//
-//        assertEquals("class", resource("/class").get(String.class));
-//    }
+    public void testMissingDependenciesSubResourceClass() {
+        initiateWebApplication(MissingDependenciesSubResource.class);
+
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            public void f() {
+                resource("/class").get(String.class);
+            }
+        }).messages;
+
+
+        assertEquals(3, messages.size());
+    }
 
 
     @Path("/")
@@ -131,11 +150,15 @@ public class MissingDependenciesTest extends AbstractResourceTester {
         @QueryParam("foo") String foo;
     }
 
-//    public void testMissingDependenciesSingletonResource() {
-//        initiateWebApplication(MissingDependenciesSingletonResource.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testMissingDependenciesSingletonResource() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            public void f() {
+                initiateWebApplication(MissingDependenciesSingletonResource.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
 
 
     @Path("/")
@@ -173,9 +196,14 @@ public class MissingDependenciesTest extends AbstractResourceTester {
         }
     }
 
-//    public void testMissingDependenciesProvider() {
-//        initiateWebApplication(MissingDependenciesProviderResource.class, MissingDependenciesProvider.class);
-//
-//        assertEquals("foo", resource("/").get(String.class));
-//    }
+    public void testMissingDependenciesProvider() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            public void f() {
+                initiateWebApplication(MissingDependenciesProviderResource.class,
+                        MissingDependenciesProvider.class);
+            }
+        }).messages;
+
+        assertEquals(3, messages.size());
+    }
 }

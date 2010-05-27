@@ -59,7 +59,7 @@ public class RenderedImageTypeTest extends AbstractResourceTester {
     }
         
     @Path("/")
-    public class ImageResource {
+    public static class ImageResource {
         
         @Consumes("image/gif")
         @Produces("image/png")
