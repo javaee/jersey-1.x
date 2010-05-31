@@ -76,6 +76,7 @@
                     <archive>
                         <manifestEntries>
                             <probe-provider-xml-file-names>jersey-gf-statsprovider-probe-provider.xml</probe-provider-xml-file-names>
+                            <Bundle-SymbolicName>com.sun.jersey.glassfish.statsproviders</Bundle-SymbolicName>
                         </manifestEntries>
                     </archive>
                 </configuration>
