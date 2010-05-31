@@ -34,7 +34,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl.inject;
+package com.sun.jersey.impl.errors;
 
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.inject.Errors;

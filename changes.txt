@@ -1,4 +1,19 @@
 release 1.3 (05/06-2010)
+- Fixed Jersey versioning issue for GlassFish when a version of
+  Jersey is deployed in the war that is different to the version of Jersey
+  version distributed with GlassFish.
+  META-INF/sevices files will be ignored if the corresponding
+  META-INF/MANIFEST.MF of the same jar contains a Bundle-SymbolicName
+  beginning with "com.sun.jersey" and a Bundle-Version that is not equal
+  to the Bundle-Version declared in the META-INF/MANIFEST.MF for the same jar
+  that contains the com.sun.jersey.spi.service.ServiceFinder.class.
+- Fixed issue 66
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=66
+  *Breaking changes*
+  Errors will result if dependencies cannot be injected rather than a null
+  value being injected.
+  Non-static inner classes as root resource and provider classes are no longer
+  supported.
 - Fixed issue for WadlGeneratorConfig and building of properties, which now
   correctly works for any property value type.
 - Fixed issue 527

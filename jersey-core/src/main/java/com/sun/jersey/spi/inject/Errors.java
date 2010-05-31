@@ -152,12 +152,12 @@ public final class Errors {
 
         final String message = sb.toString();
         if (isFatal) {
-            LOGGER.severe("The following errors have been detected with resource and/or provider classes:\n" + message);
-//            if (throwException) {
-//                throw new ErrorMessagesException(new ArrayList<ErrorMessage>(messages));
-//            }
+            LOGGER.severe("The following errors and warnings have been detected with resource and/or provider classes:\n" + message);
+            if (throwException) {
+                throw new ErrorMessagesException(new ArrayList<ErrorMessage>(messages));
+            }
         } else {
-            LOGGER.warning("The following errors have been detected with resource and/or provider classes:\n" + message);
+            LOGGER.warning("The following warnings have been detected with resource and/or provider classes:\n" + message);
         }
     }
 

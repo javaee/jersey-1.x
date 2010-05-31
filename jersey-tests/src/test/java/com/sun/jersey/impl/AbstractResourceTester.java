@@ -156,6 +156,7 @@ public abstract class AbstractResourceTester extends TestCase implements Contain
         try {
             c.f();
         } catch(RuntimeException ex) {
+            ex.printStackTrace();
             assertTrue(ex.getClass().getName() + " is not assignable to runtime exception " + rex.getName(),
                     ex.getClass().isAssignableFrom(rex));
             t = rex.cast(ex);

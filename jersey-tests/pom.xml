@@ -214,8 +214,6 @@
                 <configuration>
                     <excludes>
                         <exclude>com/sun/jersey/impl/container/httpserver/*Test.java</exclude>
-                        <exclude>com/sun/jersey/impl/inject/MissingDependenciesTest.java</exclude>
-                        <exclude>com/sun/jersey/impl/inject/NonPublicNonStaticTest.java</exclude>
                     </excludes>
                     <forkMode>always</forkMode>
                     <enableAssertions>false</enableAssertions>
