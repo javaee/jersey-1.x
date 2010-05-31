@@ -36,23 +36,20 @@
  */
 package com.sun.jersey.impl.inject;
 
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
-import java.io.IOException;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.impl.inject.NonPublicNonStaticTest.NonStaticResource;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.resource.Singleton;
+import java.io.IOException;
 import java.util.List;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
 /**
  *
@@ -156,16 +153,16 @@ public class InjectAnnotationInjectableTest extends AbstractResourceTester {
         }
     }
 
-//    public void testBadInjectSingleton() {
-//        List<Errors.ErrorMessage> messages = catches(new Closure() {
-//            @Override
-//            public void f() {
-//                initiateWebApplication(BadInjectSingletonResource.class);
-//            }
-//        }, Errors.ErrorMessagesException.class).messages;
-//
-//        assertEquals(1, messages.size());
-//    }
+    public void testBadInjectSingleton() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(BadInjectSingletonResource.class);
+            }
+        }, Errors.ErrorMessagesException.class).messages;
+
+        assertEquals(1, messages.size());
+    }
 
 
     @Path("/")
