@@ -71,7 +71,7 @@ public class DeferredResourceConfig extends DefaultResourceConfig {
     public Application getApplication(ProviderFactory pf) {
         ComponentProvider cp = pf.getComponentProvider(appClass);
         if (cp == null) {
-            throw new ContainerException("");
+            throw new ContainerException("The application class " + appClass.getName() + " could not be instantiated");
         }
         Application app = (Application)cp.getInstance();
         

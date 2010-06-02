@@ -141,6 +141,7 @@ import com.sun.jersey.spi.uri.rules.UriRules;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -719,6 +720,31 @@ public final class WebApplicationImpl implements WebApplication {
         }
          
         this.resourceContext = new ResourceContext() {
+            public ExtendedUriInfo matchUriInfo(URI u) throws ContainerException {
+                try {
+                    return handleMatchResourceRequest(u);
+                } catch (ContainerException ex) {
+                    throw ex;
+                } catch (WebApplicationException ex) {
+                    if (ex.getResponse().getStatus() == 404) {
+                        return null;
+                    } else {
+                        throw new ContainerException(ex);
+                    }
+                } catch (RuntimeException ex) {
+                    throw new ContainerException(ex);
+                }
+            }
+
+            public Object matchResource(URI u) throws ContainerException {
+                ExtendedUriInfo ui = matchUriInfo(u);
+                return (ui != null) ? ui.getMatchedResources().get(0) : null;
+            }
+
+            public <T> T matchResource(URI u, Class<T> c) throws ContainerException, ClassCastException {
+                return c.cast(matchResource(u));
+            }
+
             public <T> T getResource(Class<T> c) {
                 return c.cast(getResourceComponentProvider(c).getInstance(context));
             }
@@ -1010,6 +1036,20 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
+    public WebApplicationContext handleMatchResourceRequest(URI u) {
+        final WebApplicationContext oldContext = (WebApplicationContext)context.get();
+
+        final WebApplicationContext newContext = oldContext.createMatchResourceContext(u);
+
+        context.set(newContext);
+        try {
+            _handleRequest(newContext, newContext.getContainerRequest());
+            return newContext;
+        } finally {
+            context.set(oldContext);
+        }
+    }
+
     public void destroy() {
         for (ResourceComponentProvider rcp : providerMap.values()) {
             rcp.destroy();
@@ -1035,25 +1075,7 @@ public final class WebApplicationImpl implements WebApplication {
     private void _handleRequest(final WebApplicationContext localContext,
             ContainerRequest request, ContainerResponse response) throws IOException {
         try {
-            for (ContainerRequestFilter f : filterFactory.getRequestFilters()) {
-                request = f.filter(request);
-                localContext.setContainerRequest(request);
-            }
-            
-            /**
-             * The matching algorithm currently works from an absolute path.
-             * The path is required to be in encoded form.
-             */
-            StringBuilder path = new StringBuilder();
-            path.append("/").append(request.getPath(false));
-
-            if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS)) {
-                path = stripMatrixParams(path);
-            }
-
-            if (!rootsRule.accept(path, null, localContext)) {
-                throw new NotFoundException(request.getRequestUri());
-            }            
+            _handleRequest(localContext, request);
         } catch (WebApplicationException e) {
             response.mapWebApplicationException(e);
         } catch (MappableContainerException e) {
@@ -1100,6 +1122,29 @@ public final class WebApplicationImpl implements WebApplication {
                 response.mapWebApplicationException(e);
                 response.write();
             }
+        }
+    }
+
+    private void _handleRequest(final WebApplicationContext localContext,
+            ContainerRequest request) {
+        for (ContainerRequestFilter f : filterFactory.getRequestFilters()) {
+            request = f.filter(request);
+            localContext.setContainerRequest(request);
+        }
+
+        /**
+         * The matching algorithm currently works from an absolute path.
+         * The path is required to be in encoded form.
+         */
+        StringBuilder path = new StringBuilder();
+        path.append("/").append(request.getPath(false));
+
+        if (!resourceConfig.getFeature(ResourceConfig.FEATURE_MATCH_MATRIX_PARAMS)) {
+            path = stripMatrixParams(path);
+        }
+
+        if (!rootsRule.accept(path, null, localContext)) {
+            throw new NotFoundException(request.getRequestUri());
         }
     }
 

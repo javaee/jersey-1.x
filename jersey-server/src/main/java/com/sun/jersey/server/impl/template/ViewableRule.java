@@ -44,6 +44,7 @@ import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.view.Viewable;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.server.impl.application.WebApplicationContext;
 import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -84,52 +85,60 @@ public class ViewableRule implements UriRule {
                 resource);
 
         final HttpRequestContext request = context.getRequest();
-        // Only accept GET requests
-        if (!request.getMethod().equals("GET"))
-            return false;
-        
-        // Obtain the template path
-        final String templatePath = (path.length() > 0) ? 
-            context.getMatchResult().group(1) :
-            "";
+        // Only accept GET requests and internal matching requests
+        if (request.getMethod().equals("GET") ||
+                request.getMethod().equals(WebApplicationContext.HTTP_METHOD_MATCH_RESOURCE)) {
+            // Obtain the template path
+            final String templatePath = (path.length() > 0) ?
+                context.getMatchResult().group(1) :
+                "";
 
-        // Resolve the viewable
-        Viewable v = new Viewable(templatePath, resource);
-        ResolvedViewable rv = tc.resolveViewable(v);
-        if (rv == null)
-            return false;
-
-        if (context.isTracingEnabled()) {
-            context.trace(String.format("accept implicit view: \"%s\" -> %s, %s",
-                    templatePath,
-                    ReflectionHelper.objectToString(resource),
-                    rv.getTemplateName()));
-        }
-
-        // Push the response filters
-        context.pushContainerResponseFilters(responseFilters);
-
-        // Process the request filter
-        if (!requestFilters.isEmpty()) {
-            ContainerRequest containerRequest = context.getContainerRequest();
-            for (ContainerRequestFilter f : requestFilters) {
-                containerRequest = f.filter(containerRequest);
-                context.setContainerRequest(containerRequest);
+            // Resolve the viewable
+            Viewable v = new Viewable(templatePath, resource);
+            ResolvedViewable rv = tc.resolveViewable(v);
+            if (rv == null) {
+                return false;
             }
+
+            // If an internal match resource request then always return true
+            if (request.getMethod().equals(WebApplicationContext.HTTP_METHOD_MATCH_RESOURCE)) {
+                return true;
+            }
+
+            if (context.isTracingEnabled()) {
+                context.trace(String.format("accept implicit view: \"%s\" -> %s, %s",
+                        templatePath,
+                        ReflectionHelper.objectToString(resource),
+                        rv.getTemplateName()));
+            }
+
+            // Push the response filters
+            context.pushContainerResponseFilters(responseFilters);
+
+            // Process the request filter
+            if (!requestFilters.isEmpty()) {
+                ContainerRequest containerRequest = context.getContainerRequest();
+                for (ContainerRequestFilter f : requestFilters) {
+                    containerRequest = f.filter(containerRequest);
+                    context.setContainerRequest(containerRequest);
+                }
+            }
+
+            final HttpResponseContext response = context.getResponse();
+
+            response.setStatus(200);
+
+            response.setEntity(rv);
+
+            if (!response.getHttpHeaders().containsKey("Content-Type")) {
+                MediaType contentType = getContentType(request, response);
+                response.getHttpHeaders().putSingle("Content-Type", contentType);
+            }
+
+            return true;
+        } else {
+            return false;
         }
-
-        final HttpResponseContext response = context.getResponse();
-
-        response.setStatus(200);
-        
-        response.setEntity(rv);
-
-        if (!response.getHttpHeaders().containsKey("Content-Type")) {
-            MediaType contentType = getContentType(request, response);
-            response.getHttpHeaders().putSingle("Content-Type", contentType);
-        }
-
-        return true;
     }
 
     private MediaType getContentType(HttpRequestContext request, HttpResponseContext response) {

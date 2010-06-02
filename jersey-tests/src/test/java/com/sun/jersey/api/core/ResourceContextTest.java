@@ -36,21 +36,23 @@
  */
 package com.sun.jersey.api.core;
 
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.resource.Singleton;
-import java.io.IOException;
+import java.net.URI;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 
 
 /**
  * Test {@link ResourceContext}: resource context must provide access to
  * subresources that can be provided by a custom component provider.<br>
- * Created on: Apr 19, 2008<br>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @version $Id$
+ * @author Paul.Sandoz@Sun.Com
  */
 public class ResourceContextTest extends AbstractResourceTester {
 
@@ -95,7 +97,7 @@ public class ResourceContextTest extends AbstractResourceTester {
         }
     }
 
-    public void testGetResourceFromResourceContext() throws IOException {
+    public void testGetResourceFromResourceContext() {
         initiateWebApplication(MyRootResource.class);
 
         assertEquals("1", resource("/singleton").get(String.class));
@@ -103,5 +105,82 @@ public class ResourceContextTest extends AbstractResourceTester {
 
         assertEquals("1", resource("/perrequest").get(String.class));
         assertEquals("1", resource("/perrequest").get(String.class));
-    }    
+    }
+
+
+    @Path("/match")
+    public static class MatchResource {
+
+        @Context ResourceContext resourceContext;
+
+        @GET
+        @Path("{uri: .+}")
+        public String get(@PathParam("uri") URI uri) {
+            Object r = resourceContext.matchResource(uri);
+            return (r != null) ? r.toString() : "null";
+        }
+
+        @GET
+        @Path("/class/{class}/{uri: .+}")
+        public String get(@PathParam("uri") URI uri, @PathParam("class") String className) {
+            Class c = ReflectionHelper.classForName(className);
+            Object r = resourceContext.matchResource(uri, c);
+            return (r != null) ? r.toString() : "null";
+        }
+
+    }
+
+    public void testMatchResourceWithRelativeURI() {
+        initiateWebApplication(MatchResource.class, MyRootResource.class);
+
+        assertEquals(resource("/match/singleton").get(String.class),
+                resource("/match/singleton").get(String.class));
+
+        String r1 = resource("/match/perrequest").get(String.class);
+        String r2 = resource("/match/perrequest").get(String.class);
+        assertEquals(r1.substring(0, r1.indexOf('@')),
+                r2.substring(0, r2.indexOf('@')));
+    }
+
+    public void testMatchResourceWithAbsoluteURI() {
+        initiateWebApplication(MatchResource.class, MyRootResource.class);
+
+        assertEquals(resource("/match/test:/base/singleton").get(String.class),
+                resource("/match/test:/base/singleton").get(String.class));
+
+        String r1 = resource("/match/test:/base/perrequest").get(String.class);
+        String r2 = resource("/match/test:/base/perrequest").get(String.class);
+        assertEquals(r1.substring(0, r1.indexOf('@')),
+                r2.substring(0, r2.indexOf('@')));
+    }
+
+    public void testMatchResourceWithClass() {
+        initiateWebApplication(MatchResource.class, MyRootResource.class);
+
+        assertEquals(resource("/match/class/" + SingletonResource.class.getName() + "/singleton").get(String.class),
+                resource("/match/class/" + SingletonResource.class.getName() + "/singleton").get(String.class));
+
+        String r1 = resource("/match/class/" + PerRequestResource.class.getName() + "/perrequest").get(String.class);
+        String r2 = resource("/match/class/" + PerRequestResource.class.getName() + "/perrequest").get(String.class);
+        assertEquals(r1.substring(0, r1.indexOf('@')),
+                r2.substring(0, r2.indexOf('@')));
+    }
+    
+    public void testMatchNotFound() {
+        initiateWebApplication(MatchResource.class, MyRootResource.class);
+
+        assertEquals("null", resource("/match/foo").get(String.class));
+    }
+
+
+    public void testMatchBaseBaseUri() {
+        initiateWebApplication(MatchResource.class, MyRootResource.class);
+
+        catches(new Closure() {
+            @Override
+            public void f() {
+                resource("/match/test:/no-base/singleton").get(String.class);
+            }
+        }, ContainerException.class);
+    }
 }

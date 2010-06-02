@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.server.impl.application;
 
+import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.ExtendedUriInfo;
@@ -43,7 +44,9 @@ import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
+import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -67,7 +70,8 @@ import javax.ws.rs.core.UriBuilder;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class WebApplicationContext implements UriRuleContext, ExtendedUriInfo {
-
+    public static final String HTTP_METHOD_MATCH_RESOURCE = "com.sun.jersey.MATCH_RESOURCE";
+    
     private final WebApplicationImpl app;
 
     private final boolean isTraceEnabled;
@@ -90,6 +94,34 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
             getProperties().put(TraceInformation.class.getName(), 
                     new TraceInformation(this));
         }
+    }
+
+    public WebApplicationContext createMatchResourceContext(URI u) {
+        final URI base = request.getBaseUri();
+        
+        if (u.isAbsolute()) {
+            // TODO check if base is a base of u
+            URI r = base.relativize(u);
+            if (r == u) {
+                throw new ContainerException("The URI " + u + " is not relative to the base URI " + base);
+            }
+        } else {
+            u = UriBuilder.fromUri(base).
+                    path(u.getRawPath()).
+                    replaceQuery(u.getRawQuery()).
+                    fragment(u.getRawFragment()).
+                    build();
+        }
+
+        final ContainerRequest _request = new ContainerRequest(app,
+                HTTP_METHOD_MATCH_RESOURCE,
+                base, u,
+                new InBoundHeaders(), null);
+        final ContainerResponse _response = new ContainerResponse(app,
+                _request, null);
+        return new WebApplicationContext(app,
+                _request,
+                _response);
     }
 
     public List<ContainerResponseFilter> getResponseFilters() {

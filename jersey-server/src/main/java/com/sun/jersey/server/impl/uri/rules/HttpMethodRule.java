@@ -44,6 +44,7 @@ import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.server.impl.application.WebApplicationContext;
 import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -170,13 +171,17 @@ public final class HttpMethodRule implements UriRule {
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         UriRuleProbeProvider.ruleAccept(HttpMethodRule.class.getSimpleName(), path,
                 resource);
-
+        
         // If the path is not empty then do not accept
         if (path.length() > 0) return false;
 
         final HttpRequestContext request = context.getRequest();
-        final HttpResponseContext response = context.getResponse();
 
+        // If an internal match resource request then always return true
+        if (request.getMethod().equals(WebApplicationContext.HTTP_METHOD_MATCH_RESOURCE)) {
+            return true;
+        }
+        
         if (context.isTracingEnabled()) {
             final String currentPath = context.getUriInfo().getMatchedURIs().get(0);
             if (isSubResource) {
@@ -194,6 +199,8 @@ public final class HttpMethodRule implements UriRule {
             }
         }
 
+        final HttpResponseContext response = context.getResponse();
+        
         // Get the list of resource methods for the HTTP method
         ResourceMethodListPair methods = map.get(request.getMethod());
         if (methods == null) {

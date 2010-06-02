@@ -37,6 +37,7 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.api.container.ContainerException;
+import java.net.URI;
 import javax.ws.rs.core.Context;
 
 /**
@@ -48,10 +49,66 @@ import javax.ws.rs.core.Context;
  * classes are to be returned by sub-resource locator methods. Such instances
  * will be injected and managed within the declared scope just like instances
  * of root resource classes.
+ * <p>
+ * The resource context can be utilized when matching of URIs are
+ * required, for example when validating URIs sent in a request entity.
+ * Note that application functionality may be affected as the matching
+ * process will result in the construction or sharing of previously constructed
+ * resource classes that are in scope of the HTTP request, and the invocation of
+ * matching sub-resource locator methods. No resource methods wll be invoked.
  *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
+ * @author Paul.Sandoz@Sun.Com
  */
 public interface ResourceContext {
+
+    /**
+     * Match a URI to URI information.
+     * <p>
+     * If the URI is relative then the base URI of the application will be
+     * used to resolve the relative URI to an absolute URI.
+     * If the URI is absolute then it must be relative to the base URI of the
+     * application.
+     * 
+     * @param u the URI.
+     * @return the URI information, otherwise null if the URI cannot be matched.
+     * @throws ContainerException if there is an error when matching.
+     */
+    ExtendedUriInfo matchUriInfo(URI u) throws ContainerException;
+
+    /**
+     * Match a URI to a resource instance.
+     * <p>
+     * If the URI is relative then the base URI of the application will be
+     * used to resolve the relative URI to an absolute URI.
+     * If the URI is absolute then it must be relative to the base URI of the
+     * application.
+     *
+     * @param u the URI.
+     * @return the resource instance, otherwise null if the URI cannot be
+     *         matched.
+     * @throws ContainerException if there is an error when matching.
+     */
+    Object matchResource(URI u) throws ContainerException;
+
+    /**
+     * Match a URI to a resource instance.
+     * <p>
+     * If the URI is relative then the base URI of the application will be
+     * used to resolve the relative URI to an absolute URI.
+     * If the URI is absolute then it must be relative to the base URI of the
+     * application.
+     * 
+     * @param <T> the type of the resource.
+     * @param u the URI.
+     * @param c the resource class.
+     * @return the resource instance, otherwise null if the URI cannot be
+     *         matched.
+     * @throws ContainerException if there is an error when matching.
+     * @throws ClassCastException if the resource instance cannot be cast to
+     *         <code>c</code>.
+     */
+    <T> T matchResource(URI u, Class<T> c) throws ContainerException, ClassCastException;
     
     /**
      * Provides an instance of the given resource class.
