@@ -97,6 +97,7 @@ public class JSONConfiguration {
     private final boolean humanReadableFormatting;
     private final Map<String, String> jsonXml2JsonNs;
     private final boolean usePrefixAtNaturalAttributes;
+    private final Character namespaceSeparator;
 
     /**
      * Builder class for constructing {@link JSONConfiguration} options
@@ -111,6 +112,7 @@ public class JSONConfiguration {
         protected boolean humanReadableFormatting = false;
         protected Map<String, String> jsonXml2JsonNs = new HashMap<String, String>(0);
         protected boolean usePrefixAtNaturalAttributes = false;
+        protected Character namespaceSeparator = '.';
 
         private Builder(Notation notation) {
             this.notation = notation;
@@ -302,6 +304,24 @@ public class JSONConfiguration {
             return this;
         }
 
+
+        /**
+         * Setter for XML namespace separator.
+         * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+         * <p>
+         * The value is a character used to separate a namespace identifier from the name
+         *  of a XML attribute/element in JSON.
+         * <p>
+         * The default value is dot character ('.').
+         */
+        public MappedBuilder nsSeparator(Character separator) {
+            if (separator == null) {
+                throw new NullPointerException("Namespace separator can not be null!");
+            }
+            this.namespaceSeparator = separator;
+            return this;
+        }
+
         /**
          * Setter for XML root element unwrapping.
          * This property is valid for the {@link JSONConfiguration.Notation#MAPPED}
@@ -329,6 +349,7 @@ public class JSONConfiguration {
         humanReadableFormatting = b.humanReadableFormatting;
         jsonXml2JsonNs = b.jsonXml2JsonNs;
         usePrefixAtNaturalAttributes = b.usePrefixAtNaturalAttributes;
+        namespaceSeparator = b.namespaceSeparator;
     }
 
     private JSONConfiguration(JSONConfiguration jsonConf, boolean formatted) {
@@ -340,6 +361,7 @@ public class JSONConfiguration {
         humanReadableFormatting = formatted;
         jsonXml2JsonNs = jsonConf.jsonXml2JsonNs;
         usePrefixAtNaturalAttributes = jsonConf.usePrefixAtNaturalAttributes;
+        namespaceSeparator = jsonConf.namespaceSeparator;
     }
 
     /**
@@ -452,6 +474,17 @@ public class JSONConfiguration {
      */
     public Map<String, String> getXml2JsonNs() {
         return (jsonXml2JsonNs != null) ? Collections.unmodifiableMap(jsonXml2JsonNs) : null;
+    }
+
+    /**
+     * Returns XML namespace separator, which is used when constructing JSON identifiers
+     * for XML elements/attributes in other than default namespace
+     * This property is valid for the {@link JSONConfiguration.Notation#MAPPED} notation only.
+     * @return XML namespace separator character
+     * @see MappedBuilder#nsSeparator(java.lang.Character)
+     */
+    public Character getNsSeparator() {
+        return namespaceSeparator;
     }
 
     /**

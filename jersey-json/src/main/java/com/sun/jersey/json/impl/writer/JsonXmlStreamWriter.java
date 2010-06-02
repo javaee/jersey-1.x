@@ -133,6 +133,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     }
     Writer mainWriter;
     boolean stripRoot;
+    char nsSeparator;
     final List<ProcessingState> processingStack = new ArrayList<ProcessingState>();
     int depth;
     final Collection<String> arrayElementNames = new LinkedList<String>();
@@ -146,6 +147,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
     private JsonXmlStreamWriter(Writer writer, JSONConfiguration config) {
         this.mainWriter = writer;
         this.stripRoot = config.isRootUnwrapping();
+        this.nsSeparator = config.getNsSeparator();
         if (null != config.getArrays()) {
             this.arrayElementNames.addAll(config.getArrays());
         }
@@ -385,7 +387,7 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
 
     private String getEffectiveName(String namespaceURI, String localName) {
         if ((namespaceURI != null) && xml2JsonNs.containsKey(namespaceURI)) {
-            return String.format("%s.%s", xml2JsonNs.get(namespaceURI), localName);
+            return String.format("%s%c%s", xml2JsonNs.get(namespaceURI), nsSeparator,localName);
         } else {
             return localName;
         }

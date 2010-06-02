@@ -74,6 +74,12 @@ public class NamespaceAttributeTest extends TestCase {
         tryConfiguration(JSONConfiguration.mapped().xml2JsonNs(ns2json).rootUnwrapping(false).build());
     }
 
+    public void testMappedCustomNsSeparator() throws Exception {
+        Map<String, String> ns2json = new HashMap<String, String>();
+        ns2json.put("http://example.com", "example");
+        tryConfiguration(JSONConfiguration.mapped().xml2JsonNs(ns2json).nsSeparator(':').rootUnwrapping(false).build());
+    }
+
     private void tryConfiguration(JSONConfiguration configuration) throws Exception {
 
         final JSONJAXBContext ctx = new JSONJAXBContext(configuration, NamespaceBeanWithAttribute.class);

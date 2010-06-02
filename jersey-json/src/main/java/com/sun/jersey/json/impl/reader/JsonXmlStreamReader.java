@@ -82,6 +82,8 @@ public class JsonXmlStreamReader implements XMLStreamReader {
 
     boolean jsonRootUnwrapping;
     String rootElementName;
+    char nsSeparator;
+    CharSequence nsSeparatorAsSequence;
     final Map<String, String> revertedXml2JsonNs = new HashMap<String, String>();
     final Collection<String> attrAsElemNames = new LinkedList<String>();
 
@@ -135,6 +137,8 @@ public class JsonXmlStreamReader implements XMLStreamReader {
             for (String uri : config.getXml2JsonNs().keySet())
             revertedXml2JsonNs.put(config.getXml2JsonNs().get(uri), uri);
         }
+        nsSeparator = config.getNsSeparator();
+        nsSeparatorAsSequence = new StringBuffer(1).append(nsSeparator);
         lexer = new JsonLexer(reader);
         depth = 0;
         processingStack = new ArrayList<ProcessingState>();
@@ -710,10 +714,10 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     }
 
     private QName createQName(String name) {
-        if (revertedXml2JsonNs.isEmpty() || !name.contains(".")) {
+        if (revertedXml2JsonNs.isEmpty() || !name.contains(nsSeparatorAsSequence)) {
             return new QName(name);
         } else {
-            int dotIndex = name.indexOf(".");
+            int dotIndex = name.indexOf(nsSeparator);
             String prefix = name.substring(0, dotIndex);
             String suffix = name.substring(dotIndex + 1);
             return revertedXml2JsonNs.containsKey(prefix) ? new QName(revertedXml2JsonNs.get(prefix), suffix) : new QName(name);
