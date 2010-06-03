@@ -71,8 +71,6 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.ResourceConfigurator;
-import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderFactory;
@@ -90,14 +88,8 @@ import com.sun.jersey.server.impl.model.parameter.QueryParamInjectableProvider;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.impl.modelapi.validation.BasicValidator;
 import com.sun.jersey.server.impl.template.TemplateFactory;
-import com.sun.jersey.server.impl.uri.PathPattern;
-import com.sun.jersey.server.impl.uri.PathTemplate;
-import com.sun.jersey.server.impl.uri.rules.ResourceClassRule;
-import com.sun.jersey.server.impl.uri.rules.ResourceObjectRule;
-import com.sun.jersey.server.impl.uri.rules.RightHandPathRule;
 import com.sun.jersey.server.impl.uri.rules.RootResourceClassesRule;
 import com.sun.jersey.server.impl.wadl.WadlFactory;
-import com.sun.jersey.server.impl.wadl.WadlResource;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -441,6 +433,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
  
+    @Override
     public FeaturesAndProperties getFeaturesAndProperties() {
         return resourceConfig;
     }
@@ -452,7 +445,7 @@ public final class WebApplicationImpl implements WebApplication {
         return wa;
     }
 
-    public UriRules<UriRule> getUriRules(final Class c) {
+    /* package */ UriRules<UriRule> getUriRules(final Class c) {
         assert c != null;
 
         // Try the non-blocking read, the most common opertaion
@@ -481,7 +474,7 @@ public final class WebApplicationImpl implements WebApplication {
         return r;
     }
 
-    public ResourceComponentProvider getResourceComponentProvider(final Class c) {
+    /* package */ ResourceComponentProvider getResourceComponentProvider(final Class c) {
         assert c != null;
 
         // Try the non-blocking read, the most common opertaion
@@ -513,7 +506,7 @@ public final class WebApplicationImpl implements WebApplication {
         return rcp;
     }
 
-    public ResourceComponentProvider getResourceComponentProvider(final ComponentContext cc, final Class c) {
+    /* package */ ResourceComponentProvider getResourceComponentProvider(final ComponentContext cc, final Class c) {
         assert c != null;
 
         if (cc == null || cc.getAnnotations().length == 0)
@@ -563,13 +556,16 @@ public final class WebApplicationImpl implements WebApplication {
         return rcp;
     }
 
-    private void initiateResource(AbstractResource ar) {
-        final Class c = ar.getResourceClass();
+    /* package */ void initiateResource(AbstractResource ar) {
+        initiateResource(ar.getResourceClass());
+    }
+
+    /* package */ void initiateResource(Class c) {
         getUriRules(c);
         getResourceComponentProvider(c);
     }
 
-    private void initiateResource(AbstractResource ar, final Object resource) {
+    /* package */ void initiateResource(AbstractResource ar, final Object resource) {
         final Class c = ar.getResourceClass();
         getUriRules(c);
 
@@ -613,11 +609,11 @@ public final class WebApplicationImpl implements WebApplication {
                 ar);
     }
 
-    private AbstractResource getAbstractResource(Object o) {
+    /* package */ AbstractResource getAbstractResource(Object o) {
         return getAbstractResource(o.getClass());
     }
     
-    private AbstractResource getAbstractResource(Class c) {
+    /* package */ AbstractResource getAbstractResource(Class c) {
         AbstractResource ar = abstractResourceMap.get(c);
         if (ar == null) {
             ar = IntrospectionModeller.createResource(c);
@@ -634,14 +630,17 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
+    @Override
     public boolean isInitiated () {
         return initiated;
     }
 
+    @Override
     public void initiate(ResourceConfig resourceConfig) {
         initiate(resourceConfig, null);
     }
     
+    @Override
     public void initiate(final ResourceConfig rc, final IoCComponentProviderFactory _provider) {
         Errors.processWithErrors(new Errors.Closure<Void>() {
             public Void f() {
@@ -652,7 +651,7 @@ public final class WebApplicationImpl implements WebApplication {
         });
     }
 
-    public void _initiate(final ResourceConfig rc, final IoCComponentProviderFactory _provider) {
+    private void _initiate(final ResourceConfig rc, final IoCComponentProviderFactory _provider) {
         if (rc == null) {
             throw new IllegalArgumentException("ResourceConfig instance MUST NOT be null");
         }
@@ -998,21 +997,26 @@ public final class WebApplicationImpl implements WebApplication {
         cpFactory.injectOnAllComponents();
         cpFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
         
-        // Obtain all root resources
-        this.rootsRule = new RootResourceClassesRule(processRootResources());
+        // Obtain all root resource rules
+        RulesMap<UriRule> rootRules = new RootResourceUriRules(this,
+                resourceConfig, wadlFactory, injectableFactory).getRules();
+        this.rootsRule = new RootResourceClassesRule(rootRules);
 
         this.isTraceEnabled = resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE) |
                 resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE_PER_REQUEST);
     }
 
+    @Override
     public MessageBodyWorkers getMessageBodyWorkers() {
         return bodyFactory;
     }
 
+    @Override
     public ExceptionMapperContext getExceptionMapperContext() {
         return exceptionFactory;
     }
     
+    @Override
     public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
             throws IOException {
         final ContainerResponse response = new ContainerResponse(
@@ -1022,6 +1026,7 @@ public final class WebApplicationImpl implements WebApplication {
         handleRequest(request, response);
     }
     
+    @Override
     public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
         final WebApplicationContext localContext = new
                 WebApplicationContext(this, request, response);
@@ -1036,7 +1041,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    public WebApplicationContext handleMatchResourceRequest(URI u) {
+    private WebApplicationContext handleMatchResourceRequest(URI u) {
         final WebApplicationContext oldContext = (WebApplicationContext)context.get();
 
         final WebApplicationContext newContext = oldContext.createMatchResourceContext(u);
@@ -1050,6 +1055,7 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
+    @Override
     public void destroy() {
         for (ResourceComponentProvider rcp : providerMap.values()) {
             rcp.destroy();
@@ -1064,10 +1070,12 @@ public final class WebApplicationImpl implements WebApplication {
 
     // Traceable
 
+    @Override
     public boolean isTracingEnabled() {
         return isTraceEnabled;
     }
 
+    @Override
     public void trace(String message) {
         context.get().trace(message);
     }
@@ -1148,193 +1156,9 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
+    @Override
     public HttpContext getThreadLocalHttpContext() {
         return context;
-    }
-
-    private void ensureTemplateUnused(UriTemplate t, Class<?> c, Set<UriTemplate> templates) {
-        if (!templates.contains(t)) {
-            templates.add(t);
-        } else {
-            LOGGER.severe(ImplMessages.AMBIGUOUS_RR_PATH(c, t));
-            throw new ContainerException(ImplMessages.AMBIGUOUS_RR_PATH(c, t));
-        }
-    }
-
-    private RulesMap<UriRule> processRootResources() {
-        Set<Class<?>> classes = resourceConfig.getRootResourceClasses();
-
-        Set<Object> singletons = resourceConfig.getRootResourceSingletons();
-
-        if (classes.isEmpty() && 
-                singletons.isEmpty() &&
-                resourceConfig.getExplicitRootResources().isEmpty()) {
-            LOGGER.severe(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
-            throw new ContainerException(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
-        }
-
-
-        Map<Class<?>, AbstractResource> rootResourcesMap =
-                new HashMap<Class<?>, AbstractResource>();
-        Set<AbstractResource> rootResourcesSet =
-                new HashSet<AbstractResource>();
-
-        // Add declared singleton instances of root resource classes
-        for (Object o : singletons) {
-            AbstractResource ar = getAbstractResource(o);
-            rootResourcesMap.put(o.getClass(), ar);
-            rootResourcesSet.add(ar);
-        }
-
-        // Add declared root resource classes
-        for (Class<?> c : classes) {
-            AbstractResource ar = getAbstractResource(c);
-            rootResourcesMap.put(c, ar);
-            rootResourcesSet.add(ar);
-        }
-        
-        // Add explicit declared root resource classes
-        Map<String, AbstractResource> explicitRootResources = new HashMap<String, AbstractResource>();
-        for (Map.Entry<String, Object> e : resourceConfig.getExplicitRootResources().entrySet()) {
-            Object o = e.getValue();
-            Class c = (o instanceof Class) ? (Class)o : o.getClass();
-
-            AbstractResource ar = rootResourcesMap.get(c);
-            if (ar == null) {
-                ar = getAbstractResource(c);
-                rootResourcesMap.put(c, ar);
-            }
-
-            ar = new AbstractResource(e.getKey(), ar);
-            rootResourcesSet.add(ar);
-            explicitRootResources.put(e.getKey(), ar);
-        }
-
-
-        // Initiate the WADL with the root resources
-        initWadl(rootResourcesSet, wadlFactory);
-
-
-        RulesMap<UriRule> rulesMap = new RulesMap<UriRule>();
-
-        // need to validate possible conflicts in uri templates
-        Set<UriTemplate> uriTemplatesUsed = new HashSet<UriTemplate>();
-
-        // Process singleton instances of root resource classes
-        for (Object o : singletons) {
-            ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
-            ci.inject(o);
-
-            AbstractResource ar = rootResourcesMap.get(o.getClass());
-
-            UriTemplate t = new PathTemplate(ar.getPath().getValue());
-
-            ensureTemplateUnused(t, o.getClass(), uriTemplatesUsed);
-
-            PathPattern p = new PathPattern(t);
-
-            // Configure meta-data
-            initiateResource(ar, o);
-
-            rulesMap.put(p, new RightHandPathRule(
-                        resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                        t.endsWithSlash(),
-                        new ResourceObjectRule(t, o)));
-        }
-
-        // Process root resource classes
-        for (Class<?> c : classes) {
-            AbstractResource ar = rootResourcesMap.get(c);
-
-            UriTemplate t = new PathTemplate(ar.getPath().getValue());
-            
-            ensureTemplateUnused(t, c, uriTemplatesUsed);
-
-            PathPattern p = new PathPattern(t);
-
-            // Configure meta-data
-            initiateResource(ar);
-
-            rulesMap.put(p, new RightHandPathRule(
-                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                    t.endsWithSlash(),
-                    new ResourceClassRule(t, c)));
-        }
-
-        // Process explicit root resources
-        for (Map.Entry<String, Object> e : resourceConfig.getExplicitRootResources().entrySet()) {
-            String path = e.getKey();
-            Object o = e.getValue();
-            if (o instanceof Class) {
-                Class c = (Class)o;
-                UriTemplate t = new PathTemplate(path);
-
-                ensureTemplateUnused(t, c, uriTemplatesUsed);
-
-                PathPattern p = new PathPattern(t);
-
-                // Configure meta-data
-                initiateResource(explicitRootResources.get(path));
-
-                rulesMap.put(p, new RightHandPathRule(
-                        resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                        t.endsWithSlash(),
-                        new ResourceClassRule(t, c)));
-            } else {
-                ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
-                ci.inject(o);
-
-                UriTemplate t = new PathTemplate(path);
-
-                ensureTemplateUnused(t, o.getClass(), uriTemplatesUsed);
-
-                PathPattern p = new PathPattern(t);
-
-                // Configure meta-data
-                initiateResource(explicitRootResources.get(path));
-
-                rulesMap.put(p, new RightHandPathRule(
-                            resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                            t.endsWithSlash(),
-                            new ResourceObjectRule(t, o)));
-            }
-        }
-
-        initWadlResource(rulesMap);
-        
-        return rulesMap;
-    }
-
-
-    private void initWadl(Set<AbstractResource> rootResources,
-            WadlFactory wadlFactory) {
-        if (!wadlFactory.isSupported())
-            return;
-
-        wadlFactory.init(injectableFactory, rootResources);
-    }
-
-    private void initWadlResource(RulesMap<UriRule> rulesMap) {
-        if (!wadlFactory.isSupported())
-            return;
-
-        UriTemplate t = new PathTemplate("application.wadl");
-
-        PathPattern p = new PathPattern(t);
-
-        // If "application.wadl" is already defined to not add the
-        // default WADL resource
-        if (rulesMap.containsKey(p))
-            return;
-        
-        // Configure meta-data
-        getUriRules(WadlResource.class);
-        getResourceComponentProvider(WadlResource.class);
-        
-        rulesMap.put(p, new RightHandPathRule(
-                resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                t.endsWithSlash(),
-                new ResourceClassRule(t, WadlResource.class)));
     }
 
     /**
@@ -1368,7 +1192,6 @@ public final class WebApplicationImpl implements WebApplication {
         return sb;
     }
 
-    @SuppressWarnings("unchecked")
     private <T> T createProxy(Class<T> c, InvocationHandler i) {
         return (T) Proxy.newProxyInstance(
                 this.getClass().getClassLoader(),

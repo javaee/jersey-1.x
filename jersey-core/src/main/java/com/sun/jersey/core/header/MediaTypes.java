@@ -68,6 +68,16 @@ public class MediaTypes {
         return m1.getSubtype().equalsIgnoreCase(m2.getSubtype()) && m1.getType().equalsIgnoreCase(m2.getType());
     }
 
+    public final static boolean intersects(List<? extends MediaType> ml1, List<? extends MediaType> ml2) {
+        for (MediaType m1: ml1) {
+            for (MediaType m2 : ml2) {
+                if (MediaTypes.typeEquals(m1, m2))
+                    return true;
+            }
+        }
+        return false;
+    }
+    
     /**
      * Comparator for media types.
      * <p>

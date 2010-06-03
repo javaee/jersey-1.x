@@ -107,6 +107,15 @@ public class AbstractResourceMethod extends AbstractMethod
         return httpMethod;
     }
 
+    public boolean hasEntity() {
+        for (Parameter p : getParameters()) {
+            if (Parameter.Source.ENTITY == p.getSource()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
     public List<Parameter> getParameters() {
         return parameters;
     }

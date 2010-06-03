@@ -48,7 +48,6 @@ import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.model.Parameterized;
 import com.sun.jersey.api.model.ResourceModelIssue;
-import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.impl.ImplMessages;
@@ -61,11 +60,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.HeaderParam;
@@ -75,7 +72,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -91,129 +87,12 @@ public class BasicValidator extends AbstractModelValidator {
                     ImplMessages.ERROR_RES_URI_PATH_INVALID(resource.getResourceClass(), resource.getPath()),
                     true)); // TODO: is it really a fatal issue?
         }
-        // check sub-resource locators for ambiguities
-        Map<UriTemplate, String> srlUriTemplates = new HashMap<UriTemplate, String>();
-        Map<UriTemplate, String> srlUriTemplatesWithSlash = new HashMap<UriTemplate, String>();
-        for (AbstractSubResourceLocator srl : resource.getSubResourceLocators()) {
-            UriTemplate srlUriTemplate = new UriTemplate(srl.getPath().getValue());
-            UriTemplate srlUriTemplateWithSlash =
-                    srlUriTemplate.endsWithSlash() ? srlUriTemplate : new UriTemplate(srl.getPath().getValue() + '/');
-            if (srlUriTemplates.containsKey(srlUriTemplate)) {
-                issueList.add(new ResourceModelIssue(
-                        resource,
-                        ImplMessages.AMBIGUOUS_SRLS(resource.getResourceClass(), srlUriTemplate.getTemplate(), srlUriTemplates.get(srlUriTemplate)),
-                        true));
-            } else {
-                if (srlUriTemplatesWithSlash.containsKey(srlUriTemplateWithSlash)) {
-                    issueList.add(new ResourceModelIssue(
-                            resource,
-                            ImplMessages.AMBIGUOUS_SRLS(resource.getResourceClass(), srlUriTemplate.getTemplate(), srlUriTemplatesWithSlash.get(srlUriTemplate)),
-                            true));
-                } else {
-                    srlUriTemplatesWithSlash.put(srlUriTemplateWithSlash, srlUriTemplate.getTemplate());
-                }
-                srlUriTemplates.put(srlUriTemplate, srlUriTemplate.getTemplate());
-            }
-        }
-
-        // check resource methods for ambiguities
-        findOutMTAmbiguities(resource, resource.getResourceMethods(), new ResourceMethodAmbiguityErrMsgGenerator<AbstractResourceMethod>() {
-
-            void generateInErrMsg(AbstractResource resource, AbstractResourceMethod arm1, AbstractResourceMethod arm2, MediaType mt) {
-                issueList.add(new ResourceModelIssue(
-                        resource,
-                        ImplMessages.AMBIGUOUS_RMS_IN(resource.getResourceClass(), arm1.getHttpMethod(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
-                        false));
-            }
-            ;
-
-            void generateOutErrMsg(AbstractResource resource, AbstractResourceMethod arm1, AbstractResourceMethod arm2, MediaType mt) {
-                issueList.add(new ResourceModelIssue(
-                        resource,
-                        ImplMessages.AMBIGUOUS_RMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedOutputTypes(), arm2.getSupportedOutputTypes()),
-                        true));
-            }
-            ;
-        });
-
-        // check sub-resource methods for ambiguities
-        findOutMTAmbiguities(resource, resource.getSubResourceMethods(), new ResourceMethodAmbiguityErrMsgGenerator<AbstractSubResourceMethod>() {
-
-            boolean isConflictingPaths(String path1, String path2) {
-                UriTemplate t1 = new UriTemplate(path1);
-                UriTemplate t2 = new UriTemplate(path2);
-                if (t1.equals(t2)) {
-                    return true;
-                } else {
-                    if (t1.endsWithSlash()) {
-                        return (!t2.endsWithSlash()) && t1.equals(new UriTemplate(path2 + "/"));
-                    } else {
-                        return t2.endsWithSlash() && t2.equals(new UriTemplate(path1 + "/"));
-                    }
-                }
-            }
-            ;
-
-            void generateInErrMsg(AbstractResource resource, AbstractSubResourceMethod arm1, AbstractSubResourceMethod arm2, MediaType mt) {
-                if (isConflictingPaths(arm1.getPath().getValue(), arm2.getPath().getValue())) {
-                    issueList.add(new ResourceModelIssue(
-                            resource,
-                            ImplMessages.AMBIGUOUS_SRMS_IN(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedInputTypes(), arm2.getSupportedInputTypes()),
-                            false));
-                }
-            }
-            ;
-
-            void generateOutErrMsg(AbstractResource resource, AbstractSubResourceMethod arm1, AbstractSubResourceMethod arm2, MediaType mt) {
-                if (isConflictingPaths(arm1.getPath().getValue(), arm2.getPath().getValue())) {
-                    issueList.add(new ResourceModelIssue(
-                            resource,
-                            ImplMessages.AMBIGUOUS_SRMS_OUT(resource.getResourceClass(), arm1.getHttpMethod(), arm1.getPath().getValue(), mt, arm1.getMethod().getName(), arm2.getMethod().getName(), arm1.getSupportedOutputTypes(), arm2.getSupportedOutputTypes()),
-                            true));
-                }
-            }
-        });
 
         checkNonPublicMethods(resource);
     }
 
-    private abstract class ResourceMethodAmbiguityErrMsgGenerator<T extends AbstractResourceMethod> {
-
-        abstract void generateInErrMsg(AbstractResource resource, T arm1, T arm2, MediaType mt);
-
-        abstract void generateOutErrMsg(AbstractResource resource, T arm1, T arm2, MediaType mt);
-    }
-
-    private <T extends AbstractResourceMethod> void findOutMTAmbiguities(AbstractResource resource, List<T> methods, ResourceMethodAmbiguityErrMsgGenerator generator) {
-        for (int i = 0; i < methods.size(); i++) {
-            T arm1 = methods.get(i);
-            for (int j = i + 1; j < methods.size(); j++) {
-                T arm2 = methods.get(j);
-                if (arm1.getHttpMethod().equalsIgnoreCase(arm2.getHttpMethod())) {
-                    for (MediaType mt1 : arm1.getSupportedInputTypes()) {
-                        for (MediaType mt2 : arm2.getSupportedInputTypes()) {
-                            if (mt1.isCompatible(mt2) && ((mt1.isWildcardType() == mt2.isWildcardType()) && (mt1.isWildcardSubtype() == mt2.isWildcardSubtype()))) {
-                                // check also output mime types
-                                for (MediaType outmt1 : arm1.getSupportedOutputTypes()) {
-                                    for (MediaType outmt2 : arm2.getSupportedOutputTypes()) {
-                                        if (outmt1.isCompatible(outmt2) && ((outmt1.isWildcardType() == outmt2.isWildcardType()) && (outmt1.isWildcardSubtype() == outmt2.isWildcardSubtype()))) {
-                                            // TODO: check only if an entity parameter is present, do not hardcode the http GET/HEAD method
-                                            if (!(("GET".equalsIgnoreCase(arm1.getHttpMethod())) || ("HEAD".equalsIgnoreCase(arm1.getHttpMethod())))) {
-                                                generator.generateInErrMsg(resource, arm1, arm2, mt1);
-                                            }
-                                            generator.generateOutErrMsg(resource, arm1, arm2, outmt1);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     public void visitAbstractResourceConstructor(AbstractResourceConstructor constructor) {
+        // TODO check parameters
     }
 
     public void visitAbstractField(AbstractField field) {
@@ -237,13 +116,11 @@ public class BasicValidator extends AbstractModelValidator {
         }
         // ensure GET does not consume an entity parameter
         if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()))) {
-            for (Parameter p : method.getParameters()) {
-                if (Parameter.Source.ENTITY == p.getSource()) {
-                    issueList.add(new ResourceModelIssue(
-                            method,
-                            ImplMessages.ERROR_GET_CONSUMES_ENTITY(method.getMethod()),
-                            true));
-                }
+            if (method.hasEntity()) {
+                issueList.add(new ResourceModelIssue(
+                        method,
+                        ImplMessages.ERROR_GET_CONSUMES_ENTITY(method.getMethod()),
+                        true));
             }
         }
         // ensure there is not multiple HTTP method designators specified on the method

@@ -202,6 +202,10 @@ public final class Errors {
         getInstance().messages.add(em);
     }
 
+    public int numberOfErrors() {
+        return getInstance().messages.size();
+    }
+    
     public static void innerClass(Class c) {
         error("The inner class " + c.getName() + " is not a static inner class and cannot be instantiated.");
     }
