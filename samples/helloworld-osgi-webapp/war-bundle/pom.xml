@@ -113,6 +113,7 @@
                         <Export-Package>com.sun.jersey.samples.helloworld</Export-Package>
                         <Import-Package>com.sun.jersey.api.core,com.sun.jersey.spi.container.servlet,*</Import-Package>
                         <Webapp-Context>helloworld</Webapp-Context>
+                        <Web-ContextPath>helloworld</Web-ContextPath>
                         <Bundle-Activator>com.sun.jersey.samples.helloworld.WebAppContextListener</Bundle-Activator>
                     </instructions>
                 </configuration>
