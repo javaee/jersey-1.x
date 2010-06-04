@@ -385,8 +385,8 @@ public Response smooth(
     32 bit signed integer and assigned to the step method parameter. If "step"
     does not exist then a default value of 2, as declared in the <ulink url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/DefaultValue.html">@DefaultValue</ulink>
     annotation, will be assigned to the step method parameter. If the "step"
-    value cannot be parsed as an 32 bit signed integer then a 400 (Client
-    Error) response is returned. User defined Java types such as
+    value cannot be parsed as a 32 bit signed integer then a 404 (Not
+    Found) response is returned. User defined Java types such as
     <literal>ColorParam</literal> may be used, which as implemented as
     follows: </para>
 
