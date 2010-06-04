@@ -53,8 +53,10 @@ import com.sun.jersey.server.impl.wadl.WadlFactory;
 import com.sun.jersey.server.impl.wadl.WadlResource;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.uri.rules.UriRule;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -174,6 +176,17 @@ public class RootResourceUriRules {
             }
         }
 
+        rules.processConflicts(new RulesMap.ConflictClosure() {
+            public void onConflict(PathPattern p1, PathPattern p2) {
+                Errors.error(String.format("Conflicting URI templates. "
+                        + "The URI templates %s and %s for root resource classes "
+                        + "transform to the same regular expression %s",
+                        p1.getTemplate().getTemplate(),
+                        p2.getTemplate().getTemplate(),
+                        p1));
+            }
+        });
+
         initWadlResource();
     }
 
@@ -239,8 +252,15 @@ public class RootResourceUriRules {
         if (p == null)
             return false;
 
-        if (rules.containsKey(p)) {
-            Errors.error(ImplMessages.AMBIGUOUS_RR_PATH(c, p.getTemplate()));
+        final PathPattern conflict = rules.hasConflict(p);
+        if (conflict != null) {
+            Errors.error(String.format("Conflicting URI templates. "
+                    + "The URI template %s for root resource class %s "
+                    + "and the URI template %s transform to the same regular expression %s",
+                    p.getTemplate().getTemplate(),
+                    c.getName(),
+                    conflict.getTemplate().getTemplate(),
+                    p));
             return false;
         } else {
             return true;

@@ -36,6 +36,8 @@
  */
 package com.sun.jersey.impl.errors;
 
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.inject.Errors;
 import java.util.List;
@@ -78,6 +80,49 @@ public class PathAndResourceMethodErrorsTest extends AbstractResourceTester {
         }).messages;
 
         assertEquals(3, messages.size());
+    }
+
+    @Path("/{one}")
+    public static class PathErrorsOneResource {
+    }
+
+    @Path("/{two}")
+    public static class PathErrorsTwoResource {
+    }
+
+    @Path("/{three}")
+    public static class PathErrorsThreeResource {
+    }
+
+    public void testConflictingRootResourceErrors() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                ResourceConfig rc = new DefaultResourceConfig(PathErrorsOneResource.class, PathErrorsTwoResource.class);
+                rc.getSingletons().add(new PathErrorsThreeResource());
+                rc.getExplicitRootResources().put("/{four}", PathErrorsOneResource.class);
+                rc.getExplicitRootResources().put("/{five}", new PathErrorsThreeResource());
+
+                initiateWebApplication(rc);
+            }
+        }).messages;
+
+        assertEquals(4, messages.size());
+    }
+
+    public void testConflictingRootResourceErrors2() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                ResourceConfig rc = new DefaultResourceConfig();
+                rc.getExplicitRootResources().put("/{one}", PathErrorsOneResource.class);
+                rc.getExplicitRootResources().put("/{one}/", new PathErrorsThreeResource());
+
+                initiateWebApplication(rc);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
     }
 
     @Path("/")

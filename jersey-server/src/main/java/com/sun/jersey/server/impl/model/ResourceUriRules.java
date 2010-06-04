@@ -100,12 +100,12 @@ public final class ResourceUriRules {
     private final WadlFactory wadlFactory;
 
     public ResourceUriRules(
-            ResourceConfig resourceConfig,
-            ResourceMethodDispatcherFactory df,
-            ServerInjectableProviderContext injectableContext,
-            FilterFactory ff,
-            WadlFactory wadlFactory,
-            AbstractResource resource
+            final ResourceConfig resourceConfig,
+            final ResourceMethodDispatcherFactory df,
+            final ServerInjectableProviderContext injectableContext,
+            final FilterFactory ff,
+            final WadlFactory wadlFactory,
+            final AbstractResource resource
             ) {
         this.resourceConfig = resourceConfig;
         this.df = df;
@@ -131,26 +131,22 @@ public final class ResourceUriRules {
 
         processMethods(resource, implictProduces, rulesMap);
 
-        // Check for matching ambiguties with path patterns
-        List<PathPattern> ks = new ArrayList<PathPattern>(rulesMap.keySet());
-        for (int i = 0; i < ks.size(); i++) {
-            final PathPattern p1 = ks.get(i);
-            for (int j = i + 1; j < ks.size(); j++) {
-                final PathPattern p2 = ks.get(j);
-                if (p1.equals(p2)) {
-                    Errors.error(String.format("Ambiguous URI templates for sub-resource methods and " +
-                            "sub-resource locators of resource class %s: %s and %s " +
-                            "correspond to the same regular expression %s",
-                            resource.getResourceClass().getName(),
-                            p1.getTemplate().getTemplate(),
-                            p2.getTemplate().getTemplate(),
-                            p1));
-                }
+        // Check for matching conflicts with path patterns
+        rulesMap.processConflicts(new RulesMap.ConflictClosure() {
+            public void onConflict(PathPattern p1, PathPattern p2) {
+                Errors.error(String.format("Conflicting URI templates. "
+                        + "The URI templates %s and %s for sub-resource methods "
+                        + "and/or sub-resource locators of resource class %s "
+                        + "transform to the same regular expression %s",
+                        p1.getTemplate().getTemplate(),
+                        p2.getTemplate().getTemplate(),
+                        resource.getResourceClass().getName(),
+                        p1));
             }
-        }
+        });
 
         // Create the atomic rules, at most only one will be matched
-        UriRules<UriRule> atomicRules = UriRulesFactory.create(rulesMap);
+        final UriRules<UriRule> atomicRules = UriRulesFactory.create(rulesMap);
         
         // Create the end sequential rules, zero or more may be matched
         List<PatternRulePair<UriRule>> patterns = new ArrayList<PatternRulePair<UriRule>>();
@@ -179,12 +175,12 @@ public final class ResourceUriRules {
         patterns.add(new PatternRulePair<UriRule>(
                 UriPattern.EMPTY, new TerminatingRule()));        
         // Create the sequential rules
-        UriRules<UriRule> sequentialRules = 
+        final UriRules<UriRule> sequentialRules =
                 new SequentialMatchingPatterns<UriRule>(patterns);
         
         // Combined the atomic and sequential rules, the former will be matched
         // first
-        UriRules<UriRule> combiningRules = 
+        final UriRules<UriRule> combiningRules =
                 new CombiningMatchingPatterns<UriRule>(
                 Arrays.asList(atomicRules, sequentialRules));
         
@@ -196,8 +192,8 @@ public final class ResourceUriRules {
     }
 
     private void processSubResourceLocators(
-            AbstractResource resource,
-            RulesMap<UriRule> rulesMap) {
+            final AbstractResource resource,
+            final RulesMap<UriRule> rulesMap) {
         for (final AbstractSubResourceLocator locator : resource.getSubResourceLocators()) {
             PathPattern p = null;
             try {
@@ -208,14 +204,19 @@ public final class ResourceUriRules {
                 continue;
             }
 
-            if (rulesMap.containsKey(p)) {
-                Errors.error(String.format("Ambiguous URI template, %s, for sub-resource locator %s. Check for duplicates.",
-                        p.getTemplate().getTemplate(), locator.getMethod()));
+            final PathPattern conflict = rulesMap.hasConflict(p);
+            if (conflict != null) {
+                Errors.error(String.format("Conflicting URI templates. "
+                        + "The URI template %s for sub-resource locator %s "
+                        + "and the URI template %s transform to the same regular expression %s",
+                        p.getTemplate().getTemplate(),
+                        locator.getMethod(),
+                        conflict.getTemplate().getTemplate(),
+                        p));
+                continue;
             }
 
-            List<ResourceFilter> resourceFilters = ff.getResourceFilters(locator);
-
-            List<Injectable> is = injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest);
+            final List<Injectable> is = injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest);
             if (is.contains(null)) {
                 // Missing dependency
                 for (int i = 0; i < is.size(); i++) {
@@ -225,7 +226,8 @@ public final class ResourceUriRules {
                 }
             }
             
-            UriRule r = new SubLocatorRule(
+            final List<ResourceFilter> resourceFilters = ff.getResourceFilters(locator);
+            final UriRule r = new SubLocatorRule(
                     p.getTemplate(),
                     locator.getMethod(),
                     is,
@@ -241,9 +243,9 @@ public final class ResourceUriRules {
     }
 
     private void processSubResourceMethods(
-            AbstractResource resource,
-            List<QualitySourceMediaType> implictProduces,
-            RulesMap<UriRule> rulesMap) {
+            final AbstractResource resource,
+            final List<QualitySourceMediaType> implictProduces,
+            final RulesMap<UriRule> rulesMap) {
         final Map<PathPattern, ResourceMethodMap> patternMethodMap =
                 new HashMap<PathPattern, ResourceMethodMap>();
 
@@ -273,19 +275,14 @@ public final class ResourceUriRules {
         }
 
         // Create the rules for the sub-resource HTTP methods
-        for (Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
-            if (implictProduces != null) {
-                List<ResourceMethod> getList = e.getValue().get(HttpMethod.GET);
-                if (getList != null && !getList.isEmpty()) {
-                    e.getValue().put(new ViewResourceMethod(implictProduces));
-                }
-            }
+        for (final Map.Entry<PathPattern, ResourceMethodMap> e : patternMethodMap.entrySet()) {
+            addImplicitMethod(implictProduces, e.getValue());
 
             final PathPattern p = e.getKey();
             final ResourceMethodMap rmm = e.getValue();
 
             processHead(rmm);
-            processOptions(rmm, resource, p, wadlFactory);
+            processOptions(rmm, resource, p);
 
             rmm.sort();
             
@@ -298,9 +295,9 @@ public final class ResourceUriRules {
     }
 
     private void processMethods(
-            AbstractResource resource,
-            List<QualitySourceMediaType> implictProduces,
-            RulesMap<UriRule> rulesMap) {
+            final AbstractResource resource,
+            final List<QualitySourceMediaType> implictProduces,
+            final RulesMap<UriRule> rulesMap) {
         final ResourceMethodMap rmm = new ResourceMethodMap();
         for (final AbstractResourceMethod resourceMethod : resource.getResourceMethods()) {
             ResourceMethod rm = new ResourceHttpMethod(df, ff, resourceMethod);
@@ -310,15 +307,10 @@ public final class ResourceUriRules {
             }
         }
 
-        if (implictProduces != null) {
-            List<ResourceMethod> getList = rmm.get(HttpMethod.GET);
-            if (getList != null && !getList.isEmpty()) {
-                rmm.put(new ViewResourceMethod(implictProduces));
-            }
-        }
+        addImplicitMethod(implictProduces, rmm);
 
         processHead(rmm);
-        processOptions(rmm, resource, null, wadlFactory);
+        processOptions(rmm, resource, null);
 
         // Create the rules for the HTTP methods
         rmm.sort();
@@ -329,7 +321,20 @@ public final class ResourceUriRules {
         }
     }
 
-    private boolean isValidResourceMethod(ResourceMethod rm, ResourceMethodMap rmm) {
+    private void addImplicitMethod(
+            final List<QualitySourceMediaType> implictProduces,
+            final ResourceMethodMap rmm) {
+        if (implictProduces != null) {
+            final List<ResourceMethod> getList = rmm.get(HttpMethod.GET);
+            if (getList != null && !getList.isEmpty()) {
+                rmm.put(new ViewResourceMethod(implictProduces));
+            }
+        }
+    }
+
+    private boolean isValidResourceMethod(
+            final ResourceMethod rm,
+            final ResourceMethodMap rmm) {
         final List<ResourceMethod> rml = rmm.get(rm.getHttpMethod());
         if (rml != null) {
             boolean conflict = false;
@@ -344,11 +349,11 @@ public final class ResourceUriRules {
             if (conflict) {
                 if (rm.getAbstractResourceMethod().hasEntity()) {
                     Errors.error(String.format("Consuming media type conflict. " +
-                            "The resource methods %s and %s can consume the same media type.",
+                            "The resource methods %s and %s can consume the same media type",
                             rm.getAbstractResourceMethod().getMethod(), erm.getAbstractResourceMethod().getMethod()));
                 } else {
                     Errors.error(String.format("Producing media type conflict. " +
-                            "The resource methods %s and %s can produce the same media type.",
+                            "The resource methods %s and %s can produce the same media type",
                             rm.getAbstractResourceMethod().getMethod(), erm.getAbstractResourceMethod().getMethod()));
                 }
             }
@@ -360,8 +365,8 @@ public final class ResourceUriRules {
         return true;
     }
 
-    private void processHead(ResourceMethodMap methodMap) {
-        List<ResourceMethod> getList = methodMap.get(HttpMethod.GET);
+    private void processHead(final ResourceMethodMap methodMap) {
+        final List<ResourceMethod> getList = methodMap.get(HttpMethod.GET);
         if (getList == null || getList.isEmpty()) {
             return;
         }
@@ -371,9 +376,9 @@ public final class ResourceUriRules {
             headList = new ArrayList<ResourceMethod>();
         }
 
-        for (ResourceMethod getMethod : getList) {
+        for (final ResourceMethod getMethod : getList) {
             if (!containsMediaOfMethod(headList, getMethod)) {
-                ResourceMethod headMethod = new ResourceHeadWrapperMethod(getMethod);
+                final ResourceMethod headMethod = new ResourceHeadWrapperMethod(getMethod);
                 methodMap.put(headMethod);
                 headList = methodMap.get(HttpMethod.HEAD);
             }
@@ -381,16 +386,17 @@ public final class ResourceUriRules {
     }
 
     /**
-     * Determin if a the resource method list contains a method that 
+     * Determine if a the resource method list contains a method that
      * has the same consume/produce media as another resource method.
      * 
      * @param methods the resource methods
      * @param method the resource method to check
      * @return true if the list contains a method with the same media as method.
      */
-    private boolean containsMediaOfMethod(List<ResourceMethod> methods,
-            ResourceMethod method) {
-        for (ResourceMethod m : methods) {
+    private boolean containsMediaOfMethod(
+            final List<ResourceMethod> methods,
+            final ResourceMethod method) {
+        for (final ResourceMethod m : methods) {
             if (method.mediaEquals(m)) {
                 return true;
             }
@@ -400,18 +406,18 @@ public final class ResourceUriRules {
     }
 
     private void processOptions(
-            ResourceMethodMap methodMap,
-            AbstractResource resource,
-            PathPattern p,
-            WadlFactory wadlFactory) {
-        List<ResourceMethod> l = methodMap.get("OPTIONS");
+            final ResourceMethodMap methodMap,
+            final AbstractResource resource,
+            final PathPattern p) {
+        final List<ResourceMethod> l = methodMap.get("OPTIONS");
         if (l != null) {
             return;
         }
 
         ResourceMethod optionsMethod = wadlFactory.createWadlOptionsMethod(methodMap, resource, p);
-        if (optionsMethod == null)
+        if (optionsMethod == null) {
             optionsMethod = new ResourceHttpOptionsMethod(methodMap);
+        }
         methodMap.put(optionsMethod);
     }
 }
