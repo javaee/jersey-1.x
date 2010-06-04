@@ -46,6 +46,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
+import javax.ws.rs.ext.Providers;
 
 /**
  * A Web application that manages a set of resource classes.
@@ -113,11 +114,18 @@ public interface WebApplication extends Traceable {
     FeaturesAndProperties getFeaturesAndProperties();
 
     /**
+     * Get the providers.
+     *
+     * @return the providers.
+     */
+    Providers getProviders();
+    
+    /**
      * Get the message body workers that can be used for getting
      * message body readers and writers. 
      * 
      * @return the message body workers. The return value is 
-     *         undefined before the web applicaiton is initialized.
+     *         undefined before the web application is initialized.
      */
     MessageBodyWorkers getMessageBodyWorkers();
 

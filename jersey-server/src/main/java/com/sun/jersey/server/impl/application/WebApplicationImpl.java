@@ -228,6 +228,8 @@ public final class WebApplicationImpl implements WebApplication {
     
     private List<IoCComponentProviderFactory> providerFactories;
 
+    private Providers providers;
+    
     private MessageBodyFactory bodyFactory;
 
     private StringReaderFactory stringReaderFactory;
@@ -901,7 +903,7 @@ public final class WebApplicationImpl implements WebApplication {
                 MessageBodyWorkers.class, bodyFactory));
         
         // Injection of Providers
-        Providers p = new Providers() {
+        this.providers = new Providers() {
             public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
                     Annotation[] as, MediaType m) {
                 return bodyFactory.getMessageBodyReader(c, t, as, m);
@@ -925,7 +927,7 @@ public final class WebApplicationImpl implements WebApplication {
         };
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
-                Providers.class, p));
+                Providers.class, providers));
         
         // Obtain all String readers
         this.stringReaderFactory = new StringReaderFactory();
@@ -1004,6 +1006,11 @@ public final class WebApplicationImpl implements WebApplication {
 
         this.isTraceEnabled = resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE) |
                 resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE_PER_REQUEST);
+    }
+
+    @Override
+    public Providers getProviders() {
+        return providers;
     }
 
     @Override

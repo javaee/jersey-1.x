@@ -55,10 +55,10 @@ public class GuiceUnBoundTest extends AbstractGuiceGrizzlyTest {
         }
     }
 
-    public static class TestServletConfig extends JerseyGuiceServletContextListener {
+    public static class TestServletConfig extends JerseyTestGuiceServletContextListener {
         @Override
         protected ServletModule configure() {
-            return new JerseyServletModule().
+            return new JerseyTestServletModule().
                     path("*").
                     initParam(ServletContainer.APPLICATION_CONFIG_CLASS, ClassNamesResourceConfig.class.getName()).
                     initParam(ClassNamesResourceConfig.PROPERTY_CLASSNAMES, UnBoundPerRequestResource.class.getName() + 

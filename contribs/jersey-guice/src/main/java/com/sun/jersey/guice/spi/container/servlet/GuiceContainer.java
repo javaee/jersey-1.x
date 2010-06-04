@@ -78,6 +78,8 @@ public class GuiceContainer extends ServletContainer {
 
     private final Injector injector;
 
+    private WebApplication webapp;
+
     public class ServletGuiceComponentProviderFactory extends GuiceComponentProviderFactory {
         public ServletGuiceComponentProviderFactory(ResourceConfig config, Injector injector) {
             super(config, injector);
@@ -109,6 +111,11 @@ public class GuiceContainer extends ServletContainer {
 
     @Override
     protected void initiate(ResourceConfig config, WebApplication webapp) {
+        this.webapp = webapp;
         webapp.initiate(config, new ServletGuiceComponentProviderFactory(config, injector));
+    }
+
+    public WebApplication getWebApplication() {
+        return webapp;
     }
 }

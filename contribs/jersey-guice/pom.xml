@@ -106,6 +106,7 @@
                     <links>
                         <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
                         <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/jersey/</link>
+                        <link>http://google-guice.googlecode.com/svn/tags/2.0/javadoc/</link>
                     </links>
                     <notimestamp>true</notimestamp>
                 </configuration>

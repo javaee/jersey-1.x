@@ -73,7 +73,7 @@
  *
  *         &#64;Override
  *         protected Injector getInjector() {
- *             return Guice.createInjector(new ServletModule() {
+ *             return Guice.createInjector(new JerseyServletModule() {
  *
  *                 &#64;Override
  *                 protected void configureServlets() {
@@ -88,7 +88,12 @@
  * </blockquote></pre>
  * Notice that one class <code>GuiceResource</code> is bound and the
  * {@link com.sun.jersey.guice.spi.container.servlet.GuiceContainer} is 
- * declared in the <code>serve</code> method. Instances of
+ * declared in the <code>serve</code> method. A instance of 
+ * module {@link com.sun.jersey.guice.JerseyServletModule} is created. This
+ * module extends from {@link com.google.inject.servlet.ServletModule} and
+ * provides JAX-RS and Jersey bindings.
+ * <p>
+ * Instances of
  * <code>GuiceResource</code> will be managed according to the scope declared
  * using Guice defined scopes. For example the <code>GuiceResource</code>
  * could be as follows:
@@ -129,7 +134,7 @@
  *
  *         &#64;Override
  *         protected Injector getInjector() {
- *             return Guice.createInjector(new ServletModule() {
+ *             return Guice.createInjector(new JerseyServletModule() {
  *
  *                 &#64;Override
  *                 protected void configureServlets() {
@@ -148,9 +153,9 @@
  * Any root resource or provider classes found in the package <code>unbound</code>
  * or sub-packages of will be registered whether they be Guice-bound nor not.
  * <p>
- * Sometimes it is convienient for developers not to explicitly bind a
+ * Sometimes it is convenient for developers not to explicitly bind a
  * resource or provider, let Guice instantiate, and let Jersey manage
- * the life-cycle. This behaviour can be enabled for a resource or
+ * the life-cycle. This behavior can be enabled for a resource or
  * provider class as follows:
  * <ol>
  * <li>a class constructor is annotated with {@link com.google.inject.Inject};
@@ -159,8 +164,8 @@
  *     for example using package scanning registration.
  * </ol>
  * <p>
- * In other cases it is convienient to let Jersey instantiate and manage
- * the life-cycle and let Guice perform injection. This behaviour can be
+ * In other cases it is convenient to let Jersey instantiate and manage
+ * the life-cycle and let Guice perform injection. This behavior can be
  * enabled for a resource or provider class as follows:
  * <ol>
  * <li>a field or method is annotated with {@link com.google.inject.Inject};

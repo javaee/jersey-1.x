@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * @author paulsandoz
  */
-public class JerseyServletModule extends ServletModule {
+public class JerseyTestServletModule extends ServletModule {
     private Set<Class<?>> clazzes = new HashSet<Class<?>>();
 
     private String path = "/*";
@@ -24,22 +24,22 @@ public class JerseyServletModule extends ServletModule {
 
     private Class<? extends GuiceContainer> servletClass = GuiceContainer.class;
     
-    public JerseyServletModule servlet(Class<? extends GuiceContainer> servletClass) {
+    public JerseyTestServletModule servlet(Class<? extends GuiceContainer> servletClass) {
         this.servletClass = servletClass;
         return this;
     }
 
-    public JerseyServletModule path(String path) {
+    public JerseyTestServletModule path(String path) {
         this.path = path;
         return this;
     }
 
-    public JerseyServletModule bindClass(Class<?> clazz) {
+    public JerseyTestServletModule bindClass(Class<?> clazz) {
         clazzes.add(clazz);
         return this;
     }
 
-    public JerseyServletModule initParam(String name, String value) {
+    public JerseyTestServletModule initParam(String name, String value) {
         initParams.put(name, value);
         return this;
     }

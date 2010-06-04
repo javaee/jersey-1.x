@@ -70,10 +70,10 @@ public class GuiceBoundTest extends AbstractGuiceGrizzlyTest {
         }
     }
 
-    public static class TestServletConfig extends JerseyGuiceServletContextListener {
+    public static class TestServletConfig extends JerseyTestGuiceServletContextListener {
         @Override
         protected ServletModule configure() {
-            return new JerseyServletModule().path("*").
+            return new JerseyTestServletModule().path("*").
                     bindClass(BoundPerRequestResource.class).
                     bindClass(BoundNoScopeResource.class).
                     bindClass(BoundSingletonResource.class);
@@ -126,10 +126,10 @@ public class GuiceBoundTest extends AbstractGuiceGrizzlyTest {
         }
     }
 
-    public static class SubResourceServletConfig extends JerseyGuiceServletContextListener {
+    public static class SubResourceServletConfig extends JerseyTestGuiceServletContextListener {
         @Override
         protected ServletModule configure() {
-            return new JerseyServletModule().path("*").
+            return new JerseyTestServletModule().path("*").
                     bindClass(BoundSubResource.class);
         }
     }
@@ -175,10 +175,10 @@ public class GuiceBoundTest extends AbstractGuiceGrizzlyTest {
         }
     }
 
-    public static class InjectServletConfig extends JerseyGuiceServletContextListener {
+    public static class InjectServletConfig extends JerseyTestGuiceServletContextListener {
         @Override
         protected ServletModule configure() {
-            return new JerseyServletModule().path("*").
+            return new JerseyTestServletModule().path("*").
                     bindClass(InjectResource.class).
                     bindClass(GuiceManagedClass.class);
         }

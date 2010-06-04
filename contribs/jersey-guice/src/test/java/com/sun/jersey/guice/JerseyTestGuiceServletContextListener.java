@@ -13,11 +13,11 @@ import com.google.inject.servlet.ServletModule;
  *
  * @author paulsandoz
  */
-public abstract class JerseyGuiceServletContextListener extends GuiceServletContextListener {
+public abstract class JerseyTestGuiceServletContextListener extends GuiceServletContextListener {
 
     private final ServletModule module;
 
-    public JerseyGuiceServletContextListener() {
+    public JerseyTestGuiceServletContextListener() {
         this.module = configure();
     }
 
