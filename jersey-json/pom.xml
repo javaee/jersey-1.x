@@ -157,7 +157,7 @@
                 <configuration>
                     <instructions>
                         <Export-Package>com.sun.jersey.api.json, com.sun.jersey.json.impl.*</Export-Package>
-                        <Import-Package>com.sun.xml.bind.annotation, *</Import-Package>
+                        <Import-Package>com.sun.xml.bind.annotation;resolution:=optional,com.sun.xml.bind.v2.*;resolution:=optional, *</Import-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
