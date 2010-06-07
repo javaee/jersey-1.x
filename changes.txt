@@ -1,4 +1,5 @@
 release 1.3 (06-2010)
+- Upgrade the version of Abdera used in the contribs/jersey-atom-abdera to 1.0.
 - Guice integration supports the @Inject binding of common
   JAX-RS and Jersey dependencies such as UriInfo and ExtendedUriInfo.
   Extend from com.sun.jersey.guice.JerseyServletModule, instead of

@@ -50,17 +50,6 @@
     <packaging>jar</packaging>
     <name>jersey-atom-abdera</name>
 
-    <!-- This repository can be removed once Abdera releases a version
-         outside the incubator, which would end up in the Maven central
-         repository. -->
-    <repositories>
-        <repository>
-            <id>apache-incubating</id>
-            <name>Apache Incubating Repository</name>
-            <url>http://repository.apache.org/snapshots</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -70,7 +59,7 @@
         <dependency>
           <groupId>org.apache.abdera</groupId>
           <artifactId>abdera-parser</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.0</version>
           <!-- NOTE - the exclusions below are appropriate for apps deployed
                in a Java EE environment, where the server provides all the
                required implementations. -->
@@ -102,7 +91,7 @@
         <dependency>
           <groupId>org.apache.abdera</groupId>
           <artifactId>abdera-extensions-json</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.sun.grizzly</groupId>
