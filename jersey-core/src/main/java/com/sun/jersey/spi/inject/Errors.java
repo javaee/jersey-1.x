@@ -46,13 +46,6 @@ import java.util.logging.Logger;
 /**
  * TODO do not use static thread local?
  *
- * TODO turn back on exception reporting when deploying to war, class loader
- * delegation set to false, with an older version of Jersey is shipped with GF
- * works correctly.
- * 
- * TODO inner classes reports a missing dependency for the constructor parameter
- * corresponding to the enclosing class, ignore that?
- * 
  * @author Paul.Sandoz@Sun.Com
  */
 public final class Errors {

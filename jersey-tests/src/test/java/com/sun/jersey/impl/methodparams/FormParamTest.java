@@ -71,7 +71,30 @@ public class FormParamTest extends AbstractResourceTester {
     public FormParamTest(String testName) {
         super(testName);
     }
-    
+
+    @Path("/")
+    public static class FormResourceNoConsumes {
+        @POST
+        public String post(
+                @FormParam("a") String a,
+                MultivaluedMap<String, String> form) {
+            assertEquals(a, form.getFirst("a"));
+            return a;
+        }
+    }
+
+    public void testFormResourceNoConsumes() {
+        initiateWebApplication(FormResourceNoConsumes.class);
+
+        WebResource r = resource("/");
+
+        Form form = new Form();
+        form.add("a", "foo");
+
+        String s = r.type(MediaType.APPLICATION_OCTET_STREAM_TYPE).post(String.class, form);
+        assertEquals("foo", s);
+    }
+
     @XmlRootElement
     public static class JAXBBean {
 
@@ -254,152 +277,6 @@ public class FormParamTest extends AbstractResourceTester {
             return a + b + cdc.getFileName();
         }
     }
-
-    @Path("/")
-    public static class MultipartFormResourceY {
-        @POST
-        @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
-        public String post(
-                @FormParam("a") String a,
-                @FormParam("b") String b,
-                @FormParam("c") JAXBBean c,
-                @FormParam("c") FormDataContentDisposition cdc,
-                Form form,
-                @Context UriInfo ui,
-                @QueryParam("a") String qa) throws Exception {
-            assertEquals(a, form.getFirst("a"));
-            assertEquals(b, form.getFirst("b"));
-            assertNull(cdc);
-            return a + b;
-        }
-    }
-
-    public void testMultipartFormParam() throws Exception {
-        initiateWebApplication(MultipartFormResourceX.class);
-
-        WebResource r = resource("/");
-
-        MimeMultipart form = new MimeMultipart();
-
-        InternetHeaders headers = new InternetHeaders();
-        headers.addHeader("content-disposition", "form-data; name=\"a\"");
-        MimeBodyPart bp = new MimeBodyPart(headers, "foo".getBytes());
-        form.addBodyPart(bp);
-
-        headers = new InternetHeaders();
-        headers.addHeader("content-disposition", "form-data; name=\"b\"");
-        bp = new MimeBodyPart(headers, "bar".getBytes());
-        form.addBodyPart(bp);
-
-        headers = new InternetHeaders();
-        headers.addHeader("content-disposition", "form-data; name=\"c\"; filename=\"file.xml\"");
-        headers.addHeader("Content-type", "application/xml");
-        bp = new MimeBodyPart(headers, "<jaxbBean><value>content</value></jaxbBean>".getBytes());
-        form.addBodyPart(bp);
-
-        String s = r.type("multipart/form-data").post(String.class, form);
-        assertEquals("foobarfile.xml", s);
-    }
-
-    public void testMultipartFormParamWithForm() {
-        initiateWebApplication(MultipartFormResourceY.class);
-
-        WebResource r = resource("/");
-
-        Form form = new Form();
-        form.add("a", "foo");
-        form.add("b", "bar");
-        form.add("c", "<jaxbBean><value>content</value></jaxbBean>");
-
-        String s = r.post(String.class, form);
-        assertEquals("foobar", s);
-    }
-
-
-    @Path("/")
-    public static class MultipartFormParamTypes
-    {
-        @POST
-        @Consumes("multipart/form-data")
-        public String createSubscription(
-                @FormParam("int") int i,
-                @FormParam("float") float f,
-                @FormParam("decimal") BigDecimal d
-                ) {
-            return "" + i + " " + f + " " + d;
-        }
-    }
-
-
-    public void testMultipartFormListSubscription() throws Exception {
-        initiateWebApplication(MultipartFormParamTypes.class);
-
-        WebResource r = resource("/");
-
-        MimeMultipart form = new MimeMultipart();
-
-        InternetHeaders headers = new InternetHeaders();
-        headers.addHeader("content-disposition", "form-data; name=\"int\"");
-        MimeBodyPart bp = new MimeBodyPart(headers, "1234".getBytes());
-        form.addBodyPart(bp);
-
-        headers = new InternetHeaders();
-        headers.addHeader("content-disposition", "form-data; name=\"float\"");
-        bp = new MimeBodyPart(headers, "3.14".getBytes());
-        form.addBodyPart(bp);
-
-        headers = new InternetHeaders();
-        headers.addHeader("content-disposition", "form-data; name=\"decimal\"");
-        headers.addHeader("Content-type", "application/xml");
-        bp = new MimeBodyPart(headers, "1.61".getBytes());
-        form.addBodyPart(bp);
-
-        String s = r.type("multipart/form-data").post(String.class, form);
-        assertEquals("1234 3.14 1.61", s);
-    }
-
-    @Path("/")
-    public static class MultipartFormResourceNull {
-        @POST
-        @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
-        public String post(
-                @FormParam("a") String a,
-                @FormParam("b") String b) throws Exception {
-            assertNotNull(a);
-            assertNull(b);
-            return a;
-        }
-    }
-
-    public void testMultipartFormParamWithFormNull() {
-        initiateWebApplication(MultipartFormResourceNull.class);
-
-        WebResource r = resource("/");
-
-        Form form = new Form();
-        form.add("a", "foo");
-
-        String s = r.post(String.class, form);
-        assertEquals("foo", s);
-    }
-
-    public void testMultipartFormParamWithFormDataNull() throws Exception {
-        initiateWebApplication(MultipartFormResourceNull.class);
-
-        WebResource r = resource("/");
-
-        MimeMultipart form = new MimeMultipart();
-
-        InternetHeaders headers = new InternetHeaders();
-        headers.addHeader("content-disposition", "form-data; name=\"a\"");
-        MimeBodyPart bp = new MimeBodyPart(headers, "foo".getBytes());
-        form.addBodyPart(bp);
-
-        String s = r.type("multipart/form-data").post(String.class, form);
-        assertEquals("foo", s);
-    }
-
-
 
     @Path("/")
     public static class FormResourceJAXB {

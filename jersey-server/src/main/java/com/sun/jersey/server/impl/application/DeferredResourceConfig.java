@@ -68,25 +68,41 @@ public class DeferredResourceConfig extends DefaultResourceConfig {
         this.defaultClasses = defaultClasses;
     }
 
-    public Application getApplication(ProviderFactory pf) {
-        ComponentProvider cp = pf.getComponentProvider(appClass);
-        if (cp == null) {
-            throw new ContainerException("The application class " + appClass.getName() + " could not be instantiated");
+    public ApplicationHolder getApplication(ProviderFactory pf) {
+        return new ApplicationHolder(pf);
+    }
+
+    public class ApplicationHolder {
+        private final Application originalApp;
+
+        private final DefaultResourceConfig adaptedApp;
+
+        private ApplicationHolder(ProviderFactory pf) {
+            final ComponentProvider cp = pf.getComponentProvider(appClass);
+            if (cp == null) {
+                throw new ContainerException("The Application class " + appClass.getName() + " could not be instantiated");
+            }
+            this.originalApp = (Application)cp.getInstance();
+
+            if ((originalApp.getClasses() == null || originalApp.getClasses().isEmpty()) &&
+                    (originalApp.getSingletons() == null || originalApp.getSingletons().isEmpty())) {
+                LOGGER.info("Instantiated the Application class " + appClass.getName() +
+                        ". The following root resource and provider classes are registered: " + defaultClasses);
+                this.adaptedApp = new DefaultResourceConfig(defaultClasses);
+                adaptedApp.add(originalApp);
+            } else {
+                LOGGER.info("Instantiated the Application class " + appClass.getName());
+                adaptedApp = null;
+            }
+
         }
-        Application app = (Application)cp.getInstance();
-        
-        if ((app.getClasses() == null || app.getClasses().isEmpty()) &&
-                (app.getSingletons() == null || app.getSingletons().isEmpty())) {
-            LOGGER.info("Instantiating the Application class, named " +
-                    appClass.getName() +
-                    ". The following root resource and provider classes are registered: " + defaultClasses);
-            DefaultResourceConfig drc = new DefaultResourceConfig(defaultClasses);
-            drc.add(app);
-            return drc;
-        } else {
-            LOGGER.info("Instantiating the Application class, named " +
-                    appClass.getName());
-            return app;
+
+        public Application getOriginalApplication() {
+            return originalApp;
+        }
+
+        public Application getApplication() {
+            return (adaptedApp != null) ? adaptedApp : originalApp;
         }
     }
 }

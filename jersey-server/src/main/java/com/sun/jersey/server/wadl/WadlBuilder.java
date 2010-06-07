@@ -34,7 +34,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.server.wadl;
 
 import java.util.HashMap;
@@ -77,14 +76,14 @@ import java.util.Collections;
  * @version $Id$
  */
 public class WadlBuilder {
-    
+
     private WadlGenerator _wadlGenerator;
-    
+
     public WadlBuilder() {
-        this( new WadlGeneratorImpl() );
+        this(new WadlGeneratorImpl());
     }
-    
-    public WadlBuilder( WadlGenerator wadlGenerator ) {
+
+    public WadlBuilder(WadlGenerator wadlGenerator) {
         _wadlGenerator = wadlGenerator;
     }
 
@@ -93,21 +92,21 @@ public class WadlBuilder {
      * @param resources the set of resources
      * @return the JAXB WADL application bean
      */
-    public Application generate(Set<AbstractResource> resources ) {
+    public Application generate(Set<AbstractResource> resources) {
         Application wadlApplication = _wadlGenerator.createApplication();
         Resources wadlResources = _wadlGenerator.createResources();
-        
+
         // for each resource
-        for (AbstractResource r: resources) {
+        for (AbstractResource r : resources) {
             Resource wadlResource = generateResource(r, null);
             wadlResources.getResource().add(wadlResource);
         }
         wadlApplication.setResources(wadlResources);
-        
+
         addVersion(wadlApplication);
         return wadlApplication;
     }
-    
+
     /**
      * Generate WADL for a resource.
      * @param resource the resource
@@ -119,7 +118,7 @@ public class WadlBuilder {
         Resource wadlResource = generateResource(resource, null);
         wadlResources.getResource().add(wadlResource);
         wadlApplication.setResources(wadlResources);
-        
+
         addVersion(wadlApplication);
         return wadlApplication;
     }
@@ -137,7 +136,7 @@ public class WadlBuilder {
         Resource wadlResource = generateSubResource(resource, path);
         wadlResources.getResource().add(wadlResource);
         wadlApplication.setResources(wadlResources);
-        
+
         addVersion(wadlApplication);
         return wadlApplication;
     }
@@ -145,75 +144,78 @@ public class WadlBuilder {
     private void addVersion(Application wadlApplication) {
         // Include Jersey version as doc element with generatedBy attribute
         Doc d = new Doc();
-        d.getOtherAttributes().put(new QName("http://jersey.dev.java.net/", "generatedBy", "jersey"), 
+        d.getOtherAttributes().put(new QName("http://jersey.dev.java.net/", "generatedBy", "jersey"),
                 BuildId.getBuildId());
-        wadlApplication.getDoc().add(0, d);                
+        wadlApplication.getDoc().add(0, d);
     }
-    
+
     private com.sun.research.ws.wadl.Method generateMethod(AbstractResource r, final Map<String, Param> wadlResourceParams, final AbstractResourceMethod m) {
-        com.sun.research.ws.wadl.Method wadlMethod = _wadlGenerator.createMethod( r, m );
+        com.sun.research.ws.wadl.Method wadlMethod = _wadlGenerator.createMethod(r, m);
         // generate the request part
         Request wadlRequest = generateRequest(r, m, wadlResourceParams);
-        if (wadlRequest != null)
+        if (wadlRequest != null) {
             wadlMethod.setRequest(wadlRequest);
+        }
         // generate the response part
         Response wadlResponse = generateResponse(r, m);
-        if (wadlResponse != null)
+        if (wadlResponse != null) {
             wadlMethod.setResponse(wadlResponse);
+        }
         return wadlMethod;
     }
 
-    private Request generateRequest(AbstractResource r, final AbstractResourceMethod m, 
-            Map<String,Param> wadlResourceParams) {
-        if (m.getParameters().size()==0)
+    private Request generateRequest(AbstractResource r, final AbstractResourceMethod m,
+            Map<String, Param> wadlResourceParams) {
+        if (m.getParameters().size() == 0) {
             return null;
-        
-        Request wadlRequest = _wadlGenerator.createRequest( r, m );
+        }
 
-        for (Parameter p: m.getParameters()) {
-            if (p.getSource()==Parameter.Source.ENTITY) {
-                for (MediaType mediaType: m.getSupportedInputTypes()) {
-                    setRepresentationForMediaType( r, m, mediaType, wadlRequest );
+        Request wadlRequest = _wadlGenerator.createRequest(r, m);
+
+        for (Parameter p : m.getParameters()) {
+            if (p.getSource() == Parameter.Source.ENTITY) {
+                for (MediaType mediaType : m.getSupportedInputTypes()) {
+                    setRepresentationForMediaType(r, m, mediaType, wadlRequest);
                 }
-            }
-            else if ( p.getAnnotation().annotationType() == FormParam.class ) {
+            } else if (p.getAnnotation().annotationType() == FormParam.class) {
                 // Use application/x-www-form-urlencoded if no @Consumes
                 List<MediaType> supportedInputTypes = m.getSupportedInputTypes();
-                if (supportedInputTypes.size() == 0 ||
-                        ((supportedInputTypes.size() == 1) && (supportedInputTypes.get(0).equals(MediaType.WILDCARD_TYPE)))) {
-                    supportedInputTypes.clear();
-                    supportedInputTypes.add(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+                if (supportedInputTypes.size() == 0
+                        || (supportedInputTypes.size() == 1 && supportedInputTypes.get(0).isWildcardType())) {
+                    supportedInputTypes = Collections.singletonList(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
                 }
 
-                for ( MediaType mediaType: m.getSupportedInputTypes() ) {
-                    final RepresentationType wadlRepresentation = setRepresentationForMediaType( r, m, mediaType, wadlRequest );
-                    if ( getParamByName( wadlRepresentation.getParam(), p.getSourceName() ) == null ) {
-                        final Param wadlParam = generateParam( r, m, p );
-                        if ( wadlParam != null ) {
-                            wadlRepresentation.getParam().add( wadlParam );
+                for (MediaType mediaType : m.getSupportedInputTypes()) {
+                    final RepresentationType wadlRepresentation = setRepresentationForMediaType(r, m, mediaType, wadlRequest);
+                    if (getParamByName(wadlRepresentation.getParam(), p.getSourceName()) == null) {
+                        final Param wadlParam = generateParam(r, m, p);
+                        if (wadlParam != null) {
+                            wadlRepresentation.getParam().add(wadlParam);
                         }
                     }
                 }
-            }
-            else {
-                Param wadlParam = generateParam( r, m, p );
-                if (wadlParam == null)
+            } else {
+                Param wadlParam = generateParam(r, m, p);
+                if (wadlParam == null) {
                     continue;
-                if (wadlParam.getStyle()==ParamStyle.TEMPLATE)
-                    wadlResourceParams.put(wadlParam.getName(),wadlParam);
-                else
+                }
+                if (wadlParam.getStyle() == ParamStyle.TEMPLATE) {
+                    wadlResourceParams.put(wadlParam.getName(), wadlParam);
+                } else {
                     wadlRequest.getParam().add(wadlParam);
+                }
             }
         }
-        if (wadlRequest.getRepresentation().size()+wadlRequest.getParam().size() == 0)
+        if (wadlRequest.getRepresentation().size() + wadlRequest.getParam().size() == 0) {
             return null;
-        else
+        } else {
             return wadlRequest;
+        }
     }
 
-    private Param getParamByName( final List<Param> params, final String name ) {
-        for( Param param : params ) {
-            if ( param.getName().equals( name ) ) {
+    private Param getParamByName(final List<Param> params, final String name) {
+        for (Param param : params) {
+            if (param.getName().equals(name)) {
                 return param;
             }
         }
@@ -230,21 +232,21 @@ public class WadlBuilder {
      * @author Martin Grotzke
      * @return the wadl request representation for the specified {@link MediaType}.
      */
-    private RepresentationType setRepresentationForMediaType( AbstractResource r,
+    private RepresentationType setRepresentationForMediaType(AbstractResource r,
             final AbstractResourceMethod m, MediaType mediaType,
-            Request wadlRequest ) {
-        RepresentationType wadlRepresentation = getRepresentationByMediaType( wadlRequest.getRepresentation(), mediaType );
-        if ( wadlRepresentation == null ) {
-            wadlRepresentation = _wadlGenerator.createRequestRepresentation( r, m, mediaType );
+            Request wadlRequest) {
+        RepresentationType wadlRepresentation = getRepresentationByMediaType(wadlRequest.getRepresentation(), mediaType);
+        if (wadlRepresentation == null) {
+            wadlRepresentation = _wadlGenerator.createRequestRepresentation(r, m, mediaType);
             wadlRequest.getRepresentation().add(wadlRepresentation);
         }
         return wadlRepresentation;
     }
 
     private RepresentationType getRepresentationByMediaType(
-            final List<RepresentationType> representations, MediaType mediaType ) {
-        for( RepresentationType representation : representations ) {
-            if ( mediaType.toString().equals( representation.getMediaType() ) ) {
+            final List<RepresentationType> representations, MediaType mediaType) {
+        for (RepresentationType representation : representations) {
+            if (mediaType.toString().equals(representation.getMediaType())) {
                 return representation;
             }
         }
@@ -252,8 +254,9 @@ public class WadlBuilder {
     }
 
     private Param generateParam(AbstractResource r, AbstractMethod m, final Parameter p) {
-        if (p.getSource()==Parameter.Source.ENTITY || p.getSource()==Parameter.Source.CONTEXT)
+        if (p.getSource() == Parameter.Source.ENTITY || p.getSource() == Parameter.Source.CONTEXT) {
             return null;
+        }
         Param wadlParam = _wadlGenerator.createParam(r, m, p);
         return wadlParam;
     }
@@ -261,9 +264,9 @@ public class WadlBuilder {
     private Resource generateResource(AbstractResource r, String path) {
         return generateResource(r, path, Collections.<Class<?>>emptySet());
     }
-    
+
     private Resource generateResource(AbstractResource r, String path, Set<Class<?>> visitedClasses) {
-        Resource wadlResource = _wadlGenerator.createResource( r, path );
+        Resource wadlResource = _wadlGenerator.createResource(r, path);
 
         // prevent infinite recursion
         if (visitedClasses.contains(r.getResourceClass())) {
@@ -286,7 +289,7 @@ public class WadlBuilder {
 
         // for each sub-resource method
         Map<String, Resource> wadlSubResources = new HashMap<String, Resource>();
-        Map<String, Map<String, Param>> wadlSubResourcesParams = 
+        Map<String, Map<String, Param>> wadlSubResourcesParams =
                 new HashMap<String, Map<String, Param>>();
         for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
             // find or create sub resource for uri template
@@ -318,14 +321,15 @@ public class WadlBuilder {
         for (AbstractSubResourceLocator l : r.getSubResourceLocators()) {
             AbstractResource subResource = IntrospectionModeller.createResource(
                     l.getMethod().getReturnType());
-            Resource wadlSubResource = generateResource(subResource, 
+            Resource wadlSubResource = generateResource(subResource,
                     l.getPath().getValue(), visitedClasses);
             wadlResource.getMethodOrResource().add(wadlSubResource);
-            
+
             for (Parameter p : l.getParameters()) {
                 Param wadlParam = generateParam(r, l, p);
-                if (wadlParam != null && wadlParam.getStyle()==ParamStyle.TEMPLATE)
+                if (wadlParam != null && wadlParam.getStyle() == ParamStyle.TEMPLATE) {
                     wadlSubResource.getParam().add(wadlParam);
+                }
             }
         }
         return wadlResource;
@@ -335,8 +339,9 @@ public class WadlBuilder {
         Resource wadlResource = new Resource();
         if (r.isRootResource()) {
             StringBuilder b = new StringBuilder(r.getPath().getValue());
-            if (!(r.getPath().getValue().endsWith("/") || path.startsWith("/")))
+            if (!(r.getPath().getValue().endsWith("/") || path.startsWith("/"))) {
                 b.append("/");
+            }
             b.append(path);
             wadlResource.setPath(b.toString());
         }
@@ -345,8 +350,9 @@ public class WadlBuilder {
         for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
             // find or create sub resource for uri template
             String template = m.getPath().getValue();
-            if (!template.equals(path))
+            if (!template.equals(path)) {
                 continue;
+            }
             com.sun.research.ws.wadl.Method wadlMethod = generateMethod(r, wadlSubResourceParams, m);
             wadlResource.getMethodOrResource().add(wadlMethod);
         }
@@ -359,10 +365,10 @@ public class WadlBuilder {
     }
 
     private Response generateResponse(AbstractResource r, final AbstractResourceMethod m) {
-        if (m.getMethod().getReturnType() == void.class)
+        if (m.getMethod().getReturnType() == void.class) {
             return null;
-        Response wadlResponse = _wadlGenerator.createResponse( r, m );
+        }
+        Response wadlResponse = _wadlGenerator.createResponse(r, m);
         return wadlResponse;
     }
-    
 }

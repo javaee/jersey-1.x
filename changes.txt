@@ -1,4 +1,15 @@
 release 1.3 (06-2010)
+- Removed support for resource methods utilizing @FormParam and consuming
+  "multipart/form-data". This functionality has been replaced by @FormDataParam
+  in the jersey-multipart module.
+- Fixed issue 531
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=531
+  WADL generation should not modify the abstract model when @FormParam is
+  declared in a resource method parameter and the @Consumes is absent.
+- Fixed issue 538
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=538
+  The reference to the registered application may be injected as follows:
+    @Context Application app;
 - Upgrade the version of Abdera used in the contribs/jersey-atom-abdera to 1.0.
 - Guice integration supports the @Inject binding of common
   JAX-RS and Jersey dependencies such as UriInfo and ExtendedUriInfo.

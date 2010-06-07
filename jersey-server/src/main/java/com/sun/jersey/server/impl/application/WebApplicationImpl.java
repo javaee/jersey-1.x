@@ -115,6 +115,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.impl.BuildId;
+import com.sun.jersey.server.impl.application.DeferredResourceConfig.ApplicationHolder;
 import com.sun.jersey.server.impl.model.parameter.FormParamInjectableProvider;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorFactory;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
@@ -137,6 +138,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -861,12 +863,20 @@ public final class WebApplicationImpl implements WebApplication {
 
         // Create application-declared Application instance as a component
         if (rc instanceof DeferredResourceConfig) {
-            DeferredResourceConfig drc = (DeferredResourceConfig)rc;
+            final DeferredResourceConfig drc = (DeferredResourceConfig)rc;
             // Check if resource config has already been cloned
             if (resourceConfig == drc)
                 resourceConfig = drc.clone();
-            resourceConfig.add(drc.getApplication(cpFactory));
+
+            final ApplicationHolder da = drc.getApplication(cpFactory);
+            resourceConfig.add(da.getApplication());
             updateRequired = true;
+
+            injectableFactory.add(new ContextInjectableProvider<Application>(
+                    Application.class, da.getOriginalApplication()));
+        } else {
+            injectableFactory.add(new ContextInjectableProvider<FeaturesAndProperties>(
+                    Application.class, resourceConfig));
         }
 
         // Pipelined, decentralized configuration

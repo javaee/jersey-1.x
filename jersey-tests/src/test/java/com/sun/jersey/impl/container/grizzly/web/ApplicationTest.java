@@ -104,8 +104,9 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
 
         @GET
         @Produces("text/plain")
-        public String get(@Context ResourceConfig rc) {
+        public String get(@Context ResourceConfig rc, @Context Application app) {
             assertTrue(rc.getFeature("feature"));
+            
             return rc.getProperty("property").toString();
         }
     }
@@ -247,7 +248,8 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
 
         @GET
         @Produces("text/plain")
-        public String get(@Context ResourceConfig rc) {
+        public String get(@Context ResourceConfig rc, @Context Application app) {
+            assertTrue(app instanceof OverridePropertyApp);
 
             assertEquals(ResourceSingleton.class,
                     rc.getSingletons().iterator().next().getClass());
@@ -304,6 +306,10 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
 
     @Path("/")
     public static class ResourceInjectApp {
+
+        public ResourceInjectApp(@Context Application app) {
+            assertTrue(app instanceof InjectApp);
+        }
 
         @GET
         @Produces("text/plain")
@@ -391,7 +397,11 @@ public class ApplicationTest extends AbstractGrizzlyWebContainerTester {
     @Path("/")
     public static class ResourceInjectAppProvider {
 
-        public ResourceInjectAppProvider(@Context SingletonTypeOne one, @Context SingletonTypeTwo two) {
+        public ResourceInjectAppProvider(
+                @Context Application app,
+                @Context SingletonTypeOne one,
+                @Context SingletonTypeTwo two) {
+            assertTrue(app instanceof InjectAppProvider);
             assertNotNull(one);
             assertNotNull(two);
         }
