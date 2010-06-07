@@ -185,7 +185,7 @@ public class WadlBuilder {
                     supportedInputTypes = Collections.singletonList(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
                 }
 
-                for (MediaType mediaType : m.getSupportedInputTypes()) {
+                for (MediaType mediaType : supportedInputTypes) {
                     final RepresentationType wadlRepresentation = setRepresentationForMediaType(r, m, mediaType, wadlRequest);
                     if (getParamByName(wadlRepresentation.getParam(), p.getSourceName()) == null) {
                         final Param wadlParam = generateParam(r, m, p);
