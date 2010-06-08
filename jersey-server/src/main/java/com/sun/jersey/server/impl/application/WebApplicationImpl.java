@@ -123,7 +123,7 @@ import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactor
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
-import com.sun.jersey.server.spi.component.ServerSide;
+import com.sun.jersey.spi.inject.ServerSide;
 import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.container.ExceptionMapperContext;
 import com.sun.jersey.spi.inject.Errors;

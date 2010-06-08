@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.multipart.impl;
 
+import com.sun.jersey.multipart.Boundary;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
 import com.sun.jersey.multipart.MultiPart;
@@ -47,12 +48,12 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -123,29 +124,17 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
         }
 
         // Initialize local variables we need
-        Writer writer = new BufferedWriter(new OutputStreamWriter(stream)); // FIXME - charset???
+        final Writer writer = new BufferedWriter(new OutputStreamWriter(stream)); // FIXME - charset???
 
         // Determine the boundary string to be used, creating one if needed
-        if (mediaType == null) {
-            Map<String, String> parameters = new HashMap<String, String>();
-            parameters.put("boundary", createBoundary());
-            mediaType = new MediaType("multipart", "mixed", parameters);
-            headers.putSingle("Content-Type", mediaType);
-        }
-        String boundaryString = mediaType.getParameters().get("boundary");
-        if (boundaryString == null) {
-            boundaryString = createBoundary();
-            Map<String, String> parameters = new HashMap<String, String>();
-            parameters.putAll(mediaType.getParameters());
-            parameters.put("boundary", boundaryString);
-            mediaType = new MediaType(mediaType.getType(),
-                    mediaType.getSubtype(),
-                    parameters);
-            headers.putSingle("Content-Type", mediaType);
+        final MediaType boundaryMediaType = Boundary.addBoundary(mediaType);
+        if (boundaryMediaType != mediaType) {
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, boundaryMediaType);
         }
 
+        final String boundaryString = boundaryMediaType.getParameters().get("boundary");
         // Iterate through the body parts for this message
-        for (BodyPart bodyPart : entity.getBodyParts()) {
+        for (final BodyPart bodyPart : entity.getBodyParts()) {
 
             // Write the leading boundary string
             writer.write("\r\n--");
@@ -153,11 +142,11 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
             writer.write("\r\n");
 
             // Write the headers for this body part
-            MediaType bodyMediaType = bodyPart.getMediaType();
+            final MediaType bodyMediaType = bodyPart.getMediaType();
             if (bodyMediaType == null) {
                 throw new WebApplicationException(new IllegalArgumentException("Missing body part media type"));
             }
-            MultivaluedMap<String, String> bodyHeaders = bodyPart.getHeaders();
+            final MultivaluedMap<String, String> bodyHeaders = bodyPart.getHeaders();
             bodyHeaders.putSingle("Content-Type", bodyMediaType.toString());
 
             if (bodyHeaders.getFirst("Content-Disposition") == null
@@ -166,7 +155,7 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
             }
 
             // Iterate for the nested body parts
-            for (Map.Entry<String, List<String>> entry : bodyHeaders.entrySet()) {
+            for (final Map.Entry<String, List<String>> entry : bodyHeaders.entrySet()) {
 
                 // Only headers that match "Content-*" are allowed on body parts
                 if (!entry.getKey().toLowerCase().startsWith("content-")) {
@@ -206,7 +195,7 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
                 bodyEntity = ((BodyPartEntity) bodyEntity).getInputStream();
             }
 
-            MessageBodyWriter bodyWriter = providers.getMessageBodyWriter(
+            final MessageBodyWriter bodyWriter = providers.getMessageBodyWriter(
                     bodyClass,
                     bodyClass,
                     EMPTY_ANNOTATIONS,
@@ -235,23 +224,5 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
         writer.write(boundaryString);
         writer.write("--\r\n");
         writer.flush();
-    }
-
-    // --------------------------------------------------------- Private Methods
-    /**
-     * <p>Counter used to generate unique boundary values.  Access to this
-     * value SHOULD be synchronized to ensure unique boundary values in a
-     * multithreaded environment.</p>
-     */
-    private static int boundaryCounter = 0;
-
-    /**
-     * <p>Create and return a unique value for the <code>boundary</code>
-     * parameter of our <code>Content-Type</code> header field.</p>
-     */
-    private synchronized static String createBoundary() {
-        StringBuilder sb = new StringBuilder();
-        return "Boundary_" + (++boundaryCounter) + "_" + sb.hashCode() +
-                "_" + System.currentTimeMillis();
     }
 }

@@ -40,7 +40,7 @@ package com.sun.jersey.server.impl.template;
 import com.sun.jersey.spi.template.ResolvedViewable;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.api.view.Viewable;
-import com.sun.jersey.server.spi.component.ServerSide;
+import com.sun.jersey.spi.inject.ServerSide;
 import com.sun.jersey.spi.inject.ConstrainedTo;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;

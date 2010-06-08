@@ -38,6 +38,7 @@ package com.sun.jersey.multipart.impl;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.client.apache.ApacheHttpClient;
+import com.sun.jersey.multipart.Boundary;
 import com.sun.jersey.multipart.MultiPart;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -114,4 +115,22 @@ public class MultipartMixedWithApacheClientTest extends AbstractGrizzlyServerTes
         client.resource(getUri()).
                 type("multipart/mixed").post(multiPartInput);
     }
+
+    public void testChunkedEncodingUsingMultiPart() {
+        startServer(ProducesFormDataUsingMultiPart.class);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        for (int i = 0; i < 900 * 1024; i++)
+            baos.write(65);
+
+        MultiPart multiPartInput = new MultiPart().
+                bodyPart(new ByteArrayInputStream("01234567890123456789012345678901234567890123456789".getBytes()), MediaType.APPLICATION_OCTET_STREAM_TYPE).
+                bodyPart(baos.toByteArray(), MediaType.APPLICATION_OCTET_STREAM_TYPE);
+
+        client.setChunkedEncodingSize(1024);
+        client.resource(getUri()).
+                type(Boundary.addBoundary(MediaType.valueOf("multipart/mixed"))).
+                post(multiPartInput);
+    }
+
 }

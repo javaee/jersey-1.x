@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,49 +34,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
-package com.sun.jersey.multipart.impl;
-
-import com.sun.jersey.multipart.MultiPart;
-import com.sun.jersey.multipart.MultiPartConfig;
-import com.sun.jersey.spi.CloseableService;
-import com.sun.jersey.spi.inject.ConstrainedTo;
-import com.sun.jersey.spi.inject.ServerSide;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.Provider;
-import javax.ws.rs.ext.Providers;
-import org.jvnet.mimepull.MIMEParsingException;
+package com.sun.jersey.spi.inject;
 
 /**
- * <p>{@link Provider} {@link MessageBodyReader} implementation for
- * {@link MultiPart} entities.</p>
+ *
+ * @author Paul.Sandoz@Sun.Com
  */
-@ConstrainedTo(ServerSide.class)
-public class MultiPartReaderServerSide extends MultiPartReaderClientSide {
-
-    private final CloseableService closeableService;
-
-    public MultiPartReaderServerSide(@Context Providers providers, @Context MultiPartConfig config,
-            @Context CloseableService closeableService) {
-        super(providers, config);
-        
-        this.closeableService = closeableService;
-    }
-
-    protected MultiPart readMultiPart(Class<MultiPart> type, Type genericType,
-                              Annotation[] annotations, MediaType mediaType,
-                              MultivaluedMap<String, String> headers,
-                              InputStream stream) throws IOException, MIMEParsingException {
-        MultiPart mp = super.readMultiPart(type, genericType, annotations, mediaType, headers, stream);
-        closeableService.add(mp);
-        return mp;
-    }
-
-}
+public final class ServerSide extends ConstrainedToType { }

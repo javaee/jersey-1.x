@@ -34,12 +34,64 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.server.spi.component;
 
-import com.sun.jersey.spi.inject.ConstrainedToType;
+package com.sun.jersey.multipart;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.ws.rs.core.MediaType;
 
 /**
+ * Utility for creating boundary parameters.
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ServerSide extends ConstrainedToType { }
+public final class Boundary {
+
+    /**
+     * Transform a media type and add a boundary parameter with a unique value
+     * if one is not already present.
+     *
+     * @param mediaType, if null then a media type of "multipart/mixed" with
+     *        a boundary parameter will be returned.
+     * @return the media type with a boundary parameter.
+     */
+    public static MediaType addBoundary(MediaType mediaType) {
+        if (mediaType == null) {
+            final Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put("boundary", createBoundary());
+
+            return new MediaType("multipart", "mixed", parameters);
+        }
+
+        if (!mediaType.getParameters().containsKey("boundary")) {
+            final Map<String, String> parameters = new HashMap<String, String>(
+                    mediaType.getParameters());
+            parameters.put("boundary", createBoundary());
+            
+            return new MediaType(mediaType.getType(), mediaType.getSubtype(),
+                    parameters);
+        }
+
+        return mediaType;
+    }
+
+
+    private final static AtomicInteger boundaryCounter = new AtomicInteger();
+
+    /**
+     * Create a unique boundary.
+     *
+     * @return the boundary.
+     */
+    public static String createBoundary() {
+        return new StringBuilder("Boundary_").
+                append(boundaryCounter.incrementAndGet()).
+                append('_').
+                append(new Object().hashCode()).
+                append('_').
+                append(System.currentTimeMillis()).
+                toString();
+    }
+}

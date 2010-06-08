@@ -44,6 +44,8 @@ import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartConfig;
+import com.sun.jersey.spi.inject.ClientSide;
+import com.sun.jersey.spi.inject.ConstrainedTo;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -68,8 +70,9 @@ import org.jvnet.mimepull.MIMEPart;
  * <p>{@link Provider} {@link MessageBodyReader} implementation for
  * {@link MultiPart} entities.</p>
  */
+@ConstrainedTo(ClientSide.class)
 @Consumes("multipart/*")
-public class MultiPartReader implements MessageBodyReader<MultiPart> {
+public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
 
     /**
      * <P>Injectable helper to look up appropriate {@link Provider}s
@@ -88,7 +91,7 @@ public class MultiPartReader implements MessageBodyReader<MultiPart> {
      * <p>Accept constructor injection of the configuration parameters for this
      * application.</p>
      */
-    public MultiPartReader(@Context Providers providers, @Context MultiPartConfig config) {
+    public MultiPartReaderClientSide(@Context Providers providers, @Context MultiPartConfig config) {
         this.providers = providers;
         
         if (config == null) {

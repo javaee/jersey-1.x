@@ -58,6 +58,7 @@ import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.spi.inject.ClientSide;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
@@ -215,6 +216,7 @@ public class Client extends Filterable implements ClientHandler {
                 : new IoCProviderFactory(injectableFactory, provider);
 
         ProviderServices providerServices = new ProviderServices(
+                ClientSide.class,
                 this.componentProviderFactory,
                 config.getClasses(),
                 config.getSingletons());
