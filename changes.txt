@@ -1,4 +1,6 @@
 release 1.3 (06-2010)
+- ServiceFinder will defer to the defining class loader of the current class
+  if a provider class cannot be loaded from the thread context class loader.
 - Changed the declaration of components defined by jersey-multipart to use
   the META-INF/services service interface name to avoid the components being
   output in the logs.
@@ -6,9 +8,10 @@ release 1.3 (06-2010)
   https://jersey.dev.java.net/issues/show_bug.cgi?id=488
   When using Apache HTTP client, chunked encoding and jersey-multipart
   it is necessary for the client to explicitly declare the boundary string for 
-  the content type. See com.sun.jersey.multipart.Boundary. This is due to 
-  architectural restrictions with the Apache HTTP client (the headers have
-  to be declared before the entity is written.
+  the content type. See com.sun.jersey.multipart.Boundary and
+  com.sun.jersey.multipart.MultiPartMediaTypes.
+  This is due to architectural restrictions with the Apache HTTP client as
+  the headers have to be declared before the entity is written.
 - Removed support for resource methods utilizing @FormParam and consuming
   "multipart/form-data". This functionality has been replaced by @FormDataParam
   in the jersey-multipart module.

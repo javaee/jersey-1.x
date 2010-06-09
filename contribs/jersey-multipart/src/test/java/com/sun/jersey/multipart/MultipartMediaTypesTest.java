@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * 
  * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -37,60 +37,26 @@
 
 package com.sun.jersey.multipart;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import javax.ws.rs.core.MediaType;
+import junit.framework.TestCase;
 
-/**
- * Utility for creating boundary parameters.
- *
- * @author Paul.Sandoz@Sun.Com
- */
-public final class Boundary {
-
-    public static final String BOUNDARY_PARAMETER = "boundary";
-
-    /**
-     * Transform a media type and add a boundary parameter with a unique value
-     * if one is not already present.
-     *
-     * @param mediaType, if null then a media type of "multipart/mixed" with
-     *        a boundary parameter will be returned.
-     * @return the media type with a boundary parameter.
-     */
-    public static MediaType addBoundary(MediaType mediaType) {
-        if (mediaType == null) {
-            return MultiPartMediaTypes.createMixed();
-        }
-
-        if (!mediaType.getParameters().containsKey(BOUNDARY_PARAMETER)) {
-            final Map<String, String> parameters = new HashMap<String, String>(
-                    mediaType.getParameters());
-            parameters.put(BOUNDARY_PARAMETER, createBoundary());
-            
-            return new MediaType(mediaType.getType(), mediaType.getSubtype(),
-                    parameters);
-        }
-
-        return mediaType;
+public class MultipartMediaTypesTest extends TestCase {
+    
+    public MultipartMediaTypesTest(String testName) {
+        super(testName);
     }
 
+    public void testMediaTypes() {
+        test(MultiPartMediaTypes.MULTIPART_ALTERNATIVE_TYPE, MultiPartMediaTypes.createAlternative());
+        test(MultiPartMediaTypes.MULTIPART_DIGEST_TYPE, MultiPartMediaTypes.createDigest());
+        test(MultiPartMediaTypes.MULTIPART_MIXED_TYPE, MultiPartMediaTypes.createMixed());
+        test(MultiPartMediaTypes.MULTIPART_PARELLEL_TYPE, MultiPartMediaTypes.createParallel());
+        test(MediaType.MULTIPART_FORM_DATA_TYPE, MultiPartMediaTypes.createFormData());
+    }
 
-    private final static AtomicInteger boundaryCounter = new AtomicInteger();
-
-    /**
-     * Create a unique boundary.
-     *
-     * @return the boundary.
-     */
-    public static String createBoundary() {
-        return new StringBuilder("Boundary_").
-                append(boundaryCounter.incrementAndGet()).
-                append('_').
-                append(new Object().hashCode()).
-                append('_').
-                append(System.currentTimeMillis()).
-                toString();
+    private void test(MediaType x, MediaType y) {
+        assertEquals(x.getType(), y.getType());
+        assertEquals(x.getSubtype(), y.getSubtype());
+        assertTrue(y.getParameters().containsKey("boundary"));
     }
 }

@@ -37,6 +37,7 @@
 
 package com.sun.jersey.spi.service;
 
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.impl.SpiMessages;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -695,7 +696,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                 nextName = pending.next();
                 if (ignoreOnClassNotFound) {
                     try {
-                        Class.forName(nextName, true, loader);
+                        ReflectionHelper.classForNameWithException(nextName, loader);
                     } catch (ClassNotFoundException ex) {
                         // Provider implementation not found
                         if(LOGGER.isLoggable(Level.CONFIG)) {
@@ -751,7 +752,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
             String cn = nextName;
             nextName = null;
             try {
-                return (Class<T>)Class.forName(cn, true, loader);
+                return (Class<T>)ReflectionHelper.classForNameWithException(cn, loader);
             } catch (ClassNotFoundException ex) {
                 fail(serviceName,
                         SpiMessages.PROVIDER_NOT_FOUND(cn, service));
@@ -802,8 +803,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                 }
                 nextName = pending.next();
                 try {
-                    t = service.cast( 
-                            Class.forName(nextName, true, loader).newInstance());
+                    t = service.cast(ReflectionHelper.classForNameWithException(nextName, loader).newInstance());
                 } catch (ClassNotFoundException ex) {
                     if (ignoreOnClassNotFound) {
                         // Provider implementation not found

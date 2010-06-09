@@ -37,6 +37,7 @@
 
 package com.sun.jersey.multipart;
 
+import java.util.Collections;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -44,10 +45,6 @@ import javax.ws.rs.core.MediaType;
  * manifest constants.</p>
  */
 public final class MultiPartMediaTypes {
-
-    // Protected constructor to disable instantiation
-    protected MultiPartMediaTypes() {
-    }
 
     /** "multipart/alternative" */
     public static final String MULTIPART_ALTERNATIVE = "multipart/alternative";
@@ -77,4 +74,44 @@ public final class MultiPartMediaTypes {
     public static final MediaType MULTIPART_PARELLEL_TYPE =
             new MediaType("multipart", "parallel");
 
+
+    /**
+     * @return a "multipart/alternative" with a boundary parameter.
+     */
+    public static MediaType createAlternative() {
+        return create(MULTIPART_ALTERNATIVE_TYPE);
+    }
+
+    /**
+     * @return a "multipart/digest" with a boundary parameter.
+     */
+    public static MediaType createDigest() {
+        return create(MULTIPART_DIGEST_TYPE);
+    }
+
+    /**
+     * @return a "multipart/mixed" with a boundary parameter.
+     */
+    public static MediaType createMixed() {
+        return create(MULTIPART_MIXED_TYPE);
+    }
+
+    /**
+     * @return a "multipart/parallel" with a boundary parameter.
+     */
+    public static MediaType createParallel() {
+        return create(MULTIPART_PARELLEL_TYPE);
+    }
+
+    /**
+     * @return a "multipart/form-data" with a boundary parameter.
+     */
+    public static MediaType createFormData() {
+        return create(MediaType.MULTIPART_FORM_DATA_TYPE);
+    }
+
+    private static MediaType create(MediaType mt) {
+        return new MediaType(mt.getType(), mt.getSubtype(),
+                Collections.singletonMap(Boundary.BOUNDARY_PARAMETER, Boundary.createBoundary()));
+    }
 }

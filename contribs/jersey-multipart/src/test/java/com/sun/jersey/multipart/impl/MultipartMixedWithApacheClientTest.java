@@ -40,6 +40,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import com.sun.jersey.multipart.Boundary;
 import com.sun.jersey.multipart.MultiPart;
+import com.sun.jersey.multipart.MultiPartMediaTypes;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -129,7 +130,7 @@ public class MultipartMixedWithApacheClientTest extends AbstractGrizzlyServerTes
 
         client.setChunkedEncodingSize(1024);
         client.resource(getUri()).
-                type(Boundary.addBoundary(MediaType.valueOf("multipart/mixed"))).
+                type(MultiPartMediaTypes.createMixed()).
                 post(multiPartInput);
     }
 
