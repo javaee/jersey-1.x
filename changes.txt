@@ -1,4 +1,13 @@
 release 1.3 (06-2010)
+- Fixed issue 472
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=472
+  Ensure that preconditions with GET then a PUT with If-Unmodified-Since works
+  correctly at the granularity of seconds.
+  The last modified date is rounded down to the nearest second when comparing
+  against If-Modified-Since or If-Unmodified-Since values.
+  (HTTP formatted dates are rounded down to the nearest second.)
+  This can result in lost updates if two or more PUTs occur within an interval
+  of a second. The application should use etags in such cases.
 - ServiceFinder will defer to the defining class loader of the current class
   if a provider class cannot be loaded from the thread context class loader.
 - Changed the declaration of components defined by jersey-multipart to use

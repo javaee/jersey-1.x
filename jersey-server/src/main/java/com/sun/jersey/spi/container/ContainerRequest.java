@@ -721,9 +721,8 @@ public class ContainerRequest implements HttpRequestContext {
         String ifUnmodifiedSinceHeader = getRequestHeaders().getFirst("If-Unmodified-Since");
         if (ifUnmodifiedSinceHeader != null) {
             try {
-                long ifUnmodifiedSince = HttpHeaderReader.
-                        readDate(ifUnmodifiedSinceHeader).getTime() + 1000;
-                if (lastModified > ifUnmodifiedSince) {
+                long ifUnmodifiedSince = HttpHeaderReader.readDate(ifUnmodifiedSinceHeader).getTime();
+                if (roundDown(lastModified) > ifUnmodifiedSince) {
                     // 412 Precondition Failed
                     return Responses.preconditionFailed();
                 }
@@ -754,10 +753,8 @@ public class ContainerRequest implements HttpRequestContext {
             long lastModified,
             String ifModifiedSinceHeader) {
         try {
-            // TODO round up if modified since or round down last modified
-            long ifModifiedSince = HttpHeaderReader.
-                    readDate(ifModifiedSinceHeader).getTime() + 1000;
-            if (ifModifiedSince  > lastModified) {
+            long ifModifiedSince = HttpHeaderReader.readDate(ifModifiedSinceHeader).getTime();
+            if (roundDown(lastModified) <= ifModifiedSince) {
                 // 304 Not modified
                 return Responses.notModified();
             }
@@ -767,7 +764,17 @@ public class ContainerRequest implements HttpRequestContext {
         
         return null;
     }
-    
+
+    /**
+     * Round down the time to the nearest second.
+     * 
+     * @param time the time to round down.
+     * @return the rounded down time.
+     */
+    private static long roundDown(long time) {
+        return time - time % 1000;
+    }
+
     // SecurityContext
     
     public Principal getUserPrincipal() {
