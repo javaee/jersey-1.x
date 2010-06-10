@@ -54,11 +54,6 @@
             <version>1.1.1</version>
         </dependency>
         <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-all</artifactId>
-            <version>3.1</version>
-        </dependency>
-         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.1</version>
@@ -74,8 +69,8 @@
             <version>${project.version}</version>
         </dependency>
           <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
+            <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+            <artifactId>jersey-gf-server</artifactId>
             <version>${project.version}</version>
         </dependency>
           <dependency>
@@ -131,8 +126,8 @@
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
                                  <artifactItem>
-                                    <groupId>com.sun.jersey</groupId>
-                                    <artifactId>jersey-server</artifactId>
+                                    <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+                                    <artifactId>jersey-gf-server</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
@@ -179,14 +174,6 @@
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
                                   <artifactItem>
-                                    <groupId>asm</groupId>
-                                    <artifactId>asm-all</artifactId>
-                                    <version>3.1</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}</outputDirectory>
-                                </artifactItem>
-                                   <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-core-asl</artifactId>
                                     <version>1.1.1</version>

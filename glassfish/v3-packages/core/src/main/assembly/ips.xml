@@ -14,7 +14,7 @@
       <includes>
         <include>jsr311-api.jar</include>
         <include>jersey-core.jar</include>
-        <include>jersey-server.jar</include>
+        <include>jersey-gf-server.jar</include>
         <include>jersey-client.jar</include>
         <include>jersey-json.jar</include>
         <include>jersey-gf-statsproviders.jar</include>
