@@ -53,6 +53,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>jersey-gf-statsproviders</module>
+        <module>jersey-gf-core</module>
         <module>jersey-gf-server</module>
     </modules>
 </project>

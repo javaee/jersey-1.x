@@ -41,6 +41,13 @@ release 1.3 (06-2010)
   Instead of one big uber JAR, jersey-gf-bundle.jar, individual Jersey modules 
   are integrated to GlassFish to allow better modularization
   and alignment with non GlassFish environment
+  Only the following two of the individual Jersey modules integrated 
+  to GFv3 remain GlassFish specific:
+    - jersey-gf-core: bundles jsr311-api to allow multiple Jersey version
+                      co-existence as the API only allows to register one RuntimeDelegation instance.
+                      In fact, this bundle should be re-usable outside GlassFish as well 
+    - jersey-gf-server: uses a special private=GlassFish attribute to import
+                        packages from GlassFish provided asm-all bundle
 - Fixed issue 436
   https://jersey.dev.java.net/issues/show_bug.cgi?id=436
   Resources may be looked up using a URI via methods on 
