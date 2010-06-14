@@ -49,6 +49,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -117,11 +118,11 @@ public final class SourceProvider {
                 return new SAXSource(spf.getValue().newSAXParser().getXMLReader(),
                         new InputSource(entityStream));
             } catch (SAXParseException ex) {
-                throw new WebApplicationException(ex, 400);
+                throw new WebApplicationException(ex, Status.BAD_REQUEST);
             } catch (SAXException ex) {
-                throw new WebApplicationException(ex, 500);
+                throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
             } catch (ParserConfigurationException ex) {
-                throw new WebApplicationException(ex, 500);
+                throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
             }
         }
     }
@@ -152,11 +153,11 @@ public final class SourceProvider {
                 Document d = dbf.getValue().newDocumentBuilder().parse(entityStream);
                 return new DOMSource(d);
             } catch (SAXParseException ex) {
-                throw new WebApplicationException(ex, 400);
+                throw new WebApplicationException(ex, Status.BAD_REQUEST);
             } catch (SAXException ex) {
-                throw new WebApplicationException(ex, 500);
+                throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
             } catch (ParserConfigurationException ex) {
-                throw new WebApplicationException(ex, 500);
+                throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
             }
         }
     }
@@ -199,11 +200,11 @@ public final class SourceProvider {
                 StreamResult sr = new StreamResult(entityStream);
                 tf.getValue().newTransformer().transform(o, sr);
             } catch (SAXException ex) {
-                throw new WebApplicationException(ex, 500);
+                throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
             } catch (ParserConfigurationException ex) {
-                throw new WebApplicationException(ex, 500);
+                throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
             } catch (TransformerException ex) {
-                throw new WebApplicationException(ex, 500);
+                throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
             }
         }        
     }

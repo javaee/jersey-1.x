@@ -50,6 +50,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -93,9 +94,9 @@ public final class DocumentProvider extends AbstractMessageReaderWriterProvider<
         try {
             return dbf.getValue().newDocumentBuilder().parse(entityStream);
         } catch (SAXException ex) {
-            throw new WebApplicationException(ex, 400);
+            throw new WebApplicationException(ex, Status.BAD_REQUEST);
         } catch (ParserConfigurationException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -115,7 +116,7 @@ public final class DocumentProvider extends AbstractMessageReaderWriterProvider<
             StreamResult sr = new StreamResult(entityStream);
             tf.getValue().newTransformer().transform(new DOMSource(t), sr);
         } catch (TransformerException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 }

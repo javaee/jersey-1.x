@@ -51,6 +51,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -131,9 +132,9 @@ public class XMLRootObjectProvider extends AbstractJAXBProvider<Object> {
             return getUnmarshaller(type, mediaType).
                     unmarshal(getSAXSource(spf.getValue(), entityStream));
         } catch (UnmarshalException ex) {
-            throw new WebApplicationException(ex, 400);
+            throw new WebApplicationException(ex, Status.BAD_REQUEST);
         } catch (JAXBException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 

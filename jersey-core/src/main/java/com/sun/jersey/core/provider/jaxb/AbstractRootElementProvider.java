@@ -46,6 +46,7 @@ import java.nio.charset.Charset;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -104,9 +105,9 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
         try {
             return readFrom(type, mediaType, getUnmarshaller(type, mediaType), entityStream);
         } catch (UnmarshalException ex) {
-            throw new WebApplicationException(ex, 400);
+            throw new WebApplicationException(ex, Status.BAD_REQUEST);
         } catch (JAXBException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -148,7 +149,7 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
             }
             writeTo(t, mediaType, c, m, entityStream);
         } catch (JAXBException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -34,36 +34,57 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.api;
 
-import com.sun.jersey.core.spi.factory.ResponseImpl;
-import java.lang.reflect.Type;
+package com.sun.jersey.core.spi.factory;
+
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.core.Response.StatusType;
+import junit.framework.TestCase;
 
 /**
- * An adaption of {@link JResponse} as a {@link Response}.
  *
- * @see JResponse#toResponse()
- * @see JResponse#toResponse(java.lang.reflect.Type)
  * @author Paul.Sandoz@Sun.Com
  */
-public final class JResponseAsResponse extends ResponseImpl {
-    private final JResponse<?> jr;
+public class ResponseImplTest extends TestCase {
 
-    /* package */ JResponseAsResponse(JResponse<?> jr) {
-        this(jr, jr.getType());
+    public void testDeclaredStatusCodes() {
+        for (Status s : Status.values()) {
+            StatusType _s = ResponseImpl.toStatusType(s.getStatusCode());
+            assertSame(s, _s);
+        }
     }
 
-    /* package */ JResponseAsResponse(JResponse<?> jr, Type type) {
-        super(jr.getStatusType(), jr.getMetadata(), jr.getEntity(), type);
-        this.jr = jr;
+    public void testUndeclaredStatusCodes() {
+        StatusType st = ResponseImpl.toStatusType(199);
+        assertNotNull(st);
+        assertEquals(199, st.getStatusCode());
+        assertEquals("", st.getReasonPhrase());
+        assertEquals(Family.INFORMATIONAL, st.getFamily());
+
+        st = ResponseImpl.toStatusType(299);
+        assertNotNull(st);
+        assertEquals(299, st.getStatusCode());
+        assertEquals("", st.getReasonPhrase());
+        assertEquals(Family.SUCCESSFUL, st.getFamily());
+
+        st = ResponseImpl.toStatusType(399);
+        assertNotNull(st);
+        assertEquals(399, st.getStatusCode());
+        assertEquals("", st.getReasonPhrase());
+        assertEquals(Family.REDIRECTION, st.getFamily());
+
+        st = ResponseImpl.toStatusType(499);
+        assertNotNull(st);
+        assertEquals(499, st.getStatusCode());
+        assertEquals("", st.getReasonPhrase());
+        assertEquals(Family.CLIENT_ERROR, st.getFamily());
+
+        st = ResponseImpl.toStatusType(599);
+        assertNotNull(st);
+        assertEquals(599, st.getStatusCode());
+        assertEquals("", st.getReasonPhrase());
+        assertEquals(Family.SERVER_ERROR, st.getFamily());
     }
 
-    /**
-     * Get the adapted {@link JResponse} instance.
-     *
-     * @return the adapted JResponse instance.
-     */
-    public JResponse<?> getJResponse() {
-        return jr;
-    }
 }

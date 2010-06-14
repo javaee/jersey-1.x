@@ -57,6 +57,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
@@ -134,7 +135,7 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
         try {
             return readMultiPart(type, genericType, annotations, mediaType, headers, stream);
         } catch (MIMEParsingException ex) {
-            throw new WebApplicationException(ex, 400);
+            throw new WebApplicationException(ex, Status.BAD_REQUEST);
         }
     }
 
@@ -193,7 +194,7 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
 
                 bodyPart.getContentDisposition();
             } catch (IllegalArgumentException ex) {
-                throw new WebApplicationException(ex, 400);
+                throw new WebApplicationException(ex, Status.BAD_REQUEST);
             }
 
             // Copy data into a BodyPartEntity structure

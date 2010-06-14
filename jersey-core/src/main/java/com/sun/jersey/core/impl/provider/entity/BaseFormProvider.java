@@ -50,6 +50,7 @@ import java.util.StringTokenizer;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 /**
  *
@@ -79,7 +80,7 @@ public abstract class BaseFormProvider<T extends MultivaluedMap<String, String>>
             }
             return map;
         } catch (IllegalArgumentException ex) {
-            throw new WebApplicationException(ex, 400);
+            throw new WebApplicationException(ex, Status.BAD_REQUEST);
         }
     }
 

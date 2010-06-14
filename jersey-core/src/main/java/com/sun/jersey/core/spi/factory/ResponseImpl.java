@@ -41,6 +41,7 @@ import com.sun.jersey.core.header.OutBoundHeaders;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
@@ -53,13 +54,31 @@ import javax.ws.rs.ext.MessageBodyWriter;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ResponseImpl extends Response {
-    private final int status;
 
+    private final StatusType statusType;
+    
     private final MultivaluedMap<String, Object> headers;
 
     private final Object entity;
 
     private final Type entityType;
+
+    /**
+     * Construct given a status type, entity and metadata.
+     *
+     * @param statusType the status type
+     * @param headers the metadata, it is the callers responsibility to copy
+     *        the metadata if necessary.
+     * @param entity the entity
+     * @param entityType the entity type, it is the callers responsibility to
+     *        ensure the entity type is compatible with the entity.
+     */
+    protected ResponseImpl(StatusType statusType, OutBoundHeaders headers, Object entity, Type entityType) {
+        this.statusType = statusType;
+        this.headers = headers;
+        this.entity = entity;
+        this.entityType = entityType;
+    }
 
     /**
      * Construct given a status, entity and metadata.
@@ -68,14 +87,23 @@ public class ResponseImpl extends Response {
      * @param headers the metadata, it is the callers responsibility to copy
      *        the metadata if necessary.
      * @param entity the entity
-     * @param entityType the entity type, it is the callers responsiblity to
+     * @param entityType the entity type, it is the callers responsibility to
      *        ensure the entity type is compatible with the entity.
      */
     protected ResponseImpl(int status, OutBoundHeaders headers, Object entity, Type entityType) {
-        this.status = status;
+        this.statusType = toStatusType(status);
         this.headers = headers;
         this.entity = entity;
         this.entityType = entityType;
+    }
+
+    /**
+     * Get the status type.
+     *
+     * @return the status type.
+     */
+    public StatusType getStatusType() {
+        return statusType;
     }
 
     /**
@@ -90,7 +118,7 @@ public class ResponseImpl extends Response {
     // Response 
     
     public int getStatus() {
-        return status;
+        return statusType.getStatusCode();
     }
 
     public MultivaluedMap<String, Object> getMetadata() {
@@ -99,5 +127,62 @@ public class ResponseImpl extends Response {
 
     public Object getEntity() {
         return entity;
+    }
+
+    public static StatusType toStatusType(final int statusCode) {
+        switch(statusCode) {
+            case 200: return Status.OK;
+            case 201: return Status.CREATED;
+            case 202: return Status.ACCEPTED;
+            case 204: return Status.NO_CONTENT;
+
+            case 301: return Status.MOVED_PERMANENTLY;
+            case 303: return Status.SEE_OTHER;
+            case 304: return Status.NOT_MODIFIED;
+            case 307: return Status.TEMPORARY_REDIRECT;
+
+            case 400: return Status.BAD_REQUEST;
+            case 401: return Status.UNAUTHORIZED;
+            case 403: return Status.FORBIDDEN;
+            case 404: return Status.NOT_FOUND;
+            case 406: return Status.NOT_ACCEPTABLE;
+            case 409: return Status.CONFLICT;
+            case 410: return Status.GONE;
+            case 412: return Status.PRECONDITION_FAILED;
+            case 415: return Status.UNSUPPORTED_MEDIA_TYPE;
+
+            case 500: return Status.INTERNAL_SERVER_ERROR;
+            case 503: return Status.SERVICE_UNAVAILABLE;
+
+            default: {
+                return new StatusType() {
+                    @Override
+                    public int getStatusCode() {
+                        return statusCode;
+                    }
+
+                    @Override
+                    public Family getFamily() {
+                        return toFamilyCode(statusCode);
+                    }
+
+                    @Override
+                    public String getReasonPhrase() {
+                        return "";
+                    }
+                };
+            }
+        }
+    }
+
+    public static Family toFamilyCode(final int statusCode) {
+        switch(statusCode / 100) {
+            case 1: return Family.INFORMATIONAL;
+            case 2: return Family.SUCCESSFUL;
+            case 3: return Family.REDIRECTION;
+            case 4: return Family.CLIENT_ERROR;
+            case 5: return Family.SERVER_ERROR;
+            default: return Family.OTHER;
+        }
     }
 }

@@ -50,6 +50,7 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 /**
  *
@@ -78,9 +79,9 @@ public final class MimeMultipartProvider extends AbstractMessageReaderWriterProv
         try {
             return new MimeMultipart(ds);
         } catch (ParseException ex) {
-            throw new WebApplicationException(ex, 400);
+            throw new WebApplicationException(ex, Status.BAD_REQUEST);
         } catch (MessagingException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -101,7 +102,7 @@ public final class MimeMultipartProvider extends AbstractMessageReaderWriterProv
             // TODO put boundary string as parameter of media type?
             t.writeTo(entityStream);
         } catch (MessagingException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 }

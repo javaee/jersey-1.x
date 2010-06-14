@@ -44,6 +44,7 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.StatusType;
 
 /**
  * An abstraction of a HTTP response.
@@ -82,6 +83,17 @@ public interface HttpResponseContext {
      *         if no throwable was mapped to a response.
      */
     Throwable getMappedThrowable();
+
+    /**
+     * @return the status type of the response
+     */
+    StatusType getStatusType();
+
+    /**
+     * Set the status type of the response.
+     * @param statusType the status type.
+     */
+    void setStatusType(StatusType statusType);
 
     /**
      * @return the status of the response

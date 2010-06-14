@@ -50,6 +50,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.Variant;
 
 /**
@@ -59,7 +61,7 @@ import javax.ws.rs.core.Variant;
  */
 public final class ResponseBuilderImpl extends Response.ResponseBuilder {    
 
-    private int status = 204;
+    private StatusType statusType = Status.NO_CONTENT;
 
     private OutBoundHeaders headers;
 
@@ -70,7 +72,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     public ResponseBuilderImpl() { }
 
     private ResponseBuilderImpl(ResponseBuilderImpl that) {
-        this.status = that.status;
+        this.statusType = that.statusType;
         this.entity = that.entity;
         if (that.headers != null) {
             this.headers = new OutBoundHeaders(that.headers);
@@ -95,8 +97,8 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     // Response.Builder
 
     public Response build() {
-        Response r = new ResponseImpl(
-                status,
+        final Response r = new ResponseImpl(
+                statusType,
                 getHeaders(),
                 entity,
                 entityType);
@@ -105,7 +107,7 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
     }
 
     private void reset() {
-        status = 204;
+        statusType = Status.NO_CONTENT;
         headers = null;
         entity = null;
         entityType = null;
@@ -116,9 +118,15 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         return new ResponseBuilderImpl(this);
     }
 
-    public Response.ResponseBuilder status(int status) {
-        this.status = status;
+    public Response.ResponseBuilder status(StatusType status) {
+        if (status == null)
+            throw new IllegalArgumentException();
+        this.statusType = status;
         return this;
+    };
+
+    public Response.ResponseBuilder status(int status) {
+        return status(ResponseImpl.toStatusType(status));
     }
 
     public Response.ResponseBuilder entity(Object entity) {
@@ -126,7 +134,6 @@ public final class ResponseBuilderImpl extends Response.ResponseBuilder {
         this.entityType = (entity != null) ? entity.getClass() : null;
         return this;
     }
-
 
     public Response.ResponseBuilder type(MediaType type) {
         headerSingle(HttpHeaders.CONTENT_TYPE, type);

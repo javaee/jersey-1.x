@@ -39,6 +39,9 @@ package com.sun.jersey.api;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.core.Response.StatusType;
 
 /**
  * Common status codes and responses.
@@ -63,44 +66,61 @@ public class Responses {
     public static final int PRECONDITION_FAILED = 412;
     
     public static final int UNSUPPORTED_MEDIA_TYPE = 415;
-    
+
+    private static StatusType METHOD_NOT_ALLOWED_TYPE = new StatusType() {
+        @Override
+        public int getStatusCode() {
+            return METHOD_NOT_ALLOWED;
+        }
+
+        @Override
+        public Family getFamily() {
+            return Family.CLIENT_ERROR;
+        }
+
+        @Override
+        public String getReasonPhrase() {
+            return "Method Not Allowed";
+        }
+    };
+
     public static ResponseBuilder noContent() {
-        return status(NO_CONTENT);
+        return status(Status.NO_CONTENT);
     }
     
     public static ResponseBuilder notModified() {
-        return status(NOT_MODIFIED);
+        return status(Status.NOT_MODIFIED);
     }
     
     public static ResponseBuilder clientError() {
-        return status(CLIENT_ERROR);
+        return status(Status.BAD_REQUEST);
     }
 
     public static ResponseBuilder notFound() {
-        return status(NOT_FOUND);
+        return status(Status.NOT_FOUND);
     }
     
     public static ResponseBuilder methodNotAllowed() {
-        return status(METHOD_NOT_ALLOWED);
+        return status(METHOD_NOT_ALLOWED_TYPE);
     }
     
     public static ResponseBuilder notAcceptable() {
-        return status(NOT_ACCEPTABLE);
+        return status(Status.NOT_ACCEPTABLE);
     }
     
     public static ResponseBuilder conflict() {
-        return status(CONFLICT);        
+        return status(Status.CONFLICT);
     }
     
     public static ResponseBuilder preconditionFailed() {
-        return status(PRECONDITION_FAILED);
+        return status(Status.PRECONDITION_FAILED);
     }
     
     public static ResponseBuilder unsupportedMediaType() {
-        return status(UNSUPPORTED_MEDIA_TYPE);
+        return status(Status.UNSUPPORTED_MEDIA_TYPE);
     }
     
-    private static ResponseBuilder status(int status) {
+    private static ResponseBuilder status(StatusType status) {
         return Response.status(status);                
     }
 }

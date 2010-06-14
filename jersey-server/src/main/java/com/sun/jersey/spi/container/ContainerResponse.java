@@ -47,8 +47,6 @@ import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -62,6 +60,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -92,9 +92,9 @@ public class ContainerResponse implements HttpResponseContext {
     private Response response;
 
     private Throwable mappedThrowable;
-    
-    private int status;
-    
+
+    private StatusType statusType;
+
     private MultivaluedMap<String, Object> headers;
     
     private Object originalEntity;
@@ -178,7 +178,7 @@ public class ContainerResponse implements HttpResponseContext {
         this.wa = wa;
         this.request = request;
         this.responseWriter = responseWriter;
-        this.status = Responses.NO_CONTENT;
+        this.statusType = Status.NO_CONTENT;
     }
     
     /*package */ ContainerResponse(
@@ -511,12 +511,14 @@ public class ContainerResponse implements HttpResponseContext {
         this.response = response = (response != null) ? response : Responses.noContent().build();
         this.mappedThrowable = null;
         
-        setStatus(response.getStatus());
-        setHeaders(response.getMetadata());
         if (response instanceof ResponseImpl) {
             final ResponseImpl responseImpl = (ResponseImpl)response;
+            setStatusType(responseImpl.getStatusType());
+            setHeaders(response.getMetadata());
             setEntity(responseImpl.getEntity(), responseImpl.getEntityType());
         } else {
+            setStatus(response.getStatus());
+            setHeaders(response.getMetadata());
             setEntity(response.getEntity());
         }
     }
@@ -529,12 +531,20 @@ public class ContainerResponse implements HttpResponseContext {
         return mappedThrowable;
     }
 
+    public StatusType getStatusType() {
+        return statusType;
+    }
+
+    public void setStatusType(StatusType statusType) {
+        this.statusType = statusType;
+    }
+
     public int getStatus() {
-        return status;
+        return statusType.getStatusCode();
     }
     
     public void setStatus(int status) {
-        this.status = status;
+        this.statusType = ResponseImpl.toStatusType(status);
     }
     
     public Object getEntity() {
@@ -609,7 +619,7 @@ public class ContainerResponse implements HttpResponseContext {
             if (location instanceof URI) {
                 final URI locationUri = (URI)location;
                 if (!locationUri.isAbsolute()) {
-                    final URI base = (status == 201)
+                    final URI base = (statusType.getStatusCode() == Status.CREATED.getStatusCode())
                             ? request.getAbsolutePath()
                             : request.getBaseUri();
                     location = UriBuilder.fromUri(base).

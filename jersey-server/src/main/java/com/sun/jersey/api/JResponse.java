@@ -37,6 +37,7 @@
 package com.sun.jersey.api;
 
 import com.sun.jersey.core.header.OutBoundHeaders;
+import com.sun.jersey.core.spi.factory.ResponseImpl;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -53,7 +54,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.Response.StatusType;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
 /**
@@ -78,11 +78,25 @@ import javax.ws.rs.core.Variant;
  * @author Paul.Sandoz@Sun.Com
  */
 public class JResponse<E> {
-    private final int status;
+    private final StatusType statusType;
 
     private final E entity;
 
     private final OutBoundHeaders headers;
+
+    /**
+     * Construct given a status type, entity and metadata.
+     *
+     * @param statusType the status type
+     * @param headers the metadata, it is the callers responsibility to copy
+     *        the metadata if necessary.
+     * @param entity the entity
+     */
+    public JResponse(StatusType statusType, OutBoundHeaders headers, E entity) {
+        this.statusType = statusType;
+        this.entity = entity;
+        this.headers = headers;
+    }
 
     /**
      * Construct given a status, entity and metadata.
@@ -93,9 +107,7 @@ public class JResponse<E> {
      * @param entity the entity
      */
     public JResponse(int status, OutBoundHeaders headers, E entity) {
-        this.status = status;
-        this.entity = entity;
-        this.headers = headers;
+        this(ResponseImpl.toStatusType(status), headers, entity);
     }
 
     /**
@@ -105,7 +117,7 @@ public class JResponse<E> {
      * @param that the JResponse to copy from.
      */
     public JResponse(JResponse<E> that) {
-        this(that.status,
+        this(that.statusType,
                 that.headers != null ? new OutBoundHeaders(that.headers) : null,
                 that.entity);
     }
@@ -116,7 +128,9 @@ public class JResponse<E> {
      * @param b the builder.
      */
     protected JResponse(AJResponseBuilder<E, ?> b) {
-        this(b.getStatus(), b.getMetadata(), b.getEntity());
+        this.statusType = b.getStatusType();
+        this.entity = b.getEntity();
+        this.headers = b.getMetadata();
     }
 
     /**
@@ -139,12 +153,21 @@ public class JResponse<E> {
     }
 
     /**
+     * Get the status type associated with the response.
+     *
+     * @return the response status type.
+     */
+    public StatusType getStatusType() {
+        return statusType;
+    }
+
+    /**
      * Get the status code associated with the response.
      * 
      * @return the response status code.
      */
     public int getStatus() {
-        return status;
+        return statusType.getStatusCode();
     }
 
     /**
@@ -548,9 +571,9 @@ public class JResponse<E> {
      */
     public static abstract class AJResponseBuilder<E, B extends AJResponseBuilder> {
         /**
-         * The status code.
+         * The status type.
          */
-        protected int status = 204;
+        protected StatusType statusType = Status.NO_CONTENT;
 
         /**
          * The response metadata.
@@ -574,7 +597,7 @@ public class JResponse<E> {
          * @param that the AJResponseBuilder to copy from.
          */
         protected AJResponseBuilder(AJResponseBuilder<E, ?> that) {
-            this.status = that.status;
+            this.statusType = that.statusType;
             this.entity = that.entity;
             if (that.headers != null) {
                 this.headers = new OutBoundHeaders(that.headers);
@@ -587,9 +610,18 @@ public class JResponse<E> {
          * Reset to the default state.
          */
         protected void reset() {
-            status = 204;
+            statusType = Status.NO_CONTENT;
             entity = null;
             headers = null;
+        }
+
+        /**
+         * Get the status type associated with the response.
+         *
+         * @return the response status type.
+         */
+        protected StatusType getStatusType() {
+            return statusType;
         }
 
         /**
@@ -598,7 +630,7 @@ public class JResponse<E> {
          * @return the response status code.
          */
         protected int getStatus() {
-            return status;
+            return statusType.getStatusCode();
         }
 
         /**
@@ -630,8 +662,7 @@ public class JResponse<E> {
          * than 599.
          */
         public B status(int status) {
-            this.status = status;
-            return (B)this;
+            return status(ResponseImpl.toStatusType(status));
         }
 
         /**
@@ -644,7 +675,8 @@ public class JResponse<E> {
         public B status(StatusType status) {
             if (status == null)
                 throw new IllegalArgumentException();
-            return status(status.getStatusCode());
+            this.statusType = status;
+            return (B)this;
         };
 
         /**

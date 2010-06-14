@@ -63,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import javax.ws.rs.core.Response.Status;
 
 /**
  *
@@ -162,7 +163,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
                 m.setProperty(Marshaller.JAXB_ENCODING, charsetName);
             writeList(elementType, c, mediaType, charset, m, entityStream);
         } catch (JAXBException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -226,11 +227,11 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
                     ? createArray(l, elementType)
                     : l;
         } catch (UnmarshalException ex) {
-            throw new WebApplicationException(ex, 400);
+            throw new WebApplicationException(ex, Status.BAD_REQUEST);
         } catch (XMLStreamException ex) {
-            throw new WebApplicationException(ex, 400);
+            throw new WebApplicationException(ex, Status.BAD_REQUEST);
         } catch (JAXBException ex) {
-            throw new WebApplicationException(ex, 500);
+            throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
         }
     }
 

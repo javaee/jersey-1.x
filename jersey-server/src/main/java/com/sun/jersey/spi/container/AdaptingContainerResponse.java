@@ -46,6 +46,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.StatusType;
 
 /**
  * An adapting in-bound HTTP response that may override the behaviour of
@@ -141,6 +142,16 @@ public class AdaptingContainerResponse extends ContainerResponse {
     @Override
     public Throwable getMappedThrowable() {
         return acr.getMappedThrowable();
+    }
+
+    @Override
+    public StatusType getStatusType() {
+        return acr.getStatusType();
+    }
+
+    @Override
+    public void setStatusType(StatusType statusType) {
+        acr.setStatusType(statusType);
     }
 
     @Override

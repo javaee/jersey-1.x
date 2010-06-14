@@ -264,10 +264,16 @@ public class WebComponent implements ContainerListener {
             // after the invocation of sendError.
             writeHeaders();
 
-            if (useSendError && cResponse.getStatus() >= 400)
-                response.sendError(cResponse.getStatus());
-            else
+            if (useSendError && cResponse.getStatus() >= 400) {
+                final String reason = cResponse.getStatusType().getReasonPhrase();
+                if (reason == null || reason.isEmpty()) {
+                    response.sendError(cResponse.getStatus());
+                } else {
+                    response.sendError(cResponse.getStatus(), reason);
+                }
+            } else {
                 response.setStatus(cResponse.getStatus());
+            }
         }
 
         public void write(int b) throws IOException {
