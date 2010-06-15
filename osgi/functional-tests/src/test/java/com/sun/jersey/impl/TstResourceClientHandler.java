@@ -60,17 +60,17 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TestResourceClientHandler extends TerminatingClientHandler {
+public class TstResourceClientHandler extends TerminatingClientHandler {
     private final WebApplication w;
     
     private final URI baseUri;
     
-    public TestResourceClientHandler(URI baseUri, WebApplication w) {
+    public TstResourceClientHandler(URI baseUri, WebApplication w) {
         this.baseUri = baseUri;
         this.w = w;
     }
     
-    private static class TestContainerResponseWriter implements ContainerResponseWriter {
+    private static class TstContainerResponseWriter implements ContainerResponseWriter {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
         public OutputStream writeStatusAndHeaders(long contentLength, 
@@ -106,7 +106,7 @@ public class TestResourceClientHandler extends TerminatingClientHandler {
             }
         }
         
-        final TestContainerResponseWriter writer = new TestContainerResponseWriter();
+        final TstContainerResponseWriter writer = new TstContainerResponseWriter();
         final ContainerResponse cResponse = new ContainerResponse(
                 w,
                 cRequest,
