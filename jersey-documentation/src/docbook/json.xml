@@ -324,6 +324,13 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
 	           .xml2JsonNs(ns2json).build(), types);</programlisting>
 		   </example>
 	</para>
+	<para>
+	Dot character (.) will be used by default as a namespace separator in the JSON identifiers. E.g. for the above mentioned <literal>example</literal> namespace
+	and tag <literal>T</literal>, <literal>"example.T"</literal> JSON identifier will be generated. To change this default behaviour, you can use the <literal>nsSeparator</literal>
+	method on the mapped JSONConfiguration builder: <literal>JSONConfiguration.mapped().xml2JsonNs(ns2json).nsSeparator(':').build()</literal>. Then you will 
+	get <literal>"example:T"</literal> instead of <literal>"example.T"</literal> generated. This option should be used carefully, as the Jersey framework does not even try to check
+	conflicts between the user selected separator character and the tag and/or namespace names. 
+	</para>
       </section>
       
       
