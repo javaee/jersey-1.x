@@ -54,6 +54,7 @@ public class AbstractResourceMethod extends AbstractMethod
     private List<Parameter> parameters;
     private Class returnType;
     private Type genericReturnType;
+    private boolean isConsumesDeclared;
     private boolean isProducesDeclared;
 
     public AbstractResourceMethod(
@@ -91,18 +92,26 @@ public class AbstractResourceMethod extends AbstractMethod
         return consumeMimeList;
     }
 
+    public void setAreInputTypesDeclared(boolean declared) {
+        isConsumesDeclared = declared;
+    }
+
+    public boolean areInputTypesDeclared() {
+        return isConsumesDeclared;
+    }
+
     public List<MediaType> getSupportedOutputTypes() {
         return produceMimeList;
     }
 
-    public void setAreInputTypesDeclared(boolean declared) {
+    public void setAreOutputTypesDeclared(boolean declared) {
         isProducesDeclared = declared;
     }
 
-    public boolean areInputTypesDeclared() {
+    public boolean areOutputTypesDeclared() {
         return isProducesDeclared;
     }
-    
+
     public String getHttpMethod() {
         return httpMethod;
     }

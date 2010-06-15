@@ -48,6 +48,7 @@ import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.model.Parameterized;
 import com.sun.jersey.api.model.ResourceModelIssue;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.impl.ImplMessages;
@@ -107,22 +108,27 @@ public class BasicValidator extends AbstractModelValidator {
 
     public void visitAbstractResourceMethod(AbstractResourceMethod method) {
         checkParameters(method, method.getMethod());
-        // ensure GET returns non-void value
-        if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()) && (void.class == method.getMethod().getReturnType()))) {
-            issueList.add(new ResourceModelIssue(
-                    method,
-                    ImplMessages.ERROR_GET_RETURNS_VOID(method.getMethod()),
-                    false));
-        }
-        // ensure GET does not consume an entity parameter
-        if (!isRequestResponseMethod(method) && ("GET".equals(method.getHttpMethod()))) {
-            if (method.hasEntity()) {
-                issueList.add(new ResourceModelIssue(
-                        method,
-                        ImplMessages.ERROR_GET_CONSUMES_ENTITY(method.getMethod()),
-                        true));
+
+        if ("GET".equals(method.getHttpMethod())) {
+            if (!isRequestResponseMethod(method)) {
+                // ensure GET returns non-void value
+                if (void.class == method.getMethod().getReturnType()) {
+                    issueList.add(new ResourceModelIssue(
+                            method,
+                            ImplMessages.ERROR_GET_RETURNS_VOID(method.getMethod()),
+                            false));
+                }
+
+                // ensure GET does not consume an entity parameter
+                if (method.hasEntity()) {
+                    issueList.add(new ResourceModelIssue(
+                            method,
+                            ImplMessages.ERROR_GET_CONSUMES_ENTITY(method.getMethod()),
+                            false));
+                }
             }
         }
+
         // ensure there is not multiple HTTP method designators specified on the method
         List<String> httpAnnotList = new LinkedList<String>();
         for (Annotation a : method.getMethod().getDeclaredAnnotations()) {
@@ -292,6 +298,8 @@ public class BasicValidator extends AbstractModelValidator {
 
     // TODO: the method could probably have more then 2 params...
     private boolean isRequestResponseMethod(AbstractResourceMethod method) {
-        return (method.getMethod().getParameterTypes().length == 2) && (HttpRequestContext.class == method.getMethod().getParameterTypes()[0]) && (HttpResponseContext.class == method.getMethod().getParameterTypes()[1]);
+        return (method.getMethod().getParameterTypes().length == 2) && 
+                (HttpRequestContext.class == method.getMethod().getParameterTypes()[0]) &&
+                (HttpResponseContext.class == method.getMethod().getParameterTypes()[1]);
     }
 }

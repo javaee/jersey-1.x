@@ -87,7 +87,7 @@ public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider
         return mpep;
     }
 
-    protected void processForm(HttpContext context) {
+    private void processForm(HttpContext context) {
         Form form = (Form)context.getProperties().get(FORM_PROPERTY);
         if (form == null) {
             form = context.getRequest().getEntity(Form.class);

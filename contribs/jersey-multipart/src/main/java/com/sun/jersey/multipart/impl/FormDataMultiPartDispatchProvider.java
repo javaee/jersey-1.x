@@ -131,11 +131,7 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
         if (!hasFormParam)
             return null;
 
-        List<Injectable> is = getInjectables(method);
-        if (is == null)
-            return null;
-
-        return new FormDataInjectableValuesProvider(is);
+        return new FormDataInjectableValuesProvider(getInjectables(method));
     }
 
     private List<Injectable> getInjectables(AbstractResourceMethod method) {

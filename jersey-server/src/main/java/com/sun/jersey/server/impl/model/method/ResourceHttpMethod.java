@@ -79,7 +79,7 @@ public final class ResourceHttpMethod extends ResourceMethod {
                 template,
                 arm.getSupportedInputTypes(),
                 arm.getSupportedOutputTypes(),
-                arm.areInputTypesDeclared(),
+                arm.areOutputTypesDeclared(),
                 df.getDispatcher(arm),
                 FilterFactory.getRequestFilters(resourceFilters),
                 FilterFactory.getResponseFilters(resourceFilters));

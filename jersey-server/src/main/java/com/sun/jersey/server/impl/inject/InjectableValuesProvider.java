@@ -23,7 +23,6 @@ public class InjectableValuesProvider {
      * @param is the list of injectable.
      */
     public InjectableValuesProvider(List<Injectable> is) {
-        super();
         this.is = AbstractHttpContextInjectable.transform(is);
     }
 

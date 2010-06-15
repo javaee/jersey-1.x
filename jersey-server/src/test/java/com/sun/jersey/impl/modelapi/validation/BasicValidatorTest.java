@@ -210,7 +210,8 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(validator.fatalIssuesFound());
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(!validator.getIssueList().get(0).isFatal());
     }
 
     public static class TestSRLReturningVoid {
@@ -262,7 +263,8 @@ public class BasicValidatorTest extends TestCase {
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         printIssueList(validator);
-        assertTrue(validator.fatalIssuesFound());
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(!validator.getIssueList().get(0).isFatal());
     }
 
     @Path("rootMultipleHttpMethodDesignatorsRM")

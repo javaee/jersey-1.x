@@ -1,4 +1,7 @@
 release 1.3 (06-2010)
+- Remove the restriction that a GET method cannot receive entities. Warnings
+  will be presented instead of errors. Although this is highly uncommon The HTTP
+  spec does not rule this out thus Jersey was being unduly restrictive.
 - Fixed issue 543
   https://jersey.dev.java.net/issues/show_bug.cgi?id=543
   unable to build extended-wadl-webapp sample

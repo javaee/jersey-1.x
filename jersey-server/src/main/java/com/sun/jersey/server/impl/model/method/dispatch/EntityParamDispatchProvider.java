@@ -58,32 +58,25 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
                 
     @Override
     protected InjectableValuesProvider getInjectableValuesProvider(AbstractResourceMethod abstractResourceMethod) {
-        boolean requireNoEntityParameter =
-                "GET".equals(abstractResourceMethod.getHttpMethod());
-
-        List<Injectable> is = processParameters(abstractResourceMethod,
-                requireNoEntityParameter);
-        return new InjectableValuesProvider(is);
+        return new InjectableValuesProvider(processParameters(abstractResourceMethod));
     }
 
-    private List<Injectable> processParameters(AbstractResourceMethod method,
-            boolean requireNoEntityParameter) {
+    private List<Injectable> processParameters(AbstractResourceMethod method) {
         
         if ((null == method.getParameters()) || (0 == method.getParameters().size())) {
             return Collections.emptyList();
         }
 
         boolean hasEntity = false;
-        List<Injectable> is = new ArrayList<Injectable>(method.getParameters().size());
+        final List<Injectable> is = new ArrayList<Injectable>(method.getParameters().size());
         for (int i = 0; i < method.getParameters().size(); i++) {
-            Parameter parameter = method.getParameters().get(i);
+            final Parameter parameter = method.getParameters().get(i);
             
             if (Parameter.Source.ENTITY == parameter.getSource()) {
                 hasEntity = true;
                 is.add(processEntityParameter(
                         parameter,
-                        method.getMethod().getParameterAnnotations()[i],
-                        requireNoEntityParameter));
+                        method.getMethod().getParameterAnnotations()[i]));
             } else {
                 is.add(getInjectableProviderContext().
                         getInjectable(parameter, ComponentScope.PerRequest));
@@ -94,15 +87,13 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
             return is;
 
         if (Collections.frequency(is, null) == 1) {
-            for (int i = 0; i < is.size(); i++) {
-                if (is.get(i) == null) {
-                    Injectable ij = processEntityParameter(
-                        method.getParameters().get(i),
-                        method.getMethod().getParameterAnnotations()[i],
-                        requireNoEntityParameter);
-                    is.set(i, ij);
-                    break;
-                }
+            final int i = is.lastIndexOf(null);
+            final Parameter parameter = method.getParameters().get(i);
+            if (Parameter.Source.UNKNOWN == parameter.getSource()) {
+                final Injectable ij = processEntityParameter(
+                    parameter,
+                    method.getMethod().getParameterAnnotations()[i]);
+                is.set(i, ij);
             }
         }
 
@@ -127,13 +118,7 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
         
     private Injectable processEntityParameter(
             Parameter parameter,
-            Annotation[] annotations,
-            boolean requireNoEntityParameter) {
-        if (requireNoEntityParameter) {
-            // Entity as a method parameterClass is not required
-            return null;
-        }
-
+            Annotation[] annotations) {
         return new EntityInjectable(parameter.getParameterClass(),
                 parameter.getParameterType(), annotations);
     }

@@ -45,6 +45,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
@@ -85,6 +86,20 @@ public class MissingDependenciesTest extends AbstractResourceTester {
         public void get(@Context String injectedValue) {
         }
 
+        @POST
+        public void post(@Context String injectedValue) {
+        }
+
+        @GET
+        @Path("subm")
+        public void getSub(@Context String injectedValue) {
+        }
+
+        @POST
+        @Path("subm")
+        public void postSub(@Context String injectedValue) {
+        }
+
         @Path("sub")
         public MissingDependenciesResource sub(@Context String injectedValue) {
             return new MissingDependenciesResource("value");
@@ -100,7 +115,7 @@ public class MissingDependenciesTest extends AbstractResourceTester {
             }
         }).messages;
 
-        assertEquals(7, messages.size());
+        assertEquals(14, messages.size());
     }
 
 
@@ -127,7 +142,7 @@ public class MissingDependenciesTest extends AbstractResourceTester {
         }).messages;
 
 
-        assertEquals(4, messages.size());
+        assertEquals(11, messages.size());
     }
     
     public void testMissingDependenciesSubResourceClass() {

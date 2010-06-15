@@ -148,6 +148,7 @@ public class IntrospectionModeller {
         if (am.isAnnotationPresent(Consumes.class))
             consumeMimeAnnotation = am.getAnnotation(Consumes.class);
         
+        resourceMethod.setAreInputTypesDeclared(consumeMimeAnnotation != null);
         resourceMethod.getSupportedInputTypes().addAll(
                 MediaTypes.createMediaTypes(consumeMimeAnnotation));
     }
@@ -160,7 +161,7 @@ public class IntrospectionModeller {
         if (am.isAnnotationPresent(Produces.class))
             produceMimeAnnotation = am.getAnnotation(Produces.class);
         
-        resourceMethod.setAreInputTypesDeclared(produceMimeAnnotation != null);
+        resourceMethod.setAreOutputTypesDeclared(produceMimeAnnotation != null);
         resourceMethod.getSupportedOutputTypes().addAll(
                 MediaTypes.createQualitySourceMediaTypes(produceMimeAnnotation));
     }
