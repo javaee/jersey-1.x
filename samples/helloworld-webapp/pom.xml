@@ -87,7 +87,6 @@
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
                 </configuration>
-
                 <dependencies>
                     <dependency>
                         <groupId>com.sun.jersey</groupId>
