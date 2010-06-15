@@ -1,4 +1,7 @@
 release 1.3 (06-2010)
+- Fixed issue 543
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=543
+  unable to build extended-wadl-webapp sample
 - Fixed issue 293
   https://jersey.dev.java.net/issues/show_bug.cgi?id=293
   The response building will retain the StatusType (if explictly set) or those
