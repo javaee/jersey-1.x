@@ -67,8 +67,8 @@ public class Main {
     public static SelectorThread startServer() throws IOException{
         final Map<String, String> initParams = new HashMap<String, String>();
 
-        initParams.put("com.sun.jersey.config.property.packages",
-                "com.sun.jersey.samples.jacksonjsonprovider");
+        initParams.put("javax.ws.rs.Application",
+                MyApplication.class.getName());
 
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         return threadSelector;

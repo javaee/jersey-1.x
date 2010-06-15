@@ -37,53 +37,29 @@
 
 package com.sun.jersey.samples.jacksonjsonprovider;
 
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.WebAppDescriptor;
+import java.util.HashSet;
+import java.util.Set;
+import javax.ws.rs.core.Application;
+import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
-import javax.ws.rs.core.MediaType;
+/**
+ *
+ * @author japod
+ */
+public class MyApplication extends Application {
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+    @Override
+    public Set<Class<?>> getClasses() {
 
-public class MainTest extends JerseyTest {
+        final Set<Class<?>> classes = new HashSet<Class<?>>();
 
-    public MainTest() {
-        super(new WebAppDescriptor.Builder("javax.ws.rs.Application", MyApplication.class.getName()).build());
-    }
+        // register root resources
+        classes.add(EmptyArrayResource.class);
+        classes.add(NonJAXBBeanResource.class);
 
-    @Test
-    public void testEmptyArrayPresent() {
-        WebResource r = resource();
-        String responseMsg = r.path("emptyArrayResource").accept(MediaType.APPLICATION_JSON).get(String.class);
-        assertTrue(responseMsg.contains("[]"));
-    }
+        // register the Jackson JSON provider
+        classes.add(JacksonJsonProvider.class);
 
-    @Test
-    public void testJSONPPresent() {
-        WebResource r = resource();
-        String responseMsg = r.path("nonJAXBResource").accept("application/javascript").get(String.class);
-        assertTrue(responseMsg.startsWith("callback("));
-    }
-
-    @Test
-    public void testJSONDoesNotReflectJSONPWrapper() {
-        WebResource r = resource();
-        String responseMsg = r.path("nonJAXBResource").accept("application/json").get(String.class);
-        assertTrue(!responseMsg.contains("jsonSource"));
-    }
-
-    /**
-     * Test if a WADL document is available at the relative path
-     * "application.wadl".
-     */
-    @Test
-    public void testApplicationWadl() {
-         WebResource r = resource();
-        String serviceWadl = r.path("application.wadl").
-                accept(MediaTypes.WADL).get(String.class);
-
-        assertTrue(serviceWadl.length() > 0);
+        return classes;
     }
 }
