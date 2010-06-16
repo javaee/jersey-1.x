@@ -1,4 +1,9 @@
 release 1.3 (06-2010)
+- Fixed issue 540
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=540
+  Parameterized types of List/Set/SortedSet are supported for parameters,
+  for example @QueryParam("d") List<List<String>>, if there is a
+  StringReaderProvider registered that supports the type List<String>.
 - Remove the restriction that a GET method cannot receive entities. Warnings
   will be presented instead of errors. Although this is highly uncommon The HTTP
   spec does not rule this out thus Jersey was being unduly restrictive.

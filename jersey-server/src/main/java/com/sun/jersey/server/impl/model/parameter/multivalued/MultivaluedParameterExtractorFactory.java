@@ -40,6 +40,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.core.reflection.ReflectionHelper.TypeClassPair;
 import com.sun.jersey.spi.StringReader;
 import com.sun.jersey.spi.StringReaderWorkers;
 import java.lang.annotation.Annotation;
@@ -94,12 +95,12 @@ public final class MultivaluedParameterExtractorFactory implements MultivaluedPa
                 parameter == SortedSet.class) {
             // Get the generic type of the list
             // If none default to String
-            Class c = ReflectionHelper.getGenericClass(parameterType);
-            if (c == null || c == String.class) {
+            final TypeClassPair tcp = ReflectionHelper.getTypeArgumentAndClass(parameterType);
+            if (tcp == null || tcp.c == String.class) {
                 return CollectionStringExtractor.getInstance(
                         parameter, parameterName, defaultValue);
             } else {
-                final StringReader sr = w.getStringReader(c, c, annotations);
+                final StringReader sr = w.getStringReader(tcp.c, tcp.t, annotations);
                 if (sr == null)
                     return null;
 

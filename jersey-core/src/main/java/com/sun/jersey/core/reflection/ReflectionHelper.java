@@ -266,44 +266,88 @@ public class ReflectionHelper {
      * @return the class of the actual type argument. If the type argument
      *         is a class then the class is returned. If the type argument
      *         is a generic array type and the generic component type is a
-     *         class then class of the array is returned. If the parameterizedType
-     *         is not an instance of ParameterizedType or contains more than one
-     *         type argument null is returned.
+     *         class then class of the array is returned. if the type argument
+     *         is a parameterized type and it's raw type is a class then
+     *         that class is returned.
+     *         If the parameterizedType is not an instance of ParameterizedType
+     *         or contains more than one type argument null is returned.
      * @throws IllegalArgumentException if the single type argument is not of
-     *         a class or a generic array type, or the generic component type
-     *         of the generic array type is not class.
+     *         a class, or a generic array type, or the generic component type
+     *         of the generic array type is not class, or not a parameterized
+     *         type with a raw type that is not a class.
      */
     public static Class getGenericClass(Type parameterizedType) throws IllegalArgumentException {
+        final Type t = getTypeArgumentOfParameterizedType(parameterizedType);
+        if (t == null)
+            return null;
+
+        final Class c = getClassOfType(t);
+        if (c == null) {
+            throw new IllegalArgumentException(ImplMessages.GENERIC_TYPE_NOT_SUPPORTED(
+                    t, parameterizedType));
+        }
+        return c;
+    }
+
+    public static final class TypeClassPair {
+        public final Type t;
+        public final Class c;
+
+        public TypeClassPair(Type t, Class c) {
+            this.t = t;
+            this.c = c;
+        }
+    }
+
+    public static TypeClassPair getTypeArgumentAndClass(Type parameterizedType) throws IllegalArgumentException {
+        final Type t = getTypeArgumentOfParameterizedType(parameterizedType);
+        if (t == null)
+            return null;
+
+        final Class c = getClassOfType(t);
+        if (c == null) {
+            throw new IllegalArgumentException(ImplMessages.GENERIC_TYPE_NOT_SUPPORTED(
+                    t, parameterizedType));
+        }
+
+        return new TypeClassPair(t, c);
+    }
+
+    private static Type getTypeArgumentOfParameterizedType(Type parameterizedType) {
         if (!(parameterizedType instanceof ParameterizedType)) return null;
-        
+
         ParameterizedType type = (ParameterizedType)parameterizedType;
         Type[] genericTypes = type.getActualTypeArguments();
         if (genericTypes.length != 1) return null;
-        
-        Type genericType = genericTypes[0];
-        if (genericType instanceof Class) {
-            return (Class)genericTypes[0];
-        } else if (genericType instanceof GenericArrayType) {
-            GenericArrayType arrayType = (GenericArrayType)genericType;
+
+        return genericTypes[0];
+    }
+
+    private static Class getClassOfType(Type type) {
+        if (type instanceof Class) {
+            return (Class)type;
+        } else if (type instanceof GenericArrayType) {
+            GenericArrayType arrayType = (GenericArrayType)type;
             Type t = arrayType.getGenericComponentType();
             if (t instanceof Class) {
                 Class c = (Class)t;
                 try {
-                    // TODO is there a better way to get the Class object 
+                    // TODO is there a better way to get the Class object
                     // representing an array
                     Object o = Array.newInstance(c, 0);
                     return o.getClass();
                 } catch (Exception e) {
                     throw new IllegalArgumentException(e);
                 }
-            } else {
-                throw new IllegalArgumentException(ImplMessages.GENERIC_TYPE_NOT_SUPPORTED(genericType,
-                                                                                              parameterizedType));
             }
-        } else {
-            throw new IllegalArgumentException(ImplMessages.GENERIC_TYPE_NOT_SUPPORTED(genericType,
-                                                                                           parameterizedType));
+        } else if (type instanceof ParameterizedType) {
+            ParameterizedType subType = (ParameterizedType)type;
+            Type t = subType.getRawType();
+            if (t instanceof Class) {
+                return (Class)t;
+            }
         }
+        return null;
     }
 
     /**

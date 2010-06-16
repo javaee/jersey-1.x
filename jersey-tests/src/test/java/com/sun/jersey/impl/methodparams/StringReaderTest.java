@@ -53,8 +53,12 @@ import java.lang.reflect.Type;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.StringReaderProvider;
+import java.lang.reflect.ParameterizedType;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
@@ -144,6 +148,48 @@ public class StringReaderTest extends AbstractResourceTester {
         ClientResponse cr = resource("/", false).queryParam("d", " 123 ").
                 get(ClientResponse.class);
         assertEquals(404, cr.getStatus());
+    }
+
+
+    public static class ListOfStringReaderProvider implements StringReaderProvider<List<String>> {
+
+        @Override
+        public StringReader<List<String>> getStringReader(Class<?> type,
+                Type genericType, Annotation[] annotations) {
+            if (type != List.class) return null;
+
+            if (genericType instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType)genericType;
+                if (parameterizedType.getActualTypeArguments().length != 1) return null;
+
+                if (parameterizedType.getActualTypeArguments()[0] != String.class) return null;
+            } else {
+                return null;
+            }
+
+            return new StringReader<List<String>>() {
+                @Override
+                public List<String> fromString(String value) {
+                    return Arrays.asList(value.split(","));
+                }
+            };
+        }
+    }
+
+    @Path("/")
+    public static class ListOfStringResource {
+        @GET
+        public String doGet(@QueryParam("l") List<List<String>> l) {
+            return l.toString();
+        }
+    }
+
+    public void testListOfStringReaderProvider() {
+        initiateWebApplication(ListOfStringResource.class, ListOfStringReaderProvider.class);
+        String s = resource("/", false).queryParam("l", "1,2,3").
+                get(String.class);
+
+        assertEquals(Collections.singletonList(Arrays.asList("1", "2", "3")).toString(), s);
     }
 
 
