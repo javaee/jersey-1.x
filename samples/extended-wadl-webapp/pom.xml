@@ -165,17 +165,14 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <!-- Run the application using "mvn embedded-glassfish:run" -->
             <plugin>
-                <groupId>org.glassfish</groupId>
-                <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.0</version>
-                <configuration>
-                    <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>${basedir}/target/extended-wadl-webapp.war</app>
-                    <autoDelete>true</autoDelete>
-                    <port>8080</port>
-                </configuration>
+              <groupId>org.mortbay.jetty</groupId>
+              <artifactId>maven-jetty-plugin</artifactId>
+              <version>6.1.24</version>
+              <configuration>
+                <webApp>${basedir}/target/extended-wadl-webapp.war</webApp>
+                <contextPath>extended-wadl-webapp</contextPath>
+              </configuration>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
