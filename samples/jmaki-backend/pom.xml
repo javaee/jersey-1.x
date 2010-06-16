@@ -96,6 +96,15 @@
                 </configuration>
             </plugin>
             <plugin>
+              <groupId>org.mortbay.jetty</groupId>
+              <artifactId>maven-jetty-plugin</artifactId>
+              <version>6.1.24</version>
+              <configuration>
+                <webApp>${basedir}/target/jmakibackend.war</webApp>
+                <contextPath>jMakiBackend</contextPath>
+              </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
                 <executions>
