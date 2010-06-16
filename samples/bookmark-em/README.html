@@ -101,6 +101,10 @@ $AS_HOME/bin/asadmin deploy target/bookmark-em.war
 mvn test -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -DenableLogging -DJERSEY_HTTP_PORT=8080 -Ptest
 </pre>
 
+<p>Due to a bug in recent maven versions (related to command line parameter processing), the above might not work.
+The last known maven version to work is 2.0.9.
+</p>
+
 <h2>Links</h2>
 
 <a href="https://blueprints.dev.java.net/bpcatalog/ee5/persistence/webonlyapp.html">https://blueprints.dev.java.net/bpcatalog/ee5/persistence/webonlyapp.html</a>

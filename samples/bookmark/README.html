@@ -121,6 +121,10 @@ and make sure you do not miss the backslash (\) in <code>create\=true</code> par
 mvn test -Dtest.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -DenableLogging -DJERSEY_HTTP_PORT=8080 -Ptest
 </pre>
 
+<p>Due to a bug in recent maven versions (related to command line parameter processing), the above might not work.
+The last known maven version to work is 2.0.9.
+</p>
+
 <h2>TODOs</h2>
 <ul>
   <li>add tags</li>                                                                                                 
