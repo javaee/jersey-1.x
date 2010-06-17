@@ -41,7 +41,7 @@
     <parent>
         <groupId>com.sun.jersey.experimental.view-client</groupId>
         <artifactId>view-client</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-view-client</artifactId>
     <packaging>jar</packaging>

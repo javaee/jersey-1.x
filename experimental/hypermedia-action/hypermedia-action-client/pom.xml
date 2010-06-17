@@ -41,7 +41,7 @@
     <parent>
         <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
         <artifactId>hypermedia-action</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <artifactId>hypermedia-action-client</artifactId>
     <packaging>jar</packaging>

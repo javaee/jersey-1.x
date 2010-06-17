@@ -42,7 +42,7 @@
     <parent>
       <groupId>com.sun.jersey.glassfish.v2</groupId>
       <artifactId>glassfish-packages</artifactId>
-      <version>1.3-SNAPSHOT</version>
+      <version>1.4-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-gfv2-package</artifactId>
     <name>Jersey GFv2 UC Main Module</name>

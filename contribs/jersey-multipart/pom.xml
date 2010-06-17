@@ -43,7 +43,7 @@
     <parent>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-contribs</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>jersey-multipart</artifactId>

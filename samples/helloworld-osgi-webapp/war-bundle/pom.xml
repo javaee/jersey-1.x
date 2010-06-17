@@ -40,7 +40,7 @@
 
     <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
     <artifactId>war-bundle</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
 
     <name>Helloworld OSGi WebApp - Jersey Sample WAR</name>
 

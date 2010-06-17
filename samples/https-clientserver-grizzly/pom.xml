@@ -39,7 +39,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <artifactId>https-clientserver-grizzly</artifactId>
     <name>HTTPS Client/Server - Jersey sample - Grizzly</name>
