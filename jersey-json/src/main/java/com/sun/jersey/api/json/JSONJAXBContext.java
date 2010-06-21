@@ -135,7 +135,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * of object names will be declared as an array, even if only one
      * element is present.
      * <p>
-     * For example, consider that the the property value is not set and the
+     * For example, consider that the property value is not set and the
      * JSON document is <code>{ ..., "arr1":"single element", ... }</code>.
      * If the property value is set to contain <code>"arr1"</code> then
      * the JSON document would be <code>{ ..., "arr1":["single element"], ... }</code>.
@@ -156,7 +156,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * of object names will be declared as non-string value, which is not surrounded 
      * by double quotes.
      * <p>
-     * For example, consider that the the property value is not set and the
+     * For example, consider that the property value is not set and the
      * JSON document is <code>{ ..., "anumber":"12", ... }</code>.
      * If the property value is set to contain <code>"anumber"</code>
      * then the JSON document would be <code>{ ..., "anumber":12, ... }</code>.
@@ -177,7 +177,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * of object names will be declared as an element as not as an attribute if
      * the object corresponds to an XML attribute information item.
      * <p>
-     * For example, consider that the the property value is not set and the
+     * For example, consider that the property value is not set and the
      * JSON document is <code>{ ..., "@number":"12", ... }</code>.
      * If the property value is set contain <code>"number"</code>
      * then the JSON document would be <code>{ ..., "number":"12", ... }</code>.
