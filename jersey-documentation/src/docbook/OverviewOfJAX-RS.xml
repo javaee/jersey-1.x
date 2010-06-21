@@ -158,7 +158,7 @@ public Response putContainer() {
 }</programlisting></example>By default the JAX-RS runtime will automatically support the
       methods HEAD and OPTIONS, if not explicitly implemented. For HEAD the
       runtime will invoke the implemented GET method (if present) and ignore
-      the response entity (if set). For OPTIONS the the Allow response header
+      the response entity (if set). For OPTIONS the Allow response header
       will be set to the set of HTTP methods support by the resource. In
       addition Jersey will return a <ulink url="https://wadl.dev.java.net/">WADL</ulink> document describing the
       resource.</para>
