@@ -22,6 +22,12 @@ svn checkout https://jersey.dev.java.net/svn/jersey/trunk/jersey jersey --userna
 </programlisting>
 </para>
 <para>
+If you are new to Subversion, you may want to visit the <ulink url="http://subversion.tigris.org/">Subversion Project website</ulink> and read <ulink url="http://svnbook.red-bean.com/">Version Control with Subversion</ulink>.
+</para>
+<para>
+<ulink url="https://jersey.dev.java.net/servlets/ProjectSource">Read more about how to checkout this project's repository...</ulink>
+</para>
+<para>
 Stable releases of Jersey are tagged in the location
 <ulink url="https://jersey.dev.java.net/svn/jersey/tags">https://jersey.dev.java.net/svn/jersey/tags</ulink>.
 </para>
