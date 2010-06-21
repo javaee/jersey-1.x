@@ -92,7 +92,7 @@ public class MasterResourceBeanTest extends JerseyTest {
     }
 
     /**
-     * Test the the request for resource 2 gives the appropriate reponse.
+     * Test the request for resource 2 gives the appropriate reponse.
      */
     @Test
     public void doTestResource2Page() {
