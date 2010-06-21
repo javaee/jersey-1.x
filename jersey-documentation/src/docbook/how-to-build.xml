@@ -18,7 +18,7 @@ The Jersey source code is available from the Subversion repository located at
 To check out the trunk where active development on the next release occurs use
 the following command:
 <programlisting>
-svn checkout https://jersey.dev.java.net/svn/jersey/trunk/jersey jersey -username &lt;username&gt;
+svn checkout https://jersey.dev.java.net/svn/jersey/trunk/jersey jersey --username &lt;username&gt;
 </programlisting>
 </para>
 <para>
