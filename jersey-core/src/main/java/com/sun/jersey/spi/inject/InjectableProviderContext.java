@@ -77,7 +77,7 @@ public interface InjectableProviderContext {
      * Get an injectable.
      * 
      * @param <A> the type of the annotation.
-     * @param <C> the the context type. Types of the {@link java.lang.reflect.Type} and 
+     * @param <C> the context type. Types of the {@link java.lang.reflect.Type} and 
      *        {@link com.sun.jersey.api.model.Parameter} are the only types that
      *        are supported.
      * @param ac the annotation class.
@@ -99,7 +99,7 @@ public interface InjectableProviderContext {
      * Get an injectable.
      * 
      * @param <A> the type of the annotation.
-     * @param <C> the the context type. Types of the {@link java.lang.reflect.Type} and 
+     * @param <C> the context type. Types of the {@link java.lang.reflect.Type} and 
      *        {@link com.sun.jersey.api.model.Parameter} are the only types that
      *        are supported.
      * @param ac the annotation class.
@@ -131,7 +131,7 @@ public interface InjectableProviderContext {
      * Get an injectable.
      *
      * @param <A> the type of the annotation.
-     * @param <C> the the context type. Types of the {@link java.lang.reflect.Type} and
+     * @param <C> the context type. Types of the {@link java.lang.reflect.Type} and
      *        {@link com.sun.jersey.api.model.Parameter} are the only types that
      *        are supported.
      * @param ac the annotation class.
