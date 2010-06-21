@@ -187,7 +187,7 @@ public class ReflectionHelper {
      * Get the Class from the class name.
      * <p>
      * The context class loader will be utilized if accessible and non-null.
-     * Otherwise the the defining class loader of this class will
+     * Otherwise the defining class loader of this class will
      * be utilized.
      *
      * @param name the class name.
