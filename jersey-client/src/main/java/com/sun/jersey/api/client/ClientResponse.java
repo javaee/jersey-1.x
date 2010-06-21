@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
+ *
  * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
- * 
+ *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- * 
+ *
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- * 
+ *
  * Contributor(s):
- * 
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -71,7 +71,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
  * A client (in-bound) HTTP response.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class ClientResponse {
@@ -138,7 +138,7 @@ public class ClientResponse {
          */
         TEMPORARY_REDIRECT(307, "Temporary Redirect"),
 
-        
+
         /**
          * 400 Bad Request, see {@link <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">HTTP/1.1 documentation</a>}.
          */
@@ -310,25 +310,25 @@ public class ClientResponse {
     }
 
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
-    
-    protected static final HeaderDelegate<EntityTag> entityTagDelegate = 
+
+    protected static final HeaderDelegate<EntityTag> entityTagDelegate =
             RuntimeDelegate.getInstance().createHeaderDelegate(EntityTag.class);
-    
-    protected static final HeaderDelegate<Date> dateDelegate = 
+
+    protected static final HeaderDelegate<Date> dateDelegate =
             RuntimeDelegate.getInstance().createHeaderDelegate(Date.class);
-        
+
     private Map<String, Object> properties;
 
     private int status;
-    
+
     private InBoundHeaders headers;
 
     private boolean isEntityBuffered;
-    
+
     private InputStream entity;
 
     private MessageBodyWorkers workers;
-    
+
     public ClientResponse(int status, InBoundHeaders headers, InputStream entity, MessageBodyWorkers workers) {
         this.status = status;
         this.headers = headers;
@@ -338,7 +338,7 @@ public class ClientResponse {
 
     /**
      * Get the client.
-     * 
+     *
      * @return the client.
      */
     public Client getClient() {
@@ -351,7 +351,7 @@ public class ClientResponse {
      * A response property is an application-defined property that may be
      * added by the user, a filter, or the handler that is managing the
      * connection.
-     * 
+     *
      * @return the map of response properties.
      */
     public Map<String, Object> getProperties() {
@@ -359,19 +359,19 @@ public class ClientResponse {
 
         return properties = new HashMap<String, Object>();
     }
-    
+
     /**
      * Get the status code.
-     * 
+     *
      * @return the status code.
      */
     public int getStatus() {
         return status;
     }
-    
+
     /**
      * Set the status code.
-     * 
+     *
      * @param status the status code.
      */
     public void setStatus(int status) {
@@ -392,7 +392,7 @@ public class ClientResponse {
      *
      * @return the status code, or null if the underlying status code was set
      *         using the method {@link #setStatus(int)} and there is no
-     *         mapping between the the integer value and the Response.Status
+     *         mapping between the integer value and the Response.Status
      *         enumeration value.
      */
     public Status getClientResponseStatus() {
@@ -401,10 +401,10 @@ public class ClientResponse {
 
     /**
      * Get the status code.
-     * 
+     *
      * @return the status code, or null if the underlying status code was set
      *         using the method {@link #setStatus(int)} and there is no
-     *         mapping between the the integer value and the Response.Status
+     *         mapping between the integer value and the Response.Status
      *         enumeration value.
      * @deprecated use {@link #getClientResponseStatus() }
      */
@@ -412,10 +412,10 @@ public class ClientResponse {
     public Response.Status getResponseStatus() {
         return Response.Status.fromStatusCode(status);
     }
-    
+
     /**
      * Set the status code.
-     * 
+     *
      * @param status the status code.
      * @deprecated see {@link #setStatus(javax.ws.rs.core.Response.StatusType) }
      */
@@ -423,10 +423,10 @@ public class ClientResponse {
     public void setResponseStatus(Response.StatusType status) {
         setStatus(status);
     }
-    
+
     /**
      * Get the HTTP headers of the response.
-     * 
+     *
      * @return the HTTP headers of the response.
      * @deprecated
      */
@@ -468,7 +468,7 @@ public class ClientResponse {
 
     /**
      * Get the input stream of the response.
-     * 
+     *
      * @return the input stream of the response.
      */
     public InputStream getEntityInputStream() {
@@ -477,7 +477,7 @@ public class ClientResponse {
 
     /**
      * Set the input stream of the response.
-     * 
+     *
      * @param entity the input stream of the response.
      */
     public void setEntityInputStream(InputStream entity) {
@@ -490,11 +490,11 @@ public class ClientResponse {
      * <p>
      * If the entity is not an instance of Closeable then the entity
      * input stream is closed.
-     * 
+     *
      * @param <T> the type of the response.
      * @param c the type of the entity.
      * @return an instance of the type <code>c</code>.
-     * 
+     *
      * @throws ClientHandlerException if there is an error processing the response.
      * @throws UniformInterfaceException if the response status is 204 (No Contnet).
      */
@@ -507,11 +507,11 @@ public class ClientResponse {
      * <p>
      * If the entity is not an instance of Closeable then this response
      * is closed.
-     * 
+     *
      * @param <T> the type of the response.
      * @param gt the generic type of the entity.
      * @return an instance of the type represented by the generic type.
-     * 
+     *
      * @throws ClientHandlerException if there is an error processing the response.
      * @throws UniformInterfaceException if the response status is 204 (No Content).
      */
@@ -544,7 +544,7 @@ public class ClientResponse {
 
             throw new ClientHandlerException(message);
         }
-        
+
         try {
             T t = br.readFrom(c, type, EMPTY_ANNOTATIONS, mediaType, headers, entity);
             if (br instanceof CompletableReader) {
@@ -580,7 +580,7 @@ public class ClientResponse {
         } finally {
             close();
         }
-        
+
         entity = new ByteArrayInputStream(baos.toByteArray());
         isEntityBuffered = true;
     }
@@ -589,7 +589,7 @@ public class ClientResponse {
      * Close the response.
      * <p>
      * The entity input stream is closed.
-     * 
+     *
      * @throws ClientHandlerException if there is an error closing the response.
      */
     public void close() throws ClientHandlerException {
@@ -602,43 +602,43 @@ public class ClientResponse {
 
     /**
      * Get the media type of the response.
-     * 
+     *
      * @return the media type.
      */
     public MediaType getType() {
         String ct = getHeaders().getFirst("Content-Type");
         return (ct != null) ? MediaType.valueOf(ct) : null;
     }
-    
+
     /**
      * Get the location.
-     * 
+     *
      * @return the location, otherwise <code>null</code> if not present.
      */
     public URI getLocation() {
         String l = getHeaders().getFirst("Location");
         return (l != null) ? URI.create(l) : null;
     }
-    
+
     /**
      * Get the entity tag.
-     * 
+     *
      * @return the entity tag, otherwise <code>null</code> if not present.
      */
     public EntityTag getEntityTag() {
         String t = getHeaders().getFirst("ETag");
-        
+
         return (t != null) ? entityTagDelegate.fromString(t) : null;
     }
 
     /**
      * Get the last modified date.
-     * 
+     *
      * @return the last modified date, otherwise <code>null</code> if not present.
      */
     public Date getLastModified() {
         String d = getHeaders().getFirst("Last-Modified");
-        
+
         return (d != null) ? dateDelegate.fromString(d) : null;
     }
 
@@ -652,10 +652,10 @@ public class ClientResponse {
 
         return (d != null) ? dateDelegate.fromString(d) : null;
     }
-    
+
     /**
      * Get the language.
-     * 
+     *
      * @return the language, otherwise <code>null</code> if not present.
      */
     public String getLanguage() {
@@ -674,7 +674,7 @@ public class ClientResponse {
         String sizeStr = getHeaders().getFirst("Content-Length");
         if (sizeStr == null)
             return -1;
-        
+
         try {
             size = Integer.parseInt(sizeStr);
         } catch (NumberFormatException nfe) {
@@ -686,13 +686,13 @@ public class ClientResponse {
 
     /**
      * Get the list of cookies.
-     * 
+     *
      * @return the cookies.
      */
     public List<NewCookie> getCookies() {
         List<String> hs = getHeaders().get("Set-Cookie");
         if (hs == null) return Collections.emptyList();
-        
+
         List<NewCookie> cs = new ArrayList<NewCookie>();
         for (String h : hs) {
             cs.add(NewCookie.valueOf(h));
@@ -705,7 +705,7 @@ public class ClientResponse {
      * <p>
      * Note that the Allow HTTP header will be returned from an OPTIONS
      * request.
-     * 
+     *
      * @return the allowed HTTP methods, all methods will returned as
      *         upper case strings.
      */
