@@ -965,7 +965,7 @@ release 1.1.0-ea (2009-05-04)
     one or more entities, or is "*" then a 412 response will be returned
     otherwise null will be returned.
     This is primarily of use for implementations of PUT.
-  - Unify the the value of @Consumes and @Produces as follows:
+  - Unify the value of @Consumes and @Produces as follows:
 
         /**
          * A list of media types. Each entry may specify a single type or consist
@@ -1957,7 +1957,7 @@ release 0.6 (2008-03-07)
   - The charset parameter is removed from javax.ws.rs.core.Variant
     constructor and getters. The method to add one or more charsets has been
     removed from javax.ws.rs.core.Variant.VariantListBuilder. The charset
-    parameter must be included as a "charset" parameter of the the media type.
+    parameter must be included as a "charset" parameter of the media type.
   - Response.ResponseBuilder.tag(String ) now assumes the String parameter
     value is the contents of a strong entity tag rather than the entity tag
     itself.
