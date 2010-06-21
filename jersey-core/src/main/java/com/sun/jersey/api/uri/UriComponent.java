@@ -578,7 +578,7 @@ public class UriComponent {
      * between two path segments. Thus if the path is '/' then the path segment 
      * list will contain two empty path segments. If the path is "//" then
      * the path segment list will contain three empty path segments. If the path 
-     * is "/a/" the the path segment list will consist of the following path
+     * is "/a/" the path segment list will consist of the following path
      * segments in order: "", "a" and "".
      * 
      * @param path the path component in encoded form.
