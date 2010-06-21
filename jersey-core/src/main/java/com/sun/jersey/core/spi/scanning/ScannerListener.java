@@ -67,7 +67,7 @@ public interface ScannerListener {
      *
      * @param name the resource name.
      * @param in the input stream of the resource
-     * @throws IOException if an error occurs when processing the the resource.
+     * @throws IOException if an error occurs when processing the resource.
      */
     void onProcess(String name, InputStream in) throws IOException;
 }
