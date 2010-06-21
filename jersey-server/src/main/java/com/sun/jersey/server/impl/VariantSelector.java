@@ -207,7 +207,7 @@ public final class VariantSelector {
             List<T> as, DimensionChecker<T, U> dc) {
         int q = QualityFactor.MINUMUM_QUALITY;
         // Iterate over the acceptable entries
-        // This assumes the the entries are ordered by the quality
+        // This assumes the entries are ordered by the quality
         for (T a : as) {
             // If entries of the higest quality factor have already been
             // selected no need to continue further
