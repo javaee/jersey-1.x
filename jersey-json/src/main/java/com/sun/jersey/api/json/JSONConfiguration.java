@@ -224,7 +224,7 @@ public class JSONConfiguration {
          * The property value is a collection of strings representing JSON object names.
          * Those objects will be declared as arrays in  JSON document.
          * <p>
-         * For example, consider that the the property value is not set and the
+         * For example, consider that the property value is not set and the
          * JSON document is <code>{ ..., "arr1":"single element", ... }</code>.
          * If the property value is set to contain <code>"arr1"</code> then
          * the JSON document would become <code>{ ..., "arr1":["single element"], ... }</code>.
@@ -273,7 +273,7 @@ public class JSONConfiguration {
          * of object names will be declared as non-string value, which is not surrounded
          * by double quotes.
          * <p>
-         * For example, consider that the the property value is not set and the
+         * For example, consider that the property value is not set and the
          * JSON document is <code>{ ..., "anumber":"12", ... }</code>.
          * If the property value is set to contain <code>"anumber"</code>
          * then the JSON document would be <code>{ ..., "anumber":12, ... }</code>.
