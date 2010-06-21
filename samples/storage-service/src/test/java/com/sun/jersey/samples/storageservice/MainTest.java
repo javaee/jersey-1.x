@@ -120,7 +120,7 @@ public class MainTest extends TestCase {
         ClientResponse response = content.put(ClientResponse.class);
         assertEquals(Response.Status.CREATED, response.getResponseStatus());
 
-        // PUT the items to be added to the the "quotes" container
+        // PUT the items to be added to the "quotes" container
         response = content.path("1").type(MediaType.TEXT_PLAIN).put(ClientResponse.class,
                 "Something is rotten in the state of Denmark");
         assertEquals(Response.Status.CREATED, response.getResponseStatus());
