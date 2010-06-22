@@ -304,7 +304,7 @@ public void postClichedMessage(String message) {
 <programlisting  linenumbering="numbered">&lt;web-app&gt;
     &lt;servlet&gt;
         &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
-        &lt;servlet-class&gt;gt;MyApplication&lt;/servlet-class&gt;
+        &lt;servlet-class&gt;MyApplication&lt;/servlet-class&gt;
     &lt;/servlet&gt;
     ....</programlisting></example></para>
 
