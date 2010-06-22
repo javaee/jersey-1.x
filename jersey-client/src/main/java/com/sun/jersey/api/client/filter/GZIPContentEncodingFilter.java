@@ -100,16 +100,16 @@ public class GZIPContentEncodingFilter extends ClientFilter {
 
     @Override
     public ClientResponse handle(ClientRequest request) throws ClientHandlerException {
-        if (!request.getMetadata().containsKey(HttpHeaders.ACCEPT_ENCODING)) {
-            request.getMetadata().add(HttpHeaders.ACCEPT_ENCODING, "gzip");
+        if (!request.getHeaders().containsKey(HttpHeaders.ACCEPT_ENCODING)) {
+            request.getHeaders().add(HttpHeaders.ACCEPT_ENCODING, "gzip");
         }
 
         if (request.getEntity() != null) {
-            Object o = request.getMetadata().getFirst(HttpHeaders.CONTENT_ENCODING);
+            Object o = request.getHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
             if (o != null && o.equals("gzip")) {
                 request.setAdapter(new Adapter(request.getAdapter()));
             } else if (compressRequestEntity) {
-                request.getMetadata().add(HttpHeaders.CONTENT_ENCODING, "gzip");
+                request.getHeaders().add(HttpHeaders.CONTENT_ENCODING, "gzip");
                 request.setAdapter(new Adapter(request.getAdapter()));
             }
         }

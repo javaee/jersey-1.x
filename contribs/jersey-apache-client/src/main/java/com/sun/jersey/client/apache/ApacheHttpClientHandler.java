@@ -73,7 +73,6 @@ import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
-import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -180,7 +179,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
                     // This makes it impossible to use the multipart
                     // writer that modifies the content type to add a boundary
                     // parameter
-                    writeOutBoundHeaders(cr.getMetadata(), method);
+                    writeOutBoundHeaders(cr.getHeaders(), method);
 
                     // Do not buffer the request entity when chunked encoding is
                     // set
@@ -241,7 +240,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
 
             }
         } else {
-            writeOutBoundHeaders(cr.getMetadata(), method);
+            writeOutBoundHeaders(cr.getHeaders(), method);
         
             // Follow redirects
             method.setFollowRedirects(cr.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_FOLLOW_REDIRECTS));

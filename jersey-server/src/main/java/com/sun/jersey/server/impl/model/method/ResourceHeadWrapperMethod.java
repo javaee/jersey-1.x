@@ -52,7 +52,9 @@ public final class ResourceHeadWrapperMethod extends ResourceMethod {
                 m.getConsumes(), 
                 m.getProduces(),
                 m.isProducesDeclared(),
-                m.getDispatcher());
+                m.getDispatcher(),
+                m.getRequestFilters(),
+                m.getResponseFilters());
         
         if (!m.getHttpMethod().equals("GET")) {
             throw new ContainerException("");

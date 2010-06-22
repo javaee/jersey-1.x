@@ -1,4 +1,18 @@
 release 1.4 (08-2010)
+- Fixed issue 549
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=549
+  Implicit HEAD method support was not re-using any resource method-specific
+  filters on the GET method from which the HEAD method was derived from.
+- Fixed issue 547
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=547
+  The GZIPContentEncodingFilter works correctly with the Client API and
+  HttpURLConnection when a request entity is sent for which the size is known
+  in advance, for example a File or byte[].
+- Fixed issue 506
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=506
+  Fixed regression. Servlet url patterns of the form
+        <url-pattern>*.xxx</url-pattern>
+  now function as was the case for Jersey 1.0.3.1.
 
 release 1.3 (17-06-2010)
 - Fixed issue 540

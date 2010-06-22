@@ -598,11 +598,13 @@ public class ServletContainer extends HttpServlet implements Filter {
          * invoked for the case when the URI is equal to the deployment URL
          * minus the '/', for example http://locahost:8080/HelloWorldWebApp
          */
+        final String servletPath = request.getServletPath();
         String pathInfo = request.getPathInfo();
         StringBuffer requestURL = request.getRequestURL();
         String requestURI = request.getRequestURI();
-        final boolean checkPath = pathInfo == null || pathInfo.length() == 0 || pathInfo.equals("/");
-        if (checkPath && !request.getRequestURI().endsWith("/")) {
+        final boolean checkPathInfo = pathInfo == null || pathInfo.isEmpty() || pathInfo.equals("/");
+        final boolean checkServletPath = servletPath == null || servletPath.isEmpty();
+        if (checkPathInfo && checkServletPath && !request.getRequestURI().endsWith("/")) {
             if (webComponent.getResourceConfig().getFeature(ResourceConfig.FEATURE_REDIRECT)) {
                 URI l = UriBuilder.fromUri(request.getRequestURL().toString()).
                         path("/").
@@ -636,7 +638,7 @@ public class ServletContainer extends HttpServlet implements Filter {
          * for the decodedPath.
          */
         final String decodedBasePath = (pathInfo != null)
-                ? request.getContextPath() + request.getServletPath() + "/"
+                ? request.getContextPath() + servletPath + "/"
                 : request.getContextPath() + "/";
 
         final String encodedBasePath = UriComponent.encode(decodedBasePath,

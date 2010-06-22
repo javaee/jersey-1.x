@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
@@ -182,9 +183,9 @@ public abstract class TerminatingClientHandler implements ClientHandler {
                 throw new ClientHandlerException(message);
             }
 
-            this.size = bw.getSize(
-                    entity, entityClass, entityType,
-                    EMPTY_ANNOTATIONS, mediaType);
+            this.size = headers.containsKey(HttpHeaders.CONTENT_ENCODING)
+                    ? -1
+                    : bw.getSize(entity, entityClass, entityType, EMPTY_ANNOTATIONS, mediaType);
         }
 
         /**
@@ -291,9 +292,9 @@ public abstract class TerminatingClientHandler implements ClientHandler {
                     ", and MIME media type, " + mediaType + ", was not found");
         }
 
-        final long size = bw.getSize(
-                entity, entityClass, entityType,
-                EMPTY_ANNOTATIONS, mediaType);
+        final long size = headers.containsKey(HttpHeaders.CONTENT_ENCODING) 
+                ? -1 
+                : bw.getSize(entity, entityClass, entityType, EMPTY_ANNOTATIONS, mediaType);
         listener.onRequestEntitySize(size);
 
         final OutputStream out = ro.getAdapter().adapt(ro, listener.onGetOutputStream());

@@ -82,7 +82,7 @@ public class GZIPContentEncodingTest extends AbstractGrizzlyWebContainerTester {
         assertEquals("GET", r.get(String.class));
     }    
 
-    public void testPost() {
+    public void testPostOfString() {
         Map<String, String> initParams = new HashMap<String, String>();
         initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
                 GZIPContentEncodingFilter.class.getName());
@@ -96,5 +96,21 @@ public class GZIPContentEncodingTest extends AbstractGrizzlyWebContainerTester {
         WebResource r = c.resource(getUri().build());
 
         assertEquals("POST", r.post(String.class, "POST"));
-    }    
+    }
+
+    public void testPostOfByteArray() {
+        Map<String, String> initParams = new HashMap<String, String>();
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                GZIPContentEncodingFilter.class.getName());
+        initParams.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                GZIPContentEncodingFilter.class.getName());
+        startServer(initParams, Resource.class);
+
+
+        Client c = Client.create();
+        c.addFilter(new com.sun.jersey.api.client.filter.GZIPContentEncodingFilter());
+        WebResource r = c.resource(getUri().build());
+
+        assertEquals("POST", r.post(String.class, "POST".getBytes()));
+    }
 }

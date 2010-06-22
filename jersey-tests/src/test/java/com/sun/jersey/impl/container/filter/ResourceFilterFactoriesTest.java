@@ -163,12 +163,30 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
         ClientResponse cr = r.get(ClientResponse.class);
         assertEquals(200, cr.getStatus());
         assertEquals("onetwo", cr.getEntity(String.class));
-        List<String> xTest = cr.getMetadata().get("X-TEST");
+        List<String> xTest = cr.getHeaders().get("X-TEST");
         assertEquals(2, xTest.size());
         assertEquals("two", xTest.get(0));
         assertEquals("one", xTest.get(1));
     }
 
+    public void testResourceMethodHead() {
+        ResourceConfig rc = new DefaultResourceConfig(ResourceWithMethod.class);
+
+        FilterOne f1 = new FilterOne();
+        FilterTwo f2 = new FilterTwo();
+        rc.getProperties().put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES,
+                Arrays.asList(f1, f2));
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/", false);
+
+        ClientResponse cr = r.head();
+        assertEquals(200, cr.getStatus());
+        List<String> xTest = cr.getHeaders().get("X-TEST");
+        assertEquals(2, xTest.size());
+        assertEquals("two", xTest.get(0));
+        assertEquals("one", xTest.get(1));
+    }
 
     @Path("/")
     public static class ResourceWithSubresourceLocator {
@@ -210,7 +228,7 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
         ClientResponse cr = r.get(ClientResponse.class);
         assertEquals(200, cr.getStatus());
         assertEquals("onetwo", cr.getEntity(String.class));
-        List<String> xTest = cr.getMetadata().get("X-TEST");
+        List<String> xTest = cr.getHeaders().get("X-TEST");
         assertEquals(2, xTest.size());
         assertEquals("two", xTest.get(0));
         assertEquals("one", xTest.get(1));
@@ -248,7 +266,7 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
         ClientResponse cr = r.get(ClientResponse.class);
         assertEquals(200, cr.getStatus());
         assertEquals("onetwo", cr.getEntity(String.class));
-        List<String> xTest = cr.getMetadata().get("X-TEST");
+        List<String> xTest = cr.getHeaders().get("X-TEST");
         assertEquals(2, xTest.size());
         assertEquals("two", xTest.get(0));
         assertEquals("one", xTest.get(1));
@@ -287,7 +305,7 @@ public class ResourceFilterFactoriesTest extends AbstractResourceTester {
         ClientResponse cr = r.get(ClientResponse.class);
         assertEquals(200, cr.getStatus());
         assertEquals("onetwo", cr.getEntity(String.class));
-        List<String> xTest = cr.getMetadata().get("X-TEST");
+        List<String> xTest = cr.getHeaders().get("X-TEST");
         assertEquals(2, xTest.size());
         assertEquals("two", xTest.get(0));
         assertEquals("one", xTest.get(1));
