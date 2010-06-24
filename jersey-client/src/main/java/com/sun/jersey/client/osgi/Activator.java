@@ -70,7 +70,8 @@ public class Activator implements BundleActivator {
 
     private Bundle getJerseyServerBundle(BundleContext bc) {
         for (Bundle b : bc.getBundles()) {
-            if (b.getSymbolicName().endsWith("jersey-server")) {
+            final String symbolicName = b.getSymbolicName();
+            if ((symbolicName != null) && symbolicName.endsWith("jersey-server")) {
                 return b;
             }
         }
