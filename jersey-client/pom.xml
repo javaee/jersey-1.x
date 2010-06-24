@@ -90,8 +90,8 @@
                     <instructions>
                         <Bundle-Activator>com.sun.jersey.client.osgi.Activator</Bundle-Activator>
                         <Import-Package>javax.mail.*;resolution:=optional, *</Import-Package>
-                        <Private-Package>com.sun.ws.rs.ext, com.sun.jersey.client.osgi</Private-Package>
-                        <Export-Package>com.sun.jersey.api.client.*,com.sun.jersey.client.*</Export-Package>
+                        <Private-Package>com.sun.jersey.client.osgi</Private-Package>
+                        <Export-Package>com.sun.jersey.api.client.*,com.sun.jersey.client.*,com.sun.ws.rs.ext</Export-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
