@@ -48,11 +48,12 @@
     <modules>
         <module>atompub-contacts-client</module>
         <module>atompub-contacts-models</module>
-        <module>atompub-contacts-server</module>
-        <module>bookmark-em</module>
+        <module>atompub-contacts-server</module>        
         <module>bookmark</module>
+        <module>bookmark-em</module>
         <module>bookstore</module>
         <module>entity-provider</module>
+        <module>exceptions</module>
         <module>extended-wadl-webapp</module>
         <module>generate-wadl</module>
         <module>groovy</module>
@@ -78,8 +79,7 @@
         <module>simple-servlet</module> 
         <module>sparklines</module>
         <module>spring-annotations</module>
-        <module>storage-service</module>
-        <module>exceptions</module>
+        <module>storage-service</module>        
     </modules>
     <build>
         <plugins>
