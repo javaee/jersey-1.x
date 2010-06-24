@@ -9,6 +9,7 @@
        d) Create singleton component and inject into resource at construction
 
 2) Add the sample to the modules of jersey-samples (once the README is done)
+    and remove the exclude clause referring to the sample at the samples/assembly.xml file
 
 3) Also, check that it works properly with other container types like EmbeddedGF, External GlassFish, etc.
 
