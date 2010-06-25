@@ -1,4 +1,7 @@
 release 1.4 (08-2010)
+- Fixed issue 542
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=542
+  Added client HTTPDigestAuthFilter from external contributor + tests
 - Fixed issue 549
   https://jersey.dev.java.net/issues/show_bug.cgi?id=549
   Implicit HEAD method support was not re-using any resource method-specific
