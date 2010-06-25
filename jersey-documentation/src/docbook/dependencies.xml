@@ -131,7 +131,7 @@
 
         <listitem>
           <ulink
-          url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar">jsr311-api.jar</ulink>
+          url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar">jsr311-api.jar</ulink>
 
           ,
         </listitem>
@@ -150,7 +150,7 @@
 
         <listitem>
           <ulink
-          url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar">jsr311-api.jar</ulink>
+          url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar">jsr311-api.jar</ulink>
 
           ,
         </listitem>
@@ -226,7 +226,7 @@
 
         <listitem>
           <ulink
-          url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar">jsr311-api.jar</ulink>
+          url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar">jsr311-api.jar</ulink>
         </listitem>
       </itemizedlist> or, if using the jersey-bundle: <itemizedlist>
         <listitem>
@@ -238,7 +238,7 @@
 
         <listitem>
           <ulink
-          url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1/jsr311-api-1.1.jar">jsr311-api.jar</ulink>
+          url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/1.1.1/jsr311-api-1.1.1.jar">jsr311-api.jar</ulink>
         </listitem>
       </itemizedlist></para>
 
