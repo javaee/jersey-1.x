@@ -51,6 +51,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -171,11 +172,20 @@ public final class ContainerFactory {
                 // Register a container listener
                 Object o = resourceConfig.getProperties().get(
                         ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
-                if (o instanceof ContainerNotifier && 
+                if (o instanceof List) {
+                    List list = (List) o;
+                    for (Object elem : list) {
+                        if (elem instanceof ContainerNotifier &&
+                                c instanceof ContainerListener) {
+                            ContainerNotifier crf = (ContainerNotifier) elem;
+                            crf.addListener((ContainerListener) c);
+                        }
+                    }
+                } else if (o instanceof ContainerNotifier &&
                         c instanceof ContainerListener) {
-                    ContainerNotifier crf = (ContainerNotifier)o;
-                    crf.addListener((ContainerListener)c);
-                }                
+                    ContainerNotifier crf = (ContainerNotifier) o;
+                    crf.addListener((ContainerListener) c);
+                }
                 return c;
             }
         }

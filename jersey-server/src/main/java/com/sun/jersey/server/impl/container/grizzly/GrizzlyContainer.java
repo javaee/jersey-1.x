@@ -37,18 +37,20 @@
 
 package com.sun.jersey.server.impl.container.grizzly;
 
+import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.spi.container.WebApplication;
-import java.io.OutputStream;
-import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
+import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
-import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.spi.container.ReloadListener;
+import com.sun.jersey.spi.container.WebApplication;
+
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Enumeration;
@@ -189,6 +191,10 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
     public void onReload() {
         WebApplication oldApplication = application;
         application = application.clone();
+
+        if (application.getFeaturesAndProperties() instanceof ReloadListener)
+            ((ReloadListener) application.getFeaturesAndProperties()).onReload();
+
         oldApplication.destroy();
     }    
 }

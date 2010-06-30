@@ -38,10 +38,11 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.spi.scanning.WebAppResourcesScanner;
+
+import javax.servlet.ServletContext;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.servlet.ServletContext;
 
 /**
  * A mutable implementation of {@link DefaultResourceConfig} that dynamically 
@@ -55,6 +56,9 @@ import javax.servlet.ServletContext;
  * @author Paul.Sandoz@Sun.Com
  */
 public class WebAppResourceConfig extends ScanningResourceConfig {
+
+    private String[] paths;
+    private ServletContext sc;
     
     private static final Logger LOGGER = 
             Logger.getLogger(WebAppResourceConfig.class.getName());
@@ -80,6 +84,15 @@ public class WebAppResourceConfig extends ScanningResourceConfig {
             throw new IllegalArgumentException(
                     "Array of paths must not be null or empty");
 
+        this.paths = paths;
+        this.sc = sc;
+
+        init(paths, sc);
+    }
+
+    @Override
+    public void onReload() {
+        getClasses().clear();
         init(paths, sc);
     }
     
@@ -95,7 +108,7 @@ public class WebAppResourceConfig extends ScanningResourceConfig {
 
         init(new WebAppResourcesScanner(paths, sc));
     }
-    
+
     private static String[] getPaths(Map<String, Object> props) {
         Object v = props.get(ClasspathResourceConfig.PROPERTY_CLASSPATH);
         if (v == null) {

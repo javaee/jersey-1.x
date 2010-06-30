@@ -1,4 +1,7 @@
 release 1.4 (08-2010)
+- Integrated JRebel support from branch
+  Introduced new experimental module (jersey-jrebel) + some necessary
+  modifications in jersey-server to improve reloading support.
 - Fixed issue 542
   https://jersey.dev.java.net/issues/show_bug.cgi?id=542
   Added client HTTPDigestAuthFilter from external contributor + tests

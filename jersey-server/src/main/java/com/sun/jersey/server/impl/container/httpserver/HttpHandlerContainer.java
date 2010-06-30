@@ -37,19 +37,21 @@
 
 package com.sun.jersey.server.impl.container.httpserver;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
-import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.server.impl.application.WebApplicationImpl;
+import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.net.httpserver.Headers;
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpsExchange;
-import java.io.ByteArrayOutputStream;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -59,7 +61,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * A {@link HttpHandler} for a {@link WebApplicationImpl}.
@@ -215,6 +216,10 @@ public class HttpHandlerContainer implements HttpHandler, ContainerListener {
     public void onReload() {
         WebApplication oldApplication = application;
         application = application.clone();
+
+        if (application.getFeaturesAndProperties() instanceof ReloadListener)
+            ((ReloadListener) application.getFeaturesAndProperties()).onReload();
+
         oldApplication.destroy();
     }
 }

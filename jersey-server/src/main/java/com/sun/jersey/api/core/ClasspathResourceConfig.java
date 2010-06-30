@@ -105,7 +105,8 @@ public class ClasspathResourceConfig extends ScanningResourceConfig {
     /**
      * Perform a new search for resource classes and provider classes.
      */
-    public void reload() {
+    @Override
+    public void onReload() {
         getClasses().clear();
         init(paths);
     }

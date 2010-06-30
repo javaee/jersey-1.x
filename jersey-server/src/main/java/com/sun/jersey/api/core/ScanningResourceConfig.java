@@ -38,15 +38,17 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.core.spi.scanning.Scanner;
+import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.scanning.AnnotationScannerListener;
 import com.sun.jersey.spi.scanning.PathProviderScannerListener;
+
+import javax.ws.rs.Path;
+import javax.ws.rs.ext.Provider;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.Path;
-import javax.ws.rs.ext.Provider;
 
 /**
  * A resource configuration that performs scanning to find root resource
@@ -54,9 +56,11 @@ import javax.ws.rs.ext.Provider;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class ScanningResourceConfig extends DefaultResourceConfig {
+public class ScanningResourceConfig extends DefaultResourceConfig implements ReloadListener {
     private static final Logger LOGGER = 
             Logger.getLogger(ScanningResourceConfig.class.getName());
+
+    private Scanner scanner;
 
     /**
      * Initialize and scan for root resource and provider classes
@@ -65,6 +69,8 @@ public class ScanningResourceConfig extends DefaultResourceConfig {
      * @param scanner the scanner.
      */
     public void init(final Scanner scanner) {
+        this.scanner = scanner;
+
         final AnnotationScannerListener asl = new PathProviderScannerListener();
         scanner.scan(asl);
 
@@ -86,6 +92,24 @@ public class ScanningResourceConfig extends DefaultResourceConfig {
             }
 
         }
+    }
+
+    /**
+     * Perform a new search for resource classes and provider classes.
+     * <p/>
+     * Deprecated, use onReload instead.
+     */
+    @Deprecated
+    public void reload() {
+        onReload();
+    }
+
+    /**
+     * Perform a new search for resource classes and provider classes.
+     */
+    public void onReload() {
+        getClasses().clear();
+        init(scanner);
     }
 
     private Set<Class> get(Class<? extends Annotation> ac) {

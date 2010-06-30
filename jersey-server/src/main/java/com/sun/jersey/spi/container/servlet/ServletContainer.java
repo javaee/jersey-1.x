@@ -38,23 +38,20 @@
 package com.sun.jersey.spi.container.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.WebAppResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
+import com.sun.jersey.spi.container.ContainerNotifier;
+import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.Enumeration;
-import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import com.sun.jersey.spi.service.ServiceFinder;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -70,6 +67,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -426,6 +432,16 @@ public class ServletContainer extends HttpServlet implements Filter {
      */
     protected void initiate(ResourceConfig rc, WebApplication wa) {
         wa.initiate(rc);
+
+        if (rc instanceof ReloadListener) {
+            List<ContainerNotifier> notifiers = new ArrayList<ContainerNotifier>();
+
+            for (ContainerNotifier cn : ServiceFinder.find(ContainerNotifier.class)) {
+                notifiers.add(cn);
+            }
+
+            rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, notifiers);
+        }
     }
 
     /**
@@ -451,7 +467,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * requests will be processed using the previously loaded web application.
      */
     public void reload() {
-        webComponent.reload();
+        webComponent.onReload();
     }
 
     /**

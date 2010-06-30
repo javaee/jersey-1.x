@@ -65,9 +65,22 @@ import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
+import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+
+import javax.naming.NamingException;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.SecurityContext;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -87,17 +100,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.naming.NamingException;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
 
 /**
  * An abstract Web component that may be extended a Servlet and/or
@@ -212,8 +214,16 @@ public class WebComponent implements ContainerListener {
 
         Object o = resourceConfig.getProperties().get(
                 ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
-        if (o instanceof ContainerNotifier) {
-            ContainerNotifier crf = (ContainerNotifier)o;
+        if (o instanceof List) {
+            List list = (List) o;
+            for (Object elem : list) {
+                if (elem instanceof ContainerNotifier) {
+                    ContainerNotifier crf = (ContainerNotifier) elem;
+                    crf.addListener(this);
+                }
+            }
+        } else if (o instanceof ContainerNotifier) {
+            ContainerNotifier crf = (ContainerNotifier) o;
             crf.addListener(this);
         }
     }
@@ -575,29 +585,6 @@ public class WebComponent implements ContainerListener {
     }
 
     /**
-     * Reload the Web application. This will create and initiate the web
-     * application using the same {@link ResourceConfig} implementation
-     * that was used to load the Web application.
-     * <p>
-     * This method may be called at runtime, more than once, to reload the
-     * Web application. For example, if a {@link ResourceConfig} implementation
-     * is capable of detecting changes to resource classes (addition or removal)
-     * or providers then this method may be invoked to reload the web
-     * application for such changes to take effect.
-     * <p>
-     * If this method is called when there are pending requests then such
-     * requests will be processed using the previously loaded web application.
-     */
-    public void reload() {
-        WebApplication oldApplication = application;
-        WebApplication newApplication = create();
-        initiate(resourceConfig, newApplication);
-
-        application = newApplication;
-        oldApplication.destroy();
-    }
-
-    /**
      * Get the default resource configuration if one is not declared in the
      * web.xml.
      * <p>
@@ -622,9 +609,31 @@ public class WebComponent implements ContainerListener {
 
     
     // ContainerListener
-    
+    /**
+     * Reload the Web application. This will create and initiate the web
+     * application using the same {@link ResourceConfig} implementation
+     * that was used to load the Web application.
+     * <p>
+     * This method may be called at runtime, more than once, to reload the
+     * Web application. For example, if a {@link ResourceConfig} implementation
+     * is capable of detecting changes to resource classes (addition or removal)
+     * or providers then this method may be invoked to reload the web
+     * application for such changes to take effect.
+     * <p>
+     * If this method is called when there are pending requests then such
+     * requests will be processed using the previously loaded web application.
+     */
     public void onReload() {
-        reload();
+        WebApplication oldApplication = application;
+        WebApplication newApplication = create();
+        initiate(resourceConfig, newApplication);
+        application = newApplication;
+
+        if(resourceConfig instanceof ReloadListener)
+            ((ReloadListener) resourceConfig).onReload();
+
+        oldApplication.destroy();
+        
     }
 
 
