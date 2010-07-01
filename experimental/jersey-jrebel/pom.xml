@@ -44,6 +44,7 @@
         <artifactId>jersey-experimental</artifactId>
 	<version>1.4-SNAPSHOT</version>
     </parent>
+    <name>Jersey JRebel</name>
     <artifactId>jersey-jrebel</artifactId>
 
     <dependencies>
