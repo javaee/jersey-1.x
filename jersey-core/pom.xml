@@ -160,7 +160,6 @@
                 </configuration>
             </plugin>
 
-<!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -171,7 +170,7 @@
                     <excludePackageNames>com.sun.jersey.core.impl:com.sun.jersey.impl</excludePackageNames>
                 </configuration>
             </plugin>
--->
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
