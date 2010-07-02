@@ -13,7 +13,7 @@ pkg = {
                      "info.classification" : "Web Services"  },
     "dirtrees" : [ "glassfish" ],
     "depends" : { 
-                  "pkg:/jersey@1.3" : {"type" : "require" }
+                  "pkg:/jersey@1.4" : {"type" : "require" }
                 },
     "licenses" : { "glassfish/jersey/LICENSE.txt" : { "license" : "CDDL+GPL" }}
 }
