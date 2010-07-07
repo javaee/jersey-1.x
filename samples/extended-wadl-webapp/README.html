@@ -20,6 +20,55 @@
       </ul>
       
     <p>The mapping of the URI path space is presented in the following table:</p>
+     <table border="1">
+            <tbody>
+                <tr>
+                    <th>URI path</th>
+                    <th>Resource class</th>
+                    <th>HTTP method</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>/extended-wadl-webapp</td>
+                    <td>ItemsResource</td>
+                    <td>---</td>
+                    <td>root resource for managing items</td>
+                </tr>
+                <tr>
+                    <td>/extended-wadl-webapp/application.wadl</td>
+                    <td>---</td>
+                    <td>---</td>
+                    <td>Generated wadl</td>
+                </tr>
+                <tr>
+                    <td>/extended-wadl-webapp/items</td>
+                    <td>ItemsResource</td>
+                    <td>GET</td>
+                    <td>Returns list of items</td>
+                </tr>
+                <tr>
+                    <td>/extended-wadl-webapp/items/{id}</td>
+                    <td>ItemResource</td>
+                    <td>GET</td>
+                    <td>Returns item with uniqueId = {id} or returns HTTP 404 if
+                        item does not exist</td>
+                </tr>
+                <tr>
+                    <td>/extended-wadl-webapp/{item}<br>
+                        (with item as request entity)</td>
+                    <td>ItemsResource</td>
+                    <td>POST</td>
+                    <td>Creates new item and allocates unique id for it</td>
+                </tr>
+                <tr>
+                    <td>/extended-wadl-webapp/value/{value}<br>
+                        (with item as request entity)</td>
+                    <td>ItemResource</td>
+                    <td>PUT</td>
+                    <td>Update the value property of the current item</td>
+                </tr>
+            </tbody>
+        </table>
 
       <h2>Running the Example</h2>
       <p>If you are working with Jersey GlassFish update center module installed into your existing GlassFish instance, 
