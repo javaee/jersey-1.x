@@ -33,39 +33,24 @@
                     <td>ItemsResource</td>
                     <td>---</td>
                     <td>root resource for managing items</td>
-                </tr>
+                </tr>                
                 <tr>
-                    <td>/extended-wadl-webapp/application.wadl</td>
-                    <td>---</td>
-                    <td>---</td>
-                    <td>Generated wadl</td>
-                </tr>
-                <tr>
-                    <td>/extended-wadl-webapp/items</td>
-                    <td>ItemsResource</td>
-                    <td>GET</td>
-                    <td>Returns list of items</td>
-                </tr>
-                <tr>
-                    <td>/extended-wadl-webapp/items/{id}</td>
-                    <td>ItemResource</td>
-                    <td>GET</td>
-                    <td>Returns item with uniqueId = {id} or returns HTTP 404 if
-                        item does not exist</td>
-                </tr>
-                <tr>
-                    <td>/extended-wadl-webapp/{item}<br>
-                        (with item as request entity)</td>
+                    <td>items</td>
                     <td>ItemsResource</td>
                     <td>POST</td>
-                    <td>Creates new item and allocates unique id for it</td>
+                    <td>Creates a new item and allocates a new unique URI for it, the new URI is returned back in the Location header</td>
                 </tr>
                 <tr>
-                    <td>/extended-wadl-webapp/value/{value}<br>
-                        (with item as request entity)</td>
+                    <td>items/{id}</td>
+                    <td>ItemResource</td>
+                    <td>GET</td>
+                    <td>Returns an item with the id={id}</td>
+                </tr>               
+                <tr>
+                    <td>items/{id}/value/{val}</td>
                     <td>ItemResource</td>
                     <td>PUT</td>
-                    <td>Update the value property of the current item</td>
+                    <td>Updates the value of the item with the id={id} with the new value {val}</td>
                 </tr>
             </tbody>
         </table>
