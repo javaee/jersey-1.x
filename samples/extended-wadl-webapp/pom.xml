@@ -43,14 +43,7 @@
     </parent>
     <artifactId>extended-wadl-webapp</artifactId>
     <name>Extended WADL WebApp - Jersey sample</name>
-    <packaging>war</packaging>                 
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1.12</version>
-                </dependency>
-            </dependencies>                  
+    <packaging>war</packaging>                                      
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
