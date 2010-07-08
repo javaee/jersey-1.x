@@ -43,78 +43,14 @@
     </parent>
     <artifactId>extended-wadl-webapp</artifactId>
     <name>Extended WADL WebApp - Jersey sample</name>
-    <packaging>war</packaging>
-    <profiles>
-        <profile>
-            <id>jdk-1.5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
+    <packaging>war</packaging>                 
             <dependencies>
                 <dependency>
                     <groupId>com.sun.xml.bind</groupId>
                     <artifactId>jaxb-impl</artifactId>
                     <version>2.1.12</version>
                 </dependency>
-            </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <docletArtifacts>
-                                <docletArtifact>
-                                    <groupId>com.sun.jersey.contribs</groupId>
-                                    <artifactId>maven-wadl-plugin</artifactId>
-                                    <version>${jersey-release-version}</version>
-                                </docletArtifact>
-                                <docletArtifact>
-                                    <groupId>com.sun.jersey.contribs</groupId>
-                                    <artifactId>wadl-resourcedoc-doclet</artifactId>
-                                    <version>${jersey-release-version}</version>
-                                </docletArtifact>
-                                <!--
-                                    Also specify jersey and xerces as doclet artifacts as the ResourceDoclet
-                                    uses classes provided by them to generate the resourcedoc.
-                                 -->
-                                <docletArtifact>
-                                    <groupId>com.sun.jersey</groupId>
-                                    <artifactId>jersey-server</artifactId>
-                                    <version>${jersey-release-version}</version>
-                                </docletArtifact>
-                                <docletArtifact>
-                                    <groupId>xerces</groupId>
-                                    <artifactId>xercesImpl</artifactId>
-                                    <version>2.6.1</version>
-                                </docletArtifact>
-                                <docletArtifact>
-                                    <groupId>javax.xml.bind</groupId>
-                                    <artifactId>jaxb-api</artifactId>
-                                    <version>2.1</version>
-                                </docletArtifact>
-                                <docletArtifact>
-                                    <groupId>javax.xml</groupId>
-                                    <artifactId>jaxb-impl</artifactId>
-                                    <version>2.1</version>
-                                </docletArtifact>
-                                <docletArtifact>
-                                    <groupId>javax.activation</groupId>
-                                    <artifactId>activation</artifactId>
-                                    <version>1.1</version>
-                                </docletArtifact>
-                                <docletArtifact>
-                                    <groupId>javax.xml.stream</groupId>
-                                    <artifactId>stax-api</artifactId>
-                                    <version>1.0</version>
-                                </docletArtifact>
-                            </docletArtifacts>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile> 
-    </profiles>
+            </dependencies>                  
     <dependencies>
         <dependency>
             <groupId>com.sun.jersey</groupId>
