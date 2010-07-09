@@ -105,6 +105,20 @@ public abstract class AbstractSimpleServerTester extends TestCase {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        sleepIfSoConfigured();
+    }
+
+    private void sleepIfSoConfigured() {
+        int timeToSleep = getEnvVariable("JERSEY_HTTP_SLEEP", 0);
+        if (timeToSleep > 0) {
+            System.out.println("Sleeping for " + timeToSleep + " ms");
+            try {
+                // Wait for the server to start
+                Thread.sleep(timeToSleep);
+            } catch (InterruptedException ex) {
+                System.out.println("Sleeping interrupted: " + ex.getLocalizedMessage());
+            }
+        }
     }
     
     public void stopServer() {
