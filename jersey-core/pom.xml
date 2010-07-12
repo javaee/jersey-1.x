@@ -51,6 +51,7 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
             <version>1.1.1</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -148,13 +149,14 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>com.sun.jersey.*;-split-package:=merge-first</Export-Package>
-                        <Import-Package>javax.mail.*;resolution:=optional, *</Import-Package>
+                        <Export-Package>javax.ws.rs.*;-split-package:=merge-first,com.sun.jersey.*;-split-package:=merge-first</Export-Package>
+                        <Import-Package>!javax.ws.rs.*,javax.mail.*;resolution:=optional, *</Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Private-Package>com.sun.jersey.core.osgi;-split-package:=merge-first</Private-Package>
                         <Bundle-Activator>com.sun.jersey.core.osgi.Activator</Bundle-Activator>
                         <Implementation-Title>jersey-core osgi</Implementation-Title>
                         <Implementation-Version>${project.version}</Implementation-Version>
+                        <Embed-Dependency>jsr311-api;inline=true</Embed-Dependency>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>

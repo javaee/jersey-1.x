@@ -168,7 +168,6 @@ public class ServerClientMixedTest {
                 // load PAX url war
                 mavenBundle("org.ops4j.pax.url","pax-url-war","1.1.2"),
                 
-                mavenBundle("javax.ws.rs","jsr311-api","1.1.1"),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
         	mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
         	mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),

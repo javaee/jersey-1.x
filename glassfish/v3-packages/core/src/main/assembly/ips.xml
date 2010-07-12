@@ -12,7 +12,6 @@
      <fileSet>
       <directory>target/assembly</directory>
       <includes>
-        <include>jsr311-api.jar</include>
         <include>jersey-core.jar</include>
         <include>jersey-gf-server.jar</include>
         <include>jersey-client.jar</include>

@@ -97,7 +97,6 @@ public abstract class AbstractResourceTester implements ContainerListener {
                 wrappedBundle(mavenBundle().groupId("javax.mail").artifactId("mail").versionAsInProject()),
 
                 // load Jersey bundles
-                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),

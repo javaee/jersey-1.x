@@ -90,7 +90,6 @@ public abstract class AbstractWebAppTest {
                                 "http://download.java.net/maven/2"),
                 mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
                 mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
-                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject()));
