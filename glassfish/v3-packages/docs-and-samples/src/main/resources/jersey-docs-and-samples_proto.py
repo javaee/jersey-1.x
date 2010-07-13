@@ -1,6 +1,6 @@
 pkg = {
     "name"          : "jersey-docs-and-examples",
-    "version"       : "1.4,0-0.1",
+    "version"       : "1.4,0-0.3",
     "attributes"    : { "pkg.summary" : "Jersey Examples And Documentation, RESTful Web services for GlassFish",
                         "pkg.description" : 
 "This package contains Jersey API javadocs and examples. Once installed, \
