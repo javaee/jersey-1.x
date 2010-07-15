@@ -158,30 +158,55 @@ public final class ServiceFinder<T> implements Iterable<T> {
     
     private static final String MANIFEST = "META-INF/MANIFEST.MF";
 
+    private static final String MODULE_VERSION = "META-INF/jersey-module-version";
+
     private static final String PREFIX = "META-INF/services/";
 
     private static final String BUNDLE_VERSION_ATTRIBUTE = "Bundle-Version";
 
     private static final String BUNDLE_SYMBOLIC_NAME_ATTRIBUTE = "Bundle-SymbolicName";
 
-    private static final String BUNDLE_VERSION = getBundleVersion();
+    private static final String BUNDLE_VERSION = getBundleAttribute(BUNDLE_VERSION_ATTRIBUTE);
+
+    private static final String BUNDLE_SYMBOLIC_NAME = getBundleAttribute(BUNDLE_SYMBOLIC_NAME_ATTRIBUTE);
+
+    private static final String MODULE_VERSION_VALUE = getModuleVersion();
 
     private final Class<T> serviceClass;
     private final String serviceName;
     private final ClassLoader classLoader;
     private final boolean ignoreOnClassNotFound;
 
-    private static String getBundleVersion() {
+    private static String getBundleAttribute(String attributeName) {
         try {
             final String version = getManifest(ServiceFinder.class).
                     getMainAttributes().
-                    getValue(BUNDLE_VERSION_ATTRIBUTE);
+                    getValue(attributeName);
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("ServiceFinder Bundle-Version: " + version);
+                LOGGER.fine("ServiceFinder " + attributeName + ": " + version);
             }
             return version;
         } catch (IOException ex) {
             LOGGER.log(Level.FINE, "Error loading META-INF/MANIFEST.MF associated with " + ServiceFinder.class.getName(), ex);
+            return null;
+        }
+    }
+
+    private static String getModuleVersion() {
+        try {
+            String resource = ServiceFinder.class.getName().replace(".", "/") + ".class";
+            URL url = getResource(ServiceFinder.class.getClassLoader(), resource);
+            if (url == null)
+                throw new IOException("Resource not found: " + url);
+
+            URL moduleVersionURL = new URL(getManifestURL(resource, url).toString().replace(MANIFEST, MODULE_VERSION));
+            byte[] array = new byte[20];
+
+            moduleVersionURL.openStream().read(array);
+
+            return new String(array);
+        } catch (IOException ioe) {
+            LOGGER.log(Level.FINE, "Error loading META-INF/jersey-module-version associated with " + ServiceFinder.class.getName(), ioe);
             return null;
         }
     }
@@ -244,13 +269,36 @@ public final class ServiceFinder<T> implements Iterable<T> {
                     "\n  " + BUNDLE_SYMBOLIC_NAME_ATTRIBUTE + ": " + symbolicName +
                     "\n  " + BUNDLE_VERSION_ATTRIBUTE + ": " + version);
         }
-        
+
         if (symbolicName != null && 
                 symbolicName.startsWith("com.sun.jersey") &&
                 !BUNDLE_VERSION.equals(version)) {
             return false;
         } else {
+            String moduleVersion = getJerseyModuleVersion(manifestURL);
+
+            if(moduleVersion != null &&
+                    (!moduleVersion.equals(MODULE_VERSION_VALUE)) ||
+                        (symbolicName != null &&
+                        (BUNDLE_SYMBOLIC_NAME.startsWith("com.sun.jersey") ^ symbolicName.startsWith("com.sun.jersey")))) {
+                return false;
+            }
+
             return true;
+        }
+    }
+
+    private static String getJerseyModuleVersion(URL manifestURL) {
+        try {
+            URL jerseyBundleURL = new URL(manifestURL.toString().replace(MANIFEST, MODULE_VERSION));
+            byte[] array = new byte[20];
+
+            jerseyBundleURL.openStream().read(array);
+            return new String(array);
+
+        } catch (IOException ioe) {
+            // add logger message
+            return null;
         }
     }
     
