@@ -213,9 +213,6 @@
                         <DynamicImport-Package>*</DynamicImport-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
-                    <!--configuration>
-                      <excludeDependencies>jersey-core;scope=provided|runtime</excludeDependencies>
-                    </configuration-->
                 </configuration>
             </plugin>
 
