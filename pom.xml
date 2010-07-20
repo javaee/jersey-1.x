@@ -292,7 +292,7 @@
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>2.3.1</version>
                 <configuration>
-                    <excludeFilterFile>findbugsFilter.xml</excludeFilterFile>
+                    <!--excludeFilterFile>findbugsFilter.xml</excludeFilterFile-->
                     <xmlOutput>true</xmlOutput>
                     <!-- Optional derectory to put findbugs xdoc xml report -->
                     <xmlOutputDirectory>target/site</xmlOutputDirectory>

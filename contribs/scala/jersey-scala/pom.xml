@@ -46,6 +46,12 @@
       <artifactId>scalatest</artifactId>
       <version>0.9.4</version>
       <scope>test</scope>
+      <exclusions>
+          <exclusion>
+              <groupId>org.scala-lang</groupId>
+              <artifactId>scala-library</artifactId>
+          </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 
@@ -56,6 +62,7 @@
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
+        <version>2.14</version>
         <executions>
           <execution>
             <goals>
@@ -112,15 +119,4 @@
       </plugin>
     </plugins>
   </build>
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <configuration>
-          <scalaVersion>${scala.version}</scalaVersion>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 </project>
