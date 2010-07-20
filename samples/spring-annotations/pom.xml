@@ -169,6 +169,7 @@
                     <app>${basedir}/target/spring-annotations.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
+                    <instanceRoot>./target/gbembeddedtmp</instanceRoot>
                 </configuration>
                 <dependencies>
                     <dependency>

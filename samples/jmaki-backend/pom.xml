@@ -36,8 +36,8 @@
  holder.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
@@ -84,17 +84,17 @@
                 </configuration>
             </plugin>
             <plugin>
-              <groupId>org.mortbay.jetty</groupId>
-              <artifactId>maven-jetty-plugin</artifactId>
-              <version>6.1.24</version>
-              <configuration>
-                <webApp>${basedir}/target/jmakibackend.war</webApp>
-                <contextPath>jMakiBackend</contextPath>
-              </configuration>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>6.1.24</version>
+                <configuration>
+                    <webApp>${basedir}/target/jmakibackend.war</webApp>
+                    <contextPath>jMakiBackend</contextPath>
+                </configuration>
             </plugin>
 
             <!-- Run the application using "mvn embedded-glassfish:run" -->
-             <plugin>
+            <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-embedded-glassfish-plugin</artifactId>
                 <version>3.0</version>
@@ -103,6 +103,7 @@
                     <app>${basedir}/target/jmakibackend.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
+                    <instanceRoot>./target/gbembeddedtmp</instanceRoot>
                 </configuration>
             </plugin>
 
@@ -125,7 +126,7 @@
                 	</execution>
                 </executions>
             </plugin>
-             <plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
@@ -146,7 +147,7 @@
         </plugins>
     </build>
     <repositories>
-       <repository>
+        <repository>
             <id>maven-repository.dev.java.net</id>
             <name>Java.net Maven 1 Repository (legacy)</name>
             <url>http://download.java.net/maven/1</url>
@@ -163,7 +164,7 @@
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
         </repository>
-     </repositories>
+    </repositories>
     <pluginRepositories>
         <pluginRepository>
             <id>maven2-repository.dev.java.net</id>
