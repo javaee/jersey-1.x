@@ -10,7 +10,7 @@
 <h2>How to run the example</h2>
 
 <h3>Generate the application.wadl</h3>
-<p>Build the project, generate the resourcedoc.xml with javadoc and generate the wadl file:
+<p>Build the project, generate the <code>resourcedoc.xml</code> with javadoc and generate the wadl file:
 <pre>
 $ mvn compile javadoc:javadoc com.sun.jersey.contribs:maven-wadl-plugin:generate
 </pre>
@@ -18,19 +18,19 @@ $ mvn compile javadoc:javadoc com.sun.jersey.contribs:maven-wadl-plugin:generate
 <p>Afterwards have a look at the <code>target/classes/application.wadl</code>
 and at these artifacts:
 <dl>
-  <dt>pom.xml</dt>
+  <dt><code>pom.xml</code></dt>
   <dd>How all this wadl generation stuff is configured</dd>
 
-  <dt>src/main/java/com/sun/jersey/samples/generatewadl/resources/ItemsResource.java</dt>
+  <dt><code>src/main/java/com/sun/jersey/samples/generatewadl/resources/ItemsResource.java</code></dt>
   <dd>Shows how custom javadoc tags can be used to extend the generated wadl documentation</dd>
   
-  <dt>src/main/java/com/sun/jersey/samples/generatewadl/util/ExampleDocProcessor.java</dt>
-  <dd>Shows how you can process your custom tags and add them to the generated resourcedoc.xml.
-  An "@example.tag" can be found at ItemsResource.createItem</dd>
+  <dt><code>src/main/java/com/sun/jersey/samples/generatewadl/util/ExampleDocProcessor.java</code></dt>
+  <dd>Shows how you can process your custom tags and add them to the generated <code>resourcedoc.xml</code>.
+  An "@example.tag" can be found at <code>ItemsResource.createItem</code></dd>
   
-  <dt>src/main/java/com/sun/jersey/samples/generatewadl/util/ExampleWadlGenerator</dt>
-  <dd>Shows how the custom information added by the ExampleDocProcessor to the resourcedoc.xml
-  can be processed by this WadlGenerator and used to extend the generated application.wadl</dd>
+  <dt><code>src/main/java/com/sun/jersey/samples/generatewadl/util/ExampleWadlGenerator</code></dt>
+  <dd>Shows how the custom information added by the ExampleDocProcessor to the <code>resourcedoc.xml</code>
+  can be processed by this WadlGenerator and used to extend the generated <code>application.wadl</code></dd>
 </dl>
 </p>
 
@@ -42,7 +42,7 @@ $ mvn package
 </pre>
 </p>
 
-<p>and afterwards have a look at the generated target/application.html</p>
+<p>and afterwards have a look at the generated <code>target/application.html</code></p>
 
 </body>
 </html>
