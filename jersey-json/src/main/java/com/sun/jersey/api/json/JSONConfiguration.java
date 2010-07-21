@@ -382,7 +382,7 @@ public class JSONConfiguration {
     /**
      * The default JSONConfiguration uses {@link JSONConfiguration.Notation#MAPPED} notation with root unwrapping option set to true.
      */
-    public static JSONConfiguration DEFAULT = mapped().rootUnwrapping(true).build();
+    public static final JSONConfiguration DEFAULT = mapped().rootUnwrapping(true).build();
 
     /**
      * A static method for obtaining a builder of {@link JSONConfiguration} instance, which will use {@link Notation#NATURAL} JSON notation.
