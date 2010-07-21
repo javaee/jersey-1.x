@@ -219,7 +219,15 @@
                     <artifactId>maven-bundle-plugin</artifactId>
                     <version>1.4.1</version>
                 </plugin>
-            </plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>2.3.1</version>
+                    <configuration>
+                        <xmlOutput>true</xmlOutput>
+                    </configuration>
+                </plugin>
+             </plugins>
         </pluginManagement>
         
         <plugins>
@@ -284,21 +292,5 @@
             <url>java-net:/maven2-repository/trunk/repository/</url>
         </repository>
     </distributionManagement>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.3.1</version>
-                <configuration>
-                    <!--excludeFilterFile>findbugsFilter.xml</excludeFilterFile-->
-                    <xmlOutput>true</xmlOutput>
-                    <!-- Optional derectory to put findbugs xdoc xml report -->
-                    <xmlOutputDirectory>target/site</xmlOutputDirectory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
 
 </project>
