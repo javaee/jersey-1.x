@@ -76,6 +76,7 @@ public class JsonTest {
 
                 // jersey-json deps
                 mavenBundle().groupId("org.codehaus.jackson").artifactId("jackson-core-asl").versionAsInProject(),
+                mavenBundle().groupId("org.codehaus.jackson").artifactId("jackson-mapper-asl").versionAsInProject(),
                 mavenBundle().groupId("org.codehaus.jettison").artifactId("jettison").versionAsInProject(),
 
                 // customize the export header

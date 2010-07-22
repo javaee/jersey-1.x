@@ -106,6 +106,7 @@ public abstract class AbstractResourceTester implements ContainerListener {
 
                 // jersey-json deps
                 mavenBundle().groupId("org.codehaus.jackson").artifactId("jackson-core-asl").versionAsInProject(),
+                mavenBundle().groupId("org.codehaus.jackson").artifactId("jackson-mapper-asl").versionAsInProject(),
                 mavenBundle().groupId("org.codehaus.jettison").artifactId("jettison").versionAsInProject(),
 
                 // jersey-atom deps
