@@ -1,4 +1,5 @@
 release 1.4 (08-2010)
+- Jackson dependency upgraded to version 1.5.4 
 - *Breaking change*: in order to prevent OSGi bundle reload issues
   we need to bundle JSR-311 API classes with the jersey-core module
 - Integrated JRebel support from branch
