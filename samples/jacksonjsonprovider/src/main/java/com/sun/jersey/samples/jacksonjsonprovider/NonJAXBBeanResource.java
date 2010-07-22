@@ -51,13 +51,8 @@ import javax.ws.rs.core.MediaType;
 @Path("/nonJAXBResource")
 public class NonJAXBBeanResource {
 
-    @GET @Produces(MediaType.APPLICATION_JSON)
-    public NonJAXBBean getSimpleBean() {
-        return new NonJAXBBean();
-    }
-
-    @GET @Produces("application/javascript")
+    @GET @Produces({"application/javascript", MediaType.APPLICATION_JSON})
     public JSONWithPadding getSimpleBeanJSONP() {
-        return new JSONWithPadding(getSimpleBean());
+        return new JSONWithPadding(new NonJAXBBean());
     }
 }

@@ -37,6 +37,13 @@
 
 package com.sun.jersey.api.json;
 
+import java.io.IOException;
+import org.codehaus.jackson.JsonGenerator;
+import org.codehaus.jackson.JsonProcessingException;
+import org.codehaus.jackson.map.JsonSerializableWithType;
+import org.codehaus.jackson.map.SerializerProvider;
+import org.codehaus.jackson.map.TypeSerializer;
+
 /**
  * An entity supporting JSON with Padding (JSONP).
  * <p>
@@ -52,7 +59,7 @@ package com.sun.jersey.api.json;
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-public class JSONWithPadding {
+public class JSONWithPadding implements JsonSerializableWithType {
 
     public static final String DEFAULT_CALLBACK_NAME = "callback";
 
@@ -61,7 +68,7 @@ public class JSONWithPadding {
     private final Object jsonSource;
 
     /**
-     * Pad JSON using the default funcation name "callback".
+     * Pad JSON using the default function name "callback".
      *
      * @param jsonSource the JSON to pad.
      */
@@ -70,10 +77,10 @@ public class JSONWithPadding {
     }
 
     /**
-     * Pad JSON using a declared callback funcation name.
+     * Pad JSON using a declared callback function name.
      *
      * @param jsonSource the JSON to pad.
-     * @param callbackName the callback funcation name.
+     * @param callbackName the callback function name.
      */
     public JSONWithPadding(Object jsonSource, String callbackName) {
         if (jsonSource == null)
@@ -99,5 +106,22 @@ public class JSONWithPadding {
      */
     public Object getJsonSource() {
         return jsonSource;
+    }
+
+
+    @Override
+    public void serialize(JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonProcessingException {
+        if (jsonSource == null) {
+            provider.getNullValueSerializer().serialize(null, jgen, provider);
+        } else {
+            Class<?> cls = jsonSource.getClass();
+            provider.findTypedValueSerializer(cls, true).serialize(jsonSource, jgen, provider);
+        }
+    }
+
+    @Override
+    public void serializeWithType(JsonGenerator jgen, SerializerProvider provider, TypeSerializer typeSer) throws IOException, JsonProcessingException {
+        serialize(jgen, provider);
     }
 }

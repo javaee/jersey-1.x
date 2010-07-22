@@ -88,18 +88,22 @@ public class JSONWithPaddingProvider extends AbstractMessageReaderWriterProvider
     }
     
 
+    @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return false;
     }
 
+    @Override
     public JSONWithPadding readFrom(Class<JSONWithPadding> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
         throw new UnsupportedOperationException("Not supported by design.");
     }
 
+    @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return type == JSONWithPadding.class;
     }
 
+    @Override
     public void writeTo(JSONWithPadding t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
         Object jsonEntity = t.getJsonSource();
         Type entityGenericType = jsonEntity.getClass();

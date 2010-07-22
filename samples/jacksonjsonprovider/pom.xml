@@ -138,7 +138,7 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-jaxrs</artifactId>
-            <version>1.1.1</version>
+            <version>1.5.4</version>
         </dependency>
         <dependency>
             <groupId>com.sun.grizzly</groupId>
