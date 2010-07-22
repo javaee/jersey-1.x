@@ -48,6 +48,7 @@ import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.JsonStreamContext;
 import org.codehaus.jackson.JsonToken;
+import org.codehaus.jackson.ObjectCodec;
 import org.codehaus.jackson.type.TypeReference;
 
 /**
@@ -177,8 +178,8 @@ public class JacksonRootAddingParser extends JsonParser {
     }
 
     @Override
-    public void skipChildren() throws IOException, JsonParseException {
-        parser.skipChildren();
+    public JsonParser skipChildren() throws IOException, JsonParseException {
+        return parser.skipChildren();
     }
 
     @Override
@@ -260,5 +261,15 @@ public class JacksonRootAddingParser extends JsonParser {
     @Override
     public BigDecimal getDecimalValue() throws IOException, JsonParseException {
         return parser.getDecimalValue();
+    }
+
+    @Override
+    public ObjectCodec getCodec() {
+        return parser.getCodec();
+    }
+
+    @Override
+    public void setCodec(ObjectCodec c) {
+        parser.setCodec(c);
     }
 }

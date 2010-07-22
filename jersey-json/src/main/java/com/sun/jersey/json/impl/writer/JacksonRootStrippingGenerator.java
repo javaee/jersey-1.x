@@ -70,14 +70,24 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
         return new JacksonRootStrippingGenerator(g);
     }
 
-    @Override
+    @Override @Deprecated
     public void enableFeature(Feature feature) {
         generator.enableFeature(feature);
     }
 
     @Override
+    public JsonGenerator enable(Feature feature) {
+        return generator.enable(feature);
+    }
+
+    @Override @Deprecated
     public void disableFeature(Feature feature) {
         generator.disableFeature(feature);
+    }
+
+    @Override
+    public JsonGenerator disable(Feature feature) {
+        return generator.disable(feature);
     }
 
     @Override
@@ -85,14 +95,19 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
         generator.setFeature(feature, enabled);
     }
 
-    @Override
+    @Override @Deprecated
     public boolean isFeatureEnabled(Feature feature) {
         return generator.isFeatureEnabled(feature);
     }
 
     @Override
-    public void useDefaultPrettyPrinter() {
-        generator.useDefaultPrettyPrinter();
+    public boolean isEnabled(Feature f) {
+        return generator.isEnabled(f);
+    }
+
+    @Override
+    public JsonGenerator useDefaultPrettyPrinter() {
+        return generator.useDefaultPrettyPrinter();
     }
 
     @Override
@@ -225,8 +240,8 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
     }
 
     @Override
-    public void setCodec(ObjectCodec codec) {
-        generator.setCodec(codec);
+    public JsonGenerator setCodec(ObjectCodec codec) {
+        return generator.setCodec(codec);
     }
 
     @Override
