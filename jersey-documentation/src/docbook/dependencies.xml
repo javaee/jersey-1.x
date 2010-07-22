@@ -394,7 +394,14 @@
       <para>Non-maven developers require: <itemizedlist>
           <listitem>
             <ulink
-            url="http://repository.codehaus.org/org/codehaus/jackson/jackson-core-asl/1.1.1/jackson-core-asl-1.1.1.jar">jackson-core-asl.jar</ulink>
+            url="http://repository.codehaus.org/org/codehaus/jackson/jackson-core-asl/1.5.4/jackson-core-asl-1.5.4.jar">jackson-core-asl.jar</ulink>
+
+            ,
+          </listitem>
+
+          <listitem>
+            <ulink
+            url="http://repository.codehaus.org/org/codehaus/jackson/jackson-mapper-asl/1.5.4/jackson-mapper-asl-1.5.4.jar">jackson-mapper-asl.jar</ulink>
 
             ,
           </listitem>

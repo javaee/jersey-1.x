@@ -35,6 +35,7 @@ Stop all running server instances. Then remove the following files from the Glas
     <listitem>glassfish/modules/jersey-gf-statsproviders.jar</listitem>
     <listitem>glassfish/modules/jersey-multipart.jar</listitem>
     <listitem>glassfish/modules/jackson-core-asl.jar</listitem>
+    <listitem>glassfish/modules/jackson-mapper-asl.jar</listitem>
     <listitem>glassfish/modules/jettison.jar</listitem>
     <listitem>glassfish/modules/mimepull.jar</listitem>
 </itemizedlist>
