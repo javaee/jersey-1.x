@@ -183,7 +183,7 @@ public abstract class AbstractHttpServiceTest {
             try {
                 return Integer.parseInt(varValue);
             } catch (NumberFormatException e) {
-                // will return default value bellow
+                // will return default value below
             }
         }
         return defaultValue;
