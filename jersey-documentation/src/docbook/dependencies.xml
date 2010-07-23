@@ -408,6 +408,13 @@
 
           <listitem>
             <ulink
+            url="http://repository.codehaus.org/org/codehaus/jackson/jackson-jaxrs/1.5.4/jackson-jaxrs-1.5.4.jar">jackson-jaxrs.jar</ulink>
+
+            ,
+          </listitem>
+
+          <listitem>
+            <ulink
             url="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar">jettison.jar</ulink>
 
             ,

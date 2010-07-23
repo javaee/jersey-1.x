@@ -135,12 +135,7 @@
             <artifactId>jersey-server</artifactId>
             <version>${version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-jaxrs</artifactId>
-            <version>1.5.4</version>
-        </dependency>
-        <dependency>
+       <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
             <version>1.9.18-i</version>

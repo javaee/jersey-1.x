@@ -38,7 +38,6 @@
 package com.sun.jersey.json.impl.provider.entity;
 
 
-import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.jersey.json.impl.ImplMessages;
 import java.io.IOException;
 import java.io.InputStream;

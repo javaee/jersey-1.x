@@ -36,9 +36,13 @@
  */
 package com.sun.jersey.json.impl.provider.entity;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
+import com.sun.jersey.core.util.FeaturesAndProperties;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -59,6 +63,8 @@ import java.nio.charset.Charset;
  * @author Paul.Sandoz@Sun.Com, Jakub.Podlesak@Sun.COM
  */
 public class JSONRootElementProvider extends AbstractRootElementProvider {
+    
+    boolean jacksonEntityProviderTakesPrecedence = false;
 
     JSONRootElementProvider(Providers ps) {
         super(ps);
@@ -66,6 +72,22 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
 
     JSONRootElementProvider(Providers ps, MediaType mt) {
         super(ps, mt);
+    }
+
+    @Context @Override
+    public void setConfiguration(FeaturesAndProperties fp) {
+        super.setConfiguration(fp);
+        jacksonEntityProviderTakesPrecedence = fp.getFeature(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER);
+    }
+
+    @Override
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return !jacksonEntityProviderTakesPrecedence && super.isReadable(type, genericType, annotations, mediaType);
+    }
+
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return !jacksonEntityProviderTakesPrecedence && super.isWriteable(type, genericType, annotations, mediaType);
     }
 
     @Produces("application/json")
@@ -87,7 +109,7 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
 
         @Override
         protected boolean isSupported(MediaType m) {
-            return m.getSubtype().endsWith("+json");
+            return !jacksonEntityProviderTakesPrecedence && m.getSubtype().endsWith("+json");
         }
     }
 

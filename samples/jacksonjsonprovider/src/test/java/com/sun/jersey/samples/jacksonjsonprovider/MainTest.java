@@ -37,6 +37,7 @@
 
 package com.sun.jersey.samples.jacksonjsonprovider;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -50,7 +51,8 @@ import static org.junit.Assert.*;
 public class MainTest extends JerseyTest {
 
     public MainTest() {
-        super(new WebAppDescriptor.Builder("javax.ws.rs.Application", MyApplication.class.getName()).build());
+        super(new WebAppDescriptor.Builder("javax.ws.rs.Application", MyApplication.class.getName())
+                .initParam(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER, "true").build());
     }
 
     @Test

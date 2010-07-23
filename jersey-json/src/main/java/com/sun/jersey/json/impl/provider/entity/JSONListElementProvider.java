@@ -40,6 +40,7 @@ package com.sun.jersey.json.impl.provider.entity;
 import com.sun.jersey.api.json.JSONConfigurated;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.Stax2JsonFactory;
 import java.io.IOException;
@@ -47,6 +48,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -69,12 +72,30 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class JSONListElementProvider extends AbstractListElementProvider {
 
+    boolean jacksonEntityProviderTakesPrecedence = false;
+
     JSONListElementProvider(Providers ps) {
         super(ps);
     }
 
     JSONListElementProvider(Providers ps, MediaType mt) {
         super(ps, mt);
+    }
+
+    @Context @Override
+    public void setConfiguration(FeaturesAndProperties fp) {
+        super.setConfiguration(fp);
+        jacksonEntityProviderTakesPrecedence = fp.getFeature(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER);
+    }
+
+    @Override
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return !jacksonEntityProviderTakesPrecedence && super.isReadable(type, genericType, annotations, mediaType);
+    }
+
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return !jacksonEntityProviderTakesPrecedence && super.isWriteable(type, genericType, annotations, mediaType);
     }
 
     @Produces("application/json")
@@ -90,7 +111,7 @@ public class JSONListElementProvider extends AbstractListElementProvider {
 
         @Override
         protected boolean isSupported(MediaType m) {
-            return m.getSubtype().endsWith("+json");
+            return !jacksonEntityProviderTakesPrecedence && m.getSubtype().endsWith("+json");
         }
     }
 

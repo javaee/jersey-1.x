@@ -21,6 +21,7 @@
         <include>asm-all.jar</include>
         <include>jackson-core-asl.jar</include>
         <include>jackson-mapper-asl.jar</include>
+        <include>jackson-jaxrs.jar</include>
         <include>jettison.jar</include>
         <include>mimepull.jar</include>
       </includes>

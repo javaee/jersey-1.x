@@ -47,12 +47,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * An immutable configuration of JSON notationand options. JSONConfiguration could be used
+ * An immutable configuration of JSON notation and options. JSONConfiguration could be used
  * for configuring the JSON notation on {@link JSONJAXBContext}
  *
  * @author Jakub.Podlesak@Sun.COM
  */
 public class JSONConfiguration {
+
+    public final static String FEATURE_JACKSON_ENTITY_PROVIDER
+            = "com.sun.jersey.api.json.JacksonJsonEntityProvidersFeature";
 
     /**
      * Enumeration of supported JSON notations.

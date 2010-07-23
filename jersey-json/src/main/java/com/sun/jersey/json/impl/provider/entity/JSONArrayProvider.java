@@ -37,7 +37,6 @@
 
 package com.sun.jersey.json.impl.provider.entity;
 
-import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.jersey.json.impl.ImplMessages;
 import java.io.IOException;
 import java.io.InputStream;
@@ -77,6 +76,7 @@ public class JSONArrayProvider extends JSONLowLevelProvider<JSONArray>{
         super(JSONArray.class);
     }
 
+    @Override
     public JSONArray readFrom(
             Class<JSONArray> type, 
             Type genericType, 
@@ -93,6 +93,7 @@ public class JSONArrayProvider extends JSONLowLevelProvider<JSONArray>{
         }
     }
     
+    @Override
     public void writeTo(
             JSONArray t, 
             Class<?> type, 

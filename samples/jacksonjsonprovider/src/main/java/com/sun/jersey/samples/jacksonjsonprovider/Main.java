@@ -39,6 +39,7 @@ package com.sun.jersey.samples.jacksonjsonprovider;
 
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.json.JSONConfiguration;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
@@ -67,8 +68,9 @@ public class Main {
     public static SelectorThread startServer() throws IOException{
         final Map<String, String> initParams = new HashMap<String, String>();
 
-        initParams.put("javax.ws.rs.Application",
-                MyApplication.class.getName());
+        initParams.put("javax.ws.rs.Application", MyApplication.class.getName());
+
+        initParams.put(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER, "true");
 
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         return threadSelector;

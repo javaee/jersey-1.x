@@ -9,3 +9,4 @@ com.sun.jersey.json.impl.provider.entity.JSONArrayProvider$General
 com.sun.jersey.json.impl.provider.entity.JSONObjectProvider$App
 com.sun.jersey.json.impl.provider.entity.JSONObjectProvider$General
 com.sun.jersey.json.impl.provider.entity.JSONWithPaddingProvider
+com.sun.jersey.json.impl.provider.entity.JacksonProviderProxy

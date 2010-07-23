@@ -37,9 +37,11 @@
 
 package com.sun.jersey.json.impl.provider.entity;
 
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -54,6 +56,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
 /**
@@ -62,12 +66,30 @@ import java.nio.charset.Charset;
  */
 public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     
+    boolean jacksonEntityProviderTakesPrecedence = false;
+
     JSONJAXBElementProvider(Providers ps) {
         super(ps);
     }
 
     JSONJAXBElementProvider(Providers ps, MediaType mt) {
         super(ps, mt);
+    }
+
+    @Context @Override
+    public void setConfiguration(FeaturesAndProperties fp) {
+        super.setConfiguration(fp);
+        jacksonEntityProviderTakesPrecedence = fp.getFeature(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER);
+    }
+
+    @Override
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return !jacksonEntityProviderTakesPrecedence && super.isReadable(type, genericType, annotations, mediaType);
+    }
+
+    @Override
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
+        return !jacksonEntityProviderTakesPrecedence && super.isWriteable(type, genericType, annotations, mediaType);
     }
 
     @Produces("application/json")
@@ -87,6 +109,7 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
         }
     }
 
+    @Override
     protected final JAXBElement<?> readFrom(Class<?> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
             throws JAXBException {
@@ -96,6 +119,7 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
                 unmarshalJAXBElementFromJSON(new InputStreamReader(entityStream, c), type);
     }
     
+    @Override
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException {

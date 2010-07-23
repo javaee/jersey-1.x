@@ -40,7 +40,6 @@ package com.sun.jersey.samples.jacksonjsonprovider;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
 /**
  *
@@ -56,9 +55,6 @@ public class MyApplication extends Application {
         // register root resources
         classes.add(EmptyArrayResource.class);
         classes.add(NonJAXBBeanResource.class);
-
-        // register the Jackson JSON provider
-        classes.add(JacksonJsonProvider.class);
 
         return classes;
     }
