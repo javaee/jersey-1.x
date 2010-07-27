@@ -52,7 +52,7 @@ public class MainTest extends JerseyTest {
 
     public MainTest() {
         super(new WebAppDescriptor.Builder("javax.ws.rs.Application", MyApplication.class.getName())
-                .initParam(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER, "true").build());
+                .initParam(JSONConfiguration.FEATURE_POJO_MAPPING, "true").build());
     }
 
     @Test

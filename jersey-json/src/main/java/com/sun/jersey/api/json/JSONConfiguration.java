@@ -54,8 +54,8 @@ import java.util.logging.Logger;
  */
 public class JSONConfiguration {
 
-    public final static String FEATURE_JACKSON_ENTITY_PROVIDER
-            = "com.sun.jersey.api.json.JacksonJsonEntityProvidersFeature";
+    public final static String FEATURE_POJO_MAPPING
+            = "com.sun.jersey.api.json.POJOMappingFeature";
 
     /**
      * Enumeration of supported JSON notations.

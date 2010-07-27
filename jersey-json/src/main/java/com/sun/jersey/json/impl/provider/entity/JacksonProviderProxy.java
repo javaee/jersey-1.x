@@ -68,7 +68,7 @@ public class JacksonProviderProxy implements MessageBodyReader<Object>, MessageB
 
     @Context
     public void setFeaturesAndProperties(FeaturesAndProperties fp) {
-        jacksonEntityProviderFeatureSet = fp.getFeature(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER);
+        jacksonEntityProviderFeatureSet = fp.getFeature(JSONConfiguration.FEATURE_POJO_MAPPING);
     }
 
     @Context

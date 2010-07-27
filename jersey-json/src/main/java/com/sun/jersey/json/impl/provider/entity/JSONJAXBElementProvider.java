@@ -79,7 +79,7 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
     @Context @Override
     public void setConfiguration(FeaturesAndProperties fp) {
         super.setConfiguration(fp);
-        jacksonEntityProviderTakesPrecedence = fp.getFeature(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER);
+        jacksonEntityProviderTakesPrecedence = fp.getFeature(JSONConfiguration.FEATURE_POJO_MAPPING);
     }
 
     @Override

@@ -70,7 +70,7 @@ public class Main {
 
         initParams.put("javax.ws.rs.Application", MyApplication.class.getName());
 
-        initParams.put(JSONConfiguration.FEATURE_JACKSON_ENTITY_PROVIDER, "true");
+        initParams.put(JSONConfiguration.FEATURE_POJO_MAPPING, "true");
 
         SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         return threadSelector;

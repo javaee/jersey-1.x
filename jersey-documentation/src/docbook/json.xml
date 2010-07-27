@@ -12,9 +12,12 @@
   and <ulink
   url="https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/MessageBodyWriter.html">MessageBodyWriter</ulink>
   providers distributed with <emphasis>jersey-json</emphasis> module. These providers enable using
-  two basic approaches when working with JSON format:
+  three basic approaches when working with JSON format:
 
   <itemizedlist>
+    <listitem>
+      <para><link linkend="json.pojo.approach.title">POJO support</link></para>
+    </listitem>
     <listitem>
       <para><link linkend="json.jaxb.approach.title">JAXB based JSON support</link></para>
     </listitem>
@@ -23,11 +26,34 @@
     </listitem>
   </itemizedlist>
   
-  Both approaches use the same principle. You need to make your resource methods consume and/or produce
-  instances of certain Java types, known to provided MessageBodyReaders/Writers. Also, naturally, you need to make sure
-  you use <emphasis>jersey-json</emphasis> module with your application.
+  The first method is pretty generic and allows you to map any Java Object to JSON and vice versa. 
+  The other two approaches limit you in Java types your resource methods could produce and/or consume.
+  JAXB based approach could be taken if you want to utilize certain JAXB features.
+  The last, low-level, approach gives you the best fine-grained control over the outcoming JSON data format.
   </para>
 
+  <section>
+    <title id="json.pojo.approach.title">POJO support</title>
+    <para>
+    POJO suppport represents the easiest way to convert your Java Objects to JSON and back.
+    It is based on the <ulink url="http://jackson.codehaus.org/">Jackson library</ulink>.
+    </para>
+    <para>
+    To switch this method on, you will need to turn <emphasis>JSONConfiguration.FEATURE_POJO_MAPPING</emphasis> feature on.
+    This could be done in <code>web.xml</code> using the following servlet init parameter:
+<example>
+<title>POJO JSON support web.xml configuration</title>
+<programlisting linenumbering="numbered">
+        &lt;init-param&gt;
+            &lt;param-name&gt;com.sun.jersey.api.json.POJOMappingFeature&lt;/param-name&gt;
+            &lt;param-value&gt;true&lt;/param-value&gt;
+        &lt;/init-param&gt;
+</programlisting>
+</example>
+    
+    </para>
+  </section>  
+    
   <section>
     <title id="json.jaxb.approach.title">JAXB Based JSON support</title>
     
