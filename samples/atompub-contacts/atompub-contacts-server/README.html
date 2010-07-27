@@ -45,16 +45,7 @@ JavaBean "model" classes to be shared by the client and server modules.
              "admin" and password "password"</b>).  The administrative user can add, update,
 		     and delete other users, as well as manage the contacts for any user.  All
 		     other users can only manage their own contact lists.
-		     </p>
-    	    	    <p>
-	    	    This module contains JavaBean classes for the two types of application data
-		    that can be transmitted via this web service -- User represents a system user,
-		    and Contact represents one of potentially many contacts associated with that
-		    user.  The User class contains JAXB annotations, so we can leverage the fact
-		    that JAX-RS based applications can automatically serialize and deserialize
-		    instances of such a class, with no need to provide MessageBodyReader or
-		    MessageBodyWriter providers itself.
-	    	     </p>
+		     </p>    	    	    
 	    	     <p>
 	    	     The server illustrates two different techniques for embedding application
 		     data in Atom feeds and entries:
