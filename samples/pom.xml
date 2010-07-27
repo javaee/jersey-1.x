@@ -46,9 +46,7 @@
     </description>
     <packaging>pom</packaging>
     <modules>
-        <module>atompub-contacts-client</module>
-        <module>atompub-contacts-models</module>
-        <module>atompub-contacts-server</module>        
+        <module>atompub-contacts</module>              
         <module>bookmark</module>
         <module>bookmark-em</module>
         <module>bookstore</module>
