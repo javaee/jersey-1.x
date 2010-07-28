@@ -114,7 +114,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
     
     /**
      * If true matrix parameters (if present) in the request URI path component
-     * will be ignored when matching the path to URI templates declared by
+     * will not be ignored when matching the path to URI templates declared by
      * resource classes.
      * <p>
      * The default value is false.
@@ -125,7 +125,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
     /**
      * If true then the matching algorithm will attempt to match and accept
      * any static content or templates associated with a resource that were
-     * not explicitly decared by that resource.
+     * not explicitly declared by that resource.
      * <p>
      * If a template is matched then the model for the viewable will be the
      * resource instance associated with the template.
