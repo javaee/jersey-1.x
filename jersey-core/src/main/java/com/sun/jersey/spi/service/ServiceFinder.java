@@ -196,16 +196,13 @@ public final class ServiceFinder<T> implements Iterable<T> {
         try {
             String resource = ServiceFinder.class.getName().replace(".", "/") + ".class";
             URL url = getResource(ServiceFinder.class.getClassLoader(), resource);
-            if (url == null)
-                throw new IOException("Resource not found: " + url);
-
-            URL moduleVersionURL = new URL(getManifestURL(resource, url).toString().replace(MANIFEST, MODULE_VERSION));
-            byte[] array = new byte[20];
-
-            moduleVersionURL.openStream().read(array);
-
-            return new String(array);
-        } catch (IOException ioe) {
+            if (url == null) {
+                LOGGER.log(Level.FINE, "Error getting " + ServiceFinder.class.getName() + " class as a resource");
+                return null;
+            }
+        
+            return getJerseyModuleVersion(getManifestURL(resource, url));
+        } catch(IOException ioe) {
             LOGGER.log(Level.FINE, "Error loading META-INF/jersey-module-version associated with " + ServiceFinder.class.getName(), ioe);
             return null;
         }
@@ -290,14 +287,11 @@ public final class ServiceFinder<T> implements Iterable<T> {
 
     private static String getJerseyModuleVersion(URL manifestURL) {
         try {
-            URL jerseyBundleURL = new URL(manifestURL.toString().replace(MANIFEST, MODULE_VERSION));
-            byte[] array = new byte[20];
+            URL moduleVersionURL = new URL(manifestURL.toString().replace(MANIFEST, MODULE_VERSION));
 
-            jerseyBundleURL.openStream().read(array);
-            return new String(array);
-
+            return new BufferedReader(new InputStreamReader(moduleVersionURL.openStream())).readLine();
         } catch (IOException ioe) {
-            // add logger message
+            LOGGER.log(Level.FINE, "Error loading META-INF/jersey-module-version associated with " + ServiceFinder.class.getName(), ioe);
             return null;
         }
     }
@@ -656,8 +650,8 @@ public final class ServiceFinder<T> implements Iterable<T> {
     /**
      * Parse the content of the given URL as a provider-configuration file.
      *
-     * @param service  The service class for which providers are being sought;
-     *                 used to construct error detail strings
+     * @param serviceName  The service class for which providers are being sought;
+     *                     used to construct error detail strings
      * @param u        The URL naming the configuration file to be parsed
      * @param returned A Set containing the names of provider classes that have already
      *                 been returned.  This set will be updated to contain the names
