@@ -40,14 +40,12 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.sun.jersey.samples</groupId>
-        <artifactId>jersey-samples</artifactId>
-        <version>1.4-SNAPSHOT</version>
-    </parent>
-
+    <groupId>com.sun.jersey.samples.atompub-contacts</groupId>
     <artifactId>atompub-contacts-models</artifactId>
+    <version>1.4-SNAPSHOT</version>
+
     <packaging>jar</packaging>
+
     <name>AtomPub Contacts Models - jersey sample</name>
 
      <profiles>
@@ -163,4 +161,14 @@
             <url>http://repository.apache.org/snapshots</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>java.net-m2-dist-repository</id>
+            <name>java.net-m2-repository</name>
+            <url>java-net:/maven2-repository/trunk/repository/</url>
+        </repository>
+    </distributionManagement>
+
 </project>

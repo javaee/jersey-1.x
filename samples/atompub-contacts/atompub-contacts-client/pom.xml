@@ -41,31 +41,13 @@
                       http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.sun.jersey.samples</groupId>
-        <artifactId>jersey-samples</artifactId>
-        <version>1.4-SNAPSHOT</version>
-    </parent>
-
+    <groupId>com.sun.jersey.samples.atompub-contacts</groupId>
     <artifactId>atompub-contacts-client</artifactId>
-    <packaging>jar</packaging>
-    <name>AtomPub Contacts Client - jersey sample</name>
+    <version>1.4-SNAPSHOT</version>
 
-    <profiles>
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <jdk>1.5</jdk>
-             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.codehaus.woodstox</groupId>
-                    <artifactId>wstx-lgpl</artifactId>
-                    <version>3.2.3</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+    <packaging>jar</packaging>
+
+    <name>AtomPub Contacts Client - jersey sample</name>
 
     <dependencies>
         <dependency>
@@ -96,12 +78,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.samples</groupId>
+            <groupId>com.sun.jersey.samples.atompub-contacts</groupId>
             <artifactId>atompub-contacts-models</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey.samples</groupId>
+            <groupId>com.sun.jersey.samples.atompub-contacts</groupId>
             <artifactId>atompub-contacts-server</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
@@ -213,4 +195,14 @@
             <url>http://repository.apache.org/snapshots</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>java.net-m2-dist-repository</id>
+            <name>java.net-m2-repository</name>
+            <url>java-net:/maven2-repository/trunk/repository/</url>
+        </repository>
+    </distributionManagement>
+
 </project>
