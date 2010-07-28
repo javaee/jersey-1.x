@@ -1,8 +1,8 @@
 release 1.4 (08-2010)
-- JSONConfiguration.FEATURE_POJO_MAPPING feature introduced
-  to simplify Jackson entity provider utilization
+- JSONConfiguration.FEATURE_POJO_MAPPING ResourceConfig feature introduced
+  to simplify Jackson POJO entity provider utilization
   Users no longer need to register the Jackson provider explicitly
-- Jackson dependency upgraded to version 1.5.4 
+- Jackson dependency upgraded to version 1.5.5 
 - *Breaking change*: in order to prevent OSGi bundle reload issues
   we need to bundle JSR-311 API classes with the jersey-core module
 - Integrated JRebel support from branch
