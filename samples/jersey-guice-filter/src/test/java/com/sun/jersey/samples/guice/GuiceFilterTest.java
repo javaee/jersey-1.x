@@ -49,10 +49,11 @@ import org.junit.Test;
  */
 public class GuiceFilterTest extends JerseyTest {
 
-    @Override
+    /*allow to be tested with other containers
+     @Override
     protected TestContainerFactory getTestContainerFactory() {
         return new GrizzlyWebTestContainerFactory();
-    }
+    }*/
 
     public GuiceFilterTest() {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.guice.resources")
