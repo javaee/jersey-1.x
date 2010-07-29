@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-   <parent>
+    <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
         <version>1.4-SNAPSHOT</version>
@@ -27,7 +27,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
             </dependencies>
         </profile>
     </profiles>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -38,6 +38,26 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
+            </plugin>
+            <!-- Run the application using "mvn embedded-glassfish:run" -->
+            <plugin>
+                <groupId>org.glassfish</groupId>
+                <artifactId>maven-embedded-glassfish-plugin</artifactId>
+                <version>3.0</version>
+                <configuration>
+                    <goalPrefix>embedded-glassfish</goalPrefix>
+                    <app>${basedir}/target/guicefilter-webapp.war</app>
+                    <autoDelete>true</autoDelete>
+                    <port>8080</port>
+                    <instanceRoot>./target/gbembeddedtmp</instanceRoot>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>jersey-server</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -60,9 +80,49 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
             <artifactId>jersey-guice</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!--jersey-test-framework-grizzly
+            com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory
+            com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory
+            -->
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-grizzly</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--jersey-test-framework-http
+            com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory
+         -->
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-http</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--
+          jersey-test-framework-inmemory
+          com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory
+          -->
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-inmemory</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--jersey-test-framework-embedded-glassfish
+            com.sun.jersey.test.framework.spi.container.embedded.glassfish.TestContainerFactory
+         -->
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-embedded-glassfish</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!--jersey-test-framework-external
+            com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -->
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-external</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
@@ -73,7 +133,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
     </properties>
 
     <repositories>
-         <repository>
+        <repository>
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Maven 2 Repository</name>
             <url>http://download.java.net/maven/2/</url>
@@ -86,7 +146,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
             <layout>legacy</layout>
         </repository>
     </repositories>
-    
+
 </project>
 
 
