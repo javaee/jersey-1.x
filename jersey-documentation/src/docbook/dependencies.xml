@@ -273,10 +273,9 @@
 
       <para>Maven developers, deploying an application using the Simple HTTP
       Web server, require a dependency on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-simple/&version;/jersey-simple-&version;.pom">jersey-simple</ulink>
+      url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-simple-server/&version;/jersey-simple-server-&version;.pom">jersey-simple-server</ulink>
       module.</para>
     </section>
-
     <section>
       <title>Light weight HTTP server</title>
 
