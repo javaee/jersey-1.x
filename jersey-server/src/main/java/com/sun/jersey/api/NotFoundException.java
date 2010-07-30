@@ -95,4 +95,9 @@ public class NotFoundException extends WebApplicationException {
     public URI getNotFoundUri() {
         return notFoundUri;
     }
+
+    @Override    
+    public String getMessage() {
+        return super.getMessage() + " for uri: " + notFoundUri;
+    }
 }
