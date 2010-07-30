@@ -1,4 +1,17 @@
 release 1.4 (08-2010)
+- Fixed issue 563
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=563
+  When using the low-level Grizzly container injection of GrizzlyRequest
+  and GrizzlyResponse are now supported as follows:
+    @Context ThreadLocal<GrizzlyRequest> request
+    @Context ThreadLocal<GrizzlyResponse> response
+  The thread local is required because GrizzlyRequest/Response are classes,
+  not interfaces, and therefore cannot be proxied using the Java proxy API.
+- Fixed issue 562
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=562
+  When ServletContainer.FEATURE_FILTER_FORWARD_ON_404 feature is set to true
+  and Jersey forwards to the next filter in the chain then the response
+  status code will be set to 200 before forwarding.
 - JSONConfiguration.FEATURE_POJO_MAPPING ResourceConfig feature introduced
   to simplify Jackson POJO entity provider utilization
   Users no longer need to register the Jackson provider explicitly

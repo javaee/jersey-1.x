@@ -34,31 +34,48 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.impl.container.grizzly;
 
-package com.sun.jersey.server.impl.container.grizzly;
-
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.ContainerProvider;
-import com.sun.jersey.spi.container.WebApplication;
-import com.sun.grizzly.tcp.Adapter;
+import com.sun.grizzly.tcp.http11.GrizzlyRequest;
+import com.sun.grizzly.tcp.http11.GrizzlyResponse;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 
 /**
  *
- * @author Marc.Hadley@Sun.Com
+ * @author Paul.Sandoz@Sun.Com
  */
-public class GrizzlyContainerProvider implements ContainerProvider<Adapter> {
-    
-    public GrizzlyContainerProvider() {
-        Class<?> c = Adapter.class;
+public class InjectionTest extends AbstractGrizzlyServerTester {
+    public InjectionTest(String testName) {
+        super(testName);
     }
     
-    public Adapter createContainer(Class<Adapter> type, 
-            ResourceConfig resourceConfig, 
-            WebApplication application) throws ContainerException {
-        if (type != Adapter.class)
-            return null;
+    @Path("/")
+    public static class Resource {
+        private final GrizzlyRequest request;
+
+        public Resource(
+                @Context ThreadLocal<GrizzlyRequest> request,
+                @Context ThreadLocal<GrizzlyResponse> response) {
+            assertNotNull(request);
+            assertNotNull(response);
+            this.request = request.get();
+        }
+
+        @GET
+        public String get() {
+            return request.getMethod().toUpperCase();
+        }               
+    }
         
-        return new GrizzlyContainer(resourceConfig, application);
+    public void testHead() throws Exception {
+        startServer(Resource.class);
+        
+        WebResource r = Client.create().resource(getUri().path("/").build());
+        
+        assertEquals("GET", r.get(String.class));
     }
 }

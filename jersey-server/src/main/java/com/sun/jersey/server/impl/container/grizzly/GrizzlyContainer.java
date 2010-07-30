@@ -41,21 +41,28 @@ import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 
 /**
  *
@@ -67,8 +74,32 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
     
     private String basePath = "/";
 
-    public GrizzlyContainer(WebApplication app) throws ContainerException {
+    private final ThreadLocalInvoker<GrizzlyRequest> requestInvoker =
+            new ThreadLocalInvoker<GrizzlyRequest>();
+
+    private final ThreadLocalInvoker<GrizzlyResponse> responseInvoker =
+            new ThreadLocalInvoker<GrizzlyResponse>();
+
+    private static class ContextInjectableProvider<T> extends
+            SingletonTypeInjectableProvider<Context, T> {
+
+        protected ContextInjectableProvider(Type type, T instance) {
+            super(type, instance);
+        }
+    }
+
+    public GrizzlyContainer(ResourceConfig rc, WebApplication app) throws ContainerException {
         this.application = app;
+
+        GenericEntity<ThreadLocal<GrizzlyRequest>> requestThreadLocal =
+                new GenericEntity<ThreadLocal<GrizzlyRequest>>(requestInvoker.getImmutableThreadLocal()) {};
+        rc.getSingletons().add(new ContextInjectableProvider<ThreadLocal<GrizzlyRequest>>(
+                requestThreadLocal.getType(), requestThreadLocal.getEntity()));
+
+        GenericEntity<ThreadLocal<GrizzlyResponse>> responseThreadLocal =
+                new GenericEntity<ThreadLocal<GrizzlyResponse>>(responseInvoker.getImmutableThreadLocal()) {};
+        rc.getSingletons().add(new ContextInjectableProvider<ThreadLocal<GrizzlyResponse>>(
+                responseThreadLocal.getType(), responseThreadLocal.getEntity()));
     }
 
     private final static class Writer implements ContainerResponseWriter {
@@ -102,8 +133,20 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
         public void finish() throws IOException {            
         }
     }
-    
+
     public void service(GrizzlyRequest request, GrizzlyResponse response) {
+        try {
+            requestInvoker.set(request);
+            responseInvoker.set(response);
+
+            _service(request, response);
+        } finally {
+            requestInvoker.set(null);
+            responseInvoker.set(null);
+        }
+    }
+
+    private void _service(GrizzlyRequest request, GrizzlyResponse response) {
         WebApplication _application = application;
         
         final URI baseUri = getBaseUri(request);
