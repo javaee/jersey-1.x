@@ -1,16 +1,37 @@
-1) Create a README.html file which describes the following elements of the sample:
 
-       a) Explain web.xml and GuiceServletConfig
+1) Check that it works properly with other container types like Grizzly, External GlassFish, etc.
 
-       b) Create resource class, @Path("bound/perrequest"), using guice @RequestScoped
+add this text to bottom of README.html after verifying that it works properly using these other containers specified below:
 
-       c) Inject URI info and a query parameter
+<p>You can run the example using other container types like Grizzly, External GlassFish, etc. as follows:
+            <p>You can run the example using Grizzly as follows:</p>
+         <!--jersey-test-framework-grizzly-->
+          <blockquote><code>mvn clean package install -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory</code>
+          </blockquote>
+          <blockquote><code>mvn clean package install -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory</code>
+          </blockquote>
 
-       d) Create singleton component and inject into resource at construction
+          <p>You can run the example using HTTPContainer as follows:</p>
+          <!--jersey-test-framework-http-->
+          <blockquote><code>mvn clean package install -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory</code>
+          </blockquote>
 
-2) Add the sample to the modules of jersey-samples (once the README is done)
-    and remove the exclude clause referring to the sample at the samples/assembly.xml file
+          <p>You can run the example using InMemoryContainer as follows:</p>
+          <!--jersey-test-framework-inmemory-->
+          <blockquote><code>mvn clean install -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory</code>
+          </blockquote>
 
-3) Also, check that it works properly with other container types like EmbeddedGF, External GlassFish, etc.
 
-4) Remove the overriding of test container in the test class.
+          <!--<p>Otherwise, you can run the example using embedded GlassFish as follows:</p>-->
+          <!--jersey-test-framework-embedded-glassfish-->
+          <!--mvn clean install -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.embedded.glassfish.TestContainerFactory-->
+
+
+          <p>You can run the example using external Container as follows:</p>
+          <!--jersey-test-framework-external-->
+          <blockquote><code>mvn clean package install -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory</code>
+          </blockquote>
+
+2)  remove the exclude clause referring to the sample todos.txt at the samples/assembly.xml file, and then remove todos.txt
+
+
