@@ -853,6 +853,15 @@ public class ServletContainer extends HttpServlet implements Filter {
         // If forwarding is configured and response is a 404 with no entity
         // body then call the next filter in the chain
         if (forwardOn404 && status == 404 && !response.isCommitted()) {
+            // lets clear the response to OK before we forward to the next in the chain
+            // as OK is the default set by servlet containers before filters/servlets do any wor
+            // so lets hide our footsteps and pretend we were never in the chain at all and let the 
+            // next filter or servlet return the 404 if they can't find anything to return
+            // 
+            // We could add an optional flag to disable this step if anyone can ever find a case where
+            // this causes a problem, though I suspect any problems will really be with downstream
+            // servlets not correctly setting an error status if they cannot find something to return
+            response.setStatus(HttpServletResponse.SC_OK);
             chain.doFilter(request, response);
         }
     }
