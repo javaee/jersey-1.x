@@ -35,7 +35,7 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.container.servlet;
+package com.sun.jersey.server.impl;
 
 import java.lang.reflect.Method;
 import javax.naming.Context;

@@ -53,7 +53,7 @@ import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.server.impl.InitialContextHelper;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
-import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
+import com.sun.jersey.server.impl.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.jcdi.JCDIComponentProviderFactoryInitializer;
 import com.sun.jersey.server.impl.managedbeans.ManagedBeanComponentProviderFactoryInitilizer;

@@ -37,6 +37,7 @@
 
 package com.sun.jersey.server.impl.container.servlet;
 
+import com.sun.jersey.server.impl.ThreadLocalNamedInvoker;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.WebApplication;

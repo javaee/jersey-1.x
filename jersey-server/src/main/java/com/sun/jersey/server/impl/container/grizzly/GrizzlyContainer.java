@@ -43,7 +43,7 @@ import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
+import com.sun.jersey.server.impl.ThreadLocalInvoker;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
