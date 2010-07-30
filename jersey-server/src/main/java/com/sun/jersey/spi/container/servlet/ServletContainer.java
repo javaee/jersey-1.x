@@ -210,7 +210,8 @@ public class ServletContainer extends HttpServlet implements Filter {
      * If true and a 404 response with no entity body is returned from either
      * the runtime or the application then the runtime forwards the request to
      * the next filter in the filter chain. This enables another filter or
-     * the underlying servlet engine to process the request
+     * the underlying servlet engine to process the request.
+     * Before the request is forwarded the response status is set to 200.
      * <p>
      * This property is only applicable when this class is used as a
      * {@link Filter}, otherwise this property will be ignored and not
