@@ -113,7 +113,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             = "com.sun.jersey.config.feature.Redirect";
     
     /**
-     * If true matrix parameters (if present) in the request URI path component
+     * If true then matrix parameters (if present) in the request URI path component
      * will not be ignored when matching the path to URI templates declared by
      * resource classes.
      * <p>
