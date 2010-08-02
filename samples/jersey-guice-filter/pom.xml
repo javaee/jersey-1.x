@@ -12,23 +12,8 @@
     <name>GuiceFilter WebApp - Jersey Sample</name>
     <packaging>war</packaging>
 
-    <profiles>
-        <profile>
-            <id>jdk-1.5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1.12</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
-
     <build>
+        <finalName>jersey-guice-filter</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -46,7 +31,7 @@
                 <version>3.0</version>
                 <configuration>
                     <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>${basedir}/target/guicefilter-webapp.war</app>
+                    <app>${basedir}/target/jersey-guice-filter.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
                     <instanceRoot>./target/gbembeddedtmp</instanceRoot>
@@ -55,6 +40,11 @@
                     <dependency>
                         <groupId>com.sun.jersey</groupId>
                         <artifactId>jersey-server</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.jersey.contribs</groupId>
+                        <artifactId>jersey-guice</artifactId>
                         <version>${project.version}</version>
                     </dependency>
                 </dependencies>
@@ -73,7 +63,6 @@
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
@@ -112,12 +101,14 @@
         <!--jersey-test-framework-embedded-glassfish
             com.sun.jersey.test.framework.spi.container.embedded.glassfish.TestContainerFactory
          -->
+         <!--
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-embedded-glassfish</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        -->
         <!--jersey-test-framework-external
             com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -->
         <dependency>
