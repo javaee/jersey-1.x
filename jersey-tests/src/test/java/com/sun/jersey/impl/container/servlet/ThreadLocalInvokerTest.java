@@ -37,7 +37,7 @@
 
 package com.sun.jersey.impl.container.servlet;
 
-import com.sun.jersey.server.impl.container.servlet.ThreadLocalInvoker;
+import com.sun.jersey.server.impl.ThreadLocalInvoker;
 import java.lang.reflect.Proxy;
 import junit.framework.TestCase;
 
