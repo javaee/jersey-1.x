@@ -40,7 +40,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
-import com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory;
 import org.junit.Test;
 
 /**
@@ -48,13 +47,7 @@ import org.junit.Test;
  * @author naresh
  */
 public class GuiceFilterTest extends JerseyTest {
-
-    /*allow to be tested with other containers
-     @Override
-    protected TestContainerFactory getTestContainerFactory() {
-        return new GrizzlyWebTestContainerFactory();
-    }*/
-
+   
     public GuiceFilterTest() {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.guice.resources")
                 .contextListenerClass(com.sun.jersey.samples.guice.GuiceServletConfig.class)
