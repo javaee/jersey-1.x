@@ -48,7 +48,7 @@
                 <exclude>**/target/**</exclude>
                 <exclude>**/generated/**</exclude>
                 <exclude>**/.svn/**</exclude>
-                <exclude>**/jersey-guice-filter/**</exclude>
+                <exclude>**/jersey-guice-filter/todos.txt</exclude>
             </excludes>
         </fileSet>
     </fileSets>
