@@ -1,1 +1,1 @@
-com.sun.jersey.test.framework.spi.container.embedded.glassfish.TestContainerFactory
+com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory
