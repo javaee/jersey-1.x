@@ -63,6 +63,7 @@
         <module>jacksonjsonprovider</module>
         <module>jaxb</module>
         <module>jcdi-beans-webapp</module>
+        <module>jersey-cdi</module>
         <module>jersey-ejb</module>
         <module>jersey-guice-filter</module>
         <module>jmaki-backend</module>
