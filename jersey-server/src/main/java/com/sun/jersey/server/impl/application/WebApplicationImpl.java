@@ -99,6 +99,7 @@ import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationListener;
 import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.server.impl.component.IoCResourceFactory;
@@ -1003,12 +1004,19 @@ public final class WebApplicationImpl implements WebApplication {
         // Initiate string readers
         stringReaderFactory.init(providerServices);
 
-
         // Inject on all components
         Errors.setReportMissingDependentFieldOrMethod(true);
         cpFactory.injectOnAllComponents();
         cpFactory.injectOnProviderInstances(resourceConfig.getProviderSingletons());
-        
+
+        // web application is ready
+        for (IoCComponentProviderFactory providerFactory : providerFactories) {
+            if (providerFactory instanceof WebApplicationListener) {
+                WebApplicationListener listener = (WebApplicationListener) providerFactory;
+                listener.onWebApplicationReady();
+            }
+        }
+                
         // Obtain all root resource rules
         RulesMap<UriRule> rootRules = new RootResourceUriRules(this,
                 resourceConfig, wadlFactory, injectableFactory).getRules();
@@ -1032,7 +1040,12 @@ public final class WebApplicationImpl implements WebApplication {
     public ExceptionMapperContext getExceptionMapperContext() {
         return exceptionFactory;
     }
-    
+
+    @Override
+    public ServerInjectableProviderFactory getServerInjectableProviderFactory() {
+        return injectableFactory;
+    }
+        
     @Override
     public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
             throws IOException {

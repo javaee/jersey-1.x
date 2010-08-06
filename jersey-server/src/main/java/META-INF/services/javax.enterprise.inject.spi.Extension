@@ -1,1 +1,1 @@
-com.sun.jersey.server.impl.jcdi.JCDIComponentExtension
+com.sun.jersey.server.impl.cdi.CDIExtension

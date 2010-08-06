@@ -44,6 +44,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.Traceable;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import javax.ws.rs.ext.Providers;
@@ -144,6 +145,13 @@ public interface WebApplication extends Traceable {
      * @return the thread local instance of HttpContext.
      */
     HttpContext getThreadLocalHttpContext();
+
+    /**
+     * Get the server injectable provider factory.
+     *
+     * @return the server injectable provider factory
+     */
+    ServerInjectableProviderFactory getServerInjectableProviderFactory();
 
     /**
      * Handle an HTTP request by dispatching the request to the appropriate

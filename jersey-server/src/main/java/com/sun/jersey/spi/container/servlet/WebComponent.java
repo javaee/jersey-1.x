@@ -52,10 +52,10 @@ import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.server.impl.InitialContextHelper;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
+import com.sun.jersey.server.impl.cdi.CDIComponentProviderFactoryInitializer;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
 import com.sun.jersey.server.impl.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
-import com.sun.jersey.server.impl.jcdi.JCDIComponentProviderFactoryInitializer;
 import com.sun.jersey.server.impl.managedbeans.ManagedBeanComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
 import com.sun.jersey.server.impl.monitoring.GlassFishMonitoringInitializer;
@@ -544,13 +544,13 @@ public class WebComponent implements ContainerListener {
         rc.getClasses().add(JSPTemplateProcessor.class);
 
         // TODO
-        // If JCDI is enabled should EJB injection be disabled?
+        // If CDI is enabled should EJB injection be disabled?
         EJBComponentProviderFactoryInitilizer.initialize(rc);
 
-        JCDIComponentProviderFactoryInitializer.initialize(rc);
+        CDIComponentProviderFactoryInitializer.initialize(rc, wa);
 
         // TODO
-        // If JCDI is enabled then no need to initialize managed beans
+        // If CDI is enabled then no need to initialize managed beans
         ManagedBeanComponentProviderFactoryInitilizer.initialize(rc);
         
         GlassFishMonitoringInitializer.initialize();

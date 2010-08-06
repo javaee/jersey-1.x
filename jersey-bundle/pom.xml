@@ -117,9 +117,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.jboss.webbeans</groupId>
-            <artifactId>webbeans-osgi-bundle</artifactId>
-            <version>1.0.0.PREVIEW4.SP1</version>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-osgi-bundle</artifactId>
+            <version>1.0.1-Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

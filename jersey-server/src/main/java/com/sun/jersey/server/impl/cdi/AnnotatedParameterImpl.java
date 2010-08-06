@@ -34,40 +34,56 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.server.impl.jcdi;
 
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.server.impl.InitialContextHelper;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+package com.sun.jersey.server.impl.cdi;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Set;
+import javax.enterprise.inject.spi.AnnotatedCallable;
+import javax.enterprise.inject.spi.AnnotatedParameter;
 
 /**
+ * Implements the CDI AnnotatedParameter interface.
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author robc
  */
-public class JCDIComponentProviderFactoryInitializer {
-    private static final Logger LOGGER = Logger.getLogger(
-            JCDIComponentProviderFactoryInitializer.class.getName());
+public class AnnotatedParameterImpl<T> extends AnnotatedImpl implements AnnotatedParameter<T> {
 
-    public static void initialize(ResourceConfig rc) {
-        try {
-            InitialContext ic = InitialContextHelper.getInitialContext();
-            if (ic == null)
-                return;
-            Object beanManager = ic.lookup("java:comp/BeanManager");
-            // Some implementations of InitialContext return null instead of
-            // throwing NamingException if there is no Object associated with
-            // the name
-            if (beanManager == null) {
-                LOGGER.config("The JCDI BeanManager is not available. JAX-RS JCDI support is disabled.");
-                return;
-            }
+    private AnnotatedCallable<T> declaringCallable;
+    private int position;
 
-            rc.getSingletons().add(new JCDIComponentProviderFactory(beanManager));
-        } catch (NamingException ex) {
-            LOGGER.log(Level.CONFIG, "The JCDI BeanManager is not available. JAX-RS JCDI support is disabled.", ex);
-        }
+    public AnnotatedParameterImpl(Type baseType,
+                           Set<Type> typeClosure,
+                           Set<Annotation> annotations,
+                           AnnotatedCallable<T> declaringCallable,
+                           int position) {
+        super(baseType, typeClosure, annotations);
+        this.declaringCallable = declaringCallable;
+        this.position = position;
+    }
+
+    public AnnotatedParameterImpl(AnnotatedParameter<T> param, AnnotatedCallable<T> declaringCallable) {
+        this(param.getBaseType(),
+             param.getTypeClosure(),
+             param.getAnnotations(),
+             declaringCallable,
+             param.getPosition());
+    }
+
+    public AnnotatedParameterImpl(AnnotatedParameter<T> param, Set<Annotation> annotations, AnnotatedCallable<T> declaringCallable) {
+        this(param.getBaseType(),
+             param.getTypeClosure(),
+             annotations,
+             declaringCallable,
+             param.getPosition());
+    }
+
+    public AnnotatedCallable<T> getDeclaringCallable() {
+        return declaringCallable;
+    }
+
+    public int getPosition() {
+        return position;
     }
 }
