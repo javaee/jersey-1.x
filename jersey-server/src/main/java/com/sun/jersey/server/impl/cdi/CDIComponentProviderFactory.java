@@ -36,13 +36,9 @@
  */
 package com.sun.jersey.server.impl.cdi;
 
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
@@ -54,22 +50,16 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.InjectionTarget;
-import javax.enterprise.inject.spi.ProcessInjectionTarget;
-import javax.ws.rs.ext.Provider;
 
 import static com.sun.jersey.server.impl.cdi.Utils.getBean;
-import static com.sun.jersey.server.impl.cdi.Utils.getInstance;
 
 /**
  * Factory for IoCComponentProvider for CDI beans.
@@ -85,14 +75,6 @@ public class CDIComponentProviderFactory implements
 
     private static final Logger LOGGER = Logger.getLogger(
             CDIComponentProviderFactory.class.getName());
-
-    private static final IoCComponentProcessor NULL_COMPONENT_PROCESSOR = new IoCComponentProcessor() {
-        public void preConstruct() {
-        }
-
-        public void postConstruct(Object o) {
-        }
-    };
     
     private final BeanManager beanManager;
 
