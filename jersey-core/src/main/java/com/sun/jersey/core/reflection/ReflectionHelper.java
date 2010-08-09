@@ -38,8 +38,10 @@
 package com.sun.jersey.core.reflection;
 
 import com.sun.jersey.impl.ImplMessages;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -57,6 +59,21 @@ import java.util.Map;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ReflectionHelper {
+
+    /**
+     *
+     */
+    public static Class getDeclaringClass(AccessibleObject ao) {
+        if (ao instanceof Method) {
+            return ((Method)ao).getDeclaringClass();
+        } else if (ao instanceof Field) {
+            return ((Field)ao).getDeclaringClass();
+        } else if (ao instanceof Constructor) {
+            return ((Constructor)ao).getDeclaringClass();
+        } else {
+            throw new RuntimeException();
+        }
+    }
 
     /**
      * Create a string representation of an object.

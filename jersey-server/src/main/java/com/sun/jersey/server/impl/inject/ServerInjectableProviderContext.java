@@ -41,6 +41,7 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import java.lang.reflect.AccessibleObject;
 import java.util.List;
 
 /**
@@ -53,7 +54,7 @@ public interface ServerInjectableProviderContext extends InjectableProviderConte
      * Check if a parameter type is registered for injection.
      *
      * @param p the parameter, from which the parameter type is obtained.
-     * @return if reigstered, otherwise false.
+     * @return if registered, otherwise false.
      */
     public boolean isParameterTypeRegistered(Parameter p);
 
@@ -70,12 +71,34 @@ public interface ServerInjectableProviderContext extends InjectableProviderConte
     /**
      * Get an injectable given a parameter.
      *
+     * @param ao the accessible object that is the target of injection
+     * @param p the parameter.
+     * @param s the scope for which the injectable will be used
+     * @return the injectable, otherwise null if an injectable could
+     *         not be found.
+     */
+    Injectable getInjectable(AccessibleObject ao, Parameter p, ComponentScope s);
+
+    /**
+     * Get an injectable given a parameter.
+     *
      * @param p the parameter.
      * @param s the scope for which the injectable will be used
      * @return the injectable and scope, otherwise null if an injectable could
      *         not be found.
      */
     InjectableScopePair getInjectableiWithScope(Parameter p, ComponentScope s);
+
+    /**
+     * Get an injectable given a parameter.
+     *
+     * @param ao the accessible object that is the target of injection
+     * @param p the parameter.
+     * @param s the scope for which the injectable will be used
+     * @return the injectable and scope, otherwise null if an injectable could
+     *         not be found.
+     */
+    InjectableScopePair getInjectableiWithScope(AccessibleObject ao, Parameter p, ComponentScope s);
 
     /**
      * Get a list of injectable given a list of parameter.
@@ -87,4 +110,16 @@ public interface ServerInjectableProviderContext extends InjectableProviderConte
      *         list will be null.
      */
     List<Injectable> getInjectable(List<Parameter> ps, ComponentScope s);
+
+    /**
+     * Get a list of injectable given a list of parameter.
+     *
+     * @param ao the accessible object that is the target of injection
+     * @param ps the list of parameter.
+     * @param s the scope for which the injectable will be used
+     * @return the list of injectable, if an injectable for a parameter
+     *         could not be found the corresponding element in the
+     *         list will be null.
+     */
+    List<Injectable> getInjectable(AccessibleObject ao, List<Parameter> ps, ComponentScope s);
 }

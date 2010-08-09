@@ -217,6 +217,7 @@ public class ComponentConstructor<T> {
         for (Constructor con : c.getConstructors()) {
             List<Injectable> is = new ArrayList<Injectable>();
             int ps = con.getParameterTypes().length;
+            aoc.setAccessibleObject(con);
             for (int p = 0; p < ps; p++) {
                 Type pgtype = con.getGenericParameterTypes()[p];
                 Annotation[] as = con.getParameterAnnotations()[p];

@@ -43,7 +43,6 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractSetterMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.core.spi.component.AccessibleObjectContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
@@ -72,7 +71,6 @@ public final class ResourceComponentInjector {
     
     private Field[] perRequestFields;
     private AbstractHttpContextInjectable<?>[] perRequestFieldInjectables;
-    private boolean[] perRequestPrimitive;
     
     private Method[] singletonSetters;    
     private Object[] singletonSetterValues;
@@ -84,7 +82,7 @@ public final class ResourceComponentInjector {
      * Create a new resource component injector.
      * 
      * @param ipc the injectable provider context to obtain injectables.
-     * @param s the scope underwhich injection will be performed.
+     * @param s the scope under which injection will be performed.
      * @param resource the abstract resource model.
      */
     public ResourceComponentInjector(ServerInjectableProviderContext ipc, ComponentScope s, AbstractResource resource) {
@@ -108,12 +106,10 @@ public final class ResourceComponentInjector {
         Map<Field, Injectable<?>> singletons = new HashMap<Field, Injectable<?>>();
         Map<Field, Injectable<?>> perRequest = new HashMap<Field, Injectable<?>>();
         
-        AccessibleObjectContext aoc = new AccessibleObjectContext();
         for (AbstractField af : fields) {
-            aoc.setAccesibleObject(af.getField());
             Parameter p = af.getParameters().get(0);
 
-            InjectableScopePair isp = ipc.getInjectableiWithScope(p, s);
+            InjectableScopePair isp = ipc.getInjectableiWithScope(af.getField(), p, s);
             if (isp != null) {
                 configureField(af.getField());
                 if (s == ComponentScope.PerRequest && isp.cs != ComponentScope.Singleton) {
@@ -139,12 +135,10 @@ public final class ResourceComponentInjector {
         size = perRequest.entrySet().size();
         perRequestFields = new Field[size];
         perRequestFieldInjectables = new AbstractHttpContextInjectable<?>[size];
-        perRequestPrimitive = new boolean[size];
         i = 0;
         for (Map.Entry<Field, Injectable<?>> e : perRequest.entrySet()) {
             perRequestFields[i] = e.getKey();
-            perRequestFieldInjectables[i] = AbstractHttpContextInjectable.transform(e.getValue());
-            perRequestPrimitive[i++] = e.getKey().getType().isPrimitive();
+            perRequestFieldInjectables[i++] = AbstractHttpContextInjectable.transform(e.getValue());
         }        
     }
     
@@ -164,13 +158,11 @@ public final class ResourceComponentInjector {
         Map<Method, Injectable<?>> singletons = new HashMap<Method, Injectable<?>>();
         Map<Method, Injectable<?>> perRequest = new HashMap<Method, Injectable<?>>();
         
-        AccessibleObjectContext aoc = new AccessibleObjectContext();
         int methodIndex = 0;
         for (AbstractSetterMethod sm : setterMethods) {
             Parameter p = sm.getParameters().get(0);
-            aoc.setAccesibleObject(sm.getMethod(), p.getAnnotations());
 
-            InjectableScopePair isp = ipc.getInjectableiWithScope(p, s);
+            InjectableScopePair isp = ipc.getInjectableiWithScope(sm.getMethod(), p, s);
             if (isp != null) {
                 if (s == ComponentScope.PerRequest && isp.cs != ComponentScope.Singleton) {
                     perRequest.put(sm.getMethod(), isp.i);
@@ -214,10 +206,7 @@ public final class ResourceComponentInjector {
         int i = 0;
         for (Field f : singletonFields) {
             try {
-                if (f.get(o) == null) {
-                    f.set(o, singletonFieldValues[i]);
-                }
-                i++;
+                f.set(o, singletonFieldValues[i++]);
             } catch (IllegalAccessException ex) {
                 throw new ContainerException(ex);
             }
@@ -226,10 +215,7 @@ public final class ResourceComponentInjector {
         i = 0;
         for (Field f : perRequestFields) {
             try {
-                if (perRequestPrimitive[i] || f.get(o) == null) {
-                    f.set(o, perRequestFieldInjectables[i].getValue(c));
-                }
-                i++;
+                f.set(o, perRequestFieldInjectables[i++].getValue(c));
             } catch (IllegalAccessException ex) {
                 throw new ContainerException(ex);
             }

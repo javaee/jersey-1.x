@@ -42,6 +42,7 @@ import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.spi.inject.Injectable;
+import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,7 @@ import java.util.List;
 public final class ServerInjectableProviderFactory extends InjectableProviderFactory
             implements ServerInjectableProviderContext {
 
+    @Override
     public boolean isParameterTypeRegistered(Parameter p) {
         if (p.getAnnotation() == null) return false;
 
@@ -60,10 +62,16 @@ public final class ServerInjectableProviderFactory extends InjectableProviderFac
         return isAnnotationRegistered(p.getAnnotation().annotationType(), p.getParameterType().getClass());
     }
 
+    @Override
     public InjectableScopePair getInjectableiWithScope(Parameter p, ComponentScope s) {
+        return getInjectableiWithScope(null, p, s);
+    }
+
+    @Override
+    public InjectableScopePair getInjectableiWithScope(AccessibleObject ao, Parameter p, ComponentScope s) {
         if (p.getAnnotation() == null) return null;
 
-        ComponentContext ic = new AnnotatedContext(p.getAnnotations());
+        ComponentContext ic = new AnnotatedContext(ao, p.getAnnotations());
 
         if (s == ComponentScope.PerRequest) {
             // Find a per request injectable with Parameter
@@ -95,17 +103,29 @@ public final class ServerInjectableProviderFactory extends InjectableProviderFac
         }
     }
 
+    @Override
     public Injectable getInjectable(Parameter p, ComponentScope s) {
-        InjectableScopePair isp = getInjectableiWithScope(p, s);
+        return getInjectable(null, p, s);
+    }
+
+    @Override
+    public Injectable getInjectable(AccessibleObject ao, Parameter p, ComponentScope s) {
+        InjectableScopePair isp = getInjectableiWithScope(ao, p, s);
         if (isp == null)
             return null;
         return isp.i;
     }
 
+    @Override
     public List<Injectable> getInjectable(List<Parameter> ps, ComponentScope s) {
+        return getInjectable(null, ps, s);
+    }
+
+    @Override
+    public List<Injectable> getInjectable(AccessibleObject ao, List<Parameter> ps, ComponentScope s) {
         List<Injectable> is = new ArrayList<Injectable>();
         for (Parameter p : ps)
-            is.add(getInjectable(p, s));
+            is.add(getInjectable(ao, p, s));
         return is;
     }
 }

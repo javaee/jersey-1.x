@@ -1,4 +1,12 @@
 release 1.4 (08-2010)
+- Fixed issue 564
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=564
+  Modified field injection so that injection will occur independent of the
+  field value. Previously injection would only occur if the field value
+  was null.
+- Support @ResourceRef (which has the same semantics as Jersey's @Inject
+  but does not conflict with the JSR 330 version) and @ParentRef for injecting
+  a parent into sub-resource.
 - Fixed issue 563
   https://jersey.dev.java.net/issues/show_bug.cgi?id=563
   When using the low-level Grizzly container injection of GrizzlyRequest

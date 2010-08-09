@@ -63,7 +63,7 @@ public class ComponentInjector<T> {
     /**
      * Create a component injector.
      * 
-     * @param ipc the injector provider context to ontain injectables.
+     * @param ipc the injector provider context to obtain injectables.
      * @param c the class of the type to inject on.
      */
     public ComponentInjector(InjectableProviderContext ipc, Class<T> c) {
@@ -77,15 +77,14 @@ public class ComponentInjector<T> {
      * @param t the instance to inject on.
      */
     public void inject(T t) {
-        AccessibleObjectContext aoc = new AccessibleObjectContext();
+        AnnotatedContext aoc = new AnnotatedContext();
 
         Class oClass = c;
         while (oClass != Object.class) {
             for (final Field f : oClass.getDeclaredFields()) {
-                if (getFieldValue(t, f) != null) continue;
-
-                aoc.setAccesibleObject(f);
+                aoc.setAccessibleObject(f);
                 final Annotation[] as = f.getAnnotations();
+                aoc.setAnnotations(as);
                 boolean missingDependency = false;
                 for (Annotation a : as) {
                     Injectable i = ipc.getInjectable(
@@ -117,7 +116,8 @@ public class ComponentInjector<T> {
                 hasReturnType(void.class).
                 nameStartsWith("set")) {
             final Annotation[] as = m.getAnnotations();
-            aoc.setAccesibleObject(m.getMethod(), as);
+            aoc.setAccessibleObject(m.getMethod());
+            aoc.setAnnotations(as);
             final Type gpt = m.getGenericParameterTypes()[0];
 
             boolean missingDependency = false;
@@ -151,21 +151,6 @@ public class ComponentInjector<T> {
                     }
                     f.set(resource, value);
                     return null;
-                } catch (IllegalAccessException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        });
-    }
-
-    private Object getFieldValue(final Object resource, final Field f) {
-        return AccessController.doPrivileged(new PrivilegedAction<Object>() {
-            public Object run() {
-                try {
-                    if (!f.isAccessible()) {
-                        f.setAccessible(true);
-                    }
-                    return f.get(resource);
                 } catch (IllegalAccessException ex) {
                     throw new RuntimeException(ex);
                 }

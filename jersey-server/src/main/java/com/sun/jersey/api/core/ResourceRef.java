@@ -1,9 +1,9 @@
 /*
  *
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
+ * 
  * Copyright 1997-2010 Sun Microsystems, Inc. All rights reserved.
- *
+ * 
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
@@ -11,7 +11,7 @@
  * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
- *
+ * 
  * When distributing the software, include this License Header Notice in each
  * file and include the License file at jersey/legal/LICENSE.txt.
  * Sun designates this particular file as subject to the "Classpath" exception
@@ -20,9 +20,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own
  * identifying information: "Portions Copyrighted [year]
  * [name of copyright owner]"
- *
+ * 
  * Contributor(s):
- *
+ * 
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -34,53 +34,34 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.core.spi.component;
+package com.sun.jersey.api.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
 /**
- * A component context for an accessible object and/or an array of annotations.
- * 
- * @author Paul.Sandoz@Oracle.Com
+ * Used to annotate fields or parameters that shall be injected with 
+ * resource class instances or instances obtained from registered
+ * IoC component provider factories (if any).
+ * <p>
+ * If the name of instance to inject is not recognized or there is no IoC
+ * component provider factory registered then an error will occur.
+ *
+ * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */
-public class AnnotatedContext implements ComponentContext {
-
-    private Annotation[] annotations;
-
-    private AccessibleObject ao;
-    
-    public AnnotatedContext() {
-    }
-
-    public AnnotatedContext(Annotation[] annotations) {
-        this(null, annotations);
-    }
-
-    public AnnotatedContext(AccessibleObject ao) {
-        this(ao, null);
-    }
-
-    public AnnotatedContext(AccessibleObject ao, Annotation[] annotations) {
-        this.ao = ao;
-        this.annotations = annotations;
-    }
-
-    public void setAnnotations(Annotation[] annotations) {
-        this.annotations = annotations;
-    }
-
-    public void setAccessibleObject(AccessibleObject ao) {
-        this.ao = ao;
-    }
-    
-    // ComponentContext
-    
-    public AccessibleObject getAccesibleObject() {
-        return ao;
-    }
-
-    public Annotation[] getAnnotations() {
-        return annotations;
-    }
+@Target({PARAMETER, METHOD, FIELD})
+@Retention(RUNTIME)
+@Documented
+public @interface ResourceRef {
+    /**
+     * @return the name of the object to inject, by default the name
+     *         is the class name of the type that is injected.
+     */
+    String value() default "";
 }

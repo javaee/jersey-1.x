@@ -70,7 +70,10 @@ import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
+import com.sun.jersey.api.core.ParentRef;
 import com.sun.jersey.api.core.ResourceConfigurator;
+import com.sun.jersey.api.core.ResourceRef;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.component.ProviderFactory;
@@ -133,6 +136,9 @@ import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.net.URI;
@@ -372,6 +378,37 @@ public final class WebApplicationImpl implements WebApplication {
             }
         });
 
+        injectableFactory.add(new InjectableProvider<ResourceRef, Type>() {
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
+            }
+
+            public Injectable<Injectable> getInjectable(ComponentContext ic, ResourceRef a, Type c) {
+                if (c instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)c;
+                    if (pt.getRawType() == Injectable.class) {
+                        if (pt.getActualTypeArguments().length == 1) {
+                            final Injectable<?> i = injectableFactory.getInjectable(
+                                    a.annotationType(),
+                                    ic,
+                                    a,
+                                    pt.getActualTypeArguments()[0],
+                                    ComponentScope.PERREQUEST_UNDEFINED_SINGLETON);
+                            if (i == null)
+                                return null;
+                            return new Injectable<Injectable>() {
+                                public Injectable getValue() {
+                                    return i;
+                                }
+                            };
+                        }
+                    }
+                }
+
+                return null;
+            }
+        });
+
         closeableFactory = new CloseableServiceFactory(context);
         injectableFactory.add(closeableFactory);
     }
@@ -521,6 +558,13 @@ public final class WebApplicationImpl implements WebApplication {
             final Annotation a = cc.getAnnotations()[0];
             if (a.annotationType() == Inject.class) {
                 final Inject i = Inject.class.cast(a);
+                final String value = (i.value() != null)
+                        ? i.value().trim()
+                        : "";
+                if (value.isEmpty())
+                    return getResourceComponentProvider(c);
+            } else if (a.annotationType() == ResourceRef.class) {
+                final ResourceRef i = ResourceRef.class.cast(a);
                 final String value = (i.value() != null)
                         ? i.value().trim()
                         : "";
@@ -760,6 +804,52 @@ public final class WebApplicationImpl implements WebApplication {
                 resourceConfig.getProviderClasses(),
                 resourceConfig.getProviderSingletons());
 
+        // Add injectable provider for @ParentRef
+
+        injectableFactory.add(
+            new InjectableProvider<ParentRef, Type>() {
+                    public ComponentScope getScope() {
+                        return ComponentScope.PerRequest;
+                    }
+
+                    public Injectable<Object> getInjectable(ComponentContext cc, ParentRef a, Type t) {
+                        if (!(t instanceof Class))
+                            return null;
+
+                        final Class target = ReflectionHelper.getDeclaringClass(cc.getAccesibleObject());
+                        final Class inject = (Class)t;
+                        return new Injectable<Object>() {
+                            public Object getValue() {
+                                final UriInfo ui = context.getUriInfo();
+                                final List l = ui.getMatchedResources();
+
+                                final Object parent = getParent(l, target);
+                                if (parent == null) return null;
+                                try {
+                                    return inject.cast(parent);
+                                } catch (ClassCastException ex) {
+                                    throw new ContainerException(
+                                            "The parent resource is expected to be of class " + inject.getName() +
+                                            " but is of class " + l.get(1).getClass().getName(),
+                                            ex);
+                                }
+                            }
+
+                            private Object getParent(List l, Class target) {
+                                if (l.isEmpty()) {
+                                    return null;
+                                } else if (l.size() == 1) {
+                                    return (l.get(0).getClass() == target) ? null : l.get(0);
+                                } else {
+                                    return (l.get(0).getClass() == target) ? l.get(1) : l.get(0);
+                                }
+                            }
+                        };
+                    }
+
+
+                });
+
         // Add injectable provider for @Inject
 
         injectableFactory.add(
@@ -829,6 +919,75 @@ public final class WebApplicationImpl implements WebApplication {
 
                 });
         
+        // Add injectable provider for @ResourceRef
+
+        injectableFactory.add(
+            new InjectableProvider<ResourceRef, Type>() {
+                    public ComponentScope getScope() {
+                        return ComponentScope.PerRequest;
+                    }
+
+                    public Injectable<Object> getInjectable(ComponentContext cc, ResourceRef a, Type t) {
+                        if (!(t instanceof Class))
+                            return null;
+
+                        final ResourceComponentProvider rcp = getResourceComponentProvider(cc, (Class)t);
+
+                        return new Injectable<Object>() {
+                            public Object getValue() {
+                                return rcp.getInstance(context);
+                            }
+                        };
+                    }
+
+                });
+
+        injectableFactory.add(
+            new InjectableProvider<ResourceRef, Type>() {
+                    public ComponentScope getScope() {
+                        return ComponentScope.Undefined;
+                    }
+
+                    public Injectable<Object> getInjectable(ComponentContext cc, ResourceRef a, Type t) {
+                        if (!(t instanceof Class))
+                            return null;
+
+                        final ResourceComponentProvider rcp = getResourceComponentProvider(cc, (Class)t);
+                        if (rcp.getScope() == ComponentScope.PerRequest)
+                            return null;
+
+                        return new Injectable<Object>() {
+                            public Object getValue() {
+                                return rcp.getInstance(context);
+                            }
+                        };
+                    }
+
+                });
+
+        injectableFactory.add(
+            new InjectableProvider<ResourceRef, Type>() {
+                    public ComponentScope getScope() {
+                        return ComponentScope.Singleton;
+                    }
+
+                    public Injectable<Object> getInjectable(ComponentContext cc, ResourceRef a, Type t) {
+                        if (!(t instanceof Class))
+                            return null;
+
+                        final ResourceComponentProvider rcp = getResourceComponentProvider(cc, (Class)t);
+                        if (rcp.getScope() != ComponentScope.Singleton)
+                            return null;
+
+                        return new Injectable<Object>() {
+                            public Object getValue() {
+                                return rcp.getInstance(context);
+                            }
+                        };
+                    }
+
+                });
+
         // Allow injection of features and properties
         injectableFactory.add(new ContextInjectableProvider<FeaturesAndProperties>(
                 FeaturesAndProperties.class, resourceConfig));
@@ -1024,6 +1183,18 @@ public final class WebApplicationImpl implements WebApplication {
 
         this.isTraceEnabled = resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE) |
                 resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE_PER_REQUEST);
+    }
+
+    private Class getDeclaringClass(AccessibleObject ao) {
+        if (ao instanceof Field) {
+            return ((Field)ao).getDeclaringClass();
+        } else if (ao instanceof Method) {
+            return ((Method)ao).getDeclaringClass();
+        } else if (ao instanceof Constructor) {
+            return ((Constructor)ao).getDeclaringClass();
+        } else {
+            return null;
+        }
     }
 
     @Override

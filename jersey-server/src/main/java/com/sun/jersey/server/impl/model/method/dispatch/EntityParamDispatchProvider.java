@@ -79,7 +79,7 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
                         method.getMethod().getParameterAnnotations()[i]));
             } else {
                 is.add(getInjectableProviderContext().
-                        getInjectable(parameter, ComponentScope.PerRequest));
+                        getInjectable(method.getMethod(), parameter, ComponentScope.PerRequest));
             }
         }
 

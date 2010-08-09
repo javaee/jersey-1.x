@@ -218,7 +218,7 @@ public class ResourceComponentConstructor {
         SortedSet<ConstructorInjectablePair> cs = new TreeSet<ConstructorInjectablePair>(
                 new ConstructorComparator());        
         for (AbstractResourceConstructor arc : ar.getConstructors()) {
-            List<Injectable> is = sipc.getInjectable(arc.getParameters(), scope);
+            List<Injectable> is = sipc.getInjectable(arc.getCtor(), arc.getParameters(), scope);
             cs.add(new ConstructorInjectablePair(arc.getCtor(), is));
         }
 

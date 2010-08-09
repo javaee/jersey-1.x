@@ -216,7 +216,8 @@ public final class ResourceUriRules {
                 continue;
             }
 
-            final List<Injectable> is = injectableContext.getInjectable(locator.getParameters(), ComponentScope.PerRequest);
+            final List<Injectable> is = injectableContext.getInjectable(
+                    locator.getMethod(), locator.getParameters(), ComponentScope.PerRequest);
             if (is.contains(null)) {
                 // Missing dependency
                 for (int i = 0; i < is.size(); i++) {
