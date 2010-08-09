@@ -37,24 +37,19 @@
 
 package com.sun.jersey.samples.jersey_cdi.resources;
 
-import javax.annotation.ManagedBean;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import java.math.BigDecimal;
+import javax.enterprise.context.RequestScoped;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 
 /**
- * A managed bean that uses (but does not inject) a path parameter.
  *
- * @author robc
+ * @author paulsandoz
  */
-@ManagedBean
-@Path("echo/{a}")
-public class EchoParamResource {
+@RequestScoped
+public class FormBean {
 
-    @GET
-    @Produces("text/plain")
-    public String get(@PathParam("a") String param) {
-        return "ECHO " + param;
-    }
+    @FormParam("x") BigDecimal x;
+
+    @DefaultValue("1") @FormParam("y") BigDecimal y;
 }

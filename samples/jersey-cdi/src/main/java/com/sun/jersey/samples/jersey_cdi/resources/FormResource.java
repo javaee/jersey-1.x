@@ -37,24 +37,30 @@
 
 package com.sun.jersey.samples.jersey_cdi.resources;
 
-import javax.annotation.ManagedBean;
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 
 /**
- * A managed bean that uses (but does not inject) a path parameter.
  *
- * @author robc
+ * @author paulsandoz
  */
-@ManagedBean
-@Path("echo/{a}")
-public class EchoParamResource {
+@RequestScoped
+@Path("/form")
+public class FormResource {
 
-    @GET
-    @Produces("text/plain")
-    public String get(@PathParam("a") String param) {
-        return "ECHO " + param;
+    // Delay instantiation until required by POST method
+    // as form parameters will not make sense if other HTTP methods are
+    // also declared
+    @Inject Provider<FormBean> pfb;
+
+    // Ideally we need to support @Inject on resource/sub-resource and
+    // sub-resource locator methods
+    @POST
+    public String post() {
+        FormBean fb = pfb.get();
+        return fb.x.add(fb.y).toString();
     }
 }

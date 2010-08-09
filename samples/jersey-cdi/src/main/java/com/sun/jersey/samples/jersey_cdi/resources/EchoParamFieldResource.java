@@ -40,7 +40,6 @@ package com.sun.jersey.samples.jersey_cdi.resources;
 import java.util.List;
 import java.util.Set;
 import javax.annotation.ManagedBean;
-import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.GET;
@@ -48,9 +47,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.UriInfo;
 
 /**
  * Shows injection of path and query parameters into the fields of a managed bean.

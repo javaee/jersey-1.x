@@ -38,7 +38,6 @@
 package com.sun.jersey.samples.jersey_cdi.resources;
 
 import javax.annotation.ManagedBean;
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
