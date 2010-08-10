@@ -12,9 +12,9 @@
 bundled with GlassFish installation.</para>
 
 <section>
-<title>GlassFish v3.0</title>
+<title>GlassFish v3.0 and v3.0.1</title>
 <para>
-GlassFish v3.0 comes up with Jersey version 1.1.4.1. To upgrade this version to &version; you will need 
+GlassFish v3.0 comes up with Jersey version 1.1.4.1. GlassFish v3.0.1 with Jersey version 1.1.5. To upgrade these to &version; you will need 
 to replace certain files manually.
 </para>
 
@@ -26,7 +26,7 @@ scenario. Please keep in mind things could break. It is recommended to back up a
 The actual replace steps follow.
 </para>
 
-<para>Remove the existing Jersey files.
+<para>Remove the existing Jersey files:
 Stop all running server instances. Then remove the following files from the GlassFish installation directory:
 
 <itemizedlist>
@@ -35,8 +35,6 @@ Stop all running server instances. Then remove the following files from the Glas
     <listitem>glassfish/modules/jersey-gf-statsproviders.jar</listitem>
     <listitem>glassfish/modules/jersey-multipart.jar</listitem>
     <listitem>glassfish/modules/jackson-core-asl.jar</listitem>
-    <listitem>glassfish/modules/jackson-mapper-asl.jar</listitem>
-    <listitem>glassfish/modules/jackson-jaxrs.jar</listitem>
     <listitem>glassfish/modules/jettison.jar</listitem>
     <listitem>glassfish/modules/mimepull.jar</listitem>
 </itemizedlist>
@@ -59,11 +57,60 @@ http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-docs-an
 
 and unzip it's content into the GlassFish installation directory.
 </para>
+<para>
+To be 100 % sure the changes take effect, you might also want to remove the felix cache, which is located in <literal>glassfish/domains/domain1/osgi-cache</literal> directory.
+This directory gets created upon the first start of the GlassFish instance.  
+</para>
 </section>
 
 <section>
-<title>GlassFish 3.0.1 and 3.1</title>
-<para>TODO</para>
+<title>GlassFish 3.1</title>
+<para>GlassFish v3.1 is still a work in progress. We try to integrate Jersey promoted builds there on a weekly basis, so that GlassFish v3.1 nightlies always
+contain fresh Jersey bits. This, however, applies only to the Jersey library and not to Jersey examples and documentation.
+</para>
+<para>
+If you want to update the Jersey bits in GlassFish with the latest snapshot version, or if you want to install Jersey documentation and examples, you would need
+to do the following steps:
+</para>
+<para>Remove the existing Jersey files:
+Stop all running server instances. Then remove the following files from the GlassFish installation directory:
+
+<itemizedlist>
+    <listitem>glassfish/modules/jersey-core.jar</listitem>
+    <listitem>glassfish/modules/jersey-client.jar</listitem>
+    <listitem>glassfish/modules/jersey-gf-server.jar</listitem>
+    <listitem>glassfish/modules/jersey-json.jar</listitem>
+    <listitem>glassfish/modules/jersey-multipart.jar</listitem>    
+    <listitem>glassfish/modules/jersey-gf-statsproviders.jar</listitem>
+    <listitem>glassfish/modules/jackson-core-asl.jar</listitem>
+    <listitem>glassfish/modules/jackson-mapper-asl.jar</listitem>
+    <listitem>glassfish/modules/jackson-jaxrs.jar</listitem>
+    <listitem>glassfish/modules/jettison.jar</listitem>
+    <listitem>glassfish/modules/mimepull.jar</listitem>
+</itemizedlist>
+
+Download the new Jersey version archive from
+
+<ulink
+  url="http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-core/&version;/jersey-gfv3-core-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-core/&version;/jersey-gfv3-core-&version;-project.zip</ulink>
+  
+and unzip it's <literal>glassfish/modules</literal> content into the GlassFish installation directory (to the <literal>glassfish/modules</literal> subdirectory there).
+</para>
+
+<para>
+To install also Jersey examples in addition, download (you can change the version in the link to get another non-snapshot version of Jersey)
+
+<ulink
+  url="
+http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-docs-and-samples/&version;/jersey-gfv3-docs-and-samples-&version;-project.zip">
+http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-docs-and-samples/&version;/jersey-gfv3-docs-and-samples-&version;-project.zip</ulink>
+
+and unzip it's content into the GlassFish installation directory.
+</para>
+<para>
+To be 100 % sure the changes take effect, you might also want to remove the felix cache, which is located in <literal>glassfish/domains/domain1/osgi-cache</literal> directory.
+This directory gets created upon the first start of the GlassFish instance.  
+</para>
 </section>
 
 </chapter>
