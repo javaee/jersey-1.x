@@ -36,7 +36,7 @@
  */
 package com.sun.jersey.impl.inject;
 
-import com.sun.jersey.api.core.ResourceRef;
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
@@ -55,9 +55,9 @@ import javax.ws.rs.Path;
  *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */
-public class ResourceRefAnnotationInjectableTest extends AbstractResourceTester {
+public class InjectParamAnnotationInjectableTest extends AbstractResourceTester {
 
-    public ResourceRefAnnotationInjectableTest(String testName) {
+    public InjectParamAnnotationInjectableTest(String testName) {
         super(testName);
     }
 
@@ -73,12 +73,12 @@ public class ResourceRefAnnotationInjectableTest extends AbstractResourceTester 
     public static class PerRequestResource {
         private final SingletonSubResourceResource sr;
 
-        public PerRequestResource(@ResourceRef SingletonSubResourceResource sr) {
+        public PerRequestResource(@InjectParam SingletonSubResourceResource sr) {
             this.sr = sr;
         }
 
         @Path("sr")
-        public SingletonSubResourceResource get(@ResourceRef SingletonSubResourceResource _sr) {
+        public SingletonSubResourceResource get(@InjectParam SingletonSubResourceResource _sr) {
             assertEquals(sr, _sr);
             return sr;
         }
@@ -106,21 +106,21 @@ public class ResourceRefAnnotationInjectableTest extends AbstractResourceTester 
         private final SingletonSubResourceResource singleton;
 
         public SingletonResource(
-                @ResourceRef Injectable<PerRequestSubResourceResource> request,
-                @ResourceRef SingletonSubResourceResource singleton) {
+                @InjectParam Injectable<PerRequestSubResourceResource> request,
+                @InjectParam SingletonSubResourceResource singleton) {
             this.request = request;
             this.singleton = singleton;
         }
 
         @Path("request")
-        public PerRequestSubResourceResource get(@ResourceRef PerRequestSubResourceResource _sr) {
+        public PerRequestSubResourceResource get(@InjectParam PerRequestSubResourceResource _sr) {
             PerRequestSubResourceResource sr = request.getValue();
             assertEquals(sr, _sr);
             return sr;
         }
 
         @Path("singleton")
-        public SingletonSubResourceResource get(@ResourceRef SingletonSubResourceResource _singleton) {
+        public SingletonSubResourceResource get(@InjectParam SingletonSubResourceResource _singleton) {
             assertEquals(singleton, _singleton);
             return singleton;
         }
@@ -142,7 +142,7 @@ public class ResourceRefAnnotationInjectableTest extends AbstractResourceTester 
     public static class BadInjectSingletonResource {
         private final PerRequestSubResourceResource sr;
 
-        public BadInjectSingletonResource(@ResourceRef PerRequestSubResourceResource sr) {
+        public BadInjectSingletonResource(@InjectParam PerRequestSubResourceResource sr) {
             this.sr = sr;
             assertNull(sr);
         }
@@ -172,20 +172,20 @@ public class ResourceRefAnnotationInjectableTest extends AbstractResourceTester 
         private final SingletonSubResourceResource sr2;
 
         public PerRequestNamedInjectResource(
-                @ResourceRef("1") SingletonSubResourceResource sr1,
-                @ResourceRef("2") SingletonSubResourceResource sr2) {
+                @InjectParam("1") SingletonSubResourceResource sr1,
+                @InjectParam("2") SingletonSubResourceResource sr2) {
             this.sr1 = sr1;
             this.sr2 = sr2;
         }
 
         @Path("sr1")
-        public SingletonSubResourceResource get1(@ResourceRef("1") SingletonSubResourceResource _sr1) {
+        public SingletonSubResourceResource get1(@InjectParam("1") SingletonSubResourceResource _sr1) {
             assertEquals(sr1, _sr1);
             return sr1;
         }
 
         @Path("sr2")
-        public SingletonSubResourceResource get2(@ResourceRef("2") SingletonSubResourceResource _sr2) {
+        public SingletonSubResourceResource get2(@InjectParam("2") SingletonSubResourceResource _sr2) {
             assertEquals(sr2, _sr2);
             return sr2;
         }
@@ -203,7 +203,7 @@ public class ResourceRefAnnotationInjectableTest extends AbstractResourceTester 
     @Path("/")
     public static class MyResource {
 
-        @ResourceRef MyBean myBean;
+        @InjectParam MyBean myBean;
 
         @GET
         public MyBean get() {

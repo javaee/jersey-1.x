@@ -36,6 +36,7 @@
  */
 package com.sun.jersey.spi.spring.container;
 
+import com.sun.jersey.api.core.InjectParam;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
@@ -239,6 +240,15 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
                 }
 
             }
+
+            final InjectParam injectParam = getAnnotation(cc.getAnnotations(), InjectParam.class);
+            if (injectParam != null) {
+                annotatedWithInject = true;
+                if (injectParam.value() != null && !injectParam.value().equals("")) {
+                    return injectParam.value();
+                }
+
+            }
         }
 
         final String names[] = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(springContext, c);
@@ -272,10 +282,10 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
                     append(c.getName()).append(".");
 
             if (annotatedWithInject) {
-                sb.append("\nYou should specify the name of the preferred bean at @Inject: Inject(\"yourBean\").");
+                sb.append("\nYou should specify the name of the preferred bean with @InjectParam(\"name\") or @Inject(\"name\").");
             } else {
                 sb.append("\nAnnotation information was not available, the reason might be because you're not using " +
-                        "@Inject. You should use @Inject and specifiy the bean name via Inject(\"yourBean\").");
+                        "@InjectParam. You should use @InjectParam and specifiy the bean name via InjectParam(\"name\").");
             }
 
             sb.append("\nAvailable bean names: ").append(toCSV(names));

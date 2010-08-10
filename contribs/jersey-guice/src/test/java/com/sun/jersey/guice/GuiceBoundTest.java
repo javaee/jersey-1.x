@@ -4,6 +4,7 @@ import com.google.inject.Singleton;
 import com.google.inject.servlet.RequestScoped;
 import com.google.inject.servlet.ServletModule;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.core.ResourceContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -161,7 +162,7 @@ public class GuiceBoundTest extends AbstractGuiceGrizzlyTest {
 
         @GET
         @Produces("text/plain")
-        public String getIt(@com.sun.jersey.spi.inject.Inject GuiceManagedClass gmc) {
+        public String getIt(@InjectParam GuiceManagedClass gmc) {
             assertEquals("inject", ui.getPath());
             assertEquals("x", x);
 

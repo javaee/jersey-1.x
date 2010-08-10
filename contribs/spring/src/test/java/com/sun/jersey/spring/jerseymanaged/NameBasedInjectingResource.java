@@ -28,6 +28,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.resource.Singleton;
 import junit.framework.Assert;
@@ -49,7 +50,7 @@ public class NameBasedInjectingResource {
     @Inject("namedItem3_1")
     private Item3 _item1;
 
-    @Inject("namedItem3_2")
+    @InjectParam("namedItem3_2")
     private Item3 _item2;
 
     public NameBasedInjectingResource() {
@@ -61,7 +62,7 @@ public class NameBasedInjectingResource {
     public Item3 getItemByValue(
             @PathParam("value") String value,
             @Inject("namedItem3_1") Item3 item1,
-            @Inject("namedItem3_2") Item3 item2) {
+            @InjectParam("namedItem3_2") Item3 item2) {
 
         Assert.assertEquals(item1, _item1);
         Assert.assertEquals(item2, _item2);

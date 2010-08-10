@@ -72,7 +72,7 @@ import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.ParentRef;
 import com.sun.jersey.api.core.ResourceConfigurator;
-import com.sun.jersey.api.core.ResourceRef;
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
@@ -378,12 +378,12 @@ public final class WebApplicationImpl implements WebApplication {
             }
         });
 
-        injectableFactory.add(new InjectableProvider<ResourceRef, Type>() {
+        injectableFactory.add(new InjectableProvider<InjectParam, Type>() {
             public ComponentScope getScope() {
                 return ComponentScope.Singleton;
             }
 
-            public Injectable<Injectable> getInjectable(ComponentContext ic, ResourceRef a, Type c) {
+            public Injectable<Injectable> getInjectable(ComponentContext ic, InjectParam a, Type c) {
                 if (c instanceof ParameterizedType) {
                     ParameterizedType pt = (ParameterizedType)c;
                     if (pt.getRawType() == Injectable.class) {
@@ -563,8 +563,8 @@ public final class WebApplicationImpl implements WebApplication {
                         : "";
                 if (value.isEmpty())
                     return getResourceComponentProvider(c);
-            } else if (a.annotationType() == ResourceRef.class) {
-                final ResourceRef i = ResourceRef.class.cast(a);
+            } else if (a.annotationType() == InjectParam.class) {
+                final InjectParam i = InjectParam.class.cast(a);
                 final String value = (i.value() != null)
                         ? i.value().trim()
                         : "";
@@ -922,12 +922,12 @@ public final class WebApplicationImpl implements WebApplication {
         // Add injectable provider for @ResourceRef
 
         injectableFactory.add(
-            new InjectableProvider<ResourceRef, Type>() {
+            new InjectableProvider<InjectParam, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.PerRequest;
                     }
 
-                    public Injectable<Object> getInjectable(ComponentContext cc, ResourceRef a, Type t) {
+                    public Injectable<Object> getInjectable(ComponentContext cc, InjectParam a, Type t) {
                         if (!(t instanceof Class))
                             return null;
 
@@ -943,12 +943,12 @@ public final class WebApplicationImpl implements WebApplication {
                 });
 
         injectableFactory.add(
-            new InjectableProvider<ResourceRef, Type>() {
+            new InjectableProvider<InjectParam, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.Undefined;
                     }
 
-                    public Injectable<Object> getInjectable(ComponentContext cc, ResourceRef a, Type t) {
+                    public Injectable<Object> getInjectable(ComponentContext cc, InjectParam a, Type t) {
                         if (!(t instanceof Class))
                             return null;
 
@@ -966,12 +966,12 @@ public final class WebApplicationImpl implements WebApplication {
                 });
 
         injectableFactory.add(
-            new InjectableProvider<ResourceRef, Type>() {
+            new InjectableProvider<InjectParam, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.Singleton;
                     }
 
-                    public Injectable<Object> getInjectable(ComponentContext cc, ResourceRef a, Type t) {
+                    public Injectable<Object> getInjectable(ComponentContext cc, InjectParam a, Type t) {
                         if (!(t instanceof Class))
                             return null;
 

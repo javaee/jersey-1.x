@@ -37,7 +37,7 @@
 package com.sun.jersey.impl.inject;
 
 import com.sun.jersey.api.core.ParentRef;
-import com.sun.jersey.api.core.ResourceRef;
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -63,7 +63,7 @@ public class ParentRefAnnotationInjectableTest extends AbstractResourceTester {
         @ParentRef Object parent;
 
         @Path("b")
-        public BResource sub(@ResourceRef BResource b) {
+        public BResource sub(@InjectParam BResource b) {
             return b;
         }
 
@@ -77,7 +77,7 @@ public class ParentRefAnnotationInjectableTest extends AbstractResourceTester {
         @ParentRef AResource parent;
 
         @Path("c")
-        public CResource sub(@ResourceRef CResource c) {
+        public CResource sub(@InjectParam CResource c) {
             return c;
         }
 

@@ -39,15 +39,13 @@ package com.sun.jersey.impl.methodparams;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.spi.inject.Inject;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import javax.mail.internet.InternetHeaders;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -369,7 +367,7 @@ public class FormParamTest extends AbstractResourceTester {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String post(
-                @Inject ParamBean pb,
+                @InjectParam ParamBean pb,
                 @FormParam("a") String a,
                 @FormParam("b") String b,
                 Form form) {
@@ -396,7 +394,7 @@ public class FormParamTest extends AbstractResourceTester {
     public static class FormResourceBeanNoFormParam {
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-        public String post(@Inject ParamBean pb) {
+        public String post(@InjectParam ParamBean pb) {
             return pb.a + pb.b;
         }
     }
@@ -418,7 +416,7 @@ public class FormParamTest extends AbstractResourceTester {
     public static class FormResourceBeanConstructor {
         private final ParamBean pb;
 
-        public FormResourceBeanConstructor(@Inject ParamBean pb) {
+        public FormResourceBeanConstructor(@InjectParam ParamBean pb) {
             this.pb = pb;
         }
 
@@ -486,7 +484,7 @@ public class FormParamTest extends AbstractResourceTester {
     public static class FormResourceBeanConstructorFormParam {
         private final ParamBean pb;
 
-        public FormResourceBeanConstructorFormParam(@Inject ParamBean pb) {
+        public FormResourceBeanConstructorFormParam(@InjectParam ParamBean pb) {
             this.pb = pb;
         }
 

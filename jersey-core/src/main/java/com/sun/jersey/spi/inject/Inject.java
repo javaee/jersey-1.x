@@ -53,11 +53,14 @@ import java.lang.annotation.Target;
  * If the name of instance to inject is not recognized or there is no IoC
  * component provider factory registered then no injection will occur.
  *
+ * @deprecated see {@link com.sun.jersey.api.core.InjectParam}
+ * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */
 @Target({PARAMETER, METHOD, FIELD})
 @Retention(RUNTIME)
 @Documented
+@Deprecated
 public @interface Inject {
     /**
      * @return the name of the object to inject, by default the name

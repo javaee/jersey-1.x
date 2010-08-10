@@ -46,19 +46,26 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 /**
- * Used to annotate fields or parameters that shall be injected with 
- * resource class instances or instances obtained from registered
- * IoC component provider factories (if any).
+ * Used to annotate fields, methods or parameters that shall be injected with
+ * instances obtained from Jersey or registered IoC component provider
+ * factories that provide support for Guice, Spring or CDI.
  * <p>
- * If the name of instance to inject is not recognized or there is no IoC
- * component provider factory registered then an error will occur.
+ * When Jersey is used without IoC component provider support this annotation
+ * provides basic injection support of beans. References to beans may be 
+ * obtained be they existing references to instances of resources or just beans
+ * that have JAX-RS/Jersey artifacts injected on them.
+ * <p>
+ * When Jersey is used with an IoC component provider, such as Guice or CDI,
+ * this annotation may be used in conjuction with the Guice or JSR 330-based
+ * @Inject when references to beans are obtained as parameters of
+ * resource methods, sub-resource methods or sub-resource locator methods.
  *
- * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
+ * @author Paul.Sandoz@Oracle.Com
  */
 @Target({PARAMETER, METHOD, FIELD})
 @Retention(RUNTIME)
 @Documented
-public @interface ResourceRef {
+public @interface InjectParam {
     /**
      * @return the name of the object to inject, by default the name
      *         is the class name of the type that is injected.

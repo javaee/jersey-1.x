@@ -41,11 +41,11 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.resource.Singleton;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -81,7 +81,7 @@ public class ProviderResourceRefTest extends AbstractResourceTester {
     }
 
     public static class StringWriterWithInject implements MessageBodyWriter<String> {
-        @Inject SingletonResource sr;
+        @InjectParam SingletonResource sr;
 
         public boolean isWriteable(Class<?> type, Type genericType,
                 Annotation[] annotations, MediaType mediaType) {
@@ -112,7 +112,7 @@ public class ProviderResourceRefTest extends AbstractResourceTester {
 
 
     public static class Filter implements ContainerResponseFilter {
-        @Inject SingletonResource sr;
+        @InjectParam SingletonResource sr;
         
         public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             response.getHttpHeaders().putSingle("X-Filter", "" + sr.i);

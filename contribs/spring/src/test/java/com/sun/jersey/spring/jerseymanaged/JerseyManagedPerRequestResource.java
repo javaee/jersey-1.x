@@ -21,6 +21,7 @@
  */
 package com.sun.jersey.spring.jerseymanaged;
 
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.spring.*;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -49,7 +50,7 @@ public class JerseyManagedPerRequestResource {
     @Inject
     private Item _singletonItem;
     
-    @Inject
+    @InjectParam
     private Item2 _prototypeItem;
     
     private int _count;
