@@ -12,7 +12,7 @@
 bundled with GlassFish installation.</para>
 
 <section>
-<title>GlassFish v3.0 and v3.0.1</title>
+<title>GlassFish v3.0 and 3.0.1</title>
 <para>
 GlassFish v3.0 comes up with Jersey version 1.1.4.1. GlassFish v3.0.1 with Jersey version 1.1.5. To upgrade these to &version; you will need 
 to replace certain files manually.
@@ -64,12 +64,16 @@ This directory gets created upon the first start of the GlassFish instance.
 </section>
 
 <section>
-<title>GlassFish 3.1</title>
+<title>GlassFish v3.1</title>
 <para>GlassFish v3.1 is still a work in progress. We try to integrate Jersey promoted builds there on a weekly basis, so that GlassFish v3.1 nightlies always
-contain fresh Jersey bits. This, however, applies only to the Jersey library and not to Jersey examples and documentation.
+contain fresh Jersey bits. GlassFish v3.1 nightly builds could be downloaded from 
+<ulink url="http://download.java.net/glassfish/v3.1/nightly/">http://download.java.net/glassfish/v3.1/nightly/</ulink>
+GlassFish v3.1 promoted builds are available at 
+<ulink url="http://download.java.net/glassfish/v3.1/promoted/">http://download.java.net/glassfish/v3.1/promoted/</ulink>
+ 
 </para>
 <para>
-If you want to update the Jersey bits in GlassFish with the latest snapshot version, or if you want to install Jersey documentation and examples, you would need
+If you want to update the Jersey bits in GlassFish with the latest Jersey snapshot version, or if you want to install Jersey documentation and examples, you would need
 to do the following steps:
 </para>
 <para>Remove the existing Jersey files:
