@@ -128,7 +128,7 @@
                 <glossterm>jersey-test-framework-embedded-glassfish</glossterm>
                 <glossdef>
                     <para>
-                        <literal>com.sun.jersey.test.framework.spi.container.embedded.glassfish.TestContainerFactory</literal>
+                        <literal>com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory</literal>
                     </para>
                 </glossdef>
             </glossentry>
