@@ -105,13 +105,13 @@
         <dependency>
             <groupId>org.glassfish.external</groupId>
             <artifactId>management-api</artifactId>
-            <version>3.0.0-b008</version>
+            <version>3.0.0-b012</version>
         </dependency>
         <dependency>
             <groupId>org.glassfish.gmbal</groupId>
             <artifactId>gmbal</artifactId>
            <!--version>${gfprobe-provider-client.version}</version-->
-            <version>3.0.0-b019</version>
+            <version>3.0.0-b023</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
