@@ -45,9 +45,10 @@ package com.sun.jersey.api.client.filter;
 public abstract class ContainerListener {
 
     /**
-     * Called when any amount of bytes from request entity is written (sent).
+     * Called when any amount of bytes from request entity is sent.
      *
-     * @param bytes sum of send bytes
+     * @param delta the number of bytes sent for this event
+     * @param bytes the total number of bytes sent so far
      */
     public void onSent(long delta, long bytes) {};
 
@@ -62,7 +63,8 @@ public abstract class ContainerListener {
     /**
      * Called when any amount of bytes is read from responses entity
      *
-     * @param bytes sum of received bytes
+     * @param delta the number of bytes received for this event
+     * @param bytes the total number of bytes received so far
      */
     public void onReceived(long delta, long bytes) {};
 
