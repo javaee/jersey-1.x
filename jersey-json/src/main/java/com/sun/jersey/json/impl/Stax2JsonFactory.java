@@ -121,16 +121,14 @@ public class Stax2JsonFactory {
                         return new Jackson2StaxReader(JacksonRootAddingParser.createRootAddingParser(nonListParser, "jsonArrayRootElement"), config);
                     }
                 } catch (Exception ex) {
-                    Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new XMLStreamException(ex);
                 }
-                break;
             case MAPPED:
                 try {
                     return new JsonXmlStreamReader(reader, rootName, config);
                 } catch (IOException ex) {
-                    Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new XMLStreamException(ex);
                 }
-                break;
             case MAPPED_JETTISON:
                 try {
                     Configuration jmConfig;
@@ -152,6 +150,7 @@ public class Stax2JsonFactory {
                     throw new XMLStreamException(ex);
                 }
         }
-        return null;
+        // This should not occur
+        throw new IllegalArgumentException("Unknown JSON config");
     }
 }
