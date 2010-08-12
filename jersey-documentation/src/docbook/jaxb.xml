@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+<!ENTITY % ents SYSTEM "jersey.ent">
+%ents;
+]>
+<chapter id="jaxb">
+
+    <title>XML Support</title>
+
+    <para>As you probably already know, Jersey uses MessageBodyWriters and MessageBodyReaders to parse
+        incoming request and create outgoing responses. Every user can create its own representation but...
+        this is not recommended way how to do things. XML is proven standard for interchanging informations,
+        especially in web services. Jerseys support XML entities via JAXB so that means it has default
+        XML MessageBodyReaders/Writers implementations available.</para>
+
+    <para>Good start for people which already have some experinece with JAXB annotations is JAXB sample.
+        You can see various usecases there. This text is mainly meant for those who don't have prior experience
+        with JAXB. Don't expect that all possible annotations and their combinations
+        will be covered in this chapter, <ulink url="http://jaxb.dev.java.net">JAXB (JSR 222 implementation)</ulink> is pretty complex and comprehensive. But if
+        you just want to know how you can interchange XML messages with your REST service, you are looking
+        at right chapter.</para>
+
+    <section>
+        <title id="jaxb.xmlRootElement">Getting started</title>
+
+        <para>Lets start with simple example. Lets say we have class <code>Planet</code> and service
+        which produces "Planets"</para>
+
+        <example>
+            <title>Planet class</title>
+            <programlisting linenumbering="numbered">@XmlRootElement
+public class Planet {
+    public int id;
+    public String name;
+    public double radius;
+}
+            </programlisting>
+        </example>
+
+        <example>
+            <title>Resource class</title>
+            <programlisting linenumbering="numbered">@Path("planet")
+public class Resource {
+
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public Planet getPlanet() {
+        Planet p = new Planet();
+        p.id = 1;
+        p.name = "Earth";
+        p.radius = 1.0;
+
+        return p;
+    }
+}            </programlisting>
+        </example>
+
+        <para>You can see there is some extra annotation declared on <code>Planet</code> class.
+        Concretely <code>XmlRootelement</code>. What it does? This is a JAXB annotation which
+        maps java class to XML element. We don't need specify anything else, because <code>Planet</code>
+        is very simple class and all fields are public. In this case, XML element name will be derived
+        from class name or you can set name property: <code>@XmlRootElement(name="yourName")</code>.</para>
+
+        <para>Our resource class will respond to GET /planet with
+            <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+                &lt;planet&gt;
+                        &lt;id&gt;1&lt;/id&gt;
+                        &lt;name&gt;Earth&lt;/name&gt;
+                        &lt;radius&gt;1.0&lt;/radius&gt;
+                &lt;/planet&gt;
+            </programlisting>
+
+            which might be exactly what we want... or not. Or we might not really care, because we
+            can use Jersey client for making requests to this resource and this is easy as:
+            <code>Planet planet = webResource.path("planet").accept(MediaType.APPLICATION_XML_TYPE).get(Planet.class);</code>.
+            There is pre-created WebResource object which points to our applications context root and
+            we simpli add path (in our clase its "planet"), accept header (not mandatory, but service could
+            provide different content based on this header; for example text/html can be served for web browsers) and
+            at the end we specify that we are expecting <code>Planet</code> class via GET request.</para>
+
+            <para>There may be need for not just producing XML, we might want to consume it as well.
+
+                <example>
+                    <title>Method for consuming Planet</title>
+                    <programlisting linenumbering="numbered">    @POST
+    @Consumes(MediaType.APPLICATION_XML)
+    public void setPlanet(Planet p) {
+        System.out.println("setPlanet " + p);
+    }
+                    </programlisting>
+                </example>
+
+           After valid request is made (with Jersey client you can do <code>webResource.path("planet").post(p);</code>),
+           service will print out string representation of Planet, which can look like <literal>Planet{id=2, name='Mars', radius=1.51}</literal>.
+           </para>
+
+        <para>If there is a need for some other (non default) XML representation, other JAXB annotations would
+        need to be used. This process is usually simplified by generating java source from XML Schema which is
+        done by xjc. Xjc is XML to java compiler and is part of JAXB. See <ulink url="http://jaxb.dev.java.net">JAXB home page</ulink>
+        for further details.</para>
+    </section>
+
+    <section>
+        <title id="jabx.JAXBElement">POJOs</title>
+
+        <para>Sometimes you can't / don't want to add JAXB annotations to source code and you still want
+        to have resources consuming and producing XML representation of your classes. In this case, <code>JAXBElement</code>
+        class should help you. Let's redo planet resource but this time we won't have <code>XmlRootElement</code>
+        annotation on <code>Planet</code> class.</para>
+
+        <example>
+            <title>Resource class - JAXBElement</title>
+            <programlisting linenumbering="numbered">@Path("planet")
+public class Resource {
+
+    @GET
+    @Produces(MediaType.APPLICATION_XML)
+    public JAXBElement&lt;Planet&gt; getPlanet() {
+        Planet p = new Planet();
+        p.id = 1;
+        p.name = "Earth";
+        p.radius = 1.0;
+
+        return new JAXBElement&lt;Planet&gt;(new QName("planet"), Planet.class, p);
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_XML)
+    public void setPlanet(JAXBElement&lt;Planet&gt; p) {
+        System.out.println("setPlanet " + p.getValue());
+    }
+}            </programlisting>
+        </example>
+
+        <para>As you can see, everything is little more complicated with JAXBElement. This is because now you need
+        to explicitly set element name for <code>Planet</code> class XML representation. Client side is even more ugly
+        than server side because you can't do <code>JAXBElement&lt;Planet&gt;.class</code> so Jersey client
+        API provides way how to workaround it by declaring subclass of <code>GenericType</code>.</para>
+
+        <example>
+            <title>Client side - JAXBElement</title>
+            <programlisting linenumbering="numbered">        // GET
+        GenericType&lt;JAXBElement&lt;Planet&gt;&gt; planetType = new GenericType&lt;JAXBElement&lt;Planet&gt;&gt;() {};
+
+        Planet planet = (Planet) webResource.path("planet").accept(MediaType.APPLICATION_XML_TYPE).get(planetType).getValue();
+        System.out.println("### " + planet);
+
+        // POST
+        Planet p = new Planet();
+        // ...
+
+        webResource.path("planet").post(new JAXBElement&lt;Planet&gt;(new QName("planet"), Planet.class, p));           </programlisting>
+        </example>
+
+    </section>
+
+    <section>
+        <title id="jaxb.JAXBContext">Using custom JAXBContext</title>
+
+        <para>In some scenarios you can take advantage of using custom <code>JAXBContext</code>. Creating
+            <code>JAXBContext</code> is expensive operation and if you already have one created, same instance
+        can be used by Jersey. Other possible usecase for this is when you need to set some specific things
+        to JAXBContext, for example set different classloader.</para>
+
+        <example>
+            <title>PlanetJAXBContextProvider</title>
+            <programlisting linenumbering="numbered">@Provider
+public class PlanetJAXBContextProvider implements ContextResolver&lt;JAXBContext&gt; {
+
+    public JAXBContext getContext(Class&lt;?&gt; type) {
+        JAXBContext context = null;
+
+        if(type != Planet.class)
+            return null; // we don't support nothing else than Planet
+
+        try {
+            context = JAXBContext.newInstance(Planet.class);
+        } catch (Exception e) {
+            return null;
+        }
+
+        return context;
+    }
+}
+        </programlisting>
+        </example>
+
+        <para>Sample above shows simple <code>JAXBContext</code> creation, all you need to do is put
+        this <code>@Provider</code> annotated class somewhere where Jersey can find it. Users sometimes
+        have problems with using provider classes on client side, so just for reminder - you have to
+        declare them in client config (cliend does not anything like package scanning done by server).</para>
+
+        <example>
+            <title>Using Provider with Jersey client</title>
+            <programlisting linenumbering="numbered">                ClientConfig cc = new DefaultClientConfig();
+                cc.getClasses().add(PlanetJAXBContextProvider.class);
+                Client c = Client.create(cc);
+            </programlisting>
+        </example>
+    </section>
+</chapter>
