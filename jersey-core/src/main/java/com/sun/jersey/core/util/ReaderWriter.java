@@ -151,7 +151,17 @@ public final class ReaderWriter {
      */
     public static final String readFromAsString(InputStream in,
             MediaType type) throws IOException {
-        Reader reader = new InputStreamReader(in, getCharset(type));
+        return readFromAsString(new InputStreamReader(in, getCharset(type)));
+    }
+
+    /**
+     * Read the characters of a reader and convert to a string.
+     * 
+     * @param reader the reader
+     * @return the string
+     * @throws IOException if there is an error reading from the reader.
+     */
+    public static final String readFromAsString(Reader reader) throws IOException {
         StringBuilder sb = new StringBuilder();
         char[] c = new char[BUFFER_SIZE];
         int l;

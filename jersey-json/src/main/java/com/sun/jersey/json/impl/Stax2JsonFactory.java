@@ -37,6 +37,7 @@
 package com.sun.jersey.json.impl;
 
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.json.impl.writer.*;
 import com.sun.jersey.json.impl.reader.Jackson2StaxReader;
 import com.sun.jersey.json.impl.reader.JacksonRootAddingParser;
@@ -46,6 +47,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import org.codehaus.jackson.JsonFactory;
@@ -103,11 +105,11 @@ public class Stax2JsonFactory {
         }
     }
 
-    public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName) {
+    public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName) throws XMLStreamException {
         return createReader(reader, config, rootName, false);
     }
 
-    public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName, boolean readingList) {
+    public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName, boolean readingList) throws XMLStreamException {
         switch (config.getNotation()) {
             case NATURAL:
                 try {
@@ -138,30 +140,18 @@ public class Stax2JsonFactory {
                         jmConfig = new Configuration(config.getXml2JsonNs());
                     }
                     return new MappedXMLStreamReader(
-                            new JSONObject(new JSONTokener(readFromAsString(reader))),
+                            new JSONObject(new JSONTokener(ReaderWriter.readFromAsString(reader))),
                             new MappedNamespaceConvention(jmConfig));
                 } catch (Exception ex) {
-                    Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new XMLStreamException(ex);
                 }
-                break;
             case BADGERFISH:
                 try {
-                    return new BadgerFishXMLStreamReader(new JSONObject(new JSONTokener(readFromAsString(reader))));
+                    return new BadgerFishXMLStreamReader(new JSONObject(new JSONTokener(ReaderWriter.readFromAsString(reader))));
                 } catch (Exception ex) {
-                    Logger.getLogger(JSONUnmarshallerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    throw new XMLStreamException(ex);
                 }
-                break;
         }
         return null;
-    }
-
-    private static String readFromAsString(Reader reader) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        char[] c = new char[1024];
-        int l;
-        while ((l = reader.read(c)) != -1) {
-            sb.append(c, 0, l);
-        }
-        return sb.toString();
     }
 }

@@ -47,8 +47,10 @@ import java.nio.charset.Charset;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
@@ -103,8 +105,12 @@ public class BaseJSONUnmarshaller implements JSONUnmarshaller, JSONConfigurated 
         return jaxbUnmarshaller.unmarshal(createXmlStreamReader(reader, declaredType), declaredType);
     }
 
-    private XMLStreamReader createXmlStreamReader(Reader reader, Class expectedType) {
+    private XMLStreamReader createXmlStreamReader(Reader reader, Class expectedType) throws JAXBException {
+        try {
         return Stax2JsonFactory.createReader(reader, jsonConfig,
                 jsonConfig.isRootUnwrapping() ? JSONHelper.getRootElementName(expectedType) : null);
+        } catch (XMLStreamException ex) {
+            throw new UnmarshalException("Error creating JSON-based XMLStreamReader", ex);
+        }
     }
 }
