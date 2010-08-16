@@ -77,16 +77,22 @@ public class CDIComponentProviderFactory implements
             CDIComponentProviderFactory.class.getName());
     
     private final BeanManager beanManager;
+    private final CDIExtension extension;
 
     public CDIComponentProviderFactory(Object bm, ResourceConfig rc, WebApplication wa) {
         beanManager = (BeanManager)bm;
-        CDIExtension extension = Utils.getInstance(beanManager, CDIExtension.class);
+        // work around proxying bug in Weld
+        if (CDIExtension.lookupExtensionInBeanManager) {
+            extension = Utils.getInstance(beanManager, CDIExtension.class);
+        }
+        else {
+            extension = CDIExtension.getInitializedExtension();
+        }
         extension.setWebApplication(wa);
         extension.setResourceConfig(rc);
     }
     
     public void onWebApplicationReady() {
-        CDIExtension extension = Utils.getInstance(beanManager, CDIExtension.class);
         extension.lateInitialize();
     }
 

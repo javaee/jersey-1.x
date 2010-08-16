@@ -51,7 +51,7 @@ import javax.enterprise.inject.spi.BeanManager;
   * @author Paul.Sandoz@Sun.Com
   */
 public class Utils {
-    
+
     private Utils() {}
     
     public static Bean<?> getBean(BeanManager bm, Class<?> c) {

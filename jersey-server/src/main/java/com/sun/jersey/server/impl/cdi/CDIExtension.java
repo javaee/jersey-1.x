@@ -137,14 +137,39 @@ public class CDIExtension implements Extension {
     private int nextSyntheticQualifierValue = 0;
     
     private List<InitializedLater> toBeInitializedLater;
+    
+    private static ThreadLocal<CDIExtension> initializedExtension = new ThreadLocal<CDIExtension>();
+    
+    /*
+     * Setting this system property to "true" will force use of the BeanManager to look up the bean for the active CDIExtension,
+     * rather than going through a thread local.
+     */
+    private static final String LOOKUP_EXTENSION_IN_BEAN_MANAGER_SYSTEM_PROPERTY = "com.sun.jersey.server.impl.cdi.lookupExtensionInBeanManager";
+    
+    public static final boolean lookupExtensionInBeanManager = getLookupExtensionInBeanManager();
+    
+    private static boolean getLookupExtensionInBeanManager() {
+        return Boolean.parseBoolean(System.getProperty(LOOKUP_EXTENSION_IN_BEAN_MANAGER_SYSTEM_PROPERTY, "false"));
+    }
+
+    /*
+     * Returns the instance of CDIExtension that was initialized previously in this same thread, if any.
+     */
+    public static CDIExtension getInitializedExtension() {
+        return initializedExtension.get();
+    }
 
     public CDIExtension() {}
 
     private void initialize() {
-        // initialize in a separate method because the META-INF/service mechanism
-        // seems to cause a spurious instance to be created and we don't want to
-        // waste cycles initializing it
+        // initialize in a separate method because Weld creates a proxy for the extension
+        // and we don't want to waste time initializing it
 
+        // workaround for Weld proxy bug
+        if (!lookupExtensionInBeanManager) {
+            initializedExtension.set(this);
+        }
+        
         // annotations to be turned into qualifiers
         Set<Class<? extends Annotation>> set = new HashSet<Class<? extends Annotation>>();
         set.add(CookieParam.class);
@@ -739,9 +764,17 @@ public class CDIExtension implements Extension {
      * By contrast, all the CDI driven code earlier in this source file
      * runs before Jersey gets a chance to initialize itself.
      */
-    void lateInitialize() {
-        for (InitializedLater object : toBeInitializedLater) {
-            object.later();
+    void lateInitialize() {        
+        try {
+            for (InitializedLater object : toBeInitializedLater) {
+                object.later();
+            }
+        }
+        finally {
+            // clear the thread local as soon as possible
+            if (!lookupExtensionInBeanManager) {
+                initializedExtension.set(null);
+            }
         }
     }
     
