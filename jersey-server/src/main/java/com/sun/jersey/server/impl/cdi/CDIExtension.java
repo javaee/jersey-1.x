@@ -54,6 +54,8 @@ import com.sun.jersey.spi.inject.Injectable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -64,7 +66,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.annotation.ManagedBean;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -90,7 +91,6 @@ import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
-import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Application;
@@ -244,11 +244,17 @@ public class CDIExtension implements Extension {
     private static class PatchInformation {
         private DiscoveredParameter parameter;
         private SyntheticQualifier syntheticQualifier;
+        private Annotation annotation;
         private boolean mustAddInject;
 
         public PatchInformation(DiscoveredParameter parameter, SyntheticQualifier syntheticQualifier, boolean mustAddInject) {
+            this(parameter, syntheticQualifier, null, mustAddInject);
+        }
+
+        public PatchInformation(DiscoveredParameter parameter, SyntheticQualifier syntheticQualifier, Annotation annotation, boolean mustAddInject) {
             this.parameter = parameter;
             this.syntheticQualifier = syntheticQualifier;
+            this.annotation = annotation;
             this.mustAddInject = mustAddInject;
         }
 
@@ -260,6 +266,10 @@ public class CDIExtension implements Extension {
             return syntheticQualifier;
         }
 
+        public Annotation getAnnotation() {
+            return annotation;
+        }
+        
         public boolean mustAddInject() {
             return mustAddInject;
         }
@@ -270,6 +280,7 @@ public class CDIExtension implements Extension {
 
         AnnotatedType<T> type = event.getAnnotatedType();
 
+        /*
         // only scan managed beans
         if (!type.isAnnotationPresent(ManagedBean.class)) {
             return;
@@ -279,6 +290,7 @@ public class CDIExtension implements Extension {
         if (!type.isAnnotationPresent(Path.class)) {
             return;
         }
+        */
 
         // first pass to determine if we need to patch any sites
         // we also record any qualifiers with parameters we encounter
@@ -294,7 +306,7 @@ public class CDIExtension implements Extension {
         Map<AnnotatedParameter<T>, PatchInformation> parameterToPatchInfoMap = new HashMap<AnnotatedParameter<T>, PatchInformation>();
 
         for (AnnotatedConstructor<T> constructor : type.getConstructors()) {
-            if (processAnnotatedCallable(constructor, classHasEncodedAnnotation, parameterToPatchInfoMap)) {
+            if (processAnnotatedConstructor(constructor, classHasEncodedAnnotation, parameterToPatchInfoMap)) {
                 mustPatchConstructors.add(constructor);
             }
         }
@@ -312,10 +324,11 @@ public class CDIExtension implements Extension {
         }
 
         Set<AnnotatedMethod<T>> mustPatchMethods = new HashSet<AnnotatedMethod<T>>();
+        Set<AnnotatedMethod<T>> setterMethodsWithoutInject = new HashSet<AnnotatedMethod<T>>();
 
         for (AnnotatedMethod<? super T> method : type.getMethods()) {
             if (method.getDeclaringType() == type) {
-                if (processAnnotatedCallable((AnnotatedMethod<T>)method, classHasEncodedAnnotation, parameterToPatchInfoMap)) {
+                if (processAnnotatedMethod((AnnotatedMethod<T>)method, classHasEncodedAnnotation, parameterToPatchInfoMap, setterMethodsWithoutInject)) {
                     mustPatchMethods.add((AnnotatedMethod<T>)method);
                 }
             }
@@ -360,6 +373,9 @@ public class CDIExtension implements Extension {
                         else {
                             annotations.addAll(field.getAnnotations());
                         }
+                        if (patchInfo.getAnnotation() != null) {
+                            annotations.add(patchInfo.getAnnotation());
+                        }
                         newFields.add(new AnnotatedFieldImpl<T>(field, annotations, newType));
                     }
                     else {
@@ -376,14 +392,30 @@ public class CDIExtension implements Extension {
             Set<AnnotatedMethod<? super T>> newMethods = new HashSet<AnnotatedMethod<? super T>>();
             for (AnnotatedMethod<? super T> method : type.getMethods()) {
                 if (method.getDeclaringType() == type) {
-                    AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, newType);
                     if (mustPatchMethods.contains((AnnotatedMethod<T>)method)) {
-                        patchAnnotatedCallable((AnnotatedMethod<T>)method, newMethod, parameterToPatchInfoMap);
+                        if (setterMethodsWithoutInject.contains((AnnotatedMethod<T>)method)) {
+                            Set<Annotation> annotations = new HashSet<Annotation>();
+                            annotations.add(injectAnnotationLiteral);
+                            for (Annotation annotation : method.getAnnotations()) {
+                                if (!knownParameterQualifiers.contains(annotation.annotationType())) {
+                                    annotations.add(annotation);
+                                }
+                            }
+                            AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, annotations, newType);
+                            patchAnnotatedCallable((AnnotatedMethod<T>)method, newMethod, parameterToPatchInfoMap);
+                            newMethods.add(newMethod);
+                        }
+                         else {
+                            AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, newType);
+                            patchAnnotatedCallable((AnnotatedMethod<T>)method, newMethod, parameterToPatchInfoMap);
+                            newMethods.add(newMethod);
+                        }
                     }
                     else {
+                        AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, newType);
                         copyParametersOfAnnotatedCallable((AnnotatedMethod<T>)method, newMethod);
+                        newMethods.add(newMethod);
                     }
-                    newMethods.add(newMethod);
                 }
                 else {
                     // simple copy
@@ -401,14 +433,14 @@ public class CDIExtension implements Extension {
         }
     }
 
-    private <T> boolean processAnnotatedCallable(AnnotatedCallable<T> callable,
+    private <T> boolean processAnnotatedConstructor(AnnotatedConstructor<T> constructor,
                                                  boolean classHasEncodedAnnotation,
                                                  Map<AnnotatedParameter<T>, PatchInformation> parameterToPatchInfoMap) {
         boolean mustPatch = false;
 
-        if (callable.getAnnotation(Inject.class) != null) {
-            boolean methodHasEncodedAnnotation = callable.isAnnotationPresent(Encoded.class);
-            for (AnnotatedParameter<T> parameter : callable.getParameters()) {
+        if (constructor.getAnnotation(Inject.class) != null) {
+            boolean methodHasEncodedAnnotation = constructor.isAnnotationPresent(Encoded.class);
+            for (AnnotatedParameter<T> parameter : constructor.getParameters()) {
                 for (Annotation annotation : parameter.getAnnotations()) {
                     Set<DiscoveredParameter> discovered = discoveredParameterMap.get(annotation.annotationType());
                     if (discovered != null) {
@@ -435,6 +467,93 @@ public class CDIExtension implements Extension {
         }
         
         return mustPatch;
+    }
+
+    private <T> boolean processAnnotatedMethod(AnnotatedMethod<T> method,
+                                                 boolean classHasEncodedAnnotation,
+                                                 Map<AnnotatedParameter<T>, PatchInformation> parameterToPatchInfoMap,
+                                                 Set<AnnotatedMethod<T>> setterMethodsWithoutInject) {
+        boolean mustPatch = false;
+
+        if (method.getAnnotation(Inject.class) != null) {
+            // a method already annotated with @Inject -- we assume the user is
+            // aware of CDI and all we need to do is to detect the need for
+            // a synthetic qualifier so as to take @DefaultValue and @Encoded into
+            // account
+            boolean methodHasEncodedAnnotation = method.isAnnotationPresent(Encoded.class);
+            for (AnnotatedParameter<T> parameter : method.getParameters()) {
+                for (Annotation annotation : parameter.getAnnotations()) {
+                    Set<DiscoveredParameter> discovered = discoveredParameterMap.get(annotation.annotationType());
+                    if (discovered != null) {
+                        if (knownParameterQualifiers.contains(annotation.annotationType())) {
+                            if (methodHasEncodedAnnotation ||
+                                classHasEncodedAnnotation ||
+                                parameter.isAnnotationPresent(DefaultValue.class)) {
+                                mustPatch = true;
+                            }
+
+                            boolean encoded = parameter.isAnnotationPresent(Encoded.class) || methodHasEncodedAnnotation || classHasEncodedAnnotation;
+                            DefaultValue defaultValue = parameter.getAnnotation(DefaultValue.class);
+                            if (defaultValue != null) {
+                                mustPatch = true;
+                            }
+                            DiscoveredParameter jerseyParameter = new DiscoveredParameter(annotation, parameter.getBaseType(), defaultValue, encoded);
+                            discovered.add(jerseyParameter);
+                            LOGGER.fine("  recorded " + jerseyParameter);
+                            parameterToPatchInfoMap.put(parameter, new PatchInformation(jerseyParameter, getSyntheticQualifierFor(jerseyParameter), false));
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            // a method *not* annotated with @Inject -- here we only deal with
+            // setter methods with a JAX-RS "qualifier" (Context, QueryParam, etc.)
+            // on the method itself
+            if (isSetterMethod(method)) {
+                boolean methodHasEncodedAnnotation = method.isAnnotationPresent(Encoded.class);
+                for (Annotation annotation : method.getAnnotations()) {
+                    Set<DiscoveredParameter> discovered = discoveredParameterMap.get(annotation.annotationType());
+                    if (discovered != null) {
+                        if (knownParameterQualifiers.contains(annotation.annotationType())) {
+                            mustPatch = true;
+                            setterMethodsWithoutInject.add(method);
+                            for (AnnotatedParameter<T> parameter : method.getParameters()) {
+                                boolean encoded = parameter.isAnnotationPresent(Encoded.class) || methodHasEncodedAnnotation || classHasEncodedAnnotation;
+                                DefaultValue defaultValue = parameter.getAnnotation(DefaultValue.class);
+                                if (defaultValue == null) {
+                                    defaultValue = method.getAnnotation(DefaultValue.class);
+                                }
+                                DiscoveredParameter jerseyParameter = new DiscoveredParameter(annotation, parameter.getBaseType(), defaultValue, encoded);
+                                discovered.add(jerseyParameter);
+                                LOGGER.fine("  recorded " + jerseyParameter);
+                                SyntheticQualifier syntheticQualifier = getSyntheticQualifierFor(jerseyParameter);
+                                // if there is no synthetic qualifier, add to the parameter the annotation that was on the method itself
+                                Annotation addedAnnotation = syntheticQualifier == null ? annotation : null;
+                                parameterToPatchInfoMap.put(parameter, new PatchInformation(jerseyParameter, syntheticQualifier, addedAnnotation, false));
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return mustPatch;
+    }
+
+    private <T> boolean isSetterMethod(AnnotatedMethod<T> method) {
+        Method javaMethod = method.getJavaMember();
+        if ((javaMethod.getModifiers() & Modifier.PUBLIC) != 0 &&
+            (javaMethod.getReturnType() == Void.TYPE) &&
+            (javaMethod.getName().startsWith("set"))) {
+            List<AnnotatedParameter<T>> parameters = method.getParameters();
+            if (parameters.size() == 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private <T> boolean processAnnotatedField(AnnotatedField<T> field,
@@ -491,6 +610,9 @@ public class CDIExtension implements Extension {
                 }
                 else {
                     annotations.addAll(parameter.getAnnotations());
+                }
+                if (patchInfo.getAnnotation() != null) {
+                    annotations.add(patchInfo.getAnnotation());
                 }
                 newParams.add(new AnnotatedParameterImpl<T>(parameter, annotations, callable));
             }

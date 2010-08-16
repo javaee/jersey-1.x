@@ -72,6 +72,15 @@ public class AnnotatedMethodImpl<T> extends AnnotatedCallableImpl<T> implements 
              method.isStatic());
     }
 
+    public AnnotatedMethodImpl(AnnotatedMethod<? super T> method, Set<Annotation> annotations, AnnotatedType<T> declaringType) {
+        this(method.getBaseType(),
+             method.getTypeClosure(),
+             annotations,
+             declaringType,
+             method.getJavaMember(),
+             method.isStatic());
+    }
+
     @Override
     public Method getJavaMember() {
         return javaMember;
