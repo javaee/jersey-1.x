@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+<!ENTITY % ents SYSTEM "jersey.ent">
+%ents;
+]>
+<chapter id="osgi">
+  <title>OSGi Support</title>
+
+  <para>In version 1.2, OSGi support was added to Jersey. You should be able to use Jersey to build a web application
+  packaged as an OSGified WAR. Such a bundle is called WAB (Web Application Bundle) in the OSGi world. 
+  You should be also able to utilize the OSGi HttpService feature to publish a Jersey based servlet in the OSGi runtime.
+  </para>
+  
+  
+  <para>Two new examples were added to the Jersey distribution to depict the above mentioned features
+  <itemizedlist>
+    <listitem>
+      <para><ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-osgi-webapp/&version;/helloworld-osgi-webapp-&version;-project.zip">Hello world WAB</ulink></para>
+    </listitem>
+    <listitem>
+      <para><ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/osgi-http-service/&version;/osgi-http-service-&version;-project.zip">Simple OSGi HttpService application</ulink></para>
+    </listitem>
+  </itemizedlist>
+  
+  Both examples are multi-module maven projects and both consist of an OSGi application bundle and a test module. The tests are based on the Pax Exam framework.
+  Both examples also include a readme file containing instructions how to manually run the application using Apache Felix OSGi container. 
+  </para>
+
+  <para>
+    The following paragraph describes, how to deploy the above mentioned Jersey example WAB application to the <ulink url="http://www.glassfish.org/">GlassFish v3.1</ulink> application server.
+    GlassFish v3.1 uses Apache Felix OSGi runtime. Presuming you have the default GlassFish instance running you should be able to connect to the Felix console with 
+<programlisting>
+        telnet localhost 6666
+</programlisting>
+
+    You should see the Felix prompt. The presented WAB requires an OSGi Event Admin API implementation. At the moment, GlassFish container does not have any. 
+    You will need to install one before you try to install and start the Jersey WAB file:
+    
+<programlisting>Trying ::1...
+Trying 127.0.0.1...
+Connected to localhost.
+Escape character is '^]'.
+
+Felix Remote Shell Console:
+============================
+
+->install http://repo2.maven.org/maven2/org/apache/felix/org.apache.felix.eventadmin/1.2.2/org.apache.felix.eventadmin-1.2.2.jar
+Bundle ID: 241
+->install http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-osgi-webapp/war-bundle/&version;/war-bundle-&version;.war
+Bundle ID: 242
+-> start 241 242
+</programlisting>
+
+You should now be able to access the Jersey resource at <ulink url="http://localhost:8080/helloworld/webresources/helloworld">http://localhost:8080/helloworld/webresources/helloworld</ulink>
+
+</para>
+</chapter>
