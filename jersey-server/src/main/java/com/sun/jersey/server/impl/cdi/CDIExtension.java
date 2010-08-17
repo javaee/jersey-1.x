@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.util.FeaturesAndProperties;
@@ -209,6 +210,7 @@ public class CDIExtension implements Extension {
         set3.add(HttpRequestContext.class);
         set3.add(HttpResponseContext.class);
         set3.add(MessageBodyWorkers.class);
+        set3.add(ResourceContext.class);
         set3.add(WebApplication.class);
         staticallyDefinedContextBeans = Collections.unmodifiableSet(set3);
 
@@ -769,90 +771,45 @@ public class CDIExtension implements Extension {
         event.addBean(new PredefinedBean<Application>(Application.class, contextAnnotationLiteral));
 
         // @Context HttpHeaders
-        event.addBean(new ProviderBasedBean<HttpHeaders>(HttpHeaders.class, new Provider<HttpHeaders>() {
-            public HttpHeaders get() {
-                return webApplication.getThreadLocalHttpContext().getRequest();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<HttpHeaders>(HttpHeaders.class, contextAnnotationLiteral));
 
         // @Context Providers
-        event.addBean(new ProviderBasedBean<Providers>(Providers.class, new Provider<Providers>() {
-            public Providers get() {
-                return webApplication.getProviders();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<Providers>(Providers.class, contextAnnotationLiteral));
 
         // @Context Request
-        event.addBean(new ProviderBasedBean<Request>(Request.class, new Provider<Request>() {
-            public Request get() {
-                return webApplication.getThreadLocalHttpContext().getRequest();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<Request>(Request.class, contextAnnotationLiteral));
 
         // @Context SecurityContext
-        event.addBean(new ProviderBasedBean<SecurityContext>(SecurityContext.class, new Provider<SecurityContext>() {
-            public SecurityContext get() {
-                return webApplication.getThreadLocalHttpContext().getRequest();
-            }
-        }, contextAnnotationLiteral));        
+        event.addBean(new PredefinedBean<SecurityContext>(SecurityContext.class, contextAnnotationLiteral));
 
         // @Context UriInfo
-        event.addBean(new ProviderBasedBean<UriInfo>(UriInfo.class, new Provider<UriInfo>() {
-            public UriInfo get() {
-                return webApplication.getThreadLocalHttpContext().getUriInfo();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<UriInfo>(UriInfo.class, contextAnnotationLiteral));
         
         // now the Jersey extensions
 
         // @Context ExceptionMapperContext
-        event.addBean(new ProviderBasedBean<ExceptionMapperContext>(ExceptionMapperContext.class, new Provider<ExceptionMapperContext>() {
-            public ExceptionMapperContext get() {
-                return webApplication.getExceptionMapperContext();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<ExceptionMapperContext>(ExceptionMapperContext.class, contextAnnotationLiteral));
 
         // @Context ExtendedUriInfo
-        event.addBean(new ProviderBasedBean<ExtendedUriInfo>(ExtendedUriInfo.class, new Provider<ExtendedUriInfo>() {
-            public ExtendedUriInfo get() {
-                return webApplication.getThreadLocalHttpContext().getUriInfo();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<ExtendedUriInfo>(ExtendedUriInfo.class, contextAnnotationLiteral));
         
         // @Context FeaturesAndProperties
-        event.addBean(new ProviderBasedBean<FeaturesAndProperties>(FeaturesAndProperties.class, new Provider<FeaturesAndProperties>() {
-            public FeaturesAndProperties get() {
-                return webApplication.getFeaturesAndProperties();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<FeaturesAndProperties>(FeaturesAndProperties.class, contextAnnotationLiteral));
 
         // @Context HttpContext
-        event.addBean(new ProviderBasedBean<HttpContext>(HttpContext.class, new Provider<HttpContext>() {
-            public HttpContext get() {
-                return webApplication.getThreadLocalHttpContext();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<HttpContext>(HttpContext.class, contextAnnotationLiteral));
 
         // @Context HttpRequestContext
-        event.addBean(new ProviderBasedBean<HttpRequestContext>(HttpRequestContext.class, new Provider<HttpRequestContext>() {
-            public HttpRequestContext get() {
-                return webApplication.getThreadLocalHttpContext().getRequest();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<HttpRequestContext>(HttpRequestContext.class, contextAnnotationLiteral));
 
         // @Context HttpResponseContext
-        event.addBean(new ProviderBasedBean<HttpResponseContext>(HttpResponseContext.class, new Provider<HttpResponseContext>() {
-            public HttpResponseContext get() {
-                return webApplication.getThreadLocalHttpContext().getResponse();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<HttpResponseContext>(HttpResponseContext.class, contextAnnotationLiteral));
 
         // @Context MessageBodyWorkers
-        event.addBean(new ProviderBasedBean<MessageBodyWorkers>(MessageBodyWorkers.class, new Provider<MessageBodyWorkers>() {
-            public MessageBodyWorkers get() {
-                return webApplication.getMessageBodyWorkers();
-            }
-        }, contextAnnotationLiteral));
+        event.addBean(new PredefinedBean<MessageBodyWorkers>(MessageBodyWorkers.class, contextAnnotationLiteral));
+
+        // @Context ResourceContext
+        event.addBean(new PredefinedBean<ResourceContext>(ResourceContext.class, contextAnnotationLiteral));
 
         // @Context WebApplication
         event.addBean(new ProviderBasedBean<WebApplication>(WebApplication.class, new Provider<WebApplication>() {
