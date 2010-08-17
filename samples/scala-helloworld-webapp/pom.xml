@@ -135,7 +135,7 @@
                     <app>${basedir}/target/scala-helloworld-webapp.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <instanceRoot>./target/gbembeddedtmp</instanceRoot>
+                    <instanceRoot>./target/gfembeddedtmp</instanceRoot>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -244,6 +244,6 @@
      </repositories>
     <properties>
         <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
-        <scala.version>2.7.3</scala.version>
+        <scala.version>2.7.7</scala.version>
     </properties>
 </project>
