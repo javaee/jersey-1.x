@@ -34,7 +34,7 @@
                     <app>${basedir}/target/jersey-guice-filter.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <instanceRoot>./target/gbembeddedtmp</instanceRoot>
+                    <instanceRoot>./target/gfembeddedtmp</instanceRoot>
                 </configuration>
                 <dependencies>
                     <dependency>

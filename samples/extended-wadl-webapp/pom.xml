@@ -105,7 +105,7 @@
                     <app>${basedir}/target/extended-wadl-webapp.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <instanceRoot>./target/gbembeddedtmp</instanceRoot>
+                    <instanceRoot>./target/gfembeddedtmp</instanceRoot>
                 </configuration>
             </plugin>
  
