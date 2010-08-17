@@ -146,7 +146,7 @@ URI offers;</programlisting>
 &lt;/dependency&gt;</programlisting>
         <para>Second the filter needs to be installed in the application either programmatically by
             adding:</para>
-        <programlisting>com.sun.jersey.server.linking.impl.LinkFilter</programlisting>
+        <programlisting>com.sun.jersey.server.linking.LinkFilter</programlisting>
         <para>to the list defined by:</para>
         <programlisting>com.sun.jersey.spi.container.ContainerResponseFilters</programlisting>
         <para>or using a <literal>web.xml</literal> init parameter:</para>

@@ -35,8 +35,10 @@
  * holder.
  */
 
-package com.sun.jersey.server.linking.impl;
+package com.sun.jersey.server.linking;
 
+import com.sun.jersey.server.linking.impl.LinkProcessor;
+import com.sun.jersey.server.linking.impl.RefProcessor;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
@@ -46,7 +48,18 @@ import javax.ws.rs.core.UriInfo;
 /**
  * Filter that processes {@link Link} annotated fields in returned response
  * entities.
+ * <p>
+ * When an application is deployed as a Servlet or Filter this filter can be
+ * registered using the following initialization parameters:
+ * <blockquote><pre>
+ *     &lt;init-param&gt
+ *         &lt;param-name&gt;com.sun.jersey.spi.container.ContainerResponseFilters&lt;/param-name&gt;
+ *         &lt;param-value&gt;com.sun.jersey.server.linking.LinkFilter&lt;/param-value&gt;
+ *     &lt;/init-param&gt;
+ * </pre></blockquote>
+ * <p>
  * @author mh124079
+ * @see Link
  */
 public class LinkFilter implements ContainerResponseFilter {
 
@@ -63,5 +76,4 @@ public class LinkFilter implements ContainerResponseFilter {
         }
         return response;
     }
-
 }

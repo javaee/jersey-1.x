@@ -9,7 +9,7 @@
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-            <param-value>com.sun.jersey.server.linking.impl.LinkFilter</param-value>
+            <param-value>com.sun.jersey.server.linking.LinkFilter</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

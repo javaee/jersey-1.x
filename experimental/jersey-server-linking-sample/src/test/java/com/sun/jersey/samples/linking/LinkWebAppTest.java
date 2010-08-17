@@ -39,7 +39,7 @@ package com.sun.jersey.samples.linking;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import java.util.List;
@@ -52,11 +52,10 @@ import org.junit.Test;
  */
 public class LinkWebAppTest extends JerseyTest {
 
-
     public LinkWebAppTest() throws Exception {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.linking.resources")
-                .contextPath("items").build());
-        // TODO insert link filter for unit tests - how ?
+                .contextPath("items").
+                initParam("com.sun.jersey.spi.container.ContainerResponseFilters", "com.sun.jersey.server.linking.LinkFilter").build());
     }
 
     /**
@@ -66,18 +65,9 @@ public class LinkWebAppTest extends JerseyTest {
     @Test
     public void testHelloWorld() throws Exception {
         WebResource webResource = resource();
+        webResource.addFilter(new LoggingFilter());
         ClientResponse response = webResource.path("1").get(ClientResponse.class);
-//        List<String> linkHeaders = response.getHeaders().get("Link");
-//        Assert.assertEquals(2, linkHeaders.size());
+        List<String> linkHeaders = response.getHeaders().get("Link");
+        Assert.assertEquals(2, linkHeaders.size());
     }
-
-    @Test
-    public void testApplicationWadl() {
-        WebResource webResource = resource();
-        String serviceWadl = webResource.path("application.wadl").
-                accept(MediaTypes.WADL).get(String.class);
-
-        Assert.assertTrue(serviceWadl.length() > 0);
-    }    
-
 }
