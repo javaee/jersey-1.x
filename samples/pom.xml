@@ -66,6 +66,7 @@
         <module>jersey-cdi</module>
         <module>jersey-ejb</module>
         <module>jersey-guice-filter</module>
+        <module>jersey-server-linking-sample</module>
         <module>jmaki-backend</module>
         <module>json-from-jaxb</module>
         <module>jsonp</module>
