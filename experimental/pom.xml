@@ -53,8 +53,6 @@
         Projects that provide additional experimental functionality to jersey.
     </description>
     <modules>
-        <module>jersey-server-linking</module>
-        <module>jersey-server-linking-sample</module>
         <module>hypermedia-action</module>
         <module>view-client</module>
         <module>jersey-jrebel</module>
