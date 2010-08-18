@@ -85,7 +85,7 @@ specifying the web application context path. Our WAB has (beside some other) the
   <programlisting>
 Web-ContextPath: helloworld
 Webapp-Context: helloworld
-Bundle-ClassPath: .,WEB-INF/classes,classes
+Bundle-ClassPath: WEB-INF/classes
   </programlisting>
 where the second one is ignored by GlassFish, but is needed by other containers not fully compliant with the OSGi Enterprise Specification mentioned above.
 The third manifest header worth mentioning is the <code>Bundle-ClassPath</code> specifying where to find the application Java classes within the bundle archive.
