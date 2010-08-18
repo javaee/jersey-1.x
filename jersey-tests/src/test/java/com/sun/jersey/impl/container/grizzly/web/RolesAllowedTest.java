@@ -41,6 +41,8 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.ResourceContext;
+import com.sun.jersey.server.impl.application.WebApplicationContext;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import java.security.Principal;
@@ -52,6 +54,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 /**
@@ -65,8 +68,10 @@ public class RolesAllowedTest extends AbstractGrizzlyWebContainerTester {
         @Context UriInfo ui;
         
         public ContainerRequest filter(ContainerRequest request) {
-            String user = request.getHeaderValue("X-USER");
-            request.setSecurityContext(new Authenticator(user));
+            if (!request.getMethod().equals(WebApplicationContext.HTTP_METHOD_MATCH_RESOURCE)) {
+                String user = request.getHeaderValue("X-USER");
+                request.setSecurityContext(new Authenticator(user));
+            }
             return request;
         }
 
@@ -120,8 +125,32 @@ public class RolesAllowedTest extends AbstractGrizzlyWebContainerTester {
         @RolesAllowed("admin")
         @POST
         public String post(String content) { return content; }
+
+        @Path("sub-user")
+        @RolesAllowed("user")
+        public SubResource subUser() {
+            return new SubResource();
+        }
+
+        @Path("sub-admin")
+        @RolesAllowed("admin")
+        public SubResource subAdmin() {
+            return new SubResource();
+        }
+
+        @Path("internal")
+        @POST
+        public String internalCall(@Context ResourceContext rc, String path) {
+            Object o = rc.matchResource(UriBuilder.fromPath(path).build());
+            return (o != null) ? o.getClass().getSimpleName() : "null";
+        }
     }
-    
+
+    public static class SubResource {
+        @GET
+        public String get() { return "GET"; }
+    }
+
     public RolesAllowedTest(String testName) {
         super(testName);
     }
@@ -156,5 +185,13 @@ public class RolesAllowedTest extends AbstractGrizzlyWebContainerTester {
 
     public void testPostAsAdmin() {
         assertEquals("POST", r.path("foo").header("X-USER", "admin").post(String.class, "POST"));
+    }
+
+    public void testInternalMatchAsUser() {
+        assertEquals("SubResource", r.path("foo/internal").header("X-USER", "foo").post(String.class, "foo/sub-user"));
+    }
+
+    public void testInternalMatchAsAdmin() {
+        assertEquals("SubResource", r.path("foo/internal").header("X-USER", "admin").post(String.class, "foo/sub-admin"));
     }
 }
