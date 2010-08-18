@@ -16,5 +16,4 @@
   url="mailto:users@jersey.dev.java.net">users@jersey.dev.java.net</ulink>.</para>
 
     <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="hypermedia.xml" />
-    <xi:include xmlns:xi="http://www.w3.org/2001/XInclude"  href="linking.xml" />
 </chapter>

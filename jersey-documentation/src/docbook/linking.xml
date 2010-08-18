@@ -5,7 +5,7 @@
 <!ENTITY jaxrs-javadoc
 "https://jsr311.dev.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/">
 ]>
-<section>
+<chapter id="linking">
     <title>Declarative Hyperlinking</title>
     <para><ulink url="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">RESTful
             APIs must be hypertext-driven</ulink>. JAX-RS currently offers <ulink
@@ -152,13 +152,13 @@ URI offers;</programlisting>
         <para>or using a <literal>web.xml</literal> init parameter:</para>
         <programlisting>&lt;init-param&gt;
   &lt;param-name&gt;com.sun.jersey.spi.container.ContainerResponseFilters&lt;/param-name&gt;
-  &lt;param-value&gt;com.sun.jersey.server.linking.impl.LinkFilter&lt;/param-value&gt;
+  &lt;param-value&gt;com.sun.jersey.server.linking.LinkFilter&lt;/param-value&gt;
 &lt;/init-param&gt;
 </programlisting>
 <para>See the <ulink
-            url="http://download.java.net/maven/2/com/sun/jersey/experimental/jersey-server-linking-sample/"
+            url="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-server-linking-sample/"
             >jersey-server-linking-sample</ulink> for more details.</para>
     </section>
     
     
-</section>
+</chapter>
