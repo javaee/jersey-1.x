@@ -1,4 +1,7 @@
 release 1.4 (08-2010)
+- Fixed issue 572
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=572
+  Propagate security context when making internal invocations to match URIs.
 - Fixed issue 564
   https://jersey.dev.java.net/issues/show_bug.cgi?id=564
   Modified field injection so that injection will occur independent of the
