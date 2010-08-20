@@ -340,7 +340,7 @@ public class OAuthParameters extends HashMap<String, String> {
     /**
      * Sets the protocol version to the default value of 1.0.
      */
-    private void setVersion() {
+    public void setVersion() {
         setVersion("1.0");
     }
 
@@ -358,14 +358,14 @@ public class OAuthParameters extends HashMap<String, String> {
     /**
      * Returns the verifier code.
      */
-    private String getVerifier() {
+    public String getVerifier() {
         return get(VERIFIER);
     }
 
     /**
      * Sets the verifier code.
      */
-    private void setVerifier(String verifier) {
+    public void setVerifier(String verifier) {
         put(VERIFIER, verifier);
     }
 
@@ -384,14 +384,14 @@ public class OAuthParameters extends HashMap<String, String> {
     /**
      * Returns the callback URL.
      */
-    private String getCallback() {
+    public String getCallback() {
         return get(CALLBACK);
     }
 
     /**
      * Sets the callback URL.
      */
-    private void setCallback(String callback) {
+    public void setCallback(String callback) {
         put(CALLBACK, callback);
     }
 
