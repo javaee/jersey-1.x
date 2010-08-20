@@ -21,6 +21,21 @@
             <includes>
                 <include>jersey-core/**</include>
                 <include>jersey-server/**</include>
+                <include>jersey-client/**</include>
+                <include>jersey-atom/**</include>
+                <include>jersey-json/**</include>
+                <include>jersey-fastinfoset/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+          <directory>../../contribs</directory>
+          <useDefaultExcludes>true</useDefaultExcludes>
+            <outputDirectory></outputDirectory>
+            <excludes>
+                <exclude>**/target/**</exclude>
+            </excludes>
+            <includes>
+                <include>jersey-multipart/**</include>
             </includes>
         </fileSet>
     </fileSets>

@@ -58,7 +58,32 @@
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-atom</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+         <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-fastinfoset</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+          <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-multipart</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+     </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -66,7 +91,7 @@
                 <artifactId>xslt-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>update-gf-deps</id>
+                        <id>remove-non-bundled-modules</id>
                         <phase>package</phase> <!-- append to the packaging phase. -->
                         <goals>
                             <goal>transform</goal> <!-- goals == mojos -->

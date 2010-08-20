@@ -7,8 +7,13 @@
      <fileSet>
       <directory>target/assembly</directory>
       <includes>
-        <include>jersey-server-*.jar</include>
         <include>jersey-core-*.jar</include>
+        <include>jersey-server-*.jar</include>
+        <include>jersey-client-*.jar</include>
+        <include>jersey-atom-*.jar</include>
+        <include>jersey-json-*.jar</include>
+        <include>jersey-fastinfoset-*.jar</include>
+        <include>jersey-multipart-*.jar</include>
       </includes>
       <outputDirectory></outputDirectory>
     </fileSet>

@@ -46,6 +46,11 @@
         <modules>
             <module>jersey-core</module>
             <module>jersey-server</module>
+            <module>jersey-client</module>
+            <module>jersey-atom</module>
+            <module>jersey-json</module>
+            <module>jersey-fastinfoset</module>
+            <module>jersey-multipart</module>
         </modules>
     </xsl:template>
 
