@@ -36,7 +36,6 @@
 
 package com.sun.jersey.oauth.client;
 
-import java.util.Map;
 import javax.ws.rs.ext.Providers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
@@ -110,7 +109,7 @@ public final class OAuthClientFilter extends ClientFilter {
     public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
 
         // secrets and parameters exist; no auth header already: sign request; add as authorization header
-        if (parameters != null && secrets != null && !request.getMetadata().containsKey("Authorization")) {
+        if (parameters != null && secrets != null && !request.getHeaders().containsKey("Authorization")) {
 
             final OAuthParameters p = (OAuthParameters)parameters.clone(); // make modifications to clone
 

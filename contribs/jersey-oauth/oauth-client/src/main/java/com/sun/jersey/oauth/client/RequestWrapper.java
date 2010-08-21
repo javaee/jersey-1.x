@@ -85,10 +85,12 @@ class RequestWrapper implements OAuthRequest {
         setParameters(); // stored because parsing query/entity parameters too much work for each value-get
     }
 
+    @Override
     public String getRequestMethod() {
         return clientRequest.getMethod();
     }
 
+    @Override
     public URL getRequestURL() {
         try {
             final URI uri = clientRequest.getURI();
@@ -99,27 +101,31 @@ class RequestWrapper implements OAuthRequest {
         }
     }
 
+    @Override
     public Set<String> getParameterNames() {
         return parameters.keySet();
     }
 
+    @Override
     public List<String> getParameterValues(final String name) {
         return parameters.get(name);
     }
 
+    @Override
     public List<String> getHeaderValues(final String name) {
 
         ArrayList<String> list = new ArrayList();
 
-        for (Object header : clientRequest.getMetadata().get(name)) {
+        for (Object header : clientRequest.getHeaders().get(name)) {
             list.add(ClientRequest.getHeaderValue(header));
         }
 
         return list;
     }
 
+    @Override
     public void addHeaderValue(final String name, final String value) {
-        clientRequest.getMetadata().add(name, value);
+        clientRequest.getHeaders().add(name, value);
     }
 }
 
