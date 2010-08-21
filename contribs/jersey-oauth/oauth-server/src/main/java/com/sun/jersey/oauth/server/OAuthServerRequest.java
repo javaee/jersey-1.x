@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
+ * Copyright 2009, 2010 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -57,7 +57,7 @@ import com.sun.jersey.oauth.signature.OAuthRequest;
  */
 public class OAuthServerRequest implements OAuthRequest {
 
-private HttpRequestContext context;
+    private HttpRequestContext context;
 
     private static HashSet<String> EMPTY_SET = new HashSet<String>();
 
@@ -67,10 +67,12 @@ private HttpRequestContext context;
         this.context = context;
     }
 
+    @Override
     public String getRequestMethod() {
         return context.getMethod();
     }
 
+    @Override
     public URL getRequestURL() {
         try {
             return context.getRequestUri().toURL();
@@ -102,6 +104,7 @@ private HttpRequestContext context;
         return v;
     }
 
+    @Override
     public Set<String> getParameterNames() {
         HashSet<String> n = new HashSet<String>();
         n.addAll(keys(context.getQueryParameters()));
@@ -109,6 +112,7 @@ private HttpRequestContext context;
         return n;
     }
 
+    @Override
     public List<String> getParameterValues(String name) {
         ArrayList<String> v = new ArrayList<String>();
         v.addAll(values(context.getQueryParameters(), name));
@@ -116,10 +120,12 @@ private HttpRequestContext context;
         return v;
     }
 
+    @Override
     public List<String> getHeaderValues(String name) {
         return context.getRequestHeader(name);
     }
 
+    @Override
     public void addHeaderValue(String name, String value) throws IllegalStateException {
         throw new IllegalStateException("Modifying OAuthServerRequest unsupported");
     }
