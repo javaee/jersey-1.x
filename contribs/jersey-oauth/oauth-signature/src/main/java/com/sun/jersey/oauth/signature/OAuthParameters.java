@@ -86,6 +86,17 @@ public class OAuthParameters extends HashMap<String, String> {
     /** Name of parameter containing the callback URL. */
     public static final String CALLBACK = "oauth_callback";
 
+    /** Name of parameter containing the token secret.
+     * This parameter is never used in requests. It is part of a response to the request token and access token requests.
+     */
+    public static final String TOKEN_SECRET = "oauth_token_secret";
+
+    /** Name of parameter containing the token secret.
+     * This parameter is never used in requests. It is part of a response to the request token requests.
+     */
+    public static final String CALLBACK_CONFIRMED = "oauth_callback_confirmed";
+
+
     /* Authorization scheme and delimiter. */
     private static final String SCHEME_SPACE = SCHEME + ' ';
 

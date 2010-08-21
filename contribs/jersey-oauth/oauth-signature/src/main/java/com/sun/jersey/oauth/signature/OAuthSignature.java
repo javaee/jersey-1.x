@@ -37,7 +37,6 @@
 package com.sun.jersey.oauth.signature;
 
 import com.sun.jersey.api.uri.UriComponent;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -45,9 +44,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * Class used for processing an OAuth signature (signing or verifying).
@@ -84,7 +80,7 @@ public class OAuthSignature {
      * @param params the OAuth authorization parameters.
      * @param secrets the secrets used to generate the OAuth signature.
      * @return the OAuth digital signature.
-     * @throws SignatureException if an error occurred generating the signature.
+     * @throws OAuthSignatureException if an error occurred generating the signature.
      */
     public static String generate(OAuthRequest request,
     OAuthParameters params, OAuthSecrets secrets) throws OAuthSignatureException {
