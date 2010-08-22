@@ -146,7 +146,8 @@ public class OAuthServerFilter implements ContainerRequestFilter {
     @Override
     public ContainerRequest filter(ContainerRequest request) {
         // do not filter requests that do not use OAuth authentication
-        if (!request.getHeaderValue(OAuthParameters.AUTHORIZATION_HEADER).toUpperCase().startsWith(OAuthParameters.SCHEME.toUpperCase())) {
+        String authHeader = request.getHeaderValue(OAuthParameters.AUTHORIZATION_HEADER);
+        if (authHeader == null || !authHeader.toUpperCase().startsWith(OAuthParameters.SCHEME.toUpperCase())) {
             return request;
         }
 
