@@ -40,18 +40,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.sun.jersey.experimental</groupId>
-        <artifactId>jersey-experimental</artifactId>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-project</artifactId>
 	<version>1.4-SNAPSHOT</version>
     </parent>
-    <name>Jersey JRebel</name>
+    <name>Jersey JRebel plugin</name>
     <artifactId>jersey-jrebel</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.zeroturnaround</groupId>
             <artifactId>jr-sdk</artifactId>
-            <version>3.1</version>
+            <version>3.1.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

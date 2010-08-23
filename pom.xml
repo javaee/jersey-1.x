@@ -117,6 +117,7 @@
         <module>jersey-server</module>
         <module>jersey-server-linking</module>
         <module>jersey-client</module>
+        <module>jersey-jrebel</module>
         <module>jersey-json</module>
         <module>jersey-atom</module>
         <module>jersey-fastinfoset</module>

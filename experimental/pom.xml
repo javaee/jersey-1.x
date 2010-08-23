@@ -55,6 +55,5 @@
     <modules>
         <module>hypermedia-action</module>
         <module>view-client</module>
-        <module>jersey-jrebel</module>
     </modules>
 </project>
