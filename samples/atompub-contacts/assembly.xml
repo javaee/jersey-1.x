@@ -40,7 +40,7 @@
     holder.
 
 -->
-1222220<assembly>
+<assembly>
   <id>project</id>
   <formats>
     <format>zip</format>
