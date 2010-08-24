@@ -86,6 +86,7 @@
 			<plugin>
 				<groupId>com.agilejava.docbkx</groupId>
 				<artifactId>docbkx-maven-plugin</artifactId>
+				<version>2.0.10</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.docbook</groupId>
@@ -99,7 +100,8 @@
 					<sourceDirectory>${gen-src-dir}</sourceDirectory>
 					<targetDirectory>${project.build.directory}/docbook</targetDirectory>
 					<includes>user-guide.xml</includes>
-					<partAutolabel>1</partAutolabel>
+                    <htmlStylesheet>https://jersey.dev.java.net/documentation.css</htmlStylesheet>
+                    <partAutolabel>1</partAutolabel>
 					<sectionAutolabel>1</sectionAutolabel>
 					<sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>
           <useExtensions>1</useExtensions>
@@ -107,6 +109,7 @@
           <linenumberingEveryNth>1</linenumberingEveryNth>
           <calloutsExtension>1</calloutsExtension>
           <calloutGraphics>0</calloutGraphics>
+          <highlightSource>1</highlightSource>
           <!--calloutGraphicsExtension>1</calloutGraphicsExtension-->
 				</configuration>
 				<executions>

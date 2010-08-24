@@ -112,7 +112,7 @@ developers the <ulink url="http://maven.apache.org/ant-tasks.html">Ant
 Tasks for Maven</ulink> may be used to add the following to the ant
 document such that the dependencies do not need to be downloaded
 explicitly:</para>
-<programlisting>&lt;artifact:dependencies pathId=&quot;dependency.classpath&quot;&gt;
+<programlisting language="xml">&lt;artifact:dependencies pathId=&quot;dependency.classpath&quot;&gt;
   &lt;dependency groupId=&quot;com.sun.jersey&quot; 
               artifactId=&quot;jersey-server&quot;
               version=&quot;&version;&quot;/&gt;
@@ -165,7 +165,7 @@ HTTP method and the media type. This is a key feature of JSR 311.</para>
 <para>The root resource will be deployed using the Grizzly Web
 container.</para>
 <para>Create the following Java class in your project:</para>
-<programlisting linenumbering="numbered">public class Main {
+<programlisting language="java" linenumbering="numbered">public class Main {
           
      public static void main(String[] args) throws IOException {
              
