@@ -56,18 +56,18 @@
     </description>
     <url>https://jersey.dev.java.net/</url>
     <organization>
-        <name>Sun Microsystems, Inc</name>
-        <url>http://www.sun.com/</url>
+        <name>Oracle Corporation</name>
+        <url>http://www.oracle.com/</url>
     </organization>
     <licenses>
         <license>
-            <name>CDDL 1.0</name>
-            <url>https://glassfish.dev.java.net/public/CDDL+GPL.html</url>
+            <name>CDDL 1.1</name>
+            <url>https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html</url>
             <distribution>repo</distribution>
         </license>
         <license>
             <name>GPL2 w/ CPE</name>
-            <url>https://glassfish.dev.java.net/public/CDDL+GPL.html</url>
+            <url>https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
