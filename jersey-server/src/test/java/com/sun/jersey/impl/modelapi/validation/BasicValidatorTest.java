@@ -497,7 +497,7 @@ public class BasicValidatorTest extends TestCase {
         validator.validate(ar);
         printIssueList(validator);
         assertTrue(!validator.fatalIssuesFound());
-        assertEquals(7, validator.getIssueList().size());
+        assertEquals(0, validator.getIssueList().size());
     }
 
     public static class GenericArrayResource<T, V> {
@@ -537,7 +537,7 @@ public class BasicValidatorTest extends TestCase {
         validator.validate(ar);
         printIssueList(validator);
         assertTrue(!validator.fatalIssuesFound());
-        assertEquals(7, validator.getIssueList().size());
+        assertEquals(0, validator.getIssueList().size());
     }
 
     // TODO: test multiple root resources with the same uriTempl (in WebApplicationImpl.processRootResources ?)

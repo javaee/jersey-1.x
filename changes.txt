@@ -1,4 +1,11 @@
 release 1.4 (08-2010)
+- Fixed issue 573
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=573
+  Entities that are defined to be parameterized types with type variable as
+  arguments will be resolved, recursively to concrete types where possible.
+  For, example List<T> T[], Map<T, T> and Map<T, List<T>> will be resolved,
+  when T is a String, to List<String> String[], Map<String, String> and
+  Map<String, List<String>>
 - Fixed issue 572
   https://jersey.dev.java.net/issues/show_bug.cgi?id=572
   Propagate security context when making internal invocations to match URIs.

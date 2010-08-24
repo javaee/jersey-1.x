@@ -350,15 +350,7 @@ public class ReflectionHelper {
             GenericArrayType arrayType = (GenericArrayType)type;
             Type t = arrayType.getGenericComponentType();
             if (t instanceof Class) {
-                Class c = (Class)t;
-                try {
-                    // TODO is there a better way to get the Class object
-                    // representing an array
-                    Object o = Array.newInstance(c, 0);
-                    return o.getClass();
-                } catch (Exception e) {
-                    throw new IllegalArgumentException(e);
-                }
+                return getArrayClass((Class)t);
             }
         } else if (type instanceof ParameterizedType) {
             ParameterizedType subType = (ParameterizedType)type;
@@ -368,6 +360,21 @@ public class ReflectionHelper {
             }
         }
         return null;
+    }
+
+    /**
+     * Get Array class of component class.
+     *
+     * @param c the component class of the array
+     * @return the array class.
+     */
+    public static Class getArrayClass(Class c) {
+        try {
+            Object o = Array.newInstance(c, 0);
+            return o.getClass();
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**
@@ -646,10 +653,7 @@ public class ReflectionHelper {
                 if (t instanceof Class) {
                     c = (Class)t;
                     try {
-                        // TODO is there a better way to get the Class object
-                        // representing an array
-                        Object o = Array.newInstance(c, 0);
-                        return new ClassTypePair(o.getClass());
+                        return new ClassTypePair(getArrayClass(c));
                     } catch (Exception e) {
                     }
                     return null;
