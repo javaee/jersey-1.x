@@ -740,8 +740,8 @@ public class AsyncWebResource extends Filterable implements
     // AsyncClientHandler
     
     public Future<ClientResponse> handle(final ClientRequest request, final FutureListener<ClientResponse> l) {
-        Callable c = new Callable() {
-            public Object call() throws Exception {
+        Callable<ClientResponse> c = new Callable<ClientResponse>() {
+            public ClientResponse call() throws Exception {
                 return getHeadHandler().handle(request);
             }
         };

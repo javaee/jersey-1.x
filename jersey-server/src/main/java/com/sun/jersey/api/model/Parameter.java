@@ -40,6 +40,7 @@
 
 package com.sun.jersey.api.model;
 
+import com.sun.jersey.spi.container.ParamQualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
@@ -113,6 +114,15 @@ public class Parameter implements AnnotatedElement {
 
     public Type getParameterType() {
         return type;
+    }
+
+    public boolean isQualified() {
+        for (Annotation a : getAnnotations()) {
+            if (a.annotationType().isAnnotationPresent(ParamQualifier.class)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public <T extends Annotation> T getAnnotation(Class<T> annotationType) {

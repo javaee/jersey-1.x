@@ -47,6 +47,7 @@ import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
+import com.sun.jersey.spi.container.ParamQualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -89,14 +90,18 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
         if (hasEntity)
             return is;
 
+        // Try to find entity if there is one unresolved parameter and
+        // the annotations are unknown
         if (Collections.frequency(is, null) == 1) {
             final int i = is.lastIndexOf(null);
             final Parameter parameter = method.getParameters().get(i);
             if (Parameter.Source.UNKNOWN == parameter.getSource()) {
-                final Injectable ij = processEntityParameter(
-                    parameter,
-                    method.getMethod().getParameterAnnotations()[i]);
-                is.set(i, ij);
+                if (!parameter.isQualified()) {
+                    final Injectable ij = processEntityParameter(
+                        parameter,
+                        method.getMethod().getParameterAnnotations()[i]);
+                    is.set(i, ij);
+                }
             }
         }
 

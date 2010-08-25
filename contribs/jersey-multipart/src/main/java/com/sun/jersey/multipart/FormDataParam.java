@@ -41,6 +41,7 @@
 package com.sun.jersey.multipart;
 
 import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.spi.container.ParamQualifier;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -144,6 +145,7 @@ import javax.ws.rs.FormParam;
  */
 @Target({ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
+@ParamQualifier
 public @interface FormDataParam {
     /**
      * Defines the control name of a "multipart/form-data" body part whose

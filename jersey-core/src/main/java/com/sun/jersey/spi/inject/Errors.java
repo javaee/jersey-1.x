@@ -103,9 +103,26 @@ public final class Errors {
 
     private final ArrayList<ErrorMessage> messages = new ArrayList<ErrorMessage>(0);
 
+    private int mark = -1;
+
     private int stack = 0;
 
     private boolean fieldReporting = true;
+
+    private void _mark() {
+        mark = messages.size();
+    }
+
+    private void _unmark() {
+        mark = -1;
+    }
+
+    private void _reset() {
+        if (mark >= 0 && mark < messages.size()) {
+            messages.subList(mark, messages.size()).clear();
+            _unmark();
+        }
+    }
 
     private void preProcess() {
         stack++;
@@ -187,6 +204,18 @@ public final class Errors {
         }
 
         throw caught;
+    }
+
+    public static void mark() {
+        getInstance()._mark();
+    }
+
+    public static  void unmark() {
+        getInstance()._unmark();
+    }
+
+    public static void reset() {
+        getInstance()._reset();
     }
 
     public static void error(String message) {

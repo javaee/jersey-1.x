@@ -1,4 +1,9 @@
 release 1.4 (08-2010)
+- Fixed issue 575
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=575
+  Fixed regression in jersey-multipart where @FormDataParam annotated parameters
+  were not being recognized resulting in deployment errors or incorrect
+  information being passed as the entity parameter.
 - Fixed issue 573
   https://jersey.dev.java.net/issues/show_bug.cgi?id=573
   Entities that are defined to be parameterized types with type variable as

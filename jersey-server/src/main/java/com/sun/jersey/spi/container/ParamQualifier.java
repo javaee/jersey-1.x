@@ -37,59 +37,22 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spi.container;
 
-package com.sun.jersey.server.impl.application;
-
-import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.core.spi.component.ProviderServices;
-import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.server.impl.model.method.dispatch.ResourceMethodDispatchProvider;
-import com.sun.jersey.spi.dispatch.RequestDispatcher;
-import com.sun.jersey.spi.inject.Errors;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * A meta-annotation that identifies an annotation as a parameter-based
+ * annotation.
+ * 
+ * @author Paul.Sandoz@Oracle.Com
  */
-public final class ResourceMethodDispatcherFactory {
-    private static final Logger LOGGER = Logger.getLogger(ResourceMethodDispatcherFactory.class.getName());
-    
-    private final Set<ResourceMethodDispatchProvider> dispatchers;
-    
-    public ResourceMethodDispatcherFactory(ProviderServices providerServices) {
-        dispatchers = providerServices.getProvidersAndServices(
-                ResourceMethodDispatchProvider.class);
-    }
-
-    // TemplateContext
-    
-    public Set<ResourceMethodDispatchProvider> getDispatchers() {
-        return dispatchers;
-    }
-    
-    public RequestDispatcher getDispatcher(AbstractResourceMethod abstractResourceMethod) {
-        // Mark the errors so it is possible to reset
-        Errors.mark();
-        for (ResourceMethodDispatchProvider rmdp : dispatchers) {
-            try {
-                RequestDispatcher d = rmdp.create(abstractResourceMethod);
-                if (d != null) {
-                    // Reset any errors, if any, produced from previous dispatch
-                    // providers
-                    Errors.reset();
-                    return d;
-                }
-            } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, ImplMessages.ERROR_PROCESSING_METHOD(
-                        abstractResourceMethod.getMethod(),
-                        rmdp.getClass().getName()), e);
-            }
-        }
-
-        Errors.unmark();
-        return null;        
-    }
+@Target({ElementType.ANNOTATION_TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface ParamQualifier {
 }
