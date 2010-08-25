@@ -54,17 +54,29 @@ public class MultipartResource {
     @Path("part")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @POST
-    public String post(@FormDataParam("part") String in) {
-        return in;
+    public String post(@FormDataParam("part") String s) {
+        return s;
     }
 
     @Path("part-file-name")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @POST
     public String post(
-            @FormDataParam("part") String in,
+            @FormDataParam("part") String s,
             @FormDataParam("part") FormDataContentDisposition d) {
-        return in + ":" + d.getFileName();
+        return s + ":" + d.getFileName();
+    }
+
+    @Path("xml-jaxb-part")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @POST
+    public String post(
+            @FormDataParam("string") String s,
+            @FormDataParam("string") FormDataContentDisposition sd,
+            @FormDataParam("bean") Bean b,
+            @FormDataParam("bean") FormDataContentDisposition bd
+            ) {
+        return s + ":" + sd.getFileName() + "," + b.value + ":" + bd.getFileName();
     }
 
 }

@@ -40,9 +40,11 @@
 package com.sun.jersey.samples.helloworld;
 
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
+import com.sun.jersey.samples.helloworld.resources.Bean;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import javax.ws.rs.core.MediaType;
@@ -84,4 +86,20 @@ public class MultipartWebAppTest extends JerseyTest {
         String s = webResource.type(MediaType.MULTIPART_FORM_DATA_TYPE).post(String.class, mp);
         Assert.assertEquals("CONTENT:file", s);
     }
+
+    @Test
+    public void testXmlJAXBPart() {
+        WebResource webResource = resource().path("form/xml-jaxb-part");
+
+        FormDataMultiPart mp = new FormDataMultiPart();
+        mp.bodyPart(new FormDataBodyPart(FormDataContentDisposition.name("bean").fileName("bean").build(),
+                new Bean("BEAN"),
+                MediaType.APPLICATION_XML_TYPE));
+        mp.bodyPart(new FormDataBodyPart(FormDataContentDisposition.name("string").fileName("string").build(),
+                "STRING"));
+
+        String s = webResource.type(MediaType.MULTIPART_FORM_DATA_TYPE).post(String.class, mp);
+        Assert.assertEquals("STRING:string,BEAN:bean", s);
+    }
+
 }
