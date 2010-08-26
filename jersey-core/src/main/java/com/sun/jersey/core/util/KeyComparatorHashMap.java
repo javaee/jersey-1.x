@@ -226,11 +226,14 @@ public class KeyComparatorHashMap<K,V>
         return key == null ? (T)NULL_KEY : key;
     }
 
+    static <T> boolean isNull(T key) {
+        return key == NULL_KEY;
+    }
     /**
      * Returns key represented by specified internal representation.
      */
     static <T> T unmaskNull(T key) {
-        return (key == NULL_KEY ? null : key);
+        return key == NULL_KEY ? null : key;
     }
 
     /**
@@ -288,8 +291,12 @@ public class KeyComparatorHashMap<K,V>
     }
 
     int keyComparatorHash(K k) {
-        int h = keyComparator.hash(k);
-        
+        return isNull(k)
+                ? hash(k.hashCode())
+                : hash(keyComparator.hash(k));
+    }
+
+    int hash(int h) {
         h += ~(h << 9);
         h ^=  (h >>> 14);
         h +=  (h << 4);
@@ -301,7 +308,13 @@ public class KeyComparatorHashMap<K,V>
      * Check for equality of non-null reference x and possibly-null y. 
      */
     boolean keyComparatorEq(K x, K y) {
-        return x == y || keyComparator.equals(x, y);
+        if (isNull(x)) {
+            return x == y;
+        } else if (isNull(y)) {
+            return x == y;
+        } else {
+            return x == y || keyComparator.equals(x, y);
+        }
     }
     
     /**

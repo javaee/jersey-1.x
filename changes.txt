@@ -1,4 +1,7 @@
 release 1.4 (08-2010)
+- Fixed issue 552
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=552
+  Support null key values (as documented) for KeyComparatorHashMap.
 - Fixed issue 550
   https://jersey.dev.java.net/issues/show_bug.cgi?id=550
   When a WebApplicationException is thrown because a message body reader/writer
