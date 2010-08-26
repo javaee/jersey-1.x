@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.spi.container;
 
+import com.sun.jersey.api.MessageException;
 import com.sun.jersey.core.header.OutBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.container.MappableContainerException;
@@ -259,9 +260,10 @@ public class ContainerResponse implements HttpResponseContext {
                 entity.getClass(), entityType, 
                 annotations, contentType);
         if (p == null) {
-            LOGGER.severe("A message body writer for Java class " + entity.getClass().getName() +
+            String message = "A message body writer for Java class " + entity.getClass().getName() +
                     ", and Java type " + entityType +
-                    ", and MIME media type " + contentType + " was not found");
+                    ", and MIME media type " + contentType + " was not found";
+            LOGGER.severe(message);
             Map<MediaType, List<MessageBodyWriter>> m = getMessageBodyWorkers().
                     getWriters(contentType);
             LOGGER.severe("The registered message body writers compatible with the MIME media type are:\n" +
@@ -273,7 +275,7 @@ public class ContainerResponse implements HttpResponseContext {
                 responseWriter.finish();
                 return;
             } else {
-                throw new WebApplicationException(500);
+                throw new WebApplicationException(new MessageException(message), 500);
             }
         }
 

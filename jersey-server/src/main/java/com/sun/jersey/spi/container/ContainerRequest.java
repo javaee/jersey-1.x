@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.spi.container;
 
+import com.sun.jersey.api.MessageException;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.container.MappableContainerException;
@@ -429,14 +430,16 @@ public class ContainerRequest implements HttpRequestContext {
                 type, genericType,
                 as, mediaType);
         if (bw == null) {
-            LOGGER.severe("A message body reader for Java class " + type.getName() +
+            String message = "A message body reader for Java class " + type.getName() +
                     ", and Java type " + genericType +
-                    ", and MIME media type " + mediaType + " was not found");
+                    ", and MIME media type " + mediaType + " was not found";
+            LOGGER.severe(message);
             Map<MediaType, List<MessageBodyReader>> m = getMessageBodyWorkers().
                     getReaders(mediaType);
             LOGGER.severe("The registered message body readers compatible with the MIME media type are:\n" +
                     getMessageBodyWorkers().readersToString(m));
             throw new WebApplicationException(
+                    new MessageException(message),
                     Responses.unsupportedMediaType().build());
         }
 

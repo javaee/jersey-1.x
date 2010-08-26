@@ -1,4 +1,9 @@
 release 1.4 (08-2010)
+- Fixed issue 550
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=550
+  When a WebApplicationException is thrown because a message body reader/writer
+  cannot be found a message is included with the exception (in addition to that
+  message being logged).
 - Fixed issue 575
   https://jersey.dev.java.net/issues/show_bug.cgi?id=575
   Fixed regression in jersey-multipart where @FormDataParam annotated parameters
