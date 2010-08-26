@@ -208,19 +208,20 @@ public class Resource {
             <title>PlanetJAXBContextProvider</title>
             <programlisting linenumbering="numbered">@Provider
 public class PlanetJAXBContextProvider implements ContextResolver&lt;JAXBContext&gt; {
+    private JAXBContext context = null;
 
     public JAXBContext getContext(Class&lt;?&gt; type) {
-        JAXBContext context = null;
-
         if(type != Planet.class)
             return null; // we don't support nothing else than Planet
 
-        try {
-            context = JAXBContext.newInstance(Planet.class);
-        } catch (Exception e) {
-            return null;
+        if(context == null) {
+            try {
+                context = JAXBContext.newInstance(Planet.class);
+            } catch (JAXBException e) {
+                // log warning/error; null will be returned which indicates that this
+                // provider won't/can't be used.
+            }
         }
-
         return context;
     }
 }
