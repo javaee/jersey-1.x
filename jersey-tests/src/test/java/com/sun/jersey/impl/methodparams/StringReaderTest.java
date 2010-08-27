@@ -55,7 +55,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import javax.ws.rs.Path;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.StringReader.ValidateDefaultValue;
 import com.sun.jersey.spi.StringReaderProvider;
+import com.sun.jersey.spi.inject.Errors;
 import java.lang.reflect.ParameterizedType;
 import java.net.URI;
 import java.util.Arrays;
@@ -95,7 +97,7 @@ public class StringReaderTest extends AbstractResourceTester {
             return "DATE";
         }
     }
-    
+
     public void testBadDateResource() {
         initiateWebApplication(BadDateResource.class);
         ClientResponse cr = resource("/", false).queryParam("d", "123").
@@ -295,7 +297,7 @@ public class StringReaderTest extends AbstractResourceTester {
     }
 
     public void testParamException() {
-        initiateWebApplication(ParamExceptionMapperResource.class, 
+        initiateWebApplication(ParamExceptionMapperResource.class,
                 PathExceptionMapper.class,
                 MatrixExceptionMapper.class,
                 QueryExceptionMapper.class,
@@ -378,4 +380,109 @@ public class StringReaderTest extends AbstractResourceTester {
         assertEquals("uri", cr.getEntity(String.class));
     }
 
+
+    public static class ValidateParamReaderProvider implements StringReaderProvider<ValidateParam> {
+
+        public StringReader<ValidateParam> getStringReader(Class<?> type,
+                Type genericType, Annotation[] annotations) {
+            if (type != ValidateParam.class) return null;
+
+            return new StringReader<ValidateParam>() {
+                public ValidateParam fromString(String value) {
+                    return new ValidateParam(value);
+                }
+            };
+        }
+    }
+
+    public static class ValidateTrueParamReaderProvider implements StringReaderProvider<ValidateParam> {
+
+        @ValidateDefaultValue
+        public static class NoValidateParamStringReader implements StringReader<ValidateParam> {
+            @Override
+            public ValidateParam fromString(String value) {
+                return new ValidateParam(value);
+            }
+        }
+
+        public StringReader<ValidateParam> getStringReader(Class<?> type,
+                Type genericType, Annotation[] annotations) {
+            if (type != ValidateParam.class) return null;
+
+            return new NoValidateParamStringReader();
+        }
+    }
+
+    public static class ValidateFalseParamReaderProvider implements StringReaderProvider<ValidateParam> {
+
+        @ValidateDefaultValue(false)
+        public static class NoValidateParamStringReader implements StringReader<ValidateParam> {
+            @Override
+            public ValidateParam fromString(String value) {
+                return new ValidateParam(value);
+            }
+        }
+
+        public StringReader<ValidateParam> getStringReader(Class<?> type,
+                Type genericType, Annotation[] annotations) {
+            if (type != ValidateParam.class) return null;
+
+            return new NoValidateParamStringReader();
+        }
+    }
+
+    public static class ValidateParam {
+        public final String s;
+
+        public ValidateParam(String s) {
+            if (s.equals("invalid"))
+                throw new IllegalArgumentException();
+            this.s = s;
+        }
+    }
+
+    @Path("/")
+    public static class ValidateParamResource {
+        @GET
+        public String doGet(@DefaultValue("invalid") @QueryParam("x") ValidateParam d) {
+            return d.s;
+        }
+    }
+
+    private Errors.ErrorMessagesException catches(Closure c) {
+        return catches(c, Errors.ErrorMessagesException.class);
+    }
+
+    public void testValidateParam() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(ValidateParamResource.class, ValidateParamReaderProvider.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+    public void testValidateTrueParam() {
+        List<Errors.ErrorMessage> messages = catches(new Closure() {
+            @Override
+            public void f() {
+                initiateWebApplication(ValidateParamResource.class, ValidateTrueParamReaderProvider.class);
+            }
+        }).messages;
+
+        assertEquals(1, messages.size());
+    }
+
+    public void testNoValidateFalseParam() {
+        initiateWebApplication(ValidateParamResource.class, ValidateFalseParamReaderProvider.class);
+        ClientResponse cr = resource("/", false).queryParam("x", "valid").
+                get(ClientResponse.class);
+        assertEquals("valid", cr.getEntity(String.class));
+
+        cr = resource("/", false).queryParam("x", "invalid").
+                get(ClientResponse.class);
+        assertEquals(404, cr.getStatus());
+    }
 }

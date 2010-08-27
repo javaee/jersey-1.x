@@ -37,51 +37,42 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+package com.sun.jersey.server.impl.model.parameter.multivalued;
+
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.spi.StringReader;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
 
 /**
- * Read a string value and convert to a Java type.
- * <p>
- * A {@link StringReaderProvider} is responsible for providing an instance
- * of this interface.
- * <p>
- * If annotated with {@link ValidateDefaultValue} with a value of true or
- * the annotation is absent then the reader will be used to validate a default 
- * value (if any) by calling the fromString method, perhaps at initialization,
- * before any value, default or otherwise, is actually required. This
- * enables the early reporting of errors for default values.
- * If annotated with {@link ValidateDefaultValue} with a value of false then
- * the reader will not be used to validate a default (if any) before any value,
- * default or otherwise, is actually required.
  *
- * @param <T> the Java type to convert to.
- * 
  * @author Paul.Sandoz@Sun.Com
  */
-public interface StringReader<T> {
+abstract class AbstractStringReaderExtractor
+        implements MultivaluedParameterExtractor {
+    protected final StringReader sr;
+    protected final String parameter;
+    protected final String defaultStringValue;
 
-    /**
-     * Declares whether validation of a default value should occur before any
-     * value, default or otherwise, is actually required.
-     */
-    @Target({ElementType.TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @Documented
-    public static @interface ValidateDefaultValue {
-        boolean value() default true;
+    public AbstractStringReaderExtractor(StringReader sr, String parameter, String defaultStringValue) {
+        this.sr = sr;
+        this.parameter = parameter;
+        this.defaultStringValue = defaultStringValue;
+        if (defaultStringValue != null) {
+            StringReader.ValidateDefaultValue validate = sr.getClass().
+                    getAnnotation(StringReader.ValidateDefaultValue.class);
+            if (validate == null || validate.value()) {
+                sr.fromString(defaultStringValue);
+            }
+        }
     }
-    
-    /**
-     * Read a string value and convert to a Java type.
-     *
-     * @param value The string value.
-     * @return the instance of the Java type.
-     */
-    T fromString(String value);
+
+    public String getName() {
+        return parameter;
+    }
+
+    public String getDefaultStringValue() {
+        return defaultStringValue;
+    }
 }

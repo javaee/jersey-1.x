@@ -1,4 +1,10 @@
 release 1.4 (08-2010)
+- Fixed issue 546
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=546
+  Validating default values with @DefaultValue of an @*Param at initialization
+  time to produce on errors on deployment can be avoided if the StringReader
+  is annotated with @StringReader.@ValidateDefaultValue(false). In such cases
+  if the default value is incorrect it will result in a runtime error.
 - Fixed issue 552
   https://jersey.dev.java.net/issues/show_bug.cgi?id=552
   Support null key values (as documented) for KeyComparatorHashMap.

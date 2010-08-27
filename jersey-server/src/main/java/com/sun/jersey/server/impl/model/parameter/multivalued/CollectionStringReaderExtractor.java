@@ -54,28 +54,12 @@ import javax.ws.rs.core.MultivaluedMap;
  * @author Paul.Sandoz@Sun.Com
  */
 abstract class CollectionStringReaderExtractor<V extends Collection>
-        implements MultivaluedParameterExtractor {
-
-    final StringReader sr;
-    final String parameter;
-    final String defaultStringValue;
+        extends AbstractStringReaderExtractor {
 
     protected CollectionStringReaderExtractor(StringReader sr, String parameter, String defaultStringValue) {
-        this.sr = sr;
-        this.parameter = parameter;
-        this.defaultStringValue = defaultStringValue;
-        Object defaultValue = (defaultStringValue != null) ? sr.fromString(defaultStringValue) : null;
+        super(sr, parameter, defaultStringValue);
     }
 
-    public String getName() {
-        return parameter;
-    }
-
-    public String getDefaultStringValue() {
-        return defaultStringValue;
-    }
-
-    @SuppressWarnings("unchecked")
     public Object extract(MultivaluedMap<String, String> parameters) {
         final List<String> stringList = parameters.get(parameter);
         if (stringList != null) {

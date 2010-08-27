@@ -49,26 +49,10 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-final class StringReaderExtractor
-        implements MultivaluedParameterExtractor {
-    private final StringReader sr;
-    private final String parameter;
-    private final String defaultStringValue;
+final class StringReaderExtractor extends AbstractStringReaderExtractor {
 
     public StringReaderExtractor(StringReader sr, String parameter, String defaultStringValue) {
-        this.sr = sr;
-        this.parameter = parameter;
-        this.defaultStringValue = defaultStringValue;
-        Object defaultValue = (defaultStringValue != null) ?
-            sr.fromString(defaultStringValue) : null;
-    }
-
-    public String getName() {
-        return parameter;
-    }
-
-    public String getDefaultStringValue() {
-        return defaultStringValue;
+        super(sr, parameter, defaultStringValue);
     }
 
     public Object extract(MultivaluedMap<String, String> parameters) {
