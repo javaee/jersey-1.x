@@ -92,7 +92,6 @@
                         <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/jersey/</link>
                         <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/contribs/jersey-oauth/oauth-signature/</link>
                     </links>
-                    <excludePackageNames>com.sun.jersey.oauth.server</excludePackageNames>
                     <notimestamp>true</notimestamp>
                 </configuration>
             </plugin>
