@@ -45,11 +45,10 @@ import com.sun.jersey.json.impl.writer.*;
 import com.sun.jersey.json.impl.reader.Jackson2StaxReader;
 import com.sun.jersey.json.impl.reader.JacksonRootAddingParser;
 import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -112,11 +111,15 @@ public class Stax2JsonFactory {
         return createReader(reader, config, rootName, false);
     }
 
+
     public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName, boolean readingList) throws XMLStreamException {
+
+        Reader nonEmptyReader = ensureNonEmptyReader(reader);
+
         switch (config.getNotation()) {
             case NATURAL:
                 try {
-                    final JsonParser rawParser = new JsonFactory().createJsonParser(reader);
+                    final JsonParser rawParser = new JsonFactory().createJsonParser(nonEmptyReader);
                     final JsonParser nonListParser = config.isRootUnwrapping() ? JacksonRootAddingParser.createRootAddingParser(rawParser, rootName) : rawParser;
                     if (!readingList) {
                         return new Jackson2StaxReader(nonListParser, config);
@@ -128,7 +131,7 @@ public class Stax2JsonFactory {
                 }
             case MAPPED:
                 try {
-                    return new JsonXmlStreamReader(reader, rootName, config);
+                    return new JsonXmlStreamReader(nonEmptyReader, rootName, config);
                 } catch (IOException ex) {
                     throw new XMLStreamException(ex);
                 }
@@ -141,14 +144,14 @@ public class Stax2JsonFactory {
                         jmConfig = new Configuration(config.getXml2JsonNs());
                     }
                     return new MappedXMLStreamReader(
-                            new JSONObject(new JSONTokener(ReaderWriter.readFromAsString(reader))),
+                            new JSONObject(new JSONTokener(ReaderWriter.readFromAsString(nonEmptyReader))),
                             new MappedNamespaceConvention(jmConfig));
                 } catch (Exception ex) {
                     throw new XMLStreamException(ex);
                 }
             case BADGERFISH:
                 try {
-                    return new BadgerFishXMLStreamReader(new JSONObject(new JSONTokener(ReaderWriter.readFromAsString(reader))));
+                    return new BadgerFishXMLStreamReader(new JSONObject(new JSONTokener(ReaderWriter.readFromAsString(nonEmptyReader))));
                 } catch (Exception ex) {
                     throw new XMLStreamException(ex);
                 }
@@ -156,4 +159,19 @@ public class Stax2JsonFactory {
         // This should not occur
         throw new IllegalArgumentException("Unknown JSON config");
     }
+
+    private static Reader ensureNonEmptyReader(Reader reader) throws XMLStreamException {
+        try {
+            Reader mr = reader.markSupported() ? reader : new BufferedReader(reader);
+            mr.mark(1);
+            if (mr.read() == -1) {
+                throw new XMLStreamException("JSON expression can not be empty!");
+            }
+            mr.reset();
+            return mr;
+        } catch (IOException ex) {
+            throw new XMLStreamException(ex);
+        }
+    }
+
 }

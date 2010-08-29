@@ -1,4 +1,9 @@
 release 1.4 (08-2010)
+- Fixed issue 577
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=577
+  When a client sends an empty request to a resource method that consumes
+  JAXB/JSON the natural and mapped conventions produce inconsistent results and
+  should return a 400 error.
 - Fixed issue 546
   https://jersey.dev.java.net/issues/show_bug.cgi?id=546
   Validating default values with @DefaultValue of an @*Param at initialization

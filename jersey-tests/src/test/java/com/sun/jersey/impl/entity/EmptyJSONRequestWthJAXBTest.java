@@ -99,12 +99,12 @@ public class EmptyJSONRequestWthJAXBTest extends AbstractResourceTester {
 
     }
     
-//    public void testEmptyRequestMapped() {
-//        initiateWebApplication(Resource.class);
-//        WebResource r = resource("/", false);
-//
-//        _test(r);
-//    }
+    public void testEmptyRequestMapped() {
+        initiateWebApplication(Resource.class);
+        WebResource r = resource("/", false);
+
+        _test(r);
+    }
 
     public static abstract class CR implements ContextResolver<JAXBContext> {
 
@@ -136,13 +136,13 @@ public class EmptyJSONRequestWthJAXBTest extends AbstractResourceTester {
         }
     }
 
-//    public void testEmptyRequestNatural() {
-//        initiateWebApplication(NaturalCR.class, Resource.class);
-//        WebResource r = resource("/", false);
-//        r.addFilter(new LoggingFilter());
-//
-//        _test(r);
-//    }
+    public void testEmptyRequestNatural() {
+        initiateWebApplication(NaturalCR.class, Resource.class);
+        WebResource r = resource("/", false);
+        r.addFilter(new LoggingFilter());
+
+        _test(r);
+    }
 
 
     public static class MappedJettisonCR extends CR {
