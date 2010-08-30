@@ -121,6 +121,7 @@ public interface WebApplication extends Traceable {
      * Get the providers.
      *
      * @return the providers.
+     * @since 1.3
      */
     Providers getProviders();
     
