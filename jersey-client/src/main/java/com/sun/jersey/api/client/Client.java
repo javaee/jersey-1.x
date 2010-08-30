@@ -61,6 +61,7 @@ import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.core.util.LazyVal;
 import com.sun.jersey.spi.inject.ClientSide;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Injectable;
@@ -70,11 +71,12 @@ import com.sun.jersey.spi.service.ServiceFinder;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,7 +97,7 @@ import javax.ws.rs.ext.Providers;
  * created from the client.
  * <p>
  * A client may be configured by passing a {@link ClientConfig} instance to
- * the appropriate construtor.
+ * the appropriate constructor.
  * <p>
  * Methods to create instances of {@link WebResource} are thread-safe. Methods
  * that modify configuration and or filters are not guaranteed to be
@@ -121,6 +123,8 @@ public class Client extends Filterable implements ClientHandler {
 
     private boolean destroyed = false;
 
+    private LazyVal<ExecutorService> es;
+    
     private Map<String, Object> properties;
 
     private Set<ViewProxyProvider> vpps;
@@ -189,6 +193,13 @@ public class Client extends Filterable implements ClientHandler {
     private void init(ClientHandler root, ClientConfig config,
             IoCComponentProviderFactory provider) {
 
+        this.es = new LazyVal<ExecutorService>() {
+                @Override
+                protected ExecutorService instance() {
+                    return Executors.newCachedThreadPool();
+                }
+            };
+        
         Class<?>[] components = ServiceFinder.find("jersey-client-components").toClassArray();
         if (components.length > 0) {
             if (LOGGER.isLoggable(Level.INFO)) {
@@ -492,7 +503,37 @@ public class Client extends Filterable implements ClientHandler {
         throw new IllegalArgumentException("A view proxy is not " +
                 "available for the class '" + c.getName() + "'");
     }
-  
+
+    /**
+     * Set the {@link ExecutorService} for sending asynchronous
+     * HTTP requests when no underlying asynchronous HTTP implementation is
+     * utilized.
+     *
+     * @param es the {@link ExecutorService}.
+     * @since 1.4
+     */
+    public void setExecutorService(ExecutorService es) {
+        if (es == null)
+            throw new IllegalArgumentException("ExecutorService service MUST not be null");
+
+        this.es.set(es);
+    }
+
+    /**
+     * Get the {@link ExecutorService} for sending asynchronous
+     * HTTP requests when no underlying asynchronous HTTP implementation is
+     * utilized.
+     * <p>
+     * By default the implementation returned
+     * from {@link Executors#newCachedThreadPool() } is utilized.
+     *
+     * @return the {@link ExecutorService}.
+     * @since 1.4
+     */
+    public ExecutorService getExecutorService() {
+        return es.get();
+    }
+
     /**
      * Get the mutable property bag.
      *

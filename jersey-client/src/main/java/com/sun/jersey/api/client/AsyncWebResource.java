@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
@@ -84,15 +85,19 @@ public class AsyncWebResource extends Filterable implements
         AsyncUniformInterface {    
     private static final Logger LOGGER = Logger.getLogger(AsyncWebResource.class.getName());
 
+    private final ExecutorService es;
+
     private final URI u;
 
-    /* package */ AsyncWebResource(ClientHandler c, URI u) {
-        super(c);
+    /* package */ AsyncWebResource(Client c, URI u) {
+        super((ClientHandler)c);
+        this.es = c.getExecutorService();
         this.u = u;
     }
     
     private AsyncWebResource(AsyncWebResource that, UriBuilder ub) {
         super(that);
+        this.es = that.es;
         this.u = ub.build();
     }
     
@@ -758,7 +763,7 @@ public class AsyncWebResource extends Filterable implements
             }
         };
 
-        new Thread(ft).start();
+        es.submit(ft);
         return ft;
     }
 }

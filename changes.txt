@@ -1,4 +1,10 @@
 release 1.4 (08-2010)
+- Fixed issue 578
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=578
+  The async client, when no HTTP async implementation is utilized, uses
+  ExecutorService to execute the request/response task.
+  The default implementation is Executors.newCachedThreadPool() and the
+  implementation can be set on the Client.
 - Fixed issue 577
   https://jersey.dev.java.net/issues/show_bug.cgi?id=577
   When a client sends an empty request to a resource method that consumes

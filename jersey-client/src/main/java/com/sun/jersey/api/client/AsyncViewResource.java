@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
@@ -66,17 +67,21 @@ public class AsyncViewResource extends Filterable implements
     
     private final Client client;
 
+    private final ExecutorService es;
+
     private final URI u;
         
     /* package */ AsyncViewResource(Client c, URI u) {
         super((ClientHandler)c);
         this.client = c;
+        this.es = c.getExecutorService();
         this.u = u;
     }
 
     private AsyncViewResource(AsyncViewResource that, UriBuilder ub) {
         super(that);
         this.client = that.client;
+        this.es = that.es;
         this.u = ub.build();
     }
     
@@ -527,7 +532,7 @@ public class AsyncViewResource extends Filterable implements
             }
         };
 
-        new Thread(ft).start();
+        es.submit(ft);
         return ft;
     }
 }

@@ -41,10 +41,10 @@
 package com.sun.jersey.impl.client;
 
 import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.impl.container.grizzly.*;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.sun.jersey.impl.container.grizzly.AbstractGrizzlyServerTester;
 import java.util.concurrent.Future;
 import javax.ws.rs.Path;
 import javax.ws.rs.GET;
