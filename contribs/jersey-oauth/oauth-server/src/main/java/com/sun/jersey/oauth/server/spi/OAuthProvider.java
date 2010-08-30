@@ -50,53 +50,47 @@ import java.util.Map;
  * @author Martin Matula
  */
 public interface OAuthProvider {
-    /** Returns the OAuth protection realm.
-     *
-     * @return OAuth protection realm.
-     */
-    String getRealm();
 
-    /** Gets consumer secret corresponding to a given consumer key.
+    /** Gets consumer corresponding to a given consumer key.
      *
      * @param consumerKey consumer key
      * @return corresponding consumer secret or {@literal null} if no consumer with the given key is known
      */
-    String getConsumerSecret(String consumerKey);
+    OAuthConsumer getConsumer(String consumerKey);
 
     /** Creates a new request token for a given consumerKey.
      *
      * @param consumerKey consumer key to create a request token for
      * @param callbackUrl callback url for this request token request
-     * @param parameters additional service provider-specific parameters
+     * @param attributes additional service provider-specific parameters
+     *      (this can be used to indicate what level of access is requested
+     *      - i.e. readonly, or r/w, etc.)
      * @return new request token
      */
-    OAuthToken newRequestToken(String consumerKey, String callbackUrl, Map<String, List<String>> parameters);
+    OAuthToken newRequestToken(String consumerKey, String callbackUrl, Map<String, List<String>> attributes);
 
     /** Returns the request token by the consumer key and token value.
      *
-     * @param consumerKey consumer key
      * @param token request token value
      * @return request token or {@literal null} if no such token corresponding to a given
      * consumer key is found
      */
-    OAuthToken getRequestToken(String consumerKey, String token);
+    OAuthToken getRequestToken(String token);
 
     /** Creates a new access token. This method must validate the passed arguments
      * and return {@literal null} if any of them is invalid.
      *
-     * @param consumerKey consumer key
      * @param requestToken authorized request token
      * @param verifier verifier passed to the callback after authorization
      * @return new access token or null if the arguments are invalid (e.g. there
      * is no such request token as in the argument, or the verifier does not match)
      */
-    OAuthToken newAccessToken(String consumerKey, String requestToken, String verifier);
+    OAuthToken newAccessToken(OAuthToken requestToken, String verifier);
 
     /** Returns the access token by the consumer key and token value.
      *
-     * @param consumerKey consumer key
      * @param token access token value
      * @return access token or {@literal null} if no such found
      */
-    OAuthToken getAccessToken(String consumerKey, String token);
+    OAuthToken getAccessToken(String token);
 }

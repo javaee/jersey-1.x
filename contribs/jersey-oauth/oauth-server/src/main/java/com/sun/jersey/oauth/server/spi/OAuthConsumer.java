@@ -38,26 +38,20 @@
  * holder.
  */
 
-package com.sun.jersey.oauth.server.providers;
+package com.sun.jersey.oauth.server.spi;
 
-import com.sun.jersey.oauth.server.OAuthException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
-/** Provider that maps {@link OAuthException} to the right status code.
- *
- * @author Martin Matula
+/** Class representing a registered consumer.
  */
-@Provider
-public class OAuthExceptionMapper implements ExceptionMapper<OAuthException>{
-    @Override
-    public Response toResponse(OAuthException e) {
-        ResponseBuilder rb = Response.status(e.status);
-        if (e.wwwAuthHeader != null) {
-            rb.header("WWW-Authenticate", e.wwwAuthHeader);
-        }
-        return rb.build();
-    }
+public interface OAuthConsumer {
+    /** Returns consumer key.
+     *
+     * @return consumer key
+     */
+    String getKey();
+
+    /** Returns consumer secret.
+     *
+     * @return consumer secret
+     */
+    String getSecret();
 }

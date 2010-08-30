@@ -41,8 +41,7 @@
 package com.sun.jersey.oauth.server.spi;
 
 import java.security.Principal;
-import java.util.List;
-import java.util.Map;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 
 /** Interface representing an OAuth token (i.e. access token or request token).
@@ -62,13 +61,22 @@ public interface OAuthToken {
      */
     String getSecret();
 
-    /** Returns additional custom parameters associated with the token.
-     * These will be included as additional parameters in the response to the
-     * request token or access token request.
+    /** Returns consumer this token was issued for.
      *
-     * @return immutable map of custom parameters
+     * @return consumer this token was issued for.
      */
-    Map<String, List<String>> getCustomParameters();
+    OAuthConsumer getConsumer();
+
+    /** Returns additional custom attributes associated with the token.
+     * If this is a request token, this should be a the same set or a defined
+     * subset of parameters that were passed to the {@link OAuthProvider#newRequestToken(java.lang.String, java.lang.String, javax.ws.rs.core.MultivaluedMap)}
+     * method that created this request token. If this is an access token,
+     * this is any application defined set that will included as form parameters
+     * in a response to accessToken request.
+     *
+     * @return immutable map of custom attributes
+     */
+    MultivaluedMap<String, String> getAttributes();
 
     /** Returns a {@link Principal} object containing the name of the
      * user the request containing this token is authorized to act on behalf of.

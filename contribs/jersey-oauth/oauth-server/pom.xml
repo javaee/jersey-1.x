@@ -70,6 +70,11 @@
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -92,10 +97,12 @@
                         <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/jersey/</link>
                         <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/contribs/jersey-oauth/oauth-signature/</link>
                     </links>
+                    <subpackages>com.sun.jersey.oauth.server.api:com.sun.jersey.oauth.server.spi</subpackages>
                     <notimestamp>true</notimestamp>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 </project>
+
 

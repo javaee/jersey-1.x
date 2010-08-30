@@ -50,6 +50,7 @@ import com.sun.jersey.oauth.server.NonceManager;
 import com.sun.jersey.oauth.server.OAuthException;
 import com.sun.jersey.oauth.server.OAuthSecurityContext;
 import com.sun.jersey.oauth.server.OAuthServerRequest;
+import com.sun.jersey.oauth.server.spi.OAuthConsumer;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 import com.sun.jersey.oauth.signature.OAuthSignature;
@@ -57,9 +58,9 @@ import com.sun.jersey.oauth.signature.OAuthSignatureException;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import java.util.Collections;
 import java.util.Set;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
 
 /** OAuth request filter that filters all requests indicating in the Authorization
  * header they use OAuth. Checks if the incoming requests are properly authenticated
@@ -75,7 +76,7 @@ import javax.ws.rs.ext.Provider;
  *
  * <p>
  * This filter requires an implementation of {@link OAuthProvider} interface to be
- * available as a provider (i.e. class annotated by the {@link Provider} annotation).
+ * registered through the {@link OAuthServerFilter#PROPERTY_PROVIDER} property.
  * <p>
  * The constants in this class indicate how you can parameterize this filter. E.g. when an application
  * is deployed as a Servlet or Filter you can set the path patern to be ignored by this filter
@@ -91,6 +92,10 @@ import javax.ws.rs.ext.Provider;
  * @author Martin Matula
  */
 public class OAuthServerFilter implements ContainerRequestFilter {
+    /** Mandatory property - class name of the OAuthProvider class. */
+    public static final String PROPERTY_PROVIDER = "com.sun.jersey.config.property.oauth.provider";
+    /** OAuth realm. Default is set to "default". */
+    public static final String PROPERTY_REALM = "com.sun.jersey.config.property.oauth.realm";
     /** Property that can be set to a regular expression used to match the path (relative to the base URI) this
      * filter should not be applied to. */
     public static final String PROPERTY_IGNORE_PATH_PATTERN = "com.sun.jersey.config.property.oauth.ignorePathPattern";
@@ -136,6 +141,7 @@ public class OAuthServerFilter implements ContainerRequestFilter {
         versions = Collections.unmodifiableSet(v);
 
         // optional initialization parameters (defaulted)
+        String realm = defaultInitParam(rc, PROPERTY_REALM, "default");
         maxAge = intValue(defaultInitParam(rc, PROPERTY_MAX_AGE, "300000")); // 5 minutes
         gcPeriod = intValue(defaultInitParam(rc, PROPERTY_GC_PERIOD, "100")); // every 100 on average
         ignorePathPattern = pattern(defaultInitParam(rc, PROPERTY_IGNORE_PATH_PATTERN, null)); // no pattern
@@ -144,7 +150,7 @@ public class OAuthServerFilter implements ContainerRequestFilter {
         nonces = new NonceManager(maxAge, gcPeriod);
 
         // www-authenticate header for the life of the object
-        wwwAuthenticateHeader = "OAuth realm=\"" + provider.getRealm() + "\"";
+        wwwAuthenticateHeader = "OAuth realm=\"" + realm + "\"";
     }
 
     @Override
@@ -168,7 +174,7 @@ public class OAuthServerFilter implements ContainerRequestFilter {
             if (optional) {
                 return request;
             } else {
-                throw e;
+                throw new WebApplicationException(e.toResponse());
             }
         }
 
@@ -196,19 +202,22 @@ public class OAuthServerFilter implements ContainerRequestFilter {
         supportedOAuthParam(params.getVersion(), versions);
 
         // retrieve secret for consumer key
-        String consumerSecret = provider.getConsumerSecret(consumerKey);
-        if (consumerSecret == null) {
+        OAuthConsumer consumer = provider.getConsumer(consumerKey);
+        if (consumer == null) {
             throw newUnauthorizedException();
         }
 
-        OAuthToken accessToken = provider.getAccessToken(consumerKey, token);
-
-        // unsupported signature method results in 400 bad request
-        if (accessToken.getSecret() == null) {
+        OAuthToken accessToken = provider.getAccessToken(token);
+        if (accessToken == null) {
             throw newUnauthorizedException();
         }
 
-        OAuthSecrets secrets = new OAuthSecrets().consumerSecret(consumerSecret).tokenSecret(accessToken.getSecret());
+        OAuthConsumer atConsumer = accessToken.getConsumer();
+        if (atConsumer == null || !atConsumer.getSecret().equals(consumer.getSecret())) {
+            throw newUnauthorizedException();
+        }
+
+        OAuthSecrets secrets = new OAuthSecrets().consumerSecret(consumer.getSecret()).tokenSecret(accessToken.getSecret());
 
         if (!verifySignature(osr, params, secrets)) {
             throw newUnauthorizedException();

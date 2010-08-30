@@ -41,6 +41,7 @@
 package com.sun.jersey.oauth.server;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 /** Exception that is mapped either to {@link Response.Status#BAD_REQUEST} or
  * {@link Response.Status#UNAUTHORIZED}.
@@ -54,6 +55,18 @@ public class OAuthException extends RuntimeException {
     public OAuthException(Response.Status status, String wwwAuthHeader) {
         this.status = status;
         this.wwwAuthHeader = wwwAuthHeader;
+    }
+
+    /** Maps this exception to a response object.
+     * 
+     * @return Response this exception maps to.
+     */
+    public Response toResponse() {
+        ResponseBuilder rb = Response.status(status);
+        if (wwwAuthHeader != null) {
+            rb.header("WWW-Authenticate", wwwAuthHeader);
+        }
+        return rb.build();
     }
 }
 

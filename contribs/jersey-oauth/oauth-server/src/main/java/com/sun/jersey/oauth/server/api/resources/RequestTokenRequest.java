@@ -38,96 +38,96 @@
  * holder.
  */
 
-package com.sun.jersey.oauth.server.resources;
+package com.sun.jersey.oauth.server.api.resources;
 
-import com.sun.jersey.oauth.server.OAuthServerRequest;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.sun.jersey.oauth.signature.OAuthParameters;
+import com.sun.jersey.oauth.signature.OAuthSecrets;
+import com.sun.jersey.oauth.signature.OAuthSignature;
+import com.sun.jersey.oauth.signature.OAuthSignatureException;
+import com.sun.jersey.oauth.server.OAuthException;
+import com.sun.jersey.oauth.server.OAuthServerRequest;
+import com.sun.jersey.oauth.server.spi.OAuthConsumer;
+import com.sun.jersey.oauth.server.spi.OAuthProvider;
+import com.sun.jersey.oauth.server.spi.OAuthToken;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.Path;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import com.sun.jersey.oauth.signature.OAuthParameters;
-import com.sun.jersey.oauth.signature.OAuthSecrets;
-import com.sun.jersey.oauth.signature.OAuthSignature;
-import com.sun.jersey.oauth.signature.OAuthSignatureException;
-import com.sun.jersey.oauth.server.OAuthException;
-import com.sun.jersey.oauth.server.spi.OAuthProvider;
-import com.sun.jersey.oauth.server.spi.OAuthToken;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 
 /**
- * Resource handling access token requests.
+ * Resource handling request token requests.
  *
  * @author Hubert A. Le Van Gong <hubert.levangong at Sun.COM>
  * @author Martin Matula
  */
 
-@Path("/accessToken")
-public class AccessTokenRequest {
+@Path("/requestToken")
+public class RequestTokenRequest {
     private @Context OAuthProvider provider;
-
+    private @Context HttpContext hc;
     /**
-     * POST method for creating a request for Rquest Token
+     * POST method for creating a request for a Request Token
      * @param content representation for the resource
      * @return an HTTP response with content of the updated or created resource.
      */
     @POST
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
-    public Form postAccessTokenRequest(@Context HttpContext hc, @Context Request req, String content) {
-        boolean sigIsOk = false;
-        OAuthServerRequest request = new OAuthServerRequest(hc.getRequest());
-        OAuthParameters params = new OAuthParameters();
-        params.readRequest(request);
-
-        if (params.getToken() == null) {
-            throw new WebApplicationException(new Throwable("oauth_token MUST be present."), 400);
-        }
-
-        String consKey = params.getConsumerKey();
-        if (consKey == null) {
-            throw new OAuthException(Response.Status.BAD_REQUEST, null);
-        }
-
-        OAuthToken rt = provider.getRequestToken(consKey, params.getToken());
-        if (rt == null) {
-            // token invalid
-            throw new OAuthException(Response.Status.BAD_REQUEST, null);
-        }
-
-        String consSecret = provider.getConsumerSecret(consKey);
-        if (consSecret == null) {
-            // consumer key invalid or service not registered
-            throw new OAuthException(Response.Status.BAD_REQUEST, null);
-        }
-
-        OAuthSecrets secrets = new OAuthSecrets().consumerSecret(consSecret).tokenSecret(rt.getSecret());
+    @Consumes("application/x-www-form-urlencoded")
+    @Produces("application/x-www-form-urlencoded")
+    public Response postReqTokenRequest() {
         try {
-            sigIsOk = OAuthSignature.verify(request, params, secrets);
-        } catch (OAuthSignatureException ex) {
-            Logger.getLogger(AccessTokenRequest.class.getName()).log(Level.SEVERE, null, ex);
+            OAuthServerRequest request = new OAuthServerRequest(hc.getRequest());
+            OAuthParameters params = new OAuthParameters();
+            params.readRequest(request);
+
+            String tok = params.getToken();
+            if ((tok != null) && (!tok.contentEquals(""))) {
+                throw new OAuthException(Response.Status.BAD_REQUEST, null);
+            }
+
+            String consKey = params.getConsumerKey();
+            if (consKey == null) {
+                throw new OAuthException(Response.Status.BAD_REQUEST, null);
+            }
+
+            OAuthConsumer consumer = provider.getConsumer(consKey);
+            if (consumer == null) {
+                throw new OAuthException(Response.Status.BAD_REQUEST, null);
+            }
+            OAuthSecrets secrets = new OAuthSecrets().consumerSecret(consumer.getSecret()).tokenSecret("");
+
+            boolean sigIsOk = false;
+            try {
+                sigIsOk = OAuthSignature.verify(request, params, secrets);
+            } catch (OAuthSignatureException ex) {
+                Logger.getLogger(RequestTokenRequest.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            if (!sigIsOk) {
+                throw new OAuthException(Response.Status.BAD_REQUEST, null);
+            }
+
+            MultivaluedMap<String, String> parameters = new MultivaluedMapImpl();
+            for (String n : request.getParameterNames()) {
+                parameters.put(n, request.getParameterValues(n));
+            }
+
+            OAuthToken rt = provider.newRequestToken(consKey, params.getCallback(), parameters);
+
+            Form resp = new Form();
+            resp.putSingle(OAuthParameters.TOKEN, rt.getToken());
+            resp.putSingle(OAuthParameters.TOKEN_SECRET, rt.getSecret());
+            resp.putSingle(OAuthParameters.CALLBACK_CONFIRMED, "true");
+            return Response.ok(resp).build();
+        } catch (OAuthException e) {
+            return e.toResponse();
         }
-
-        if (!sigIsOk) {
-            // signature invalid
-            throw new OAuthException(Response.Status.BAD_REQUEST, null);
-        }
-
-        // We're good to go.
-        OAuthToken at = provider.newAccessToken(consKey, rt.getToken(), params.getVerifier());
-
-        // Preparing the response.
-        Form resp = new Form();
-        resp.putSingle(OAuthParameters.TOKEN, at.getToken());
-        resp.putSingle(OAuthParameters.TOKEN_SECRET, at.getSecret());
-        resp.putAll(at.getCustomParameters());
-        return resp;
     }
 }
