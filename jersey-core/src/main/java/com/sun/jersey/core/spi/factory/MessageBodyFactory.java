@@ -288,12 +288,13 @@ public class MessageBodyFactory implements MessageBodyWorkers {
             Annotation[] as, 
             MediaType mediaType) {
 
-        MessageBodyReader reader = null;
+        MessageBodyReader reader;
 
-        if(!customReaderProviders.isEmpty())
+        if(!customReaderProviders.isEmpty()) {
             reader = _getMessageBodyReader(c, t, as, mediaType, customReaderProviders);
-        if(reader != null)
-            return reader;
+            if(reader != null)
+                return reader;
+        }
         reader = _getMessageBodyReader(c, t, as, mediaType, readerProviders);
 
         return reader;
@@ -320,12 +321,13 @@ public class MessageBodyFactory implements MessageBodyWorkers {
             Annotation[] as, 
             MediaType mediaType, MediaType lookup) {
 
-        MessageBodyReader reader = null;
+        MessageBodyReader reader;
 
-        if(!customReaderProviders.isEmpty())
+        if(!customReaderProviders.isEmpty()) {
             reader = _getMessageBodyReader(c, t, as, mediaType, lookup, customReaderProviders);
-        if(reader != null)
-            return reader;
+            if(reader != null)
+                return reader;
+        }
         reader = _getMessageBodyReader(c, t, as, mediaType, lookup, readerProviders);
 
         return reader;
@@ -351,12 +353,13 @@ public class MessageBodyFactory implements MessageBodyWorkers {
             Annotation[] as,
             MediaType mediaType) {
 
-        MessageBodyWriter p = null;
+        MessageBodyWriter p;
 
-        if(!customWriterProviders.isEmpty())
+        if(!customWriterProviders.isEmpty()) {
             p = _getMessageBodyWriter(c, t, as, mediaType, customWriterProviders);
-        if(p != null)
-            return p;
+            if(p != null)
+                return p;
+        }
         p = _getMessageBodyWriter(c, t, as, mediaType, writerProviders);
 
         return p;
