@@ -1,4 +1,8 @@
 release 1.4 (08-2010)
+- Fixed issue 571
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=571
+  User defined providers (MessageBodyReaders and Writers) must have higher
+  priority than Jersey provided ones (client & server side).
 - When ServletContainer.FEATURE_FILTER_FORWARD_ON_404 is enabled
   and the status code is 404 call HttpServletResponse.setStatus otherwise
   call HttpServletResponse.sendError.
