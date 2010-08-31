@@ -246,6 +246,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
                 new KeyComparatorLinkedHashMap<MediaType, List<MessageBodyReader>>(
                 MEDIA_TYPE_COMPARATOR);
 
+        getCompatibleReadersWritersMap(mediaType, customReaderProviders, subSet);
         getCompatibleReadersWritersMap(mediaType, readerProviders, subSet);
         return subSet;
     }
@@ -255,6 +256,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
                 new KeyComparatorLinkedHashMap<MediaType, List<MessageBodyWriter>>(
                 MEDIA_TYPE_COMPARATOR);
 
+        getCompatibleReadersWritersMap(mediaType, customWriterProviders, subSet);
         getCompatibleReadersWritersMap(mediaType, writerProviders, subSet);
         return subSet;
     }
@@ -300,7 +302,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
             Map<MediaType, List<MessageBodyReader>> providers) {
         MessageBodyReader p = null;
         if (mediaType != null) {
-            p = _getMessageBodyReader(c, t, as, mediaType, mediaType);
+            p = _getMessageBodyReader(c, t, as, mediaType, mediaType, providers);
             if (p == null)
                 p = _getMessageBodyReader(c, t, as, mediaType,
                         new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD), providers);
