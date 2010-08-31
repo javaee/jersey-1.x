@@ -83,6 +83,16 @@ public interface FeaturesAndProperties {
             = "com.sun.jersey.config.feature.XmlRootElementProcessing";
 
     /**
+     * If true, provider precedence will work as it did prior Jersey version 1.4.
+     * That behaviour was not according to the spec regarding priority of user
+     * defined providers. See (@link https://jersey.dev.java.net/issues/show_bug.cgi?id=571}. 
+     * <p>
+     * The default value is false.
+     */
+    public static final String FEATURE_PRE_1_4_PROVIDER_PRECEDENCE
+            = "com.sun.jersey.config.feature.Pre14ProviderPrecedence";
+
+    /**
      * Get the map of features associated with the client.
      *
      * @return the features.

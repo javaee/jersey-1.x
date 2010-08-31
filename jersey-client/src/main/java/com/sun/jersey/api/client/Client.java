@@ -39,38 +39,47 @@
  */
 package com.sun.jersey.api.client;
 
-import com.sun.jersey.api.client.filter.Filterable;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.ClientFilter;
+import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.proxy.ViewProxy;
 import com.sun.jersey.client.proxy.ViewProxyProvider;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
-import com.sun.jersey.core.spi.component.ProviderFactory;
-import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ProviderFactory;
+import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitializer;
-import com.sun.jersey.spi.MessageBodyWorkers;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCProviderFactory;
 import com.sun.jersey.core.spi.factory.ContextResolverFactory;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.core.spi.factory.MessageBodyFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.core.util.LazyVal;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.inject.ClientSide;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.service.ServiceFinder;
+
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Providers;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,13 +89,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Providers;
 
 /**
  * The main class for creating {@link WebResource} instances and configuring
@@ -256,7 +258,8 @@ public class Client extends Filterable implements ClientHandler {
         final ContextResolverFactory crf = new ContextResolverFactory();
 
         // Obtain all message body readers/writers
-        final MessageBodyFactory bodyContext = new MessageBodyFactory(providerServices);
+        final MessageBodyFactory bodyContext = new MessageBodyFactory(providerServices,
+                config.getFeature(FeaturesAndProperties.FEATURE_PRE_1_4_PROVIDER_PRECEDENCE));
         // Allow injection of message body context
         injectableFactory.add(new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyContext));

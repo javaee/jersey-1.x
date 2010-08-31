@@ -41,14 +41,11 @@
 package com.sun.jersey.impl.entity;
 
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.impl.AbstractResourceTester;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.WebApplicationException;
@@ -58,6 +55,11 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 /**
  *
@@ -114,14 +116,26 @@ public class ParameterTypeArgumentOrderTest extends AbstractResourceTester {
     }
     
     public void testObjectResource() {
-        initiateWebApplication(ObjectResource.class, ObjectWriter.class);
-        
+        ResourceConfig rc = new DefaultResourceConfig(ObjectResource.class, ObjectWriter.class);
+        rc.getFeatures().put(FeaturesAndProperties.FEATURE_PRE_1_4_PROVIDER_PRECEDENCE, true);
+        initiateWebApplication(rc);
+
         WebResource r = resource("/");
-                
+
         assertEquals("OBJECTCLASS", r.path("object").get(String.class));
         assertEquals("STREAMINGOUTPUT", r.path("streamingoutput").get(String.class));
     }
 
+    public void testObjectResource2() {
+        ResourceConfig rc = new DefaultResourceConfig(ObjectResource.class, ObjectWriter.class);
+        // rc.getFeatures().put(FeaturesAndProperties.FEATURE_PRE_1_4_PROVIDER_PRECEDENCE, true);
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/");
+
+        assertEquals("OBJECTCLASS", r.path("object").get(String.class));
+        assertNotSame("STREAMINGOUTPUT", r.path("streamingoutput").get(String.class));
+    }
 
     public static class GenericClassWriter<T> implements MessageBodyWriter<T> {
         private final Class c;
