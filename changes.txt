@@ -1,4 +1,7 @@
 release 1.4 (08-2010)
+- When ServletContainer.FEATURE_FILTER_FORWARD_ON_404 is enabled
+  and the status code is 404 call HttpServletResponse.setStatus otherwise
+  call HttpServletResponse.sendError.
 - Fixed issue 578
   https://jersey.dev.java.net/issues/show_bug.cgi?id=578
   The async client, when no HTTP async implementation is utilized, uses

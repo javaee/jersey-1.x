@@ -154,7 +154,7 @@ public class WebComponent implements ContainerListener {
 
     private ResourceConfig resourceConfig;
 
-    private boolean useSendError;
+    private boolean useSetStatusOn404 = false;
 
     private WebApplication application;
 
@@ -205,12 +205,9 @@ public class WebComponent implements ContainerListener {
         if (resourceConfig == null)
             resourceConfig = createResourceConfig(config);
 
-        if (config.getConfigType() == WebConfig.ConfigType.FilterConfig) {
-            if (resourceConfig.getFeature(ServletContainer.FEATURE_FILTER_FORWARD_ON_404)) {
-                useSendError = false;
-            }
-        } else {
-            useSendError = true;
+        if (config.getConfigType() == WebConfig.ConfigType.FilterConfig &&
+                resourceConfig.getFeature(ServletContainer.FEATURE_FILTER_FORWARD_ON_404)) {
+            useSetStatusOn404 = true;
         }
 
         load();
@@ -244,7 +241,7 @@ public class WebComponent implements ContainerListener {
     private final static class Writer extends OutputStream implements ContainerResponseWriter {
         final HttpServletResponse response;
 
-        final boolean useSendError;
+        final boolean useSetStatusOn404;
 
         ContainerResponse cResponse;
 
@@ -254,8 +251,8 @@ public class WebComponent implements ContainerListener {
 
         boolean statusAndHeadersWritten = false;
 
-        Writer(boolean useSendError, HttpServletResponse response) {
-            this.useSendError = useSendError;
+        Writer(boolean useSetStatusOn404, HttpServletResponse response) {
+            this.useSetStatusOn404 = useSetStatusOn404;
             this.response = response;
         }
 
@@ -277,12 +274,16 @@ public class WebComponent implements ContainerListener {
             // after the invocation of sendError.
             writeHeaders();
 
-            if (useSendError && cResponse.getStatus() >= 400) {
-                final String reason = cResponse.getStatusType().getReasonPhrase();
-                if (reason == null || reason.isEmpty()) {
-                    response.sendError(cResponse.getStatus());
+            if (cResponse.getStatus() >= 400) {
+                if (useSetStatusOn404 && cResponse.getStatus() == 404) {
+                    response.setStatus(cResponse.getStatus());
                 } else {
-                    response.sendError(cResponse.getStatus(), reason);
+                    final String reason = cResponse.getStatusType().getReasonPhrase();
+                    if (reason == null || reason.isEmpty()) {
+                        response.sendError(cResponse.getStatus());
+                    } else {
+                        response.sendError(cResponse.getStatus(), reason);
+                    }
                 }
             } else {
                 response.setStatus(cResponse.getStatus());
@@ -415,7 +416,7 @@ public class WebComponent implements ContainerListener {
             requestInvoker.set(request);
             responseInvoker.set(response);
 
-            final Writer w = new Writer(useSendError, response);
+            final Writer w = new Writer(useSetStatusOn404, response);
             _application.handleRequest(cRequest, w);
             return w.cResponse.getStatus();
         } catch (MappableContainerException ex) {
