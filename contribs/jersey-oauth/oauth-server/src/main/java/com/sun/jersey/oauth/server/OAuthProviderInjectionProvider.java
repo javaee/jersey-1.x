@@ -43,10 +43,13 @@ package com.sun.jersey.oauth.server;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.util.LazyVal;
 import com.sun.jersey.oauth.server.api.OAuthServerFilter;
 import com.sun.jersey.oauth.server.spi.OAuthProvider;
+import com.sun.jersey.spi.inject.ConstrainedTo;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.InjectableProvider;
+import com.sun.jersey.spi.inject.ServerSide;
 import java.lang.reflect.Type;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
@@ -57,42 +60,46 @@ import javax.ws.rs.ext.Provider;
  * @author Martin Matula
  */
 @Provider
+@ConstrainedTo(ServerSide.class)
 public class OAuthProviderInjectionProvider implements Injectable<OAuthProvider>, InjectableProvider<Context, Type> {
-    private final OAuthProvider instance;
+    private @Context ResourceConfig rc;
 
-    public OAuthProviderInjectionProvider(@Context ResourceConfig rc) {
-        // first find out what class is registered
-        String providerClassName = (String) rc.getProperty(OAuthServerFilter.PROPERTY_PROVIDER);
-        if (providerClassName == null) {
-            throw new RuntimeException("Missing OAuthProvider class name in the configuration. Make sure '" + OAuthServerFilter.PROPERTY_PROVIDER + "' property is set.");
-        }
-        Class providerClass;
-        try {
-            providerClass = Class.forName(providerClassName, true, Thread.currentThread().getContextClassLoader());
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException("Could not load OAuthProvider implementation: " + ex.getMessage(), ex);
-        }
-
-        OAuthProvider provider = null;
-        for (Object obj : rc.getProviderSingletons()) {
-            if (obj.getClass() == providerClass) {
-                provider = (OAuthProvider) obj;
-                break;
+    private final LazyVal<OAuthProvider> instance = new LazyVal<OAuthProvider>() {
+        @Override
+        protected OAuthProvider instance() {
+            // first find out what class is registered
+            String providerClassName = (String) rc.getProperty(OAuthServerFilter.PROPERTY_PROVIDER);
+            if (providerClassName == null) {
+                throw new RuntimeException("Missing OAuthProvider class name in the configuration. Make sure '" + OAuthServerFilter.PROPERTY_PROVIDER + "' property is set.");
             }
-        }
-        if (provider == null) {
+            Class providerClass;
             try {
-                provider = (OAuthProvider) providerClass.newInstance();
-            } catch (Exception ex) {
-                throw new RuntimeException("Could not instantiate OAuthProvider class", ex);
+                providerClass = Class.forName(providerClassName, true, Thread.currentThread().getContextClassLoader());
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException("Could not load OAuthProvider implementation: " + ex.getMessage(), ex);
             }
+
+            OAuthProvider provider = null;
+            for (Object obj : rc.getProviderSingletons()) {
+                if (obj.getClass() == providerClass) {
+                    provider = (OAuthProvider) obj;
+                    break;
+                }
+            }
+            if (provider == null) {
+                try {
+                    provider = (OAuthProvider) providerClass.newInstance();
+                } catch (Exception ex) {
+                    throw new RuntimeException("Could not instantiate OAuthProvider class", ex);
+                }
+            }
+            return provider;
         }
-        instance = provider;
-    }
+    };
 
     @Override
     public OAuthProvider getValue() {
-        return instance;
+        return instance.get();
     }
 
     @Override
@@ -104,7 +111,7 @@ public class OAuthProviderInjectionProvider implements Injectable<OAuthProvider>
     public Injectable getInjectable(ComponentContext cc, Context a, Type t) {
         if (t instanceof Class) {
             Class c = (Class) t;
-            if (c.isInstance(instance) && OAuthProvider.class.isAssignableFrom(c)) {
+            if (c.isInstance(instance.get()) && OAuthProvider.class.isAssignableFrom(c)) {
                 return this;
             }
         }
