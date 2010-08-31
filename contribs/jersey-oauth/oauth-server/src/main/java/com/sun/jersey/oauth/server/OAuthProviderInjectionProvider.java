@@ -111,7 +111,7 @@ public class OAuthProviderInjectionProvider implements Injectable<OAuthProvider>
     public Injectable getInjectable(ComponentContext cc, Context a, Type t) {
         if (t instanceof Class) {
             Class c = (Class) t;
-            if (c.isInstance(instance.get()) && OAuthProvider.class.isAssignableFrom(c)) {
+            if (OAuthProvider.class.isAssignableFrom(c) && c.isInstance(instance.get())) {
                 return this;
             }
         }
