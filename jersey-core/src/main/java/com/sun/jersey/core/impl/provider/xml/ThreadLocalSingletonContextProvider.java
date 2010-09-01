@@ -67,7 +67,7 @@ public abstract class ThreadLocalSingletonContextProvider<T> implements Injectab
     }
 
     public ComponentScope getScope() {
-        return ComponentScope.Undefined;
+        return ComponentScope.Singleton;
     }
 
     public Injectable<T> getInjectable(ComponentContext ic, Context a, Type c) {
