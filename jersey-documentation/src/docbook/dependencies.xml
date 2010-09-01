@@ -143,7 +143,7 @@
     <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-server&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
     <para>And the following repositories need to be added to the pom:
@@ -197,7 +197,7 @@
     dependencies do not need to be downloaded explicitly: <programlisting>&lt;artifact:dependencies pathId="dependency.classpath"&gt;
   &lt;dependency groupId="com.sun.jersey" 
               artifactId="jersey-server"
-              version="&version;;"/&gt;
+              version="&version;"/&gt;
   &lt;artifact:remoteRepository id="maven2-repository.dev.java.net"
                              url="http://download.java.net/maven/2/" /&gt;
   &lt;artifact:remoteRepository id="maven-repository.dev.java.net"
@@ -239,7 +239,7 @@
     <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-client&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting> Non-maven developers require:
     <itemizedlist>
         <listitem>
@@ -273,7 +273,7 @@
     <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-apache-client&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
   </section>
 
@@ -357,7 +357,7 @@
       added to the pom: <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
       <para>Non-maven developers require: <itemizedlist>
@@ -427,7 +427,7 @@
       dependency needs to be added to the pom: <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-fastinfoset&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
       <para>Non-maven developers require: <itemizedlist>
@@ -482,7 +482,7 @@
       <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-atom-abdera&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
       <para>The use of the Java types
@@ -496,7 +496,7 @@
       <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-atom&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
       <para>Non-maven developers require: <itemizedlist>
@@ -531,7 +531,7 @@
       <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
       <para>Non-maven developers require: <ulink
@@ -574,7 +574,7 @@
       <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-multipart&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
       <para>Non-maven developers require: <itemizedlist>
@@ -622,7 +622,7 @@
     <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-spring&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
     <para>See the Java documentation <ulink
@@ -640,7 +640,7 @@
     <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-guice&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
     <para>See the Java documentation <ulink
@@ -692,7 +692,7 @@
     <programlisting>&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.jersey-test-framework&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-test-framework-grizzly&lt;/artifactId&gt;
-    &lt;version&gt;&version;;&lt;/version&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
     &lt;scope&gt;test&lt;/scope&gt;
 &lt;/dependency&gt;</programlisting></para>
 
