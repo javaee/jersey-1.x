@@ -48,7 +48,7 @@ import javax.ws.rs.Path;
 
 /**
  *
- * @author paulsandoz
+ * @author Paul.Sandoz@Oracle.Com
  */
 @RequestScoped
 @Path("/form")
@@ -64,6 +64,6 @@ public class FormResource {
     @POST
     public String post() {
         FormBean fb = pfb.get();
-        return fb.x.add(fb.y).toString();
+        return fb.getX().add(fb.getY()).toString();
     }
 }

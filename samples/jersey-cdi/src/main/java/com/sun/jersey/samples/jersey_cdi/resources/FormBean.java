@@ -47,7 +47,7 @@ import javax.ws.rs.FormParam;
 
 /**
  *
- * @author paulsandoz
+ * @author Paul.Sandoz@Oracle.Com
  */
 @RequestScoped
 public class FormBean {
@@ -55,4 +55,16 @@ public class FormBean {
     @FormParam("x") BigDecimal x;
 
     @DefaultValue("1") @FormParam("y") BigDecimal y;
+
+    // Getter methods are required because this bean will be proxied
+    // (@RequestScoped) so any reference accessing the fields directly will
+    // not obtain the correct values
+    
+    public BigDecimal getX() {
+        return x;
+    }
+
+    public BigDecimal getY() {
+        return y;
+    }
 }
