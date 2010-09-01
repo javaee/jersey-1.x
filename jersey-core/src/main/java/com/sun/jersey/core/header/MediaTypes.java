@@ -41,14 +41,17 @@
 package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.util.Map;
 
 /**
  * Common media types and functonality.
@@ -282,4 +285,29 @@ public class MediaTypes {
             throw new IllegalArgumentException(ex);
         }
     }
+
+    private static Map<String, MediaType> mediaTypeCache = new HashMap<String, MediaType>() {
+        {
+            put("application", new MediaType("application", MediaType.MEDIA_TYPE_WILDCARD));
+            put("multipart", new MediaType("multipart", MediaType.MEDIA_TYPE_WILDCARD));
+            put("text", new MediaType("text", MediaType.MEDIA_TYPE_WILDCARD));
+        }
+    };
+
+    /**
+     * Returns MediaType with wildcard in subtype.
+     *
+     * @param mediaType original MediaType.
+     * @return MediaType with wildcard in subtype.
+     */
+    public static MediaType getTypeWildCart(MediaType mediaType) {
+        MediaType mt = mediaTypeCache.get(mediaType.getType());
+
+        if(mt == null) {
+            mt = new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD);
+        }
+
+        return mt;
+    }
+
 }

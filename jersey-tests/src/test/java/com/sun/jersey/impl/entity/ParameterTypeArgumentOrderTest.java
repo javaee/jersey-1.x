@@ -128,7 +128,7 @@ public class ParameterTypeArgumentOrderTest extends AbstractResourceTester {
 
     public void testObjectResource2() {
         ResourceConfig rc = new DefaultResourceConfig(ObjectResource.class, ObjectWriter.class);
-        // rc.getFeatures().put(FeaturesAndProperties.FEATURE_PRE_1_4_PROVIDER_PRECEDENCE, true);
+        rc.getFeatures().put(FeaturesAndProperties.FEATURE_PRE_1_4_PROVIDER_PRECEDENCE, false);
         initiateWebApplication(rc);
 
         WebResource r = resource("/");

@@ -309,7 +309,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
             p = _getMessageBodyReader(c, t, as, mediaType, mediaType, providers);
             if (p == null)
                 p = _getMessageBodyReader(c, t, as, mediaType,
-                        new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD), providers);
+                        MediaTypes.getTypeWildCart(mediaType), providers);
         }
         if (p == null)
             p = _getMessageBodyReader(c, t, as, mediaType, MediaTypes.GENERAL_MEDIA_TYPE, providers);
@@ -376,7 +376,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
             p = _getMessageBodyWriter(c, t, as, mediaType, mediaType, providers);
             if (p == null)
                 p = _getMessageBodyWriter(c, t, as, mediaType,
-                        new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD), providers);
+                        MediaTypes.getTypeWildCart(mediaType), providers);
         }
         if (p == null)
             p = _getMessageBodyWriter(c, t, as, mediaType, MediaTypes.GENERAL_MEDIA_TYPE, providers);
@@ -411,7 +411,7 @@ public class MessageBodyFactory implements MessageBodyWorkers {
         } else {
             getCompatibleReadersWritersList(mediaType, set, subSet);
             getCompatibleReadersWritersList(
-                    new MediaType(mediaType.getType(), MediaType.MEDIA_TYPE_WILDCARD),
+                    MediaTypes.getTypeWildCart(mediaType),
                     set, subSet);
             getCompatibleReadersWritersList(MediaTypes.GENERAL_MEDIA_TYPE, set, subSet);
         }
