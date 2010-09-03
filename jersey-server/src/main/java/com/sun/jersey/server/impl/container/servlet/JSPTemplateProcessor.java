@@ -44,6 +44,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.view.Viewable;
+import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.template.ViewProcessor;
 import java.io.IOException;
@@ -111,6 +112,12 @@ public class JSPTemplateProcessor implements ViewProcessor<String> {
     }
 
     public void writeTo(String resolvedPath, Viewable viewable, OutputStream out) throws IOException {
+        if (hc.isTracingEnabled()) {
+            hc.trace(String.format("forwarding view to JSP page: \"%s\", it = %s",
+                    resolvedPath,
+                    ReflectionHelper.objectToString(viewable.getModel())));
+        }
+
         // Commit the status and headers to the HttpServletResponse
         out.flush();
 

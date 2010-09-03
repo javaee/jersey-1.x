@@ -1,4 +1,8 @@
 release 1.4 (08-2010)
+- Fixed issue 554
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=554
+  Tracing is enabled for the JSP template processor. The JSP name and reference
+  to the it variable is output.
 - Fixed issue 571
   https://jersey.dev.java.net/issues/show_bug.cgi?id=571
   User defined providers (MessageBodyReaders and Writers) must have higher

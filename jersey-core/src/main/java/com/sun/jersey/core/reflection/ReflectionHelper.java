@@ -91,11 +91,12 @@ public class ReflectionHelper {
      * o.getClass().getName() + '@' + Integer.toHexString(o.hashCode())
      * </pre></blockquote>
      *
-     *
      * @param o the object.
-     * @return the string representaton of the object.
+     * @return the string representation of the object.
      */
     public static String objectToString(Object o) {
+        if (o == null)
+            return "null";
         StringBuffer sb = new StringBuffer();
         sb.append(o.getClass().getName()).
                 append('@').append(Integer.toHexString(o.hashCode()));
