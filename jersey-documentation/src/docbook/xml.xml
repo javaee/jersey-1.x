@@ -45,25 +45,70 @@
 <!ENTITY % ents SYSTEM "jersey.ent">
 %ents;
 ]>
-<chapter id="jaxb">
+<chapter id="xml">
 
     <title>XML Support</title>
 
     <para>As you probably already know, Jersey uses MessageBodyWriters and MessageBodyReaders to parse
         incoming request and create outgoing responses. Every user can create its own representation but...
-        this is not recommended way how to do things. XML is proven standard for interchanging informations,
-        especially in web services. Jerseys support XML entities via JAXB so that means it has default
-        XML MessageBodyReaders/Writers implementations available.</para>
-
-    <para>Good start for people which already have some experinece with JAXB annotations is JAXB sample.
-        You can see various usecases there. This text is mainly meant for those who don't have prior experience
-        with JAXB. Don't expect that all possible annotations and their combinations
-        will be covered in this chapter, <ulink url="http://jaxb.dev.java.net">JAXB (JSR 222 implementation)</ulink> is pretty complex and comprehensive. But if
-        you just want to know how you can interchange XML messages with your REST service, you are looking
-        at right chapter.</para>
+        this is not recommended way how to do things. XML is proven standard for interchanging information,
+        especially in web services. Jerseys supports low level data types used for direct manipulation and
+        JAXB XML entities.</para>
 
     <section>
-        <title id="jaxb.xmlRootElement">Getting started</title>
+        <title id="xml.lowlevel">Low level XML support</title>
+
+        <para>Jersey currently support several low level data types: <code>StreamSource</code>, <code>SAXSource</code>,
+            <code>DOMSource</code> and <code>Document</code>. You can use these types as return type or method (resource)
+            parameter. Lets say we want to test this feature and we have helloworld sample as starting point. All we
+            need to do is add methods (resources) which consumes and produces XML and types mentioned above will
+            be used.</para>
+
+        <example>
+            <title>Low level XML test - methods added to HelloWorldResource.java</title>
+            <programlisting linenumbering="numbered">    @Path("1")
+    @POST
+    public StreamSource get1(StreamSource streamSource) {
+        return streamSource;
+    }
+
+    @Path("2")
+    @POST
+    public SAXSource get2(SAXSource saxSource) {
+        return saxSource;
+    }
+
+    @Path("3")
+    @POST
+    public DOMSource get3(DOMSource domSource) {
+        return domSource;
+    }
+
+    @Path("4")
+    @POST
+    public Document get4(Document document) {
+        return document;
+    }</programlisting>
+        </example>
+
+        <para>Both MessageBodyReaders and MessageBodyWriters are used in this case, all we need is do POST request
+            with some XML document as a request entity. I want to keep this as simple as possible so I'm going to
+            send only root element with no content: <code>"&lt;test /&gt;"</code>. You can create Jersey client to
+            do that or use some other tool, for example <code>curl</code> as I did. (<code>curl -v http://localhost:9998/helloworld/1 -d "&lt;test /&gt;"</code>).
+            You should get exactly same XML from our service as is present in the request; in this case, XML headers
+            are added to response but content stays. Feel free to iterate through all resources.</para>
+
+    </section>
+
+    <section>
+        <title id="xml.jaxb.xmlRootElement">Getting started with JAXB</title>
+
+        <para>Good start for people which already have some experience with JAXB annotations is JAXB sample.
+            You can see various usecases there. This text is mainly meant for those who don't have prior experience
+            with JAXB. Don't expect that all possible annotations and their combinations
+            will be covered in this chapter, <ulink url="http://jaxb.dev.java.net">JAXB (JSR 222 implementation)</ulink> is pretty complex and comprehensive. But if
+            you just want to know how you can interchange XML messages with your REST service, you are looking
+            at right chapter.</para>
 
         <para>Lets start with simple example. Lets say we have class <code>Planet</code> and service
         which produces "Planets"</para>
@@ -143,7 +188,7 @@ public class Resource {
     </section>
 
     <section>
-        <title id="jabx.JAXBElement">POJOs</title>
+        <title id="xml.jabx.JAXBElement">POJOs</title>
 
         <para>Sometimes you can't / don't want to add JAXB annotations to source code and you still want
         to have resources consuming and producing XML representation of your classes. In this case, <code>JAXBElement</code>
@@ -197,7 +242,7 @@ public class Resource {
     </section>
 
     <section>
-        <title id="jaxb.JAXBContext">Using custom JAXBContext</title>
+        <title id="xml.jaxb.JAXBContext">Using custom JAXBContext</title>
 
         <para>In some scenarios you can take advantage of using custom <code>JAXBContext</code>. Creating
             <code>JAXBContext</code> is expensive operation and if you already have one created, same instance

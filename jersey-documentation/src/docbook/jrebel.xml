@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+
+    The contents of this file are subject to the terms of either the GNU
+    General Public License Version 2 only ("GPL") or the Common Development
+    and Distribution License("CDDL") (collectively, the "License").  You
+    may not use this file except in compliance with the License.  You can
+    obtain a copy of the License at
+    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    or packager/legal/LICENSE.txt.  See the License for the specific
+    language governing permissions and limitations under the License.
+
+    When distributing the software, include this License Header Notice in each
+    file and include the License file at packager/legal/LICENSE.txt.
+
+    GPL Classpath Exception:
+    Oracle designates this particular file as subject to the "Classpath"
+    exception as provided by Oracle in the GPL Version 2 section of the License
+    file that accompanied this code.
+
+    Modifications:
+    If applicable, add the following below the License Header, with the fields
+    enclosed by brackets [] replaced by your own identifying information:
+    "Portions Copyright [year] [name of copyright owner]"
+
+    Contributor(s):
+    If you wish your version of this file to be governed by only the CDDL or
+    only the GPL Version 2, indicate your decision by adding "[Contributor]
+    elects to include this software in this distribution under the [CDDL or GPL
+    Version 2] license."  If you don't indicate a single choice of license, a
+    recipient has the option to distribute your version of this file under
+    either the CDDL, the GPL Version 2 or to extend the choice of license to
+    its licensees as provided above.  However, if you add GPL Version 2 code
+    and therefore, elected the GPL Version 2 license, then the option applies
+    only if the new code is made subject to such option by the copyright
+    holder.
+
+-->
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
+<!ENTITY % ents SYSTEM "jersey.ent">
+%ents;
+]>
+<chapter id="jrebel">
+    <title>JRebel support</title>
+
+    <para>Jersey provides basic support for JRebel, which can be used to reload java
+        classes in runtime without need to redeploy your application. You can simply
+        change the source code, recompile and JRebel takes care of changing in-memory
+        bytecode and when new request is processed, new version of your class will be
+        used.</para>
+
+    <para>JRebel isn't opensource and is not for free BUT Zeroturnaround (JRebel's author)
+        provides free license for open source project developers. More details can be found
+        on project website: <ulink url="http://www.zeroturnaround.com/jrebel/">http://zeroturnaround.com/jrebel</ulink>.
+        Jersey currently supports JRebel version 3.1.2.</para>
+
+    <para>JRebel has some limitations and unfortunately we are going to hit them. It currently
+        doesn't have ability to detect newly added class and emmit appropriate event. It is possible
+        that this feature somehow works in IDE plugins but I wanted to have some functionality with
+        just maven.</para>
+
+    <section>
+        <title id="jrebel.sample">Sample</title>
+
+        <para>I pressume you have JRebel correctly set up (you should see JRebel informational message when
+            you run any java program). Additinally, you have to add few dependencies to your pomfile:</para>
+
+        <example>
+            <title>pom.xml modifications - dependencies</title>
+            <programlisting linenumbering="numbered">        &lt;dependency&gt;
+            &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+            &lt;artifactId&gt;jersey-jrebel&lt;/artifactId&gt;
+            &lt;version&gt;${project.version}&lt;/version&gt;
+        &lt;/dependency&gt;
+</programlisting>
+        </example>
+
+        <example>
+            <title>pom.xml modifications - plugin</title>
+            <programlisting linenumbering="numbered">            &lt;plugin&gt;
+                &lt;groupId&gt;org.zeroturnaround&lt;/groupId&gt;
+                &lt;artifactId&gt;javarebel-maven-plugin&lt;/artifactId&gt;
+
+                &lt;executions&gt;
+                    &lt;execution&gt;
+                        &lt;id&gt;generate-rebel-xml&lt;/id&gt;
+                        &lt;phase&gt;process-resources&lt;/phase&gt;
+                        &lt;goals&gt;
+                            &lt;goal&gt;generate&lt;/goal&gt;
+                        &lt;/goals&gt;
+                    &lt;/execution&gt;
+                &lt;/executions&gt;
+            &lt;/plugin&gt;</programlisting>
+        </example>
+
+        <para>Now you are all set to test a redeploy-less way of development. Compile Helloworld sample with
+            <code>mvn clean install</code> and run it with <code>mvn exec:java</code>. What happens? Helloworld
+            application is deployed on Grizzly container; it should work with other containers as well.</para>
+
+        <para>Let's open another terminal and do initial request: <code>curl -v http://localhost:9998/helloworld</code>.
+            You should see messages indicating initialization of Jersey framework and so on. Finally, response
+            <code>Hello World</code> should appear. Let's say we no longer want to have this response and change it
+            to... <code>Hi You!</code>. Its as easy as modifying method get <code>getClichedMessage</code> in <code>HelloWorldResource</code>
+            class. When you are done, save yout changes and run <code>mvn compile</code>. This should overwrite generated
+            class with new version. You can make GET request to <code>http://localhost:9998/helloworld</code> and
+            see if it really worked.</para>
+    </section>
+
+    <section>
+        <title id="jrebel.limitations">Limitations</title>
+        <para>As stated above, JRebel currently doesn't notify its plugin about newly created class. But its possible to
+            detect this newly added resource and use it in your application when you are doing some other change in existing
+            code. Why? After some change has beed made, Jersey re-initializes itself and new class can be detected in the
+            process. You have to use package scanning for finding your resources if you want to have this feature enabled.</para>
+    </section>
+
+</chapter>
