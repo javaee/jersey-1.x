@@ -57,6 +57,9 @@ import java.util.logging.Logger;
  */
 public class JSONConfiguration {
 
+    /**
+     * TODO: JavaDoc
+     */
     public final static String FEATURE_POJO_MAPPING
             = "com.sun.jersey.api.json.POJOMappingFeature";
 
