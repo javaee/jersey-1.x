@@ -1,4 +1,9 @@
 release 1.4 (08-2010)
+- Fixed issue 431
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=431
+  The use of @PerSession no longer results in a NotSerializableException when 
+  session state is persisted for internal state, associated with resource
+  instances, that is stored as a session attribute.
 - Fixed issue 554
   https://jersey.dev.java.net/issues/show_bug.cgi?id=554
   Tracing is enabled for the JSP template processor. The JSP name and reference

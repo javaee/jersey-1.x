@@ -57,6 +57,9 @@ import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionBindingEvent;
@@ -71,27 +74,43 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
 
     private final ServerInjectableProviderContext sipc;
 
+    private final ServletContext sc;
+
     private final HttpServletRequest hsr;
 
     private final HttpContext threadLocalHc;
 
+    private final String abstractPerSessionMapPropertyName;
+
+    private final Map<Class, AbstractPerSession> abstractPerSessionMap =
+            new ConcurrentHashMap<Class, AbstractPerSession>();
+
     public PerSessionFactory(
             @Context ServerInjectableProviderContext sipc,
+            @Context ServletContext sc,
             @Context HttpServletRequest hsr,
             @Context HttpContext threadLocalHc) {
         this.hsr = hsr;
+        this.sc = sc;
         this.sipc = sipc;
         this.threadLocalHc = threadLocalHc;
+
+        abstractPerSessionMapPropertyName = this.toString();
+
+        sc.setAttribute(abstractPerSessionMapPropertyName, abstractPerSessionMap);
     }
 
+    @Override
     public ComponentScope getScope(Class c) {
         return ComponentScope.Undefined;
     }
 
+    @Override
     public ResourceComponentProvider getComponentProvider(Class c) {
         return new PerSesson();
     }
 
+    @Override
     public ResourceComponentProvider getComponentProvider(IoCComponentProvider icp, Class c) {
         if (icp instanceof IoCInstantiatedComponentProvider) {
             return new PerSessonInstantiated((IoCInstantiatedComponentProvider)icp);
@@ -101,25 +120,30 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
         throw new IllegalStateException();
     }
 
-    private static class ProviderObjectPair {
-        private final AbstractPerSession s;
-        private final Object o;
-
-        public ProviderObjectPair(AbstractPerSession s, Object o) {
-            this.s = s;
-            this.o = o;
-        }
-    }
-    
-    private static class SessionMap extends HashMap<String, ProviderObjectPair>
+    private static class SessionMap extends HashMap<String, Object>
             implements HttpSessionBindingListener {
 
+        private final String abstractPerSessionMapPropertyName;
+
+        SessionMap(String abstractPerSessionMapPropertyName) {
+            this.abstractPerSessionMapPropertyName = abstractPerSessionMapPropertyName;
+        }
+
+        @Override
         public void valueBound(HttpSessionBindingEvent hsbe) {
         }
 
+        @Override
         public void valueUnbound(HttpSessionBindingEvent hsbe) {
-            for (ProviderObjectPair x : values()) {
-                x.s.destroy(x.o);
+            final ServletContext sc = hsbe.getSession().getServletContext();
+            final Map<Class, AbstractPerSession> abstractPerSessionMap =
+                    (Map<Class, AbstractPerSession>)sc.getAttribute(abstractPerSessionMapPropertyName);
+
+            for (final Object o : values()) {
+                final AbstractPerSession aps = abstractPerSessionMap.get(o.getClass());
+                if (aps != null) {
+                    aps.destroy(o);
+                }
             }
         }
     }
@@ -131,40 +155,47 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
 
         private Class c;
         
+        @Override
         public void init(AbstractResource abstractResource) {
             this.rcd = new ResourceComponentDestructor(abstractResource);
             this.c = abstractResource.getResourceClass();
         }
 
+        @Override
         public final Object getInstance() {
             return getInstance(threadLocalHc);
         }
 
+        @Override
         public final ComponentScope getScope() {
             return ComponentScope.Undefined;
         }
         
+        @Override
         public final Object getInstance(HttpContext hc) {
             HttpSession hs = hsr.getSession();
 
             synchronized(hs) {
                 SessionMap sm = (SessionMap)hs.getAttribute(SCOPE_PER_SESSION);
                 if (sm == null) {
-                    sm = new SessionMap();
+                    sm = new SessionMap(abstractPerSessionMapPropertyName);
                     hs.setAttribute(SCOPE_PER_SESSION, sm);
                 }
-                ProviderObjectPair x = sm.get(c.getName());
-                if (x != null)
-                    return x.o;
 
-                Object o = _getInstance(hc);
-                sm.put(c.getName(), new ProviderObjectPair(this, o));
+                Object o = sm.get(c.getName());
+                if (o != null)
+                    return o;
+
+                o = _getInstance(hc);
+                sm.put(c.getName(), o);
+                abstractPerSessionMap.put(c, this);
                 return o;
             }
         }
 
         protected abstract Object _getInstance(HttpContext hc);
 
+        @Override
         public final void destroy() {
         }
 
@@ -194,6 +225,7 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
                     abstractResource);
         }
 
+        @Override
         protected Object _getInstance(HttpContext hc) {
             try {
                 return rcc.construct(hc);
@@ -237,6 +269,7 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
             }
         }
 
+        @Override
         protected Object _getInstance(HttpContext hc) {
             Object o = iicp.getInstance();
             if (destroyable == null) {
@@ -274,6 +307,7 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
                     abstractResource);
         }
 
+        @Override
         protected Object _getInstance(HttpContext hc) {
             try {
                 return ipcp.proxy(rcc.construct(hc));

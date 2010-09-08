@@ -42,6 +42,7 @@ package com.sun.jersey.spi.container.servlet;
 
 import com.sun.jersey.server.impl.container.servlet.PerSessionFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactoryClass;
+import java.io.Serializable;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -50,8 +51,10 @@ import java.lang.annotation.Target;
 
 /**
  * Used to annotate resource classes that require a new instance
- * for each HTTP servlet session. Resource class instances are stored on
- * the session attributes using the resource class name as the key.
+ * for each HTTP servlet session.
+ * <p>
+ * Resource classes must implement {@link Serializable} if state is to be
+ * persisted.
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
