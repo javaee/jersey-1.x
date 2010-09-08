@@ -41,13 +41,13 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-      <artifactId>glassfish-packages</artifactId>
-      <groupId>com.sun.jersey.glassfish.v3</groupId>
-      <version>1.4-SNAPSHOT</version>
+        <artifactId>glassfish-packages</artifactId>
+        <groupId>com.sun.jersey.glassfish.v3</groupId>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-gfv3-core</artifactId>
     <name>Jersey GFv3 UC Core Package Image</name>
@@ -68,9 +68,14 @@
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.5.5</version>
         </dependency>
-           <dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-jaxrs</artifactId>
+            <version>1.5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
             <version>1.5.5</version>
         </dependency>
         <dependency>
@@ -78,27 +83,27 @@
             <artifactId>jersey-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-          <dependency>
+        <dependency>
             <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
             <artifactId>jersey-gf-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-          <dependency>
+        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${project.version}</version>
         </dependency>
-          <dependency>
+        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
             <version>${project.version}</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
             <artifactId>jersey-gf-statsproviders</artifactId>
             <version>${project.version}</version>
         </dependency>
-          <dependency>
+        <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-multipart</artifactId>
             <version>${project.version}</version>
@@ -106,7 +111,7 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin> 
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -117,8 +122,8 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                          <stripVersion>true</stripVersion>
-                          <artifactItems>
+                            <stripVersion>true</stripVersion>
+                            <artifactItems>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
@@ -127,7 +132,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
                                     <artifactId>jersey-gf-server</artifactId>
                                     <version>${project.version}</version>
@@ -135,7 +140,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-client</artifactId>
                                     <version>${project.version}</version>
@@ -143,7 +148,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-json</artifactId>
                                     <version>${project.version}</version>
@@ -159,7 +164,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.contribs</groupId>
                                     <artifactId>jersey-multipart</artifactId>
                                     <version>${project.version}</version>
@@ -167,7 +172,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>org.jvnet</groupId>
                                     <artifactId>mimepull</artifactId>
                                     <version>1.4</version>
@@ -175,7 +180,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                  <artifactItem>
+                                <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-core-asl</artifactId>
                                     <version>1.5.5</version>
@@ -183,7 +188,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                   <artifactItem>
+                                <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-mapper-asl</artifactId>
                                     <version>1.5.5</version>
@@ -191,7 +196,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                    <artifactItem>
+                                <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-jaxrs</artifactId>
                                     <version>1.5.5</version>
@@ -199,7 +204,15 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-xc</artifactId>
+                                    <version>1.5.5</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
                                     <groupId>org.codehaus.jettison</groupId>
                                     <artifactId>jettison</artifactId>
                                     <version>1.1</version>
@@ -207,7 +220,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                           </artifactItems>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -221,10 +234,13 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                        <phase>package</phase> <!-- append to the packaging phase. -->
+                        <id>make-assembly</id>
+                        <!-- this is used for inheritance merges -->
+                        <phase>package</phase>
+                        <!-- append to the packaging phase. -->
                         <goals>
-                            <goal>attached</goal> <!-- goals == mojos -->
+                            <goal>attached</goal>
+                            <!-- goals == mojos -->
                         </goals>
                     </execution>
                 </executions>
@@ -233,7 +249,7 @@
     </build>
 
     <properties>
-      <assembly.directory>${project.build.directory}/assembly</assembly.directory>
+        <assembly.directory>${project.build.directory}/assembly</assembly.directory>
     </properties>
 
 </project>

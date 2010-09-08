@@ -41,7 +41,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.test.osgi</groupId>
     <artifactId>functional-osgi-tests</artifactId>
@@ -99,7 +99,7 @@
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
-               </configuration>
+                </configuration>
             </plugin>
             <!-- use pax exam maven plugin -->
             <plugin>
@@ -122,7 +122,7 @@
                 </configuration>
             </plugin>
 
-       </plugins>
+        </plugins>
     </build>
 
     <dependencies>
@@ -162,9 +162,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-          <groupId>org.ops4j.pax.swissbox</groupId>
-          <artifactId>pax-swissbox-tinybundles</artifactId>
-          <version>${pax-exam-version}</version>
+            <groupId>org.ops4j.pax.swissbox</groupId>
+            <artifactId>pax-swissbox-tinybundles</artifactId>
+            <version>${pax-exam-version}</version>
         </dependency>
         <!--dependency>
             <groupId>org.osgi</groupId>
@@ -217,14 +217,19 @@
             <artifactId>jackson-core-asl</artifactId>
             <version>1.5.5</version>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.5.5</version>
         </dependency>
-          <dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-jaxrs</artifactId>
+            <version>1.5.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
             <version>1.5.5</version>
         </dependency>
         <dependency>
@@ -257,9 +262,9 @@
             <version>3.1</version>
         </dependency>
         <dependency>
-           <groupId>javax.annotation</groupId>
-           <artifactId>jsr250-api</artifactId>
-           <version>1.0</version>
+            <groupId>javax.annotation</groupId>
+            <artifactId>jsr250-api</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>

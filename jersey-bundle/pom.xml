@@ -40,7 +40,8 @@
     holder.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey</groupId>
@@ -54,7 +55,8 @@
     <description>A bundle containing code of all jar-based modules that provide
         JAX-RS and Jersey-related features. Such a bundle is *only intended* for
         developers that do not use Maven's dependency system.
-    The bundle does not include code for contributes, tests and samples.</description>
+        The bundle does not include code for contributes, tests and samples.
+    </description>
     <dependencies>
         <dependency>
             <groupId>javax.ws.rs</groupId>
@@ -91,19 +93,25 @@
             <version>1.5.5</version>
             <scope>provided</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.5.5</version>
             <scope>provided</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-jaxrs</artifactId>
             <version>1.5.5</version>
             <scope>provided</scope>
         </dependency>
-         <dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
+            <version>1.5.5</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.servlet</artifactId>
             <version>3.0</version>
@@ -332,7 +340,8 @@
                                 <spi>com.sun.jersey.spi.container.ContainerProvider</spi>
                                 <spi>com.sun.jersey.spi.container.ContainerRequestFilter</spi>
                                 <spi>com.sun.jersey.spi.container.ContainerResponseFilter</spi>
-                                <spi>com.sun.jersey.server.impl.model.method.dispatch.ResourceMethodDispatchProvider</spi>
+                                <spi>com.sun.jersey.server.impl.model.method.dispatch.ResourceMethodDispatchProvider
+                                </spi>
                                 <spi>com.sun.jersey.spi.container.WebApplicationProvider</spi>
                                 <spi>com.sun.jersey.spi.HeaderDelegateProvider</spi>
                                 <spi>com.sun.jersey.spi.inject.InjectableProvider</spi>
@@ -355,7 +364,10 @@
                         <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
                     </links>
                     <sourcepath>${gen-src-dir}</sourcepath>
-                    <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl com.sun.jersey.atom.rome.impl com.sun.jersey.fastinfoset.impl com.sun.jersey.json.impl</excludePackageNames>
+                    <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl
+                        com.sun.jersey.impl com.sun.research.ws.wadl com.sun.jersey.atom.rome.impl
+                        com.sun.jersey.fastinfoset.impl com.sun.jersey.json.impl
+                    </excludePackageNames>
                     <notimestamp>true</notimestamp>
                 </configuration>
             </plugin>

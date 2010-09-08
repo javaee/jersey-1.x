@@ -41,13 +41,13 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-      <groupId>com.sun.jersey.glassfish.v2</groupId>
-      <artifactId>glassfish-packages</artifactId>
-      <version>1.4-SNAPSHOT</version>
+        <groupId>com.sun.jersey.glassfish.v2</groupId>
+        <artifactId>glassfish-packages</artifactId>
+        <version>1.4-SNAPSHOT</version>
     </parent>
     <groupId>com.sun.jersey.glassfish.v2.internal</groupId>
     <artifactId>module_jersey</artifactId>
@@ -70,15 +70,21 @@
             <version>1.5.5</version>
             <scope>compile</scope>
         </dependency>
-         <dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
             <version>1.5.5</version>
             <scope>compile</scope>
         </dependency>
-          <dependency>
+        <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-jaxrs</artifactId>
+            <version>1.5.5</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-xc</artifactId>
             <version>1.5.5</version>
             <scope>compile</scope>
         </dependency>
@@ -90,7 +96,7 @@
     </dependencies>
     <build>
         <plugins>
-            <plugin> 
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
@@ -101,8 +107,8 @@
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
-                          <artifactItems>
-                               <artifactItem>
+                            <artifactItems>
+                                <artifactItem>
                                     <groupId>javax.ws.rs</groupId>
                                     <artifactId>jsr311-api</artifactId>
                                     <version>1.1.1</version>
@@ -120,7 +126,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/jersey-javadoc</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>bookmark</artifactId>
                                     <version>${project.version}</version>
@@ -138,7 +144,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>helloworld-webapp</artifactId>
                                     <version>${project.version}</version>
@@ -147,7 +153,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>jmaki-backend</artifactId>
                                     <version>${project.version}</version>
@@ -156,7 +162,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>scala-helloworld-webapp</artifactId>
                                     <version>${project.version}</version>
@@ -165,7 +171,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>simple-servlet</artifactId>
                                     <version>${project.version}</version>
@@ -174,7 +180,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>extended-wadl-webapp</artifactId>
                                     <version>${project.version}</version>
@@ -183,7 +189,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                 </artifactItem>
-                                  <artifactItem>
+                                <artifactItem>
                                     <groupId>com.sun.jersey.samples</groupId>
                                     <artifactId>spring-annotations</artifactId>
                                     <version>${project.version}</version>
@@ -195,16 +201,16 @@
                             </artifactItems>
                         </configuration>
                     </execution>
-                     <execution>
+                    <execution>
                         <id>copy</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                          <stripVersion>false</stripVersion>
-                          <artifactItems>
-                               <artifactItem>
+                            <stripVersion>false</stripVersion>
+                            <artifactItems>
+                                <artifactItem>
                                     <groupId>javax.ws.rs</groupId>
                                     <artifactId>jsr311-api</artifactId>
                                     <version>1.1.1</version>
@@ -220,7 +226,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-core-asl</artifactId>
                                     <version>1.5.5</version>
@@ -228,7 +234,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                  <artifactItem>
+                                <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-mapper-asl</artifactId>
                                     <version>1.5.5</version>
@@ -236,7 +242,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                   <artifactItem>
+                                <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-jaxrs</artifactId>
                                     <version>1.5.5</version>
@@ -244,7 +250,15 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                  <artifactItem>
+                                <artifactItem>
+                                    <groupId>org.codehaus.jackson</groupId>
+                                    <artifactId>jackson-xc</artifactId>
+                                    <version>1.5.5</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
                                     <groupId>org.codehaus.jettison</groupId>
                                     <artifactId>jettison</artifactId>
                                     <version>1.0.1</version>
@@ -252,7 +266,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                                 <artifactItem>
+                                <artifactItem>
                                     <groupId>asm</groupId>
                                     <artifactId>asm</artifactId>
                                     <version>3.1</version>
@@ -260,7 +274,7 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
-                           </artifactItems>
+                            </artifactItems>
                         </configuration>
                     </execution>
                 </executions>
@@ -274,10 +288,13 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                        <phase>package</phase> <!-- append to the packaging phase. -->
+                        <id>make-assembly</id>
+                        <!-- this is used for inheritance merges -->
+                        <phase>package</phase>
+                        <!-- append to the packaging phase. -->
                         <goals>
-                            <goal>single</goal> <!-- goals == mojos -->
+                            <goal>single</goal>
+                            <!-- goals == mojos -->
                         </goals>
                     </execution>
                 </executions>
@@ -286,7 +303,7 @@
     </build>
 
     <properties>
-      <assembly.directory>${project.build.directory}/assembly</assembly.directory>
+        <assembly.directory>${project.build.directory}/assembly</assembly.directory>
     </properties>
 
 </project>
