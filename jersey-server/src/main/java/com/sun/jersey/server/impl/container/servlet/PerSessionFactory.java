@@ -82,7 +82,7 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
 
     private final String abstractPerSessionMapPropertyName;
 
-    private final Map<Class, AbstractPerSession> abstractPerSessionMap =
+    private final ConcurrentHashMap<Class, AbstractPerSession> abstractPerSessionMap =
             new ConcurrentHashMap<Class, AbstractPerSession>();
 
     public PerSessionFactory(
@@ -182,13 +182,15 @@ public final class PerSessionFactory implements ResourceComponentProviderFactory
                     hs.setAttribute(SCOPE_PER_SESSION, sm);
                 }
 
+                abstractPerSessionMap.putIfAbsent(c, this);
+
                 Object o = sm.get(c.getName());
-                if (o != null)
+                if (o != null) {
                     return o;
+                }
 
                 o = _getInstance(hc);
                 sm.put(c.getName(), o);
-                abstractPerSessionMap.put(c, this);
                 return o;
             }
         }
