@@ -41,8 +41,8 @@
 
 -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
-<!ENTITY % ents SYSTEM "jersey.ent">
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
+<!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
 ]>
 <chapter id="chapter_deps">
@@ -140,14 +140,14 @@
     <para>Maven developers require a dependency on the <ulink
     url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.pom">jersey-server</ulink>
     module. The following dependency needs to be added to the pom:
-    <programlisting>&lt;dependency&gt;
+    <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-server&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
     <para>And the following repositories need to be added to the pom:
-    <programlisting>&lt;repository&gt;
+    <programlisting language="xml">&lt;repository&gt;
     &lt;id&gt;maven2-repository.dev.java.net&lt;/id&gt;
     &lt;name&gt;Java.net Repository for Maven&lt;/name&gt;
     &lt;url&gt;http://download.java.net/maven/2/&lt;/url&gt;
@@ -194,7 +194,7 @@
       </itemizedlist> For Ant developers the <ulink
     url="http://maven.apache.org/ant-tasks.html">Ant Tasks for Maven</ulink>
     may be used to add the following to the ant document such that the
-    dependencies do not need to be downloaded explicitly: <programlisting>&lt;artifact:dependencies pathId="dependency.classpath"&gt;
+    dependencies do not need to be downloaded explicitly: <programlisting language="xml">&lt;artifact:dependencies pathId="dependency.classpath"&gt;
   &lt;dependency groupId="com.sun.jersey" 
               artifactId="jersey-server"
               version="&version;"/&gt;
@@ -236,7 +236,7 @@
     <para>Maven developers require a dependency on the <ulink
     url="http://download.java.net/maven/2/com/sun/jersey/jersey-client/&version;/jersey-client-&version;.pom">jersey-client</ulink>
     module. The following dependency needs to be added to the pom:
-    <programlisting>&lt;dependency&gt;
+    <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-client&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -270,7 +270,7 @@
     and receive HTTP responses requires a dependency on the <ulink
     url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-apache-client/&version;/jersey-apache-client-&version;.pom">jersey-apache-client</ulink>
     module. The following dependency needs to be added to the pom:
-    <programlisting>&lt;dependency&gt;
+    <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-apache-client&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -354,7 +354,7 @@
       and such a version is required when enabling support for the JAXB
       natural JSON convention. For all other supported JSON conventions any
       JAXB 2.x version may be utilized. The following dependency needs to be
-      added to the pom: <programlisting>&lt;dependency&gt;
+      added to the pom: <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -424,7 +424,7 @@
       <code>application/fastinfoset</code> require a dependency on the <ulink
       url="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/&version;/jersey-fastinfoset-&version;.pom">jersey-fastinfoset</ulink>
       module (no dependency on jaxb-impl is required). The following
-      dependency needs to be added to the pom: <programlisting>&lt;dependency&gt;
+      dependency needs to be added to the pom: <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-fastinfoset&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -479,7 +479,7 @@
       <para>Maven developers require a dependency on the <ulink
       url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-atom-abdera/&version;/jersey-atom-abdera-&version;.pom">jersey-atom-abdera</ulink>
       module. The following dependency needs to be added to the pom:
-      <programlisting>&lt;dependency&gt;
+      <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-atom-abdera&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -493,7 +493,7 @@
       <para>Maven developers require a dependency on the <ulink
       url="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/&version;/jersey-atom-&version;.pom">jersey-atom</ulink>
       module. The following dependency needs to be added to the pom:
-      <programlisting>&lt;dependency&gt;
+      <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-atom&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -528,7 +528,7 @@
       <para>Maven developers require a dependency on the <ulink
       url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/&version;/jersey-json-&version;.pom">jersey-json</ulink>
       module. The following dependency needs to be added to the pom:
-      <programlisting>&lt;dependency&gt;
+      <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-json&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -571,7 +571,7 @@
       developers requires a dependency on the <ulink
       url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/&version;/jersey-multipart-&version;.pom">jersey-multipart</ulink>
       module. The following dependency needs to be added to the pom:
-      <programlisting>&lt;dependency&gt;
+      <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-multipart&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -619,7 +619,7 @@
     dependency on the <ulink
     url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-spring/&version;/jersey-spring-&version;.pom">jersey-spring</ulink>
     module. The following dependency needs to be added to the pom:
-    <programlisting>&lt;dependency&gt;
+    <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-spring&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -637,7 +637,7 @@
     <ulink
     url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-guice/&version;/jersey-guice-&version;.pom">jersey-guice</ulink>
     module. The following dependency needs to be added to the pom:
-    <programlisting>&lt;dependency&gt;
+    <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-guice&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -655,7 +655,7 @@
     GuiceyFruit features exclude the guice dependency from the maven central
     repo and add the following:</para>
 
-    <para><programlisting>&lt;dependency&gt;
+    <para><programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;org.guiceyfruit&lt;/groupId&gt;
     &lt;artifactId&gt;guiceyfruit&lt;/artifactId&gt;
     &lt;version&gt;2.0&lt;/version&gt;
@@ -689,7 +689,7 @@
     <para>Maven developers require a dependency on the <ulink
     url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly/&version;/jersey-test-framework-grizzly-&version;.pom">jersey-test-framework-grizzly</ulink>
     module. The following dependency needs to be added to the pom:
-    <programlisting>&lt;dependency&gt;
+    <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.jersey-test-framework&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-test-framework-grizzly&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;

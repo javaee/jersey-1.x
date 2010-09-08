@@ -45,7 +45,7 @@
 <!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
 ]>
-<chapter>
+<chapter id="spring">
     <title>Jersey With Spring</title>
     <section>
         <title>Introduction</title>

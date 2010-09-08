@@ -50,7 +50,7 @@
     <bookinfo>
         <title>Jersey &version; User Guide</title>
     </bookinfo>
-    <preface>
+    <preface id="preface">
         <title>Preface</title>
         <para>
 The user guide is not complete (see the JavaDoc API for all details) and will

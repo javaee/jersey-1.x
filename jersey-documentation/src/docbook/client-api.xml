@@ -45,7 +45,7 @@
 <!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
 ]>
-<chapter>
+<chapter id="client-api">
     <title>Client API</title>
     <section>
         <title>Introduction</title>
@@ -181,7 +181,7 @@
         JAXB object with such an API. For example with the Jersey API this is very easy:
         <example>
             <title>POST request with form parameters</title>
-            <programlisting linenumbering="numbered">Form f = new Form();
+            <programlisting language="java" linenumbering="numbered">Form f = new Form();
 f.add(“x”, “foo”);
 f.add(“y”, “bar”);
 
@@ -230,7 +230,7 @@ JAXBBean bean = r.
         <title>Overview of the API</title>
         <para>To utilize the client API it is first necessary to create an instance of a
             <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/Client.html">Client</ulink>, for example:
-            <programlisting>    Client c = Client.create();</programlisting>
+            <programlisting language="java">    Client c = Client.create();</programlisting>
         </para>
         <section>
             <title>Configuring a Client and WebResource</title>
@@ -239,14 +239,14 @@ JAXBBean bean = r.
                 <literal>getProperties</literal> methods or by calling the specific setter methods,
             for example the following configures the client to perform automatic redirection for
             appropriate responses:
-                <programlisting>    c.getProperties().put(
+                <programlisting language="java">    c.getProperties().put(
         ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);</programlisting>
             which is equivalent to the following:
-                <programlisting>    c.setFollowRedirects(true);</programlisting>
+                <programlisting language="java">    c.setFollowRedirects(true);</programlisting>
             Alternatively it is possible to create a <literal>Client</literal> instance using a
                 <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/config/ClientConfig.html">ClientConfig</ulink>
             object for example:
-                <programlisting>    ClientConfig cc = new DefaultClientConfig();
+                <programlisting language="java">    ClientConfig cc = new DefaultClientConfig();
     cc.getProperties().put(
         ClientConfig.PROPERTY_FOLLOW_REDIRECTS, true);
     Client c = Client.create(cc);</programlisting>
@@ -256,7 +256,7 @@ JAXBBean bean = r.
                 instance, which will inherit the configuration declared on the client instance.
                 For example, the following creates a reference to a Web resource with the URI
                 “http://localhost:8080/xyz”:
-                <programlisting>    WebResource r = c.resource(“http://localhost:8080/xyz”);</programlisting>
+                <programlisting language="java">    WebResource r = c.resource(“http://localhost:8080/xyz”);</programlisting>
             and redirection will be configured for responses to requests invoked on the Web resource.
             </para>
             <para>
@@ -282,7 +282,7 @@ JAXBBean bean = r.
                 where the terminating method corresponds to an HTTP method (see
                 <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/UniformInterface.html">UniformInterface</ulink>).
                 For example,
-                <programlisting>    String response = r.accept(
+                <programlisting language="java">    String response = r.accept(
         MediaType.APPLICATION_JSON_TYPE,
         MediaType.APPLICATION_XML_TYPE).
         header(“X-FOO”, “BAR”).
@@ -302,7 +302,7 @@ JAXBBean bean = r.
                 <literal>POST</literal> and
                 <literal>DELETE</literal> requests.
             For example, the following sends a POST request:
-                <programlisting>    String request = “content”;
+                <programlisting language="java">    String request = “content”;
     String response = r.accept(
         MediaType.APPLICATION_JSON_TYPE,
         MediaType.APPLICATION_XML_TYPE).
@@ -313,7 +313,7 @@ JAXBBean bean = r.
             section for further details on the supported Java types). The
             <literal>Content-Type</literal> of the request entity may be declared
             using the <literal>type</literal> builder method as follows:
-            <programlisting>    String response = r.accept(
+            <programlisting language="java">    String response = r.accept(
          MediaType.APPLICATION_JSON_TYPE,
          MediaType.APPLICATION_XML_TYPE).
          header(“X-FOO”, “BAR”).
@@ -321,7 +321,7 @@ JAXBBean bean = r.
          post(String.class, request);</programlisting>
             or alternatively the request entity and type may be declared
             using the entity method as follows:
-            <programlisting>    String response = r.accept(
+            <programlisting language="java">    String response = r.accept(
          MediaType.APPLICATION_JSON_TYPE,
          MediaType.APPLICATION_XML_TYPE).
          header(“X-FOO”, “BAR”).
@@ -342,14 +342,14 @@ JAXBBean bean = r.
                     can be declared from which the response status, headers and entity may be obtained.
                     For example, the following gets both the entity tag and response entity from the
                     response:
-                <programlisting>    ClientResponse response = r.get(ClientResponse.class);
+                <programlisting language="java">    ClientResponse response = r.get(ClientResponse.class);
     EntityTag e = response.getEntityTag();
     String entity = response.getEntity(String.class);</programlisting></para>
                 <para>If the <literal>ClientResponse</literal> type is not utilized and the response
                 status is greater than or equal to 300 then the runtime exception
                  <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/UniformInterfaceException.html">UniformInterfaceException</ulink>
                  is thrown. This exception may be caught and the <literal>ClientResponse</literal> obtained as follows:
-                <programlisting>    try {
+                <programlisting language="java">    try {
         String entity = r.get(String.class);
     } catch (UniformInterfaceException ue) {
         ClientResponse response = ue.getResponse();
@@ -363,7 +363,7 @@ JAXBBean bean = r.
                     can be created from an existing <literal>WebResource</literal> by building from the latter's URI.
                     Thus it is possible to build the request URI before building the request. For example, the
                     following appends a new path segment and adds some query parameters:
-                <programlisting>    WebResource r = c.resource(“http://localhost:8080/xyz”);
+                <programlisting language="java">    WebResource r = c.resource(“http://localhost:8080/xyz”);
 
     MultivaluedMap&lt;String, String&gt; params = MultivaluedMapImpl();
     params.add(“foo”, “x”);
@@ -384,12 +384,12 @@ JAXBBean bean = r.
                     in addition to JSON, Atom and Multipart MIME as supported by Jersey.
                 </para>
                 <para>To process a response entity (or representation) as a stream of bytes use InputStream as follows:
-                <programlisting>    InputStream in = r.get(InputStream.class);
+                <programlisting language="java">    InputStream in = r.get(InputStream.class);
     // Read from the stream
     in.close();</programlisting>
                 Note that it is important to close the stream after processing so that resources are freed up.</para>
                 <para>To <literal>POST</literal> a file use <literal>File</literal> as follows:
-                <programlisting>    File f = ...
+                <programlisting language="java">    File f = ...
     String response = r.post(String.class, f);</programlisting>
                 Refer to the
                     <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jaxb/&version;/jaxb-&version;-project.zip">JAXB sample</ulink> to see how JAXB with XML and JSON can be utilized with the client API (more specifically, see the unit tests).
@@ -410,11 +410,11 @@ JAXBBean bean = r.
             <para>Classes or implementations of the provider-based interfaces need to be registered with a 
             <literal>ClientConfig</literal> and passed to the <literal>Client</literal> for creation. The following
             registers a provider class <literal>MyReader</literal> which will be instantiated by Jersey:
-            <programlisting>    ClientConfig cc = new DefaultClientConfig();
+            <programlisting language="java">    ClientConfig cc = new DefaultClientConfig();
     cc.getClasses().add(MyReader.class);
     Client c = Client.create(cc);</programlisting>
             The following registers an instance or singleton of MyReader:
-            <programlisting>    ClientConfig cc = new DefaultClientConfig();
+            <programlisting language="java">    ClientConfig cc = new DefaultClientConfig();
     MyReader reader = ...
     cc.getSingletons().add(reader);
     Client c = Client.create(cc);</programlisting></para>
@@ -442,7 +442,7 @@ JAXBBean bean = r.
             For instance, in the following example the <literal>Client</literal> has two filters added,
             <literal>filter1</literal> and <literal>filter2</literal>, in that order, and the
             <literal>WebResource</literal> has one filter added, <literal>filter3</literal>:
-            <programlisting>    ClientFilter filter1 = ...
+            <programlisting language="java">    ClientFilter filter1 = ...
     ClientFilter filter2 = ...
     Client c = Client.create();
     c.addFilter(filter1);
@@ -460,7 +460,7 @@ JAXBBean bean = r.
             filter is responsible for calling the next filter in the ordered list of filters
             (or the next filter in the “chain” of filters).
             The basic template for a filter is as follows:
-            <programlisting>    class AppClientFilter extends ClientFilter {
+            <programlisting language="java">    class AppClientFilter extends ClientFilter {
         public ClientResponse handle(ClientRequest cr) {
             // Modify the request
             ClientRequest mcr = modifyRequest(cr);
@@ -530,7 +530,7 @@ JAXBBean bean = r.
             The <literal>setUp</literal> method, called before a test is executed, creates an instance of
             the Glassfish server, deploys the application, and a <literal>WebResource</literal> instance
             that references the base resource:
-            <programlisting>    @Override
+            <programlisting language="java">    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -551,14 +551,14 @@ JAXBBean bean = r.
     }</programlisting>
             The <literal>tearDown</literal> method, called after a test is executed,
             stops the Glassfish server.
-            <programlisting>    @Override
+            <programlisting language="java">    @Override
    protected void tearDown() throws Exception {
         super.tearDown();
         glassfish.stop();
    }</programlisting></para>
             <para>The <literal>testHelloWorld</literal> method tests that the response
             to a <literal>GET</literal> request to the Web resource returns “Hello World”:
-            <programlisting>    public void testHelloWorld() throws Exception {
+            <programlisting language="java">    public void testHelloWorld() throws Exception {
        String responseMsg = r.path("helloworld").
            get(String.class);
        assertEquals("Hello World", responseMsg);

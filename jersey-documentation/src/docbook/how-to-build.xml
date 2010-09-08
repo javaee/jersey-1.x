@@ -46,7 +46,7 @@
 %ents;
 ]>
 
-<chapter>
+<chapter id="how-to-build">
   <title>Building and testing Jersey</title>
 
 <section>

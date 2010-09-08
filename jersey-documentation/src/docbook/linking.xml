@@ -40,7 +40,8 @@
     holder.
 
 -->
-<!DOCTYPE chapter SYSTEM "http://www.docbook.org/xml/4.4/docbookx.dtd"[
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+                 "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
 <!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
 <!ENTITY jaxrs-javadoc
@@ -59,7 +60,7 @@
             entity class fields. The Jersey runtime is responsible for injecting the appropriate URI
             into the field prior to serialization by a message body writer. E.g. consider the
             following resource and entity classes:</para>
-        <programlisting>@Path("widgets")
+        <programlisting language="java">@Path("widgets")
 public class WidgetsResource {
   @GET
   public Widgets get() {
@@ -130,12 +131,12 @@ public class Widgets {
         <para>By default URI template parameter values are extracted from the implicit
                 <literal>instance</literal> bean, i.e. the following two annotations are
             equivalent:</para>
-        <programlisting>@Ref("widgets/{id}")
+        <programlisting language="java">@Ref("widgets/{id}")
 @Ref("widgets/${instance.id}")</programlisting>
         <para>The source for URI template parameter values can be changed using the
                 <literal>@Binding</literal> annotation, E.g. the following two annotations are
             equivalent:</para>
-        <programlisting>@Ref(value="widgets/{id}", bindings={
+        <programlisting language="java">@Ref(value="widgets/{id}", bindings={
   @Binding(name="id" value="${resource.id}"}
 )
 @Ref("widgets/${resource.id}")</programlisting>
@@ -148,7 +149,7 @@ public class Widgets {
                 <literal>condition</literal> property. The value of this property is a boolean EL
             expression and a link will only be injected if the condition expression evaluates to
             true. E.g.:</para>
-        <programlisting>@Ref(value="widgets/${instance.id}/offers",
+        <programlisting language="java">@Ref(value="widgets/${instance.id}/offers",
   condition="${instance.offers}")
 URI offers;</programlisting>
         <para>In the above, a URI will only be injected into the <literal>offers</literal> field if
@@ -163,7 +164,7 @@ URI offers;</programlisting>
                 headers</ulink> can also be added to responses using annotations. Instead of
             annotating the fields of an entity class with <literal>@Ref</literal>, you instead
             annotate the entity class itself with <literal>@Link</literal>. E.g.:</para>
-        <programlisting>@Link(
+        <programlisting language="java">@Link(
   value=@Ref("widgets/${resource.nextId}"),
   rel="next"
 )</programlisting>
@@ -180,7 +181,7 @@ URI offers;</programlisting>
         <title>Configuration</title>
         <para>Declarative hyperlinking support is provided in the form of a filter. First, the application
             must declare a dependency on the <literal>jersey-server-linking</literal> module:</para>
-        <programlisting>&lt;dependency&gt;
+        <programlisting language="xml">&lt;dependency&gt;
   &lt;groupId&gt;com.sun.jersey.experimental&lt;/groupId&gt;
   &lt;artifactId&gt;jersey-server-linking&lt;/artifactId&gt;
   &lt;version&gt;${jersey-version}&lt;/version&gt;
@@ -191,7 +192,7 @@ URI offers;</programlisting>
         <para>to the list defined by:</para>
         <programlisting>com.sun.jersey.spi.container.ContainerResponseFilters</programlisting>
         <para>or using a <literal>web.xml</literal> init parameter:</para>
-        <programlisting>&lt;init-param&gt;
+        <programlisting language="xml">&lt;init-param&gt;
   &lt;param-name&gt;com.sun.jersey.spi.container.ContainerResponseFilters&lt;/param-name&gt;
   &lt;param-value&gt;com.sun.jersey.server.linking.LinkFilter&lt;/param-value&gt;
 &lt;/init-param&gt;

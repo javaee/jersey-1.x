@@ -41,8 +41,8 @@
 
 -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd" [
-<!ENTITY % ents SYSTEM "jersey.ent">
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
+<!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
 ]>
 <chapter id="json">
@@ -84,7 +84,7 @@
     This could be done in <code>web.xml</code> using the following servlet init parameter:
 <example>
 <title>POJO JSON support web.xml configuration</title>
-<programlisting linenumbering="numbered">
+<programlisting language="xml" linenumbering="numbered">
         &lt;init-param&gt;
             &lt;param-name&gt;com.sun.jersey.api.json.POJOMappingFeature&lt;/param-name&gt;
             &lt;param-value&gt;true&lt;/param-value&gt;
@@ -114,7 +114,7 @@
     Following is a very simple example of how a JAXB bean could look like.
 <example>
 <title>Simple JAXB bean implementation</title>
-<programlisting linenumbering="numbered">@XmlRootElement
+<programlisting language="java" linenumbering="numbered">@XmlRootElement
 public class MyJaxbBean {
   public String name;
   public int age;
@@ -132,7 +132,7 @@ public class MyJaxbBean {
     
 <example>
 <title>JAXB bean used to generate JSON representation</title>
-<programlisting linenumbering="numbered">@GET @Produces(<emphasis>"application/json"</emphasis>)
+<programlisting language="java" linenumbering="numbered">@GET @Produces(<emphasis>"application/json"</emphasis>)
 public <emphasis>MyJaxbBean</emphasis> getMyBean() {
    return <emphasis>new MyJaxbBean("Agamemnon", 32)</emphasis>;
 }</programlisting>
@@ -141,7 +141,7 @@ public <emphasis>MyJaxbBean</emphasis> getMyBean() {
     Notice, that JSON specific mime type is specified in @Produces annotation, and the method returns an instance
     of MyJaxbBean, which JAXB is able to process. Resulting JSON in this case would look like:
     
-<programlisting>
+<programlisting >
     {"name":"Agamemnon", "age":"32"}
 </programlisting>
     </para>
@@ -156,7 +156,7 @@ public <emphasis>MyJaxbBean</emphasis> getMyBean() {
 	E.g. the following example depicts changes in the above mentioned MyJaxbBean that will result in <code>{"king":"Agamemnon"}</code> JSON output.
 <example>
 <title>Tweaking JSON format using JAXB</title>
-<programlisting linenumbering="numbered">@XmlRootElement
+<programlisting language="java" linenumbering="numbered">@XmlRootElement
 public class MyJaxbBean {
   
     @XmlElement(name="king")
@@ -183,7 +183,7 @@ public class MyJaxbBean {
 	
 	<example id="json.jaxb.context.resolver.example">
 	<title>An example of a JAXBContext resolver implementation</title>
-	<programlisting linenumbering="numbered">@Provider
+	<programlisting language="java" linenumbering="numbered">@Provider
 public class JAXBContextResolver implements ContextResolver&lt;JAXBContext&gt; {
 
     private JAXBContext context;
@@ -242,7 +242,7 @@ public class JAXBContextResolver implements ContextResolver&lt;JAXBContext&gt; {
       XML constructs into JSON, the notations will be described using a simple example. Following are JAXB beans, which will be used.
       
       <example><title>JAXB beans for JSON supported notations description, simple address bean</title>
-      <programlisting linenumbering="numbered">@XmlRootElement
+      <programlisting language="java" linenumbering="numbered">@XmlRootElement
 public class Address {
     public String street;
     public String town;
@@ -257,7 +257,7 @@ public class Address {
       </example>
 
       <example><title>JAXB beans for JSON supported notations description, contact bean</title>
-      <programlisting linenumbering="numbered">@XmlRootElement
+      <programlisting language="java" linenumbering="numbered">@XmlRootElement
 public class Contact {
 
     public int id;
@@ -279,7 +279,7 @@ public class Contact {
       <para>
       Following text will be mainly working with a contact bean initialized with:
       <example id="json.jaxb.bean.init.example"><title>JAXB beans for JSON supported notations description, initialization</title>
-      <programlisting>final Address[] addresses = {new Address("Long Street 1", "Short Village")};
+      <programlisting language="java">final Address[] addresses = {new Address("Long Street 1", "Short Village")};
 Contact contact = new Contact(2, "Bob", Arrays.asList(addresses));</programlisting>
 </example>
 I.e. contact bean with <code>id=2</code>, <code>name="Bob"</code> containing 
@@ -299,11 +299,11 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        
        <para>
        <code>JSONConfiguration</code> based on <literal>mapped</literal> notation could be build with 
-       <programlisting>JSONConfiguration.mapped().build()</programlisting>
+       <programlisting language="java">JSONConfiguration.mapped().build()</programlisting>
        for usage in a <code>JAXBContext</code> resolver, <xref linkend="json.jaxb.context.resolver.example"/>.
        Then a contact bean initialized with <xref linkend="json.jaxb.bean.init.example"/>, will be serialized as
        <example><title>JSON expression produced using <literal>mapped</literal> notation</title>
-       <programlisting linenumbering="numbered">{ "id":"2" 
+       <programlisting  linenumbering="numbered">{ "id":"2" 
  ,"name":"Bob"
  ,"addresses":{"street":"Long Street 1"
                     ,"town":"Short Village"}}</programlisting>
@@ -313,9 +313,9 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        <para>
        However, at least one issue might appear once you start using it with a JavaScript based client.
        The information, that <code>addresses</code> item represents an array, is being lost for every single element array. 
-       If you added another address bean to the contact,<programlisting>contact.addresses.add(new Address("Short Street 1000", "Long Village"));</programlisting>,
+       If you added another address bean to the contact,<programlisting language="java">contact.addresses.add(new Address("Short Street 1000", "Long Village"));</programlisting>,
        you would get 
-       <programlisting linenumbering="numbered">{ "id":"2" 
+       <programlisting  linenumbering="numbered">{ "id":"2" 
  ,"name":"Bob"
  ,"addresses":[{"street":"Long Street 1","town":"Short Village"}
               ,{"street":"Short Street 1000","town":"Long Village"}]}</programlisting>
@@ -326,7 +326,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
 	by setting an optional property, <literal>arrays</literal>, on your <code>JSONConfiguration</code> object.
 	For our case, you would do it with
        <example><title>Force arrays in <literal>mapped</literal> JSON notation</title>
-       <programlisting>JSONConfiguration.mapped().arrays("addresses").build()</programlisting>
+       <programlisting language="java">JSONConfiguration.mapped().arrays("addresses").build()</programlisting>
        </example>
        You can use multiple string values in the <literal>arrays</literal> method call, in case you are dealing with more
        than one array item in your beans. Similar mechanism (one or more argument values) applies also for all below desribed options.
@@ -336,23 +336,23 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        gets written as a string, <literal>"2"</literal>. To avoid this, you can use another optional property on <code>JSONConfiguration</code>
        called <literal>nonStrings</literal>.
        <example><title>Force non-string values in <literal>mapped</literal> JSON notation</title>
-       <programlisting>JSONConfiguration.mapped().arrays("addresses").nonStrings("id").build()</programlisting>
+       <programlisting language="java">JSONConfiguration.mapped().arrays("addresses").nonStrings("id").build()</programlisting>
        </example>
 	</para>       
        
        <para>
        It might happen you use XML attributes in your JAXB beans. In <literal>mapped</literal> JSON notation, these attribute names are prefixed with <literal>@</literal>
        character. If <code>id</code> was an attribute, it´s definition would look like:
-       <programlisting>  ...
+       <programlisting language="java">  ...
   @XmlAttribute
   public int id;
   ...</programlisting>
-       and then you would get <programlisting>{"@id":"2" ...</programlisting> at the JSON output.
+       and then you would get <programlisting >{"@id":"2" ...</programlisting> at the JSON output.
        In case, you want to get rid of the <literal>@</literal> prefix, you can take advantage of another configuration 
        option of <literal>JSONConfiguration</literal>, called <literal>attributeAsElement</literal>.
        Usage is similar to previous options.
        <example><title>XML attributes as XML elements in <literal>mapped</literal> JSON notation</title>
-       <programlisting>JSONConfiguration.mapped().attributeAsElement("id").build()</programlisting>
+       <programlisting language="java">JSONConfiguration.mapped().attributeAsElement("id").build()</programlisting>
        </example>
        </para>
 	<para>
@@ -361,11 +361,11 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
 	you might have wanted to keep a XML root tag equivalent generated in your JSON. If that is the case, another configuration option
 	is available for you, which is called <literal>rootUnwrapping</literal>. You can use it as follows:
        <example id="json.jaxb.mapped.root.unwrapping"><title>Keep XML root tag equivalent in JSON <literal>mapped</literal> JSON notation</title>
-       <programlisting>JSONConfiguration.mapped().rootUnwrapping(false).build()</programlisting>
+       <programlisting language="java">JSONConfiguration.mapped().rootUnwrapping(false).build()</programlisting>
        </example>
        and get the following JSON for our <literal>Contact</literal> bean:
        <example><title>XML root tag equivalent kept in JSON using <literal>mapped</literal> notation</title>
-       <programlisting linenumbering="numbered">{"contact":{ "id":"2" 
+       <programlisting  linenumbering="numbered">{"contact":{ "id":"2" 
  ,"name":"Bob"
  ,"addresses":{"street":"Long Street 1"
                     ,"town":"Short Village"}}}</programlisting>
@@ -384,7 +384,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
 	<para>
 	Namespace mapping definition is similar to <xref linkend="json.jaxb.jettison.mapped.ns.def"/> 
       <example><title>XML namespace to JSON mapping configuration for <literal>mapped</literal> notation</title>
-       <programlisting linenumbering="numbered">        Map&lt;String,String&gt; ns2json = new HashMap&lt;String, String&gt;();
+       <programlisting language="java" linenumbering="numbered">        Map&lt;String,String&gt; ns2json = new HashMap&lt;String, String&gt;();
         ns2json.put("http://example.com", "example");
         context = new JSONJAXBContext(
 	      JSONConfiguration.mapped()
@@ -414,11 +414,11 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        do not need to do any kind of manual configuration. Java arrays and lists are mapped into JSON arrays, even for single-element cases. 
        Java numbers and booleans are correctly mapped into JSON numbers and booleans, and you do not need to bother with XML attributes,
        as in JSON, they keep the original names. So  without any additional configuration, just using
-       <programlisting>JSONConfiguration.natural().build()</programlisting>
+       <programlisting language="java">JSONConfiguration.natural().build()</programlisting>
        for configuring your <code>JAXBContext</code>, you will get the following JSON for the bean 
        initialized at <xref linkend="json.jaxb.bean.init.example"/>:
        <example><title>JSON expression produced using <literal>natural</literal> notation</title>
-       <programlisting linenumbering="numbered">{ "id":2
+       <programlisting  linenumbering="numbered">{ "id":2
  ,"name":"Bob"
  ,"addresses":[{"street":"Long Street 1"
                      ,"town":"Short Village"}]}</programlisting>
@@ -430,7 +430,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        To support cases, when you use inheritance for your JAXB beans, an option was introduced to the <literal>natural</literal> JSON configuration builder
        to forbid XML root element stripping. The option looks pretty same as at the default <literal>mapped</literal> notation case (<xref linkend="json.jaxb.mapped.root.unwrapping"/>).
        <example id="json.jaxb.natural.root.unwrapping"><title>Keep XML root tag equivalent in JSON <literal>natural</literal> JSON notation</title>
-       <programlisting>JSONConfiguration.natural().rootUnwrapping(false).build()</programlisting>
+       <programlisting language="java">JSONConfiguration.natural().rootUnwrapping(false).build()</programlisting>
        </example>
        </para>
       </section>
@@ -447,10 +447,10 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        </para>
        <para>
        Jettison based <literal>mapped</literal> notation could be configured using:
-       <programlisting>JSONConfiguration.mappedJettison().build()</programlisting>
+       <programlisting language="java">JSONConfiguration.mappedJettison().build()</programlisting>
        If nothing else is configured, you will get similar JSON output as for the default, <literal>mapped</literal>, notation:
        <example><title>JSON expression produced using Jettison based <literal>mapped</literal> notation</title>
-       <programlisting linenumbering="numbered">{ "contact:{"id":2
+       <programlisting  linenumbering="numbered">{ "contact:{"id":2
               ,"name":"Bob"
               ,"addresses":{"street":"Long Street 1"
                                  ,"town":"Short Village"}}</programlisting>
@@ -461,13 +461,13 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        <para>
        If you need to deal with various XML namespaces, however, you will find Jettison <literal>mapped</literal> notation pretty useful.
        Lets define a particular namespace for <code>id</code> item:
-       <programlisting>  ...
+       <programlisting language="java">  ...
   @XmlElement(namespace="http://example.com")
   public int id;
   ...</programlisting>
  	Then you simply confgure a mapping from XML namespace into JSON prefix as follows:
       <example id="json.jaxb.jettison.mapped.ns.def"><title>XML namespace to JSON mapping configuration for Jettison based <literal>mapped</literal> notation</title>
-       <programlisting linenumbering="numbered">        Map&lt;String,String&gt; ns2json = new HashMap&lt;String, String&gt;();
+       <programlisting language="java" linenumbering="numbered">        Map&lt;String,String&gt; ns2json = new HashMap&lt;String, String&gt;();
         ns2json.put("http://example.com", "example");
         context = new JSONJAXBContext(
 	      JSONConfiguration.mappedJettison()
@@ -475,7 +475,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        </example>
        Resulting JSON will look like in the example bellow.
         <example><title>JSON expression with XML namespaces mapped into JSON</title>
-       <programlisting linenumbering="numbered">{ "contact:{"example.id":2
+       <programlisting  linenumbering="numbered">{ "contact:{"example.id":2
               ,"name":"Bob"
               ,"addresses":{"street":"Long Street 1"
                                  ,"town":"Short Village"}}</programlisting>
@@ -498,10 +498,10 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        </para>
        <para>
        <code>JSONConfiguration</code> instance using <literal>badgerfish</literal> notation could be built with
-       <programlisting>JSONConfiguration.badgerFish().build()</programlisting>
+       <programlisting language="java">JSONConfiguration.badgerFish().build()</programlisting>
        and the output JSON for <xref linkend="json.jaxb.bean.init.example"/> will be as follows.
        <example><title>JSON expression produced using <literal>badgerfish</literal> notation</title>
-       <programlisting linenumbering="numbered">{"contact":{"id":{"$":"2"}
+       <programlisting  linenumbering="numbered">{"contact":{"id":{"$":"2"}
               ,"name":{"$":"Bob"}
               ,"addresses":{"street":{"$":"Long Street 1"}
                                  ,"town":{"$":"Short Village"}}}}</programlisting>
@@ -539,7 +539,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
     
     <para>
     <example><title>JAXB bean creation</title>
-    <programlisting>MyJaxbBean myBean = new MyJaxbBean("Agamemnon", 32);</programlisting>
+    <programlisting language="java">MyJaxbBean myBean = new MyJaxbBean("Agamemnon", 32);</programlisting>
     </example>
     
     Above you construct a simple JAXB bean, which could be written in JSON as <code>{"name":"Agamemnon", "age":32}</code>
@@ -550,7 +550,7 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
     
     <example>
     <title>Constructing a JSONObject</title>
- <programlisting linenumbering="numbered">JSONObject myObject = new JSONObject();
+ <programlisting language="java" linenumbering="numbered">JSONObject myObject = new JSONObject();
 myObject.JSONObject myObject = new JSONObject();
 try {
   myObject.put("name", "Agamemnon");

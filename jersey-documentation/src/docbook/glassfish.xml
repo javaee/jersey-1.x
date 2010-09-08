@@ -46,7 +46,7 @@
 %ents;
 ]>
 
-<chapter>
+<chapter id="glassfish">
     <title>Jersey with GlassFish</title>
 
     <para>This chapter will present instructions on how to use Jersey with Glassfish

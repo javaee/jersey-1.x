@@ -46,7 +46,7 @@
 %ents;
 ]>
 
-<chapter>
+<chapter id="getting-started">
   <title>Getting Started</title>
 
   <para>This chapter will present how to get started with Jersey using
@@ -66,7 +66,7 @@ as described in <xref linkend="chapter_deps"/>
  </para>
  <para>
    The following dependencies need to be added to the pom:
-<programlisting>&lt;dependency&gt;
+<programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
     &lt;artifactId&gt;jersey-server&lt;/artifactId&gt;
     &lt;version&gt;&version;&lt;/version&gt;
@@ -78,7 +78,7 @@ as described in <xref linkend="chapter_deps"/>
 &lt;/dependency&gt;</programlisting></para>
 <para>
 And the following repositories need to be added to the pom:
-<programlisting>&lt;repository&gt;
+<programlisting language="xml">&lt;repository&gt;
     &lt;id&gt;maven2-repository.dev.java.net&lt;/id&gt;
     &lt;name&gt;Java.net Repository for Maven&lt;/name&gt;
     &lt;url&gt;http://download.java.net/maven/2/&lt;/url&gt;
@@ -137,7 +137,7 @@ creation of their own project take a look at <xref linkend="getting.started.crea
 <section>
 <title>Creating a root resource</title>
 <para>Create the following Java class in your project:</para>
-<programlisting linenumbering="numbered">    // The Java class will be hosted at the URI path &quot;/helloworld&quot;
+<programlisting language="java" linenumbering="numbered">    // The Java class will be hosted at the URI path &quot;/helloworld&quot;
     @Path(&quot;/helloworld&quot;)
     public class HelloWorldResource {
     

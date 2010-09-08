@@ -42,11 +42,11 @@
 -->
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
         "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
-        <!ENTITY % ents SYSTEM "jersey.ent" >
-        %ents;
-        ]>
+<!ENTITY % ents SYSTEM "jersey.ent" >
+%ents;
+]>
 
-<chapter>
+<chapter id="test-framework">
     <title>Jersey Test Framework</title>
 
     <para>This chapter will present how to write tests for your resources
@@ -121,7 +121,7 @@
             can take a look at helloworld sample pom file. There is declared
             dependency on:
 
-            <programlisting>
+            <programlisting language="xml">
 
                 &lt;dependency&gt;
                 &lt;groupId&gt;com.sun.jersey.jersey-test-framework&lt;/groupId&gt;
@@ -187,7 +187,7 @@
         is when you specify module which has more than one container factory or multiple modules. If this happen, test
         framework will choose factory using following rules:</para>
 
-        <programlisting>if("jersey.test.containerFactory" not specified)
+        <programlisting language="java">if("jersey.test.containerFactory" not specified)
     look for factories
     if(factories.count == 1)
         use found factory
@@ -213,7 +213,7 @@ else
         <para>Jersey Test Framework uses JUnit version 4.X, so if you can write standard unit tests, you can easily
         create Jersey Test. You need to declare test as a descendant of JerseyTest class.
 
-        <programlisting>public class MainTest extends JerseyTest {
+        <programlisting language="java">public class MainTest extends JerseyTest {
 
     public MainTest()throws Exception {
         super("com.sun.jersey.samples.helloworld.resources");

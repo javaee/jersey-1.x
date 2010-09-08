@@ -66,7 +66,7 @@
 
         <example>
             <title>Low level XML test - methods added to HelloWorldResource.java</title>
-            <programlisting linenumbering="numbered">    @Path("1")
+            <programlisting language="java" linenumbering="numbered">    @Path("1")
     @POST
     public StreamSource get1(StreamSource streamSource) {
         return streamSource;
@@ -115,7 +115,7 @@
 
         <example>
             <title>Planet class</title>
-            <programlisting linenumbering="numbered">@XmlRootElement
+            <programlisting language="java" linenumbering="numbered">@XmlRootElement
 public class Planet {
     public int id;
     public String name;
@@ -126,7 +126,7 @@ public class Planet {
 
         <example>
             <title>Resource class</title>
-            <programlisting linenumbering="numbered">@Path("planet")
+            <programlisting language="java" linenumbering="numbered">@Path("planet")
 public class Resource {
 
     @GET
@@ -149,7 +149,7 @@ public class Resource {
         from class name or you can set name property: <code>@XmlRootElement(name="yourName")</code>.</para>
 
         <para>Our resource class will respond to GET /planet with
-            <programlisting>&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
+            <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;
                 &lt;planet&gt;
                         &lt;id&gt;1&lt;/id&gt;
                         &lt;name&gt;Earth&lt;/name&gt;
@@ -169,7 +169,7 @@ public class Resource {
 
                 <example>
                     <title>Method for consuming Planet</title>
-                    <programlisting linenumbering="numbered">    @POST
+                    <programlisting language="java" linenumbering="numbered">    @POST
     @Consumes(MediaType.APPLICATION_XML)
     public void setPlanet(Planet p) {
         System.out.println("setPlanet " + p);
@@ -197,7 +197,7 @@ public class Resource {
 
         <example>
             <title>Resource class - JAXBElement</title>
-            <programlisting linenumbering="numbered">@Path("planet")
+            <programlisting language="java" linenumbering="numbered">@Path("planet")
 public class Resource {
 
     @GET
@@ -226,7 +226,7 @@ public class Resource {
 
         <example>
             <title>Client side - JAXBElement</title>
-            <programlisting linenumbering="numbered">        // GET
+            <programlisting language="java" linenumbering="numbered">        // GET
         GenericType&lt;JAXBElement&lt;Planet&gt;&gt; planetType = new GenericType&lt;JAXBElement&lt;Planet&gt;&gt;() {};
 
         Planet planet = (Planet) webResource.path("planet").accept(MediaType.APPLICATION_XML_TYPE).get(planetType).getValue();
@@ -251,7 +251,7 @@ public class Resource {
 
         <example>
             <title>PlanetJAXBContextProvider</title>
-            <programlisting linenumbering="numbered">@Provider
+            <programlisting language="java" linenumbering="numbered">@Provider
 public class PlanetJAXBContextProvider implements ContextResolver&lt;JAXBContext&gt; {
     private JAXBContext context = null;
 
@@ -280,7 +280,7 @@ public class PlanetJAXBContextProvider implements ContextResolver&lt;JAXBContext
 
         <example>
             <title>Using Provider with Jersey client</title>
-            <programlisting linenumbering="numbered">                ClientConfig cc = new DefaultClientConfig();
+            <programlisting language="java" linenumbering="numbered">                ClientConfig cc = new DefaultClientConfig();
                 cc.getClasses().add(PlanetJAXBContextProvider.class);
                 Client c = Client.create(cc);
             </programlisting>

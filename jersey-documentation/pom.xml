@@ -41,135 +41,146 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.sun.jersey</groupId>
-		<artifactId>jersey-project</artifactId>
-		<version>1.4-SNAPSHOT</version>
-	</parent>
-	<artifactId>jersey-documentation</artifactId>
-	<packaging>pom</packaging>
-	<name>jersey-documentation</name>
-	<!--dependencies>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-bundle</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-	</dependencies-->
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<configuration>
-							<tasks>
-								<echo message="Preparing char entities"/>
-								<mkdir dir="${gen-src-dir}"/>
-								<copy todir="${gen-src-dir}">
-									<fileset dir="src/docbook"/>
-								</copy>
-								<replace file="${gen-src-dir}/jersey.ent" token="$version" value="${version}"/>
-								<replace file="${gen-src-dir}/jersey.ent" token="$jsr311-version" value="1.1"/>
-							</tasks>
-						</configuration>
-						<id>process-entities</id>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			
-			<plugin>
-				<groupId>com.agilejava.docbkx</groupId>
-				<artifactId>docbkx-maven-plugin</artifactId>
-				<version>2.0.10</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.docbook</groupId>
-						<artifactId>docbook-xml</artifactId>
-						<version>4.4</version>
-						<scope>runtime</scope>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<xincludeSupported>true</xincludeSupported>
-					<sourceDirectory>${gen-src-dir}</sourceDirectory>
-					<targetDirectory>${project.build.directory}/docbook</targetDirectory>
-					<includes>user-guide.xml</includes>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-project</artifactId>
+        <version>1.4-SNAPSHOT</version>
+    </parent>
+    <artifactId>jersey-documentation</artifactId>
+    <packaging>pom</packaging>
+    <name>jersey-documentation</name>
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <tasks>
+                                <echo message="Preparing char entities"/>
+                                <mkdir dir="${src.dir}"/>
+                                <copy todir="${src.dir}">
+                                    <fileset dir="src/docbook"/>
+                                </copy>
+                                <replace file="${src.dir}/jersey.ent" token="$version" value="${version}"/>
+                                <replace file="${src.dir}/jersey.ent" token="$jsr311-version" value="1.1"/>
+                            </tasks>
+                        </configuration>
+                        <id>process-entities</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>com.agilejava.docbkx</groupId>
+                <artifactId>docbkx-maven-plugin</artifactId>
+                <version>2.0.7</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.docbook</groupId>
+                        <artifactId>docbook-xml</artifactId>
+                        <version>4.4</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <xincludeSupported>true</xincludeSupported>
+                    <sourceDirectory>${src.dir}</sourceDirectory>
+                    <targetDirectory>${project.build.directory}/docbook</targetDirectory>                    
                     <htmlStylesheet>https://jersey.dev.java.net/documentation.css</htmlStylesheet>
-                    <partAutolabel>1</partAutolabel>
-					<sectionAutolabel>1</sectionAutolabel>
-					<sectionLabelIncludesComponentLabel>1</sectionLabelIncludesComponentLabel>
-          <useExtensions>1</useExtensions>
-          <linenumberingExtension>1</linenumberingExtension>
-          <linenumberingEveryNth>1</linenumberingEveryNth>
-          <calloutsExtension>1</calloutsExtension>
-          <calloutGraphics>0</calloutGraphics>
-          <highlightSource>1</highlightSource>
-          <!--calloutGraphicsExtension>1</calloutGraphicsExtension-->
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate-html</goal>
-							<goal>generate-pdf</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/docbook.xml</descriptor>
-					</descriptors>
-				</configuration>
-				<executions>
-					<execution>
-						<id>make-assembly</id>
-						<phase>package</phase>
-						<goals>
-							<goal>attached</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>attach-artifacts</id>
-						<phase>package</phase>
-						<goals>
-							<goal>attach-artifact</goal>
-						</goals>
-						<configuration>
-							<artifacts>
-								<artifact>
-									<file>${project.build.directory}/docbook/user-guide.pdf</file>
-									<type>pdf</type>
-									<classifier>user-guide</classifier>
-								</artifact>
-							</artifacts>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin> <!-- remove the generated src dir-->
-				<artifactId>maven-clean-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
-	
-	<properties>
-		<assembly.directory>${project.build.directory}/assembly</assembly.directory>
-		<gen-src-dir>${basedir}/target/gen-src</gen-src-dir>
-	</properties>
+                    <htmlCustomization>${src.dir}/customizations.xsl</htmlCustomization>
+                    <partAutolabel>true</partAutolabel>
+                    <sectionAutolabel>true</sectionAutolabel>
+                    <sectionLabelIncludesComponentLabel>true</sectionLabelIncludesComponentLabel>
+                    <useExtensions>true</useExtensions>
+                    <linenumberingExtension>true</linenumberingExtension>
+                    <linenumberingEveryNth>1</linenumberingEveryNth>
+                    <calloutsExtension>true</calloutsExtension>
+                    <calloutGraphics>false</calloutGraphics>
+                    <highlightSource>true</highlightSource>
+                    <highlightDefaultLanguage></highlightDefaultLanguage>
+                    <!--calloutGraphicsExtension>1</calloutGraphicsExtension-->
+                </configuration>
+                <executions>
+                    <id>Single page HTML and PDF</id>
+                    <execution>
+                        <goals>
+                            <goal>generate-html</goal>
+                            <goal>generate-pdf</goal>
+                        </goals>
+                        <configuration>
+                            <includes>user-guide.xml</includes>
+                        </configuration>
+                        <phase>package</phase>
+                    </execution>
+                    <execution>
+                        <id>Multiple HTML pages</id>
+                        <goals>
+                            <goal>generate-html</goal>
+                        </goals>
+                        <configuration>
+                            <includes>index.xml</includes>
+                            <chunkedOutput>true</chunkedOutput>
+                            <chunkSectionDepth>0</chunkSectionDepth>
+                            <useIdAsFilename>true</useIdAsFilename>
+                        </configuration>    
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/docbook.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-artifacts</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>attach-artifact</goal>
+                        </goals>
+                        <configuration>
+                            <artifacts>
+                                <artifact>
+                                    <file>${project.build.directory}/docbook/user-guide.pdf</file>
+                                    <type>pdf</type>
+                                    <classifier>user-guide</classifier>
+                                </artifact>
+                            </artifacts>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin> <!-- remove the generated src dir-->
+                <artifactId>maven-clean-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    
+    <properties>
+        <assembly.directory>${project.build.directory}/assembly</assembly.directory>
+        <src.dir>${basedir}/target/gen-src</src.dir>
+    </properties>
 
 </project>

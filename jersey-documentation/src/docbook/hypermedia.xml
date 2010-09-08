@@ -45,7 +45,7 @@
 <!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
 ]>
-<section>
+<section id="hypermedia">
     <title>Hypermedia Actions</title>
     <section>
         <title>Introduction</title>
@@ -109,7 +109,7 @@
             Addresses are sub-resources that are also controlled by
             <literal>CustomerResource</literal>. An order instance refers to a single customer, a
             single address (of that customer) and one or more products. The XML representation (or
-            view) of a sample order is shown below. <programlisting><![CDATA[    <order>
+            view) of a sample order is shown below. <programlisting language="xml"><![CDATA[    <order>
         <id>1</id>
         <customer>http://.../customers/21</customer>
         <shippingAddress>http://.../customers/21/address/1</shippingAddress>
@@ -144,7 +144,7 @@
                 <para>Several details about this class are omitted for clarity. The reader is
                     referred to the hypermedia sample for more details.</para>
             </footnote>
-            <programlisting linenumbering="numbered"
+            <programlisting language="java" linenumbering="numbered"
             >    @Path("/orders/{id}")
     @HypermediaController(
         model=Order.class,
@@ -200,7 +200,7 @@
             corresponding to action resources are serialized: in this case, using link headers.
             These link headers become part of the an order's representation. For instance, an order
             in the <literal>RECEIVED</literal> state, i.e. an order that can only be reviewed or
-            canceled, will be represented as follows. <programlisting>    <![CDATA[Link: <http://.../orders/1/review>;rel=review;op=POST
+            canceled, will be represented as follows. <programlisting language="xml">    <![CDATA[Link: <http://.../orders/1/review>;rel=review;op=POST
     Link: <http://.../orders/1/cancel>;rel=cancel;op=POST
     <order>
         <id>1</id>
@@ -215,7 +215,7 @@
         </para>
         <para>Without a method annotated with <literal>@ContextualActionSet</literal>, all actions
             are available at all times regardless of the state of an order. The following method can
-            be provided to define a contextual contract for this resource. <programlisting
+            be provided to define a contextual contract for this resource. <programlisting language="java"
                 linenumbering="numbered"><![CDATA[    @ContextualActionSet
     public Set<String> getContextualActionSet() {
         Set<String> result = new HashSet<String>();
@@ -258,7 +258,7 @@
             The client-side model class should be based on the representation returned by the
             server; in particular, in our example the client-side model for an
             <literal>Order</literal> uses instances of <literal>URI</literal> to link an order to a
-            customer, an address and a list of products. <programlisting linenumbering="numbered"
+            customer, an address and a list of products. <programlisting linenumbering="numbered" language="java"
             >    @HypermediaController(
         model=Order.class,
         linkType=LinkType.LINK_HEADERS)
@@ -308,7 +308,7 @@
                     to <literal>OrderController</literal> which is omitted since it does not
                     highlight any additional feature.</para>
             </footnote>
-            <programlisting linenumbering="numbered"
+            <programlisting linenumbering="numbered" language="java"
             >    // Instantiate Jersey's Client class
     Client client = new Client();
         
@@ -381,7 +381,7 @@
             <literal>com.sun.jersey.samples.hypermedia.Main</literal> in the hypermedia sample for an example of how
             to do this using Grizzly (which can be executed with <literal>mvn install exec:java</literal>). Second, hypermedia applications must included the
             following Maven runtime dependencies:
-            <programlisting><![CDATA[
+            <programlisting language="xml"><![CDATA[
         <dependency>
             <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
             <artifactId>hypermedia-action-server</artifactId>

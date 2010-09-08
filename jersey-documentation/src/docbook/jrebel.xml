@@ -72,7 +72,7 @@
 
         <example>
             <title>pom.xml modifications - dependencies</title>
-            <programlisting linenumbering="numbered">        &lt;dependency&gt;
+            <programlisting language="xml" linenumbering="numbered">        &lt;dependency&gt;
             &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
             &lt;artifactId&gt;jersey-jrebel&lt;/artifactId&gt;
             &lt;version&gt;${project.version}&lt;/version&gt;
@@ -82,7 +82,7 @@
 
         <example>
             <title>pom.xml modifications - plugin</title>
-            <programlisting linenumbering="numbered">            &lt;plugin&gt;
+            <programlisting language="xml" linenumbering="numbered">            &lt;plugin&gt;
                 &lt;groupId&gt;org.zeroturnaround&lt;/groupId&gt;
                 &lt;artifactId&gt;javarebel-maven-plugin&lt;/artifactId&gt;
 
