@@ -54,7 +54,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -63,7 +62,6 @@ import org.codehaus.jackson.map.ObjectMapper;
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-@Provider
 public class JacksonProviderProxy implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     JacksonJsonProvider jacksonProvider = new JacksonJsonProvider();
