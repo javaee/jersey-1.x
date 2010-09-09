@@ -107,8 +107,8 @@
                     <!--calloutGraphicsExtension>1</calloutGraphicsExtension-->
                 </configuration>
                 <executions>
-                    <id>Single page HTML and PDF</id>
                     <execution>
+                        <id>Single page HTML and PDF</id>
                         <goals>
                             <goal>generate-html</goal>
                             <goal>generate-pdf</goal>
