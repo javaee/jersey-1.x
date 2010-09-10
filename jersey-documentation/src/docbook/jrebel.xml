@@ -48,41 +48,32 @@
 <chapter id="jrebel">
     <title>JRebel support</title>
 
-    <para>Jersey provides basic support for JRebel, which can be used to reload java
-        classes in runtime without need to redeploy your application. You can simply
-        change the source code, recompile and JRebel takes care of changing in-memory
-        bytecode and when new request is processed, new version of your class will be
-        used.</para>
+    <para>Jersey provides basic support for JRebel. JRebel can be used to reload java
+        classes at runtime without requiring to redeploy an application. This
+        can improve developer productivity.
+        Java source can be modified, recompiled, and JRebel will ensure changes
+        will be reflected at runtime.</para>
 
     <para>JRebel isn't opensource and is not for free BUT Zeroturnaround (JRebel's author)
-        provides free license for open source project developers. More details can be found
-        on project website: <ulink url="http://www.zeroturnaround.com/jrebel/">http://zeroturnaround.com/jrebel</ulink>.
+        provides a free license for open source project developers. More details can be found
+        on the project website: <ulink url="http://www.zeroturnaround.com/jrebel/">http://zeroturnaround.com/jrebel</ulink>.
         Jersey currently supports JRebel version 3.1.2.</para>
 
-    <para>JRebel has some limitations and unfortunately we are going to hit them. It currently
-        doesn't have ability to detect newly added class and emmit appropriate event. It is possible
-        that this feature somehow works in IDE plugins but I wanted to have some functionality with
-        just maven.</para>
-
     <section>
-        <title id="jrebel.sample">Sample</title>
+        <title id="jrebel.use">How to use JRebel with Jersey</title>
 
-        <para>I pressume you have JRebel correctly set up (you should see JRebel informational message when
-            you run any java program). Additinally, you have to add few dependencies to your pomfile:</para>
+        <para>The jersey-jrebel dependency is required in the pom file:</para>
 
-        <example>
-            <title>pom.xml modifications - dependencies</title>
-            <programlisting language="xml" linenumbering="numbered">        &lt;dependency&gt;
+            <programlisting language="xml">        &lt;dependency&gt;
             &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
             &lt;artifactId&gt;jersey-jrebel&lt;/artifactId&gt;
-            &lt;version&gt;${project.version}&lt;/version&gt;
-        &lt;/dependency&gt;
-</programlisting>
-        </example>
+            &lt;version&gt;&version;&lt;/version&gt;
+        &lt;/dependency&gt;</programlisting>
 
-        <example>
-            <title>pom.xml modifications - plugin</title>
-            <programlisting language="xml" linenumbering="numbered">            &lt;plugin&gt;
+        <para>The javarebel-maven-plugin plugin can be added to the pom to automatically configure
+        JRebel for the case when java is executed from maven:</para>
+
+            <programlisting language="xml">            &lt;plugin&gt;
                 &lt;groupId&gt;org.zeroturnaround&lt;/groupId&gt;
                 &lt;artifactId&gt;javarebel-maven-plugin&lt;/artifactId&gt;
 
@@ -96,27 +87,41 @@
                     &lt;/execution&gt;
                 &lt;/executions&gt;
             &lt;/plugin&gt;</programlisting>
-        </example>
+    </section>
 
-        <para>Now you are all set to test a redeploy-less way of development. Compile Helloworld sample with
-            <code>mvn clean install</code> and run it with <code>mvn exec:java</code>. What happens? Helloworld
-            application is deployed on Grizzly container; it should work with other containers as well.</para>
+    <section>
+        <title id="jrebel.sample">Using JRebel with the hello world sample</title>
 
-        <para>Let's open another terminal and do initial request: <code>curl -v http://localhost:9998/helloworld</code>.
-            You should see messages indicating initialization of Jersey framework and so on. Finally, response
-            <code>Hello World</code> should appear. Let's say we no longer want to have this response and change it
-            to... <code>Hi You!</code>. Its as easy as modifying method get <code>getClichedMessage</code> in <code>HelloWorldResource</code>
-            class. When you are done, save yout changes and run <code>mvn compile</code>. This should overwrite generated
-            class with new version. You can make GET request to <code>http://localhost:9998/helloworld</code> and
-            see if it really worked.</para>
+        <para>The following assumes that JRebel has been set up correctly (a JRebel informational message will
+            be output if JRebel is enabled).</para>
+
+        <para>
+            Download the <ulink
+      url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/&version;/helloworld-&version;-project.zip">hello world sample</ulink>
+      and modify the pom file in accordance with the prevous chapter.</para>
+
+        <para>
+            Compile Helloworld sample with <code>mvn clean install</code> and run it with <code>mvn exec:java</code>.
+            The Helloworld application is deployed on Grizzly container.</para>
+
+        <para>Use a browser and goto the following URL <ulink uri="http://localhost:9998/helloworld">http://localhost:9998/helloworld</ulink>.
+            Messages should be output indicating initialization of Jersey framework, and the browser should
+            display <code>Hello World</code>.</para>
+
+        <para>Modify the <code>HelloWorldResource.java</code> file such that the resource method <code>getClichedMessage</code>
+            returns a different String value. Run <code>mvn compile</code>. Reload the browser window and
+            the browser should display the modified message.</para>
     </section>
 
     <section>
         <title id="jrebel.limitations">Limitations</title>
-        <para>As stated above, JRebel currently doesn't notify its plugin about newly created class. But its possible to
-            detect this newly added resource and use it in your application when you are doing some other change in existing
-            code. Why? After some change has beed made, Jersey re-initializes itself and new class can be detected in the
-            process. You have to use package scanning for finding your resources if you want to have this feature enabled.</para>
+        <para>JRebel currently doesn't notify it's plugin about newly created classes
+        that have no reference to existing classes, such as newly created resource or provder classes.
+        However, its possible to detect a newly created resource class and use it in your
+        application when you are doing some other changes to existing code.
+        Why? After a change has beed made, Jersey re-initializes itself and the
+        new class can be detected in the process. For this case you you have to
+        use class or package scanning for detecting such resource classes.</para>
     </section>
 
 </chapter>
