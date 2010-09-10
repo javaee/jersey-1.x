@@ -49,10 +49,9 @@
   <fileSets>
    <fileSet>
       <directory>${project.build.directory}/docbook</directory>
-      <includes>
-        <include>user-guide.html</include>
-        <include>user-guide.pdf</include>
-      </includes>
+      <excludes>
+        <exclude>user-guide.fo</exclude>
+      </excludes>
       <outputDirectory></outputDirectory>
     </fileSet>
    </fileSets>

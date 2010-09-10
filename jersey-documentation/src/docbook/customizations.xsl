@@ -48,7 +48,7 @@
     <xsl:import href="highlight.xsl"/>
     
     <xsl:template name="user.header.content">
-    <div style="float:right"><a href="https://jersey.dev.java.net"><img src="/images/Jersey_yellow.png"/></a></div>
+    <div style="float:right"><a href="https://jersey.dev.java.net"><img src="https://jersey.dev.java.net/images/Jersey_yellow.png"/></a></div>
     <small>Links: <a href="index.html">Table of Contents</a> | <a href="user-guide.html">Single HTML</a></small>
     </xsl:template>
 
