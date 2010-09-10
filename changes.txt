@@ -83,9 +83,9 @@ release 1.4 (08-2010)
 - Jackson dependency upgraded to version 1.5.5 
 - *Breaking change*: in order to prevent OSGi bundle reload issues
   we need to bundle JSR-311 API classes with the jersey-core module
-- Integrated JRebel support from branch
-  Introduced new experimental module (jersey-jrebel) + some necessary
-  modifications in jersey-server to improve reloading support.
+- Fixed issue 486
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=486
+  Added JRebel support.
 - Fixed issue 542
   https://jersey.dev.java.net/issues/show_bug.cgi?id=542
   Added client HTTPDigestAuthFilter from external contributor + tests
