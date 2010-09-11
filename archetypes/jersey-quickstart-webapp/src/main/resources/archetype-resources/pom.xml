@@ -61,7 +61,7 @@
         </dependency>
     </dependencies>
     <properties>
-        <jersey-version>1.4-SNAPSHOT</jersey-version>
+        <jersey-version>1.5-SNAPSHOT</jersey-version>
     </properties>
     <repositories>
         <repository>

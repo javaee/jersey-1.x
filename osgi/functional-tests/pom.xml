@@ -45,7 +45,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.test.osgi</groupId>
     <artifactId>functional-osgi-tests</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
 
     <packaging>jar</packaging>
     <name>functional-osgi-tests</name>

@@ -45,7 +45,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.4-SNAPSHOT</version>
+        <version>1.5-SNAPSHOT</version>
     </parent>
     <artifactId>jcdi-beans-webapp</artifactId>
     <name>JCDI Beans WebApp - Jersey Sample</name>
