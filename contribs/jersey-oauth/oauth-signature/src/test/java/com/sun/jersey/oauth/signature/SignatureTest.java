@@ -121,7 +121,7 @@ public class SignatureTest extends TestCase {
     /**
      * Perform the test.
      */
-    public void testSignature() {
+    public void testHMACSHA1() {
 
         DummyRequest request = new DummyRequest().requestMethod("GET").
          requestURL("http://photos.example.net/photos").
@@ -179,13 +179,10 @@ public class SignatureTest extends TestCase {
         catch (OAuthSignatureException se) {
             fail(se.getMessage());
         }
-
-        // RSA-SHA1 test
-        RSASHA1test();
     }
     
 
-    private void RSASHA1test() {
+    public void testRSASHA1() {
         DummyRequest request = new DummyRequest().requestMethod("GET").
          requestURL("http://photos.example.net/photos").
          parameterValue("file", "vacaction.jpg").parameterValue("size", "original");
@@ -206,7 +203,7 @@ public class SignatureTest extends TestCase {
         catch (OAuthSignatureException se) {
             fail(se.getMessage());
         }
-        assertEquals(signature, RSA_SIGNATURE_ENCODED);
+        assertEquals(signature, RSA_SIGNATURE);
 
         OAuthParameters saved = (OAuthParameters)params.clone();
 
@@ -231,7 +228,11 @@ public class SignatureTest extends TestCase {
         assertEquals(params.getTimestamp(), RSA_TIMESTAMP);
         assertEquals(params.getNonce(), RSA_NONCE);
         assertEquals(params.getVersion(), VERSION);
-        assertEquals(params.getSignature(), RSA_SIGNATURE_ENCODED);
+        assertEquals(params.getSignature(), RSA_SIGNATURE);
+
+        // perform the same encoding as done by OAuthParameters.writeRequest
+        // to see if the encoded signature will match
+        assertEquals(UriComponent.encode(params.getSignature(), UriComponent.Type.UNRESERVED), RSA_SIGNATURE_ENCODED);
 
         secrets = new OAuthSecrets().consumerSecret(RSA_CERTIFICATE);
         try {
