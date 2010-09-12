@@ -461,7 +461,7 @@ public class OAuthParameters extends HashMap<String, String> {
         if (headers == null) { return this; }
 
         for (String header : headers) {
-            if (!header.regionMatches(true, 0, SCHEME_SPACE, 0, SCHEME_SPACE.length())) {
+                if (!header.regionMatches(true, 0, SCHEME_SPACE, 0, SCHEME_SPACE.length())) {
                 continue;
             }
             for (String param : header.substring(SCHEME_SPACE.length()).trim().split(",(?=(?:[^\"]*\"[^\"]*\")+$)")) {

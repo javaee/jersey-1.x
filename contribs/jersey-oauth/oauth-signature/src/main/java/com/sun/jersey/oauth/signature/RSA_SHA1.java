@@ -40,7 +40,6 @@
 
 package com.sun.jersey.oauth.signature;
 
-import com.sun.jersey.api.uri.UriComponent;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
@@ -78,6 +77,7 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
     public RSA_SHA1() {
     }
 
+    @Override
     public String name() {
         return NAME;
     }
@@ -90,6 +90,7 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
      * @return the OAuth signature, in base64-encoded form.
      * @throws InvalidSecretException if the supplied secret is not valid.
      */
+    @Override
     public String sign(String elements, OAuthSecrets secrets) throws InvalidSecretException {
     
         Signature sig;
@@ -153,8 +154,7 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
             throw new IllegalStateException(se);
         }
 
-        return UriComponent.encode(new String(Base64.encode(rsasha1)),
-                UriComponent.Type.UNRESERVED);
+        return Base64.encode(rsasha1);
     }
 
     /**
@@ -165,6 +165,7 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
      * @param signature base64-encoded OAuth signature to be verified.
      * @throws InvalidSecretException if the supplied secret is not valid.
      */
+    @Override
     public boolean verify(String elements, OAuthSecrets secrets, String signature) throws InvalidSecretException {
 
         Signature sig;
@@ -201,8 +202,7 @@ public class RSA_SHA1 implements OAuthSignatureMethod {
         byte[] decodedSignature;
 
         try {
-            decodedSignature = Base64.decode(
-                    UriComponent.decode(signature, UriComponent.Type.UNRESERVED));
+            decodedSignature = Base64.decode(signature);
         }
         catch (IOException ioe) {
             return false;
