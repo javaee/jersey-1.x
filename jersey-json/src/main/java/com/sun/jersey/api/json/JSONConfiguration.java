@@ -58,7 +58,11 @@ import java.util.logging.Logger;
 public class JSONConfiguration {
 
     /**
-     * TODO: JavaDoc
+     * A ResourceConfig feature, which allows you to enable JSON/POJO mapping functionality
+     * in Jersey. If set to true, your application will be capable of transforming JSON
+     * data to and out of POJOs. This also includes any JAXB beans existing in your
+     * application. I.e. all those beans would not be processed via XML, but rather
+     * directly marshaled and un-marshaled to and from JSON using the POJO mapping functionality.
      */
     public final static String FEATURE_POJO_MAPPING
             = "com.sun.jersey.api.json.POJOMappingFeature";
