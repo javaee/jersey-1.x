@@ -45,7 +45,6 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.json.impl.JSONHelper;
-import com.sun.jersey.json.impl.LoggingXmlStreamWriterProxy;
 import com.sun.jersey.json.impl.Stax2JsonFactory;
 import java.io.IOException;
 import java.io.InputStream;
