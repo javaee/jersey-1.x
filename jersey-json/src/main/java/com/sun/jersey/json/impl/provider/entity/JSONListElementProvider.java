@@ -45,6 +45,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.json.impl.JSONHelper;
+import com.sun.jersey.json.impl.LoggingXmlStreamWriterProxy;
 import com.sun.jersey.json.impl.Stax2JsonFactory;
 import java.io.IOException;
 import java.io.InputStream;
@@ -121,19 +122,36 @@ public class JSONListElementProvider extends AbstractListElementProvider {
     @Override
     public final void writeList(Class<?> elementType, Collection<?> t, MediaType mediaType, Charset c, Marshaller m, OutputStream entityStream) throws JAXBException, IOException {
         final OutputStreamWriter osw = new OutputStreamWriter(entityStream, c);
-        JSONConfiguration jsonConfig = JSONConfiguration.DEFAULT;
+
+        JSONConfiguration origJsonConfig = JSONConfiguration.DEFAULT;
         if (m instanceof JSONConfigurated) {
-            jsonConfig = ((JSONConfigurated)m).getJSONConfiguration();
+            origJsonConfig = ((JSONConfigurated)m).getJSONConfiguration();
         }
-        final XMLStreamWriter jxsw = Stax2JsonFactory.createWriter(osw, jsonConfig, true);
+
+        final JSONConfiguration unwrappingJsonConfig =
+                JSONConfiguration.createJSONConfigurationWithRootUnwrapping(origJsonConfig, true);
+
+        final XMLStreamWriter jxsw = Stax2JsonFactory.createWriter(osw, unwrappingJsonConfig, true);
+        final String invisibleRootName = getRootElementName(elementType);
+        final String elementName = getElementName(elementType);
+
         try {
-            jxsw.writeStartElement(getRootElementName(elementType));
+            if (!origJsonConfig.isRootUnwrapping()) {
+              osw.append(String.format("{\"%s\":", elementName));
+              osw.flush();
+            }
+            jxsw.writeStartDocument();
+            jxsw.writeStartElement(invisibleRootName);
             for (Object o : t) {
                     m.marshal(o, jxsw);
             }
             jxsw.writeEndElement();
             jxsw.writeEndDocument();
             jxsw.flush();
+            if (!origJsonConfig.isRootUnwrapping()) {
+              osw.append("}");
+              osw.flush();
+            }
         } catch (XMLStreamException ex) {
             Logger.getLogger(JSONListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
             throw new JAXBException(ex.getMessage(), ex);

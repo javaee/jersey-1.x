@@ -62,29 +62,43 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
    private enum State { START, AFTER_NULL, IN_THE_MIDDLE };
 
    State state = State.START;
-   JsonGenerator generator;
-    private boolean isClosed = false;
+   int depth = 0;
+   final JsonGenerator generator;
+   private boolean isClosed = false;
+   final int arrayDepth;
 
 
    private JacksonArrayWrapperGenerator() {
+       this(null, 0);
    }
 
     private JacksonArrayWrapperGenerator(JsonGenerator generator) {
+        this(generator, 0);
+    }
+
+    private JacksonArrayWrapperGenerator(final JsonGenerator generator, final int arrayDepth) {
         this.generator = generator;
+        this.arrayDepth = arrayDepth;
     }
 
     public static JsonGenerator createArrayWrapperGenerator(JsonGenerator g) {
         return new JacksonArrayWrapperGenerator(g);
     }
 
+    public static JsonGenerator createArrayWrapperGenerator(final JsonGenerator g, final int arrayDepth) {
+        return new JacksonArrayWrapperGenerator(g, arrayDepth);
+    }
+
     private void aboutToWriteANonNull() throws IOException {
-        if (state == State.START) {
-            generator.writeStartArray();
-            state = State.IN_THE_MIDDLE;
-        } else if(state == State.AFTER_NULL) {
-            generator.writeStartArray();
-            generator.writeNull();
-            state = State.IN_THE_MIDDLE;
+        if (depth == arrayDepth) {
+            if (state == State.START) {
+                generator.writeStartArray();
+                state = State.IN_THE_MIDDLE;
+            } else if (state == State.AFTER_NULL) {
+                generator.writeStartArray();
+                generator.writeNull();
+                state = State.IN_THE_MIDDLE;
+            }
         }
     }
 
@@ -193,25 +207,34 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
 
     @Override
     public void writeEndArray() throws IOException, JsonGenerationException {
-        aboutToWriteANonNull();
         generator.writeEndArray();
     }
 
     @Override
     public void writeStartObject() throws IOException, JsonGenerationException {
-        aboutToWriteANonNull();
-        generator.writeStartObject();
+        if (arrayDepth > 0 && depth == arrayDepth) {
+            generator.writeStartArray();
+            generator.writeStartObject();
+        } else {
+            aboutToWriteANonNull();
+            generator.writeStartObject();
+        }
+        depth++;
     }
 
     @Override
     public void writeEndObject() throws IOException, JsonGenerationException {
-        aboutToWriteANonNull();
-        generator.writeEndObject();
+        if (arrayDepth > 0 && depth == arrayDepth) {
+            generator.writeEndObject();
+            generator.writeEndArray();
+        } else {
+            generator.writeEndObject();
+        }
+        depth--;
     }
 
     @Override
     public void writeFieldName(String name) throws IOException, JsonGenerationException {
-        aboutToWriteANonNull();
         generator.writeFieldName(name);
     }
 
@@ -331,15 +354,17 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
 
     @Override
     public void flush() throws IOException {
-        switch (state) {
-            case IN_THE_MIDDLE :
-                generator.writeEndArray();
-                break;
-            case AFTER_NULL :
-            case START :
-                generator.writeStartArray();
-                generator.writeEndArray();
-                break;
+        if (depth == arrayDepth) {
+            switch (state) {
+                case IN_THE_MIDDLE:
+                    generator.writeEndArray();
+                    break;
+                case AFTER_NULL:
+                case START:
+                    generator.writeStartArray();
+                    generator.writeEndArray();
+                    break;
+            }
         }
         generator.flush();
     }

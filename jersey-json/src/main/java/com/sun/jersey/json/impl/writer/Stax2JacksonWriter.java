@@ -150,10 +150,12 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         this.generator = JacksonStringMergingGenerator.createGenerator(generator);
     }
 
+    @Override
     public void writeStartElement(String localName) throws XMLStreamException {
         writeStartElement(null, localName, null);
     }
 
+    @Override
     public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {
         writeStartElement(null, localName, namespaceURI);
     }
@@ -166,6 +168,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     }
 
+    @Override
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         try {
             pushPropInfo(localName);
@@ -286,14 +289,17 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         return (ri instanceof RuntimeReferencePropertyInfo) && (((RuntimeReferencePropertyInfo)ri).getWildcard() != null);
     }
 
+    @Override
     public void writeEmptyElement(String localName) throws XMLStreamException {
         writeEmptyElement(null, localName, null);
     }
 
+    @Override
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
         writeEmptyElement(null, localName, namespaceURI);
     }
 
+    @Override
     public void writeEmptyElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         writeStartElement(prefix, localName, namespaceURI);
         writeEndElement();
@@ -309,6 +315,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     }
 
+    @Override
     public void writeEndElement() throws XMLStreamException {
         try {
             ProcessingInfo removedPI = pop(processingStack);
@@ -327,6 +334,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     }
 
+    @Override
     public void writeEndDocument() throws XMLStreamException {
         try {
             generator.writeEndObject();
@@ -336,6 +344,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     }
 
+    @Override
     public void close() throws XMLStreamException {
         try {
             generator.close();
@@ -345,6 +354,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     }
 
+    @Override
     public void flush() throws XMLStreamException {
         try {
             generator.flush();
@@ -354,14 +364,17 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     }
 
+    @Override
     public void writeAttribute(String localName, String value) throws XMLStreamException {
         writeAttribute(null, null, localName, value);
     }
 
+    @Override
     public void writeAttribute(String namespaceURI, String localName, String value) throws XMLStreamException {
         writeAttribute(null, namespaceURI, localName, value);
     }
 
+    @Override
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
         writingAttr = true;
         writeStartElement(prefix, attrsWithPrefix ? ("@" + localName) : localName, namespaceURI);
@@ -371,47 +384,58 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         writeEndElement();
     }
 
+    @Override
     public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
         // we do not want to deal with namespaces
         // the main goal of this writer is keep the produced json as simple as possible
     }
 
+    @Override
     public void writeDefaultNamespace(String uri) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void writeComment(String data) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void writeProcessingInstruction(String target) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void writeCData(String data) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void writeDTD(String dtd) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void writeEntityRef(String name) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void writeStartDocument() throws XMLStreamException {
         writeStartDocument(null, null);
     }
 
+    @Override
     public void writeStartDocument(String version) throws XMLStreamException {
         writeStartDocument(null, version);
     }
 
+    @Override
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
         try {
             generator.writeStartObject();
@@ -453,34 +477,42 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     }
 
+    @Override
     public void writeCharacters(String text) throws XMLStreamException {
         writeCharacters(text, false);
     }
 
+    @Override
     public void writeCharacters(char[] text, int start, int length) throws XMLStreamException {
         writeCharacters(new String(text, start, length));
     }
 
+    @Override
     public String getPrefix(String uri) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setPrefix(String prefix, String uri) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setDefaultNamespace(String uri) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public NamespaceContext getNamespaceContext() {
         return null;
     }
 
+    @Override
     public Object getProperty(String name) throws IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet.");
     }

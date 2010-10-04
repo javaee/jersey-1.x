@@ -102,6 +102,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         super(ps, mt);        
     }
     
+    @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         if (type == List.class || type == Collection.class) {
             return verifyGenericType(genericType) && isSupported(mediaType);
@@ -111,6 +112,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             return false;
     }
     
+    @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         if (List.class.isAssignableFrom(type)) {
             return verifyGenericType(genericType) && isSupported(mediaType);
@@ -119,7 +121,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         } else
             return false;
     }
-    
+
     private boolean verifyArrayType(Class type) {
         type = type.getComponentType();
 
@@ -187,6 +189,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException;
     
+    @Override
     public final Object readFrom(
             Class<Object> type,
             Type genericType, 
@@ -272,15 +275,18 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
 
     protected final String getRootElementName(Class<?> elementType) {
         if(isXmlRootElementProcessing()) {
-            String name = elementType.getName();
-
-            XmlRootElement xre = elementType.getAnnotation(XmlRootElement.class);
-            if(xre != null && !xre.name().equals("##default"))
-                name = xre.name();
-
-            return convertToXmlName(inflector.pluralize(inflector.demodulize(name)));
+            return convertToXmlName(inflector.pluralize(inflector.demodulize(getElementName(elementType))));
         } else {
             return convertToXmlName(inflector.decapitalize(inflector.pluralize(inflector.demodulize(elementType.getName()))));
         }
     }    
+
+    protected final String getElementName(Class<?> elementType) {
+        String name = elementType.getName();
+        XmlRootElement xre = elementType.getAnnotation(XmlRootElement.class);
+        if (xre != null && !xre.name().equals("##default")) {
+            name = xre.name();
+        }
+        return name;
+    }
 }

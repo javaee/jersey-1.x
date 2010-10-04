@@ -139,6 +139,17 @@ public class JSONConfiguration {
         public JSONConfiguration build() {
             return new JSONConfiguration(this);
         }
+
+        private void copyAttributes(JSONConfiguration jc) {
+            arrays.addAll(jc.getArrays());
+            attrsAsElems.addAll(jc.getAttributeAsElements());
+            nonStrings.addAll(jc.getNonStrings());
+            rootUnwrapping = jc.isRootUnwrapping();
+            humanReadableFormatting = jc.isHumanReadableFormatting();
+            jsonXml2JsonNs.putAll(jc.getXml2JsonNs());
+            usePrefixAtNaturalAttributes = jc.isUsingPrefixesAtNaturalAttributes();
+            namespaceSeparator = jc.getNsSeparator();
+        }
     }
 
     /**
@@ -365,18 +376,6 @@ public class JSONConfiguration {
         namespaceSeparator = b.namespaceSeparator;
     }
 
-    private JSONConfiguration(JSONConfiguration jsonConf, boolean formatted) {
-        notation = jsonConf.notation;
-        arrays = jsonConf.arrays;
-        attrsAsElems = jsonConf.attrsAsElems;
-        nonStrings = jsonConf.nonStrings;
-        rootUnwrapping = jsonConf.rootUnwrapping;
-        humanReadableFormatting = formatted;
-        jsonXml2JsonNs = jsonConf.jsonXml2JsonNs;
-        usePrefixAtNaturalAttributes = jsonConf.usePrefixAtNaturalAttributes;
-        namespaceSeparator = jsonConf.namespaceSeparator;
-    }
-
     /**
      * A static method for obtaining {@link JSONConfiguration} instance with humanReadableFormatting
      * set according to formatted parameter.
@@ -387,9 +386,44 @@ public class JSONConfiguration {
      * @throws IllegalArgumentException when provided JSONConfiguration is null.
      */
     public static JSONConfiguration createJSONConfigurationWithFormatted(JSONConfiguration c, boolean formatted) throws IllegalArgumentException {
-        if(c == null)
+
+        if(c == null) {
             throw new IllegalArgumentException("JSONConfiguration can't be null");
-        return new JSONConfiguration(c, formatted);
+        }
+
+        if (c.isHumanReadableFormatting() == formatted) {
+            return c;
+        }
+
+        Builder b = copyBuilder(c);
+        b.humanReadableFormatting = formatted;
+
+        return b.build();
+    }
+
+    /**
+     * A static method for obtaining {@link JSONConfiguration} instance with rootUnwrapping
+     * set according to formatted parameter.
+     *
+     * @param c original instance of {@link JSONConfiguration}, can't be null
+     * @param rootUnwrapping
+     * @return copy of provided {@link JSONConfiguration} with humanReadableFormatting set to formatted.
+     * @throws IllegalArgumentException when provided JSONConfiguration is null.
+     */
+    public static JSONConfiguration createJSONConfigurationWithRootUnwrapping(JSONConfiguration c, boolean rootUnwrapping) throws IllegalArgumentException {
+
+        if(c == null){
+            throw new IllegalArgumentException("JSONConfiguration can't be null");
+        }
+
+        if (c.isRootUnwrapping() == rootUnwrapping) {
+            return c;
+        }
+
+        Builder b = copyBuilder(c);
+        b.rootUnwrapping = rootUnwrapping;
+
+        return b.build();
     }
 
     /**
@@ -448,6 +482,30 @@ public class JSONConfiguration {
         Builder badgerFishBuilder =  new Builder(Notation.BADGERFISH);
         badgerFishBuilder.rootUnwrapping = false;
         return badgerFishBuilder;
+    }
+
+    public static Builder copyBuilder(final JSONConfiguration jc) {
+
+        Builder result = new Builder(jc.getNotation());
+
+        switch (jc.notation) {
+            case BADGERFISH:
+                result = new Builder(jc.getNotation());
+                break;
+            case MAPPED_JETTISON:
+                result = new MappedJettisonBuilder(jc.getNotation());
+                break;
+            case MAPPED:
+                result = new MappedBuilder(jc.getNotation());
+                break;
+            case NATURAL:
+                result = new NaturalBuilder(jc.getNotation());
+                break;
+        }
+
+        result.copyAttributes(jc);
+
+        return result;
     }
 
 

@@ -84,12 +84,12 @@ public class Stax2JsonFactory {
                 if (config.isHumanReadableFormatting()) {
                     rawGenerator.useDefaultPrettyPrinter();
                 }
-                final JsonGenerator bodyGenerator = writingList ? JacksonArrayWrapperGenerator.createArrayWrapperGenerator(rawGenerator) : rawGenerator;
+                final JsonGenerator bodyGenerator = writingList ? JacksonArrayWrapperGenerator.createArrayWrapperGenerator(rawGenerator, config.isRootUnwrapping() ? 0 : 1) : rawGenerator;
                 if (config.isRootUnwrapping()) {
-                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(bodyGenerator), config);
+                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(bodyGenerator, writingList ? 2 : 1), config);
                 } else {
                     return new Stax2JacksonWriter(bodyGenerator, config);
-                }
+                    }
             case MAPPED:
                 return JsonXmlStreamWriter.createWriter(writer, config);
             case BADGERFISH:

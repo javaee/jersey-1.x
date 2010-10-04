@@ -1,4 +1,9 @@
 release 1.5 (11-2010)
+- Fixed issue 478
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=478
+  Applies when marshalling a collection to JSON and MAPPED or NATURAL JSON notations
+  are used. A JSON array is generated if root unwrapping is set to true.
+  Otherwise, if root unwrapping is set to false, a JSON object is returned.
 
 release 1.4 (11-09-2010)
 - Fixed issue 431

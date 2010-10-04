@@ -58,19 +58,30 @@ import org.codehaus.jackson.ObjectCodec;
  */
 public class JacksonRootStrippingGenerator extends JsonGenerator {
 
-   JsonGenerator generator;
+   final JsonGenerator generator;
    int depth = 0;
    boolean isClosed = false;
+   final int treshold;
 
    private JacksonRootStrippingGenerator() {
+       this(null, 1);
    }
 
     private JacksonRootStrippingGenerator(JsonGenerator generator) {
+        this(generator, 1);
+    }
+
+    private JacksonRootStrippingGenerator(final JsonGenerator generator, final int treshold) {
         this.generator = generator;
+        this.treshold = treshold;
     }
 
     public static JsonGenerator createRootStrippingGenerator(JsonGenerator g) {
         return new JacksonRootStrippingGenerator(g);
+    }
+
+    public static JsonGenerator createRootStrippingGenerator(JsonGenerator g, int treshold) {
+        return new JacksonRootStrippingGenerator(g, treshold);
     }
 
     @Override @Deprecated
@@ -125,7 +136,7 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
 
     @Override
     public void writeStartObject() throws IOException, JsonGenerationException {
-        if (depth > 0) {
+        if (depth > treshold-1) {
             generator.writeStartObject();
         }
         depth++;
@@ -133,7 +144,7 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
 
     @Override
     public void writeEndObject() throws IOException, JsonGenerationException {
-        if (depth > 1) {
+        if (depth > treshold) {
             generator.writeEndObject();
         }
         depth--;
@@ -141,7 +152,7 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
 
     @Override
     public void writeFieldName(String name) throws IOException, JsonGenerationException {
-        if (depth > 1) {
+        if (depth > treshold) {
             generator.writeFieldName(name);
         }
     }
