@@ -278,9 +278,9 @@ public final class ServiceFinder<T> implements Iterable<T> {
             String moduleVersion = getJerseyModuleVersion(manifestURL);
 
             if(moduleVersion != null &&
-                    (!moduleVersion.equals(MODULE_VERSION_VALUE)) ||
+                    (!moduleVersion.equals(MODULE_VERSION_VALUE) ||
                         (symbolicName != null &&
-                        (BUNDLE_SYMBOLIC_NAME.startsWith("com.sun.jersey") ^ symbolicName.startsWith("com.sun.jersey")))) {
+                        (BUNDLE_SYMBOLIC_NAME.startsWith("com.sun.jersey") ^ symbolicName.startsWith("com.sun.jersey"))))) {
                 return false;
             }
 
