@@ -59,7 +59,7 @@ public class TerminatingRule implements UriRule {
                 resource);
 
         if (context.isTracingEnabled()) {
-            context.trace("accept termination: \"" + path + "\"");
+            context.trace("accept termination (matching failure): \"" + path + "\"");
         }
 
         if (context.getResponse().isResponseSet())
