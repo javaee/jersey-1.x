@@ -324,7 +324,14 @@ public class ProviderServices {
         // Add service-defined providers to the set after application-defined
         for (Class pc : pca) {
             if (constrainedTo(pc)) {
-                sp.add(new ProviderClass(pc, true));
+                if(service.isAssignableFrom(pc)) {
+                    sp.add(new ProviderClass(pc, true));
+                } else {
+                    LOGGER.log(Level.CONFIG, "Provider " + pc.getName() +
+                            " won't be used because its not assignable to " +
+                            service.getName() + ". This might be caused by clashing " +
+                            "container-provided and application-bundled Jersey classes.");
+                }
             }
         }
     }

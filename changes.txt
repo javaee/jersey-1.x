@@ -1,4 +1,9 @@
 release 1.5 (11-2010)
+- Fixed issue 589
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=589
+  Related to https://glassfish.dev.java.net/issues/show_bug.cgi?id=13649
+  Checking "assignability" before actually creating instance of class
+  found using ServiceFinder to prevent classloading issues.
 - Fixed issue 478
   https://jersey.dev.java.net/issues/show_bug.cgi?id=478
   Applies when marshalling a collection to JSON and MAPPED or NATURAL JSON notations
