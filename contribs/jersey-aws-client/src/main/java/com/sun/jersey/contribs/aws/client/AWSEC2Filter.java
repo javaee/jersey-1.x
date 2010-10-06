@@ -1,31 +1,27 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright 2009 Sun Microsystems, Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
- * may not use this file except in compliance with the License.  You can
- * obtain a copy of the License at
- * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
- * or packager/legal/LICENSE.txt.  See the License for the specific
+ * may not use this file except in compliance with the License. You can obtain
+ * a copy of the License at https://jersey.dev.java.net/CDDL+GPL.html
+ * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
  * When distributing the software, include this License Header Notice in each
- * file and include the License file at packager/legal/LICENSE.txt.
- *
- * GPL Classpath Exception:
- * Oracle designates this particular file as subject to the "Classpath"
- * exception as provided by Oracle in the GPL Version 2 section of the License
- * file that accompanied this code.
- *
- * Modifications:
- * If applicable, add the following below the License Header, with the fields
- * enclosed by brackets [] replaced by your own identifying information:
- * "Portions Copyright [year] [name of copyright owner]"
+ * file and include the License file at jersey/legal/LICENSE.txt.
+ * Sun designates this particular file as subject to the "Classpath" exception
+ * as provided by Sun in the GPL Version 2 section of the License file that
+ * accompanied this code.  If applicable, add the following below the License
+ * Header, with the fields enclosed by brackets [] replaced by your own
+ * identifying information: "Portions Copyrighted [year]
+ * [name of copyright owner]"
  *
  * Contributor(s):
+ *
  * If you wish your version of this file to be governed by only the CDDL or
  * only the GPL Version 2, indicate your decision by adding "[Contributor]
  * elects to include this software in this distribution under the [CDDL or GPL
@@ -37,7 +33,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.contribs.aws.client;
 
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -61,7 +56,7 @@ import javax.ws.rs.core.UriBuilder;
 
 /**
  *
- * The filter allows you to make AWS Product Advertising API (former AWS Commerce API) calls
+ * The filter allows you to make AWS EC2 API calls
  * without a need to sign every single request programmatically.
  * The filter will automatically check the request query and update it as needed.
  * It will namely try to add the Timestamp and AWSAccessKeyId parameters if missing
@@ -69,7 +64,7 @@ import javax.ws.rs.core.UriBuilder;
  *
  * @author Jakub.Podlesak@Sun.COM
  */
-public final class AWSCommerceClientFilter extends ClientFilter {
+public final class AWSEC2Filter extends ClientFilter {
 
     static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
@@ -78,6 +73,8 @@ public final class AWSCommerceClientFilter extends ClientFilter {
     static final String TimestampName = "Timestamp";
     static final String AWSAccessKeyIdName = "AWSAccessKeyId";
     static final String SignatureName = "Signature";
+    static final String SignatureMethodName = "SignatureMethod";
+    static final String SignatureVersionName = "SignatureVersion";
 
     static {
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -85,6 +82,7 @@ public final class AWSCommerceClientFilter extends ClientFilter {
 
     final String awsKeyId;
     final String awsSecretAccessKey;
+
     final Mac mac;
 
 
@@ -97,6 +95,8 @@ public final class AWSCommerceClientFilter extends ClientFilter {
             final MultivaluedMap<String, String> queryParams = extractQueryParams(request);
             addTimestamp(queryParams);
             addAccessKeyId(queryParams);
+            queryParams.add("SignatureMethod", "HmacSHA256");
+            queryParams.add("SignatureVersion", "2");
 
             query = getQuerySortedByParamNames(queryParams);
         }
@@ -105,6 +105,7 @@ public final class AWSCommerceClientFilter extends ClientFilter {
         private MultivaluedMap<String, String> extractQueryParams(ClientRequest request) {
             return UriComponent.decodeQuery(request.getURI(), true);
         }
+
 
         private void addTimestamp(final MultivaluedMap<String, String> queryParams) {
             if (!queryParams.containsKey(TimestampName)) {
@@ -118,9 +119,15 @@ public final class AWSCommerceClientFilter extends ClientFilter {
             }
         }
 
+        private void addSignatureMethod(final MultivaluedMap<String, String> queryParams) {
+            if (!queryParams.containsKey(SignatureMethodName)) {
+                queryParams.add(SignatureMethodName, dateFormat.format(new Date()));
+            }
+        }
+
         String getQuerySortedByParamNames(final MultivaluedMap<String, String> queryParams) {
 
-            Set<String> sortedParameterNames = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+            Set<String> sortedParameterNames = new TreeSet<String>();
             sortedParameterNames.addAll(queryParams.keySet());
 
             StringBuilder result = new StringBuilder();
@@ -153,7 +160,7 @@ public final class AWSCommerceClientFilter extends ClientFilter {
 
     /**
      *
-     * Creates a new Amazon Product Advertising API client filter instance.
+     * Creates a new AWS EC2 API client filter instance.
      * You will need valid pair of AWS access keys (Access Key and Secret Access Key).
      * The keys should be accessible from http://aws.amazon.com/security-credentials
      * An exception will be thrown if you provide an invalid secret access key
@@ -164,7 +171,7 @@ public final class AWSCommerceClientFilter extends ClientFilter {
      * @throws InvalidKeyException
      * @throws NoSuchAlgorithmException
      */
-    public AWSCommerceClientFilter(String awsKeyId, String awsSecretAccessKey) throws InvalidKeyException, NoSuchAlgorithmException {
+    public AWSEC2Filter(String awsKeyId, String awsSecretAccessKey) throws InvalidKeyException, NoSuchAlgorithmException {
         this.awsKeyId = awsKeyId;
         this.awsSecretAccessKey = awsSecretAccessKey;
         this.mac = Mac.getInstance(HashAlgorithm);
@@ -194,14 +201,14 @@ public final class AWSCommerceClientFilter extends ClientFilter {
 
         StringBuilder result = new StringBuilder();
 
-        result.append(request.getMethod());
-        result.append('\n');
-        result.append(request.getURI().getHost());
-        result.append('\n');
-        result.append(request.getURI().getPath());
-        result.append('\n');
-        result.append(awsQueryParams.query);
-
+        result.append(request.getMethod())
+              .append('\n')
+              .append(request.getURI().getHost())
+              .append('\n')
+              .append(request.getURI().getPath())
+              .append('\n')
+              .append(awsQueryParams.query);
+              
         return result.toString();
     }
 
