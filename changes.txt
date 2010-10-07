@@ -1,4 +1,10 @@
 release 1.5 (11-2010)
+- Fixed issue 590
+  Added check before adding container notifier for existing ones and add them
+  to new set and move this from ServletCointaner.initiate to configure
+  Moved reload functionality to scanning resource config, cache last scanning
+  results and use them to compute added/removed classes and reflect this change
+  in newly scanned set.
 - Fixed issue 589
   https://jersey.dev.java.net/issues/show_bug.cgi?id=589
   Related to https://glassfish.dev.java.net/issues/show_bug.cgi?id=13649

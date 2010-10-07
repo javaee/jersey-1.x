@@ -60,10 +60,7 @@ import java.util.logging.Logger;
  */
 public class WebAppResourceConfig extends ScanningResourceConfig {
 
-    private String[] paths;
-    private ServletContext sc;
-    
-    private static final Logger LOGGER = 
+    private static final Logger LOGGER =
             Logger.getLogger(WebAppResourceConfig.class.getName());
 
     /**
@@ -87,19 +84,10 @@ public class WebAppResourceConfig extends ScanningResourceConfig {
             throw new IllegalArgumentException(
                     "Array of paths must not be null or empty");
 
-        this.paths = paths;
-        this.sc = sc;
-
         init(paths, sc);
     }
 
-    @Override
-    public void onReload() {
-        getClasses().clear();
-        init(paths, sc);
-    }
-    
-    private void init(String[] paths, ServletContext sc) {        
+    private void init(String[] paths, ServletContext sc) {
         if (LOGGER.isLoggable(Level.INFO)) {
             StringBuilder b = new StringBuilder();
             b.append("Scanning for root resource and provider classes in the Web app resource paths:");

@@ -65,6 +65,8 @@ public class ScanningResourceConfig extends DefaultResourceConfig implements Rel
 
     private Scanner scanner;
 
+    private final Set<Class<?>> cachedClasses = new HashSet<Class<?>>();
+
     /**
      * Initialize and scan for root resource and provider classes
      * using a scanner.
@@ -95,6 +97,9 @@ public class ScanningResourceConfig extends DefaultResourceConfig implements Rel
             }
 
         }
+
+        cachedClasses.clear();
+        cachedClasses.addAll(getClasses());
     }
 
     /**
@@ -110,9 +115,25 @@ public class ScanningResourceConfig extends DefaultResourceConfig implements Rel
     /**
      * Perform a new search for resource classes and provider classes.
      */
+    @Override
     public void onReload() {
+        Set<Class<?>> classesToRemove = new HashSet<Class<?>>();
+        Set<Class<?>> classesToAdd = new HashSet<Class<?>>();
+
+        for(Class c : getClasses())
+            if(!cachedClasses.contains(c))
+                classesToAdd.add(c);
+
+        for(Class c : cachedClasses)
+            if(!getClasses().contains(c))
+                classesToRemove.add(c);
+
         getClasses().clear();
+
         init(scanner);
+
+        getClasses().addAll(classesToAdd);
+        getClasses().removeAll(classesToRemove);
     }
 
     private Set<Class> get(Class<? extends Annotation> ac) {

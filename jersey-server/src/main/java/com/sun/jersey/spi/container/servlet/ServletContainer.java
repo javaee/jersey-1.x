@@ -420,6 +420,25 @@ public class ServletContainer extends HttpServlet implements Filter {
             configure(getServletConfig(), rc, wa);
         else if (filterConfig != null)
             configure(filterConfig, rc, wa);
+
+        if (rc instanceof ReloadListener) {
+            List<ContainerNotifier> notifiers = new ArrayList<ContainerNotifier>();
+
+            Object o = rc.getProperties().get(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
+
+            if (o instanceof ContainerNotifier)
+                notifiers.add((ContainerNotifier) o);
+            else if (o instanceof List)
+                for (Object elem : (List) o)
+                    if (elem instanceof ContainerNotifier)
+                        notifiers.add((ContainerNotifier) elem);
+
+            for (ContainerNotifier cn : ServiceFinder.find(ContainerNotifier.class)) {
+                notifiers.add(cn);
+            }
+
+            rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, notifiers);
+        }
     }
     
     /**
@@ -436,16 +455,6 @@ public class ServletContainer extends HttpServlet implements Filter {
      */
     protected void initiate(ResourceConfig rc, WebApplication wa) {
         wa.initiate(rc);
-
-        if (rc instanceof ReloadListener) {
-            List<ContainerNotifier> notifiers = new ArrayList<ContainerNotifier>();
-
-            for (ContainerNotifier cn : ServiceFinder.find(ContainerNotifier.class)) {
-                notifiers.add(cn);
-            }
-
-            rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, notifiers);
-        }
     }
 
     /**

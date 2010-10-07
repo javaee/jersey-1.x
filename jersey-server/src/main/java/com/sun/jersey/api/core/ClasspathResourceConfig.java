@@ -75,8 +75,6 @@ public class ClasspathResourceConfig extends ScanningResourceConfig {
     private static final Logger LOGGER = 
             Logger.getLogger(ClasspathResourceConfig.class.getName());
 
-    private final String[] paths;
-    
     public ClasspathResourceConfig() {
         this(getPaths());
     }
@@ -100,18 +98,7 @@ public class ClasspathResourceConfig extends ScanningResourceConfig {
             throw new IllegalArgumentException(
                     "Array of paths must not be null or empty");
 
-        this.paths = paths.clone();
-        
-        init(paths);
-    }
-    
-    /**
-     * Perform a new search for resource classes and provider classes.
-     */
-    @Override
-    public void onReload() {
-        getClasses().clear();
-        init(paths);
+        init(paths.clone());
     }
     
     private void init(String[] paths) {    

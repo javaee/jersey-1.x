@@ -65,8 +65,6 @@ public class PackagesResourceConfig extends ScanningResourceConfig {
     private static final Logger LOGGER = 
             Logger.getLogger(PackagesResourceConfig.class.getName());
 
-    private final String[] packages;
-    
     /**
      * Search for root resource classes declaring the packages as an 
      * array of package names.
@@ -77,8 +75,7 @@ public class PackagesResourceConfig extends ScanningResourceConfig {
         if (packages == null || packages.length == 0)
             throw new IllegalArgumentException("Array of packages must not be null or empty");
         
-        this.packages = packages.clone();
-        init(packages);
+        init(packages.clone());
     }
 
     /**
@@ -92,15 +89,6 @@ public class PackagesResourceConfig extends ScanningResourceConfig {
         this(getPackages(props));
         
         setPropertiesAndFeatures(props);
-    }
-    
-    /**
-     * Perform a new search for resource classes and provider classes.
-     */
-    @Override
-    public void onReload() {
-        getClasses().clear();
-        init(packages);
     }
     
     private void init(String[] packages) {
