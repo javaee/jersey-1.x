@@ -93,6 +93,7 @@ public class ListOfJAXBBeanTest extends AbstractResourceTester {
             }
         }
         
+        @Override
         public JAXBContext getContext(Class<?> c) {
             JAXBContext myContext = unwrappingOn ? unwrappingContext : wrappingContext;
             return types.contains(c) ? myContext : null;
@@ -113,7 +114,7 @@ public class ListOfJAXBBeanTest extends AbstractResourceTester {
         rawTestDogsResource();
     }
     
-    public void disabledTestDogsResourceUnwrappingOff() throws Exception {
+    public void testDogsResourceUnwrappingOff() throws Exception {
         unwrappingOn = false;
         rawTestDogsResource();
     }
