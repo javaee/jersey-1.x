@@ -193,12 +193,6 @@
                 </dependency>
                 <dependency>
                     <groupId>org.springframework</groupId>
-                    <artifactId>spring</artifactId>
-                    <version>${spring25-release-version}</version>
-                    <scope>compile</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.springframework</groupId>
                     <artifactId>spring-beans</artifactId>
                     <version>${spring25-release-version}</version>
                     <scope>compile</scope>
@@ -219,7 +213,7 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-aop</artifactId>
                     <version>${spring25-release-version}</version>
-                    <scope>test</scope>
+                    <scope>compile</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.aspectj</groupId>
