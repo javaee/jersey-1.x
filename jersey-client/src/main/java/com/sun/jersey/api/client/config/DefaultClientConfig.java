@@ -62,6 +62,8 @@ public class DefaultClientConfig implements ClientConfig {
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
+    public DefaultClientConfig() {}
+    
     public DefaultClientConfig(Class<?>... cs) {
         Collections.addAll(providers, cs);
     }
