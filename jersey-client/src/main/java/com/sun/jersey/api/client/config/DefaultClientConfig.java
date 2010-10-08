@@ -40,6 +40,7 @@
 
 package com.sun.jersey.api.client.config;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -48,7 +49,7 @@ import java.util.Set;
 /**
  * A default client configuration.
  * <p>
- * This class may be extended for specific confguration purposes.
+ * This class may be extended for specific configuration purposes.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -60,7 +61,15 @@ public class DefaultClientConfig implements ClientConfig {
     private final Map<String, Boolean> features = new HashMap<String, Boolean>();
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
-    
+
+    public DefaultClientConfig(Class<?>... cs) {
+        Collections.addAll(providers, cs);
+    }
+
+    public DefaultClientConfig(Set<Class<?>> cs) {
+       providers.addAll(cs);
+    }
+
     public Set<Class<?>> getClasses() {
         return providers;
     }
