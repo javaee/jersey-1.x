@@ -90,7 +90,7 @@ public class ThreadLocalInvoker<T> implements InvocationHandler {
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (threadLocalInstance.get() == null)
-            throw new IllegalStateException();
+            throw new IllegalStateException("No thread local value in scope for proxy of " + proxy.getClass());
         
         try {
             return method.invoke(threadLocalInstance.get(), args);
