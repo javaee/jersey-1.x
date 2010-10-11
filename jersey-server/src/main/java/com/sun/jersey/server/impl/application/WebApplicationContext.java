@@ -56,6 +56,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import com.sun.jersey.spi.uri.rules.UriRules;
+import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -119,7 +120,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         final ContainerRequest _request = new ContainerRequest(app,
                 HTTP_METHOD_MATCH_RESOURCE,
                 base, u,
-                new InBoundHeaders(), null);
+                new InBoundHeaders(), new ByteArrayInputStream(new byte[0]));
         _request.setSecurityContext(request);
 
         // Propagate security context

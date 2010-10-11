@@ -40,6 +40,7 @@
 package com.sun.jersey.api.core;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.resource.Singleton;
@@ -135,6 +136,21 @@ public class ResourceContextTest extends AbstractResourceTester {
 
     public void testMatchResourceWithRelativeURI() {
         initiateWebApplication(MatchResource.class, MyRootResource.class);
+
+        assertEquals(resource("/match/singleton").get(String.class),
+                resource("/match/singleton").get(String.class));
+
+        String r1 = resource("/match/perrequest").get(String.class);
+        String r2 = resource("/match/perrequest").get(String.class);
+        assertEquals(r1.substring(0, r1.indexOf('@')),
+                r2.substring(0, r2.indexOf('@')));
+    }
+
+    public void testMatchResourceWithRelativeURIAndLoggingFilter() {
+        ResourceConfig rc = new DefaultResourceConfig(MatchResource.class, MyRootResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, LoggingFilter.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, LoggingFilter.class.getName());
+        initiateWebApplication(rc);
 
         assertEquals(resource("/match/singleton").get(String.class),
                 resource("/match/singleton").get(String.class));
