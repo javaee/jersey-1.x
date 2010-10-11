@@ -159,7 +159,20 @@ import java.util.regex.PatternSyntaxException;
  */
 public class ServletContainer extends HttpServlet implements Filter {
     /**
-     * The servlet initializaton property whose value is a fully qualified
+     * The servlet initialization property whose boolean value determines
+     * if GlassFish default error pages will be returned or not.
+     * <p>
+     * The default value is true.
+     * <p>
+     * If false then GlassFish will not return default error pages.
+     * <p>
+     * This property is supported on GlassFish version 3.1 or greater.
+     * @since 1.5
+     */
+    public static final String GLASSFISH_DEFAULT_ERROR_PAGE_RESPONSE = "org.glassfish.web.isDefaultErrorPageEnabled";
+    
+    /**
+     * The servlet initialization property whose value is a fully qualified
      * class name of a class that implements {@link ResourceConfig} or
      * {@link Application}.
      */
@@ -167,7 +180,7 @@ public class ServletContainer extends HttpServlet implements Filter {
             "javax.ws.rs.Application";
 
     /**
-     * The servlet initializaton property whose value is a fully qualified
+     * The servlet initialization property whose value is a fully qualified
      * class name of a class that implements {@link ResourceConfig} or
      * {@link Application}.
      */
