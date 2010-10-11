@@ -1,13 +1,9 @@
 release 1.5 (11-2010)
-- Fixed issue 593
-  https://jersey.dev.java.net/issues/show_bug.cgi?id=593
-  Changed internal matching request to utilize an empty InputStream rather
-  than a null value.
-- Fixed issue 592
-  https://jersey.dev.java.net/issues/show_bug.cgi?id=592
-  Documented the GlassFish servlet initialization parameter
-    org.glassfish.web.isDefaultErrorPageEnabled
-  that can be used to disable GlassFish default error page support.
+- Fixed issue 487
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=487
+  Client side LoggingFilter - headers were printed out according to internal
+  structure declaration, not as their real representation in final http
+  request.
 - Fixed issue 590
   https://jersey.dev.java.net/issues/show_bug.cgi?id=590
   Added check before adding container notifier for existing ones and add them

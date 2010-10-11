@@ -45,6 +45,8 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientRequestAdapter;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.ReaderWriter;
+
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -54,7 +56,6 @@ import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * A logging filter.
@@ -207,13 +208,22 @@ public class LoggingFilter extends ClientFilter {
 
     private void printRequestHeaders(StringBuilder b, long id, MultivaluedMap<String, Object> headers) {
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
+            List<Object> val = e.getValue();
             String header = e.getKey();
-            for (Object value : e.getValue()) {
-                prefixId(b, id).append(REQUEST_PREFIX).append(header).append(": ").
-                        append(ClientRequest.getHeaderValue(value)).append("\n");
+
+            if(val.size() == 1) {
+                prefixId(b, id).append(REQUEST_PREFIX).append(header).append(": ").append(ClientRequest.getHeaderValue(val.get(0))).append("\n");
+            } else {
+                StringBuilder sb = new StringBuilder();
+                boolean add = false;
+                for(Object o : val) {
+                    if(add) sb.append(',');
+                    add = true;
+                    sb.append(ClientRequest.getHeaderValue(o));
+                }
+                prefixId(b, id).append(REQUEST_PREFIX).append(header).append(": ").append(sb.toString()).append("\n");
             }
         }
-        prefixId(b, id).append(REQUEST_PREFIX).append("\n");
     }
 
     private void logResponse(long id, ClientResponse response) {
