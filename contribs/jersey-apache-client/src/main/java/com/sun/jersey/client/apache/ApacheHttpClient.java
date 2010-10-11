@@ -43,6 +43,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
+import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -92,7 +93,7 @@ public class ApacheHttpClient extends Client {
      *
      */
     public ApacheHttpClient() {
-        this(createDefaultClientHander(), new DefaultClientConfig(), null);
+        this(createDefaultClientHander(new DefaultApacheHttpClientConfig()));
     }
 
     /**
@@ -102,18 +103,7 @@ public class ApacheHttpClient extends Client {
      *        returning a response.
      */
     public ApacheHttpClient(ApacheHttpClientHandler root) {
-        this(root, new DefaultClientConfig(), null);
-    }
-
-    /**
-     * Create a new client instance with a client configuration.
-     *
-     * @param root the root client handler for dispatching a request and
-     *        returning a response.
-     * @param config the client configuration.
-     */
-    public ApacheHttpClient(ApacheHttpClientHandler root, ClientConfig config) {
-        this(root, config, null);
+        this(root, null);
     }
 
     /**
@@ -124,22 +114,30 @@ public class ApacheHttpClient extends Client {
      *        returning a response.
      * @param config the client configuration.
      * @param provider the IoC component provider factory.
+     * @deprecated the config parameter is no longer utilized and instead
+     *             the config obtained from the {@link ApacheHttpClientHandler#getConfig() }
+     *             is utilized instead.
      */
+    @Deprecated
     public ApacheHttpClient(ApacheHttpClientHandler root, ClientConfig config,
             IoCComponentProviderFactory provider) {
-        super(root, config, provider);
+        this(root, provider);
+    }
+
+    /**
+     * Create a new instance with a client configuration and a
+     * component provider.
+     *
+     * @param root the root client handler for dispatching a request and
+     *        returning a response.
+     * @param provider the IoC component provider factory.
+     */
+    public ApacheHttpClient(ApacheHttpClientHandler root,
+            IoCComponentProviderFactory provider) {
+        super(root, root.getConfig(), provider);
 
         this.clientHandler = root;
-        
-        HttpClient client = root.getHttpClient();
-        
-        client.getParams().setAuthenticationPreemptive(
-                config.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION));
-
-        final Integer connectTimeout = (Integer)config.getProperty(ApacheHttpClientConfig.PROPERTY_CONNECT_TIMEOUT);
-        if (connectTimeout != null) {
-            client.getHttpConnectionManager().getParams().setConnectionTimeout(connectTimeout);
-        }
+        inject(this.clientHandler.getMethodProcessor());
     }
 
     /**
@@ -157,7 +155,7 @@ public class ApacheHttpClient extends Client {
      * @return a default client.
      */
     public static ApacheHttpClient create() {
-        return new ApacheHttpClient(createDefaultClientHander());
+        return create(new DefaultApacheHttpClientConfig());
     }
 
     /**
@@ -167,7 +165,7 @@ public class ApacheHttpClient extends Client {
      * @return a default client.
      */
     public static ApacheHttpClient create(ClientConfig cc) {
-        return new ApacheHttpClient(createDefaultClientHander(), cc);
+        return create(cc, null);
     }
 
     /**
@@ -178,7 +176,7 @@ public class ApacheHttpClient extends Client {
      * @return a default client.
      */
     public static ApacheHttpClient create(ClientConfig cc, IoCComponentProviderFactory provider) {
-        return new ApacheHttpClient(createDefaultClientHander(), cc, provider);
+        return new ApacheHttpClient(createDefaultClientHander(cc), provider);
     }
 
     /**
@@ -186,9 +184,9 @@ public class ApacheHttpClient extends Client {
      *
      * @return a default Apache HTTP client handler.
      */
-    private static ApacheHttpClientHandler createDefaultClientHander() {
+    private static ApacheHttpClientHandler createDefaultClientHander(ClientConfig cc) {
         final HttpClient client = new HttpClient(new MultiThreadedHttpConnectionManager());
 
-        return new ApacheHttpClientHandler(client);
+        return new ApacheHttpClientHandler(client, cc);
     }
 }

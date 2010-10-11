@@ -39,49 +39,36 @@
  */
 package com.sun.jersey.client.apache;
 
+import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.CommittingOutputStream;
-import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
-import com.sun.jersey.client.apache.config.ApacheHttpClientState;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
-import com.sun.jersey.client.apache.config.DefaultCredentialsProvider;
 import com.sun.jersey.core.header.InBoundHeaders;
 
 import com.sun.jersey.core.util.ReaderWriter;
+import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Context;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HostConfiguration;
-import org.apache.commons.httpclient.HttpState;
-import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
-import org.apache.commons.httpclient.cookie.CookiePolicy;
-import org.apache.commons.httpclient.auth.CredentialsProvider;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.OptionsMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.methods.RequestEntity;
-import org.apache.commons.httpclient.params.HttpMethodParams;
 
 /**
  * A root handler with Jakarta Commons HttpClient acting as a backend.
@@ -108,12 +95,16 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
  * @author jorgeluisw@mac.com
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ApacheHttpClientHandler extends TerminatingClientHandler {
+public final class ApacheHttpClientHandler implements ClientHandler {
 
-    private static final DefaultCredentialsProvider DEFAULT_CREDENTIALS_PROVIDER =
-            new DefaultCredentialsProvider();
-    
     private final HttpClient client;
+
+    private final ClientConfig config;
+
+    private final ApacheHttpMethodExecutor methodExecutor;
+
+    @Context
+    private MessageBodyWorkers workers;
 
     /**
      * Create a new root handler with an {@link HttpClient}.
@@ -121,7 +112,49 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
      * @param client the {@link HttpClient}.
      */
     public ApacheHttpClientHandler(HttpClient client) {
+        this(client, new DefaultApacheHttpClientConfig(), new DefaultApacheHttpMethodExecutor(client));
+    }
+
+    /**
+     * Create a new root handler with an {@link HttpClient}.
+     *
+     * @param client the {@link HttpClient}.
+     * @param config the client configuration.
+     */
+    public ApacheHttpClientHandler(HttpClient client, ClientConfig config) {
+        this(client, config, new DefaultApacheHttpMethodExecutor(client));
+    }
+
+    /**
+     * Create a new root handler with an {@link HttpClient}.
+     *
+     * @param client the {@link HttpClient}.
+     * @param config the client configuration.
+     * @param methodExecutor the method executor.
+     */
+    public ApacheHttpClientHandler(HttpClient client, ClientConfig config,
+            ApacheHttpMethodExecutor methodExecutor) {
         this.client = client;
+        this.config = config;
+        
+        client.getParams().setAuthenticationPreemptive(config.getPropertyAsFeature(
+                ApacheHttpClientConfig.PROPERTY_PREEMPTIVE_AUTHENTICATION));
+        final Integer connectTimeout = (Integer)config.getProperty(
+                ApacheHttpClientConfig.PROPERTY_CONNECT_TIMEOUT);
+        if (connectTimeout != null) {
+            client.getHttpConnectionManager().getParams().setConnectionTimeout(connectTimeout);
+        }
+
+        this.methodExecutor = methodExecutor;
+    }
+
+    /**
+     * Get the client config.
+     * 
+     * @return the client config.
+     */
+    public ClientConfig getConfig() {
+        return config;
     }
 
     /**
@@ -132,130 +165,20 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
     public HttpClient getHttpClient() {
         return client;
     }
-    
+
+    @Override
     public ClientResponse handle(final ClientRequest cr)
             throws ClientHandlerException {
 
-        final Map<String, Object> props = cr.getProperties();
-
         final HttpMethod method = getHttpMethod(cr);
 
-        method.setDoAuthentication(true);
-
-        final HttpMethodParams methodParams = method.getParams();
-
-        // Set the handle cookies property
-        if (!cr.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_HANDLE_COOKIES)) {
-            methodParams.setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
-        }
-
-        // Set the interactive and credential provider properties
-        if (cr.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_INTERACTIVE)) {
-            CredentialsProvider provider = (CredentialsProvider)props.get(ApacheHttpClientConfig.PROPERTY_CREDENTIALS_PROVIDER);
-            if (provider == null) {
-                provider = DEFAULT_CREDENTIALS_PROVIDER;
-            }
-            methodParams.setParameter(CredentialsProvider.PROVIDER, provider);
-        } else {
-            methodParams.setParameter(CredentialsProvider.PROVIDER, null);
-        }
-
-        // Set the read timeout
-        final Integer readTimeout = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_READ_TIMEOUT);
-        if (readTimeout != null) {
-            methodParams.setSoTimeout(readTimeout);
-        }
-
-        if (method instanceof EntityEnclosingMethod) {
-            final EntityEnclosingMethod entMethod = (EntityEnclosingMethod) method;
-
-            if (cr.getEntity() != null) {
-                final RequestEntityWriter re = getRequestEntityWriter(cr);
-                final Integer chunkedEncodingSize = (Integer)props.get(ApacheHttpClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
-                if (chunkedEncodingSize != null) {
-                    // There doesn't seems to be a way to set the chunk size.
-                    entMethod.setContentChunked(true);
-
-                    // It is not possible for a MessageBodyWriter to modify
-                    // the set of headers before writing out any bytes to
-                    // the OutputStream
-                    // This makes it impossible to use the multipart
-                    // writer that modifies the content type to add a boundary
-                    // parameter
-                    writeOutBoundHeaders(cr.getHeaders(), method);
-
-                    // Do not buffer the request entity when chunked encoding is
-                    // set
-                    entMethod.setRequestEntity(new RequestEntity() {
-                        public boolean isRepeatable() {
-                            return false;
-                        }
-
-                        public void writeRequest(OutputStream out) throws IOException {
-                            re.writeRequestEntity(out);
-                        }
-
-                        public long getContentLength() {
-                            return re.getSize();
-                        }
-
-                        public String getContentType() {
-                            return re.getMediaType().toString();
-                        }
-
-                    });
-
-                } else {
-                    entMethod.setContentChunked(false);
-
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    try {
-                        re.writeRequestEntity(new CommittingOutputStream(baos) {
-                            @Override
-                            protected void commit() throws IOException {
-                                writeOutBoundHeaders(cr.getMetadata(), method);
-                            }
-                        });
-                    } catch (IOException ex) {
-                        throw new ClientHandlerException(ex);
-                    }
-
-                    final byte[] content = baos.toByteArray();
-                    entMethod.setRequestEntity(new RequestEntity() {
-                        public boolean isRepeatable() {
-                            return true;
-                        }
-
-                        public void writeRequest(OutputStream out) throws IOException {
-                            out.write(content);
-                        }
-
-                        public long getContentLength() {
-                            return content.length;
-                        }
-
-                        public String getContentType() {
-                            return re.getMediaType().toString();
-                        }
-
-                    });
-                }
-
-            }
-        } else {
-            writeOutBoundHeaders(cr.getHeaders(), method);
-        
-            // Follow redirects
-            method.setFollowRedirects(cr.getPropertyAsFeature(ApacheHttpClientConfig.PROPERTY_FOLLOW_REDIRECTS));
-        }
+        methodExecutor.executeMethod(method, cr);
 
         try {
-            client.executeMethod(getHostConfiguration(client, props), method, getHttpState(props));
-
             ClientResponse r = new ClientResponse(method.getStatusCode(),
                     getInBoundHeaders(method),
                     new HttpClientResponseInputStream(method),
-                    getMessageBodyWorkers());
+                    workers);
             if (!r.hasEntity()) {
                 r.bufferEntity();
                 r.close();
@@ -289,6 +212,7 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
     }
 
     private static class CustomMethod extends EntityEnclosingMethod {
+
         private String method;
 
         CustomMethod(String method, String uri) {
@@ -300,74 +224,6 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         @Override
         public String getName() {
             return method;
-        }
-    }
-
-    private HostConfiguration getHostConfiguration(HttpClient client, Map<String, Object> props) {
-        Object proxy = props.get(ApacheHttpClientConfig.PROPERTY_PROXY_URI);
-        if (proxy != null) {
-            URI proxyUri = getProxyUri(proxy);
-
-            String proxyHost = proxyUri.getHost();
-            if (proxyHost == null) {
-                proxyHost = "localhost";
-            }
-
-            int proxyPort = proxyUri.getPort();
-            if (proxyPort == -1) {
-                proxyPort = 8080;
-            }
-
-            HostConfiguration hostConfig = new HostConfiguration(client.getHostConfiguration());
-            String setHost = hostConfig.getProxyHost();
-            int setPort = hostConfig.getProxyPort();
-
-            if ((setHost == null) ||
-                    (!setHost.equals(proxyHost)) ||
-                    (setPort == -1) ||
-                    (setPort != proxyPort)) {
-                hostConfig.setProxyHost(new ProxyHost(proxyHost, proxyPort));
-            }
-            return hostConfig;
-        } else {
-            return null;
-        }
-    }
-
-    private HttpState getHttpState(Map<String, Object> props) {
-        ApacheHttpClientState httpState = (ApacheHttpClientState) props.get(DefaultApacheHttpClientConfig.PROPERTY_HTTP_STATE);
-        if (httpState != null) {
-            return httpState.getHttpState();
-        } else {
-            return null;
-        }
-    }
-
-    private URI getProxyUri(Object proxy) {
-        if (proxy instanceof URI) {
-            return (URI) proxy;
-        } else if (proxy instanceof String) {
-            return URI.create((String) proxy);
-        } else {
-            throw new ClientHandlerException("The proxy URI property MUST be an instance of String or URI");
-        }
-    }
-
-    private void writeOutBoundHeaders(MultivaluedMap<String, Object> metadata, HttpMethod method) {
-        for (Map.Entry<String, List<Object>> e : metadata.entrySet()) {
-            List<Object> vs = e.getValue();
-            if (vs.size() == 1) {
-                method.setRequestHeader(e.getKey(), headerValueToString(vs.get(0)));
-            } else {
-                StringBuilder b = new StringBuilder();
-                for (Object v : e.getValue()) {
-                    if (b.length() > 0) {
-                        b.append(',');
-                    }
-                    b.append(headerValueToString(v));
-                }
-                method.setRequestHeader(e.getKey(), b.toString());
-            }
         }
     }
 
@@ -412,5 +268,9 @@ public final class ApacheHttpClientHandler extends TerminatingClientHandler {
         } else {
             return new BufferedInputStream(i, ReaderWriter.BUFFER_SIZE);
         }
+    }
+
+    /* package */ ApacheHttpMethodExecutor getMethodProcessor() {
+        return methodExecutor;
     }
 }

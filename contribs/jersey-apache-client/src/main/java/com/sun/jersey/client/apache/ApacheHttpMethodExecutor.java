@@ -37,17 +37,24 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.api.client;
+package com.sun.jersey.client.apache;
+
+import com.sun.jersey.api.client.ClientRequest;
+import org.apache.commons.httpclient.HttpMethod;
 
 /**
- * A terminating client handler that is invoked to produce an HTTP request
- * to send to a resource and process the HTTP response received from the resource.
- * <p>
- * This class can be extended to integrate HTTP protocol functionality with
- * the Client API. Utility methods are provided for converting header values
- * and writing a request entity.
+ * An Apache HTTP method executor.
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author imyousuf
+ * @author Paul Sandoz
  */
-public abstract class TerminatingClientHandler extends RequestWriter implements ClientHandler {
+public interface ApacheHttpMethodExecutor {
+
+    /**
+     * Execute the HTTP method
+     * 
+     * @param method the HTTP method.
+     * @param cr the client request.
+     */
+    public void executeMethod(HttpMethod method, ClientRequest cr);
 }

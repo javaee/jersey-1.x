@@ -131,6 +131,8 @@ public class Client extends Filterable implements ClientHandler {
 
     private Set<ViewProxyProvider> vpps;
 
+    private MessageBodyFactory workers;
+
     private static class ContextInjectableProvider<T> extends
             SingletonTypeInjectableProvider<Context, T> {
 
@@ -260,6 +262,7 @@ public class Client extends Filterable implements ClientHandler {
         // Obtain all message body readers/writers
         final MessageBodyFactory bodyContext = new MessageBodyFactory(providerServices,
                 config.getFeature(FeaturesAndProperties.FEATURE_PRE_1_4_PROVIDER_PRECEDENCE));
+        workers = bodyContext;
         // Allow injection of message body context
         injectableFactory.add(new ContextInjectableProvider<MessageBodyWorkers>(
                 MessageBodyWorkers.class, bodyContext));
@@ -390,6 +393,15 @@ public class Client extends Filterable implements ClientHandler {
      */
     public Providers getProviders() {
         return providers;
+    }
+
+    /**
+     * Get the {@link MessageBodyWorkers} utilized by the client.
+     *
+     * @return the {@link MessageBodyWorkers} utilized by the client.
+     */
+    public MessageBodyWorkers getMessageBodyWorkers() {
+        return workers;
     }
 
     /**
@@ -609,6 +621,7 @@ public class Client extends Filterable implements ClientHandler {
 
     // ClientHandler
 
+    @Override
     public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
         request.getProperties().putAll(properties);
         request.getProperties().put(Client.class.getName(), this);
@@ -617,6 +630,15 @@ public class Client extends Filterable implements ClientHandler {
         
         response.getProperties().put(Client.class.getName(), this);
         return response;
+    }
+
+    /**
+     * Inject client-side bindings on an instance.
+     *
+     * @param o the instance to inject on.
+     */
+    public void inject(Object o) {
+        componentProviderFactory.injectOnProviderInstance(o);
     }
 
     /**
