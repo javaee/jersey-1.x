@@ -1,4 +1,7 @@
 release 1.5 (11-2010)
+- Fixed issue 587
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=587
+  Upgrade to tag lib version 1.2 for Jersey's JSP support.
 - Fixed issue 487
   https://jersey.dev.java.net/issues/show_bug.cgi?id=487
   Client side LoggingFilter - headers were printed out according to internal
