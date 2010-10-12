@@ -50,6 +50,7 @@ import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.server.impl.InitialContextHelper;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.container.ExceptionMapperContext;
@@ -72,6 +73,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
@@ -89,6 +91,9 @@ import javax.enterprise.inject.spi.ProcessManagedBean;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.ServletContext;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
@@ -141,9 +146,9 @@ public class CDIExtension implements Extension {
     private int nextSyntheticQualifierValue = 0;
     
     private List<InitializedLater> toBeInitializedLater;
-    
-    private static ThreadLocal<CDIExtension> initializedExtension = new ThreadLocal<CDIExtension>();
-    
+
+    private static String JNDI_CDIEXTENSION_NAME = "/com.sun.jersey.config/CDIExtension";
+
     /*
      * Setting this system property to "true" will force use of the BeanManager to look up the bean for the active CDIExtension,
      * rather than going through a thread local.
@@ -160,18 +165,33 @@ public class CDIExtension implements Extension {
      * Returns the instance of CDIExtension that was initialized previously in this same thread, if any.
      */
     public static CDIExtension getInitializedExtension() {
-        return initializedExtension.get();
+        try {
+            InitialContext ic = InitialContextHelper.getInitialContext();
+            if (ic == null) {
+                throw new RuntimeException();
+            }
+            return (CDIExtension)ic.lookup(JNDI_CDIEXTENSION_NAME);
+        } catch (NamingException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public CDIExtension() {}
-
+    
     private void initialize() {
         // initialize in a separate method because Weld creates a proxy for the extension
         // and we don't want to waste time initializing it
 
         // workaround for Weld proxy bug
         if (!lookupExtensionInBeanManager) {
-            initializedExtension.set(this);
+            try {
+                InitialContext ic = InitialContextHelper.getInitialContext();
+                if (ic != null) {
+                    ic.bind(JNDI_CDIEXTENSION_NAME, this);
+                }
+            } catch (NamingException ex) {
+                throw new RuntimeException(ex);
+            }
         }
         
         // annotations to be turned into qualifiers
@@ -853,9 +873,16 @@ public class CDIExtension implements Extension {
             }
         }
         finally {
-            // clear the thread local as soon as possible
+            // clear the JNDI reference as soon as possible
             if (!lookupExtensionInBeanManager) {
-                initializedExtension.set(null);
+                try {
+                    InitialContext ic = InitialContextHelper.getInitialContext();
+                    if (ic != null) {
+                        ic.unbind(JNDI_CDIEXTENSION_NAME);
+                    }
+                } catch (NamingException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
     }
