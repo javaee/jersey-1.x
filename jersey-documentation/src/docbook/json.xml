@@ -91,8 +91,12 @@
         &lt;/init-param&gt;
 </programlisting>
 </example>
-    
+</para>
+
+<para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jacksonjsonprovider/&version;/jacksonjsonprovider-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/jacksonjsonprovider/&version;/jacksonjsonprovider-&version;-project.zip</ulink>
+   to get a complete example using POJO based JSON support.
     </para>
+    
   </section>  
     
   <section>
