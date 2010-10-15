@@ -96,24 +96,11 @@ Trying ::1...
 Trying 127.0.0.1...
 Connected to localhost.
 Escape character is '^]'.
+____________________________
+Welcome to Apache Felix Gogo
 
-Felix Remote Shell Console:
-============================
-
-->
+g!
 </programlisting>
-Both Jersey examples require an OSGi Event Admin API implementation. At the moment, GlassFish container does not provide any. 
-You will need to install one before you try to install and start the Jersey example bundle files. 
-Since GlassFish is based on Apache Felix, we will pick the default Event Admin API implementation from there:
-    
-<programlisting>
-->install http://repo2.maven.org/maven2/org/apache/felix/org.apache.felix.eventadmin/1.2.2/org.apache.felix.eventadmin-1.2.2.jar
-Bundle ID: 241
--> start 241
-->
-</programlisting>
-In the above listing, the number 241 represents handler to the OSGi bundle i have just installed. Bundle numbers are allocated dynamically. 
-It means, you might be given a different handler. It is important to always use the correct bundle number as specified by the Felix runtime in the "Bundle ID:" response.
 
   </para>
   </section>
@@ -135,12 +122,17 @@ The third manifest header worth mentioning is the <code>Bundle-ClassPath</code> 
 For more detailed information on the example please see the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-osgi-webapp/&version;/helloworld-osgi-webapp-&version;-project.zip">source code</ulink>.
 </para>
 <para>
-Following is the listing showing how to actually install and run the WAB on GlassFish (please do not forget to do the preparation described in the previous section, namely install an Event Admin implementation bundle).
-  <programlisting>->install http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-osgi-webapp/war-bundle/&version;/war-bundle-&version;.war
-Bundle ID: 242
--> start 242
+Following is the listing showing how to actually install and run the WAB on GlassFish:
+  <programlisting>g! install http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-osgi-webapp/war-bundle/1.5-SNAPSHOT/war-bundle-1.5-SNAPSHOT.war
+Bundle ID: 246
+g! start 246
 </programlisting>
-After that, you should be able to access the deployed Jersey resource at <ulink url="http://localhost:8080/helloworld/webresources/helloworld">http://localhost:8080/helloworld/webresources/helloworld</ulink>
+In the above listing, the number 246 represents handler to the OSGi bundle you have just installed. Bundle numbers are allocated dynamically. 
+It means, you might be given a different handler. It is important to always use the correct bundle number as specified by the Felix runtime in the "Bundle ID:" response.
+</para>
+<para>
+After the WAB gets installed and activated by the above mentioned commands, you should be able to access the deployed 
+Jersey resource at <ulink url="http://localhost:8080/helloworld/webresources/helloworld">http://localhost:8080/helloworld/webresources/helloworld</ulink>
 </para>
 </section> <!-- END WAB support -->
 
@@ -148,36 +140,25 @@ After that, you should be able to access the deployed Jersey resource at <ulink 
     <title>Http Service Example</title>
     
   <para>
-    Our aim is to make also OSGi Http Service feature work for Jersey on GlassFish v3.1. Due to a regression, this feature is currently broken, but things should be fixed soon.
+    OSGi Http Service support currently does not come out of the box with GlassFish, but is provided with a separate OSGi bundle,
+    <ulink url="http://download.java.net/maven/glassfish/org/glassfish/osgi-http/3.1-SNAPSHOT/osgi-http-3.1-SNAPSHOT.jar">http://download.java.net/maven/glassfish/org/glassfish/osgi-http/3.1-SNAPSHOT/osgi-http-3.1-SNAPSHOT.jar</ulink>.
+    You will need to enable the feature first, by installing that bundle. After that, you can install and activate the Jersey application bundle.
+    Both bundles could be installed and activated as follows:
     </para>
     
     <para>
-    Once fixed, the installation steps should look like follows:
-    
-<programlisting>Trying ::1...
-Trying 127.0.0.1...
-Connected to localhost.
-Escape character is '^]'.
-
-Felix Remote Shell Console:
-============================
-
-->install http://download.java.net/maven/glassfish/org/glassfish/osgi-http/3.1-SNAPSHOT/osgi-http-3.1-SNAPSHOT.jar
-Bundle ID: 243
-->install http://download.java.net/maven/2/com/sun/jersey/samples/osgi-http-service/bundle/&version;/bundle-&version;.jar
-Bundle ID: 244
--> start 243 244
+<programlisting>
+g! install http://download.java.net/maven/glassfish/org/glassfish/osgi-http/3.1-SNAPSHOT/osgi-http-3.1-SNAPSHOT.jar
+Bundle ID: 247
+g! install http://download.java.net/maven/2/com/sun/jersey/samples/osgi-http-service/bundle/1.5-SNAPSHOT/bundle-1.5-SNAPSHOT.jar
+Bundle ID: 248
+g! start 247 248
 </programlisting>
-After that, you should be able to access the Jersey resource at <ulink url="http://localhost:8080/osgi/jersey-http-service/status">http://localhost:8080/osgi/jersey-http-service/status</ulink>
+Now you should be able to access the Jersey resource at <ulink url="http://localhost:8080/osgi/jersey-http-service/status">http://localhost:8080/osgi/jersey-http-service/status</ulink>
 </para>
 
 <para>
-Finally, to close the Felix console session just enter the <code>exit</code> command:
-<programlisting>
--> exit
-Good Bye!
-Connection closed by foreign host.
-</programlisting>
+Finally, to close the Felix console session just press <code>[Ctrl]-[d]</code>.
 </para>
 </section> <!-- END HttpService support -->
 
