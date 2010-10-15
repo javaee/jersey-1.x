@@ -724,8 +724,6 @@ public class EntityTypesTest extends AbstractTypeTester {
         @POST
         @Path("type")
         public List<JAXBBean> postType(Collection<JAXBBeanType> l) {
-            System.out.println("######################## " + l.size());
-
             List<JAXBBean> beans = new ArrayList<JAXBBean>();
             for (JAXBBeanType t : l)
                 beans.add(new JAXBBean(t.value));
