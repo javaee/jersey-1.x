@@ -42,25 +42,20 @@ package com.sun.jersey.impl.entity;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Feed;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.atom.rome.impl.provider.entity.AtomEntryProvider;
 import com.sun.jersey.atom.rome.impl.provider.entity.AtomFeedProvider;
 import com.sun.jersey.core.impl.provider.entity.FileProvider;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Feed;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONObject;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
 import javax.activation.DataSource;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
@@ -85,10 +80,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  *
@@ -722,6 +724,8 @@ public class EntityTypesTest extends AbstractTypeTester {
         @POST
         @Path("type")
         public List<JAXBBean> postType(Collection<JAXBBeanType> l) {
+            System.out.println("######################## " + l.size());
+
             List<JAXBBean> beans = new ArrayList<JAXBBean>();
             for (JAXBBeanType t : l)
                 beans.add(new JAXBBean(t.value));
@@ -821,15 +825,17 @@ public class EntityTypesTest extends AbstractTypeTester {
     public void _testJAXBListRepresentationFastInfoset() {
         initiateWebApplication(JAXBListResourceFastInfoset.class);
         WebResource r = resource("/");
+        r.addFilter(new LoggingFilter());
 
         Collection<JAXBBean> a = r.get(
                 new GenericType<Collection<JAXBBean>>(){});
-        Collection<JAXBBean> b = r.post(new GenericType<Collection<JAXBBean>>(){}, 
+
+        Collection<JAXBBean> b = r.type("application/fastinfoset").post(new GenericType<Collection<JAXBBean>>(){},
                 new GenericEntity<Collection<JAXBBean>>(a){});
-        
+
         assertEquals(a, b);
         
-        b = r.path("type").post(new GenericType<Collection<JAXBBean>>(){},
+        b = r.path("type").type("application/fastinfoset").post(new GenericType<Collection<JAXBBean>>(){},
                 new GenericEntity<Collection<JAXBBean>>(a){});
         assertEquals(a, b);
     }
