@@ -187,7 +187,7 @@ public class CDIExtension implements Extension {
             try {
                 InitialContext ic = InitialContextHelper.getInitialContext();
                 if (ic != null) {
-                    ic.bind(JNDI_CDIEXTENSION_NAME, this);
+                    ic.rebind(JNDI_CDIEXTENSION_NAME, this);
                 }
             } catch (NamingException ex) {
                 throw new RuntimeException(ex);
@@ -921,6 +921,9 @@ public class CDIExtension implements Extension {
         }
 
         public void later() {
+            if (injectable != null) {
+                return;
+            }
             boolean registered = webApplication.getServerInjectableProviderFactory().isParameterTypeRegistered(parameter);
             if (!registered) {
                 throw new ContainerException("parameter type not registered " + discoveredParameter);
@@ -933,6 +936,9 @@ public class CDIExtension implements Extension {
         }
 
         @Override public T create(CreationalContext<T> creationalContext) {
+            if (injectable == null) {
+                later();
+            }
             try {
                 return injectable.getValue();
             }
