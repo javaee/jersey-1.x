@@ -223,7 +223,7 @@ public class ContainerResponse implements HttpResponseContext {
      * to that {@link OutputStream}. An appropriate {@link MessageBodyWriter}
      * will be found to write the entity.
      * 
-     * @throws WebApplicationException if {@link MessageBodyWriter} cannot be 
+     * @throws WebApplicati/ if {@link MessageBodyWriter} cannot be
      *         found for the entity with a 500 (Internal Server error) response.
      * @throws java.io.IOException if there is an error writing the entity
      */
@@ -457,13 +457,23 @@ public class ContainerResponse implements HttpResponseContext {
 
     private void onException(Throwable e, Response r, boolean mapped) {
         if (request.isTracingEnabled()) {
-            traceException(e, r);
-        } else if (!mapped) {
-            // Always log the stack trace if the exception is not mapped
-            // and status >= 500
-            if (r.getStatus() >= 500) {
-                traceException(e, r);
+            Response.Status s = Response.Status.fromStatusCode(r.getStatus());
+            if (s != null) {
+                request.trace(String.format("mapped exception to response: %s -> %d (%s)",
+                        ReflectionHelper.objectToString(e),
+                        r.getStatus(),
+                        s.getReasonPhrase()));
+            } else {
+                request.trace(String.format("mapped exception to response: %s -> %d",
+                        ReflectionHelper.objectToString(e),
+                        r.getStatus()));
             }
+        }
+          
+        if (!mapped && r.getStatus() >= 500) {
+            logException(e, r, Level.SEVERE);
+        } else if (LOGGER.isLoggable(Level.FINE)) {
+            logException(e, r, Level.FINE);
         }
 
         setResponse(r);
@@ -480,15 +490,8 @@ public class ContainerResponse implements HttpResponseContext {
         }
     }
 
-    private void traceException(Throwable e, Response r) {
-        if (request.isTracingEnabled()) {
-            request.trace(String.format("mapped exception to response: %s -> %d",
-                    ReflectionHelper.objectToString(e),
-                    r.getStatus()));
-        }
-
+    private void logException(Throwable e, Response r, Level l) {
         Response.Status s = Response.Status.fromStatusCode(r.getStatus());
-        Level l = (r.getStatus() >= 500) ? Level.SEVERE : Level.INFO;
         if (s != null) {
             LOGGER.log(l,
                     "Mapped exception to response: " + r.getStatus() + " (" + s.getReasonPhrase() + ")",
@@ -499,7 +502,7 @@ public class ContainerResponse implements HttpResponseContext {
                     e);
         }
     }
-
+    
     // HttpResponseContext
     
     public Response getResponse() {

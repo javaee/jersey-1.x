@@ -1,4 +1,10 @@
 release 1.5 (11-2010)
+- Fixed issue 595
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=595
+  When mapping exceptions to responses if the Log level is FINE when the
+  exception will be logged. This changes the current behaviour where the
+  exception was logged when tracing was enabled. Thus when Jersey is used
+  as a filter with tracing enabled 404 mapped exceptions will not be logged.
 - Fixed issue 587
   https://jersey.dev.java.net/issues/show_bug.cgi?id=587
   Upgrade to tag lib version 1.2 for Jersey's JSP support.
