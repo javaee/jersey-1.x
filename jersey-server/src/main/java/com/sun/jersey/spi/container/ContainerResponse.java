@@ -223,7 +223,7 @@ public class ContainerResponse implements HttpResponseContext {
      * to that {@link OutputStream}. An appropriate {@link MessageBodyWriter}
      * will be found to write the entity.
      * 
-     * @throws WebApplicati/ if {@link MessageBodyWriter} cannot be
+     * @throws WebApplication if {@link MessageBodyWriter} cannot be
      *         found for the entity with a 500 (Internal Server error) response.
      * @throws java.io.IOException if there is an error writing the entity
      */
