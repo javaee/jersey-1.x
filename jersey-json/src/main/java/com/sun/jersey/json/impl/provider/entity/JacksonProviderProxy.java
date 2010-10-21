@@ -55,6 +55,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
+import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -64,7 +65,9 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class JacksonProviderProxy implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
-    JacksonJsonProvider jacksonProvider = new JacksonJsonProvider();
+    JacksonJsonProvider pojoProvider = new JacksonJsonProvider();
+    JacksonJaxbJsonProvider jaxbProvider = new JacksonJaxbJsonProvider();
+
     boolean jacksonEntityProviderFeatureSet = false;
 
     @Context
@@ -76,32 +79,44 @@ public class JacksonProviderProxy implements MessageBodyReader<Object>, MessageB
     public void setProviders(Providers p) {
         final ContextResolver<ObjectMapper> omResolver = p.getContextResolver(ObjectMapper.class, MediaType.APPLICATION_JSON_TYPE);
         if (omResolver != null) {
-            jacksonProvider.setMapper(omResolver.getContext(ObjectMapper.class));
+            final ObjectMapper mapper = omResolver.getContext(ObjectMapper.class);
+            pojoProvider.setMapper(mapper);
+            jaxbProvider.setMapper(mapper);
         }
     }
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return jacksonEntityProviderFeatureSet && jacksonProvider.isReadable(type, genericType, annotations, mediaType);
+        return jacksonEntityProviderFeatureSet && 
+                (jaxbProvider.isReadable(type, genericType, annotations, mediaType) || pojoProvider.isReadable(type, genericType, annotations, mediaType));
     }
 
     @Override
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
-        return jacksonProvider.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
+        return jaxbProvider.isReadable(type, genericType, annotations, mediaType) ?
+            jaxbProvider.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream) :
+            pojoProvider.readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
     }
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return jacksonEntityProviderFeatureSet && jacksonProvider.isWriteable(type, genericType, annotations, mediaType);
+        return jacksonEntityProviderFeatureSet && 
+                (jaxbProvider.isWriteable(type, genericType, annotations, mediaType) || pojoProvider.isWriteable(type, genericType, annotations, mediaType));
     }
 
     @Override
     public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return jacksonProvider.getSize(t, type, genericType, annotations, mediaType);
+        return jaxbProvider.isWriteable(type, genericType, annotations, mediaType) ?
+            jaxbProvider.getSize(t, type, genericType, annotations, mediaType) :
+            pojoProvider.getSize(t, type, genericType, annotations, mediaType);
     }
 
     @Override
     public void writeTo(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
-        jacksonProvider.writeTo(t, type, genericType, annotations, mediaType, httpHeaders, entityStream);
+        if (jaxbProvider.isWriteable(type, genericType, annotations, mediaType)) {
+            jaxbProvider.writeTo(t, type, genericType, annotations, mediaType, httpHeaders, entityStream);
+        } else {
+            pojoProvider.writeTo(t, type, genericType, annotations, mediaType, httpHeaders, entityStream);
+        }
     }
 }
