@@ -49,6 +49,7 @@ import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
+import com.sun.jersey.spi.inject.Errors;
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
@@ -84,19 +85,22 @@ public class ResourceFactory {
 
     protected ResourceComponentProviderFactory getComponentProviderFactory(Class c) {
         Class<? extends ResourceComponentProviderFactory> providerFactoryClass = null;
+        Class<? extends Annotation> scope = null;
 
         // Use annotations to identify the correct provider, note that
         // @ResourceComponentProviderClass is a meta-annotation so we look for annotations
         // on the annotations of the resource class
         for (Annotation a: c.getAnnotations()) {
-            Class<?> annotationClass = a.annotationType();
-            ResourceComponentProviderFactoryClass rf = annotationClass.getAnnotation(
+            Class<? extends Annotation> annotationType = a.annotationType();
+            ResourceComponentProviderFactoryClass rf = annotationType.getAnnotation(
                     ResourceComponentProviderFactoryClass.class);
-            if (rf != null && providerFactoryClass == null)
+            if (rf != null && providerFactoryClass == null) {
                 providerFactoryClass = rf.value();
-            else if (rf != null && providerFactoryClass != null)
-                throw new ContainerException(c.toString()+
-                        " has multiple ResourceComponentProviderClass annotations");
+                scope = annotationType;
+            }  else if (rf != null && providerFactoryClass != null) {
+                Errors.error("Class " + c.getName() + " is annotated with multiple scopes: "
+                        + scope.getName() + " and " + annotationType.getName());
+            }
         }
 
         if (providerFactoryClass == null) {

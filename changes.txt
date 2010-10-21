@@ -1,4 +1,8 @@
 release 1.5 (11-2010)
+- Fixed issue 452
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=452
+  It is an error if a resource class is annotated with more than one
+  Jersey-based scope annotation e.g. @Singleton and @PerRequest.
 - Fixed issue 595
   https://jersey.dev.java.net/issues/show_bug.cgi?id=595
   When mapping exceptions to responses if the Log level is FINE when the
