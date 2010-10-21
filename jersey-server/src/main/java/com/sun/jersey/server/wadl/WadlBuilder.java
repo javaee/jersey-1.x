@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.server.wadl;
 
+import com.sun.jersey.api.model.AbstractField;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -55,6 +56,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.api.model.Parameterized;
 import com.sun.jersey.server.impl.BuildId;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.research.ws.wadl.Application;
@@ -67,6 +69,7 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 import java.util.Collections;
+import java.util.LinkedList;
 
 /**
  * This class implements the algorithm how the wadl is built for one or more
@@ -169,7 +172,7 @@ public class WadlBuilder {
 
     private Request generateRequest(AbstractResource r, final AbstractResourceMethod m,
             Map<String, Param> wadlResourceParams) {
-        if (m.getParameters().size() == 0) {
+        if (m.getParameters().isEmpty()) {
             return null;
         }
 
@@ -183,7 +186,7 @@ public class WadlBuilder {
             } else if (p.getAnnotation().annotationType() == FormParam.class) {
                 // Use application/x-www-form-urlencoded if no @Consumes
                 List<MediaType> supportedInputTypes = m.getSupportedInputTypes();
-                if (supportedInputTypes.size() == 0
+                if (supportedInputTypes.isEmpty()
                         || (supportedInputTypes.size() == 1 && supportedInputTypes.get(0).isWildcardType())) {
                     supportedInputTypes = Collections.singletonList(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
                 }
@@ -279,13 +282,33 @@ public class WadlBuilder {
             visitedClasses.add(r.getResourceClass());
         }
 
-        // for each resource method
         Map<String, Param> wadlResourceParams = new HashMap<String, Param>();
+
+        // add resource field/setter parameters that are associated with the resource PATH template
+
+        List<Parameterized> fieldsOrSetters = new LinkedList<Parameterized>();
+
+        if (r.getFields() != null) {
+            fieldsOrSetters.addAll(r.getFields());
+        }
+        if (r.getSetterMethods() != null) {
+            fieldsOrSetters.addAll(r.getSetterMethods());
+        }
+
+        for (Parameterized f : fieldsOrSetters) {
+            for (Parameter fp : f.getParameters()) {
+                Param wadlParam = generateParam(r, null, fp);
+                if (wadlParam != null) {
+                    wadlResource.getParam().add(wadlParam);
+                }
+            }
+        }
+        // for each resource method
         for (AbstractResourceMethod m : r.getResourceMethods()) {
             com.sun.research.ws.wadl.Method wadlMethod = generateMethod(r, wadlResourceParams, m);
             wadlResource.getMethodOrResource().add(wadlMethod);
         }
-        // add parameters that are associated with the resource PATH template
+        // add method parameters that are associated with the resource PATH template
         for (Param wadlParam : wadlResourceParams.values()) {
             wadlResource.getParam().add(wadlParam);
         }

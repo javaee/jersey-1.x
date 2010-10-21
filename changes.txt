@@ -1,4 +1,8 @@
 release 1.5 (11-2010)
+- Fixed issue 206
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=206
+  WADL resource params must also be supported 
+  for resource class fields or resource class bean properties
 - Fixed issue 289
   https://jersey.dev.java.net/issues/show_bug.cgi?id=289
   The filter init param "com.sun.jersey.config.feature.FilterContextPath" can

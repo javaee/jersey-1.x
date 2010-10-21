@@ -86,6 +86,12 @@ import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.entity.JAXBBean;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.QueryParam;
 
 /**
  *
@@ -510,6 +516,100 @@ public class WadlResourceTest extends AbstractResourceTester {
 
     }
 
+
+    @Path("fieldParam/{pp}")
+    public static class FieldParamResource {
+
+        @HeaderParam("hp") String hp;
+        @MatrixParam("mp") String mp;
+        @PathParam("pp") String pp;
+        @QueryParam("q") String q;
+
+        @GET
+        @Produces("text/plain" )
+        public String get() {
+            return pp;
+        }
+
+    }
+
+    public void testFieldParam() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        _testFieldAndSetterParam(FieldParamResource.class, "fieldParam");
+    }
+
+    @Path("setterParam/{pp}")
+    public static class SetterParamResource {
+
+        @HeaderParam("hp")
+        public void setHp(String hp) {};
+
+        @MatrixParam("mp")
+        public void setMp(String mp) {};
+
+        @PathParam("pp") 
+        public void setPP(String pp) {};
+
+        @QueryParam("q") 
+        public void setQ(String q) {};
+
+        @GET
+        @Produces("text/plain" )
+        public String get() {
+            return "nonsense";
+        }
+
+    }
+
+    public void testSetterParam() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        _testFieldAndSetterParam(SetterParamResource.class, "setterParam");
+    }
+
+    private void _testFieldAndSetterParam(Class resourceClass, String path) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+        initiateWebApplication(resourceClass);
+        WebResource r = resource("/application.wadl");
+
+        File tmpFile = r.get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://research.sun.com/wadl/2006/10"));
+
+        final String resourcePath = String.format("//wadl:resource[@path='%s/{pp}']", path);
+        final String methodPath = resourcePath + "/wadl:method[@name='GET']";
+
+        // check number of resource methods is one
+        int methodCount = ( (Double)xp.evaluate("count(" + methodPath + ")", d, XPathConstants.NUMBER) ).intValue();
+        assertEquals(1, methodCount );
+
+        Map<String, String> paramStyles = new HashMap<String, String>();
+
+        paramStyles.put("hp", "header");
+        paramStyles.put("mp", "matrix");
+        paramStyles.put("pp", "template");
+        paramStyles.put("q", "query");
+
+        for(Entry<String, String> param : paramStyles.entrySet()) {
+
+            String pName = param.getKey();
+            String pStyle = param.getValue();
+
+            String paramXPath = String.format("%s/wadl:param[@name='%s']", resourcePath, pName);
+
+            // check number of params is one
+            int pc = ( (Double)xp.evaluate("count(" + paramXPath + ")", d, XPathConstants.NUMBER) ).intValue();
+            assertEquals(1, pc );
+
+            // check the style of the param
+            String style = (String)xp.evaluate(paramXPath + "/@style", d, XPathConstants.STRING);
+            assertEquals(pStyle, style );
+        }
+    }
+
     private static class NSResolver implements NamespaceContext {
         private String prefix;
         private String nsURI;
@@ -519,6 +619,7 @@ public class WadlResourceTest extends AbstractResourceTester {
             this.nsURI = nsURI;
         }
 
+        @Override
         public String getNamespaceURI(String prefix) {
              if (prefix.equals(this.prefix))
                  return this.nsURI;
@@ -526,6 +627,7 @@ public class WadlResourceTest extends AbstractResourceTester {
                  return XMLConstants.NULL_NS_URI;
         }
 
+        @Override
         public String getPrefix(String namespaceURI) {
             if (namespaceURI.equals(this.nsURI))
                 return this.prefix;
@@ -533,6 +635,7 @@ public class WadlResourceTest extends AbstractResourceTester {
                 return null;
         }
 
+        @Override
         public Iterator getPrefixes(String namespaceURI) {
             return null;
         }

@@ -68,26 +68,32 @@ import com.sun.research.ws.wadl.Response;
  */
 public class WadlGeneratorImpl implements WadlGenerator {
 
+    @Override
     public String getRequiredJaxbContextPath() {
         final String name = Application.class.getName();
         return name.substring(0, name.lastIndexOf('.'));
     }
 
+    @Override
     public void init() throws Exception {
     }
 
+    @Override
     public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
         throw new UnsupportedOperationException( "No delegate supported." );
     }
 
+    @Override
     public Resources createResources() {
         return new Resources();
     }
 
+    @Override
     public Application createApplication() {
         return new Application();
     }
 
+    @Override
     public com.sun.research.ws.wadl.Method createMethod(
             AbstractResource r, final AbstractResourceMethod m ) {
         com.sun.research.ws.wadl.Method wadlMethod = 
@@ -97,16 +103,19 @@ public class WadlGeneratorImpl implements WadlGenerator {
         return wadlMethod;
     }
 
+    @Override
     public RepresentationType createRequestRepresentation( AbstractResource r, AbstractResourceMethod m, MediaType mediaType ) {
         RepresentationType wadlRepresentation = new RepresentationType();
         wadlRepresentation.setMediaType(mediaType.toString());
         return wadlRepresentation;
     }
 
+    @Override
     public Request createRequest(AbstractResource r, AbstractResourceMethod m) {
         return new Request();
     }
 
+    @Override
     public Param createParam( AbstractResource r, AbstractMethod m, final Parameter p ) {
         if (p.getSource() == Parameter.Source.UNKNOWN)
             return null;
@@ -166,6 +175,7 @@ public class WadlGeneratorImpl implements WadlGenerator {
         return wadlParam;
     }
 
+    @Override
     public Resource createResource( AbstractResource r, String path ) {
         Resource wadlResource = new Resource();
         if (path != null)
@@ -175,6 +185,7 @@ public class WadlGeneratorImpl implements WadlGenerator {
         return wadlResource;
     }
 
+    @Override
     public Response createResponse( AbstractResource r, AbstractResourceMethod m ) {
         final Response response = new Response();
 
