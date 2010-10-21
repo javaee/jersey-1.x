@@ -245,7 +245,26 @@ public class ServletContainer extends HttpServlet implements Filter {
      */
     public static final String FEATURE_FILTER_FORWARD_ON_404
             = "com.sun.jersey.config.feature.FilterForwardOn404";
-    
+
+    /**
+     * The filter context path.
+     * <p>
+     * If the URL pattern of a filter is set to a base path and a wildcard,
+     * such as "/base/*", then this property can be used to declare a filter
+     * context path that behaves in the same manner as the Servlet context
+     * path for determining the base URI of the application. (Note that with
+     * the Servlet 2.x API it is not possible to determine the URL pattern
+     * without parsing the web.xml, hence why this property is necessary.)
+     * <p>
+     * This property is only applicable when this class is used as a
+     * {@link Filter}, otherwise this property will be ignored and not
+     * processed.
+     * <p>
+     * This property may consist of one or more path segments separate by '/'.
+     */
+    public static final String PROPERTY_FILTER_CONTEXT_PATH
+            = "com.sun.jersey.config.feature.FilterContextPath";
+
     /**
      * A helper class for creating an injectable provider that supports
      * {@link Context} with a type and constant value.
@@ -709,6 +728,8 @@ public class ServletContainer extends HttpServlet implements Filter {
 
     // Filter
 
+    private String filterContextPath = null;
+
     public void init(FilterConfig filterConfig) throws ServletException {
         this.filterConfig = filterConfig;
 
@@ -790,6 +811,20 @@ public class ServletContainer extends HttpServlet implements Filter {
         }
 
         forwardOn404 = rc.getFeature(FEATURE_FILTER_FORWARD_ON_404);
+
+        this.filterContextPath = filterConfig.getInitParameter(PROPERTY_FILTER_CONTEXT_PATH);
+        if (filterContextPath != null) {
+            if (filterContextPath.isEmpty()) {
+                filterContextPath = null;
+            } else {
+                if (!filterContextPath.startsWith("/")) {
+                    filterContextPath = '/' + filterContextPath;
+                }
+                if (filterContextPath.endsWith("/")) {
+                    filterContextPath.substring(0, filterContextPath.length() - 1);
+                }
+            }
+        }
     }
     
     /**
@@ -863,12 +898,37 @@ public class ServletContainer extends HttpServlet implements Filter {
             return;
         }
 
+        if (filterContextPath != null) {
+            if (!servletPath.startsWith(filterContextPath)) {
+                throw new ContainerException("The servlet path, \"" + servletPath +
+                        "\", does not start with the filter context path, \"" + filterContextPath + "\"");
+            } else if (servletPath.length() == filterContextPath.length()) {
+                // Path does not end in a slash, may need to redirect
+                if (webComponent.getResourceConfig().getFeature(ResourceConfig.FEATURE_REDIRECT)) {
+                    URI l = UriBuilder.fromUri(request.getRequestURL().toString()).
+                            path("/").
+                            replaceQuery(queryString).build();
+
+                    response.setStatus(307);
+                    response.setHeader("Location", l.toASCIIString());
+                    return;
+                } else {
+                    requestURI += "/";
+                }
+            }
+        }
+
         final UriBuilder absoluteUriBuilder = UriBuilder.fromUri(
                 request.getRequestURL().toString());
 
-        final URI baseUri = absoluteUriBuilder.replacePath(request.getContextPath()).
-                path("/").
-                build();
+        final URI baseUri = (filterContextPath == null)
+                ? absoluteUriBuilder.replacePath(request.getContextPath()).
+                        path("/").
+                        build()
+                : absoluteUriBuilder.replacePath(request.getContextPath()).
+                        path(filterContextPath).
+                        path("/").
+                        build();
 
         final URI requestUri = absoluteUriBuilder.replacePath(requestURI).
                 replaceQuery(queryString).

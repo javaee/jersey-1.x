@@ -1,4 +1,14 @@
 release 1.5 (11-2010)
+- Fixed issue 289
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=289
+  The filter init param "com.sun.jersey.config.feature.FilterContextPath" can
+  be used to declare a filter context path.
+  For example if the URL pattern of the Jersey configured filter is
+  "/filterContext/*" and the param value is "/filterContext" then the base URI
+  of the application is defined to be
+  "http(s)://host:port/contextPath/filterContextPath/".
+  Note that an init param is required because the Servlet 2.x API does not
+  provide access to the URI pattern defined in the web.xml.
 - Fixed issue 452
   https://jersey.dev.java.net/issues/show_bug.cgi?id=452
   It is an error if a resource class is annotated with more than one
