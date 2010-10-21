@@ -132,8 +132,8 @@ public class ListOfJAXBBeanTest extends AbstractResourceTester {
         cc.getSingletons().add(cr);
         WebResource r = resource("/", cc);
         List<Dog> dogs = new LinkedList<Dog>();
-        dogs.add(new Dog("Alik"));
-        dogs.add(new Dog("Azor"));
+        dogs.add(new Dog("Alik", 12));
+        dogs.add(new Dog("Azor", 1));
         GenericType<List<Dog>> genericDogCollection =
                 new GenericType<List<Dog>>() {};
 

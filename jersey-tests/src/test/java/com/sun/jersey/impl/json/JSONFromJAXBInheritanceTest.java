@@ -85,6 +85,7 @@ public class JSONFromJAXBInheritanceTest extends AbstractResourceTester {
             }
         }
         
+        @Override
         public JAXBContext getContext(Class<?> c) {
             return types.contains(c) ? context : null;
         }
@@ -111,7 +112,7 @@ public class JSONFromJAXBInheritanceTest extends AbstractResourceTester {
         WebResource r = resource("/", cc);
         System.out.println(r.type(MediaType.APPLICATION_JSON).post(String.class, new Animal("bobik animal")));
         assertEquals("bobik animal", r.type("application/json").post(Animal.class, new Animal("bobik animal")).name);
-        assertEquals(Cat.class, r.type(MediaType.APPLICATION_JSON).post(Animal.class, new Cat("bobik cat")).getClass());
-        assertEquals(Dog.class, r.type(MediaType.APPLICATION_JSON).post(Animal.class, new Dog("bobik dog")).getClass());
+        assertEquals(Cat.class, r.type(MediaType.APPLICATION_JSON).post(Animal.class, new Cat("bobik cat", 9)).getClass());
+        assertEquals(Dog.class, r.type(MediaType.APPLICATION_JSON).post(Animal.class, new Dog("bobik dog", 12)).getClass());
     }        
 }

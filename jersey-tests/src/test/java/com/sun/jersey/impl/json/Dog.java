@@ -49,15 +49,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="dog")
 public class Dog extends Animal {
 
+    public int puppies;
+
     public Dog() {
     }
 
-    public Dog(String name) {
+    public Dog(String name, int puppies) {
         super(name);
+        this.puppies = puppies;
     }
 
     @Override
     public String toString() {
-        return String.format("{ \"dog\" : %s }", super.toString());
+        return String.format("{ \"dogname\" : %s, \"puppies\" : %d }", super.name, puppies);
     }
 }

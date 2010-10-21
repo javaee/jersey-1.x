@@ -55,8 +55,8 @@ public class AnimalList {
     public static Object createTestInstance() {
         AnimalList aList = new AnimalList();
         aList.animals = new LinkedList<Animal>();
-        aList.animals.add(new Dog("Fifi"));
-        aList.animals.add(new Cat("Daisy"));
+        aList.animals.add(new Dog("Fifi", 5));
+        aList.animals.add(new Cat("Daisy", 24));
         return aList;
     }
 
