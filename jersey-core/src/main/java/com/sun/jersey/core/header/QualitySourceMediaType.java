@@ -98,6 +98,15 @@ public class QualitySourceMediaType extends MediaType {
         return new QualitySourceMediaType(type, subType, qs, parameters);
     }
 
+    public static int getQualitySource(MediaType mt) {
+        if (mt instanceof QualitySourceMediaType) {
+            QualitySourceMediaType qsmt = (QualitySourceMediaType)mt;
+            return qsmt.getQualitySource();
+        } else {
+            return getQs(mt);
+        }
+    }
+    
     private static int getQs(MediaType mt) {
         try {
             return getQs(mt.getParameters().get(QUALITY_SOURCE_FACTOR));

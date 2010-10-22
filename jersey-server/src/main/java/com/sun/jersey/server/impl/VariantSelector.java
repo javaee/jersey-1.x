@@ -45,8 +45,11 @@ import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;
 import com.sun.jersey.core.header.QualityFactor;
+import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.server.impl.model.HttpHelper;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import javax.ws.rs.core.MediaType;
@@ -59,72 +62,10 @@ import javax.ws.rs.core.Variant;
 public final class VariantSelector {
     
     private VariantSelector() { }
-    
-    private static final class ListEntry<T> {
-        private T t;
-        private ListEntry<T> prev;
-        private ListEntry<T> next;
-        
-        public ListEntry() { }
-        
-        public ListEntry(ListEntry<T> prev, T t) {
-            this.t = t;
-            
-            prev.next = this;
-            this.prev = prev;
-        }
-        
-        public T value() {
-            return t;
-        }
-        
-        public ListEntry<T> next() {
-            return next;
-        }
 
-        public void removeTail() {
-            if (next != null) {
-                next.prev = null;
-                next = null;
-            }
-        }
-        
-        public void remove() {
-            if (prev != null) {
-                prev.next = next;
-            }
-            if (next != null) {
-                next.prev = prev;
-            }            
-            prev = next = null;
-        }
-        
-        public void insertAfter(ListEntry<T> e) {
-            if (this.next == e)
-                return;
-            
-            e.remove();
-            e.prev = this;
-            e.next = this.next;
-            if (e.next != null)
-                e.next.prev = e;
-            this.next = e;
-        }
-        
-        public static <T> ListEntry<T> create(Collection<T> l) {
-            ListEntry<T> head = new ListEntry<T>();
-            ListEntry<T> e = head;
-            for (T t: l) {
-                e = new ListEntry<T>(e, t);
-            }
-            
-            return head;
-        }
-    }
-    
     /**
      * Interface to get a dimension value from a variant and check if an
-     * acceptable dimension value is compatable with a dimension value.
+     * acceptable dimension value is compatible with a dimension value.
      * 
      * @param T the acceptable dimension value type
      * @param U the dimension value type
@@ -136,8 +77,15 @@ public final class VariantSelector {
          * @param v the variant
          * @return the dimension value
          */
-        U getDimension(Variant v);
+        U getDimension(VariantHolder v);
         
+        /**
+         * Get the quality source of the dimension
+         * 
+         * @return
+         */
+        int getQualitySource(VariantHolder v, U u);
+
         /**
          * Ascertain if the acceptable dimension value is compatible with
          * the dimension value
@@ -152,121 +100,170 @@ public final class VariantSelector {
     
     private static final DimensionChecker<AcceptableMediaType, MediaType> MEDIA_TYPE_DC = 
             new DimensionChecker<AcceptableMediaType, MediaType>() {
-        public MediaType getDimension(Variant v) {
-            return v.getMediaType();
+        public MediaType getDimension(VariantHolder v) {
+            return v.v.getMediaType();
         }
 
         public boolean isCompatible(AcceptableMediaType t, MediaType u) {
             return t.isCompatible(u);
-        }        
+        }
+
+        public int getQualitySource(VariantHolder v, MediaType u) {
+            return v.mediaTypeQs;
+        }
     };
     
     private static final DimensionChecker<AcceptableLanguageTag, Locale> LANGUAGE_TAG_DC = 
             new DimensionChecker<AcceptableLanguageTag, Locale>() {
-        public Locale getDimension(Variant v) {
-            return v.getLanguage();
+        public Locale getDimension(VariantHolder v) {
+            return v.v.getLanguage();
         }
 
         public boolean isCompatible(AcceptableLanguageTag t, Locale u) {
             return t.isCompatible(u);
-        }        
+        }
+
+        public int getQualitySource(VariantHolder qsv, Locale u) {
+            return QualityFactor.MINUMUM_QUALITY;
+        }
     };
     
     private static final DimensionChecker<AcceptableToken, String> CHARSET_DC = 
             new DimensionChecker<AcceptableToken, String>() {
-        public String getDimension(Variant v) {
-            MediaType m = v.getMediaType();
+        public String getDimension(VariantHolder v) {
+            MediaType m = v.v.getMediaType();
             return (m != null) ? m.getParameters().get("charset") : null;
         }
 
         public boolean isCompatible(AcceptableToken t, String u) {
             return t.isCompatible(u);
         }        
+
+        public int getQualitySource(VariantHolder qsv, String u) {
+            return QualityFactor.MINUMUM_QUALITY;
+        }
     };
     
     private static final DimensionChecker<AcceptableToken, String> ENCODING_DC = 
             new DimensionChecker<AcceptableToken, String>() {
-        public String getDimension(Variant v) {
-            return v.getEncoding();
+        public String getDimension(VariantHolder v) {
+            return v.v.getEncoding();
         }
 
         public boolean isCompatible(AcceptableToken t, String u) {
             return t.isCompatible(u);
         }        
+
+        public int getQualitySource(VariantHolder qsv, String u) {
+            return QualityFactor.MINUMUM_QUALITY;
+        }
     };
     
     /**
      * Select variants for a given dimension. 
      * 
-     * @param head the head of the list of variants. The list will be modified
-     *        so that it only contains variants that are the most acceptable.
-     *        Hence any variants that are not acceptable or are less acceptable 
-     *        are removed from the list.
+     * @param the collection of variants.
+     * 
      * @param as the list of acceptable dimension values, ordered by the quality
-     *        parameter, with the highest quality dimension value occuring first.
+     *        parameter, with the highest quality dimension value occurring
+     *        first.
      * @param dc the dimension checker
      */
-    private static <T extends QualityFactor, U> void selectVariants(ListEntry<Variant> head, 
-            List<T> as, DimensionChecker<T, U> dc) {
-        int q = QualityFactor.MINUMUM_QUALITY;
+    private static <T extends QualityFactor, U> LinkedList<VariantHolder> selectVariants(
+            Collection<VariantHolder> vs,
+            List<T> as,
+            DimensionChecker<T, U> dc) {
+        int cq = QualityFactor.MINUMUM_QUALITY;
+        int cqs = QualityFactor.MINUMUM_QUALITY;
+
+        final LinkedList<VariantHolder> selected = new LinkedList<VariantHolder>();
+        final LinkedList<VariantHolder> noDimension = new LinkedList<VariantHolder>();
+
         // Iterate over the acceptable entries
         // This assumes the entries are ordered by the quality
-        for (T a : as) {
-            // If entries of the higest quality factor have already been
-            // selected no need to continue further
-            if (a.getQuality() < q)
-                break;
-            
-            // Iterate over the variants
-            ListEntry<Variant> i = head.next();
-            while (i != null) {
-                final ListEntry<Variant> i_next = i.next();
-                // Get the dimension value of the varient to check
-                final U d = dc.getDimension(i.value());
-                
+        for (final T a : as) {
+            final int q = a.getQuality();
+
+            for (VariantHolder v : vs) {
+                // Get the dimension  value of the variant to check
+                final U d = dc.getDimension(v);
+
                 if (d != null) {
                     // Check if the acceptable entry is compatable with
                     // the dimension value
                     if (dc.isCompatible(a, d)) {
-                        // Update the quality factor
-                        // assert(q >= a.getQuality())
-                        q = a.getQuality();
-                        // Move the compatible varient entry to occur after
-                        // the head
-                        head.insertAfter(i);
-                        // Set the head to the compatible varient entry
-                        // This ensures that compatible entries are only
-                        // checked once
-                        head = i;
+                        final int qs = dc.getQualitySource(v, d);
+
+                        if (qs > cqs) {
+                            cqs = qs;
+                            cq = q;
+                            // Clear an entries that were added for qs < cqs
+                            selected.clear();
+                            selected.add(v);
+                        } else if (qs == cqs) {
+                            if (q > cq) {
+                                cq = q;
+                                selected.addFirst(v);
+                            } else if (q == cq) {
+                                selected.add(v);
+                            }
+                        }
                     }
+                } else {
+                    noDimension.add(v);
                 }
-                i = i_next;
             }
         }
-        // Order entries with null dimension values after those 
-        // with acceptable dimension values
-        ListEntry<Variant> i = head.next();
-        while (i != null) {
-            final ListEntry<Variant> i_next = i.next();
-            if (dc.getDimension(i.value()) == null) {
-                head.insertAfter(i);
-                head = i;                
-            }
-            i = i_next;
-        }        
-        // Remove the unacceptable entries
-        // Any such entries will always occur after the head entry
-        head.removeTail();
+
+        for (VariantHolder v : noDimension) {
+            selected.add(v);
+        }
+        return selected;
     }
-    
-    public static Variant selectVariant(HttpRequestContext r, List<Variant> variants) {
-        ListEntry<Variant> vs = ListEntry.create(variants);
+
+    private static class VariantHolder {
+        private final Variant v;
         
-        selectVariants(vs, HttpHelper.getAccept(r), MEDIA_TYPE_DC);
-        selectVariants(vs, HttpHelper.getAcceptLangauge(r), LANGUAGE_TAG_DC);
-        selectVariants(vs, HttpHelper.getAcceptCharset(r), CHARSET_DC);
-        selectVariants(vs, HttpHelper.getAcceptEncoding(r), ENCODING_DC);
-                
-        return vs.next() != null ? vs.next().value() : null;        
+        private final int mediaTypeQs;
+
+        public VariantHolder(Variant v) {
+            this(v, QualitySourceMediaType.DEFAULT_QUALITY_SOURCE_FACTOR);
+        }
+
+        public VariantHolder(Variant v, int mediaTypeQs) {
+            this.v = v;
+            this.mediaTypeQs = mediaTypeQs;
+        }
+    }
+
+    private static List<VariantHolder> getVariantHolderList(final List<Variant> variants) {
+        final ArrayList<VariantHolder> l = new ArrayList<VariantHolder>(variants.size());
+        for (Variant v : variants) {
+            final MediaType mt = v.getMediaType();
+            if (mt != null) {
+                if (mt instanceof QualitySourceMediaType || mt.getParameters().
+                        containsKey(QualitySourceMediaType.QUALITY_SOURCE_FACTOR)) {
+                    int qs = QualitySourceMediaType.getQualitySource(mt);
+                    l.add(new VariantHolder(v, qs));
+                } else {
+                    l.add(new VariantHolder(v));
+                }
+            } else {
+                l.add(new VariantHolder(v));
+            }
+        }
+
+        return l;
+    }
+
+    public static Variant selectVariant(HttpRequestContext r, List<Variant> variants) {
+        List<VariantHolder> vhs = getVariantHolderList(variants);
+        
+        vhs = selectVariants(vhs, HttpHelper.getAccept(r), MEDIA_TYPE_DC);
+        vhs = selectVariants(vhs, HttpHelper.getAcceptLanguage(r), LANGUAGE_TAG_DC);
+        vhs = selectVariants(vhs, HttpHelper.getAcceptCharset(r), CHARSET_DC);
+        vhs = selectVariants(vhs, HttpHelper.getAcceptEncoding(r), ENCODING_DC);
+
+        return (vhs.isEmpty()) ? null : vhs.iterator().next().v;
     }
 }

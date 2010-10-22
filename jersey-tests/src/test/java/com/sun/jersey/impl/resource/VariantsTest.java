@@ -44,6 +44,7 @@ import com.sun.jersey.impl.AbstractResourceTester;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.core.header.MediaTypes;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -74,48 +75,48 @@ public class VariantsTest extends AbstractResourceTester {
                     languages(new Locale("fr")).
                     languages(new Locale("en")).add().
                     build();
-            
+
             Variant v = r.selectVariant(vs);
             if (v == null)
                 return Response.notAcceptable(vs).build();
-            else 
+            else
                 return Response.ok(v.getLanguage().toString(), v).build();
         }
     }
-    
+
     public void testGetLanguageEn() throws IOException {
         initiateWebApplication(LanguageVariantResource.class);
         WebResource rp = resource("/");
-        
+
         ClientResponse r = rp.
                 header("Accept-Language", "en").
                 get(ClientResponse.class);
         assertEquals("en", r.getEntity(String.class));
         assertEquals("en", r.getLanguage());
     }
-    
+
     public void testGetLanguageZh() throws IOException {
         initiateWebApplication(LanguageVariantResource.class);
         WebResource rp = resource("/");
-        
+
         ClientResponse r = rp.
                 header("Accept-Language", "zh").
                 get(ClientResponse.class);
         assertEquals("zh", r.getEntity(String.class));
         assertEquals("zh", r.getLanguage());
     }
-    
+
     public void testGetLanguageMultiple() throws IOException {
         initiateWebApplication(LanguageVariantResource.class);
         WebResource rp = resource("/");
-        
+
         ClientResponse r = rp.
                 header("Accept-Language", "en;q=0.3, zh;q=0.4, fr").
                 get(ClientResponse.class);
         assertEquals("fr", r.getEntity(String.class));
         assertEquals("fr", r.getLanguage());
     }
-    
+
     @Path("/")
     public static class ComplexVariantResource {
         @GET
@@ -129,19 +130,19 @@ public class VariantsTest extends AbstractResourceTester {
                     mediaTypes(MediaType.valueOf("text/xml")).
                     languages(new Locale("en", "us")).add().
                     build();
-                    
+
             Variant v = r.selectVariant(vs);
             if (v == null)
                 return Response.notAcceptable(vs).build();
-            else 
+            else
                 return Response.ok("GET", v).build();
         }
     }
-    
+
     public void testGetComplex1() throws IOException {
         initiateWebApplication(ComplexVariantResource.class);
         WebResource rp = resource("/");
-        
+
         ClientResponse r = rp.accept("text/xml",
                 "application/xml",
                 "application/xhtml+xml",
@@ -154,12 +155,12 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.valueOf("text/xml"), r.getType());
         assertEquals("en-US", r.getLanguage());
-    }   
-    
+    }
+
     public void testGetComplex2() throws IOException {
         initiateWebApplication(ComplexVariantResource.class);
         WebResource rp = resource("/");
-        
+
         ClientResponse r = rp.accept("text/xml",
                 "application/xml",
                 "application/xhtml+xml",
@@ -173,11 +174,11 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals(MediaType.valueOf("text/xml"), r.getType());
         assertEquals("en", r.getLanguage());
     }
-    
+
     public void testGetComplex3() throws IOException {
         initiateWebApplication(ComplexVariantResource.class);
         WebResource rp = resource("/");
-        
+
         ClientResponse r = rp.accept("application/xml",
                 "text/xml",
                 "application/xhtml+xml",
@@ -190,12 +191,12 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.valueOf("application/xml"), r.getType());
         assertEquals("en-US", r.getLanguage());
-    }   
-    
+    }
+
     public void testGetComplexNotAcceptable() throws IOException {
         initiateWebApplication(ComplexVariantResource.class);
         WebResource rp = resource("/", false);
-        
+
         ClientResponse r = rp.accept("application/atom+xml").
                 header("Accept-Language", "en-us,en").
                 get(ClientResponse.class);
@@ -204,7 +205,7 @@ public class VariantsTest extends AbstractResourceTester {
         assertTrue(contains(vary, "Accept"));
         assertTrue(contains(vary, "Accept-Language"));
         assertEquals(406, r.getStatus());
-        
+
         r = rp.accept("application/xml").
                 header("Accept-Language", "fr").
                 get(ClientResponse.class);
@@ -213,6 +214,52 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals(406, r.getStatus());
     }
     
+    @Path("/")
+    public static class MediaTypeQualitySourceResource {
+        @GET
+        public Response doGet(@Context Request r) {
+            List<Variant> vs = Variant.VariantListBuilder.newInstance().
+                    mediaTypes(MediaType.valueOf("application/xml")).
+                    mediaTypes(MediaType.valueOf("text/html;qs=2.0")).
+                    add().
+                    build();
+
+            Variant v = r.selectVariant(vs);
+            if (v == null)
+                return Response.notAcceptable(vs).build();
+            else
+                return Response.ok("GET", v).build();
+        }
+    }
+
+    public void testMediaTypeQualitySource() throws IOException {
+        initiateWebApplication(MediaTypeQualitySourceResource.class);
+        WebResource rp = resource("/");
+
+        ClientResponse r = rp.accept(
+                "application/xml",
+                "text/html;q=0.9").
+                get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.valueOf("text/html"), r.getType()));
+
+        r = rp.accept(
+                "text/html",
+                "application/xml").
+                get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.valueOf("text/html"), r.getType()));
+
+        r = rp.accept(
+                "application/xml",
+                "text/html").
+                get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.valueOf("text/html"), r.getType()));
+
+        r = rp.accept(
+                "application/xml").
+                get(ClientResponse.class);
+        assertTrue(MediaTypes.typeEquals(MediaType.valueOf("application/xml"), r.getType()));
+    }
+
     private boolean contains(String l, String v) {
         String[] vs = l.split(",");
         for (String s : vs) {

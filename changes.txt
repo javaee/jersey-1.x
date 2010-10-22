@@ -1,4 +1,8 @@
 release 1.5 (11-2010)
+- Fixed issue 522
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=522
+  The Request.selectVariant supports the quality of source "qs" parameter on
+  media type variant.
 - Fixed issue 206
   https://jersey.dev.java.net/issues/show_bug.cgi?id=206
   WADL resource params must also be supported 
