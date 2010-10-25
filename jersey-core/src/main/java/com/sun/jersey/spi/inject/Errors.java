@@ -132,9 +132,11 @@ public final class Errors {
         stack--;
         fieldReporting = true;
 
-        if (stack == 0 && !messages.isEmpty()) {
+        if (stack == 0) {
             try {
-                processErrorMessages(throwException, messages);
+                if (!messages.isEmpty()) {
+                    processErrorMessages(throwException, messages);
+                }
             } finally {
                 errors.remove();
             }
@@ -174,22 +176,18 @@ public final class Errors {
         }
     }
 
-    private static ThreadLocal<Errors> errors = new ThreadLocal<Errors>() {
-        protected synchronized Errors initialValue() {
-            return new Errors();
-        }
-    };
-
-    private static Errors getInstance() {
-        return errors.get();
-    }
+    private static ThreadLocal<Errors> errors = new ThreadLocal<Errors>();
 
     public static interface Closure<T> {
         public T f();
     }
 
     public static <T> T processWithErrors(Closure<T> c) {
-        Errors e = Errors.getInstance();
+        Errors e = errors.get();
+        if (e == null) {
+            e = new Errors();
+            errors.set(e);
+        }
         e.preProcess();
 
         RuntimeException caught = null;
@@ -204,6 +202,22 @@ public final class Errors {
         }
 
         throw caught;
+    }
+
+    private static Errors getInstance() {
+        Errors e = errors.get();
+        // No error processing in scope
+        if (e == null) {
+            throw new IllegalStateException("There is no error processing in scope");
+        }
+        // The following should not be necessary but given the fragile nature of
+        // static thread local probably best to add it in case some internals of
+        // this class change
+        if (e.stack == 0) {
+            errors.remove();
+            throw new IllegalStateException("There is no error processing in scope");
+        }
+        return e;
     }
 
     public static void mark() {

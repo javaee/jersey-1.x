@@ -1,4 +1,8 @@
 release 1.5 (11-2010)
+- Fixed issue 597
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=597
+  The Errors class correctly cleans up the thread local state to stop
+  class loader leaking when deploying Web applications.
 - Fixed issue 522
   https://jersey.dev.java.net/issues/show_bug.cgi?id=522
   The Request.selectVariant supports the quality of source "qs" parameter on
