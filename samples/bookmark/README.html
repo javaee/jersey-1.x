@@ -118,11 +118,9 @@ and make sure you do not miss the backslash (\) in <code>create\=true</code> par
 <h4>Test Client Running</h4>
 
 <pre class="cliSample">
-mvn test -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -DenableLogging -Djersey.test.port=8080 -Ptest
+mvn test -DargLine="-Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -DenableLogging -Djersey.test.port=8080" -Ptest
 </pre>
 
-<p>Due to a bug in recent maven versions (related to command line parameter processing), the above might not work.
-The last known maven version to work is 2.0.9.
 </p>
 
 <h2>TODOs</h2>
