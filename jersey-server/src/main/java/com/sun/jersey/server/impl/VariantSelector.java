@@ -47,8 +47,7 @@ import com.sun.jersey.core.header.AcceptableToken;
 import com.sun.jersey.core.header.QualityFactor;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.server.impl.model.HttpHelper;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -170,53 +169,57 @@ public final class VariantSelector {
      * @param dc the dimension checker
      */
     private static <T extends QualityFactor, U> LinkedList<VariantHolder> selectVariants(
-            Collection<VariantHolder> vs,
+            LinkedList<VariantHolder> vs,
             List<T> as,
             DimensionChecker<T, U> dc) {
         int cq = QualityFactor.MINUMUM_QUALITY;
         int cqs = QualityFactor.MINUMUM_QUALITY;
 
         final LinkedList<VariantHolder> selected = new LinkedList<VariantHolder>();
-        final LinkedList<VariantHolder> noDimension = new LinkedList<VariantHolder>();
 
         // Iterate over the acceptable entries
         // This assumes the entries are ordered by the quality
         for (final T a : as) {
             final int q = a.getQuality();
 
-            for (VariantHolder v : vs) {
+            final Iterator<VariantHolder> iv = vs.iterator();
+            while (iv.hasNext()) {
+                final VariantHolder v = iv.next();
+
                 // Get the dimension  value of the variant to check
                 final U d = dc.getDimension(v);
 
                 if (d != null) {
                     // Check if the acceptable entry is compatable with
                     // the dimension value
-                    if (dc.isCompatible(a, d)) {
-                        final int qs = dc.getQualitySource(v, d);
-
+                    final int qs = dc.getQualitySource(v, d);
+                    if (qs >= cqs && dc.isCompatible(a, d)) {
                         if (qs > cqs) {
                             cqs = qs;
                             cq = q;
-                            // Clear an entries that were added for qs < cqs
+                            // Remove all entries that were added for qs < cqs
                             selected.clear();
                             selected.add(v);
-                        } else if (qs == cqs) {
-                            if (q > cq) {
-                                cq = q;
-                                selected.addFirst(v);
-                            } else if (q == cq) {
-                                selected.add(v);
-                            }
+                        } else if (q > cq) {
+                            cq = q;
+                            // Add variant with higher accept quality at the front
+                            selected.addFirst(v);
+                        } else if (q == cq) {
+                            // Ensure selection is stable with order of variants
+                            // with same quality of source and accept quality
+                            selected.add(v);
                         }
+                        iv.remove();
                     }
-                } else {
-                    noDimension.add(v);
                 }
             }
         }
 
-        for (VariantHolder v : noDimension) {
-            selected.add(v);
+        // Add all variants that are not compatible with this dimension
+        // to the end
+        for (VariantHolder v : vs) {
+            if (dc.getDimension(v) == null)
+                selected.add(v);
         }
         return selected;
     }
@@ -236,8 +239,8 @@ public final class VariantSelector {
         }
     }
 
-    private static List<VariantHolder> getVariantHolderList(final List<Variant> variants) {
-        final ArrayList<VariantHolder> l = new ArrayList<VariantHolder>(variants.size());
+    private static LinkedList<VariantHolder> getVariantHolderList(final List<Variant> variants) {
+        final LinkedList<VariantHolder> l = new LinkedList<VariantHolder>();
         for (Variant v : variants) {
             final MediaType mt = v.getMediaType();
             if (mt != null) {
@@ -257,7 +260,7 @@ public final class VariantSelector {
     }
 
     public static Variant selectVariant(HttpRequestContext r, List<Variant> variants) {
-        List<VariantHolder> vhs = getVariantHolderList(variants);
+        LinkedList<VariantHolder> vhs = getVariantHolderList(variants);
         
         vhs = selectVariants(vhs, HttpHelper.getAccept(r), MEDIA_TYPE_DC);
         vhs = selectVariants(vhs, HttpHelper.getAcceptLanguage(r), LANGUAGE_TAG_DC);
