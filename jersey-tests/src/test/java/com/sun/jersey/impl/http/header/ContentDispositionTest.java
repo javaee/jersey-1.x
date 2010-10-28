@@ -118,10 +118,10 @@ public class ContentDispositionTest extends TestCase {
         String dateString = HttpDateFormat.getPreferedDateFormat().format(
             date);
         String header = new StringBuilder(contentDispositionType).append(
-            ";filename=\"test.file\";creation-date=\"").append(
-            dateString).append("\";modification-date=\"").append(dateString).
-            append("\";read-date=\"").append(dateString).append(
-            "\";size=1222").toString();
+            "; filename=\"test.file\"; creation-date=\"").append(
+            dateString).append("\"; modification-date=\"").append(dateString).
+            append("\"; read-date=\"").append(dateString).append(
+            "\"; size=1222").toString();
         assertEquals(header, contentDisposition.toString());
     }
 

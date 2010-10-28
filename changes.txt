@@ -1,4 +1,9 @@
 release 1.5 (11-2010)
+- Fixed issue 596
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=596
+  When serializing parameters of the content-disposition header include a
+  ' ' after the '; ' as this improves interoperability with services or clients
+  that do not correctly parse content-disposition headers.
 - Fixed issue 598
   https://jersey.dev.java.net/issues/show_bug.cgi?id=598
   The Vary header is set if a call to Request.selectVariant is called.

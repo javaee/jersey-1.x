@@ -185,17 +185,17 @@ public class ContentDisposition {
 
     protected void addStringParameter(StringBuilder sb, String name, String p) {
         if (p != null)
-            sb.append(';').append(name).append("=\"").append(p).append("\"");
+            sb.append("; ").append(name).append("=\"").append(p).append("\"");
     }
 
     protected void addDateParameter(StringBuilder sb, String name, Date p) {
         if (p != null)
-            sb.append(';').append(name).append("=\"").append(HttpDateFormat.getPreferedDateFormat().format(p)).append("\"");
+            sb.append("; ").append(name).append("=\"").append(HttpDateFormat.getPreferedDateFormat().format(p)).append("\"");
     }
 
     protected void addLongParameter(StringBuilder sb, String name, Long p) {
         if (p != -1)
-            sb.append(';').append(name).append('=').append(Long.toString(p));
+            sb.append("; ").append(name).append('=').append(Long.toString(p));
     }
 
 
