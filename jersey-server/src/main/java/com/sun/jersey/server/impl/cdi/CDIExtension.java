@@ -55,6 +55,7 @@ import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.container.ExceptionMapperContext;
 import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Injectable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -73,7 +74,6 @@ import java.util.Set;
 import java.util.logging.Logger;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
 import javax.enterprise.inject.spi.AnnotatedCallable;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
@@ -93,7 +93,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.servlet.ServletContext;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.Encoded;
@@ -901,7 +900,12 @@ public class CDIExtension implements Extension {
 
         @Override
         public T create(CreationalContext<T> creationalContext) {
-            Injectable<T> injectable = webApplication.getServerInjectableProviderFactory().getInjectable(qualifier.annotationType(), null, qualifier, getBeanClass(), ComponentScope.Singleton);
+            Injectable<T> injectable = webApplication.getServerInjectableProviderFactory().
+                    getInjectable(qualifier.annotationType(), null, qualifier, getBeanClass(), ComponentScope.Singleton);
+            if (injectable == null) {
+                Errors.error("No injectable for " + getBeanClass().getName());
+                return null;
+            }
             return injectable.getValue();
         }
     }
@@ -913,8 +917,10 @@ public class CDIExtension implements Extension {
         private DiscoveredParameter discoveredParameter;
         private Parameter parameter;
         private Injectable<T> injectable;
+        private boolean processed = false;
 
-        public ParameterBean(Class<?> klass, Type type, Set<Annotation> qualifiers, DiscoveredParameter discoveredParameter, Parameter parameter) {
+        public ParameterBean(Class<?> klass, Type type, Set<Annotation> qualifiers,
+                DiscoveredParameter discoveredParameter, Parameter parameter) {
             super(klass, type, qualifiers);
             this.discoveredParameter = discoveredParameter;
             this.parameter = parameter;
@@ -924,25 +930,35 @@ public class CDIExtension implements Extension {
             if (injectable != null) {
                 return;
             }
-            boolean registered = webApplication.getServerInjectableProviderFactory().isParameterTypeRegistered(parameter);
+            if (processed)
+                return;
+            
+            processed = true;
+            boolean registered = webApplication.getServerInjectableProviderFactory().
+                    isParameterTypeRegistered(parameter);
             if (!registered) {
-                throw new ContainerException("parameter type not registered " + discoveredParameter);
+                Errors.error("Parameter type not registered " + discoveredParameter);
             }
             // TODO - here it just doesn't seem possible to remove the cast
-            injectable = (Injectable<T>) webApplication.getServerInjectableProviderFactory().getInjectable(parameter, ComponentScope.PerRequest);
+            injectable = (Injectable<T>) webApplication.getServerInjectableProviderFactory().
+                    getInjectable(parameter, ComponentScope.PerRequest);
             if (injectable == null) {
-                throw new ContainerException("no injectable for parameter " + discoveredParameter);
+                Errors.error("No injectable for parameter " + discoveredParameter);
             }
         }
 
-        @Override public T create(CreationalContext<T> creationalContext) {
+        @Override
+        public T create(CreationalContext<T> creationalContext) {
             if (injectable == null) {
                 later();
+                if (injectable == null) {
+                    return null;
+                }
             }
+
             try {
                 return injectable.getValue();
-            }
-            catch (IllegalStateException e) {
+            } catch (IllegalStateException e) {
                 if (injectable instanceof AbstractHttpContextInjectable) {
                     return (T)((AbstractHttpContextInjectable)injectable).getValue(webApplication.getThreadLocalHttpContext());
                 }

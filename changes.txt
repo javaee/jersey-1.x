@@ -1,4 +1,7 @@
 release 1.5 (11-2010)
+- Fixed issue 600
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=600
+  Report errors if CDI-based Jersey injection targets for cannot be obtained.
 - Fixed issue 597
   https://jersey.dev.java.net/issues/show_bug.cgi?id=597
   The Errors class correctly cleans up the thread local state to stop
