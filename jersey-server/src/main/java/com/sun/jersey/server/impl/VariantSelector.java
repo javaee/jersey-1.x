@@ -40,17 +40,20 @@
 
 package com.sun.jersey.server.impl;
 
-import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;
 import com.sun.jersey.core.header.QualityFactor;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.server.impl.model.HttpHelper;
+import com.sun.jersey.spi.container.ContainerRequest;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
 
@@ -95,6 +98,8 @@ public final class VariantSelector {
          *         the dimension value
          */
         boolean isCompatible(T t, U u);
+
+        String getVaryHeaderValue();
     }
     
     private static final DimensionChecker<AcceptableMediaType, MediaType> MEDIA_TYPE_DC = 
@@ -110,6 +115,10 @@ public final class VariantSelector {
         public int getQualitySource(VariantHolder v, MediaType u) {
             return v.mediaTypeQs;
         }
+
+        public String getVaryHeaderValue() {
+            return HttpHeaders.ACCEPT;
+        }
     };
     
     private static final DimensionChecker<AcceptableLanguageTag, Locale> LANGUAGE_TAG_DC = 
@@ -124,6 +133,10 @@ public final class VariantSelector {
 
         public int getQualitySource(VariantHolder qsv, Locale u) {
             return QualityFactor.MINUMUM_QUALITY;
+        }
+
+        public String getVaryHeaderValue() {
+            return HttpHeaders.ACCEPT_LANGUAGE;
         }
     };
     
@@ -141,6 +154,10 @@ public final class VariantSelector {
         public int getQualitySource(VariantHolder qsv, String u) {
             return QualityFactor.MINUMUM_QUALITY;
         }
+
+        public String getVaryHeaderValue() {
+            return HttpHeaders.ACCEPT_CHARSET;
+        }
     };
     
     private static final DimensionChecker<AcceptableToken, String> ENCODING_DC = 
@@ -155,6 +172,10 @@ public final class VariantSelector {
 
         public int getQualitySource(VariantHolder qsv, String u) {
             return QualityFactor.MINUMUM_QUALITY;
+        }
+
+        public String getVaryHeaderValue() {
+            return HttpHeaders.ACCEPT_ENCODING;
         }
     };
     
@@ -171,7 +192,8 @@ public final class VariantSelector {
     private static <T extends QualityFactor, U> LinkedList<VariantHolder> selectVariants(
             LinkedList<VariantHolder> vs,
             List<T> as,
-            DimensionChecker<T, U> dc) {
+            DimensionChecker<T, U> dc,
+            Set<String> vary) {
         int cq = QualityFactor.MINUMUM_QUALITY;
         int cqs = QualityFactor.MINUMUM_QUALITY;
 
@@ -190,6 +212,7 @@ public final class VariantSelector {
                 final U d = dc.getDimension(v);
 
                 if (d != null) {
+                    vary.add(dc.getVaryHeaderValue());
                     // Check if the acceptable entry is compatable with
                     // the dimension value
                     final int qs = dc.getQualitySource(v, d);
@@ -259,14 +282,28 @@ public final class VariantSelector {
         return l;
     }
 
-    public static Variant selectVariant(HttpRequestContext r, List<Variant> variants) {
+    public static Variant selectVariant(ContainerRequest r, List<Variant> variants) {
         LinkedList<VariantHolder> vhs = getVariantHolderList(variants);
-        
-        vhs = selectVariants(vhs, HttpHelper.getAccept(r), MEDIA_TYPE_DC);
-        vhs = selectVariants(vhs, HttpHelper.getAcceptLanguage(r), LANGUAGE_TAG_DC);
-        vhs = selectVariants(vhs, HttpHelper.getAcceptCharset(r), CHARSET_DC);
-        vhs = selectVariants(vhs, HttpHelper.getAcceptEncoding(r), ENCODING_DC);
 
-        return (vhs.isEmpty()) ? null : vhs.iterator().next().v;
+        Set<String> vary = new HashSet<String>();
+        vhs = selectVariants(vhs, HttpHelper.getAccept(r), MEDIA_TYPE_DC, vary);
+        vhs = selectVariants(vhs, HttpHelper.getAcceptLanguage(r), LANGUAGE_TAG_DC, vary);
+        vhs = selectVariants(vhs, HttpHelper.getAcceptCharset(r), CHARSET_DC, vary);
+        vhs = selectVariants(vhs, HttpHelper.getAcceptEncoding(r), ENCODING_DC, vary);
+
+
+        if (vhs.isEmpty()) {
+            return null;
+        } else {
+            StringBuilder varyHeader = new StringBuilder();
+            for (String v : vary) {
+                if (varyHeader.length() > 0) {
+                    varyHeader.append(',');
+                }
+                varyHeader.append(v);
+            }
+            r.getProperties().put(ContainerRequest.VARY_HEADER, varyHeader.toString());
+            return vhs.iterator().next().v;
+        }
     }
 }

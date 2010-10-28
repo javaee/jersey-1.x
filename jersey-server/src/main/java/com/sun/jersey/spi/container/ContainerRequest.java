@@ -109,6 +109,8 @@ public class ContainerRequest implements HttpRequestContext {
     
     private static final Annotation[] EMTPTY_ANNOTATIONS = new Annotation[0];
 
+    public static final String VARY_HEADER = "Vary";
+    
     private final WebApplication wa;
 
     private final boolean isTraceEnabled;

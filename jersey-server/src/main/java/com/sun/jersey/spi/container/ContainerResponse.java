@@ -241,6 +241,13 @@ public class ContainerResponse implements HttpResponseContext {
             responseWriter.finish();
             return;
         }
+
+        if (!getHttpHeaders().containsKey(HttpHeaders.VARY)) {
+            final String varyHeader = (String)request.getProperties().get(ContainerRequest.VARY_HEADER);
+            if (varyHeader != null) {
+                getHttpHeaders().add(HttpHeaders.VARY, varyHeader);
+            }
+        }
         
         MediaType contentType = getMediaType();
         if (contentType == null) {

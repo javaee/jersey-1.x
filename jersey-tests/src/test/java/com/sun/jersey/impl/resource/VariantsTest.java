@@ -59,7 +59,6 @@ import javax.ws.rs.core.Variant;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@SuppressWarnings("unchecked")
 public class VariantsTest extends AbstractResourceTester {
     
     public VariantsTest(String testName) {
@@ -93,6 +92,10 @@ public class VariantsTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals("en", r.getEntity(String.class));
         assertEquals("en", r.getLanguage());
+        String vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(!contains(vary, "Accept"));
+        assertTrue(contains(vary, "Accept-Language"));
     }
 
     public void testGetLanguageZh() throws IOException {
@@ -104,6 +107,11 @@ public class VariantsTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals("zh", r.getEntity(String.class));
         assertEquals("zh", r.getLanguage());
+        System.out.println(r.getHeaders().getFirst("Vary"));
+        String vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(!contains(vary, "Accept"));
+        assertTrue(contains(vary, "Accept-Language"));
     }
 
     public void testGetLanguageMultiple() throws IOException {
@@ -115,6 +123,10 @@ public class VariantsTest extends AbstractResourceTester {
                 get(ClientResponse.class);
         assertEquals("fr", r.getEntity(String.class));
         assertEquals("fr", r.getLanguage());
+        String vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(!contains(vary, "Accept"));
+        assertTrue(contains(vary, "Accept-Language"));
     }
 
     @Path("/")
@@ -155,6 +167,10 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.valueOf("text/xml"), r.getType());
         assertEquals("en-US", r.getLanguage());
+        String vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(contains(vary, "Accept"));
+        assertTrue(contains(vary, "Accept-Language"));
     }
 
     public void testGetComplex2() throws IOException {
@@ -173,6 +189,10 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.valueOf("text/xml"), r.getType());
         assertEquals("en", r.getLanguage());
+        String vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(contains(vary, "Accept"));
+        assertTrue(contains(vary, "Accept-Language"));
     }
 
     public void testGetComplex3() throws IOException {
@@ -191,6 +211,10 @@ public class VariantsTest extends AbstractResourceTester {
         assertEquals("GET", r.getEntity(String.class));
         assertEquals(MediaType.valueOf("application/xml"), r.getType());
         assertEquals("en-US", r.getLanguage());
+        String vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(contains(vary, "Accept"));
+        assertTrue(contains(vary, "Accept-Language"));
     }
 
     public void testGetComplexNotAcceptable() throws IOException {
@@ -200,7 +224,7 @@ public class VariantsTest extends AbstractResourceTester {
         ClientResponse r = rp.accept("application/atom+xml").
                 header("Accept-Language", "en-us,en").
                 get(ClientResponse.class);
-        String vary = r.getMetadata().getFirst("Vary");
+        String vary = r.getHeaders().getFirst("Vary");
         assertNotNull(vary);
         assertTrue(contains(vary, "Accept"));
         assertTrue(contains(vary, "Accept-Language"));
@@ -209,6 +233,8 @@ public class VariantsTest extends AbstractResourceTester {
         r = rp.accept("application/xml").
                 header("Accept-Language", "fr").
                 get(ClientResponse.class);
+        vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
         assertTrue(contains(vary, "Accept"));
         assertTrue(contains(vary, "Accept-Language"));
         assertEquals(406, r.getStatus());
@@ -241,23 +267,35 @@ public class VariantsTest extends AbstractResourceTester {
                 "text/html;q=0.9").
                 get(ClientResponse.class);
         assertTrue(MediaTypes.typeEquals(MediaType.valueOf("text/html"), r.getType()));
+        String vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(contains(vary, "Accept"));
 
         r = rp.accept(
                 "text/html",
                 "application/xml").
                 get(ClientResponse.class);
         assertTrue(MediaTypes.typeEquals(MediaType.valueOf("text/html"), r.getType()));
+        vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(contains(vary, "Accept"));
 
         r = rp.accept(
                 "application/xml",
                 "text/html").
                 get(ClientResponse.class);
         assertTrue(MediaTypes.typeEquals(MediaType.valueOf("text/html"), r.getType()));
+        vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(contains(vary, "Accept"));
 
         r = rp.accept(
                 "application/xml").
                 get(ClientResponse.class);
         assertTrue(MediaTypes.typeEquals(MediaType.valueOf("application/xml"), r.getType()));
+        vary = r.getHeaders().getFirst("Vary");
+        assertNotNull(vary);
+        assertTrue(contains(vary, "Accept"));
     }
 
     private boolean contains(String l, String v) {

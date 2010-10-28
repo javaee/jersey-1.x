@@ -1,4 +1,7 @@
 release 1.5 (11-2010)
+- Fixed issue 598
+  https://jersey.dev.java.net/issues/show_bug.cgi?id=598
+  The Vary header is set if a call to Request.selectVariant is called.
 - Fixed issue 600
   https://jersey.dev.java.net/issues/show_bug.cgi?id=600
   Report errors if CDI-based Jersey injection targets for cannot be obtained.
