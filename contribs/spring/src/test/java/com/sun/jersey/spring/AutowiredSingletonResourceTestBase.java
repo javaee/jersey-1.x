@@ -88,4 +88,11 @@ public class AutowiredSingletonResourceTestBase extends AbstractResourceTest {
         
     }
 
+    public void testGetApplicationContextBeanDefCount() {
+        final WebResource acResource = resource( _resourcePath + "/beandefcount" );
+
+        final int beanCount = Integer.parseInt( acResource.get( String.class ) );
+        Assert.assertTrue(beanCount > 0);
+    }
+
 }

@@ -45,6 +45,8 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import org.springframework.context.ApplicationContext;
 
 /**
  * A singleton resource class that is not managed by spring (but jersey)<br>
@@ -56,6 +58,7 @@ import javax.ws.rs.Produces;
 public class AutowiredSingletonResourceBase {
     
     private Item _item;
+    private ApplicationContext _ctx;
     private int _countUsage;
     
     public AutowiredSingletonResourceBase() {
@@ -76,6 +79,11 @@ public class AutowiredSingletonResourceBase {
         _item = item;
     }
 
+    @Context
+    public void setAppContext(ApplicationContext ctx) {
+        _ctx = ctx;
+    }
+
     @PUT
     @Path( "item/value/{value}" )
     public void setItemValue( @PathParam( "value" ) String value ) {
@@ -94,5 +102,11 @@ public class AutowiredSingletonResourceBase {
     public void updateCountUsage() {
         _countUsage++;
     }
-    
+
+    @GET
+    @Path( "beandefcount" )
+    @Produces("text/plain")
+    public String getBeanDefCount() {
+        return String.valueOf( _ctx.getBeanDefinitionCount());
+    }
 }

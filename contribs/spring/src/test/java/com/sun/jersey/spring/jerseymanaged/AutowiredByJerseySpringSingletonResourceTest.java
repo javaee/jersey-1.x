@@ -92,4 +92,11 @@ public class AutowiredByJerseySpringSingletonResourceTest extends AbstractResour
         
     }
 
+    @Test
+    public void testGetApplicationContextBeanDefCount() {
+        final WebResource acResource = resource( RESOURCE_PATH + "/beandefcount" );
+
+        final int beanCount = Integer.parseInt( acResource.get( String.class ) );
+        Assert.assertTrue(beanCount > 0);
+    }
 }

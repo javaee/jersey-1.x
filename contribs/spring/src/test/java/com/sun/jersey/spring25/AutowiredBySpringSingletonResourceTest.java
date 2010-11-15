@@ -75,4 +75,12 @@ public class AutowiredBySpringSingletonResourceTest extends AutowiredSingletonRe
         super.testGetAndUpdateItem();
     }
 
+    /* (non-Javadoc)
+     * @see com.sun.ws.rest.spring.AutowiredSingletonResourceTestBase#testGetApplicationContextBeanDefCount()
+     */
+    @Test
+    @Override
+    public void testGetApplicationContextBeanDefCount() {
+        super.testGetApplicationContextBeanDefCount();
+    }
 }

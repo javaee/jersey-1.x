@@ -98,7 +98,6 @@ public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
         final Item2 actualUpdatedItem = itemResource.get( Item2.class );
         Assert.assertNotNull( actualUpdatedItem );
         Assert.assertEquals( actualUpdatedItem.getValue(), TestData.MANAGED );
-        
     }
     
     @Test
@@ -113,7 +112,13 @@ public class AutowiredPerRequestResourceTest extends AbstractResourceTest {
         countResource.post();
         final int actualCountUpdated = Integer.parseInt( countResource.get( String.class ) );
         Assert.assertEquals( actualCountUpdated, actualCount );
-        
     }
 
+    @Test
+    public void testGetApplicationContextBeanDefCount() {
+        final WebResource acResource = resource( RESOURCE_PATH + "/beandefcount" );
+
+        final int beanCount = Integer.parseInt( acResource.get( String.class ) );
+        Assert.assertTrue(beanCount > 0);
+    }
 }

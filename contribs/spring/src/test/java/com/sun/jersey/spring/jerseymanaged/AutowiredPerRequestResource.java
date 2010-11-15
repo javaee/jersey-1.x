@@ -49,6 +49,8 @@ import javax.ws.rs.Produces;
 
 import com.sun.jersey.api.spring.Autowire;
 import com.sun.jersey.spi.resource.PerRequest;
+import javax.ws.rs.core.Context;
+import org.springframework.context.ApplicationContext;
 
 /**
  * TODO: DESCRIBE ME<br>
@@ -65,6 +67,7 @@ public class AutowiredPerRequestResource {
     private Item _singletonItem;
     private Item2 _prototypeItem;
     private int _count;
+    private ApplicationContext _ctx;
     
     public AutowiredPerRequestResource() {
     }
@@ -108,6 +111,13 @@ public class AutowiredPerRequestResource {
         _count++;
     }
 
+    @GET
+    @Path( "beandefcount" )
+    @Produces("text/plain")
+    public String getBeanDefCount() {
+        return String.valueOf( _ctx.getBeanDefinitionCount());
+    }
+
     /**
      * @param prototypeItem the prototypeItem to set
      * @author Martin Grotzke
@@ -122,6 +132,11 @@ public class AutowiredPerRequestResource {
      */
     public void setSingletonItem( Item singletonItem ) {
         _singletonItem = singletonItem;
+    }
+
+    @Context
+    public void setApplicationContext(final ApplicationContext ctx) {
+        _ctx = ctx;
     }
     
 }

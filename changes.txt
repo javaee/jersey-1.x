@@ -1,4 +1,8 @@
 release 1.5 (11-2010)
+- Fixed issue 557
+  https://java.net/jira/browse/JERSEY-557
+  Spring integration: injection of Spring's ApplicationContext 
+  should be possible using the @javax.ws.rs.core.Context annotation
 - Fixed issue 596
   https://jersey.dev.java.net/issues/show_bug.cgi?id=596
   When serializing parameters of the content-disposition header include a

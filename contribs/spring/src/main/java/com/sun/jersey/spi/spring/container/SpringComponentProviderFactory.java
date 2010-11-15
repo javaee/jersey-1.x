@@ -40,6 +40,7 @@
 package com.sun.jersey.spi.spring.container;
 
 import com.sun.jersey.api.core.InjectParam;
+import com.sun.jersey.spi.inject.Injectable;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
@@ -65,8 +66,11 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.spi.inject.Inject;
+import com.sun.jersey.spi.inject.InjectableProvider;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import javax.ws.rs.core.Context;
 
 /**
  * The Spring-based {@link IoCComponentProviderFactory}.
@@ -83,12 +87,44 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
     private final ConfigurableApplicationContext springContext;
 
     public SpringComponentProviderFactory(ResourceConfig rc, ConfigurableApplicationContext springContext) {
+
         this.springContext = springContext;
-        register(rc, springContext);
+
+        addResourceConfigInjectableProvider(rc);
+        registerSpringBeans(rc);
     }
 
-    private void register(ResourceConfig rc, ConfigurableApplicationContext springContext) {
+    private void addResourceConfigInjectableProvider(final ResourceConfig rc) {
+        rc.getSingletons().add(
+                new InjectableProvider<Context, Type>() {
+
+            @Override
+            public ComponentScope getScope() {
+                return ComponentScope.Singleton;
+            }
+
+            @Override
+            public Injectable getInjectable(ComponentContext ic, Context a, Type t) {
+                if (t.equals(ApplicationContext.class)) {
+                    return new Injectable<ApplicationContext>() {
+
+                        @Override
+                        public ApplicationContext getValue() {
+                            return springContext;
+                        }
+                    };
+                } else {
+                    return null;
+                }
+            }
+        });
+
+    }
+
+    private void registerSpringBeans(final ResourceConfig rc) {
+
         String[] names = BeanFactoryUtils.beanNamesIncludingAncestors(springContext);
+
         for (String name : names) {
             Class<?> type = ClassUtils.getUserClass(springContext.getType(name));
             if (ResourceConfig.isProviderClass(type)) {
@@ -105,13 +141,15 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
         }
     }
 
+    @Override
     public IoCComponentProvider getComponentProvider(Class c) {
         return getComponentProvider(null, c);
     }
 
+    @Override
     public IoCComponentProvider getComponentProvider(ComponentContext cc, Class c) {
         final Autowire autowire = (Autowire) c.getAnnotation(Autowire.class);
-        if (autowire != null) {
+            if (autowire != null) {
             if (LOGGER.isLoggable(Level.FINEST)) {
                 LOGGER.finest("Creating resource class " +
                         c.getSimpleName() +
@@ -183,11 +221,13 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
             this.a = a;
         }
 
+        @Override
         public Object getInstance() {
             return springContext.getBeanFactory().createBean(c,
                     a.mode().getSpringCode(), a.dependencyCheck());
         }
 
+        @Override
         public Object getInjectableInstance(Object o) {
             return SpringComponentProviderFactory.getInjectableInstance(o);
         }
@@ -205,14 +245,17 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
             this.c = c;
         }
 
+        @Override
         public ComponentScope getScope() {
             return scope;
         }
 
+        @Override
         public Object getInjectableInstance(Object o) {
             return SpringComponentProviderFactory.getInjectableInstance(o);
         }
 
+        @Override
         public Object getInstance() {
             return springContext.getBean(beanName, c);
         }
