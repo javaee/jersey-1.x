@@ -44,7 +44,7 @@ package com.sun.jersey.core.spi.component.ioc;
  * <p>
  * The component is instantiated and injected by the underlying IoC framework,
  * but the life-cycle is managed by the runtime according to the life-cycle
- * declared ub the runtime's semantics.
+ * declared by the runtime's semantics.
  *
  * @author Paul.Sandoz@Sun.Com
  */
