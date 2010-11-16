@@ -40,7 +40,6 @@
 package com.sun.jersey.spi.spring.container;
 
 import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.spi.inject.Injectable;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
@@ -66,8 +65,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.spi.inject.Inject;
-import com.sun.jersey.spi.inject.InjectableProvider;
-import java.lang.reflect.Type;
+import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import java.util.HashMap;
 import java.util.Map;
 import javax.ws.rs.core.Context;
@@ -90,35 +88,12 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
 
         this.springContext = springContext;
 
-        addResourceConfigInjectableProvider(rc);
+        addAppContextInjectableProvider(rc);
         registerSpringBeans(rc);
     }
 
-    private void addResourceConfigInjectableProvider(final ResourceConfig rc) {
-        rc.getSingletons().add(
-                new InjectableProvider<Context, Type>() {
-
-            @Override
-            public ComponentScope getScope() {
-                return ComponentScope.Singleton;
-            }
-
-            @Override
-            public Injectable getInjectable(ComponentContext ic, Context a, Type t) {
-                if (t.equals(ApplicationContext.class)) {
-                    return new Injectable<ApplicationContext>() {
-
-                        @Override
-                        public ApplicationContext getValue() {
-                            return springContext;
-                        }
-                    };
-                } else {
-                    return null;
-                }
-            }
-        });
-
+    private void addAppContextInjectableProvider(final ResourceConfig rc) {
+        rc.getSingletons().add(new SingletonTypeInjectableProvider<Context, ApplicationContext>(ApplicationContext.class, springContext) {});
     }
 
     private void registerSpringBeans(final ResourceConfig rc) {
