@@ -62,7 +62,6 @@
                     <instructions>
                         <Export-Package>com.sun.jersey.server.spi.monitoring.glassfish</Export-Package>
                         <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-            <!-- <Bundle-Activator>${pom.groupId}.App</Bundle-Activator> -->
                     </instructions>
                 </configuration>
             </plugin>

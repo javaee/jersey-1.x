@@ -51,12 +51,79 @@
     <artifactId>oauth-tests</artifactId>
     <packaging>jar</packaging>
     <name>oauth-tests</name>
+
+    <properties>
+        <pax-exam-version>1.2.0</pax-exam-version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>ops4j.releases</id>
+            <url>http://repository.ops4j.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>ops4j.snapshots</id>
+            <url>http://repository.ops4j.org/mvn-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>ops4j.releases</id>
+            <url>http://repository.ops4j.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <groupId>asm</groupId>
+            <artifactId>asm-all</artifactId>
+            <version>3.1</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam</artifactId>
+            <version>${pax-exam-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit</artifactId>
+            <version>${pax-exam-version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-container-default</artifactId>
+            <version>${pax-exam-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.exam</groupId>
+            <artifactId>pax-exam-junit-extender-impl</artifactId>
+            <version>${pax-exam-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.swissbox</groupId>
+            <artifactId>pax-swissbox-tinybundles</artifactId>
+            <version>${pax-exam-version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.grizzly</groupId>
@@ -100,6 +167,26 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <!-- use pax exam maven plugin -->
+            <plugin>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>maven-paxexam-plugin</artifactId>
+                <version>${pax-exam-version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-config</id>
+                        <goals>
+                            <goal>generate-depends-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <options>
+                        <platform>felix</platform>
+                        <!--profiles>log</profiles-->
+                    </options>
+                </configuration>
             </plugin>
         </plugins>
     </build>

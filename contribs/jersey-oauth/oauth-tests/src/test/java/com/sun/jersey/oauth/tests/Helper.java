@@ -40,46 +40,24 @@
 
 package com.sun.jersey.oauth.tests;
 
-import java.io.IOException;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
 /**
- * Peforms a full integration test between a test OAuth server and OAuth
- * client. The tests attempt as much as possible to follow the sample
- * appendices of the OAuth specification, though the hostname and port
- * differs (it's localhost in the tests, not example.com).
  *
- * @author Paul C. Bryan <pbryan@sun.com>
+ * @author japod
  */
-public class IntegrationTest extends TestCase {
-
-    /**
-     * Creates the test case.
-     *
-     * @param testName name of the test case.
-     */
-    public IntegrationTest(String testName) {
-        super(testName);
-    }
-
-    /**
-     * Returns the suite of tests being tested.
-     */
-    public static Test suite() {
-        return new TestSuite(IntegrationTest.class);
-    }
-
-    /**
-     * Performs the integration test.
-     */
-    public void testIntegration() {
-        String host = "localhost";
-        int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 9998);
-        try { Server.start(host, port); }
-        catch (IOException ioe) { fail(ioe.getMessage()); }
-        Client.execute(host, port);
-        Server.stop();
+public class Helper {
+    
+    public static int getEnvVariable(final String varName, int defaultValue) {
+        if (null == varName) {
+            return defaultValue;
+        }
+        String varValue = System.getenv(varName);
+        if (null != varValue) {
+            try {
+                return Integer.parseInt(varValue);
+            }catch (NumberFormatException e) {
+                // will return default value bellow
+            }
+        }
+        return defaultValue;
     }
 }

@@ -94,12 +94,16 @@
                 <configuration>
                     <links>
                         <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
-                        <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/jersey/</link>
-                        <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/contribs/jersey-oauth/oauth-signature/</link>
+                        <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
+                        <link>http://jersey.java.net/nonav/apidocs/${project.version}/contribs/jersey-oauth/oauth-signature/</link>
                     </links>
                     <subpackages>com.sun.jersey.oauth.server.api:com.sun.jersey.oauth.server.spi</subpackages>
                     <notimestamp>true</notimestamp>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

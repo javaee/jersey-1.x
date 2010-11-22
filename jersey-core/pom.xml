@@ -200,7 +200,6 @@
                         <Bundle-Activator>com.sun.jersey.core.osgi.Activator</Bundle-Activator>
                         <Implementation-Title>jersey-core osgi</Implementation-Title>
                         <Implementation-Version>${project.version}</Implementation-Version>
-                        <!--Embed-Dependency>jsr311-api;inline=true</Embed-Dependency-->
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
