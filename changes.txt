@@ -1,4 +1,5 @@
 release 1.5 (11-2010)
+- OSGi headers added to Jersey OAuth modules
 - Fixed issue 557
   http://java.net/jira/browse/JERSEY-557
   Spring integration: injection of Spring's ApplicationContext 
