@@ -1,15 +1,16 @@
+package com.sun.jersey.samples.helloworld
+
 import com.sun.jersey.api.client.{Client, WebResource};
 import java.io.File;
 import java.net.URI;
 import java.util.Collections;
 import javax.ws.rs.core.UriBuilder;
-import junit.framework.TestCase;
+import junit.framework.{Assert, TestCase};
 import org.glassfish.embed.{ScatteredWar, GlassFish};
 
-package com.sun.jersey.samples.helloworld {
 
 object HelloWorldWebAppTest {
-    def getPort(defaultPort: int) : int = {
+    def getPort(defaultPort: Int) : Int = {
         val port = System.getenv("JERSEY_HTTP_PORT");
 
         if (null != port)
@@ -32,11 +33,9 @@ class HelloWorldWebAppTest extends TestCase {
 
     var glassfish : GlassFish = _
 
-    // TODO Scala 2.7.3 compiler crashes when WebResource is referred to
-    // 
-//    var r : WebResource = _
+    var r : WebResource = _
 
-    override def setUp() : unit = {
+    override def setUp() : Unit = {
         super.setUp();
 
         // Start Glassfish
@@ -49,20 +48,17 @@ class HelloWorldWebAppTest extends TestCase {
         glassfish.deploy(war)
 
         val c = Client.create();
-//        r = c.resource(HelloWorldWebAppTest.BASE_URI)
+        r = c.resource(HelloWorldWebAppTest.baseUri)
     }
 
-    override def tearDown() : unit = {
+    override def tearDown() : Unit = {
         super.tearDown()
 
         glassfish.stop()
     }
 
-    def testHelloWorld() : unit = {
-//        val responseMsg = r.path("helloworld").get(ClassOf[String]);
-//        assertEquals("Hello World", responseMsg);
+    def testHelloWorld() : Unit = {
+        val responseMsg = r.path("helloworld").get(classOf[String]);
+        Assert.assertEquals("Hello World", responseMsg);
     }
-
-}
-
 }
