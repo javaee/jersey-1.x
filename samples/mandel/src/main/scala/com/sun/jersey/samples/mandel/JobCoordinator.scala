@@ -1,14 +1,13 @@
+package com.sun.jersey.samples.mandel
 
 import scala.actors.Actor
 import scala.actors.Actor._
 import scala.actors.OutputChannel
 import scala.collection.mutable.Stack
 
-package com.sun.jersey.samples.mandel {
-
-class JobCoordinator(n: int) {
+class JobCoordinator(n: Int) {
     trait Job {
-        def execute: unit
+        def execute: Unit
     }
 
     private case object FinishedProducing
@@ -29,39 +28,33 @@ class JobCoordinator(n: int) {
         val workers = new Stack[OutputChannel[Any]]
         val jobs = new Stack[Job]
 
-        for (i <- 0 to n - 1) workers += worker
+        for (i <- 0 to n - 1) workers push worker
 
         loop { react {
             case j: Job => 
                 if (!workers.isEmpty) (workers pop) ! j
-                else jobs += j
+                else jobs push j
             case FinishedProducing =>
                 finisher = sender
             case Completed =>
                 if (!jobs.isEmpty) sender ! (jobs pop)
-                else workers += sender
+                else workers push sender
 
                 if (workers.size == n && finisher != null) { 
-                    workers foreach (x => x ! Completed)
+                    workers foreach (_ ! Completed)
                     finisher ! Completed
                     exit 
                 }
         }}
     }
 
-    def job (j: => unit) : unit = {
+    def job (j: => Unit) : Unit = {
         coordinator ! new Job { def execute = j }
     }
 
-    def ! (j : Job) : unit = {
-        coordinator ! j
-    }
-
-    def waitForCompletion: unit = {
+    def waitForCompletion: Unit = {
         coordinator !? FinishedProducing match {
             case Completed =>
         }
     }
 }
-
-} // package

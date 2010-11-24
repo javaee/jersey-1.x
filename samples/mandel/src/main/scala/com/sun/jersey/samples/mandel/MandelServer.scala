@@ -1,3 +1,4 @@
+package com.sun.jersey.samples.mandel
 
 import java.net.URI;
 import java.util.HashMap;
@@ -5,10 +6,9 @@ import javax.ws.rs.core.UriBuilder;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
-package com.sun.jersey.samples.mandel {
 
 object MandelServer {
-    private def getPort(defaultPort : int) = {
+    private def getPort(defaultPort : Int) = {
         val port = System.getenv("JERSEY_HTTP_PORT");
 
         if (null != port)
@@ -53,6 +53,4 @@ object MandelServer {
         println("Server stopped");
         System.exit(0);
     }
-}
-
 }

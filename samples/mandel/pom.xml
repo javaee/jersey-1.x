@@ -51,22 +51,6 @@
     </parent>
     <artifactId>mandel</artifactId>
     <name>Mandel -- Jersey sample</name>
-    <inceptionYear>2008</inceptionYear>
-    <profiles>
-        <profile>
-            <id>jdk-1.5</id>
-            <activation>
-                <jdk>1.5</jdk>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-impl</artifactId>
-                    <version>2.1.12</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
     <dependencies>
         <dependency>
             <groupId>org.scala-lang</groupId>
@@ -113,9 +97,6 @@
                 </executions>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
-                    <args>
-                        <arg>-target:jvm-1.5</arg>
-                    </args>
                 </configuration>
             </plugin>
             <plugin>
@@ -200,6 +181,6 @@
         </plugins>
     </reporting>
     <properties>
-        <scala.version>2.7.3</scala.version>
+        <scala.version>2.8.1</scala.version>
     </properties>
 </project>

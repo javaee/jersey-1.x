@@ -1,8 +1,8 @@
 package com.sun.jersey.samples.mandel
 
 object Mandel {
-    def iter(c: Complex, limit: int) = {
-        def _iter(z: Complex, limit: int): int = {
+    def iter(c: Complex, limit: Int) = {
+        def _iter(z: Complex, limit: Int): Int = {
             if (limit == 0 || z.modSquared >= 4)
                 limit
             else

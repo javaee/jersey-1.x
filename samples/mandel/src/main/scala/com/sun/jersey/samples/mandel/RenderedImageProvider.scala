@@ -1,3 +1,5 @@
+package com.sun.jersey.samples.mandel
+
 import java.awt.image._
 import java.io._
 import javax.imageio._
@@ -7,12 +9,10 @@ import javax.ws.rs._
 import javax.ws.rs.core._
 import javax.ws.rs.ext._
 
-package com.sun.jersey.samples.mandel {
-
 @Produces(Array("image/*"))
 @Provider
 class RenderedImageProvider extends MessageBodyWriter[RenderedImage] {
-    def isWriteable(c: Class[_], gt: Type, annotations: Array[Annotation], mediaType: MediaType) : boolean = {
+    def isWriteable(c: Class[_], gt: Type, annotations: Array[Annotation], mediaType: MediaType) : Boolean = {
         classOf[RenderedImage].isAssignableFrom(c)
     }
 
@@ -22,14 +22,14 @@ class RenderedImageProvider extends MessageBodyWriter[RenderedImage] {
             annotations: Array[Annotation],
             mediaType: MediaType,
             httpHeaders: MultivaluedMap[String, Object],
-            entityStream: OutputStream) : unit = {
+            entityStream: OutputStream) : Unit = {
         val formatName = RenderedImageProvider.formatName(mediaType)
         if (formatName == null) throw new IOException("Media type " + 
             mediaType + "not supported")
         ImageIO.write(t, formatName, entityStream)
     }
 
-    def getSize(t: RenderedImage, c: Class[_], gt: Type, annotations: Array[Annotation], mediaType: MediaType) : long = {
+    def getSize(t: RenderedImage, c: Class[_], gt: Type, annotations: Array[Annotation], mediaType: MediaType) : Long = {
         -1
     }
 }
@@ -48,5 +48,3 @@ object RenderedImageProvider {
 
     def isSupported(t: MediaType) = ImageIO.getImageWritersByMIMEType(t.toString()).hasNext()
 }
-
-} // package
