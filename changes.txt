@@ -1,4 +1,7 @@
 release 1.5 (11-2010)
+- Fixed issue 606
+  http://java.net/jira/browse/JERSEY-606
+  Added null check for return value of OAuthProvider.newAccessToken(...)
 - Fixed issue 132
   http://java.net/jira/browse/JERSEY-132
   Ability to have WebResource related properties

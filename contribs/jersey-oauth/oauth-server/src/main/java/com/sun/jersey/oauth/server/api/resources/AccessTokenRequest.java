@@ -125,6 +125,10 @@ public class AccessTokenRequest {
 
             // We're good to go.
             OAuthToken at = provider.newAccessToken(rt, params.getVerifier());
+            
+            if(at == null) {
+                throw new OAuthException(Response.Status.BAD_REQUEST, null);
+            }
 
             // Preparing the response.
             Form resp = new Form();
