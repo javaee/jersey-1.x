@@ -60,5 +60,8 @@
     <modules>
         <module>hypermedia-action</module>
         <module>view-client</module>
+        <!--
+        <module>jersey-grizzly2</module>
+        -->
     </modules>
 </project>
