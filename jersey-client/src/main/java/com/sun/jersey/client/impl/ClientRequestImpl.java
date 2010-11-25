@@ -42,6 +42,8 @@ package com.sun.jersey.client.impl;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientRequestAdapter;
 import com.sun.jersey.core.header.OutBoundHeaders;
+
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
@@ -49,7 +51,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
 
 public final class ClientRequestImpl extends ClientRequest implements ClientRequestAdapter {
     private Map<String, Object> properties;
@@ -86,6 +87,10 @@ public final class ClientRequestImpl extends ClientRequest implements ClientRequ
             properties = new HashMap<String, Object>();
         
         return properties;
+    }
+
+    public void setProperties(Map<String, Object> properties) {
+        this.properties = properties;
     }
             
     public URI getURI() {

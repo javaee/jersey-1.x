@@ -40,11 +40,12 @@
 package com.sun.jersey.api.client;
 
 import com.sun.jersey.client.impl.ClientRequestImpl;
-import java.net.URI;
-import java.util.Map;
+
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.RuntimeDelegate;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
+import java.net.URI;
+import java.util.Map;
 
 /**
  * A client (out-bound) HTTP request.
@@ -62,6 +63,11 @@ public abstract class ClientRequest {
      * @return the property bag.
      */
     public abstract Map<String, Object> getProperties();
+
+    /**
+     * Sets properties (replaces everything previously set).
+     */
+    public abstract void setProperties(Map<String, Object> properties);
 
     /**
      * Get a feature that is boolean property of the property bag.

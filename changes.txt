@@ -1,4 +1,7 @@
 release 1.5 (11-2010)
+- Fixed issue 132
+  http://java.net/jira/browse/JERSEY-132
+  Ability to have WebResource related properties
 - OSGi headers added to Jersey OAuth modules
 - Fixed issue 557
   http://java.net/jira/browse/JERSEY-557

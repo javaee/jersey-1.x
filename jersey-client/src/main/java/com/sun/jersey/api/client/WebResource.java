@@ -43,14 +43,15 @@ package com.sun.jersey.api.client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
-import java.net.URI;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
+import java.net.URI;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * An encapsulation of a Web resource capable of building requests
@@ -73,15 +74,18 @@ public class WebResource extends Filterable implements
         RequestBuilder<WebResource.Builder>,
         UniformInterface {    
     private final URI u;
+    private CopyOnCloneRefCountHashMap<String, Object> properties;
 
-    /* package */ WebResource(ClientHandler c, URI u) {
+    /* package */ WebResource(ClientHandler c, CopyOnCloneRefCountHashMap<String, Object> properties, URI u) {
         super(c);
         this.u = u;
+        this.properties = properties.clone();
     }
     
     private WebResource(WebResource that, UriBuilder ub) {
         super(that);
         this.u = ub.build();
+        properties = (that.properties == null ? null : that.properties.clone());
     }
     
     /**
@@ -554,8 +558,45 @@ public class WebResource extends Filterable implements
             return handle(gt, build(method, requestEntity));
         }        
     }
+
+    /**
+     * Sets WebResource related property.
+     *
+     * @param property property identifier.
+     * @param value value of given property.
+     */
+    public void setProperty(String property, Object value) {
+        this.getProperties().put(property, value);
+    }
+
+    /**
+     * Gets WebResource related properties.
+     *
+     * <p>Properties are inherited, so setting propeties on "parent" WebResource
+     * instance, creating child (for example via WebResource.path("subpath"))
+     * will set parents properties on it. However changing child properties
+     * won't cause change in parent's properties.
+     *
+     * <p>Methods entrySet(), keySet() and values() are returning read-only
+     * results (via Collection.unmodifiableMap).
+     *
+     * @return map containg all properties.
+     */
+    public Map<String, Object> getProperties() {
+        if (properties == null) {
+            properties = new CopyOnCloneRefCountHashMap<String, Object>();
+        }
+        return properties;
+    }
+
+    private void setProperties(ClientRequest ro) {
+        if (properties != null) {
+            ro.setProperties(properties.clone());
+        }
+    }
     
     private <T> T handle(Class<T> c, ClientRequest ro) throws UniformInterfaceException {
+        setProperties(ro);
         ClientResponse r = getHeadHandler().handle(ro);
         
         if (c == ClientResponse.class) return c.cast(r);
@@ -567,6 +608,7 @@ public class WebResource extends Filterable implements
     }
 
     private <T> T handle(GenericType<T> gt, ClientRequest ro) throws UniformInterfaceException {
+        setProperties(ro);
         ClientResponse r = getHeadHandler().handle(ro);
         
         if (gt.getRawClass() == ClientResponse.class) return gt.getRawClass().cast(r);
@@ -578,6 +620,7 @@ public class WebResource extends Filterable implements
     }
     
     private void voidHandle(ClientRequest ro) throws UniformInterfaceException {
+        setProperties(ro);
         ClientResponse r = getHeadHandler().handle(ro);
         
         if (r.getStatus() >= 300) 

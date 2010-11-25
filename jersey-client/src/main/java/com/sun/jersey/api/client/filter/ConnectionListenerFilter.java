@@ -45,13 +45,14 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientRequestAdapter;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.core.util.UnmodifiableMultivaluedMap;
+
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
 
 
 
@@ -267,6 +268,11 @@ class ClientRequestContainer extends ClientRequest {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public void setProperties(Map<String, Object> properties) {
+        throw new UnsupportedOperationException("Read only instance.");
     }
 
     @Override
