@@ -43,6 +43,7 @@ package com.sun.jersey.api.client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
@@ -591,7 +592,7 @@ public class WebResource extends Filterable implements
 
     private void setProperties(ClientRequest ro) {
         if (properties != null) {
-            ro.setProperties(properties.clone());
+            ro.setProperties(properties);
         }
     }
     

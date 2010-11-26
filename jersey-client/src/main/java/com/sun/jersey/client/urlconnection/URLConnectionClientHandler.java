@@ -40,24 +40,24 @@
 package com.sun.jersey.client.urlconnection;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.CommittingOutputStream;
 import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.core.header.InBoundHeaders;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import javax.net.ssl.HttpsURLConnection;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  * A terminating client handler that uses {@link HttpURLConnection} or
@@ -132,8 +132,7 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         }
     }
 
-    private ClientResponse _invoke(final ClientRequest ro)
-            throws ProtocolException, IOException {
+    private ClientResponse _invoke(final ClientRequest ro) throws IOException {
         final HttpURLConnection uc;
 
         if(this.httpURLConnectionFactory == null) {

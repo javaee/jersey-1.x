@@ -43,6 +43,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.filter.Filterable;
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.sun.jersey.client.proxy.ViewProxy;
 import com.sun.jersey.client.proxy.ViewProxyProvider;
 import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
@@ -81,7 +82,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -441,7 +441,7 @@ public class Client extends Filterable implements ClientHandler {
      * @return the Web resource.
      */
     public AsyncWebResource asyncResource(URI u) {
-        return new AsyncWebResource(this, u);
+        return new AsyncWebResource(this, this.properties, u);
     }
 
     public ViewResource viewResource(String u) {

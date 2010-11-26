@@ -38,14 +38,15 @@
  * holder.
  */
 
-package com.sun.jersey.api.client;
+package com.sun.jersey.impl.client;
 
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import junit.framework.TestCase;
 
 /**
  * @author pavel.bucek@oracle.com
  */
-public class CopyOnCloneRefCountHashMapTest extends TestCase {
+public class CopyOnWriteHashMapTest extends TestCase {
 
     public void testClone() {
         CopyOnWriteHashMap<String, String> map1 = new CopyOnWriteHashMap<String, String>();

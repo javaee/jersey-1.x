@@ -40,13 +40,19 @@
 
 package com.sun.jersey.api.client;
 
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.api.client.async.AsyncClientHandler;
 import com.sun.jersey.api.client.async.FutureListener;
 import com.sun.jersey.api.client.async.ITypeListener;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.sun.jersey.client.impl.async.FutureClientResponseListener;
+
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -57,10 +63,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * An encapsulation of an asynchronous Web resource capable of building requests
@@ -89,10 +91,13 @@ public class AsyncWebResource extends Filterable implements
 
     private final URI u;
 
-    /* package */ AsyncWebResource(Client c, URI u) {
+    private CopyOnWriteHashMap<String, Object> properties;
+
+    /* package */ AsyncWebResource(Client c,  CopyOnWriteHashMap<String, Object> properties, URI u) {
         super((ClientHandler)c);
         this.es = c.getExecutorService();
         this.u = u;
+        this.properties = properties.clone();
     }
     
     private AsyncWebResource(AsyncWebResource that, UriBuilder ub) {
@@ -659,9 +664,45 @@ public class AsyncWebResource extends Filterable implements
             return handle(l, build(method, requestEntity));
         }
     }
-    
+
+    /**
+     * Sets WebResource related property.
+     *
+     * @param property property identifier.
+     * @param value value of given property.
+     */
+    public void setProperty(String property, Object value) {
+        this.getProperties().put(property, value);
+    }
+
+    /**
+     * Gets WebResource related properties.
+     *
+     * <p>Properties are inherited, so setting propeties on "parent" WebResource
+     * instance, creating child (for example via WebResource.path("subpath"))
+     * will set parents properties on it. However changing child properties
+     * won't cause change in parent's properties.
+     *
+     * <p>Methods entrySet(), keySet() and values() are returning read-only
+     * results (via Collection.unmodifiableMap).
+     *
+     * @return map containg all properties.
+     */
+    public Map<String, Object> getProperties() {
+        if (properties == null) {
+            properties = new CopyOnWriteHashMap<String, Object>();
+        }
+        return properties;
+    }
+
+    private void setProperties(ClientRequest ro) {
+        if (properties != null) {
+            ro.setProperties(properties);
+        }
+    }
     
     private <T> Future<T> handle(final Class<T> c, final ClientRequest request) {
+        setProperties(request);
         final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
             protected T get(ClientResponse response) {
                 if (c == ClientResponse.class) return c.cast(response);
@@ -679,6 +720,7 @@ public class AsyncWebResource extends Filterable implements
     }
 
     private <T> Future<T> handle(final GenericType<T> gt, final ClientRequest request) {
+        setProperties(request);
         final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
             protected T get(ClientResponse response) {
                 if (gt.getRawClass() == ClientResponse.class) return gt.getRawClass().cast(response);
@@ -696,6 +738,7 @@ public class AsyncWebResource extends Filterable implements
     }
     
     private <T> Future<T> handle(final ITypeListener<T> l, final ClientRequest request) {
+        setProperties(request);
         final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
             @Override
             protected void done() {
@@ -727,6 +770,7 @@ public class AsyncWebResource extends Filterable implements
     }
 
     private Future<?> voidHandle(final ClientRequest request) {
+        setProperties(request);
         final FutureClientResponseListener<?> ftw = new FutureClientResponseListener() {
             protected Object get(ClientResponse response) {
                 if (response.getStatus() >= 300)
@@ -745,6 +789,7 @@ public class AsyncWebResource extends Filterable implements
     // AsyncClientHandler
     
     public Future<ClientResponse> handle(final ClientRequest request, final FutureListener<ClientResponse> l) {
+        setProperties(request);
         Callable<ClientResponse> c = new Callable<ClientResponse>() {
             public ClientResponse call() throws Exception {
                 return getHeadHandler().handle(request);

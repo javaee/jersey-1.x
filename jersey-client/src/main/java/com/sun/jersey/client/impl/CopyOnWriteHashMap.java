@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.jersey.api.client;
+package com.sun.jersey.client.impl;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -54,7 +54,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * that result in state modification will result in copying of the state 
  * before modification.
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul.Sandoz@Oracle.Com
+ * @author pavel.bucek@oracle.com
  */
 public class CopyOnWriteHashMap<K,V> implements Map<K,V> {
     private volatile Map<K,V> core;
