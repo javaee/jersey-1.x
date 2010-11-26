@@ -48,9 +48,9 @@ import junit.framework.TestCase;
 public class CopyOnCloneRefCountHashMapTest extends TestCase {
 
     public void testClone() {
-        CopyOnCloneRefCountHashMap<String, String> map1 = new CopyOnCloneRefCountHashMap<String, String>();
+        CopyOnWriteHashMap<String, String> map1 = new CopyOnWriteHashMap<String, String>();
         map1.put("a", "val");
-        CopyOnCloneRefCountHashMap<String, String> map2 = map1.clone();
+        CopyOnWriteHashMap<String, String> map2 = map1.clone();
         map2.put("b", "val");
 
         assertTrue(map1.containsKey("a"));

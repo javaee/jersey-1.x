@@ -45,119 +45,110 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * optimized copy on clone map
+ * A basic copy on write HashMap.
+ * <p>
+ * If an instance is cloned then any methods invoked on the instance or clone
+ * that result in state modification will result in copying of the state 
+ * before modification.
  *
  * @author Paul.Sandoz@Sun.Com
  */
+public class CopyOnWriteHashMap<K,V> implements Map<K,V> {
+    private volatile Map<K,V> core;
 
-public class CopyOnCloneRefCountHashMap<K,V> implements Map<K,V> {
-    private WeakHashMap<CopyOnCloneRefCountHashMap<K,V>, Boolean> map;
+    private volatile Map<K,V> view;
 
-    private Map<K,V> core;
+    private final AtomicBoolean requiresCopyOnWrite;
 
-    private Map<K,V> view;
-
-    public CopyOnCloneRefCountHashMap() {
-        this(new HashMap<K, V>());
+    public CopyOnWriteHashMap() {
+        this.core = new HashMap<K, V>();
+        this.requiresCopyOnWrite = new AtomicBoolean(false);
     }
 
-    public CopyOnCloneRefCountHashMap(Map<K, V> core) {
-        this.core = core;
-    }
-
-    private CopyOnCloneRefCountHashMap(CopyOnCloneRefCountHashMap<K, V> m) {
-        map = m.map;
-        core = m.core;
-        view = m.view;
+    private CopyOnWriteHashMap(CopyOnWriteHashMap<K,V> that) {
+        this.core = that.core;
+        this.requiresCopyOnWrite = new AtomicBoolean(true);
     }
 
     @Override
-    public CopyOnCloneRefCountHashMap<K,V> clone() {
-        if (map == null) {
-            map = new WeakHashMap<CopyOnCloneRefCountHashMap<K,V>, Boolean>();
-            // Add reference to self in the weak hash map
-            map.put(this, true);
+    public CopyOnWriteHashMap<K,V> clone() {
+        try {
+            return new CopyOnWriteHashMap(this);
+        } finally {
+            requiresCopyOnWrite.set(true);
         }
-
-        CopyOnCloneRefCountHashMap<K,V> clone = new CopyOnCloneRefCountHashMap(this);
-
-        synchronized(map) {
-            // Add reference to clone in the weak hash map
-            map.put(clone, true);
-        }
-
-        return clone;
     }
 
     private void copy() {
-        if (map != null) {
-            synchronized(map) {
-                if (map.size() > 1) {
-                    // If the size is > 1 then there are shared copies
-                    // remove reference to self in the weak hash map and
-                    // copy the map
-                    map.remove(this);
-                    map = null;
-
-                    core = new HashMap<K, V>(core);
-                    view = null;
-                }
-            }
+        if (requiresCopyOnWrite.compareAndSet(true, false)) {
+            core = new HashMap<K, V>(core);
+            view = null;
         }
     }
 
-
+    @Override
     public int size() {
         return core.size();
     }
 
+    @Override
     public boolean isEmpty() {
         return core.isEmpty();
     }
 
+    @Override
     public boolean containsKey(Object key) {
         return core.containsKey(key);
     }
 
+    @Override
     public boolean containsValue(Object value) {
         return core.containsValue(value);
     }
 
+    @Override
     public V get(Object key) {
         return core.get(key);
     }
 
+    @Override
     public V put(K key, V value) {
         copy();
         return core.put(key,value);
     }
 
+    @Override
     public V remove(Object key) {
         copy();
         return core.remove(key);
     }
 
+    @Override
     public void putAll(Map<? extends K, ? extends V> t) {
         copy();
         core.putAll(t);
     }
 
+    @Override
     public void clear() {
         core = new HashMap<K, V>();
         copy();
     }
 
+    @Override
     public Set<K> keySet() {
         return getView().keySet();
     }
 
+    @Override
     public Collection<V> values() {
         return getView().values();
     }
 
+    @Override
     public Set<Entry<K,V>> entrySet() {
         return getView().entrySet();
     }

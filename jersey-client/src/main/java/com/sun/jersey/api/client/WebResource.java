@@ -74,9 +74,9 @@ public class WebResource extends Filterable implements
         RequestBuilder<WebResource.Builder>,
         UniformInterface {    
     private final URI u;
-    private CopyOnCloneRefCountHashMap<String, Object> properties;
+    private CopyOnWriteHashMap<String, Object> properties;
 
-    /* package */ WebResource(ClientHandler c, CopyOnCloneRefCountHashMap<String, Object> properties, URI u) {
+    /* package */ WebResource(ClientHandler c, CopyOnWriteHashMap<String, Object> properties, URI u) {
         super(c);
         this.u = u;
         this.properties = properties.clone();
@@ -584,7 +584,7 @@ public class WebResource extends Filterable implements
      */
     public Map<String, Object> getProperties() {
         if (properties == null) {
-            properties = new CopyOnCloneRefCountHashMap<String, Object>();
+            properties = new CopyOnWriteHashMap<String, Object>();
         }
         return properties;
     }

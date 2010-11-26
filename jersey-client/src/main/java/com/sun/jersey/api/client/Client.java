@@ -127,7 +127,7 @@ public class Client extends Filterable implements ClientHandler {
 
     private LazyVal<ExecutorService> es;
     
-    private CopyOnCloneRefCountHashMap<String, Object> properties;
+    private CopyOnWriteHashMap<String, Object> properties;
 
     private Set<ViewProxyProvider> vpps;
 
@@ -556,7 +556,7 @@ public class Client extends Filterable implements ClientHandler {
      */
     public Map<String, Object> getProperties() {
         if (properties == null)
-            properties = new CopyOnCloneRefCountHashMap<String, Object>();
+            properties = new CopyOnWriteHashMap<String, Object>();
 
         return properties;
     }
