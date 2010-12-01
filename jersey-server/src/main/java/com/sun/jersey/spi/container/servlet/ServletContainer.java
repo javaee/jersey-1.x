@@ -74,7 +74,6 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -533,7 +532,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @exception ServletException if the HTTP request cannot
      *            be handled.
      */
-    public int service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
+	public int service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         return webComponent.service(baseUri, requestUri, request, response);
     }
@@ -554,32 +553,7 @@ public class ServletContainer extends HttpServlet implements Filter {
     
     @Override
     public void init() throws ServletException {
-        init(new WebConfig() {
-
-            public WebConfig.ConfigType getConfigType() {
-                return WebConfig.ConfigType.ServletConfig;
-            }
-            
-            public String getName() {
-                return ServletContainer.this.getServletName();
-            }
-
-            public String getInitParameter(String name) {
-                return ServletContainer.this.getInitParameter(name);
-            }
-
-            public Enumeration getInitParameterNames() {
-                return ServletContainer.this.getInitParameterNames();
-            }
-
-            public ServletContext getServletContext() {
-                return ServletContainer.this.getServletContext();
-            }
-
-            public ResourceConfig getDefaultResourceConfig(Map<String, Object> props) throws ServletException {
-                return ServletContainer.this.getDefaultResourceConfig(props, ServletContainer.this.getServletConfig());
-            }
-        });
+        init(new WebServletConfig(this));
     }
 
     /**
@@ -602,7 +576,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @deprecated methods should implement {@link #getDefaultResourceConfig(java.util.Map, com.sun.jersey.spi.container.servlet.WebConfig) }.
      */
     @Deprecated
-    protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
+	protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
             ServletConfig servletConfig) throws ServletException  {
         return getDefaultResourceConfig(props, getWebConfig());
     }
@@ -670,7 +644,7 @@ public class ServletContainer extends HttpServlet implements Filter {
                 URI l = UriBuilder.fromUri(request.getRequestURL().toString()).
                         path("/").
                         replaceQuery(request.getQueryString()).build();
-                
+
                 response.setStatus(307);
                 response.setHeader("Location", l.toASCIIString());
                 return;
@@ -733,32 +707,7 @@ public class ServletContainer extends HttpServlet implements Filter {
     public void init(FilterConfig filterConfig) throws ServletException {
         this.filterConfig = filterConfig;
 
-        init(new WebConfig() {
-
-            public WebConfig.ConfigType getConfigType() {
-                return WebConfig.ConfigType.FilterConfig;
-            }
-
-            public String getName() {
-                return ServletContainer.this.filterConfig.getFilterName();
-            }
-
-            public String getInitParameter(String name) {
-                return ServletContainer.this.filterConfig.getInitParameter(name);
-            }
-
-            public Enumeration getInitParameterNames() {
-                return ServletContainer.this.filterConfig.getInitParameterNames();
-            }
-
-            public ServletContext getServletContext() {
-                return ServletContainer.this.filterConfig.getServletContext();
-            }
-
-            public ResourceConfig getDefaultResourceConfig(Map<String, Object> props) throws ServletException {
-                return null;
-            }
-        });
+        init(new WebFilterConfig(filterConfig));
     }
 
     /**

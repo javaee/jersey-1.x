@@ -37,49 +37,53 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.spi.container.servlet;
 
-package com.sun.jersey.server.impl.model.method.dispatch;
+import java.util.Enumeration;
+import java.util.Map;
 
-import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.spi.dispatch.RequestDispatcher;
+import com.sun.jersey.api.core.ResourceConfig;
 
 /**
- * A dispatch provider implementation that answers to methods with a return
- * definition of void, receiving only HttpRequestContext and HttpResponseContext
- * (a service alike method).
+ * A servlet based web config. Delegates all invocations to the servlet
+ * configuration from the servlet api.
  * 
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
+ * @author guilherme silveira
  */
-public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvider {
-    
-    @SuppressWarnings("unchecked")
-	private static final Class[] EXPECTED_METHOD_PARAMS = new Class[]{HttpRequestContext.class, HttpResponseContext.class};
+public class WebServletConfig implements WebConfig {
 
-	static final class HttpReqResDispatcher extends ResourceJavaMethodDispatcher {
-        HttpReqResDispatcher(AbstractResourceMethod method) {
-            super(method);
-        }
+    private final ServletContainer servlet;
 
-        public void _dispatch(Object resource, HttpContext context) 
-        throws IllegalAccessException, InvocationTargetException {
-            method.invoke(resource, context.getRequest(), context.getResponse());
-        }
+    public WebServletConfig(ServletContainer servlet) {
+        this.servlet = servlet;
     }
-    
-    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
-        if (abstractResourceMethod.getReturnType() != void.class) return null;
-        
-        // TODO: use ARM getParams instead
-        Class<?>[] parameters = abstractResourceMethod.getMethod().getParameterTypes();
-        if (!Arrays.deepEquals(parameters, EXPECTED_METHOD_PARAMS)) return null;
-                
-        return new HttpReqResDispatcher(abstractResourceMethod);
+
+    public WebConfig.ConfigType getConfigType() {
+        return WebConfig.ConfigType.ServletConfig;
+    }
+
+    public String getName() {
+        return servlet.getServletName();
+    }
+
+    public String getInitParameter(String name) {
+        return servlet.getInitParameter(name);
+    }
+
+    public Enumeration getInitParameterNames() {
+        return servlet.getInitParameterNames();
+    }
+
+    public ServletContext getServletContext() {
+        return servlet.getServletContext();
+    }
+
+    public ResourceConfig getDefaultResourceConfig(Map<String, Object> props)
+            throws ServletException {
+        return servlet.getDefaultResourceConfig(props, servlet.getServletConfig());
     }
 }

@@ -38,48 +38,40 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.method.dispatch;
+package com.sun.jersey.spi.container;
 
-import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 
 /**
- * A dispatch provider implementation that answers to methods with a return
- * definition of void, receiving only HttpRequestContext and HttpResponseContext
- * (a service alike method).
+ * Service-provider interface for creating {@link RequestDispatcher} instances.
+ * <p>
+ * An implementation (a service-provider) identifies itself by placing a 
+ * provider-configuration file (if not already present), 
+ * "com.sun.research.ws.rest.spi.invoker.ResourceMethodDispatchProvider" in the 
+ * resource directory <tt>META-INF/services</tt>, and including the fully qualified
+ * service-provider-class of the implementation in the file.
+ * <p>
+ * A provider will examine the model of the Web resource method and 
+ * determine if an invoker can be created for that Web resource method.
+ * <p>
+ * Multiple providers can specify the support for different Web resource method
+ * patterns, ranging from simple patterns (such as void return and intput 
+ * parameters) to complex patterns that take type URI and query arguments 
+ * and HTTP request headers as typed parameters.
+ * 
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvider {
+public interface ResourceMethodDispatchProvider {
     
-    @SuppressWarnings("unchecked")
-	private static final Class[] EXPECTED_METHOD_PARAMS = new Class[]{HttpRequestContext.class, HttpResponseContext.class};
-
-	static final class HttpReqResDispatcher extends ResourceJavaMethodDispatcher {
-        HttpReqResDispatcher(AbstractResourceMethod method) {
-            super(method);
-        }
-
-        public void _dispatch(Object resource, HttpContext context) 
-        throws IllegalAccessException, InvocationTargetException {
-            method.invoke(resource, context.getRequest(), context.getResponse());
-        }
-    }
-    
-    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
-        if (abstractResourceMethod.getReturnType() != void.class) return null;
-        
-        // TODO: use ARM getParams instead
-        Class<?>[] parameters = abstractResourceMethod.getMethod().getParameterTypes();
-        if (!Arrays.deepEquals(parameters, EXPECTED_METHOD_PARAMS)) return null;
-                
-        return new HttpReqResDispatcher(abstractResourceMethod);
-    }
+    /**
+     * Create a {@link RequestDispatcher} for a resource method of
+     * a resource.
+     * 
+     * @param abstractResourceMethod the abstract resource method.
+     * @return the request dispatcher, otherwise null if it could not be created
+     *         for the abstract resource method.
+     */
+    RequestDispatcher create(AbstractResourceMethod abstractResourceMethod);    
 }

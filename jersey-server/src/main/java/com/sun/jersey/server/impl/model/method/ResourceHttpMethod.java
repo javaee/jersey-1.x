@@ -44,7 +44,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.server.impl.container.filter.FilterFactory;
-import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.inject.Errors;
 import java.lang.reflect.Method;
@@ -58,22 +58,22 @@ public final class ResourceHttpMethod extends ResourceMethod {
     private final AbstractResourceMethod arm;
     
     public ResourceHttpMethod(
-            ResourceMethodDispatcherFactory df,
+            ResourceMethodDispatchProvider dp,
             FilterFactory ff,
             AbstractResourceMethod arm) {
-        this(df, ff, UriTemplate.EMPTY, arm);
+        this(dp, ff, UriTemplate.EMPTY, arm);
     }
     
     public ResourceHttpMethod(
-            ResourceMethodDispatcherFactory df,
+            ResourceMethodDispatchProvider dp,
             FilterFactory ff,
             UriTemplate template,
             AbstractResourceMethod arm) {
-        this(df, ff, ff.getResourceFilters(arm), template, arm);
+        this(dp, ff, ff.getResourceFilters(arm), template, arm);
     }
 
     public ResourceHttpMethod(
-            ResourceMethodDispatcherFactory df,
+            ResourceMethodDispatchProvider dp,
             FilterFactory ff,
             List<ResourceFilter> resourceFilters,
             UriTemplate template,
@@ -83,7 +83,7 @@ public final class ResourceHttpMethod extends ResourceMethod {
                 arm.getSupportedInputTypes(),
                 arm.getSupportedOutputTypes(),
                 arm.areOutputTypesDeclared(),
-                df.getDispatcher(arm),
+                dp.create(arm),
                 FilterFactory.getRequestFilters(resourceFilters),
                 FilterFactory.getResponseFilters(resourceFilters));
 

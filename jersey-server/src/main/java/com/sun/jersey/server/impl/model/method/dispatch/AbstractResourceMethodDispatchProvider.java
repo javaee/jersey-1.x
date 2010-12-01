@@ -40,6 +40,7 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.api.JResponse;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -91,14 +92,12 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
             return new ResponseOutInvoker(abstractResourceMethod, pp);
         } else if (JResponse.class.isAssignableFrom(returnType)) {
             return new JResponseOutInvoker(abstractResourceMethod, pp);
-        } else if (returnType != void.class) {
-            if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
-                return new ObjectOutInvoker(abstractResourceMethod, pp);
-            } else {
-                return new TypeOutInvoker(abstractResourceMethod, pp);
-            }
-        } else {
+        } else if (returnType == void.class) {
             return new VoidOutInvoker(abstractResourceMethod, pp);
+        } else if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
+            return new ObjectOutInvoker(abstractResourceMethod, pp);
+        } else {
+            return new TypeOutInvoker(abstractResourceMethod, pp);
         }
     }
 

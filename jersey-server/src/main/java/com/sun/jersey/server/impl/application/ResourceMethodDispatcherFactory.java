@@ -37,13 +37,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.server.impl.application;
 
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.core.spi.component.ProviderServices;
 import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.server.impl.model.method.dispatch.ResourceMethodDispatchProvider;
+import com.sun.jersey.spi.container.ResourceMethodDispatchAdapter;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import com.sun.jersey.spi.inject.Errors;
 import java.util.Set;
@@ -54,23 +54,31 @@ import java.util.logging.Logger;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public final class ResourceMethodDispatcherFactory {
+public final class ResourceMethodDispatcherFactory implements ResourceMethodDispatchProvider {
+
     private static final Logger LOGGER = Logger.getLogger(ResourceMethodDispatcherFactory.class.getName());
     
     private final Set<ResourceMethodDispatchProvider> dispatchers;
-    
-    public ResourceMethodDispatcherFactory(ProviderServices providerServices) {
+
+    private ResourceMethodDispatcherFactory(ProviderServices providerServices) {
         dispatchers = providerServices.getProvidersAndServices(
                 ResourceMethodDispatchProvider.class);
     }
 
-    // TemplateContext
-    
-    public Set<ResourceMethodDispatchProvider> getDispatchers() {
-        return dispatchers;
+    public static ResourceMethodDispatchProvider create(ProviderServices providerServices) {
+        ResourceMethodDispatchProvider p = new ResourceMethodDispatcherFactory(providerServices);
+
+        for (ResourceMethodDispatchAdapter a :
+                providerServices.getProvidersAndServices(ResourceMethodDispatchAdapter.class)) {
+            p = a.adapt(p);
+        }
+        return p;
     }
-    
-    public RequestDispatcher getDispatcher(AbstractResourceMethod abstractResourceMethod) {
+
+    // ResourceMethodDispatchProvider
+
+    @Override
+    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
         // Mark the errors so it is possible to reset
         Errors.mark();
         for (ResourceMethodDispatchProvider rmdp : dispatchers) {
@@ -90,6 +98,6 @@ public final class ResourceMethodDispatcherFactory {
         }
 
         Errors.unmark();
-        return null;        
+        return null;
     }
 }

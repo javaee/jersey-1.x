@@ -40,20 +40,22 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- *
+ * A provider for methods that are marked as void and receiving no args.
+ * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class VoidVoidDispatchProvider implements ResourceMethodDispatchProvider {
     
     public static final class VoidVoidMethodInvoker extends ResourceJavaMethodDispatcher {
-        public VoidVoidMethodInvoker(AbstractResourceMethod abstractResourceMethod) {
-            super(abstractResourceMethod);
+        public VoidVoidMethodInvoker(AbstractResourceMethod method) {
+            super(method);
         }
 
         public void _dispatch(Object resource, HttpContext context) 
@@ -64,10 +66,8 @@ public class VoidVoidDispatchProvider implements ResourceMethodDispatchProvider 
     
 
     public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
-        // TODO: use ARM.getParams instead
-        if (abstractResourceMethod.getMethod().getParameterTypes().length != 0) return null;
-        // TODO: use ARM.retType? instead
-        if (abstractResourceMethod.getMethod().getReturnType() != void.class) return null;
+        if (!abstractResourceMethod.getParameters().isEmpty()) return null;
+        if (abstractResourceMethod.getReturnType() != void.class) return null;
         
         return new VoidVoidMethodInvoker(abstractResourceMethod);
     }

@@ -52,13 +52,13 @@ import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.server.impl.container.filter.FilterFactory;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.jersey.server.impl.model.method.ResourceHttpMethod;
 import com.sun.jersey.server.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.server.impl.template.ViewableRule;
 import com.sun.jersey.server.impl.uri.PathPattern;
@@ -94,7 +94,7 @@ public final class ResourceUriRules {
 
     private final ResourceConfig resourceConfig;
 
-    private final ResourceMethodDispatcherFactory df;
+    private final ResourceMethodDispatchProvider dp;
 
     private final ServerInjectableProviderContext injectableContext;
 
@@ -104,14 +104,14 @@ public final class ResourceUriRules {
 
     public ResourceUriRules(
             final ResourceConfig resourceConfig,
-            final ResourceMethodDispatcherFactory df,
+            final ResourceMethodDispatchProvider dp,
             final ServerInjectableProviderContext injectableContext,
             final FilterFactory ff,
             final WadlFactory wadlFactory,
             final AbstractResource resource
             ) {
         this.resourceConfig = resourceConfig;
-        this.df = df;
+        this.dp = dp;
         this.injectableContext = injectableContext;
         this.ff = ff;
         this.wadlFactory = wadlFactory;
@@ -264,7 +264,7 @@ public final class ResourceUriRules {
                 continue;
             }
 
-            final ResourceMethod rm = new ResourceHttpMethod(df, ff, p.getTemplate(), method);
+            final ResourceMethod rm = new ResourceHttpMethod(dp, ff, p.getTemplate(), method);
             ResourceMethodMap rmm = patternMethodMap.get(p);
             if (rmm == null) {
                 rmm = new ResourceMethodMap();
@@ -304,7 +304,7 @@ public final class ResourceUriRules {
             final RulesMap<UriRule> rulesMap) {
         final ResourceMethodMap rmm = new ResourceMethodMap();
         for (final AbstractResourceMethod resourceMethod : resource.getResourceMethods()) {
-            ResourceMethod rm = new ResourceHttpMethod(df, ff, resourceMethod);
+            ResourceMethod rm = new ResourceHttpMethod(dp, ff, resourceMethod);
 
             if (isValidResourceMethod(rm, rmm)) {
                 rmm.put(rm);

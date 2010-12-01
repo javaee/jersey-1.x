@@ -38,40 +38,63 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.method.dispatch;
+package com.sun.jersey.impl.resource;
 
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.container.ResourceMethodDispatchAdapter;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
+import javax.ws.rs.Path;
+import java.io.IOException;
+import javax.ws.rs.GET;
 
 /**
- * Service-provider interface for creating {@link RequestDispatcher} instances.
- * <p>
- * An implementation (a service-provider) identifies itself by placing a 
- * provider-configuration file (if not already present), 
- * "com.sun.research.ws.rest.spi.invoker.ResourceMethodDispatchProvider" in the 
- * resource directory <tt>META-INF/services</tt>, and including the fully qualified
- * service-provider-class of the implementation in the file.
- * <p>
- * A provider will examine the model of the Web resource method and 
- * determine if an invoker can be created for that Web resource method.
- * <p>
- * Multiple providers can specify the support for different Web resource method
- * patterns, ranging from simple patterns (such as void return and intput 
- * parameters) to complex patterns that take type URI and query arguments 
- * and HTTP reuqest headers as typed parameters.
- * 
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public interface ResourceMethodDispatchProvider {
-    
-    /**
-     * Create a {@link RequestDispatcher} for a resource method of
-     * a resource.
-     * 
-     * @param abstractResourceMethod the abstract resource method.
-     * @return the request dispatcher, otherwise null if it could not be created
-     *         for the abstract resource method.
-     */
-    RequestDispatcher create(AbstractResourceMethod abstractResourceMethod);    
+public class ResourceMethodDispatchAdapterTest extends AbstractResourceTester {
+
+    public ResourceMethodDispatchAdapterTest(String testName) {
+        super(testName);
+    }
+
+    @Path("/")
+    public static class TestResource {
+        @GET
+        public String get() {
+            return "GET";
+        }
+    }
+
+    private static class Adapter implements ResourceMethodDispatchAdapter {
+        int count = 0;
+
+        @Override
+        public ResourceMethodDispatchProvider adapt(final ResourceMethodDispatchProvider provider) {
+            return new ResourceMethodDispatchProvider() {
+
+                @Override
+                public RequestDispatcher create(AbstractResourceMethod m) {
+                    if (m.getMethod().getDeclaringClass() == TestResource.class)
+                        count++;
+                    return provider.create(m);
+                }
+
+            };
+        }
+    }
+
+    public void testAdapter() throws IOException {
+        Adapter a =  new Adapter();
+        ResourceConfig rc = new DefaultResourceConfig();
+        rc.getClasses().add(TestResource.class);
+        rc.getSingletons().add(a);
+        initiateWebApplication(rc);
+
+        resource("/").get(String.class);
+        assertEquals(1, a.count);
+    }
 }

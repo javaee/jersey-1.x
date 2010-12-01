@@ -38,48 +38,20 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.method.dispatch;
-
-import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
-
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.spi.dispatch.RequestDispatcher;
+package com.sun.jersey.spi.container;
 
 /**
- * A dispatch provider implementation that answers to methods with a return
- * definition of void, receiving only HttpRequestContext and HttpResponseContext
- * (a service alike method).
+ * A provider that can adapt a @{link ResourceMethodDispatchProvider}.
  * 
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
  */
-public class HttpReqResDispatchProvider implements ResourceMethodDispatchProvider {
-    
-    @SuppressWarnings("unchecked")
-	private static final Class[] EXPECTED_METHOD_PARAMS = new Class[]{HttpRequestContext.class, HttpResponseContext.class};
+public interface ResourceMethodDispatchAdapter {
 
-	static final class HttpReqResDispatcher extends ResourceJavaMethodDispatcher {
-        HttpReqResDispatcher(AbstractResourceMethod method) {
-            super(method);
-        }
-
-        public void _dispatch(Object resource, HttpContext context) 
-        throws IllegalAccessException, InvocationTargetException {
-            method.invoke(resource, context.getRequest(), context.getResponse());
-        }
-    }
-    
-    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
-        if (abstractResourceMethod.getReturnType() != void.class) return null;
-        
-        // TODO: use ARM getParams instead
-        Class<?>[] parameters = abstractResourceMethod.getMethod().getParameterTypes();
-        if (!Arrays.deepEquals(parameters, EXPECTED_METHOD_PARAMS)) return null;
-                
-        return new HttpReqResDispatcher(abstractResourceMethod);
-    }
+    /**
+     * Adapt a @{link ResourceMethodDispatchProvider}.
+     *
+     * @param provider the provider to adapt.
+     * @return the adapted provider.
+     */
+    ResourceMethodDispatchProvider adapt(ResourceMethodDispatchProvider provider);
 }

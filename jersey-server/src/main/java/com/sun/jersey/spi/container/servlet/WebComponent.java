@@ -106,7 +106,7 @@ import java.util.logging.Logger;
 
 /**
  * An abstract Web component that may be extended a Servlet and/or
- * Filter implementation, or ecapsulated by a Servlet or Filter implementaton.
+ * Filter implementation, or encapsulated by a Servlet or Filter implementaton.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -380,13 +380,12 @@ public class WebComponent implements ContainerListener {
         // request
         final WebApplication _application = application;
 
-        final ContainerRequest cRequest = new ContainerRequest(
+        final ContainerRequest cRequest = createRequest(
                 _application,
-                request.getMethod(),
+                request,
                 baseUri,
-                requestUri,
-                getHeaders(request),
-                request.getInputStream());
+                requestUri);
+        
         cRequest.setSecurityContext(new SecurityContext() {
             public Principal getUserPrincipal() {
                 return request.getUserPrincipal();
@@ -434,6 +433,26 @@ public class WebComponent implements ContainerListener {
             requestInvoker.set(null);
             responseInvoker.set(null);            
         }
+    }
+
+    /**
+     * Extension point for creating your custom container request.
+     * @param app			the web app
+     * @param request		the current servlet api request
+     * @param baseUri		the base uri
+     * @param requestUri		the request uri
+     * @return				the request container
+     * @throws IOException	if any error occurs when getting the input stream
+     */
+    protected ContainerRequest createRequest(WebApplication app,
+			HttpServletRequest request, URI baseUri, URI requestUri) throws IOException {
+        return new ContainerRequest(
+                app,
+                request.getMethod(),
+                baseUri,
+                requestUri,
+                getHeaders(request),
+                request.getInputStream());
     }
 
     private void traceOnException(final ContainerRequest cRequest, final HttpServletResponse response) {

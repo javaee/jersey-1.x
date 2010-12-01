@@ -75,6 +75,7 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
 import com.sun.jersey.server.impl.model.ResourceUriRules;
 import com.sun.jersey.server.impl.model.RulesMap;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.server.impl.model.parameter.CookieParamInjectableProvider;
 import com.sun.jersey.server.impl.model.parameter.FormParamInjectableProvider;
 import com.sun.jersey.server.impl.model.parameter.HeaderParamInjectableProvider;
@@ -130,9 +131,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -248,7 +246,7 @@ public final class WebApplicationImpl implements WebApplication {
     
     private ExceptionMapperFactory exceptionFactory;
     
-    private ResourceMethodDispatcherFactory dispatcherFactory;
+    private ResourceMethodDispatchProvider dispatcherFactory;
     
     private ResourceContext resourceContext;
 
@@ -652,11 +650,15 @@ public final class WebApplicationImpl implements WebApplication {
         }
         return new ResourceUriRules(
                 resourceConfig,
-                dispatcherFactory,
+                getDispatchProvider(),
                 injectableFactory,
                 filterFactory,
                 wadlFactory,
                 ar);
+    }
+
+    protected ResourceMethodDispatchProvider getDispatchProvider() {
+        return dispatcherFactory;
     }
 
     /* package */ AbstractResource getAbstractResource(Object o) {
@@ -1127,7 +1129,7 @@ public final class WebApplicationImpl implements WebApplication {
         filterFactory = new FilterFactory(providerServices);
 
         // Initiate resource method dispatchers
-        dispatcherFactory = new ResourceMethodDispatcherFactory(providerServices);
+        dispatcherFactory = ResourceMethodDispatcherFactory.create(providerServices);
 
         // Initiate the WADL factory
         this.wadlFactory = new WadlFactory(resourceConfig);
@@ -1185,18 +1187,6 @@ public final class WebApplicationImpl implements WebApplication {
 
         this.isTraceEnabled = resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE) |
                 resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE_PER_REQUEST);
-    }
-
-    private Class getDeclaringClass(AccessibleObject ao) {
-        if (ao instanceof Field) {
-            return ((Field)ao).getDeclaringClass();
-        } else if (ao instanceof Method) {
-            return ((Method)ao).getDeclaringClass();
-        } else if (ao instanceof Constructor) {
-            return ((Constructor)ao).getDeclaringClass();
-        } else {
-            return null;
-        }
     }
 
     @Override
