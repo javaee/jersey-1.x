@@ -44,7 +44,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -222,9 +222,9 @@ public final class GrizzlyContainer extends HttpRequestProcessor implements
     private InBoundHeaders getHeaders(final Request request) {
         final InBoundHeaders rh = new InBoundHeaders();
         @SuppressWarnings("unchecked")
-        final Enumeration<String> names = request.getHeaderNames();
-        while (names.hasMoreElements()) {
-            final String name = names.nextElement();
+        final Iterator<String> names = request.getHeaderNames();
+        while (names.hasNext()) {
+            final String name = names.next();
             final String value = request.getHeader(name);
             rh.add(name, value);
         }
