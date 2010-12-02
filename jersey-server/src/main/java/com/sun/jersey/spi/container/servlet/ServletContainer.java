@@ -770,7 +770,7 @@ public class ServletContainer extends HttpServlet implements Filter {
                     filterContextPath = '/' + filterContextPath;
                 }
                 if (filterContextPath.endsWith("/")) {
-                    filterContextPath.substring(0, filterContextPath.length() - 1);
+                    filterContextPath = filterContextPath.substring(0, filterContextPath.length() - 1);
                 }
             }
         }

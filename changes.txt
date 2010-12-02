@@ -1,7 +1,11 @@
 release 1.5 (11-2010)
+- Fixed issue (applied patch) 611
+  http://java.net/jira/browse/JERSEY-611
+  Code attempts to substring off a trailing / but doesn't assign
+  the substring so the operation was lost.
 - Fixed issue 610
   http://java.net/jira/browse/JERSEY-610
-  Fixed adding headers (not just auth relates) to requests without
+  Fixed adding headers (not just auth related) to requests without
   entity
 - Fixed issue 606
   http://java.net/jira/browse/JERSEY-606
