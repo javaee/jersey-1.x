@@ -45,6 +45,7 @@ import com.sun.jersey.core.impl.provider.entity.Inflector;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -66,7 +67,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import javax.ws.rs.core.Response.Status;
 
 /**
  *
@@ -164,7 +164,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
 
             final Marshaller m = getMarshaller(elementType, mediaType);
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
-            if (c != UTF8)
+            if (charset != UTF8)
                 m.setProperty(Marshaller.JAXB_ENCODING, charsetName);
             writeList(elementType, c, mediaType, charset, m, entityStream);
         } catch (JAXBException ex) {

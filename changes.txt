@@ -1,4 +1,7 @@
 release 1.5 (11-2010)
+- Fixed issue (applied patch) 612
+  http://java.net/jira/browse/JERSEY-612
+  Correcting charset check in AbstractListElementProvider
 - Fixed issue (applied patch) 611
   http://java.net/jira/browse/JERSEY-611
   Code attempts to substring off a trailing / but doesn't assign
