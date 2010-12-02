@@ -1,4 +1,8 @@
 release 1.5 (11-2010)
+- Fixed issue 610
+  http://java.net/jira/browse/JERSEY-610
+  Fixed adding headers (not just auth relates) to requests without
+  entity
 - Fixed issue 606
   http://java.net/jira/browse/JERSEY-606
   Added null check for return value of OAuthProvider.newAccessToken(...)

@@ -43,18 +43,10 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.CommittingOutputStream;
 import com.sun.jersey.api.client.RequestWriter;
-import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.ApacheHttpClientState;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.DefaultCredentialsProvider;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpMethod;
@@ -65,6 +57,14 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.EntityEnclosingMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+
+import javax.ws.rs.core.MultivaluedMap;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A default implementation of an Apache HTTP method executor.
@@ -197,7 +197,8 @@ public class DefaultApacheHttpMethodExecutor extends RequestWriter implements Ap
                         }
                     });
                 }
-
+            } else {
+                writeOutBoundHeaders(cr.getHeaders(), method);
             }
         } else {
             writeOutBoundHeaders(cr.getHeaders(), method);

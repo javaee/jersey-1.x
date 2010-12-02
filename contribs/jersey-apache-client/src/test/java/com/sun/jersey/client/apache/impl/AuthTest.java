@@ -40,8 +40,9 @@
 
 package com.sun.jersey.client.apache.impl;
 
-import javax.ws.rs.Path;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -49,17 +50,20 @@ import com.sun.jersey.client.apache.ApacheHttpClient;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
 import com.sun.jersey.spi.resource.Singleton;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScheme;
 import org.apache.commons.httpclient.auth.CredentialsNotAvailableException;
 import org.apache.commons.httpclient.auth.CredentialsProvider;
+
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 
 /**
  *
@@ -136,6 +140,17 @@ public class AuthTest extends AbstractGrizzlyServerTester {
             return "GET";
         }
 
+        @GET
+        @Path("filter")
+        public String getFilter(@Context HttpHeaders h) {
+            String value = h.getRequestHeaders().getFirst("Authorization");
+            if (value == null) {
+                throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic realm=\"WallyWorld\"").build());
+            }
+
+            return "GET";
+        }
+
         @POST
         public String post(@Context HttpHeaders h, String e) {
             requestCount++;
@@ -150,6 +165,51 @@ public class AuthTest extends AbstractGrizzlyServerTester {
             return e;
         }
 
+        @POST
+        @Path("filter")
+        public String postFilter(@Context HttpHeaders h, String e) {
+            String value = h.getRequestHeaders().getFirst("Authorization");
+            if (value == null) {
+                throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic realm=\"WallyWorld\"").build());
+            }
+
+            return e;
+        }
+
+        @DELETE
+        public void delete(@Context HttpHeaders h) {
+            requestCount++;
+            String value = h.getRequestHeaders().getFirst("Authorization");
+            if (value == null) {
+                assertEquals(1, requestCount);
+                throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic realm=\"WallyWorld\"").build());
+            } else {
+                assertTrue(requestCount > 1);
+            }
+        }
+
+        @DELETE
+        @Path("filter")
+        public void deleteFilter(@Context HttpHeaders h) {
+            String value = h.getRequestHeaders().getFirst("Authorization");
+            if (value == null) {
+                throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic realm=\"WallyWorld\"").build());
+            }
+        }
+
+        @DELETE
+        @Path("filter/withEntity")
+        public String deleteFilterWithEntity(@Context HttpHeaders h, String e) {
+            String value = h.getRequestHeaders().getFirst("Authorization");
+            if (value == null) {
+                throw new WebApplicationException(Response.status(401).header("WWW-Authenticate", "Basic realm=\"WallyWorld\"").build());
+            }
+
+            return e;
+        }
+
+
+        
     }
 
     public void testAuthGet() {
@@ -166,6 +226,20 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         assertEquals("GET", r.get(String.class));
     }
 
+    public void testAuthGetWithClientFilter() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+        ApacheHttpClient c = ApacheHttpClient.create();
+        c.addFilter(new HTTPBasicAuthFilter("name", "password"));
+
+        WebResource r = c.resource(getUri().path("test/filter").build());
+        assertEquals("GET", r.get(String.class));
+    }
+
     public void testAuthPost() {
         ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
 //        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
@@ -178,6 +252,67 @@ public class AuthTest extends AbstractGrizzlyServerTester {
 
         WebResource r = c.resource(getUri().path("test").build());
         assertEquals("POST", r.post(String.class, "POST"));
+    }
+
+    public void testAuthPostWithClientFilter() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+        ApacheHttpClient c = ApacheHttpClient.create();
+        c.addFilter(new HTTPBasicAuthFilter("name", "password"));
+
+        WebResource r = c.resource(getUri().path("test/filter").build());
+        assertEquals("POST", r.post(String.class, "POST"));
+    }
+
+    public void testAuthDelete() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+        DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
+        config.getState().setCredentials(null, null, -1, "name", "password");
+        ApacheHttpClient c = ApacheHttpClient.create(config);
+
+        WebResource r = c.resource(getUri().path("test").build());
+        ClientResponse response = r.delete(ClientResponse.class);
+        assertEquals(response.getStatus(), 204);
+    }
+
+    public void testAuthDeleteWithClientFilter() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+        ApacheHttpClient c = ApacheHttpClient.create();
+        c.addFilter(new HTTPBasicAuthFilter("name", "password"));
+
+        WebResource r = c.resource(getUri().path("test/filter").build());
+        ClientResponse response = r.delete(ClientResponse.class);
+        assertEquals(204, response.getStatus());
+    }
+
+    public void testAuthDeleteWithEntityUsingClientFilter() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+        ApacheHttpClient c = ApacheHttpClient.create();
+        c.addFilter(new HTTPBasicAuthFilter("name", "password"));
+
+        WebResource r = c.resource(getUri().path("test/filter/withEntity").build());
+        ClientResponse response = r.delete(ClientResponse.class, "DELETE");
+        assertEquals(200, response.getStatus());
+        assertEquals("DELETE", response.getEntity(String.class));
     }
 
     static class BasicCredentialsProvider implements CredentialsProvider {
