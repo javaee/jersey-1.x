@@ -1,4 +1,7 @@
 release 1.5 (11-2010)
+- Fixed issue (applied patch) 613
+  http://java.net/jira/browse/JERSEY-613
+  Removed unecessary allocation
 - Fixed issue (applied patch) 612
   http://java.net/jira/browse/JERSEY-612
   Correcting charset check in AbstractListElementProvider
