@@ -95,7 +95,7 @@ public abstract class AbstractModelValidator implements AbstractModelVisitor {
      * to re-use the same validator for another resource model
      */
     public void cleanIssueList() {
-        issueList.removeAll(issueList);
+        issueList.clear();
     }
 
     /**
@@ -103,7 +103,7 @@ public abstract class AbstractModelValidator implements AbstractModelVisitor {
      * issues found to it's list. The list of issues could be then retreived
      * via getIssueList method
      * 
-     * @param resource
+     * @param component
      */
     public void validate(final AbstractModelComponent component) {
         component.accept(this);
