@@ -97,8 +97,6 @@ public final class Errors {
             }
             return true;
         }
-        public int hashcode() {return 0;}
-
     }
 
     private final ArrayList<ErrorMessage> messages = new ArrayList<ErrorMessage>(0);

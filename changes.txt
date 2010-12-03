@@ -1,4 +1,7 @@
 release 1.5 (11-2010)
+- Fixed issue 615
+  http://java.net/jira/browse/JERSEY-615
+  Removed unnecessary unused method
 - Fixed issue (applied patch) 614
   http://java.net/jira/browse/JERSEY-614
   Code cleaning - clearing List by clear(), not by removeAll() 
