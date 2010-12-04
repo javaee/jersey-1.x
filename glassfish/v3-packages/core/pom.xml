@@ -173,14 +173,6 @@
                                     <outputDirectory>${assembly.directory}</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>org.jvnet</groupId>
-                                    <artifactId>mimepull</artifactId>
-                                    <version>1.4</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${assembly.directory}</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
                                     <groupId>org.codehaus.jackson</groupId>
                                     <artifactId>jackson-core-asl</artifactId>
                                     <version>1.5.5</version>
