@@ -1,4 +1,8 @@
 release 1.5 (11-2010)
+- Fixed issue 620
+  http://java.net/jira/browse/JERSEY-620
+  Exceptions thrown by a nullary constructor of a resource were incorrectly
+  handled.
 - Fixed issue 615
   http://java.net/jira/browse/JERSEY-615
   Removed unnecessary unused method

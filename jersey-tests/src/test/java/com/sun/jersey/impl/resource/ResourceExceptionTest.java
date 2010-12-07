@@ -42,7 +42,6 @@ package com.sun.jersey.impl.resource;
 
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.container.MappableContainerException;
 import javax.ws.rs.GET;
@@ -72,7 +71,7 @@ public class ResourceExceptionTest extends AbstractResourceTester {
     }
     
     @Path("/exception/checked")
-    static public class ExceptionCheckedResource { 
+    static public class ExceptionCheckedResource {
         @GET
         public String get() throws CheckedException {
             throw new CheckedException();
@@ -81,28 +80,28 @@ public class ResourceExceptionTest extends AbstractResourceTester {
 
     public void testExceptionChecked() {
         initiateWebApplication(ExceptionCheckedResource.class);
-        
+
         boolean caught = false;
         try {
             resource("/exception/checked").get(ClientResponse.class);
-        } catch (ContainerException e) {
+        } catch (MappableContainerException e) {
             caught = true;
             assertEquals(CheckedException.class, e.getCause().getClass());
         }
         assertTrue(caught);
     }
-    
+
     @Path("/exception/runtime")
-    static public class ExceptionRutimeResource { 
+    static public class ExceptionRutimeResource {
         @GET
         public String get() {
             throw new UnsupportedOperationException();
         }
     }
-    
+
     public void testExceptionRuntime() {
         initiateWebApplication(ExceptionRutimeResource.class);
-        
+
         boolean caught = false;
         try {
             resource("/exception/runtime").get(ClientResponse.class);
@@ -111,7 +110,87 @@ public class ResourceExceptionTest extends AbstractResourceTester {
         }
         assertTrue(caught);
     }
-    
+
+
+    @Path("/exception/checked")
+    static public class ExceptionCheckedConstructorResource {
+        public ExceptionCheckedConstructorResource() throws CheckedException {
+            throw new CheckedException();
+        }
+    }
+
+    public void testExceptionCheckedConstructor() {
+        initiateWebApplication(ExceptionCheckedConstructorResource.class);
+
+        boolean caught = false;
+        try {
+            resource("/exception/checked").get(ClientResponse.class);
+        } catch (MappableContainerException e) {
+            caught = true;
+            assertEquals(CheckedException.class, e.getCause().getClass());
+        }
+        assertTrue(caught);
+    }
+
+    @Path("/exception/runtime")
+    static public class ExceptionRutimeConstructorResource {
+        public ExceptionRutimeConstructorResource() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public void testExceptionRuntimeConstructor() {
+        initiateWebApplication(ExceptionRutimeConstructorResource.class);
+
+        boolean caught = false;
+        try {
+            resource("/exception/runtime").get(ClientResponse.class);
+        } catch (UnsupportedOperationException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+
+    @Path("/exception/checked")
+    static public class ExceptionCheckedConstructorParamsResource {
+        public ExceptionCheckedConstructorParamsResource(@QueryParam("x") String x) throws CheckedException {
+            throw new CheckedException();
+        }
+    }
+
+    public void testExceptionCheckedParamsConstructor() {
+        initiateWebApplication(ExceptionCheckedConstructorParamsResource.class);
+
+        boolean caught = false;
+        try {
+            resource("/exception/checked").get(ClientResponse.class);
+        } catch (MappableContainerException e) {
+            caught = true;
+            assertEquals(CheckedException.class, e.getCause().getClass());
+        }
+        assertTrue(caught);
+    }
+
+    @Path("/exception/runtime")
+    static public class ExceptionRutimeConstructorParamsResource {
+        public ExceptionRutimeConstructorParamsResource(@QueryParam("x") String x) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    public void testExceptionRuntimeParamsConstructor() {
+        initiateWebApplication(ExceptionRutimeConstructorParamsResource.class);
+
+        boolean caught = false;
+        try {
+            resource("/exception/runtime").get(ClientResponse.class);
+        } catch (UnsupportedOperationException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
+
+
     @Path("/exception/webapplication/{status}")
     static public class ExceptionWebApplicationResource { 
         @GET

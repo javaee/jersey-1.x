@@ -152,8 +152,11 @@ public class ResourceComponentConstructor {
         }
         
         ConstructorInjectablePair cip = getConstructor(sipc, scope, ar);
-        if (cip == null || cip.is.size() == 0) {
+        if (cip == null) {
             this.constructor = null;
+            this.injectables = null;
+        } else if (cip.is.isEmpty()) {
+            this.constructor = cip.con;
             this.injectables = null;
         } else {
             if (cip.is.contains(null)) {
@@ -186,8 +189,8 @@ public class ResourceComponentConstructor {
     private Object _construct(HttpContext hc)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-        if (constructor == null) {
-            return c.newInstance();
+        if (injectables == null) {
+            return (constructor != null) ? constructor.newInstance() : c.newInstance();
         } else {
             Object[] params = new Object[injectables.size()];
             int i = 0;
@@ -217,7 +220,7 @@ public class ResourceComponentConstructor {
             AbstractResource ar) {
         if (ar.getConstructors().isEmpty())
             return null;
-        
+
         SortedSet<ConstructorInjectablePair> cs = new TreeSet<ConstructorInjectablePair>(
                 new ConstructorComparator());        
         for (AbstractResourceConstructor arc : ar.getConstructors()) {
