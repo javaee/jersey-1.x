@@ -24,7 +24,6 @@
         <include>jackson-jaxrs.jar</include>
         <include>jackson-xc.jar</include>
         <include>jettison.jar</include>
-        <include>mimepull.jar</include>
       </includes>
       <outputDirectory>glassfish/modules</outputDirectory>
     </fileSet>
