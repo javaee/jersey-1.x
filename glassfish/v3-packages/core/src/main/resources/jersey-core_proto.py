@@ -16,6 +16,7 @@ pkg = {
     "dirtrees" : [ "glassfish"],
     "depends" : { 
                   "pkg:/glassfish-nucleus@3.0" : {"type" : "require" }
+                  ,"pkg:/glassfish-common" : {"type" : "require" }
                   ,"pkg:/metro@1.4" : {"type" : "require" }
                 },
     "licenses" : { "LICENSE.txt" : { "license" : "CDDL+GPL" }, "third-party-license-readme.txt" : { "license" : "Apache2" }}
