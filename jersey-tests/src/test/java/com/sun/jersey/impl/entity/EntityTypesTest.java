@@ -93,15 +93,14 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- *
  * @author Paul.Sandoz@Sun.Com
  */
 public class EntityTypesTest extends AbstractTypeTester {
-    
+
     public EntityTypesTest(String testName) {
         super(testName);
     }
-    
+
     @Path("/")
     public static class InputStreamResource {
         @POST
@@ -111,52 +110,57 @@ public class EntityTypesTest extends AbstractTypeTester {
             final byte[] data = new byte[2048];
             while ((read = in.read(data)) != -1)
                 out.write(data, 0, read);
-            
+
             return new ByteArrayInputStream(out.toByteArray());
-        }                
+        }
     }
-    
+
     public void testInputStream() {
         ByteArrayInputStream in = new ByteArrayInputStream("CONTENT".getBytes());
         _test(in, InputStreamResource.class);
     }
-    
+
     @Path("/")
-    public static class StringResource extends AResource<String> {}
-    
+    public static class StringResource extends AResource<String> {
+    }
+
     public void testString() {
         _test("CONTENT", StringResource.class);
     }
 
     @Path("/")
-    public static class DataSourceResource extends AResource<DataSource> {}
-    
+    public static class DataSourceResource extends AResource<DataSource> {
+    }
+
     public void testDataSource() throws Exception {
         ByteArrayInputStream bais = new ByteArrayInputStream("CONTENT".getBytes());
-        ByteArrayDataSource ds = new ByteArrayDataSource(bais, "text/plain");        
+        ByteArrayDataSource ds = new ByteArrayDataSource(bais, "text/plain");
         _test(ds, DataSourceResource.class);
     }
-    
+
     @Path("/")
-    public static class ByteArrayResource extends AResource<byte[]> {}
-    
+    public static class ByteArrayResource extends AResource<byte[]> {
+    }
+
     public void testByteArrayRepresentation() {
         _test("CONTENT".getBytes(), ByteArrayResource.class);
     }
-    
+
     @Path("/")
     @Produces("application/xml")
     @Consumes("application/xml")
-    public static class JAXBBeanResource extends AResource<JAXBBean> {}
-    
+    public static class JAXBBeanResource extends AResource<JAXBBean> {
+    }
+
     public void testJAXBBeanRepresentation() {
         _test(new JAXBBean("CONTENT"), JAXBBeanResource.class, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Path("/")
     @Produces("application/foo+xml")
     @Consumes("application/foo+xml")
-    public static class JAXBBeanResourceMediaType extends AResource<JAXBBean> {}
+    public static class JAXBBeanResourceMediaType extends AResource<JAXBBean> {
+    }
 
     public void testJAXBBeanRepresentationMediaType() {
         _test(new JAXBBean("CONTENT"), JAXBBeanResourceMediaType.class, MediaType.valueOf("application/foo+xml"));
@@ -174,25 +178,28 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     @Produces("text/xml")
     @Consumes("text/xml")
-    public static class JAXBBeanTextResource extends AResource<JAXBBean> {}
-    
+    public static class JAXBBeanTextResource extends AResource<JAXBBean> {
+    }
+
     public void testJAXBBeanTextRepresentation() {
         _test(new JAXBBean("CONTENT"), JAXBBeanTextResource.class, MediaType.TEXT_XML_TYPE);
     }
-    
+
     @Path("/")
     @Produces("application/xml")
     @Consumes("application/xml")
-    public static class JAXBElementBeanResource extends AResource<JAXBElement<JAXBBeanType>> {}
-    
+    public static class JAXBElementBeanResource extends AResource<JAXBElement<JAXBBeanType>> {
+    }
+
     public void testJAXBElementBeanRepresentation() {
         _test(new JAXBBean("CONTENT"), JAXBElementBeanResource.class, MediaType.APPLICATION_XML_TYPE);
     }
-    
+
     @Path("/")
     @Produces("application/foo+xml")
     @Consumes("application/foo+xml")
-    public static class JAXBElementBeanResourceMediaType extends AResource<JAXBElement<JAXBBeanType>> {}
+    public static class JAXBElementBeanResourceMediaType extends AResource<JAXBElement<JAXBBeanType>> {
+    }
 
     public void testJAXBElementBeanRepresentationMediaType() {
         _test(new JAXBBean("CONTENT"), JAXBElementBeanResourceMediaType.class, MediaType.valueOf("application/foo+xml"));
@@ -210,12 +217,13 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     @Produces("text/xml")
     @Consumes("text/xml")
-    public static class JAXBElementBeanTextResource extends AResource<JAXBElement<JAXBBeanType>> {}
-    
+    public static class JAXBElementBeanTextResource extends AResource<JAXBElement<JAXBBeanType>> {
+    }
+
     public void testJAXBElementBeanTextRepresentation() {
         _test(new JAXBBean("CONTENT"), JAXBElementBeanTextResource.class, MediaType.TEXT_XML_TYPE);
     }
-    
+
     @Path("/")
     @Produces("application/xml")
     @Consumes("application/xml")
@@ -225,7 +233,7 @@ public class EntityTypesTest extends AbstractTypeTester {
             return new JAXBBean(t.value);
         }
     }
-    
+
     public void testJAXBTypeRepresentation() {
         initiateWebApplication(JAXBTypeResource.class);
         WebResource r = resource("/");
@@ -234,11 +242,11 @@ public class EntityTypesTest extends AbstractTypeTester {
                 post(JAXBBeanType.class);
         assertEquals(in.value, out.value);
     }
-    
+
     @Path("/")
     @Produces("application/foo+xml")
     @Consumes("application/foo+xml")
-    public static class JAXBTypeResourceMediaType extends JAXBTypeResource  {
+    public static class JAXBTypeResourceMediaType extends JAXBTypeResource {
     }
 
     public void testJAXBTypeRepresentationMediaType() {
@@ -249,8 +257,8 @@ public class EntityTypesTest extends AbstractTypeTester {
                 post(JAXBBeanType.class);
         assertEquals(in.value, out.value);
     }
-    
-    
+
+
     @Path("/")
     @Produces("application/xml")
     @Consumes("application/xml")
@@ -260,9 +268,9 @@ public class EntityTypesTest extends AbstractTypeTester {
             return o;
         }
     }
-    
+
     @Provider
-    public static class JAXBObjectResolver implements  ContextResolver<JAXBContext> {
+    public static class JAXBObjectResolver implements ContextResolver<JAXBContext> {
         public JAXBContext getContext(Class<?> c) {
             if (Object.class == c) {
                 try {
@@ -273,7 +281,7 @@ public class EntityTypesTest extends AbstractTypeTester {
             return null;
         }
     }
-    
+
     public void testJAXBObjectRepresentation() {
         initiateWebApplication(JAXBObjectResolver.class, JAXBObjectResource.class);
         WebResource r = resource("/");
@@ -307,21 +315,23 @@ public class EntityTypesTest extends AbstractTypeTester {
         ClientResponse cr = r.type("application/xml").post(ClientResponse.class, xml);
         assertEquals(400, cr.getStatus());
     }
-    
+
     @Path("/")
-    public static class FileResource extends AResource<File> {}
-    
+    public static class FileResource extends AResource<File> {
+    }
+
     public void testFileRepresentation() throws IOException {
         FileProvider fp = new FileProvider();
-        File in = fp.readFrom(File.class, File.class, null, null, null, 
+        File in = fp.readFrom(File.class, File.class, null, null, null,
                 new ByteArrayInputStream("CONTENT".getBytes()));
-        
+
         _test(in, FileResource.class);
     }
-    
+
     @Path("/")
-    public static class MimeMultipartBeanResource extends AResource<MimeMultipart> {}
-    
+    public static class MimeMultipartBeanResource extends AResource<MimeMultipart> {
+    }
+
     public void testMimeMultipartRepresentation() throws Exception {
         InternetHeaders headers = new InternetHeaders();
         headers.addHeader("content-disposition", "form-data; name=\"field1\"");
@@ -338,48 +348,50 @@ public class EntityTypesTest extends AbstractTypeTester {
         headers3.addHeader("content-disposition", "form-data; name=\"pic\"; filename=\"duke_rocket.gif\"");
         headers3.addHeader("Content-type", "image/gif");
         headers3.addHeader("Content-Transfer-Encoding", "binary");
-        
+
         InputStream fs = this.getClass().getResourceAsStream("duke_rocket.gif");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[2048];
         int l;
-        while( (l = fs.read(buffer)) != -1) {
+        while ((l = fs.read(buffer)) != -1) {
             outputStream.write(buffer, 0, l);
         }
         outputStream.close();
-        
+
         bp = new MimeBodyPart(headers3, outputStream.toByteArray());
         mmIn.addBodyPart(bp);
         _test(mmIn, MimeMultipartBeanResource.class, false);
     }
-    
+
     @Produces("application/x-www-form-urlencoded")
     @Consumes("application/x-www-form-urlencoded")
     @Path("/")
-    public static class FormResource extends AResource<Form> {}
-    
+    public static class FormResource extends AResource<Form> {
+    }
+
     public void ignoredTestFormRepresentation() {
         Form fp = new Form();
         fp.add("Email", "johndoe@gmail.com");
         fp.add("Passwd", "north 23AZ");
         fp.add("service", "cl");
         fp.add("source", "Gulp-CalGul-1.05");
-        
+
         _test(fp, FormResource.class);
     }
-    
-   
+
+
     @Produces("application/json")
     @Consumes("application/json")
     @Path("/")
-    public static class JSONObjectResource extends AResource<JSONObject> {}
+    public static class JSONObjectResource extends AResource<JSONObject> {
+    }
 
     public void testJSONObjectRepresentation() throws Exception {
         JSONObject object = new JSONObject();
         object.put("userid", 1234).
-        put("username", "1234").
-        put("email", "a@b").
-        put("password", "****");
+                put("username", "1234").
+                put("email", "a@b").
+                put("password", "****");
 
         _test(object, JSONObjectResource.class, MediaType.APPLICATION_JSON_TYPE);
     }
@@ -387,14 +399,15 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Produces("application/xxx+json")
     @Consumes("application/xxx+json")
     @Path("/")
-    public static class JSONObjectResourceGeneralMediaType extends AResource<JSONObject> {}
+    public static class JSONObjectResourceGeneralMediaType extends AResource<JSONObject> {
+    }
 
     public void testJSONObjectRepresentationGeneralMediaTyp() throws Exception {
         JSONObject object = new JSONObject();
         object.put("userid", 1234).
-        put("username", "1234").
-        put("email", "a@b").
-        put("password", "****");
+                put("username", "1234").
+                put("email", "a@b").
+                put("password", "****");
 
         _test(object, JSONObjectResourceGeneralMediaType.class, MediaType.valueOf("application/xxx+json"));
     }
@@ -402,7 +415,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Produces("application/json")
     @Consumes("application/json")
     @Path("/")
-    public static class JSONOArrayResource extends AResource<JSONArray> {}
+    public static class JSONOArrayResource extends AResource<JSONArray> {
+    }
 
     public void testJSONArrayRepresentation() throws Exception {
         JSONArray array = new JSONArray();
@@ -414,7 +428,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Produces("application/xxx+json")
     @Consumes("application/xxx+json")
     @Path("/")
-    public static class JSONOArrayResourceGeneralMediaType extends AResource<JSONArray> {}
+    public static class JSONOArrayResourceGeneralMediaType extends AResource<JSONArray> {
+    }
 
     public void testJSONArrayRepresentationGeneralMediaType() throws Exception {
         JSONArray array = new JSONArray();
@@ -424,66 +439,73 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
 
     @Path("/")
-    public static class FeedResource extends AResource<Feed> {}
-    
+    public static class FeedResource extends AResource<Feed> {
+    }
+
     public void testFeedRepresentation() throws Exception {
         InputStream in = this.getClass().getResourceAsStream("feed.xml");
         AtomFeedProvider afp = new AtomFeedProvider();
         Feed f = afp.readFrom(Feed.class, Feed.class, null, null, null, in);
-        
+
         _test(f, FeedResource.class);
     }
-    
+
     @Path("/")
-    public static class EntryResource extends AResource<Entry> {}
-    
+    public static class EntryResource extends AResource<Entry> {
+    }
+
     public void testEntryRepresentation() throws Exception {
-        InputStream in = this.getClass().getResourceAsStream("entry.xml");        
+        InputStream in = this.getClass().getResourceAsStream("entry.xml");
         AtomEntryProvider afp = new AtomEntryProvider();
         Entry e = afp.readFrom(Entry.class, Entry.class, null, null, null, in);
-        
+
         _test(e, EntryResource.class);
     }
-    
+
     @Path("/")
-    public static class ReaderResource extends AResource<Reader> {}
-    
-    public void testReaderRepresentation() throws Exception {        
+    public static class ReaderResource extends AResource<Reader> {
+    }
+
+    public void testReaderRepresentation() throws Exception {
         _test(new StringReader("CONTENT"), ReaderResource.class);
     }
-    
+
     private final static String XML_DOCUMENT = "<n:x xmlns:n=\"urn:n\"><n:e>CONTNET</n:e></n:x>";
-    
+
     @Path("/")
-    public static class StreamSourceResource extends AResource<StreamSource> {}
-    
+    public static class StreamSourceResource extends AResource<StreamSource> {
+    }
+
     public void testStreamSourceRepresentation() throws Exception {
         StreamSource ss = new StreamSource(
                 new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
         _test(ss, StreamSourceResource.class);
     }
-    
+
     @Path("/")
-    public static class SAXSourceResource extends AResource<SAXSource> {}
-    
+    public static class SAXSourceResource extends AResource<SAXSource> {
+    }
+
     public void testSAXSourceRepresentation() throws Exception {
         StreamSource ss = new StreamSource(
                 new ByteArrayInputStream(XML_DOCUMENT.getBytes()));
         _test(ss, SAXSourceResource.class);
     }
-    
+
     @Path("/")
-    public static class DOMSourceResource extends AResource<DOMSource> {}
-    
+    public static class DOMSourceResource extends AResource<DOMSource> {
+    }
+
     public void testDOMSourceRepresentation() throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         Document d = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(XML_DOCUMENT)));
         DOMSource ds = new DOMSource(d);
         _test(ds, DOMSourceResource.class);
     }
-    
+
     @Path("/")
-    public static class DocumentResource extends AResource<Document> {}
+    public static class DocumentResource extends AResource<Document> {
+    }
 
     public void testDocumentRepresentation() throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -500,7 +522,7 @@ public class EntityTypesTest extends AbstractTypeTester {
             return t;
         }
     }
-    
+
     public void testFormMultivaluedMapRepresentation() {
         MultivaluedMap<String, String> fp = new MultivaluedMapImpl();
         fp.add("Email", "johndoe@gmail.com");
@@ -509,17 +531,18 @@ public class EntityTypesTest extends AbstractTypeTester {
         fp.add("source", "Gulp-CalGul-1.05");
         fp.add("source", "foo.java");
         fp.add("source", "bar.java");
-        
+
         initiateWebApplication(FormMultivaluedMapResource.class);
         WebResource r = resource("/");
         MultivaluedMap _fp = r.entity(fp, "application/x-www-form-urlencoded").
                 post(MultivaluedMap.class);
         assertEquals(fp, _fp);
     }
-    
+
     @Path("/")
     public static class StreamingOutputResource {
-        @GET public StreamingOutput get() {
+        @GET
+        public StreamingOutput get() {
             return new StreamingOutput() {
                 public void write(OutputStream entity) throws IOException {
                     entity.write(new String("CONTENT").getBytes());
@@ -527,44 +550,46 @@ public class EntityTypesTest extends AbstractTypeTester {
             };
         }
     }
-    
+
     public void testStreamingOutputRepresentation() throws Exception {
         initiateWebApplication(StreamingOutputResource.class);
         WebResource r = resource("/");
         assertEquals("CONTENT", r.get(String.class));
     }
-    
+
     @Path("/")
     @Consumes("application/json")
     @Produces("application/json")
-    public static class JAXBElementBeanJSONResource extends AResource<JAXBElement<String>> {}
-    
+    public static class JAXBElementBeanJSONResource extends AResource<JAXBElement<String>> {
+    }
+
     public void testJAXBElementBeanJSONRepresentation() {
         initiateWebApplication(JAXBElementBeanJSONResource.class);
         WebResource r = resource("/");
 
         ClientResponse rib = r.type("application/json").
                 post(ClientResponse.class, new JAXBElement<String>(new QName("test"), String.class, "CONTENT"));
-        
+
         // TODO: the following would not be needed if i knew how to workaround JAXBElement<String>.class literal
-        
+
         byte[] inBytes = (byte[])
                 rib.getProperties().get("request.entity");
         byte[] outBytes = (byte[])
                 rib.getProperties().get("response.entity");
-        
+
         assertEquals(inBytes.length, outBytes.length);
         boolean e = false;
         for (int i = 0; i < inBytes.length; i++) {
             if (inBytes[i] != outBytes[i])
                 assertEquals("Index: " + i, inBytes[i], outBytes[i]);
         }
-    }    
+    }
 
     @Path("/")
     @Produces("application/json")
     @Consumes("application/json")
-    public static class JAXBBeanResourceJSON extends AResource<JAXBBean> {}
+    public static class JAXBBeanResourceJSON extends AResource<JAXBBean> {
+    }
 
     public void testJAXBBeanRepresentationJSON() {
         initiateWebApplication(JAXBBeanResourceJSON.class);
@@ -578,7 +603,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     @Produces("application/foo+json")
     @Consumes("application/foo+json")
-    public static class JAXBBeanResourceJSONMediaType extends AResource<JAXBBean> {}
+    public static class JAXBBeanResourceJSONMediaType extends AResource<JAXBBean> {
+    }
 
     public void testJAXBBeanRepresentationJSONMediaType() {
         initiateWebApplication(JAXBBeanResourceJSONMediaType.class);
@@ -592,7 +618,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     @Produces("application/json")
     @Consumes("application/json")
-    public static class JAXBElementBeanResourceJSON extends AResource<JAXBElement<JAXBBeanType>> {}
+    public static class JAXBElementBeanResourceJSON extends AResource<JAXBElement<JAXBBeanType>> {
+    }
 
     public void testJAXBElementBeanRepresentationJSON() {
         initiateWebApplication(JAXBElementBeanResourceJSON.class);
@@ -606,7 +633,8 @@ public class EntityTypesTest extends AbstractTypeTester {
     @Path("/")
     @Produces("application/foo+json")
     @Consumes("application/foo+json")
-    public static class JAXBElementBeanResourceJSONMediaType extends AResource<JAXBElement<JAXBBeanType>> {}
+    public static class JAXBElementBeanResourceJSONMediaType extends AResource<JAXBElement<JAXBBeanType>> {
+    }
 
     public void testJAXBElementBeanRepresentationJSONMediaType() {
         initiateWebApplication(JAXBElementBeanResourceJSONMediaType.class);
@@ -635,7 +663,7 @@ public class EntityTypesTest extends AbstractTypeTester {
                 post(JAXBBeanType.class);
         assertEquals(in.value, out.value);
     }
-    
+
     @Path("/")
     @Produces("application/foo+json")
     @Consumes("application/foo+json")
@@ -654,12 +682,13 @@ public class EntityTypesTest extends AbstractTypeTester {
                 post(JAXBBeanType.class);
         assertEquals(in.value, out.value);
     }
-    
+
     @Path("/")
     @Produces("application/fastinfoset")
     @Consumes("application/fastinfoset")
-    public static class JAXBBeanResourceFastInfoset extends AResource<JAXBBean> {}
-    
+    public static class JAXBBeanResourceFastInfoset extends AResource<JAXBBean> {
+    }
+
     public void testJAXBBeanRepresentationFastInfoset() {
         initiateWebApplication(JAXBBeanResourceFastInfoset.class);
         WebResource r = resource("/");
@@ -668,11 +697,12 @@ public class EntityTypesTest extends AbstractTypeTester {
                 post(JAXBBean.class);
         assertEquals(in.value, out.value);
     }
-    
+
     @Path("/")
     @Produces("application/fastinfoset")
     @Consumes("application/fastinfoset")
-    public static class JAXBElementBeanResourceFastInfoset extends AResource<JAXBElement<JAXBBeanType>> {}
+    public static class JAXBElementBeanResourceFastInfoset extends AResource<JAXBElement<JAXBBeanType>> {
+    }
 
     public void testJAXBElementBeanRepresentationFastInfoset() {
         initiateWebApplication(JAXBElementBeanResourceFastInfoset.class);
@@ -682,7 +712,7 @@ public class EntityTypesTest extends AbstractTypeTester {
                 post(JAXBBean.class);
         assertEquals(in.value, out.value);
     }
-    
+
     @Path("/")
     @Produces("application/fastinfoset")
     @Consumes("application/fastinfoset")
@@ -702,14 +732,14 @@ public class EntityTypesTest extends AbstractTypeTester {
         assertEquals(in.value, out.value);
     }
 
-    
+
     @Path("/")
     @Produces("application/xml")
     @Consumes("application/xml")
     public static class JAXBListResource {
         @POST
         public List<JAXBBean> post(List<JAXBBean> l) {
-            return l;            
+            return l;
         }
 
         @GET
@@ -720,17 +750,17 @@ public class EntityTypesTest extends AbstractTypeTester {
             l.add(new JAXBBean("three"));
             return l;
         }
-        
+
         @POST
         @Path("type")
         public List<JAXBBean> postType(Collection<JAXBBeanType> l) {
             List<JAXBBean> beans = new ArrayList<JAXBBean>();
             for (JAXBBeanType t : l)
                 beans.add(new JAXBBean(t.value));
-            return beans;            
-        }        
+            return beans;
+        }
     }
-    
+
     @Path("/")
     @Produces("application/xml")
     @Consumes("application/xml")
@@ -776,7 +806,6 @@ public class EntityTypesTest extends AbstractTypeTester {
     }
 
 
-
     @Path("/")
     @Produces("application/foo+xml")
     @Consumes("application/foo+xml")
@@ -789,17 +818,21 @@ public class EntityTypesTest extends AbstractTypeTester {
 
 
         Collection<JAXBBean> a = r.get(
-                new GenericType<Collection<JAXBBean>>(){});
-        Collection<JAXBBean> b = r.type("application/foo+xml").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
+                new GenericType<Collection<JAXBBean>>() {
+                });
+        Collection<JAXBBean> b = r.type("application/foo+xml").post(new GenericType<Collection<JAXBBean>>() {
+        },
+                new GenericEntity<Collection<JAXBBean>>(a) {
+                });
 
         assertEquals(a, b);
 
-        b = r.path("type").type("application/foo+xml").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
+        b = r.path("type").type("application/foo+xml").post(new GenericType<Collection<JAXBBean>>() {
+        },
+                new GenericEntity<Collection<JAXBBean>>(a) {
+                });
         assertEquals(a, b);
     }
-
 
 
     public void testJAXBListRepresentationError() {
@@ -820,21 +853,26 @@ public class EntityTypesTest extends AbstractTypeTester {
     /**
      * TODO, the unmarshalling fails.
      */
-    public void _testJAXBListRepresentationFastInfoset() {
+    public void testJAXBListRepresentationFastInfoset() {
         initiateWebApplication(JAXBListResourceFastInfoset.class);
         WebResource r = resource("/");
         r.addFilter(new LoggingFilter());
 
         Collection<JAXBBean> a = r.get(
-                new GenericType<Collection<JAXBBean>>(){});
+                new GenericType<Collection<JAXBBean>>() {
+                });
 
-        Collection<JAXBBean> b = r.type("application/fastinfoset").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
+        Collection<JAXBBean> b = r.type("application/fastinfoset").post(new GenericType<Collection<JAXBBean>>() {
+        },
+                new GenericEntity<Collection<JAXBBean>>(a) {
+                });
 
         assertEquals(a, b);
-        
-        b = r.path("type").type("application/fastinfoset").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
+
+        b = r.path("type").type("application/fastinfoset").post(new GenericType<Collection<JAXBBean>>() {
+        },
+                new GenericEntity<Collection<JAXBBean>>(a) {
+                });
         assertEquals(a, b);
     }
 
@@ -850,14 +888,19 @@ public class EntityTypesTest extends AbstractTypeTester {
         WebResource r = resource("/");
 
         Collection<JAXBBean> a = r.get(
-                new GenericType<Collection<JAXBBean>>(){});
-        Collection<JAXBBean> b = r.type("application/json").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
+                new GenericType<Collection<JAXBBean>>() {
+                });
+        Collection<JAXBBean> b = r.type("application/json").post(new GenericType<Collection<JAXBBean>>() {
+        },
+                new GenericEntity<Collection<JAXBBean>>(a) {
+                });
 
         assertEquals(a, b);
 
-        b = r.path("type").type("application/json").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
+        b = r.path("type").type("application/json").post(new GenericType<Collection<JAXBBean>>() {
+        },
+                new GenericEntity<Collection<JAXBBean>>(a) {
+                });
         assertEquals(a, b);
 
         // TODO: would be nice to produce/consume a real JSON array like following
@@ -883,14 +926,19 @@ public class EntityTypesTest extends AbstractTypeTester {
         WebResource r = resource("/");
 
         Collection<JAXBBean> a = r.get(
-                new GenericType<Collection<JAXBBean>>(){});
-        Collection<JAXBBean> b = r.type("application/foo+json").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
+                new GenericType<Collection<JAXBBean>>() {
+                });
+        Collection<JAXBBean> b = r.type("application/foo+json").post(new GenericType<Collection<JAXBBean>>() {
+        },
+                new GenericEntity<Collection<JAXBBean>>(a) {
+                });
 
         assertEquals(a, b);
 
-        b = r.path("type").type("application/foo+json").post(new GenericType<Collection<JAXBBean>>(){},
-                new GenericEntity<Collection<JAXBBean>>(a){});
+        b = r.path("type").type("application/foo+json").post(new GenericType<Collection<JAXBBean>>() {
+        },
+                new GenericEntity<Collection<JAXBBean>>(a) {
+                });
         assertEquals(a, b);
 
         // TODO: would be nice to produce/consume a real JSON array like following

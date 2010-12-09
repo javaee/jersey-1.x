@@ -40,7 +40,8 @@
     holder.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -66,7 +67,7 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>2.1.12</version>
+            <version>2.2.3</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
@@ -121,7 +122,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <exclude>**/IntArrayTest.java</exclude>  <!-- until issue#497 gets resolved -->
+                        <exclude>**/IntArrayTest.java</exclude>
+                        <!-- until issue#497 gets resolved -->
                     </excludes>
                 </configuration>
             </plugin>
@@ -176,7 +178,10 @@
                 <configuration>
                     <instructions>
                         <Export-Package>com.sun.jersey.api.json, com.sun.jersey.json.impl.*</Export-Package>
-                        <Import-Package>com.sun.xml.bind.annotation;resolution:=optional,com.sun.xml.bind.v2.*;resolution:=optional, *</Import-Package>
+                        <Import-Package>
+                            com.sun.xml.bind.annotation;resolution:=optional,com.sun.xml.bind.v2.*;resolution:=optional,
+                            *
+                        </Import-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>

@@ -1,2 +1,3 @@
 com.sun.jersey.fastinfoset.impl.provider.entity.FastInfosetRootElementProvider
 com.sun.jersey.fastinfoset.impl.provider.entity.FastInfosetJAXBElementProvider
+com.sun.jersey.fastinfoset.impl.provider.entity.FastInfosetListElementProvider

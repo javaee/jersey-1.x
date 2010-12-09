@@ -40,9 +40,9 @@
     holder.
 
 -->
-<project       xmlns="http://maven.apache.org/POM/4.0.0"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -62,41 +62,41 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-          <groupId>org.apache.abdera</groupId>
-          <artifactId>abdera-parser</artifactId>
-          <version>1.0</version>
-          <!-- NOTE - the exclusions below are appropriate for apps deployed
-               in a Java EE environment, where the server provides all the
-               required implementations. -->
-<!--
-          <exclusions>
-              <exclusion>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-activation_1.0.2_spec</artifactId>
-              </exclusion>
-              <exclusion>
-                  <groupId>org.apache.geronimo.specs</groupId>
-                  <artifactId>geronimo-stax-api_1.0_spec</artifactId>
-              </exclusion>
-              <exclusion>
-                  <groupId>org.codehaus.woodstox</groupId>
-                  <artifactId>wstx-asl</artifactId>
-              </exclusion>
-              <exclusion>
-                  <groupId>xerces</groupId>
-                  <artifactId>xercesImpl</artifactId>
-              </exclusion>
-              <exclusion>
-                  <groupId>xml-apis</groupId>
-                  <artifactId>xml-apis</artifactId>
-              </exclusion>
-            </exclusions>
--->
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-parser</artifactId>
+            <version>1.0</version>
+            <!-- NOTE - the exclusions below are appropriate for apps deployed
+          in a Java EE environment, where the server provides all the
+          required implementations. -->
+            <!--
+                      <exclusions>
+                          <exclusion>
+                              <groupId>org.apache.geronimo.specs</groupId>
+                              <artifactId>geronimo-activation_1.0.2_spec</artifactId>
+                          </exclusion>
+                          <exclusion>
+                              <groupId>org.apache.geronimo.specs</groupId>
+                              <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                          </exclusion>
+                          <exclusion>
+                              <groupId>org.codehaus.woodstox</groupId>
+                              <artifactId>wstx-asl</artifactId>
+                          </exclusion>
+                          <exclusion>
+                              <groupId>xerces</groupId>
+                              <artifactId>xercesImpl</artifactId>
+                          </exclusion>
+                          <exclusion>
+                              <groupId>xml-apis</groupId>
+                              <artifactId>xml-apis</artifactId>
+                          </exclusion>
+                        </exclusions>
+            -->
         </dependency>
         <dependency>
-          <groupId>org.apache.abdera</groupId>
-          <artifactId>abdera-extensions-json</artifactId>
-          <version>1.0</version>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-extensions-json</artifactId>
+            <version>1.0</version>
         </dependency>
         <dependency>
             <groupId>com.sun.grizzly</groupId>
@@ -119,7 +119,7 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>2.1.12</version>
+            <version>2.2.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -168,5 +168,5 @@
             </plugin>
         </plugins>
     </build>
-    
+
 </project>
