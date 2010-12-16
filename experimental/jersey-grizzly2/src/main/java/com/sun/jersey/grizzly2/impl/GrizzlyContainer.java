@@ -221,12 +221,8 @@ public final class GrizzlyContainer extends HttpRequestProcessor implements
 
     private InBoundHeaders getHeaders(final Request request) {
         final InBoundHeaders rh = new InBoundHeaders();
-        @SuppressWarnings("unchecked")
-        final Iterator<String> names = request.getHeaderNames();
-        while (names.hasNext()) {
-            final String name = names.next();
-            final String value = request.getHeader(name);
-            rh.add(name, value);
+        for (final String name : request.getHeaderNames()) {
+            rh.add(name, request.getHeader(name));
         }
 
         return rh;
