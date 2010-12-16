@@ -43,6 +43,7 @@ package com.sun.jersey.impl.client;
 import com.sun.jersey.api.client.async.TypeListener;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.impl.container.grizzly.AbstractGrizzlyServerTester;
 import java.util.ArrayList;
@@ -109,12 +110,12 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         }
     }
 
-    class StringListener extends TypeListener<String> {
+    abstract class X<T> extends TypeListener<T> {
         final List<String> l = new ArrayList<String>();
         final CountDownLatch cdl = new CountDownLatch(1);
 
-        StringListener() {
-            super(String.class);
+        X(Class<T> c) {
+            super(c);
         }
 
         public void check(String s) throws InterruptedException {
@@ -122,10 +123,32 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
             assertEquals(1, l.size());
             assertEquals(s, l.get(0));
         }
+    }
+
+    class StringListener extends X<String> {
+        StringListener() {
+            super(String.class);
+        }
 
         public void onComplete(Future<String> f) throws InterruptedException {
             try {
                 l.add(f.get());
+            } catch (ExecutionException ex) {
+                throw new IllegalStateException();
+            } finally {
+                cdl.countDown();
+            }
+        }
+    }
+
+    class ClientResponseListener extends X<ClientResponse> {
+        ClientResponseListener() {
+            super(ClientResponse.class);
+        }
+
+        public void onComplete(Future<ClientResponse> f) throws InterruptedException {
+            try {
+                l.add(f.get().getEntity(String.class));
             } catch (ExecutionException ex) {
                 throw new IllegalStateException();
             } finally {
@@ -178,6 +201,21 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         terminate(c.getExecutorService());
     }
 
+    public void testGetClientResponseListener() throws Exception {
+        startServer(HttpMethodResource.class);
+
+        Client c = Client.create();
+        AsyncWebResource r = c.asyncResource(getUri().path("test").build());
+
+        ClientResponseListener l = new ClientResponseListener();
+        Future<?> f = r.get(l);
+
+        assertTrue(ClientResponse.class.isAssignableFrom(f.get().getClass()));
+        l.check("GET");
+
+        terminate(c.getExecutorService());
+    }
+
     public void testGetListenerNotFound() throws Exception {
         startServer(HttpMethodResource.class);
 
@@ -208,6 +246,41 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
             caught = ex.getCause() instanceof UniformInterfaceException;
         }
         assertTrue(caught);
+
+        cdl.await();
+        assertEquals(1, l.size());
+        assertEquals("404", l.get(0));
+
+        terminate(c.getExecutorService());
+    }
+
+    public void testGetClientResponseListenerNotFound() throws Exception {
+        startServer(HttpMethodResource.class);
+
+        Client c = Client.create();
+        AsyncWebResource r = c.asyncResource(getUri().path("404").build());
+
+        final CountDownLatch cdl = new CountDownLatch(1);
+        final List<String> l = new ArrayList<String>();
+        Future<?> f = r.get(new TypeListener<ClientResponse>(ClientResponse.class) {
+            public void onComplete(Future<ClientResponse> t) throws InterruptedException {
+                try {
+                    l.add("" + t.get().getStatus());
+                } catch (ExecutionException ex) {
+                    throw new IllegalStateException();
+                } finally {
+                    cdl.countDown();
+                }
+            }
+        });
+
+        boolean caught = false;
+        try {
+            f.get();
+        } catch (ExecutionException ex) {
+            caught = true;
+        }
+        assertFalse(caught);
 
         cdl.await();
         assertEquals(1, l.size());

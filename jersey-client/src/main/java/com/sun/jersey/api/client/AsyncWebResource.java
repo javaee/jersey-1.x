@@ -752,6 +752,8 @@ public class AsyncWebResource extends Filterable implements
             }
 
             protected T get(ClientResponse response) {
+                if (l.getType() == ClientResponse.class) return (T)response;
+
                 if (response.getStatus() < 300) {
                     if (l.getGenericType() == null) {
                         return response.getEntity(l.getType());
