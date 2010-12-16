@@ -71,8 +71,8 @@
  *         &lt;param-value&gt;com.sun.jersey.api.container.filter.LoggingFilter&lt;/param-value&gt;
  *     &lt;/init-param&gt
  *     &lt;init-param&gt
- *         &lt;param-name&gtcom.sun.jersey.spi.container.ContainerResponseFilters&lt;/param-name&gt;
- *         &lt;param-value&gtcom.sun.jersey.api.container.filter.LoggingFilter&lt;/param-value&gt;
+ *         &lt;param-name&gt;com.sun.jersey.spi.container.ContainerResponseFilters&lt;/param-name&gt;
+ *         &lt;param-value&gt;com.sun.jersey.api.container.filter.LoggingFilter&lt;/param-value&gt;
  *     &lt;/init-param&gt;
  * </pre></blockquote>
  * Note that two or more request or response filters may be registered as a ';' separated list of fully

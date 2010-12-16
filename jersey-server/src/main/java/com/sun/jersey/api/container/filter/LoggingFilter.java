@@ -80,7 +80,7 @@ import javax.ws.rs.core.MultivaluedMap;
  * <p>
  * The logging of entities may be disabled by setting the feature
  * {@link #FEATURE_LOGGING_DISABLE_ENTITY} to true. When an application is
- * deployed as a Servlet or Filter this Jersey filter can be
+ * deployed as a Servlet or Filter this feature can be
  * registered using the following initialization parameter:
  * <blockquote><pre>
  *     &lt;init-param&gt;
