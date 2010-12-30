@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>MOXy Example</title></head>
+
+
+  <body>
+      <h1>MOXy Example</h1>
+
+      <h2>What is MOXy</h2>
+      <p>This example demonstrates that you can utilize MOXy extensions when dealing with XML representation when developing a Jersey based RESTful Web application</p>
+      
+      <p>MOXy is EclipseLink's Object to XML Mapping services. MOXy allows for a POJO object model to be mapped to an XML schema. The Java Architecture for XML Binding (JAXB) provides a Java standard for object XML mapping (OXM). MOXy supports JAXB, as well as providing its' own native API and integration with Web Services. 
+      </p>
+
+      <h2>MOXy XML Path Mapping Extension</h2>
+
+      <p>The MOXy extension shown in this example is described on the Eclipse Wiki site
+          at <a href="http://wiki.eclipse.org/EclipseLink/Examples/MOXy/GettingStarted/MOXyExtensions">http://wiki.eclipse.org/EclipseLink/Examples/MOXy/GettingStarted/MOXyExtensions</a>.
+          It allows you to specify path based mapping via @XmlPath annotation.
+      </p>
+
+      <p>If the MOXy extension was not used, the XML represenation of the customer data would look like follows:
+      <pre>
+&lt;customer&gt;
+  &lt;name&gt;Jane Doe&lt;/name&gt;
+  &lt;address&gt;
+    &lt;city&gt;My Town&lt;/city&gt;
+    &lt;street&gt;123 Any Street&lt;/street&gt;
+  &lt;/address&gt;
+  &lt;phoneNumbers&gt;
+    &lt;type&gt;work&lt;/type&gt;
+    &lt;value&gt;613-555-1111&lt;/value&gt;
+  &lt;/phoneNumbers&gt;
+  &lt;phoneNumbers&gt;
+    &lt;type&gt;cell&lt;/type&gt;
+    &lt;value&gt;613-555-2222&lt;/value&gt;
+  &lt;/phoneNumbers&gt;
+&lt;/customer&gt;
+      </pre>
+      By adding <code>@org.eclipse.persistence.oxm.annotations.XmlPath</code> annotation to the bean definition classes,
+      you will get the following XML representation instead:
+      <pre>
+&lt;customer&gt;
+  <b>&lt;personal-info&gt;</b>
+    &lt;name&gt;Jane Doe&lt;/name&gt;
+  <b>&lt;/personal-info&gt;
+  &lt;contact-info&gt;</b>
+    &lt;address&gt;
+      &lt;city&gt;My Town&lt;/city&gt;
+      &lt;street&gt;123 Any Street&lt;/street&gt;
+    &lt;/address&gt;
+    <b>&lt;phone-number&gt;</b>
+      &lt;type&gt;work&lt;/type&gt;
+      &lt;value&gt;613-555-1111&lt;/value&gt;
+    <b>&lt;/phone-number&gt;
+    &lt;phone-number&gt;</b>
+      &lt;type&gt;cell&lt;/type&gt;
+      &lt;value&gt;613-555-2222&lt;/value&gt;
+    <b>&lt;/phone-number&gt;
+  &lt;/contact-info&gt;</b>
+&lt;/customer&gt;
+      </pre>
+XML Path expressions used are:
+<ul>
+    <li>personal-info/name/text()</li>
+    <li>contact-info/address</li>
+    <li>contact-info/phone-number</li>
+</ul>
+Please check out the source code and the wiki page linked above for the detailed information on the XML Path mapping feature.
+  </p>
+  
+<h2>Replacing Implicit JAXB Runtime With MOXy</h2>
+<p>Since MOXy is a JAXB implementation, the example still utilizes the standard Jersey JAXB message body reader/writer providers.
+To make Jersey use MOXy runtime, you just need to put a <code>jaxb.properties</code> file into the Java package
+containing your JAXB beans. The file should have the following content:
+<pre>
+javax.xml.bind.context.factory=org.eclipse.persistence.jaxb.JAXBContextFactory
+</pre>
+Concrete file used in this example is placed under <code>src/main/resources/com/sun/jersey/samples/moxy/beans/jaxb.properties</code>
+</p>
+      <h2>REST Resources</h2>
+      <p>The example consists of a single REST Resource represented by the following Java class:</p>
+      <dl>
+          <dt><code>com.sun.jersey.samples.moxy.CustomerResource</code></dt>
+          <dd>A resource class that maintains a single customer data.</dd>
+      </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/customer</td>
+	<td>CustomerResource</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+	<td>/customer</td>
+	<td>CustomerResource</td>
+	<td>PUT</td>
+	</tr>
+	</table>
+
+      <h2>Running the Example</h2>
+
+      <p>If you are working with Jersey GlassFish update center module installed into your existing GlassFish instance,
+          you will need to follow instructions at <a href="../../README.html">the module README file</a> in order to
+          deploy the example.
+
+      <p>Otherwise, you can run the example using embedded GlassFish as follows:</p>
+
+      <p> run
+      <blockquote><code>mvn clean package jetty:run</code></blockquote>
+      <p>From a web browser, visit:</p>
+      <blockquote><code><a href="http://localhost:8080/moxy/customer">http://localhost:8080/moxy/customer</a></code>
+      </blockquote>
+ </body></html>
