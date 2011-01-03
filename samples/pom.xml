@@ -39,8 +39,7 @@
     only if the new code is made subject to such option by the copyright
     holder.
 
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>jersey-samples</artifactId>
@@ -77,6 +76,7 @@
         <module>jsonp</module>
         <module>managed-beans-webapp</module>
         <module>mandel</module>
+        <module>moxy</module>
         <module>multipart-webapp</module>
         <module>optimistic-concurrency</module>
         <module>osgi-http-service</module>
@@ -86,8 +86,8 @@
         <module>simple-servlet</module> 
         <module>sparklines</module>
         <module>spring-annotations</module>
-        <module>storage-service</module>        
-    </modules>
+        <module>storage-service</module>
+  </modules>
     <build>
         <plugins>
             <plugin>

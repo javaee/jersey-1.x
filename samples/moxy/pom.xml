@@ -7,7 +7,6 @@
         <groupId>com.sun.jersey.samples</groupId>
         <version>1.5-SNAPSHOT</version>
     </parent>
-    <groupId>com.sun.jersey.samples</groupId>
     <artifactId>moxy</artifactId>
     <packaging>war</packaging>
     <name>MOXy Jersey Webapp</name>
