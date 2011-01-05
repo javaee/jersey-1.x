@@ -200,22 +200,23 @@ public final class GrizzlyContainer extends HttpRequestProcessor implements
     }
 
     private URI getBaseUri(final Request request) {
-        final String contextPath = null; // request.getContextPath();
-        final String basePath;
-
-        if (contextPath == null || contextPath.length() == 0) {
-            basePath = "/";
-        } else if (contextPath.charAt(contextPath.length() - 1) != '/') {
-            basePath = contextPath + "/";
-        } else {
-            basePath = contextPath;
-        }
-
         try {
             return new URI(request.getScheme(), null, request.getServerName(),
-                    request.getServerPort(), basePath, null, null);
+                    request.getServerPort(), getBasePath(request), null, null);
         } catch (final URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
+        }
+    }
+
+    private String getBasePath(final Request request) {
+        final String contextPath = request.getContextPath();
+
+        if (contextPath == null || contextPath.length() == 0) {
+            return "/";
+        } else if (contextPath.charAt(contextPath.length() - 1) != '/') {
+            return contextPath + "/";
+        } else {
+            return contextPath;
         }
     }
 
