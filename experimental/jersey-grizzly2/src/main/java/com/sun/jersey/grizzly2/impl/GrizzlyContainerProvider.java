@@ -39,7 +39,7 @@
  */
 package com.sun.jersey.grizzly2.impl;
 
-import org.glassfish.grizzly.http.server.HttpRequestProcessor;
+import org.glassfish.grizzly.http.server.HttpHandler;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
@@ -52,14 +52,14 @@ import com.sun.jersey.spi.container.WebApplication;
  * @author Matt Swift
  */
 public class GrizzlyContainerProvider implements
-        ContainerProvider<HttpRequestProcessor> {
+        ContainerProvider<HttpHandler> {
 
     /**
      * Default constructor ensures that HttpRequestProcessor class is loaded.
      */
     public GrizzlyContainerProvider() {
         @SuppressWarnings("unused")
-        final Class<?> c = HttpRequestProcessor.class;
+        final Class<?> c = HttpHandler.class;
     }
 
     /**
@@ -67,10 +67,10 @@ public class GrizzlyContainerProvider implements
      */
     @Override
     public GrizzlyContainer createContainer(
-            final Class<HttpRequestProcessor> type,
+            final Class<HttpHandler> type,
             final ResourceConfig resourceConfig, final WebApplication application)
             throws ContainerException {
-        if (type != HttpRequestProcessor.class) {
+        if (type != HttpHandler.class) {
             return null;
         }
 

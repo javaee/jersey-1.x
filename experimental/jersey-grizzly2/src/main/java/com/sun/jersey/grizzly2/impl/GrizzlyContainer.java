@@ -44,14 +44,12 @@ import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 
-import org.glassfish.grizzly.http.server.HttpRequestProcessor;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 
@@ -60,13 +58,14 @@ import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.server.impl.ThreadLocalInvoker;
 import com.sun.jersey.spi.container.*;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import org.glassfish.grizzly.http.server.HttpHandler;
 
 /**
  * Grizzly 2.0 Jersey container.
  *
  * @author Matt Swift
  */
-public final class GrizzlyContainer extends HttpRequestProcessor implements
+public final class GrizzlyContainer extends HttpHandler implements
         ContainerListener {
 
     private static class ContextInjectableProvider<T> extends SingletonTypeInjectableProvider<Context, T> {
@@ -190,8 +189,8 @@ public final class GrizzlyContainer extends HttpRequestProcessor implements
 
         try {
             final ContainerRequest cRequest = new ContainerRequest(_application,
-                    request.getMethod(), baseUri, requestUri, getHeaders(request),
-                    request.getInputStream(true));
+                    request.getMethod().getMethodString(), baseUri, requestUri,
+                    getHeaders(request), request.getInputStream(true));
 
             _application.handleRequest(cRequest, new Writer(response));
         } catch (final IOException ex) {

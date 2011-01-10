@@ -42,7 +42,7 @@ package com.sun.jersey.grizzly2;
 import java.io.IOException;
 import java.net.URI;
 
-import org.glassfish.grizzly.http.server.HttpRequestProcessor;
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
@@ -197,8 +197,8 @@ public final class GrizzlyServerFactory {
      */
     public static HttpServer createHttpServer(final URI u) throws IOException,
             IllegalArgumentException, NullPointerException {
-        final HttpRequestProcessor processor = ContainerFactory.createContainer(HttpRequestProcessor.class);
-        return createHttpServer(u, processor);
+        final HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class);
+        return createHttpServer(u, handler);
     }
 
     /**
@@ -229,9 +229,9 @@ public final class GrizzlyServerFactory {
      */
     public static HttpServer createHttpServer(final URI u, final ResourceConfig rc)
             throws IOException, IllegalArgumentException, NullPointerException {
-        final HttpRequestProcessor processor = ContainerFactory.createContainer(
-                HttpRequestProcessor.class, rc);
-        return createHttpServer(u, processor);
+        final HttpHandler handler = ContainerFactory.createContainer(
+                HttpHandler.class, rc);
+        return createHttpServer(u, handler);
     }
 
     /**
@@ -269,13 +269,13 @@ public final class GrizzlyServerFactory {
     public static HttpServer createHttpServer(final URI u,
             final ResourceConfig rc, final IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException, NullPointerException {
-        final HttpRequestProcessor processor = ContainerFactory.createContainer(
-                HttpRequestProcessor.class, rc, factory);
+        final HttpHandler processor = ContainerFactory.createContainer(
+                HttpHandler.class, rc, factory);
         return createHttpServer(u, processor);
     }
 
     private static HttpServer createHttpServer(final URI u,
-            final HttpRequestProcessor processor) throws IOException,
+            final HttpHandler handler) throws IOException,
             IllegalArgumentException, NullPointerException {
         if (u == null) {
             throw new NullPointerException("The URI must not be null");
@@ -299,7 +299,7 @@ public final class GrizzlyServerFactory {
 
         // Map the path to the processor.
         final ServerConfiguration config = server.getServerConfiguration();
-        config.addHttpService(processor, u.getPath());
+        config.addHttpHandler(handler, u.getPath());
 
         // Start the server.
         server.start();
