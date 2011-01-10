@@ -210,7 +210,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <links>
-                        <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
+                        <link>http://jsr311.java.net/nonav/releases/1.1</link>
                     </links>
                     <excludePackageNames>com.sun.jersey.core.impl:com.sun.jersey.impl</excludePackageNames>
                 </configuration>

@@ -87,7 +87,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <links>
-                        <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
+                        <link>http://jsr311.java.net/nonav/releases/1.1</link>
                         <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
                         <link>http://jersey.java.net/nonav/apidocs/${project.version}/contribs/jersey-oauth/oauth-signature/</link>
                     </links>
