@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<probe-providers>
+<probe-provider moduleProviderName="glassfish" moduleName="jersey" probeProviderName="server" class="com.sun.jersey.server.spi.monitoring.glassfish.probes.UriRuleProbeProvider">
+   <probe name="ruleAccept">
+      <method>ruleAccept</method>
+      <probe-param type="java.lang.String" name="ruleName" />
+      <probe-param type="java.lang.String" name="path"/>
+      <probe-param type="java.lang.String" name="resourceClassName"/>
+      <return-param type="void" />
+   </probe>
+   <probe name="requestStart">
+      <method>requestStart</method>
+      <probe-param type="java.lang.String" name="requestUri" />
+      <return-param type="void" />
+   </probe>
+   <probe name="requestEnd">
+      <method>requestEnd</method>
+      <return-param type="void" />
+   </probe>
+</probe-provider>
+</probe-providers>

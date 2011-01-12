@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Jersey RESTful Web services for GlassFish</title></head>
+
+
+  <body>
+      <h1>Jersey RESTful Web services for GlassFish</h1>
+      
+      <p>This subdirectory contains Jersey samples and javadocs.</p>
+      
+      <h2>Javadocs</h2>
+      <ul>
+        <li><a href="apidocs/jersey/index.html">Jersey Javadocs</a></li>
+        <li><a href="apidocs/jsr311/index.html">JAX-RS Javadocs</a></li>
+      </ul>
+
+      <h2>Samples</h2>
+<p>Selection of Jersey samples are placed in the <a href="samples">samples</a> subdirectory.
+All of them were taken from Jersey project at <a href="https://jersey.dev.java.net">https://jersey.dev.java.net/</a>,
+and are available also on dev.java.net maven 2 <a href="http://download.java.net/maven/2/">repository</a>
+at <a href="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-samples/">http://download.java.net/maven/2/com/sun/jersey/samples/jersey-samples/</a>.
+They represent samples, which could be packaged as wars and easily deployed onto GlassFish instance.
+
+<h3>Running Samples</h3>
+
+<p>The following samples are included:
+<ul>
+    <li><a href="samples/bookmark/README.html">bookmark</a></li>
+    <li><a href="samples/bookmark-em/README.html">bookmark-em</a></li>
+    <li><a href="samples/bookstore/README.html">bookstore</a></li>
+    <li><a href="samples/extended-wadl-webapp/README.html">extended-wadl-webapp</a></li>
+    <li><a href="samples/helloworld-webapp/README.html">helloworld-webapp</a></li>
+    <li><a href="samples/jcdi-beans-webapp/README.html">jcdi-beans-webapp</a></li>
+    <li><a href="samples/jersey-ejb/README.html">jersey-ejb</a></li>
+    <li><a href="samples/jmakibackend/README.html">jmaki-backend</a></li>
+    <li><a href="samples/managed-beans-webapp/README.html">managed-beans-webapp</a></li>
+    <li><a href="samples/scala-helloworld-webapp/README.html">scala-helloworld-webapp</a></li>
+    <li><a href="samples/simple-servlet/README.html">simple-servlet</a></li>
+    <li><a href="samples/spring-annotations/README.html">spring-annotations</a></li>
+</ul>
+
+<p>For running the examples from command line you will need <a href="http://maven.apache.org/">maven</a> installed.
+Then you can just:
+<pre>
+cd $AS_HOME/jersey/samples/[sample-name]
+mvn clean package
+$AS_HOME/bin/asadmin deploy target/[sample-name].war
+</pre>
+
+<p>You can also use GlassFish admin console to deploy a generated war file. Just start your GlassFish instance
+and visit <a href="http://localhost:4848">http://localhost:4848</a>. Then select 
+<code>Applications</code>-><code>Web Applications</code> node in the left-hand menu 
+and click the <code>Deploy...</code> button. In the
+following screen, just select an example war file, and click the <code>OK</code> button at the bottom
+of the screen to get it deployed.
+<p> <img src="img/gfv3-admin-console.png"/>
+
+<p>Another option would be to run the examples using <a href="http://www.netbeans.org">NetBeans 6.5</a>
+
+<h2>GFv3 Prelude Notes</h2>
+
+<p>For Jersey based web applications, which are using JSP Views feature (see the bookstore example), 
+you will need to bundle jersey jars with the application war file. This is a known limitation,
+which will be addressed in the future releases.
+
+</body></html>
+
