@@ -57,6 +57,7 @@
 
     <modules>
         <module>v3-packages</module>
+        <module>v3.2-packages</module>
         <module>v2-package</module>
     </modules>
 
