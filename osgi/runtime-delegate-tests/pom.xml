@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.test.osgi.runtime-delegate-tests</groupId>
     <artifactId>jersey-osgi-project-runtime-delegate-tests</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.6-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>jersey-project : osgified : RuntimeDelegate config tests</name>
 

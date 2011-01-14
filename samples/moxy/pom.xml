@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jersey-samples</artifactId>
         <groupId>com.sun.jersey.samples</groupId>
-        <version>1.5-SNAPSHOT</version>
+        <version>1.6-SNAPSHOT</version>
     </parent>
     <artifactId>moxy</artifactId>
     <packaging>war</packaging>
@@ -153,7 +153,7 @@
         </dependency>
     </dependencies>
     <properties>
-        <jersey-version>1.5-SNAPSHOT</jersey-version>
+        <jersey-version>1.6-SNAPSHOT</jersey-version>
         <moxy-version>2.2.0-M6</moxy-version>
     </properties>
 </project>

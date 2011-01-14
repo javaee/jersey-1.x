@@ -5,7 +5,7 @@
     <parent>
         <artifactId>jersey-experimental</artifactId>
         <groupId>com.sun.jersey.experimental</groupId>
-        <version>1.5-SNAPSHOT</version>
+        <version>1.6-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-grizzly2</artifactId>
     <packaging>jar</packaging>
