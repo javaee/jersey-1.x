@@ -51,10 +51,11 @@ import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.sun.jersey.test.framework.impl.container.inmemory.TestResourceClientHandler;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * A low-level test container factory for creating test container instances
@@ -94,8 +95,8 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
 
         /**
          * Creates an instance of {@link InMemoryTestContainer}
-         * @param Base URI of the application
-         * @param An instance of {@link LowLevelAppDescriptor}
+         * @param baseUri URI of the application
+         * @param ad instance of {@link LowLevelAppDescriptor}
          */
         private InMemoryTestContainer(URI baseUri, LowLevelAppDescriptor ad) {
             this.baseUri = UriBuilder.fromUri(baseUri).build();

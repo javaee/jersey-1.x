@@ -1,4 +1,7 @@
 release 1.6
+- Re-fixed issue 320
+  http://java.net/jira/browse/JERSEY-320
+  Interning document parser needs to be used because of JAXB.
 
 release 1.5 (01-2011)
 - Fixed issue 624

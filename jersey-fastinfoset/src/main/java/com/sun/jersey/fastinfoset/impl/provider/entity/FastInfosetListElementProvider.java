@@ -45,11 +45,7 @@ import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
 import com.sun.jersey.core.util.ThrowHelper;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
-import java.util.Collection;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -61,6 +57,11 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
+import java.util.Collection;
 
 /**
  *
@@ -78,9 +79,14 @@ public class FastInfosetListElementProvider extends AbstractListElementProvider 
     protected final XMLStreamReader getXMLStreamReader(Class<?> elementType, MediaType mediaType, Unmarshaller u,
             InputStream entityStream)
             throws XMLStreamException {
-        return new StAXDocumentParser(entityStream);
+        StAXDocumentParser parser = new StAXDocumentParser(entityStream);
+
+        // jaxb needs interning doc parser, see http://java.net/jira/browse/JERSEY-320
+        parser.setStringInterning(true);
+
+        return parser;
     }
-    
+
     public final void writeList(Class<?> elementType, Collection<?> t,
             MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)

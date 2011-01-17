@@ -143,7 +143,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         return listClass.isAnnotationPresent(XmlRootElement.class) ||
                 listClass.isAnnotationPresent(XmlType.class);        
     }
-    
+
     public final void writeTo(
             Object t,
             Class<?> type, 
@@ -188,7 +188,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException, IOException;
-    
+
     @Override
     public final Object readFrom(
             Class<Object> type,
@@ -196,7 +196,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             Annotation annotations[],
             MediaType mediaType, 
             MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException { 
+            InputStream entityStream) throws IOException {
         try {
             final Class elementType = (type.isArray())
                     ? type.getComponentType()
@@ -204,7 +204,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             final Unmarshaller u = getUnmarshaller(elementType, mediaType);            
             final XMLStreamReader r = getXMLStreamReader(elementType, mediaType, u, entityStream);
             final List l = new ArrayList();
-            
+
             // Move to root element
             int event = r.next();
             while (event != XMLStreamReader.START_ELEMENT)
