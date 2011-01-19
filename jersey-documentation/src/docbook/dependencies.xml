@@ -3,14 +3,14 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
     and Distribution License("CDDL") (collectively, the "License").  You
     may not use this file except in compliance with the License.  You can
     obtain a copy of the License at
-    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    http://glassfish.java.net/public/CDDL+GPL_1_1.html
     or packager/legal/LICENSE.txt.  See the License for the specific
     language governing permissions and limitations under the License.
 
@@ -208,23 +208,23 @@
     for compiling or executing. Specifically the <ulink
     url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</ulink>
     dependency is required when either of the following <ulink
-    url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ResourceConfig.html">com.sun.jersey.api.core.ResourceConfig</ulink>
+    url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ResourceConfig.html">com.sun.jersey.api.core.ResourceConfig</ulink>
     implementations are utilized: <itemizedlist>
         <listitem>
           <ulink
-          url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html">com.sun.jersey.api.core.ClasspathResourceConfig</ulink>
+          url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html">com.sun.jersey.api.core.ClasspathResourceConfig</ulink>
 
           ; or
         </listitem>
 
         <listitem>
           <ulink
-          url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/PackagesResourceConfig.html">com.sun.jersey.api.core.PackagesResourceConfig</ulink>
+          url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/PackagesResourceConfig.html">com.sun.jersey.api.core.PackagesResourceConfig</ulink>
         </listitem>
       </itemizedlist></para>
 
     <para>By default Jersey will utilize the <ulink
-    url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html">ClasspathResourceConfig</ulink>
+    url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html">ClasspathResourceConfig</ulink>
     if an alternative is not specified. If an alternative is specified that
     does not depend on the asm.jar then it is no longer necessary to include
     the asm.jar in the minimum set of required jars.</para>
@@ -314,7 +314,7 @@
       deployment dependency with that container.</para>
 
       <para>See the Java documentation <ulink
-      url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/spi/container/servlet/package-summary.html">here</ulink>
+      url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/spi/container/servlet/package-summary.html">here</ulink>
       on how to configure the servlet container.</para>
 
       <para>Using servlet:
@@ -626,7 +626,7 @@
 &lt;/dependency&gt;</programlisting></para>
 
     <para>See the Java documentation <ulink
-    url="https://jersey.dev.java.net/nonav/apidocs/&version;/contribs/jersey-spring/com/sun/jersey/spi/spring/container/servlet/package-summary.html">here</ulink>
+    url="http://jersey.java.net/nonav/apidocs/&version;/contribs/jersey-spring/com/sun/jersey/spi/spring/container/servlet/package-summary.html">here</ulink>
     on how to integrate Jersey-based Web applications with Spring.</para>
   </section>
 
@@ -644,7 +644,7 @@
 &lt;/dependency&gt;</programlisting></para>
 
     <para>See the Java documentation <ulink
-    url="https://jersey.dev.java.net/nonav/apidocs/&version;/contribs/jersey-guice/com/sun/jersey/guice/spi/container/servlet/package-summary.html">here</ulink>
+    url="http://jersey.java.net/nonav/apidocs/&version;/contribs/jersey-guice/com/sun/jersey/guice/spi/container/servlet/package-summary.html">here</ulink>
     on how to integrate Jersey-based Web applications with Guice.</para>
 
     <para>The Jersey Guice support may also be used with <ulink
@@ -683,7 +683,7 @@
 
     <para>A developer may write tests using the Junit 4.x framework can extend
     from the abstract <ulink
-    url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey-test-framework/com/sun/jersey/test/framework/JerseyTest.html">JerseyTest</ulink>
+    url="http://jersey.java.net/nonav/apidocs/&version;/jersey-test-framework/com/sun/jersey/test/framework/JerseyTest.html">JerseyTest</ulink>
     class.</para>
 
     <para>Maven developers require a dependency on the <ulink
@@ -763,7 +763,7 @@
 
     <para>The extending of Jersey unit test and configuration has changed. See
     <ulink
-    url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey-test-framework/com/sun/jersey/test/framework/package-summary.html">here</ulink>
+    url="http://jersey.java.net/nonav/apidocs/&version;/jersey-test-framework/com/sun/jersey/test/framework/package-summary.html">here</ulink>
     for an example.</para>
 
     <para>See the blog entry on <ulink

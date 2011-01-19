@@ -3,14 +3,14 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
     and Distribution License("CDDL") (collectively, the "License").  You
     may not use this file except in compliance with the License.  You can
     obtain a copy of the License at
-    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    http://glassfish.java.net/public/CDDL+GPL_1_1.html
     or packager/legal/LICENSE.txt.  See the License for the specific
     language governing permissions and limitations under the License.
 
@@ -129,7 +129,7 @@
         responses rather than a resource, identified by a URI, and the use of a fixed set of HTTP methods.
         </para>
         <para>A resource in the Jersey client API is an instance of the Java class
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/WebResource.html">WebResource</ulink>,
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/WebResource.html">WebResource</ulink>,
             and encapsulates a URI. The fixed set of HTTP methods are methods on
             <literal>WebResource</literal>
             or if using the builder
@@ -148,8 +148,8 @@
         <orderedlist>
             <listitem>
                 <para>URI building using
-                    <ulink url="https://jsr311.dev.java.net/nonav/releases/1.0/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink> and
-                    <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/uri/UriTemplate.html">UriTemplate</ulink>
+                    <ulink url="http://jsr311.java.net/nonav/releases/1.0/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink> and
+                    <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/uri/UriTemplate.html">UriTemplate</ulink>
                     to safely build URIs;
                 </para>
             </listitem>
@@ -161,8 +161,8 @@
                     <literal>File</literal>,
                     <literal>DataSource</literal>
                 and JAXB beans in addition to Jersey specific features such as
-                    <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/json/package-summary.html">JSON</ulink> support and
-                    <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/contribs/jersey-multipart/index.html">MIME Multipart</ulink> support.
+                    <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/json/package-summary.html">JSON</ulink> support and
+                    <ulink url="http://jersey.java.net/nonav/apidocs/&version;/contribs/jersey-multipart/index.html">MIME Multipart</ulink> support.
                 </para>
             </listitem>
             <listitem>
@@ -194,9 +194,9 @@ JAXBBean bean = r.
     .post(JAXBBean.class, f);</programlisting>
         </example>
         In the above code a
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/representation/Form.html">Form</ulink> is created with two parameters, a new
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/WebResource.html">WebResource</ulink> instance is created from a
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/Client.html">Client</ulink> then the
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/representation/Form.html">Form</ulink> is created with two parameters, a new
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/WebResource.html">WebResource</ulink> instance is created from a
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/Client.html">Client</ulink> then the
             <literal>Form</literal> instance is <literal>POST</literal>ed to
             the resource, identified with the form media type, and the response is requested as an instance of a JAXB bean
             with an acceptable media type identifying the Java Script Object
@@ -219,17 +219,17 @@ JAXBBean bean = r.
             for details on the dependencies when using the Jersey client with Maven and Ant.
         </para>
         <para>Refer to the
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/package-summary.html">Java API documentation</ulink> for details on the Jersey client API packages and classes.
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/package-summary.html">Java API documentation</ulink> for details on the Jersey client API packages and classes.
         </para>
         <para>Refer to the
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/contribs/jersey-apache-client/index.html">Java API Apache HTTP client documentation</ulink> for details on how to use the Jersey client API with the Apache HTTP client.
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/contribs/jersey-apache-client/index.html">Java API Apache HTTP client documentation</ulink> for details on how to use the Jersey client API with the Apache HTTP client.
         </para>
     </section>
 
     <section>
         <title>Overview of the API</title>
         <para>To utilize the client API it is first necessary to create an instance of a
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/Client.html">Client</ulink>, for example:
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/Client.html">Client</ulink>, for example:
             <programlisting language="java">    Client c = Client.create();</programlisting>
         </para>
         <section>
@@ -244,7 +244,7 @@ JAXBBean bean = r.
             which is equivalent to the following:
                 <programlisting language="java">    c.setFollowRedirects(true);</programlisting>
             Alternatively it is possible to create a <literal>Client</literal> instance using a
-                <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/config/ClientConfig.html">ClientConfig</ulink>
+                <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/config/ClientConfig.html">ClientConfig</ulink>
             object for example:
                 <programlisting language="java">    ClientConfig cc = new DefaultClientConfig();
     cc.getProperties().put(
@@ -252,7 +252,7 @@ JAXBBean bean = r.
     Client c = Client.create(cc);</programlisting>
             </para>
             <para>Once a client instance is created and configured it is then possible to obtain a
-                <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/WebResource.html">WebResource</ulink>
+                <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/WebResource.html">WebResource</ulink>
                 instance, which will inherit the configuration declared on the client instance.
                 For example, the following creates a reference to a Web resource with the URI
                 “http://localhost:8080/xyz”:
@@ -278,9 +278,9 @@ JAXBBean bean = r.
         <section>
             <title>Building a request</title>
             <para>Requests to a Web resource are built using the builder pattern (see
-                <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/RequestBuilder.html">RequestBuilder</ulink>)
+                <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/RequestBuilder.html">RequestBuilder</ulink>)
                 where the terminating method corresponds to an HTTP method (see
-                <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/UniformInterface.html">UniformInterface</ulink>).
+                <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/UniformInterface.html">UniformInterface</ulink>).
                 For example,
                 <programlisting language="java">    String response = r.accept(
         MediaType.APPLICATION_JSON_TYPE,
@@ -338,7 +338,7 @@ JAXBBean bean = r.
                 is requested. The response entity will be de-serialized to a String
                 instance.</para>
                 <para>If response meta-data is required then the Java type
-                    <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/ClientResponse.html">ClientResponse</ulink>
+                    <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/ClientResponse.html">ClientResponse</ulink>
                     can be declared from which the response status, headers and entity may be obtained.
                     For example, the following gets both the entity tag and response entity from the
                     response:
@@ -347,7 +347,7 @@ JAXBBean bean = r.
     String entity = response.getEntity(String.class);</programlisting></para>
                 <para>If the <literal>ClientResponse</literal> type is not utilized and the response
                 status is greater than or equal to 300 then the runtime exception
-                 <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/UniformInterfaceException.html">UniformInterfaceException</ulink>
+                 <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/UniformInterfaceException.html">UniformInterfaceException</ulink>
                  is thrown. This exception may be caught and the <literal>ClientResponse</literal> obtained as follows:
                 <programlisting language="java">    try {
         String entity = r.get(String.class);
@@ -359,7 +359,7 @@ JAXBBean bean = r.
             <section>
                 <title>Creating new WebResources from a WebResource</title>
                 <para>A new
-                    <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/WebResource.html">WebResource</ulink>
+                    <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/WebResource.html">WebResource</ulink>
                     can be created from an existing <literal>WebResource</literal> by building from the latter's URI.
                     Thus it is possible to build the request URI before building the request. For example, the
                     following appends a new path segment and adds some query parameters:
@@ -380,7 +380,7 @@ JAXBBean bean = r.
                 <para>All the Java types for representations supported by the Jersey server side for 
                 requests and responses are also supported on the client side. This includes the standard
                 Java types as specified by JAX-RS in
-                    <ulink url="https://jsr311.dev.java.net/nonav/releases/1.0/spec/index.html">section 4.2.4</ulink>
+                    <ulink url="http://jsr311.java.net/nonav/releases/1.0/spec/index.html">section 4.2.4</ulink>
                     in addition to JSON, Atom and Multipart MIME as supported by Jersey.
                 </para>
                 <para>To process a response entity (or representation) as a stream of bytes use InputStream as follows:
@@ -401,8 +401,8 @@ JAXBBean bean = r.
             <title>Adding support for new representations</title>
             <para>The support for new application-defined representations as Java types requires the
             implementation of the same provider-based interfaces as for the server side JAX-RS API, namely
-                <ulink url="https://jsr311.dev.java.net/nonav/javadoc/javax/ws/rs/ext/MessageBodyReader.html">MessageBodyReader</ulink> and
-                <ulink url="https://jsr311.dev.java.net/nonav/javadoc/javax/ws/rs/ext/MessageBodyWriter.html">MessageBodyWriter</ulink>,
+                <ulink url="http://jsr311.java.net/nonav/javadoc/javax/ws/rs/ext/MessageBodyReader.html">MessageBodyReader</ulink> and
+                <ulink url="http://jsr311.java.net/nonav/javadoc/javax/ws/rs/ext/MessageBodyWriter.html">MessageBodyWriter</ulink>,
                 respectively, for request and response entities (or inbound and outbound representations). Refer to the
                 <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/entity-provider/&version;/entity-provider-&version;-project.zip">entity provider</ulink>
                 sample for such implementations utilized on the server side.
@@ -428,9 +428,9 @@ JAXBBean bean = r.
             headers and entity.</para>
             <para>
             The <literal>Client</literal> and <literal>WebResource</literal> classes extend from
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/filter/Filterable.html">Filterable</ulink>
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/filter/Filterable.html">Filterable</ulink>
             and that enables the addition of
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/filter/ClientFilter.html">ClientFilter</ulink>
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/filter/ClientFilter.html">ClientFilter</ulink>
             instances. A <literal>WebResource</literal> will inherit filters from its creator, which
             can be a <literal>Client</literal> or another <literal>WebResource</literal>.
             Additional filters can be added to a <literal>WebResource</literal> after it has been
@@ -471,7 +471,7 @@ JAXBBean bean = r.
         }
     }</programlisting></para>
             <para>The filter modifies the request (if required) by creating a new
-            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/ClientRequest.html">ClientRequest</ulink>
+            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/ClientRequest.html">ClientRequest</ulink>
             or modifying the state of the passed <literal>ClientRequest</literal> before calling the
             next filter. The call to the next request will return
             the response, a <literal>ClientResponse</literal>. The filter
@@ -486,7 +486,7 @@ JAXBBean bean = r.
                 <orderedlist>
                     <listitem>
                         <para>A GZIP content encoding filter,
-                            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/filter/GZIPContentEncodingFilter.html">GZIPContentEncodingFilter</ulink>.
+                            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/filter/GZIPContentEncodingFilter.html">GZIPContentEncodingFilter</ulink>.
                             If this filter is added then a request entity is compressed with the
                             <literal>Content-Encoding</literal>
                             of <literal>gzip</literal>, and a response entity if compressed with a
@@ -497,7 +497,7 @@ JAXBBean bean = r.
                     </listitem>
                     <listitem>
                         <para>A logging filter,
-                            <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/filter/LoggingFilter.html">LoggingFilter</ulink>.
+                            <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/client/filter/LoggingFilter.html">LoggingFilter</ulink>.
                             If this filter is added then the request and response headers as well as the entities are logged
                             to a declared output stream if present, or to <literal>System.out</literal> if not.
                             Often this filter will be placed at the end of the ordered list of
@@ -589,7 +589,7 @@ JAXBBean bean = r.
             </para>
             <para>To utilize HTTP with SSL it is necessary to utilize the “https” scheme.
             For certificate-based authentication see the class
-                <ulink url="https://jersey.dev.java.net/nonav/apidocs/latest/jersey/com/sun/jersey/client/urlconnection/HTTPSProperties.html">HTTPSProperties</ulink>
+                <ulink url="http://jersey.java.net/nonav/apidocs/latest/jersey/com/sun/jersey/client/urlconnection/HTTPSProperties.html">HTTPSProperties</ulink>
                 for how to set <literal>javax.net.ssl.HostnameVerifier</literal> and
                 <literal>javax.net.ssl.SSLContext</literal>.
             </para>
@@ -599,9 +599,9 @@ JAXBBean bean = r.
             <para>The support for HTTP authentication and cookies is much better with the Apache HTTP 
             client than with <literal>HttpURLConnection</literal>.
             See the Java documentation for the package
-                <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/contribs/jersey-apache-client/com/sun/jersey/client/apache/package-summary.html">com.sun.jersey.client.apache</ulink>,
-                <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/contribs/jersey-apache-client/com/sun/jersey/client/apache/config/ApacheHttpClientState.html">ApacheHttpClientState</ulink> and
-                <ulink url="https://jersey.dev.java.net/nonav/apidocs/&version;/contribs/jersey-apache-client/com/sun/jersey/client/apache/config/ApacheHttpClientConfig.html">ApacheHttpClientConfig</ulink> for more details.
+                <ulink url="http://jersey.java.net/nonav/apidocs/&version;/contribs/jersey-apache-client/com/sun/jersey/client/apache/package-summary.html">com.sun.jersey.client.apache</ulink>,
+                <ulink url="http://jersey.java.net/nonav/apidocs/&version;/contribs/jersey-apache-client/com/sun/jersey/client/apache/config/ApacheHttpClientState.html">ApacheHttpClientState</ulink> and
+                <ulink url="http://jersey.java.net/nonav/apidocs/&version;/contribs/jersey-apache-client/com/sun/jersey/client/apache/config/ApacheHttpClientConfig.html">ApacheHttpClientConfig</ulink> for more details.
             </para>
             </section>
         </section>
