@@ -294,6 +294,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jaxb.version>2.2.3-1</jaxb.version>
     </properties>
 
     <distributionManagement>

@@ -49,6 +49,11 @@
         Samples that show how to use jersey.
     </description>
     <packaging>pom</packaging>
+
+    <properties>
+        <jaxb.version>2.2.3-1</jaxb.version>
+    </properties>
+
     <modules>
         <module>atompub-contacts</module>              
         <module>bookmark</module>

@@ -21,6 +21,10 @@
     <version>1.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
+    <properties>
+        <jaxb.version>2.2.3-1</jaxb.version>
+    </properties>
+
     <modules>
         <module>ex03_1</module>
         <module>ex04_1</module>
