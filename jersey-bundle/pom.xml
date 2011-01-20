@@ -174,7 +174,7 @@
         <dependency>
             <groupId>com.sun.xml.fastinfoset</groupId>
             <artifactId>FastInfoset</artifactId>
-            <version>1.2.2</version>
+            <version>1.2.9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
