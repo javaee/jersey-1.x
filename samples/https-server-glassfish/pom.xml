@@ -119,20 +119,8 @@
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
         </pluginRepository>
-        <pluginRepository>
-            <id>maven-repository.dev.java.net</id>
-            <name>Java.net Maven 1 Repository (legacy)</name>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </pluginRepository>
     </pluginRepositories>
     <repositories>
-       <repository>
-            <id>maven-repository.dev.java.net</id>
-            <name>Java.net Maven 1 Repository (legacy)</name>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </repository>
         <repository>
             <id>glassfish-repository</id>
             <name>Java.net Repository for Glassfish</name>
