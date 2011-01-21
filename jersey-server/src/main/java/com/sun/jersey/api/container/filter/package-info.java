@@ -54,7 +54,7 @@
  * </ol>
  * A request will be filtered by container filters before the request is filtered
  * by resource filters. A response will be filtered by resource filters before
- * the request is filtered by container filters.
+ * the response is filtered by container filters.
  * <p>
  * Container filters are registered as properties of the {@link com.sun.jersey.api.core.ResourceConfig}.
  * Container request filters, of the class {@link com.sun.jersey.spi.container.ContainerRequestFilter}, are
