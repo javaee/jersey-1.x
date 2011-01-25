@@ -148,13 +148,13 @@
 
     <para>And the following repositories need to be added to the pom:
     <programlisting language="xml">&lt;repository&gt;
-    &lt;id&gt;maven2-repository.dev.java.net&lt;/id&gt;
+    &lt;id&gt;maven2-repository.java.net&lt;/id&gt;
     &lt;name&gt;Java.net Repository for Maven&lt;/name&gt;
     &lt;url&gt;http://download.java.net/maven/2/&lt;/url&gt;
     &lt;layout&gt;default&lt;/layout&gt;
 &lt;/repository&gt; 
 &lt;repository&gt;
-    &lt;id&gt;maven-repository.dev.java.net&lt;/id&gt;
+    &lt;id&gt;maven-repository.java.net&lt;/id&gt;
     &lt;name&gt;Java.net Maven 1 Repository (legacy)&lt;/name&gt;
     &lt;url&gt;http://download.java.net/maven/1&lt;/url&gt;
     &lt;layout&gt;legacy&lt;/layout&gt;
@@ -198,9 +198,9 @@
   &lt;dependency groupId="com.sun.jersey" 
               artifactId="jersey-server"
               version="&version;"/&gt;
-  &lt;artifact:remoteRepository id="maven2-repository.dev.java.net"
+  &lt;artifact:remoteRepository id="maven2-repository.java.net"
                              url="http://download.java.net/maven/2/" /&gt;
-  &lt;artifact:remoteRepository id="maven-repository.dev.java.net"
+  &lt;artifact:remoteRepository id="maven-repository.java.net"
                              url="http://download.java.net/maven/1" 
                              layout="legacy" /&gt;
 &lt;/artifact:dependencies&gt;</programlisting> The path id

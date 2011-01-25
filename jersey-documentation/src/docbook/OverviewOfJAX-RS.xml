@@ -378,9 +378,9 @@ public class MyApplication extends PackagesResourceConfig {
     </example></para>    
     <para>JAX-RS also provides the ability to obtain a container specific artifact 
     from an &jaxrs.core.Application; instance. For example, Jersey supports using
-    <ulink url="https://grizzly.dev.java.net/">Grizzly</ulink> as follows:    
+    <ulink url="http://grizzly.java.net/">Grizzly</ulink> as follows:
     <programlisting language="java">SelectorThread st = RuntimeDelegate.createEndpoint(new MyApplication(), SelectorThread.class);</programlisting>    
-    Jersey also provides <ulink url="https://grizzly.dev.java.net/">Grizzly</ulink>
+    Jersey also provides <ulink url="http://grizzly.java.net/">Grizzly</ulink>
     helper classes to deploy the ServletThread instance at a base URL for
     in-process deployment.</para>
 

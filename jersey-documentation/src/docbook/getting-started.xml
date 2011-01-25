@@ -79,13 +79,13 @@ as described in <xref linkend="chapter_deps"/>
 <para>
 And the following repositories need to be added to the pom:
 <programlisting language="xml">&lt;repository&gt;
-    &lt;id&gt;maven2-repository.dev.java.net&lt;/id&gt;
+    &lt;id&gt;maven2-repository.java.net&lt;/id&gt;
     &lt;name&gt;Java.net Repository for Maven&lt;/name&gt;
     &lt;url&gt;http://download.java.net/maven/2/&lt;/url&gt;
     &lt;layout&gt;default&lt;/layout&gt;
 &lt;/repository&gt; 
 &lt;repository&gt;
-    &lt;id&gt;maven-repository.dev.java.net&lt;/id&gt;
+    &lt;id&gt;maven-repository.java.net&lt;/id&gt;
     &lt;name&gt;Java.net Maven 1 Repository (legacy)&lt;/name&gt;
     &lt;url&gt;http://download.java.net/maven/1&lt;/url&gt;
     &lt;layout&gt;legacy&lt;/layout&gt;
@@ -119,9 +119,9 @@ explicitly:</para>
   &lt;dependency groupId=&quot;com.sun.grizzly&quot; 
               artifactId=&quot;grizzly-servlet-webserver&quot;
               version=&quot;1.8.6.4&quot;/&gt;
-  &lt;artifact:remoteRepository id=&quot;maven2-repository.dev.java.net&quot;
+  &lt;artifact:remoteRepository id=&quot;maven2-repository.java.net&quot;
                              url=&quot;http://download.java.net/maven/2/&quot; /&gt;
-  &lt;artifact:remoteRepository id=&quot;maven-repository.dev.java.net&quot;
+  &lt;artifact:remoteRepository id=&quot;maven-repository.java.net&quot;
                              url=&quot;http://download.java.net/maven/1&quot; 
                              layout=&quot;legacy&quot; /&gt;
 &lt;/artifact:dependencies&gt;</programlisting>

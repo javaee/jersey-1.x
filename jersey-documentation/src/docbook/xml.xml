@@ -3,14 +3,14 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
     and Distribution License("CDDL") (collectively, the "License").  You
     may not use this file except in compliance with the License.  You can
     obtain a copy of the License at
-    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    http://glassfish.java.net/public/CDDL+GPL_1_1.html
     or packager/legal/LICENSE.txt.  See the License for the specific
     language governing permissions and limitations under the License.
 
@@ -106,7 +106,7 @@
         <para>Good start for people which already have some experience with JAXB annotations is JAXB sample.
             You can see various usecases there. This text is mainly meant for those who don't have prior experience
             with JAXB. Don't expect that all possible annotations and their combinations
-            will be covered in this chapter, <ulink url="http://jaxb.dev.java.net">JAXB (JSR 222 implementation)</ulink> is pretty complex and comprehensive. But if
+            will be covered in this chapter, <ulink url="http://jaxb.java.net">JAXB (JSR 222 implementation)</ulink> is pretty complex and comprehensive. But if
             you just want to know how you can interchange XML messages with your REST service, you are looking
             at right chapter.</para>
 
@@ -183,7 +183,7 @@ public class Resource {
 
         <para>If there is a need for some other (non default) XML representation, other JAXB annotations would
         need to be used. This process is usually simplified by generating java source from XML Schema which is
-        done by xjc. Xjc is XML to java compiler and is part of JAXB. See <ulink url="http://jaxb.dev.java.net">JAXB home page</ulink>
+        done by xjc. Xjc is XML to java compiler and is part of JAXB. See <ulink url="http://jaxb.java.net">JAXB home page</ulink>
         for further details.</para>
     </section>
 

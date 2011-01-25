@@ -3,14 +3,14 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
     and Distribution License("CDDL") (collectively, the "License").  You
     may not use this file except in compliance with the License.  You can
     obtain a copy of the License at
-    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    http://glassfish.java.net/public/CDDL+GPL_1_1.html
     or packager/legal/LICENSE.txt.  See the License for the specific
     language governing permissions and limitations under the License.
 
@@ -48,7 +48,7 @@
     <xsl:import href="highlight.xsl"/>
     
     <xsl:template name="user.header.content">
-    <div style="float:right"><a href="https://jersey.dev.java.net"><img src="https://jersey.dev.java.net/images/Jersey_yellow.png"/></a></div>
+    <div style="float:right"><a href="http://jersey.java.net"><img src="http://jersey.java.net/images/Jersey_yellow.png"/></a></div>
     <small>Links: <a href="index.html">Table of Contents</a> | <a href="user-guide.html">Single HTML</a></small>
     </xsl:template>
 
