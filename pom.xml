@@ -114,6 +114,12 @@
                 <module>experimental</module>
             </modules>
         </profile>
+        <profile>
+            <id>osgi-tests</id>
+            <modules>
+                <module>osgi</module>
+            </modules>
+        </profile>
     </profiles>
     <modules>
         <module>contribs</module>
@@ -134,7 +140,6 @@
         <module>jersey-documentation</module>
         <module>ri</module>
         <module>glassfish</module>
-        <module>osgi</module>
     </modules>
 
     <build>
