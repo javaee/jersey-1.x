@@ -2,6 +2,10 @@ release 1.6
 - Re-fixed issue 320
   http://java.net/jira/browse/JERSEY-320
   Interning document parser needs to be used because of JAXB.
+- *Breaking change*: Fixed issue 607
+  http://java.net/jira/browse/JERSEY-607
+  OAuthProvider is no longer registered using the init param property.
+  It needs to be added as any other provider (e.g. by binding it).
 
 release 1.5 (01-2011)
 - Fixed issue 624
