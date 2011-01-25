@@ -48,10 +48,7 @@
 <chapter id="json">
   <title>JSON Support</title>
 
-  <para>Jersey JSON support comes as a set of JAX-RS <ulink
-  url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/MessageBodyReader.html">MessageBodyReader</ulink>
-  and <ulink
-  url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/MessageBodyWriter.html">MessageBodyWriter</ulink>
+  <para>Jersey JSON support comes as a set of JAX-RS &jaxrs.ext.MessageBodyReader; and &jaxrs.ext.MessageBodyWriter;
   providers distributed with <emphasis>jersey-json</emphasis> module. These providers enable using
   three basic approaches when working with JSON format:
 
@@ -182,8 +179,7 @@ public class MyJaxbBean {
 	<ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/json/JSONJAXBContext.html">JSONJAXBContext</ulink>,
 	which serves as a main configuration point in this area.
 	To pass your specialized JSONJAXBContext to Jersey, you will finally need to implement 
-	a JAXBContext <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/ContextResolver.html">ContextResolver</ulink>
-	</para>
+	a JAXBContext &jaxrs.ext.ContextResolver;:</para>
 	
 	<example id="json.jaxb.context.resolver.example">
 	<title>An example of a JAXBContext resolver implementation</title>

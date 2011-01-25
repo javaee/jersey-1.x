@@ -44,14 +44,11 @@
                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"[
 <!ENTITY % ents SYSTEM "jersey.ent" >
 %ents;
-<!ENTITY jaxrs-javadoc
-"http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/">
 ]>
 <chapter id="linking">
     <title>Declarative Hyperlinking</title>
     <para><ulink url="http://roy.gbiv.com/untangled/2008/rest-apis-must-be-hypertext-driven">RESTful
-            APIs must be hypertext-driven</ulink>. JAX-RS currently offers <ulink
-            url="&jaxrs-javadoc;core/UriBuilder.html">UriBuilder</ulink> to simplify URI
+            APIs must be hypertext-driven</ulink>. JAX-RS currently offers &jaxrs.core.UriBuilder; to simplify URI
         creation but Jersey adds an additional annotation-based alternative that is described
         here.</para>
     <section>

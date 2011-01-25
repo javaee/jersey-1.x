@@ -3,14 +3,14 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
     and Distribution License("CDDL") (collectively, the "License").  You
     may not use this file except in compliance with the License.  You can
     obtain a copy of the License at
-    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    http://glassfish.java.net/public/CDDL+GPL_1_1.html
     or packager/legal/LICENSE.txt.  See the License for the specific
     language governing permissions and limitations under the License.
 
@@ -257,7 +257,7 @@ else
         <itemizedlist>
             <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.jar">jersey-server</ulink></listitem>
             <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/&version;/jersey-core-&version;.jar">jersey-core</ulink></listitem>
-            <listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/&jsr311-version;/jsr311-api-&jsr311-version;.jar">jsr311-api</ulink></listitem>
+            <listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/&jsr311.version;/jsr311-api-&jsr311.version;.jar">jsr311-api</ulink></listitem>
             <listitem><ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm</ulink></listitem>
             <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly/&version;/jersey-test-framework-grizzly-&version;.jar">jersey-test-framework-grizzly</ulink></listitem>
             <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/&version;/jersey-test-framework-core-&version;.jar">jersey-test-framework-core</ulink></listitem>

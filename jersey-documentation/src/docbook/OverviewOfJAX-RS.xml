@@ -3,14 +3,14 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
     and Distribution License("CDDL") (collectively, the "License").  You
     may not use this file except in compliance with the License.  You can
     obtain a copy of the License at
-    https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
+    http://glassfish.java.net/public/CDDL+GPL_1_1.html
     or packager/legal/LICENSE.txt.  See the License for the specific
     language governing permissions and limitations under the License.
 
@@ -47,28 +47,22 @@
 ]>
 
 <chapter id="jax-rs">
-  <title>Overview of JAX-RS &jsr311-version;</title>
+  <title>Overview of JAX-RS &jsr311.version;</title>
 
-  <para>This chapter presents an overview of the JAX-RS &jsr311-version; features.</para>
+  <para>This chapter presents an overview of the JAX-RS &jsr311.version; features.</para>
 
-  <para>The JAX-RS &jsr311-version; API may be found online <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/index.html">here</ulink>.</para>
+  <para>The JAX-RS &jsr311.version; API may be found online <ulink url="&jsr311.release.path;/index.html">here</ulink>.</para>
 
-  <para>The JAX-RS &jsr311-version; specification draft may be found online <ulink
-  url="http://jsr311.java.net/nonav/releases/&jsr311-version;/spec/spec.html">here</ulink>.</para>
+  <para>The JAX-RS &jsr311.version; specification draft may be found online <ulink
+  url="&jsr311.release.path;/spec/spec.html">here</ulink>.</para>
 
   <section>
     <title>Root Resource Classes</title>
 
-    <para><emphasis>Root resource classes</emphasis> are POJOs (Plain Old Java
-    Objects) that are annotated with <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-    have at least one method annotated with <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-    or a resource method designator annotation such as <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/GET.html">@GET</ulink>,
-    <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/PUT.html">@PUT</ulink>,
-    <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/POST.html">@POST</ulink>,
-    or <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/DELETE.html">@DELETE</ulink>.
-    Resource methods are methods of a resource class annotated with a resource
-    method designator. This section shows how to use Jersey to annotate Java
-    objects to create RESTful web services.</para>
+    <para><emphasis>Root resource classes</emphasis> are POJOs (Plain Old Java Objects) that are annotated with &jaxrs.Path;
+    have at least one method annotated with &jaxrs.Path; or a resource method designator annotation such as &jaxrs.GET;,
+    &jaxrs.PUT;, &jaxrs.POST;, &jaxrs.DELETE;. Resource methods are methods of a resource class annotated with a resource
+    method designator. This section shows how to use Jersey to annotate Java objects to create RESTful web services.</para>
 
     <para>The following code example is a very simple example of a root
     resource class using JAX-RS annotations. The example code shown here is
@@ -102,20 +96,13 @@ public class HelloWorldResource {
     <section>
       <title>@Path</title>
 
-      <para>The <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-      annotation's value is a relative URI path. In the example above, the
-      Java class will be hosted at the URI path
-      <literal>/helloworld</literal>. This is an extremely simple use of the
-      <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-      annotation. What makes JAX-RS so useful is that you can embed variables
-      in the URIs.</para>
+      <para>The &jaxrs.Path; annotation's value is a relative URI path. In the example above, the Java class will be hosted
+      at the URI path <literal>/helloworld</literal>. This is an extremely simple use of the &jaxrs.Path; annotation.
+      What makes JAX-RS so useful is that you can embed variables in the URIs.</para>
 
-      <para><emphasis>URI path templates</emphasis> are URIs with variables
-      embedded within the URI syntax. These variables are substituted at
-      runtime in order for a resource to respond to a request based on the
-      substituted URI. Variables are denoted by curly braces. For example,
-      look at the following <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-      annotation:</para>
+      <para><emphasis>URI path templates</emphasis> are URIs with variables embedded within the URI syntax. These variables
+      are substituted at runtime in order for a resource to respond to a request based on the substituted URI. Variables are
+      denoted by curly braces. For example, look at the following &jaxrs.Path; annotation:</para>
 
       <para><programlisting language="java">@Path("/users/{username}")</programlisting>In this
       type of example, a user will be prompted to enter their name, and then a
@@ -125,11 +112,11 @@ public class HelloWorldResource {
 
       <para><literal>http://example.com/users/Galileo</literal></para>
 
-      <para>To obtain the value of the username variable the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/PathParam.html">@PathParam</ulink>
-      may be used on method parameter of a request method, for example:</para>
+      <para>To obtain the value of the username variable the &jaxrs.PathParam; may be used on method parameter of a request method,
+      for example:</para>
 
       <para><example>
-<title>Specifying URI path parameter</title>
+      <title>Specifying URI path parameter</title>
 <programlisting language="java" linenumbering="numbered">@Path("/users/{username}")
 public class UserResource {
 
@@ -149,25 +136,17 @@ public class UserResource {
       numeric characters and the underscore character. If a user name does not
       match that a 404 (Not Found) response will occur. </para>
 
-      <para>A <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-      value may or may not begin with a '/', it makes no difference. Likewise,
-      by default, a <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-      value may or may not end in a '/', it makes no difference, and thus
-      request URLs that end or do not end in a '/' will both be matched.
-      However, Jersey has a redirection mechanism, which if enabled,
-      automatically performs redirection to a request URL ending in a '/' if a
-      request URL does not end in a '/' and the matching <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-      does end in a '/'.</para>
+      <para>A &jaxrs.Path; value may or may not begin with a '/', it makes no difference. Likewise, by default, a &jaxrs.Path;
+      value may or may not end in a '/', it makes no difference, and thus request URLs that end or do not end in a '/' will both
+      be matched.
+      However, Jersey has a redirection mechanism, which if enabled, automatically performs redirection to a request URL ending
+      in a '/' if a request URL does not end in a '/' and the matching &jaxrs.Path; does end in a '/'.</para>
     </section>
 
     <section>
       <title>HTTP Methods</title>
 
-      <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/GET.html">@GET</ulink>,
-      <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/PUT.html">@PUT</ulink>,
-      <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/POST.html">@POST</ulink>,
-      <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/DELETE.html">@DELETE</ulink>,
-      and <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/HEAD.html">@HEAD</ulink>
+      <para>&jaxrs.GET;, &jaxrs.PUT;, &jaxrs.POST;, &jaxrs.DELETE; and &jaxrs.HEAD;
       are <emphasis>resource method designator</emphasis> annotations defined
       by JAX-RS and which correspond to the similarly named HTTP methods. In
       the example above, the annotated Java method will process HTTP GET
@@ -201,22 +180,18 @@ public Response putContainer() {
       runtime will invoke the implemented GET method (if present) and ignore
       the response entity (if set). For OPTIONS the Allow response header
       will be set to the set of HTTP methods support by the resource. In
-      addition Jersey will return a <ulink url="https://wadl.dev.java.net/">WADL</ulink> document describing the
+      addition Jersey will return a <ulink url="http://wadl.java.net/">WADL</ulink> document describing the
       resource.</para>
     </section>
 
     <section>
       <title>@Produces</title>
 
-      <para>The <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
-      annotation is used to specify the MIME media types of representations a
-      resource can produce and send back to the client. In this example, the
-      Java method will produce representations identified by the MIME media
-      type "text/plain".</para>
+      <para>The &jaxrs.Produces; annotation is used to specify the MIME media types of representations a resource can
+      produce and send back to the client. In this example, the Java method will produce representations identified by
+      the MIME media type "text/plain".</para>
 
-      <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
-      can be applied at both the class and method levels. Here's an
-      example:</para>
+      <para>&jaxrs.Produces; can be applied at both the class and method levels. Here's an example:</para>
 
       <para><example>
 <title>Specifying output MIME type</title>
@@ -233,12 +208,9 @@ public class SomeResource {
     public String doGetAsHtml() {
         ...
     }
-}</programlisting></example>The <literal>doGetAsPlainText</literal> method defaults to
-      the MIME type of the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
-      annotation at the class level. The <literal>doGetAsHtml</literal>
-      method's <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
-      annotation overrides the class-level <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
-      setting, and specifies that the method can produce HTML rather than
+}</programlisting></example>The <literal>doGetAsPlainText</literal> method defaults to the MIME type of the &jaxrs.Produces;
+      annotation at the class level. The <literal>doGetAsHtml</literal> method's &jaxrs.Produces;
+      annotation overrides the class-level &jaxrs.Produces; setting, and specifies that the method can produce HTML rather than
       plain text. </para>
 
       <para>If a resource class is capable of producing more that one MIME
@@ -257,8 +229,7 @@ public class SomeResource {
       "text/plain" and "text/html" but prefers the latter, then the
       <literal>doGetAsHtml</literal> method will be invoked. </para>
 
-      <para>More than one media type may be declared in the same <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
-      declaration, for example:</para>
+      <para>More than one media type may be declared in the same &jaxrs.Produces; declaration, for example:</para>
 
       <para><example>
 <title>Using multiple output MIME types</title>
@@ -273,16 +244,15 @@ public String doGetAsXmlOrJson() {
 
       <para>The examples above refer explicitly to MIME media types for
       clarity. It is possible to refer to constant values, which may reduce
-      typographical errors, see the constant field values of <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/MediaType.html">MediaType</ulink>.</para>
+      typographical errors, see the constant field values of &jaxrs.core.MediaType;.</para>
     </section>
 
     <section>
       <title>@Consumes</title>
 
-      <para>The <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Consumes.html">@Consumes</ulink>
-      annotation is used to specify the MIME media types of representations a
-      resource can consume that were sent by the client. The above example can
-      be modified to set the cliched message as follows:</para>
+      <para>The &jaxrs.Consumes; annotation is used to specify the MIME media types of representations a
+      resource can consume that were sent by the client. The above example can be modified to set the cliched
+      message as follows:</para>
 
       <para><example>
 <title>Specifying input MIME type</title>
@@ -297,17 +267,15 @@ public void postClichedMessage(String message) {
       method returns void. This means no representation is returned and
       response with a status code of 204 (No Content) will be returned.</para>
 
-      <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Consumes.html">@Consumes</ulink>
-      can be applied at both the class and method levels and more than one
-      media type may be declared in the same <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Consumes.html">@Consumes</ulink>
-      declaration.</para>
+      <para>&jaxrs.Consumes; can be applied at both the class and method levels and more than one
+      media type may be declared in the same &jaxrs.Consumes; declaration.</para>
     </section>
   </section>
 
   <section>
     <title>Deploying a RESTful Web Service</title>
 
-    <para>JAX-RS provides the deployment agnostic abstract class <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Application.html">Application</ulink>
+    <para>JAX-RS provides a deployment agnostic abstract class &jaxrs.core.Application;
     for declaring root resource and provider classes, and root resource and provider singleton instances.
     A Web service may extend this class to declare root resource and provider classes. For
     example,</para>
@@ -334,44 +302,68 @@ public void postClichedMessage(String message) {
         super("org.foo.rest;org.bar.rest");
     }
 }</programlisting></example></para>
-
-    <para>For servlet deployments JAX-RS specifies that a class that
-    implements <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Application.html">Application</ulink>
-    may be declared instead of a servlet class in
-    <literal>&lt;servlet-class&gt;</literal> element of a
-    <literal>web.xml</literal>. This is supported for a Web container implementing Servlet 3.0 as follows:</para>
+    <para>There are multiple deployment options for the class that implements &jaxrs.core.Application;
+    interface in the Servlet 3.0 container. For simple deployments, no <literal>web.xml</literal> 
+    is needed at all. Instead, an &jaxrs.ApplicationPath; annotation can be used to annotate the
+    user defined application class and specify the the base resource URI of all application resources:</para>
     <para><example>
-<title>Deployment of your application using <literal>web.xml</literal> with Servlet 3.0</title>
-<programlisting language="xml" linenumbering="numbered">&lt;web-app&gt;
+        <title>Deployment of a JAX-RS application using <literal>@ApplicationPath</literal> with Servlet 3.0</title>
+        <programlisting language="java" linenumbering="numbered">@ApplicationPath("resources")
+public class MyApplication extends PackagesResourceConfig {
+    public MyApplication() {
+        super("org.foo.rest;org.bar.rest");
+    }    
+    ...
+}</programlisting>
+    </example></para>        
+    <para>Another deployment option is to declare JAX-RS application details in the <literal>web.xml</literal>.
+    This is usually suitable in case of more complex deployments, e.g. when security model needs to be properly defined 
+    or when additional initialization parameters have to be passed to Jersey runtime.
+    JAX-RS 1.1 specifies that a fully qualified name of the class that
+    implements &jaxrs.core.Application;
+    may be declared in the <literal>&lt;servlet-name&gt;</literal> element of the JAX-RS application's
+    <literal>web.xml</literal>. This is supported in a Web container implementing Servlet 3.0 as follows:</para>
+    <para><example>
+        <title>Deployment of a JAX-RS application using <literal>web.xml</literal> with Servlet 3.0</title>
+        <programlisting language="xml" linenumbering="numbered">&lt;web-app&gt;
     &lt;servlet&gt;
-        &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
-        &lt;servlet-class&gt;MyApplication&lt;/servlet-class&gt;
+        &lt;servlet-name&gt;org.foo.rest.MyApplication&lt;/servlet-name&gt;
     &lt;/servlet&gt;
-    ....</programlisting></example></para>
-
-    <para>
-    If using Servlet 2.x then instead it is necessary to declare the Jersey
-    specific servlet and the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Application.html">Application</ulink>
-    class as follows:</para>
-
-    <para><example>
-<title>Deployment of your application using Jersey specific servlet</title>
-<programlisting language="xml" linenumbering="numbered">&lt;web-app&gt;
+    ...
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/resources&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+    ...
+&lt;/web-app&gt;</programlisting>
+    </example></para>    
+    <para>Note that the <literal>&lt;servlet-class&gt;</literal> element is ommited from the servlet declaration. 
+    This is a correct declaration utilizing the Servlet 3.0 extension mechanism. Also note that 
+    <literal>&lt;servlet-mapping&gt;</literal> is used to define the base resource URI.</para>    
+    <para>When running in a Servlet 2.x then instead it is necessary to declare the Jersey
+    specific servlet and pass the &jaxrs.core.Application; implementation class name as
+    one of the servlet's <literal>init-param</literal> entries:
+    <example>
+        <title>Deployment of your application using Jersey specific servlet</title>
+        <programlisting language="xml" linenumbering="numbered">&lt;web-app&gt;
     &lt;servlet&gt;
         &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
         &lt;servlet-class&gt;com.sun.jersey.spi.container.servlet.ServletContainer&lt;/servlet-class&gt;
         &lt;init-param&gt;
             &lt;param-name&gt;javax.ws.rs.Application&lt;/param-name&gt;
-            &lt;param-value&gt;MyApplication&lt;/param-value&gt;
+            &lt;param-value&gt;org.foo.rest.MyApplication&lt;/param-value&gt;
         &lt;/init-param&gt;
+        ...
     &lt;/servlet&gt;
-    ....</programlisting></example>Alternatively a simpler approach is to let Jersey
-    choose the PackagesResourceConfig implementation automatically by
-    declaring the packages as follows:</para>
+    ...
+&lt;/web-app&gt;</programlisting>
+    </example></para>        
+    <para>Alternatively a simpler approach is to let Jersey choose the <literal>PackagesResourceConfig</literal> 
+    implementation automatically by declaring the packages as follows:
 
-    <para><example>
-<title>Using Jersey specific servlet without an application model instance</title>
-<programlisting language="xml" linenumbering="numbered">&lt;web-app&gt;
+    <example>
+        <title>Using Jersey specific servlet without an application model instance</title>
+        <programlisting language="xml" linenumbering="numbered">&lt;web-app&gt;
     &lt;servlet&gt;
         &lt;servlet-name&gt;Jersey Web Application&lt;/servlet-name&gt;
         &lt;servlet-class&gt;com.sun.jersey.spi.container.servlet.ServletContainer&lt;/servlet-class&gt;
@@ -379,13 +371,16 @@ public void postClichedMessage(String message) {
             &lt;param-name&gt;com.sun.jersey.config.property.packages&lt;/param-name&gt;
             &lt;param-value&gt;org.foo.rest;org.bar.rest&lt;/param-value&gt;
         &lt;/init-param&gt;
+        ...
     &lt;/servlet&gt;
-    ....</programlisting></example>JAX-RS also provides the ability to obtain a
-    container specific artifact from an <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Application.html">Application</ulink>
-    instance. For example, Jersey supports using <ulink url="https://grizzly.dev.java.net/">Grizzly</ulink> as follows:</para>
-
-    <para><programlisting language="java">SelectorThread st = RuntimeDelegate.createEndpoint(new MyApplication(), SelectorThread.class);</programlisting>Jersey
-    also provides <ulink url="https://grizzly.dev.java.net/">Grizzly</ulink>
+    ...
+&lt;/web-app&gt;</programlisting>
+    </example></para>    
+    <para>JAX-RS also provides the ability to obtain a container specific artifact 
+    from an &jaxrs.core.Application; instance. For example, Jersey supports using
+    <ulink url="https://grizzly.dev.java.net/">Grizzly</ulink> as follows:    
+    <programlisting language="java">SelectorThread st = RuntimeDelegate.createEndpoint(new MyApplication(), SelectorThread.class);</programlisting>    
+    Jersey also provides <ulink url="https://grizzly.dev.java.net/">Grizzly</ulink>
     helper classes to deploy the ServletThread instance at a base URL for
     in-process deployment.</para>
 
@@ -396,16 +391,12 @@ public void postClichedMessage(String message) {
   <section>
     <title>Extracting Request Parameters</title>
 
-    <para>Parameters of a resource method may be annotated with
-    parameter-based annotations to extract information from a request. A
-    previous example presented the use <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/PathParam.html">@PathParam</ulink>
-    to extract a path parameter from the path component of the request URL
-    that matched the path declared in <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>.</para>
+    <para>Parameters of a resource method may be annotated with parameter-based annotations to extract information from
+    a request. A previous example presented the use &jaxrs.PathParam; to extract a path parameter from the path component
+    of the request URL that matched the path declared in &jaxrs.Path;.</para>
 
-    <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/QueryParam.html">@QueryParam</ulink>
-    is used to extract query parameters from the Query component of the
-    request URL. The following example is an extract from the sparklines
-    sample: </para>
+    <para>&jaxrs.QueryParam; is used to extract query parameters from the Query component of the request URL. The following
+    example is an extract from the sparklines sample: </para>
 
     <example>
 <title>Query parameters</title>
@@ -424,9 +415,9 @@ public Response smooth(
     <para>If a query parameter "step" exists in the query component of the
     request URI then the "step" value will be will extracted and parsed as a
     32 bit signed integer and assigned to the step method parameter. If "step"
-    does not exist then a default value of 2, as declared in the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/DefaultValue.html">@DefaultValue</ulink>
+    does not exist then a default value of 2, as declared in the &jaxrs.DefaultValue;
     annotation, will be assigned to the step method parameter. If the "step"
-    value cannot be parsed as a 32 bit signed integer then a 404 (Not
+    value cannot be parsed as a 32 bit signed integer then a HTTP 404 (Not
     Found) response is returned. User defined Java types such as
     <literal>ColorParam</literal> may be used, which as implemented as
     follows: </para>
@@ -488,32 +479,22 @@ public Response smooth(
     name. If this is the case then types in 4) may be used to obtain all
     values.</para>
 
-    <para>If the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/DefaultValue.html">@DefaultValue</ulink>
-    is not used on conjuction with <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/QueryParam.html">@QueryParam</ulink>
+    <para>If the &jaxrs.DefaultValue; is not used in conjunction with &jaxrs.QueryParam;
     and the query parameter is not present in the request then value will be
     an empty collection for <literal>List</literal>, <literal>Set</literal> or
     <literal>SortedSet</literal>, <literal>null</literal> for other object
     types, and the Java-defined default for primitive types.</para>
 
-    <para>The <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/PathParam.html">@PathParam</ulink>
-    and the other parameter-based annotations, <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/MatrixParam.html">@MatrixParam</ulink>,
-    <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/HeaderParam.html">@HeaderParam</ulink>,
-    <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/CookieParam.html">@CookieParam</ulink>
-    and <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/FormParam.html">@FormParam</ulink>
-    obey the same rules as <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/QueryParam.html">@QueryParam</ulink>.
-    <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/MatrixParam.html">@MatrixParam</ulink>
-    extracts information from URL path segments. <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/HeaderParam.html">@HeaderParam</ulink>
-    extracts information from the HTTP headers. <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/CookieParam.html">@CookieParam</ulink>
-    extracts information from the cookies declared in cookie related HTTP
+    <para>The &jaxrs.PathParam; and the other parameter-based annotations, &jaxrs.MatrixParam;,
+    &jaxrs.HeaderParam;, &jaxrs.CookieParam;, &jaxrs.FormParam; obey the same rules as &jaxrs.QueryParam;.
+    &jaxrs.MatrixParam; extracts information from URL path segments. &jaxrs.HeaderParam; extracts information
+    from the HTTP headers. &jaxrs.CookieParam; extracts information from the cookies declared in cookie related HTTP
     headers.</para>
 
-    <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/FormParam.html">@FormParam</ulink>
-    is slightly special because it extracts information from a request
-    representation that is of the MIME media type
-    "application/x-www-form-urlencoded" and conforms to the encoding specified
-    by HTML forms, as described here. This parameter is very useful for
-    extracting information that is POSTed by HTML forms, for example the
-    following extracts the form parameter named "name" from the POSTed form
+    <para>&jaxrs.FormParam; is slightly special because it extracts information from a request representation that
+    is of the MIME media type <literal>"application/x-www-form-urlencoded"</literal> and conforms to the encoding
+    specified by HTML forms, as described here. This parameter is very useful for extracting information that is
+    POSTed by HTML forms, for example the following extracts the form parameter named "name" from the POSTed form
     data: </para>
 
     <para><example>
@@ -546,8 +527,7 @@ public String get(@Context HttpHeaders hh) {
     Map&lt;String, Cookie&gt; pathParams = hh.getCookies();
 }</programlisting></example></para>
 
-    <para>In general <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Context.html">@Context</ulink>
-    can be used to obtain contextual Java types related to the request or
+    <para>In general &jaxrs.core.Context; can be used to obtain contextual Java types related to the request or
     response. For form parameters it is possible to do the following:</para>
 
     <para><example>
@@ -561,8 +541,7 @@ public void post(MultivaluedMap&lt;String, String&gt; formParams) {
   <section>
     <title>Representations and Java Types</title>
 
-    <para>Previous sections on <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
-    and <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Consumes.html">@Consumes</ulink>
+    <para>Previous sections on &jaxrs.Produces; and &jaxrs.Consumes;
     referred to MIME media types of representations and showed resource
     methods that consume and produce the Java type String for a number of
     different media types. However, <literal>String</literal> is just one of
@@ -606,7 +585,7 @@ public Response getImage(@PathParam("image") String image) {
     temporary file will be created where the request entity is stored.</para>
 
     <para>The <literal>Content-Type</literal> (if not set, see next section)
-    can be automatically set from the MIME media types declared by <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Produces.html">@Produces</ulink>
+    can be automatically set from the MIME media types declared by &jaxrs.Produces;
     if the most acceptable media type is not a wild card (one that contains a
     *, for example "application/" or "/*"). Given the following method:</para>
 
@@ -627,12 +606,11 @@ public String doGetAsXmlOrJson() {
 
     <para>Sometimes it is necessary to return additional
     information in response to a HTTP request. Such information may be built
-    and returned using <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Response.html">Response</ulink>
-    and <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Response.ResponseBuilder.html">Response.ResponseBuilder</ulink>.
+    and returned using &jaxrs.core.Response; and &jaxrs.core.Response.ResponseBuilder;.
     For example, a common RESTful pattern for the creation of a new resource
     is to support a POST request that returns a 201 (Created) status code and
     a <literal>Location</literal> header whose value is the URI to the newly
-    created resource. This may be acheived as follows:</para>
+    created resource. This may be achieved as follows:</para>
 
     <para><example>
 <title>Returning 201 status code and adding <literal>Location</literal> header in response to POST request</title><programlisting language="java" linenumbering="numbered">@POST
@@ -662,18 +640,13 @@ public Response post(String content) {
   <section>
     <title>Sub-resources</title>
 
-    <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-    may be used on classes and such classes are referred to as root resource
-    classes. <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-    may also be used on methods of root resource classes. This enables common
-    functionality for a number of resources to be grouped together and
-    potentially reused.</para>
+    <para>&jaxrs.Path; may be used on classes and such classes are referred to as root resource classes. &jaxrs.Path;
+    may also be used on methods of root resource classes. This enables common functionality for a number of resources
+    to be grouped together and potentially reused.</para>
 
-    <para>The first way <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-    may be used is on resource methods and such methods are referred to as
-    <emphasis>sub-resource methods</emphasis>. The following example shows the
-    method signatures for a root resource class from the jmaki-backend
-    sample:</para>
+    <para>The first way &jaxrs.Path; may be used is on resource methods and such methods are referred to as
+    <emphasis>sub-resource methods</emphasis>. The following example shows the method signatures for a root
+    resource class from the jmaki-backend sample:</para>
 
     <para><example>
 <title>Sub-resource methods</title><programlisting language="java" linenumbering="numbered">@Singleton
@@ -708,23 +681,16 @@ public class PrintersResource {
     public void deletePrinter(@PathParam("printerid") String printerId) { ... }
 }</programlisting></example></para>
 
-    <para>If the path of the request URL is "printers" then the resource
-    methods not annotated with <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-    will be selected. If the request path of the request URL is
-    "printers/list" then first the root resource class will be matched and
-    then the sub-resource methods that match "list" will be selected, which in
-    this case is the sub-resource method <literal>getListOfPrinters</literal>.
-    So in this example hierarchical matching on the path of the request URL is
-    performed.</para>
+    <para>If the path of the request URL is "printers" then the resource methods not annotated with &jaxrs.Path;
+    will be selected. If the request path of the request URL is "printers/list" then first the root resource class
+    will be matched and then the sub-resource methods that match "list" will be selected, which in this case
+    is the sub-resource method <literal>getListOfPrinters</literal>. So in this example hierarchical matching
+    on the path of the request URL is performed.</para>
 
-    <para>The second way <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/Path.html">@Path</ulink>
-    may be used is on methods <emphasis role="bold">not</emphasis> annotated
-    with resource method designators such as <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/GET.html">@GET</ulink>
-    or <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/POST.html">@POST</ulink>.
-    Such methods are referred to as <emphasis>sub-resource
-    locators</emphasis>. The following example shows the method signatures for
-    a root resource class and a resource class from the optimistic-concurrency
-    sample:</para>
+    <para>The second way &jaxrs.Path; may be used is on methods <emphasis role="bold">not</emphasis> annotated
+    with resource method designators such as &jaxrs.GET; or &jaxrs.POST;. Such methods are referred to as
+    <emphasis>sub-resource locators</emphasis>. The following example shows the method signatures for
+    a root resource class and a resource class from the optimistic-concurrency sample:</para>
 
     <para><example>
 <title>Sub-resource locators</title><programlisting language="java" linenumbering="numbered">@Path("/item")
@@ -786,17 +752,14 @@ public class ItemContentResource {
 
     <para>Building URIs and building them safely is not easy with <ulink
     url="http://java.sun.com/j2se/1.5.0/docs/api/java/net/URI.html">java.net.URI</ulink>,
-    which is why JAX-RS has the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink>
-    class that makes it simple and easy to build URIs safely.</para>
+    which is why JAX-RS has the &jaxrs.core.UriBuilder; class that makes it simple and easy to build URIs safely.</para>
 
-    <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink>
-    can be used to build new URIs or build from existing URIs. For resource
-    classes it is more than likely that URIs will be built from the base URI
-    the Web service is deployed at or from the request URI. The class <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriInfo.html">UriInfo</ulink>
-    provides such information (in addition to further information, see next
-    section).</para>
+    <para>&jaxrs.core.UriBuilder; can be used to build new URIs or build from existing URIs. For resource
+    classes it is more than likely that URIs will be built from the base URI the web service is deployed at
+    or from the request URI. The class &jaxrs.core.UriInfo; provides such information (in addition to further
+    information, see next section).</para>
 
-    <para>The following example shows URI building with UriInfo and <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink>
+    <para>The following example shows URI building with &jaxrs.core.UriInfo; and &jaxrs.core.UriBuilder;
     from the bookmark sample:</para>
 
     <para><example>
@@ -822,30 +785,24 @@ public class UsersResource {
     }
 }</programlisting></example></para>
 
-    <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriInfo.html">UriInfo</ulink>
-    is obtained using the @Context annotation, and in this particular example
-    injection onto the field of the root resource class is performed, previous
-    examples showed the use of @Context on resource method parameters.</para>
+    <para>&jaxrs.core.UriInfo; is obtained using the @Context annotation, and in this particular example injection onto
+    the field of the root resource class is performed, previous examples showed the use of @Context on resource method parameters.</para>
 
-    <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriInfo.html">UriInfo</ulink>
-    can be used to obtain URIs and associated <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink>
-    instances for the following URIs: the base URI the application is deployed
-    at; the request URI; and the absolute path URI, which is the request URI
-    minus any query components.</para>
+    <para>&jaxrs.core.UriInfo; can be used to obtain URIs and associated &jaxrs.core.UriBuilder; instances for
+    the following URIs: the base URI the application is deployed at; the request URI; and the absolute path URI, which
+    is the request URI minus any query components.</para>
 
     <para>The <literal>getUsersAsJsonArray</literal> method constructs a
     JSONArrray where each element is a URI identifying a specific user
     resource. The URI is built from the absolute path of the request URI by
-    calling <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriInfo.html#getAbsolutePathBuilder()">uriInfo.getAbsolutePathBuilder()</ulink>.
+    calling <ulink url="&jsr311.javadoc.path;/core/UriInfo.html#getAbsolutePathBuilder()">UriInfo.getAbsolutePathBuilder()</ulink>.
     A new path segment is added, which is the user ID, and then the URI is
     built. Notice that it is not necessary to worry about the inclusion of '/'
     characters or that the user ID may contain characters that need to be
     percent encoded. UriBuilder takes care of such details.</para>
 
-    <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink>
-    can be used to build/replace query or matrix parameters. URI templates can
-    also be declared, for example the following will build the URI
-    "http://localhost/segment?name=value":</para>
+    <para>&jaxrs.core.UriBuilder; can be used to build/replace query or matrix parameters. URI templates can also be declared,
+    for example the following will build the URI "http://localhost/segment?name=value":</para>
 
     <para><example>
 <title>Building URIs using query parameters</title><programlisting language="java" linenumbering="numbered">UriBuilder.fromUri("http://localhost/").
@@ -875,7 +832,7 @@ public Item getItem(@PathParam("itemid") String itemid) {
     return i;
 }</programlisting></example></para>
 
-    <para>This exception is a Jersey specific exception that extends <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/WebApplicationException.html">WebApplicationException</ulink>
+    <para>This exception is a Jersey specific exception that extends &jaxrs.WebApplicationException;
     and builds a HTTP response with the 404 status code and an optional
     message as the body of the response:</para>
 
@@ -900,13 +857,11 @@ public Item getItem(@PathParam("itemid") String itemid) {
 
 }</programlisting></example></para>
 
-    <para>In other cases it may not be appropriate to throw instances of
-    <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/WebApplicationException.html">WebApplicationException</ulink>,
-    or classes that extend <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/WebApplicationException.html">WebApplicationException</ulink>,
-    and instead it may be preferable to map an existing exception to a
-    response. For such cases it is possible to use the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/ExceptionMapper.html">ExceptionMapper</ulink>
-    interface. For example, the following maps the <ulink url="http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
-    to a 404 (Not Found) response:</para>
+    <para>In other cases it may not be appropriate to throw instances of &jaxrs.WebApplicationException;,
+    or classes that extend &jaxrs.WebApplicationException;, and instead it may be preferable to map an existing exception to a
+    response. For such cases it is possible to use the &jaxrs.ext.ExceptionMapper; interface. For example, the following
+    maps the <ulink url="http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
+    to a HTTP 404 (Not Found) response:</para>
 
     <para><example>
 <title>Mapping generic exceptions to responses</title><programlisting language="java" linenumbering="numbered">@Provider
@@ -920,31 +875,27 @@ public class EntityNotFoundMapper implements
     }
 }</programlisting></example></para>
 
-    <para>The above class is annotated with <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/ext/Provider.html">@Provider</ulink>,
-    this declares that the class is of interest to the JAX-RS runtime. Such a
-    class may be added to the set of classes of the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Application.html">Application</ulink>
-    instance that is configured. When an application throws an <ulink url="http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
-    the <literal>toResponse</literal> method of the
-    <literal>EntityNotFoundMapper</literal> instance will be invoked.</para>
+    <para>The above class is annotated with &jaxrs.ext.Provider;, this declares that the class is of interest to the JAX-RS runtime. Such a
+    class may be added to the set of classes of the &jaxrs.core.Application; instance that is configured. When an application throws an
+    <ulink url="http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
+    the <literal>toResponse</literal> method of the <literal>EntityNotFoundMapper</literal> instance will be invoked.</para>
   </section>
 
   <section>
     <title>Conditional GETs and Returning 304 (Not Modified) Responses</title>
 
     <para>Conditional GETs are a great way to reduce bandwidth, and
-    potentially server-side peformance, depending on how the information used
+    potentially server-side performance, depending on how the information used
     to determine conditions is calculated. A well-designed web site may return
     304 (Not Modified) responses for the many of the static images it
     serves.</para>
 
-    <para>JAX-RS provides support for conditional GETs using the contextual
-    interface <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Request.html">Request</ulink>.</para>
+    <para>JAX-RS provides support for conditional GETs using the contextual interface &jaxrs.core.Request;.</para>
 
-    <para>The following example shows conditional GET support from the
-    sparklines sample: </para>
+    <para>The following example shows conditional GET support from the sparklines sample:</para>
 
     <para><example>
-<title>Conditional GET support</title><programlisting language="java" linenumbering="numbered">public SparklinesResource(
+        <title>Conditional GET support</title><programlisting language="java" linenumbering="numbered">public SparklinesResource(
         @QueryParam("d") IntegerList data,
         @DefaultValue("0,100") @QueryParam("limits") Interval limits,
         @Context Request request,
@@ -969,12 +920,12 @@ public class EntityNotFoundMapper implements
 
     <para>The constructor of the <literal>SparklinesResouce</literal> root
     resource class computes an entity tag from the request URI and then calls
-    the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Request.html#evaluatePreconditions(javax.ws.rs.core.EntityTag)">request.evaluatePreconditions</ulink>
+    the <ulink url="&jsr311.javadoc.path;/core/Request.html#evaluatePreconditions(javax.ws.rs.core.EntityTag)">request.evaluatePreconditions</ulink>
     with that entity tag. If a client request contains an
     <literal>If-None-Match</literal> header with a value that contains the
-    same entity tag that was calculated then the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Request.html#evaluatePreconditions(javax.ws.rs.core.EntityTag)">evaluatePreconditions</ulink>
+    same entity tag that was calculated then the <ulink url="&jsr311.javadoc.path;/core/Request.html#evaluatePreconditions(javax.ws.rs.core.EntityTag)">evaluatePreconditions</ulink>
     returns a pre-filled out response, with the 304 status code and entity tag
-    set, that may be built and returned. Otherwise, <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Request.html#evaluatePreconditions(javax.ws.rs.core.EntityTag)">evaluatePreconditions</ulink>
+    set, that may be built and returned. Otherwise, <ulink url="&jsr311.javadoc.path;/core/Request.html#evaluatePreconditions(javax.ws.rs.core.EntityTag)">evaluatePreconditions</ulink>
     returns <literal>null</literal> and the normal response can be
     returned.</para>
 
@@ -999,8 +950,7 @@ public class EntityNotFoundMapper implements
     the years and many objects will be created and discarded to serve and
     process the HTTP request and return the HTTP response.</para>
 
-    <para>Instances of singleton root resource classes can be declared by an
-    instance of <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Application.html">Application</ulink>.</para>
+    <para>Instances of singleton root resource classes can be declared by an instance of &jaxrs.core.Application;.</para>
 
     <para>Jersey supports two further life-cycles using Jersey specific
     annotations. If a root resource class is annotated with @Singleton then
@@ -1012,16 +962,12 @@ public class EntityNotFoundMapper implements
   <section>
     <title>Security</title>
 
-    <para>Security information is available by obtaining the <ulink
-    url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/SecurityContext.html">SecurityContext</ulink>
-    using <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Context.html">@Context</ulink>,
+    <para>Security information is available by obtaining the &jaxrs.core.SecurityContext; using &jaxrs.core.Context;,
     which is essentially the equivalent functionality available on the <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletRequest.html">HttpServletRequest</ulink>.</para>
 
-    <para><ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/SecurityContext.html">SecurityContext</ulink>
-    can be used in conjunction with sub-resource locators to return different
-    resources if the user principle is included in a certain role. For
-    example, a sub-resource locator could return a different resource if a
-    user is a preferred customer:</para>
+    <para>&jaxrs.core.SecurityContext; can be used in conjunction with sub-resource locators to return different
+    resources if the user principle is included in a certain role. For example, a sub-resource locator could return
+    a different resource if a user is a preferred customer:</para>
 
     <para><example>
 <title>Accessing <code>SecurityContext</code></title><programlisting language="java" linenumbering="numbered">@Path("basket")
@@ -1078,35 +1024,31 @@ public class InjectedResource {
     <para>There are some restrictions when injecting on to resource classes
     with a life-cycle other than per-request. In such cases it is not possible
     to injected onto fields for the annotations associated with extraction of
-    request parameters. However, it is possible to use the <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Context.html">@Context</ulink>
+    request parameters. However, it is possible to use the &jaxrs.core.Context;
     annotation on fields, in such cases a thread local proxy will be
     injected.</para>
 
-    <para>The <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/FormParam.html">@FormParam</ulink>
-    annotation is special and may only be utilized on resource and
-    sub-resource methods. This is because it extracts information from a
-    request entity.</para>
+    <para>The &jaxrs.FormParam; annotation is special and may only be utilized on resource and sub-resource methods.
+    This is because it extracts information from a request entity.</para>
   </section>
 
   <section>
     <title>Use of @Context</title>
 
-    <para>Previous sections have introduced the use of <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Context.html">@Context</ulink>.
-    <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/spec/spec3.html#x3-520005">Chapter
-    5</ulink> of the JAX-RS specification presents all the standard JAX-RS
-    Java types that may be used with <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Context.html">@Context</ulink>.</para>
+    <para>Previous sections have introduced the use of &jaxrs.core.Context;. <ulink url="&jsr311.release.path;/spec/spec3.html#x3-520005">Chapter 5</ulink>
+    of the JAX-RS specification presents all the standard JAX-RS Java types that may be used with &jaxrs.core.Context;.</para>
 
     <para>When deploying a JAX-RS application using servlet then <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/ServletConfig.html">ServletConfig</ulink>,
     <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/ServletContext.html">ServletContext</ulink>,
     <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletRequest.html">HttpServletRequest</ulink>
     and <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletResponse.html">HttpServletResponse</ulink>
-    are available using <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/javax/ws/rs/core/Context.html">@Context</ulink>.</para>
+    are available using &jaxrs.core.Context;.</para>
   </section>
 
   <section>
     <title>Annotations Defined By JAX-RS</title>
 
-    <para>For a list of the annotations specified by JAX-RS see <ulink url="http://jsr311.java.net/nonav/releases/&jsr311-version;/spec/spec3.html#x3-66000A">Appendix
+    <para>For a list of the annotations specified by JAX-RS see <ulink url="&jsr311.release.path;/spec/spec3.html#x3-66000A">Appendix
     A</ulink> of the specification.</para>
   </section>
 </chapter>
