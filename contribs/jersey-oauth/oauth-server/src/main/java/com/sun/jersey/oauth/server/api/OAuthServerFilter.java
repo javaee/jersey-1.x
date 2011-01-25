@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -61,6 +61,7 @@ import java.util.Set;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.Provider;
 
 /** OAuth request filter that filters all requests indicating in the Authorization
  * header they use OAuth. Checks if the incoming requests are properly authenticated
@@ -76,7 +77,8 @@ import javax.ws.rs.core.Response;
  *
  * <p>
  * This filter requires an implementation of {@link OAuthProvider} interface to be
- * registered through the {@link OAuthServerFilter#PROPERTY_PROVIDER} property.
+ * included in the list of providers of the application (e.g. by annotating it
+ * using the {@link Provider} annotation and having it on the scanning classpath).
  * <p>
  * The constants in this class indicate how you can parameterize this filter. E.g. when an application
  * is deployed as a Servlet or Filter you can set the path patern to be ignored by this filter
@@ -92,8 +94,6 @@ import javax.ws.rs.core.Response;
  * @author Martin Matula
  */
 public class OAuthServerFilter implements ContainerRequestFilter {
-    /** Mandatory property - class name of the OAuthProvider class. */
-    public static final String PROPERTY_PROVIDER = "com.sun.jersey.config.property.oauth.provider";
     /** OAuth realm. Default is set to "default". */
     public static final String PROPERTY_REALM = "com.sun.jersey.config.property.oauth.realm";
     /** Property that can be set to a regular expression used to match the path (relative to the base URI) this
