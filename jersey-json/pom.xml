@@ -204,9 +204,9 @@
             </plugin>
 
             <plugin>
-                <groupId>de.jflex.maven.plugin</groupId>
+                <groupId>de.jflex</groupId>
                 <artifactId>maven-jflex-plugin</artifactId>
-                <version>0.2</version>
+                <version>1.4.3</version>
                 <executions>
                     <execution>
                         <goals>
@@ -225,7 +225,7 @@
         <pluginRepository>
             <id>jflex</id>
             <name>JFlex repository</name>
-            <url>http://jflex.sourceforge.net/repo/</url>
+            <url>http://jflex.sourceforge.net/maven-jflex-plugin/</url>
         </pluginRepository>
     </pluginRepositories>
 
