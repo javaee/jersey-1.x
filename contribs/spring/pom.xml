@@ -54,9 +54,9 @@
     <name>jersey-spring</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-        <dependency>
+         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
+            <artifactId>jersey-grizzly</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

@@ -285,10 +285,12 @@
 
       <para>Maven developers, deploying an application using the Grizzly HTTP
       Web server, require a dependency on the <ulink
+      url="http://download.java.net/maven/2/com/sun/jersey/jersey-grizzly/&version;/jersey-grizzly-&version;.pom">jersey-grizzly</ulink> and <ulink
       url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.pom">grizzly-servlet-webserver</ulink>
       module.</para>
 
       <para>Non-maven developers require: <ulink
+      url="http://download.java.net/maven/2/com/sun/jersey/jersey-grizzly/&version;/jersey-grizzly-&version;.jar">jersey-grizzly.jar</ulink> and <ulink
       url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.jar">grizzly-servlet-webserver.jar</ulink></para>
     </section>
 

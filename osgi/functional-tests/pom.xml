@@ -183,9 +183,9 @@
             <artifactId>jersey-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
+         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
+            <artifactId>jersey-grizzly</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

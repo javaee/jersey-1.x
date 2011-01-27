@@ -122,24 +122,25 @@
         </profile>
     </profiles>
     <modules>
+        <module>archetypes</module>
+        <module>archive</module>
         <module>contribs</module>
-        <module>samples</module>
-        <module>jersey-core</module>
-        <module>jersey-server</module>
-        <module>jersey-server-linking</module>
+        <module>glassfish</module>
+        <module>jersey-atom</module>
+        <module>jersey-bundle</module>
         <module>jersey-client</module>
+        <module>jersey-core</module>
+        <module>jersey-documentation</module>
+        <module>jersey-fastinfoset</module>
+        <module>jersey-grizzly</module>
         <module>jersey-jrebel</module>
         <module>jersey-json</module>
-        <module>jersey-atom</module>
-        <module>jersey-fastinfoset</module>
-        <module>jersey-tests</module>
-        <module>jersey-bundle</module>
-        <module>archetypes</module>
+        <module>jersey-server-linking</module>
+        <module>jersey-server</module>
         <module>jersey-test-framework</module>
-        <module>archive</module>
-        <module>jersey-documentation</module>
+        <module>jersey-tests</module>
         <module>ri</module>
-        <module>glassfish</module>
+        <module>samples</module>
     </modules>
 
     <build>

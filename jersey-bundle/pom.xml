@@ -251,6 +251,15 @@
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${gen-src-dir}</outputDirectory>
                                 </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-grizzly</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <classifier>sources</classifier>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${gen-src-dir}</outputDirectory>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-client</artifactId>
@@ -313,6 +322,11 @@
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-server</artifactId>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey</groupId>
+                                    <artifactId>jersey-grizzly</artifactId>
                                     <version>${project.version}</version>
                                 </artifactItem>
                                 <artifactItem>

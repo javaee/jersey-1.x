@@ -60,6 +60,7 @@ public class OsgiIntegrationTest {
                 // load Jersey bundles
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-grizzly").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey.contribs.jersey-oauth").artifactId("oauth-signature").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey.contribs.jersey-oauth").artifactId("oauth-server").versionAsInProject(),

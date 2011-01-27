@@ -51,9 +51,9 @@
     <name>AtomPub Simple View-Client - Jersey sample</name>
     <packaging>jar</packaging>
     <dependencies>
-        <dependency>
+         <dependency>
             <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
+            <artifactId>jersey-grizzly</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

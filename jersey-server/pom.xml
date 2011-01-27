@@ -110,13 +110,7 @@
             <version>1.6.5</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.sun.grizzly</groupId>
-            <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.18-i</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
+       <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_core</artifactId>
             <version>1.0</version>
@@ -197,7 +191,6 @@
                             com.sun.research.ws.wadl
                         </Export-Package>
                         <Import-Package>
-                            com.sun.grizzly.*;resolution:="optional",
                             com.sun.net.httpserver;resolution:="optional",
                             javax.ejb;version="3.1";resolution:="optional",
                             javax.interceptor;version="3.1";resolution:="optional",
