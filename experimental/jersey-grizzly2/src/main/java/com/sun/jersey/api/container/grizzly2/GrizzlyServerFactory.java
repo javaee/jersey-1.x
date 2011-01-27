@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.grizzly2;
+package com.sun.jersey.api.container.grizzly2;
 
 import java.io.IOException;
 import java.net.URI;

@@ -39,8 +39,8 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                com.sun.jersey.grizzly2,
-                com.sun.jersey.grizzly2.impl
+                com.sun.jersey.api.container.grizzly2,
+                com.sun.jersey.server.impl.container.grizzly2
                         </Export-Package>
                         <Import-Package>
                 org.glassfish.grizzly.*;resolution:="optional",

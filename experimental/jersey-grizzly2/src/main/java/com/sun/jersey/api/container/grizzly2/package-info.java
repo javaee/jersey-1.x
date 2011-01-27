@@ -37,43 +37,8 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.grizzly2.impl;
-
-import org.glassfish.grizzly.http.server.HttpHandler;
-
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.spi.container.ContainerProvider;
-import com.sun.jersey.spi.container.WebApplication;
+package com.sun.jersey.api.container.grizzly2;
 
 /**
- * Grizzly 2.0 Jersey container provider.
- *
- * @author Matt Swift
+ * Provides support for creating Grizzly-based HTTP containers.
  */
-public class GrizzlyContainerProvider implements
-        ContainerProvider<HttpHandler> {
-
-    /**
-     * Default constructor ensures that HttpRequestProcessor class is loaded.
-     */
-    public GrizzlyContainerProvider() {
-        @SuppressWarnings("unused")
-        final Class<?> c = HttpHandler.class;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public GrizzlyContainer createContainer(
-            final Class<HttpHandler> type,
-            final ResourceConfig resourceConfig, final WebApplication application)
-            throws ContainerException {
-        if (type != HttpHandler.class) {
-            return null;
-        }
-
-        return new GrizzlyContainer(resourceConfig, application);
-    }
-}
