@@ -1,8 +1,10 @@
 release 1.6
-- *Breaking change*: Grizzly support in a separate module
-  Grizzly support used to be part of the jersey-server module
-  This is no longer the case. If you rely on Grizzly you will
-  need to use the jersey-grizzly dependency instead of jersey-server 
+- Grizzly 2 http-server support moved from the experimental
+  area to the new jersey-grizzly2 module in the com.sun.jersey space
+- *Breaking change*: Grizzly 1 support in a separate module
+  Grizzly 1 support used to be part of the jersey-server module
+  This is no longer the case. If you rely on Grizzly 1 you will
+  need to use the jersey-grizzly dependency instead of just jersey-server 
 - Re-fixed issue 320
   http://java.net/jira/browse/JERSEY-320
   Interning document parser needs to be used because of JAXB.

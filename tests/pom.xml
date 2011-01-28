@@ -41,25 +41,48 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-project</artifactId>
-        <version>1.6-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
-    </parent>
-    <groupId>com.sun.jersey.experimental</groupId>
-    <artifactId>jersey-experimental</artifactId>
+    <groupId>com.sun.jersey.test</groupId>
+    <artifactId>functional-tests</artifactId>
+    <version>1.6-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Experimental Jersey Extensions</name>
+    <name>Project Jersey tests</name>
     <description>
-        Projects that provide additional experimental functionality to jersey.
+        Jersey is the open source (under dual CDDL+GPL license) JAX-RS (JSR 311)
+        production quality Reference Implementation for building
+        RESTful Web services. This module encapsulates all OSGi related Jersey tests.
     </description>
-    <modules>
-        <module>hypermedia-action</module>
-        <module>view-client</module>
-        <module>jersey-apache-client4</module>
+    <url>https://jersey.java.net/</url>
+    <organization>
+        <name>Oracle Corporation</name>
+        <url>http://www.oracle.com/</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>CDDL 1.1</name>
+            <url>https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html</url>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>GPL2 w/ CPE</name>
+            <url>https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+     <modules>
+        <module>grizzly2</module>
     </modules>
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>java.net-m2-dist-repository</id>
+            <name>java.net-m2-repository</name>
+            <url>java-net:/maven2-repository/trunk/repository/</url>
+        </repository>
+    </distributionManagement>
+   
 </project>

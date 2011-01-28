@@ -58,12 +58,14 @@ import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.server.impl.ThreadLocalInvoker;
 import com.sun.jersey.spi.container.*;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpHandler;
 
 /**
  * Grizzly 2.0 Jersey container.
  *
  * @author Matt Swift
+ * @author Jakub Podlesak
  */
 public final class GrizzlyContainer extends HttpHandler implements
         ContainerListener {
@@ -185,7 +187,15 @@ public final class GrizzlyContainer extends HttpHandler implements
         final WebApplication _application = application;
 
         final URI baseUri = getBaseUri(request);
-        final URI requestUri = baseUri.resolve(request.getRequest().getRequestURI());
+
+        // TODO: this is terrible, there must be a way to obtain the original request URI!
+        String originalURI = UriBuilder.fromPath(request.getRequest().getRequestURI()).build().toString();
+        String queryString = request.getQueryString();
+        if (queryString != null) {
+            originalURI = originalURI + "?" + queryString;
+        }
+
+        final URI requestUri = baseUri.resolve(originalURI);
 
         try {
             final ContainerRequest cRequest = new ContainerRequest(_application,

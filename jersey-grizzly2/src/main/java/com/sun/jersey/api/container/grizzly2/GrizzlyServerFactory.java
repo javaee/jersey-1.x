@@ -274,7 +274,7 @@ public final class GrizzlyServerFactory {
         return createHttpServer(u, processor);
     }
 
-    private static HttpServer createHttpServer(final URI u,
+    public static HttpServer createHttpServer(final URI u,
             final HttpHandler handler) throws IOException,
             IllegalArgumentException, NullPointerException {
         if (u == null) {

@@ -133,6 +133,7 @@
         <module>jersey-documentation</module>
         <module>jersey-fastinfoset</module>
         <module>jersey-grizzly</module>
+        <module>jersey-grizzly2</module>
         <module>jersey-jrebel</module>
         <module>jersey-json</module>
         <module>jersey-server-linking</module>
@@ -141,6 +142,7 @@
         <module>jersey-tests</module>
         <module>ri</module>
         <module>samples</module>
+        <module>tests</module>
     </modules>
 
     <build>
