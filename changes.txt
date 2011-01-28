@@ -1,4 +1,8 @@
 release 1.6
+- Fixed issue 637
+  http://java.net/jira/browse/JERSEY-637
+  Jersey now adds a whitespace after the semicolon separating the content
+  type parameters.
 - Grizzly 2 http-server support moved from the experimental
   area to the new jersey-grizzly2 module in the com.sun.jersey space
 - *Breaking change*: Grizzly 1 support in a separate module

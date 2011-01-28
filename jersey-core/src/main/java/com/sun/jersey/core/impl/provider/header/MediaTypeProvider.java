@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -52,24 +52,23 @@ import javax.ws.rs.core.MediaType;
  */
 public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
     
+    @Override
     public boolean supports(Class<?> type) {
         return MediaType.class.isAssignableFrom(type);
     }
 
+    @Override
     public String toString(MediaType header) {
         StringBuilder b = new StringBuilder();
-        b.append(header.getType()).
-            append('/').
-            append(header.getSubtype());
+        b.append(header.getType()).append('/').append(header.getSubtype());
         for (Map.Entry<String, String> e : header.getParameters().entrySet()) {
-            b.append(';').
-                append(e.getKey()).
-                append('=');
+            b.append("; ").append(e.getKey()).append('=');
             WriterUtil.appendQuotedIfWhiteSpaceOrQuote(b, e.getValue());
         }
         return b.toString();
     }
 
+    @Override
     public MediaType fromString(String header) {
         if (header == null)
             throw new IllegalArgumentException("Media type is null");
