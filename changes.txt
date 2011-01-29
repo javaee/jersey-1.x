@@ -1,4 +1,8 @@
 release 1.6
+- Fixed issue 626
+  http://java.net/jira/browse/JERSEY-626
+  Skipping the leading CRLF for the first boundary delimiter in multipart
+  messages.
 - Fixed issue 637
   http://java.net/jira/browse/JERSEY-637
   Jersey now adds a whitespace after the semicolon separating the content

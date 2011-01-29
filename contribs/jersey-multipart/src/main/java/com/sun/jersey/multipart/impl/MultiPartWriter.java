@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -82,11 +82,13 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
         this.providers = providers;
     }
 
+    @Override
     public long getSize(MultiPart entity, Class<?> type, Type genericType,
             Annotation[] annotations, MediaType mediaType) {
         return -1;
     }
 
+    @Override
     public boolean isWriteable(Class<?> type, Type genericType,
             Annotation[] annotations, MediaType mediaType) {
         return MultiPart.class.isAssignableFrom(type);
@@ -108,6 +110,7 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
      * @throws javax.ws.rs.WebApplicationException if an HTTP error response
      *  needs to be produced (only effective if the response is not committed yet)
      */
+    @Override
     public void writeTo(MultiPart entity, Class<?> type, Type genericType,
             Annotation[] annotations, MediaType mediaType,
             MultivaluedMap<String, Object> headers,
@@ -137,10 +140,16 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
 
         final String boundaryString = boundaryMediaType.getParameters().get("boundary");
         // Iterate through the body parts for this message
+        boolean isFirst = true;
         for (final BodyPart bodyPart : entity.getBodyParts()) {
 
             // Write the leading boundary string
-            writer.write("\r\n--");
+            if (isFirst) {
+                isFirst = false;
+                writer.write("--");
+            } else {
+                writer.write("\r\n--");
+            }
             writer.write(boundaryString);
             writer.write("\r\n");
 
