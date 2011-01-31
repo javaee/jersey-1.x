@@ -13,6 +13,29 @@
     <description>
         Grizzly 2.0 container for Jersey
     </description>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
+                                <link>http://download.oracle.com/javase/6/docs/api/</link>
+                            </links>
+                            <notimestamp>true</notimestamp>
+                            <excludePackageNames>com.sun.jersey.grizzly2.impl</excludePackageNames>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <resources>
             <resource>
@@ -58,18 +81,6 @@
                             </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
-                        <link>http://download.oracle.com/javase/6/docs/api/</link>
-                    </links>
-                    <notimestamp>true</notimestamp>
-                    <excludePackageNames>com.sun.jersey.grizzly2.impl</excludePackageNames>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

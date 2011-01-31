@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -226,6 +226,30 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin> <!-- generate javadoc from sources unpacked above -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
+                            </links>
+                            <sourcepath>${gen-src-dir}</sourcepath>
+                            <!-- excludePackageNames HAS TO be defined as single line -->
+                            <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl com.sun.jersey.atom.rome.impl com.sun.jersey.fastinfoset.impl com.sun.jersey.json.impl</excludePackageNames>
+                            <notimestamp>true</notimestamp>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <resources>
             <resource>
@@ -240,17 +264,14 @@
             </resource>
         </resources>
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
-
             <plugin> <!-- want to unpack sources from individual modules -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -331,7 +352,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin> <!-- want to compile META-INF/services registry from individual modules -->
                 <groupId>com.sun.istack</groupId>
                 <artifactId>maven-istack-commons-plugin</artifactId>
@@ -399,22 +419,7 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin> <!-- generate javadoc from sources unpacked above -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
-                    </links>
-                    <sourcepath>${gen-src-dir}</sourcepath>
-                    <!-- excludePackageNames HAS TO be defined as single line -->
-                    <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl com.sun.jersey.atom.rome.impl com.sun.jersey.fastinfoset.impl com.sun.jersey.json.impl</excludePackageNames>
-                    <notimestamp>true</notimestamp>
-                </configuration>
-            </plugin>
-
-            <plugin>
+           <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>1.1</version>
@@ -433,7 +438,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -453,7 +457,6 @@
                     </execution>
                 </executions>
             </plugin>
-
             <plugin> <!-- remove the generated src dir-->
                 <artifactId>maven-clean-plugin</artifactId>
                 <configuration>

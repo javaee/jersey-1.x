@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -76,6 +76,30 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>http://jsr311.java.net/nonav/releases/1.1</link>
+                                <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
+                                <link>http://jersey.java.net/nonav/apidocs/${project.version}/contribs/jersey-oauth/oauth-signature/</link>
+                            </links>
+                            <subpackages>com.sun.jersey.oauth.server.api:com.sun.jersey.oauth.server.spi</subpackages>
+                            <notimestamp>true</notimestamp>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
@@ -88,19 +112,6 @@
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>http://jsr311.java.net/nonav/releases/1.1</link>
-                        <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
-                        <link>http://jersey.java.net/nonav/apidocs/${project.version}/contribs/jersey-oauth/oauth-signature/</link>
-                    </links>
-                    <subpackages>com.sun.jersey.oauth.server.api:com.sun.jersey.oauth.server.spi</subpackages>
-                    <notimestamp>true</notimestamp>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>

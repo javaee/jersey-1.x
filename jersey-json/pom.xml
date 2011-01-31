@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -97,6 +97,26 @@
         </dependency>
     </dependencies>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
+                            </links>
+                            <excludePackageNames>com.sun.jersey.json.impl</excludePackageNames>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
     <build>
 
         <resources>
@@ -184,17 +204,6 @@
                         </Import-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
-                    </links>
-                    <excludePackageNames>com.sun.jersey.json.impl</excludePackageNames>
                 </configuration>
             </plugin>
 
