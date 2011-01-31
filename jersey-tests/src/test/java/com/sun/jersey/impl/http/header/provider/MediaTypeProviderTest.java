@@ -70,7 +70,7 @@ public class MediaTypeProviderTest extends TestCase {
         MediaType header = new MediaType("application", "xml", params);
         MediaTypeProvider instance = new MediaTypeProvider();
         
-        String expResult = "application/xml;charset=utf8";
+        String expResult = "application/xml; charset=utf8";
         String result = instance.toString(header);
         assertEquals(expResult, result);
     }
@@ -104,7 +104,7 @@ public class MediaTypeProviderTest extends TestCase {
         MediaTypeProvider instance = new MediaTypeProvider();
         
         String result = instance.toString(header);
-        String expResult = "application/xml;foo=\"\\\"bar\\\"\"";
+        String expResult = "application/xml; foo=\"\\\"bar\\\"\"";
         assertEquals(expResult, result);
         
         MediaType m = instance.fromString(result);
