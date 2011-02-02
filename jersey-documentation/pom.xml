@@ -63,7 +63,7 @@
                                 <copy todir="${src.dir}">
                                     <fileset dir="src/docbook"/>
                                 </copy>
-                                <replace file="${src.dir}/jersey.ent" token="$version" value="${version}"/>
+                                <replace file="${src.dir}/jersey.ent" token="$version" value="${project.version}"/>
                                 <replace file="${src.dir}/jersey.ent" token="$jsr311-version" value="1.1"/>
                             </tasks>
                         </configuration>
