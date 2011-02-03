@@ -54,7 +54,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -167,8 +169,13 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
             }
         }
 
-        // Set the request method
-        uc.setRequestMethod(ro.getMethod());
+        Boolean httpUrlConnectionSetMethodWorkaround = (Boolean)ro.getProperties().get(
+                ClientConfig.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND);
+        if (httpUrlConnectionSetMethodWorkaround != null && httpUrlConnectionSetMethodWorkaround == true) {
+            setRequestMethodUsingWorkaroundForJREBug(uc, ro.getMethod());
+        } else {
+            uc.setRequestMethod(ro.getMethod());
+        }
 
         // Write the request headers
         writeOutBoundHeaders(ro.getHeaders(), uc);
@@ -221,6 +228,30 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
                 ro.getMethod(),
                 uc);
     }
+
+    /**
+     * Workaround for a bug in <code>HttpURLConnection.setRequestMethod(String)</code>
+     * The implementation of Sun Microsystems is throwing a <code>ProtocolException</code>
+     * when the method is other than the HTTP/1.1 default methods. So
+     * to use PROPFIND and others, we must apply this workaround.
+     *
+     * See issue http://java.net/jira/browse/JERSEY-639
+     */
+
+    private static final void setRequestMethodUsingWorkaroundForJREBug(final HttpURLConnection httpURLConnection, final String method) {
+        try {
+            httpURLConnection.setRequestMethod(method); // Check whether we are running on a buggy JRE
+        } catch (final ProtocolException pe) {
+            try {
+                final Class<?> httpURLConnectionClass = httpURLConnection.getClass();
+                final Field methodField = httpURLConnectionClass.getSuperclass().getDeclaredField("method");
+                methodField.setAccessible(true);
+                methodField.set(httpURLConnection, method);
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
     
     private void writeOutBoundHeaders(MultivaluedMap<String, Object> metadata, HttpURLConnection uc) {
         for (Map.Entry<String, List<Object>> e : metadata.entrySet()) {
@@ -237,7 +268,6 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
                 }
                 uc.setRequestProperty(e.getKey(), b.toString());
             }
-
         }
     }
 

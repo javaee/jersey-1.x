@@ -1,4 +1,12 @@
 release 1.6
+- Provided a workaround for issue 639
+  http://java.net/jira/browse/JERSEY-639
+  Jersey allows to hack HttpURLConnection class and injects (via reflection)
+  HTTP method which will be used to "method" field. This approach disables
+  method name control which is used in setMethod method. Users have to set
+  ClientConfig.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND property
+  to true to activate this workaround. There is also one know limitation -
+  request can't contain entity when this code is executed.
 - Jackson dependency upgrade: 1.5.5 -> 1.7.1
 - Fixed issue 626
   http://java.net/jira/browse/JERSEY-626
