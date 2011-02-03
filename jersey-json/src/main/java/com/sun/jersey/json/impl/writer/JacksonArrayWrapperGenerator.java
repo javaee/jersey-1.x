@@ -251,6 +251,18 @@ public class JacksonArrayWrapperGenerator extends JsonGenerator {
     }
 
     @Override
+    public void writeRawUTF8String(byte[] bytes, int start, int length) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
+        generator.writeRawUTF8String(bytes, start, length);
+    }
+
+    @Override
+    public void writeUTF8String(byte[] bytes, int start, int length) throws IOException, JsonGenerationException {
+        aboutToWriteANonNull();
+        generator.writeUTF8String(bytes, start, length);
+    }
+
+    @Override
     public void writeRaw(String raw) throws IOException, JsonGenerationException {
         aboutToWriteANonNull();
         generator.writeRaw(raw);

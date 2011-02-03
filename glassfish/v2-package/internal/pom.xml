@@ -67,25 +67,25 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
-            <version>1.5.5</version>
+            <version>${jackson.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
-            <version>1.5.5</version>
+            <version>${jackson.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-jaxrs</artifactId>
-            <version>1.5.5</version>
+            <version>${jackson.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-xc</artifactId>
-            <version>1.5.5</version>
+            <version>${jackson.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -232,7 +232,7 @@
                                         <artifactItem>
                                             <groupId>org.codehaus.jackson</groupId>
                                             <artifactId>jackson-core-asl</artifactId>
-                                            <version>1.5.5</version>
+                                            <version>${jackson.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}</outputDirectory>
@@ -240,7 +240,7 @@
                                         <artifactItem>
                                             <groupId>org.codehaus.jackson</groupId>
                                             <artifactId>jackson-mapper-asl</artifactId>
-                                            <version>1.5.5</version>
+                                            <version>${jackson.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}</outputDirectory>
@@ -248,7 +248,7 @@
                                         <artifactItem>
                                             <groupId>org.codehaus.jackson</groupId>
                                             <artifactId>jackson-jaxrs</artifactId>
-                                            <version>1.5.5</version>
+                                            <version>${jackson.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}</outputDirectory>
@@ -256,7 +256,7 @@
                                         <artifactItem>
                                             <groupId>org.codehaus.jackson</groupId>
                                             <artifactId>jackson-xc</artifactId>
-                                            <version>1.5.5</version>
+                                            <version>${jackson.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}</outputDirectory>
@@ -416,7 +416,7 @@
                                         <artifactItem>
                                             <groupId>org.codehaus.jackson</groupId>
                                             <artifactId>jackson-core-asl</artifactId>
-                                            <version>1.5.5</version>
+                                            <version>${jackson.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}</outputDirectory>
@@ -424,7 +424,7 @@
                                         <artifactItem>
                                             <groupId>org.codehaus.jackson</groupId>
                                             <artifactId>jackson-mapper-asl</artifactId>
-                                            <version>1.5.5</version>
+                                            <version>${jackson.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}</outputDirectory>
@@ -432,7 +432,7 @@
                                         <artifactItem>
                                             <groupId>org.codehaus.jackson</groupId>
                                             <artifactId>jackson-jaxrs</artifactId>
-                                            <version>1.5.5</version>
+                                            <version>${jackson.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}</outputDirectory>
@@ -440,7 +440,7 @@
                                         <artifactItem>
                                             <groupId>org.codehaus.jackson</groupId>
                                             <artifactId>jackson-xc</artifactId>
-                                            <version>1.5.5</version>
+                                            <version>${jackson.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}</outputDirectory>
@@ -497,6 +497,7 @@
 
     <properties>
         <assembly.directory>${project.build.directory}/assembly</assembly.directory>
+        <jackson.version>1.7.1</jackson.version>
     </properties>
 
 </project>

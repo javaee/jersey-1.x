@@ -1,4 +1,5 @@
 release 1.6
+- Jackson dependency upgrade: 1.5.5 -> 1.7.1
 - Fixed issue 626
   http://java.net/jira/browse/JERSEY-626
   Skipping the leading CRLF for the first boundary delimiter in multipart

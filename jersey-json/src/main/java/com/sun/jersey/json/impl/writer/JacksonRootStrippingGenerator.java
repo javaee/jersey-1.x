@@ -168,6 +168,16 @@ public class JacksonRootStrippingGenerator extends JsonGenerator {
     }
 
     @Override
+    public void writeRawUTF8String(byte[] bytes, int start, int length) throws IOException, JsonGenerationException {
+        generator.writeRawUTF8String(bytes, start, length);
+    }
+
+    @Override
+    public void writeUTF8String(byte[] bytes, int start, int length) throws IOException, JsonGenerationException {
+        generator.writeUTF8String(bytes, start, length);
+    }
+
+    @Override
     public void writeRaw(String raw) throws IOException, JsonGenerationException {
         generator.writeRaw(raw);
     }

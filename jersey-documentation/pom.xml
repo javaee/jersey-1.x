@@ -65,6 +65,7 @@
                                 </copy>
                                 <replace file="${src.dir}/jersey.ent" token="$version" value="${project.version}"/>
                                 <replace file="${src.dir}/jersey.ent" token="$jsr311-version" value="1.1"/>
+                                <replace file="${src.dir}/jersey.ent" token="$jackson.version" value="${jackson.version}"/>
                             </tasks>
                         </configuration>
                         <id>process-entities</id>
