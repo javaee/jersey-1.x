@@ -42,6 +42,7 @@ package com.sun.jersey.impl.entity;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.provider.EntityHolder;
 import com.sun.jersey.impl.AbstractResourceTester;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -109,7 +110,7 @@ public class EntityHolderTest extends AbstractResourceTester {
         b = r.path("jaxb").type("application/xml").post(JAXBBean.class);
         assertEquals("EMPTY", b.value);
 
-        b = r.path("jaxb").post(JAXBBean.class, new JAXBBean("CONTENT"));
+        b = r.path("jaxb").type("application/xml").post(JAXBBean.class, new JAXBBean("CONTENT"));
         assertEquals("CONTENT", b.value);
     }
 }
