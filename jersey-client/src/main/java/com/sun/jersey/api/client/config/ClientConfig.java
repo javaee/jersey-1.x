@@ -42,7 +42,7 @@ package com.sun.jersey.api.client.config;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.core.util.FeaturesAndProperties;
-import java.util.Map;
+
 import java.util.Set;
 
 /**
@@ -127,20 +127,6 @@ public interface ClientConfig extends FeaturesAndProperties {
      */
     public static final String PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION =
             "com.sun.jersey.client.property.bufferResponseEntityOnException";
-
-    /**
-     * A value of "true" declares that the client will try
-     * to set unsupported HTTP method to HttpURLConnection via reflection.
-     * Enabling this feature might cause security related warnings/errors
-     * and it might break when other JDK implementation is used.
-     *
-     * Use only when you know what you are doing.
-     *
-     * The value MUST be an instance of {@link java.lang.Boolean}.
-     * If the property is absent then the default value is "false".
-     */
-    public static final String PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND =
-            "com.sun.jersey.client.property.httpUrlConnectionSetMethodWorkaround";
 
     /**
      * Get the set of provider classes to be instantiated in the scope

@@ -79,6 +79,21 @@ import java.util.Map;
  */
 public final class URLConnectionClientHandler extends TerminatingClientHandler {
 
+    /**
+     * A value of "true" declares that the client will try
+     * to set unsupported HTTP method to HttpURLConnection via reflection.
+     * Enabling this feature might cause security related warnings/errors
+     * and it might break when other JDK implementation is used.
+     *
+     * Use only when you know what you are doing.
+     *
+     * The value MUST be an instance of {@link java.lang.Boolean}.
+     * If the property is absent then the default value is "false".
+     */
+    public static final String PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND =
+            "com.sun.jersey.client.property.httpUrlConnectionSetMethodWorkaround";
+
+
     private final class URLConnectionResponse extends ClientResponse {
         private final String method;
         private final HttpURLConnection uc;
@@ -170,7 +185,7 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         }
 
         Boolean httpUrlConnectionSetMethodWorkaround = (Boolean)ro.getProperties().get(
-                ClientConfig.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND);
+                PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND);
         if (httpUrlConnectionSetMethodWorkaround != null && httpUrlConnectionSetMethodWorkaround == true) {
             setRequestMethodUsingWorkaroundForJREBug(uc, ro.getMethod());
         } else {

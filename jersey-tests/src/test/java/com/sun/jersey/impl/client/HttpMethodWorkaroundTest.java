@@ -43,8 +43,8 @@ package com.sun.jersey.impl.client;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.urlconnection.URLConnectionClientHandler;
 import com.sun.jersey.impl.container.grizzly.AbstractGrizzlyServerTester;
 
 import javax.ws.rs.HttpMethod;
@@ -107,7 +107,7 @@ public class HttpMethodWorkaroundTest extends AbstractGrizzlyServerTester {
         startServer(HttpMethodWorkaroundResource.class);
 
         DefaultClientConfig config = new DefaultClientConfig();
-        config.getProperties().put(ClientConfig.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
+        config.getProperties().put(URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
         Client c = Client.create(config);
 
         WebResource r = c.resource(getUri().path("test").build());
@@ -121,7 +121,7 @@ public class HttpMethodWorkaroundTest extends AbstractGrizzlyServerTester {
         startServer(HttpMethodWorkaroundResource.class);
 
         DefaultClientConfig config = new DefaultClientConfig();
-        config.getProperties().put(ClientConfig.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
+        config.getProperties().put(URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND, true);
         Client c = Client.create(config);
 
         WebResource r = c.resource(getUri().path("test/entity").build());
