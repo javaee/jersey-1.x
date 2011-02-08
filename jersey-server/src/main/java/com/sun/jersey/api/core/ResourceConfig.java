@@ -512,7 +512,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             for (Class<?> c : conflictSet) {
                 LOGGER.log(Level.SEVERE, 
                         "Root resource class " + c.getName() + 
-                        " is instantated more than once in the set of registered singletons");                                    
+                        " is instantiated more than once in the set of registered singletons");
             }
             throw new IllegalArgumentException(
                     "The set of registered singletons contains " +
@@ -586,7 +586,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             if (trimmedValue.length() == 0)
                 throw new IllegalArgumentException("The value in " + property +
                         " mappings record \"" + records[i] + "\" is empty.");
-            
+
             mappingsMap.put(trimmedSegment, parser.valueOf(trimmedValue));
         }
     }
@@ -702,10 +702,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      *         (including if the class is null)
      */
     public static boolean isProviderClass(Class<?> c) {
-        if (c == null)
-            return false;
-        
-        return c.isAnnotationPresent(Provider.class);
+        return c != null && c.isAnnotationPresent(Provider.class);
     }
 
     /**
@@ -844,6 +841,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      *
      * @return a cloned instance of this resource configuration.
      */
+    @SuppressWarnings({"CloneDoesntCallSuperClone", "CloneDoesntDeclareCloneNotSupportedException"})
     @Override
     public ResourceConfig clone() {
         ResourceConfig that = new DefaultResourceConfig();
