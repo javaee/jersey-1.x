@@ -99,7 +99,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
             = "com.sun.jersey.config.feature.CanonicalizeURIPath";
     
     /**
-     * If true, and {@link #CANONICALIZE_URI_PATH} is true,
+     * If true, and {@link #FEATURE_CANONICALIZE_URI_PATH} is true,
      * and the canonicalization/normalization operations on the
      * request URI result in a new URI that is not equal to the request URI,
      * then the client is (temporarily) redirected to the new URI.
