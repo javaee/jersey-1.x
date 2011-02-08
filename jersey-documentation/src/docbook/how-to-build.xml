@@ -53,13 +53,13 @@
 <title>Checking out the source</title>
 <para>
 The Jersey source code is available from the Subversion repository located at
-<ulink url="http://jersey.java.net/svn/jersey">http://jersey.java.net/svn/jersey</ulink>.
+<ulink url="http://java.net/projects/jersey/sources/svn/show">http://java.net/projects/jersey/sources/svn/show</ulink>.
 </para>
 <para>
 To check out the trunk where active development on the next release occurs use
 the following command:
 <programlisting>
-svn checkout http://jersey.java.net/svn/jersey/trunk/jersey jersey --username &lt;username&gt;
+svn checkout https://svn.java.net/svn/jersey~svn/trunk/jersey jersey --username &lt;username&gt;
 </programlisting>
 </para>
 <para>
