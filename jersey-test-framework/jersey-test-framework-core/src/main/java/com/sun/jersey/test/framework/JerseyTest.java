@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,8 +42,10 @@ package com.sun.jersey.test.framework;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.spi.service.ServiceFinder;
+import com.sun.jersey.test.framework.spi.client.ClientFactory;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
@@ -136,6 +138,8 @@ public abstract class JerseyTest {
      * on which the tests would be run.
      */
     private TestContainerFactory testContainerFactory;
+
+    private ClientFactory clientFactory;
 
     /**
      * The test container on which the tests would be run.
@@ -424,17 +428,24 @@ public abstract class JerseyTest {
 
     /**
      * Creates an instance of {@link Client}.
+     *
+     * Checks whether TestContainer provides client instance and
+     * if not, ClientFactory obtained through getClientFactory()
+     * will be used to create new client instance.
+     *
+     * This method is called exactly once when JerseyTest is created.
+     *
      * @param tc instance of {@link TestContainer}
      * @param ad instance of {@link AppDescriptor}
      * @return A Client instance.
      */
-    private static Client getClient(TestContainer tc, AppDescriptor ad) {
+    protected Client getClient(TestContainer tc, AppDescriptor ad) {
         Client c = tc.getClient();
 
         if (c != null) {
             return c;
         } else {
-            c = Client.create(ad.getClientConfig());
+            c = getClientFactory().create(ad.getClientConfig());
         }
 
         //check if logging is required
@@ -448,6 +459,36 @@ public abstract class JerseyTest {
 
         return c;
     }
+
+    /**
+     * Get the ClientFactory.
+     * <p>
+     * If the client factory has not been explicit set with
+     * {@link #setClientFactory(ClientFactory) } then
+     * the default client factory will be obtained.
+     *
+     * @return ClientFactory instance
+     */
+    protected ClientFactory getClientFactory() {
+        if(clientFactory == null)
+            clientFactory = getDefaultClientFactory();
+
+        return clientFactory;
+    }
+
+    private static ClientFactory getDefaultClientFactory() {
+        return new ClientFactory() {
+            @Override
+            public Client create(ClientConfig cc) {
+                return Client.create(cc);
+            }
+        };
+    }
+
+    protected void setClientFactory(ClientFactory clientFactory) {
+        this.clientFactory = clientFactory;
+    }
+
 
     /**
      * Returns the base URI of the application.

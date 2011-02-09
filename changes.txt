@@ -1,4 +1,11 @@
 release 1.6
+- Fixed issue 643
+  http://java.net/jira/browse/JERSEY-643
+  Allowing users to use different client implementation in Jersey test
+  framework. It might be done by providing ClientFactory and overriding
+  method getClientFactory in JerseyTest, which respects priority of
+  container provided client OR override getClient() method to gain
+  absolute control.
 - Provided a workaround for issue 639
   http://java.net/jira/browse/JERSEY-639
   Jersey allows to hack HttpURLConnection class and injects (via reflection)
