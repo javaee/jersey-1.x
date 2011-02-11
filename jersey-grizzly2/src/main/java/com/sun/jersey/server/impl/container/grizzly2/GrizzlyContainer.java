@@ -60,6 +60,7 @@ import com.sun.jersey.spi.container.*;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.util.Charsets;
 
 /**
  * Grizzly 2.0 Jersey container.
@@ -189,7 +190,11 @@ public final class GrizzlyContainer extends HttpHandler implements
         final URI baseUri = getBaseUri(request);
 
         // TODO: this is terrible, there must be a way to obtain the original request URI!
-        String originalURI = UriBuilder.fromPath(request.getRequest().getRequestURI()).build().toString();
+        String originalURI = UriBuilder.fromPath(
+                request.getRequest().getRequestURIRef()
+                .getOriginalRequestURIBC().toString(Charsets.DEFAULT_CHARSET))
+                .build().toString();
+
         String queryString = request.getQueryString();
         if (queryString != null) {
             originalURI = originalURI + "?" + queryString;
