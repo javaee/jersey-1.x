@@ -54,11 +54,6 @@
     <name>jersey-spring</name>
     <url>http://maven.apache.org</url>
     <dependencies>
-         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-grizzly</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
@@ -72,12 +67,6 @@
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
             <version>1.9.18-i</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -199,6 +188,17 @@
             </build>
             <dependencies>
                 <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-core</artifactId>
                     <version>${spring25-release-version}</version>
@@ -254,6 +254,17 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
                 <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-core</artifactId>
@@ -324,6 +335,17 @@
             <id>spring20</id>
             <dependencies>
                 <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-core</artifactId>
                     <version>${spring20-release-version}</version>
@@ -362,6 +384,88 @@
                                 <property>
                                     <name>applicationContext</name>
                                     <value>applicationContext-spring20.xml</value>
+                                </property>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.aspectj</groupId>
+                    <artifactId>aspectjrt</artifactId>
+                    <version>1.5.4</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.aspectj</groupId>
+                    <artifactId>aspectjweaver</artifactId>
+                    <version>1.5.4</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib</artifactId>
+                    <version>2.2</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <systemProperties>
+                                <property>
+                                    <name>applicationContext</name>
+                                    <value>applicationContext-spring25.xml</value>
                                 </property>
                             </systemProperties>
                         </configuration>

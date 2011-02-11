@@ -83,6 +83,74 @@
         </pluginRepository>
     </pluginRepositories>
 
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                    <artifactId>oauth-signature</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                    <artifactId>oauth-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                    <artifactId>oauth-server</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                    <artifactId>oauth-signature</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                    <artifactId>oauth-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+                    <artifactId>oauth-server</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>asm</groupId>
@@ -135,30 +203,6 @@
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-http-webserver</artifactId>
             <version>1.9.18-i</version>
-            <scope>test</scope>
-        </dependency>
-         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-grizzly</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-signature</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-client</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-server</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

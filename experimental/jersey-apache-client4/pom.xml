@@ -41,7 +41,7 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>jersey-experimental</artifactId>
@@ -51,12 +51,65 @@
     <artifactId>jersey-apache-client4</artifactId>
     <packaging>jar</packaging>
     <name>Jersey Apache HTTP Client</name>
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>https://jsr311.java.net/nonav/releases/1.1</link>
+                                <link>https://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
+                            </links>
+                            <excludePackageNames>com.sun.jersey.client.apache.impl</excludePackageNames>
+                            <notimestamp>true</notimestamp>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <dependencies>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -80,35 +133,7 @@
             <version>1.9.18-i</version>
             <scope>test</scope>
         </dependency>
-         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-grizzly</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <links>
-                                <link>https://jsr311.java.net/nonav/releases/1.1</link>
-                                <link>https://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
-                            </links>
-                            <excludePackageNames>com.sun.jersey.client.apache.impl</excludePackageNames>
-                            <notimestamp>true</notimestamp>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 
     <build>
         <plugins>

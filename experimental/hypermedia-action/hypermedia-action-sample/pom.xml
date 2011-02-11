@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
@@ -9,17 +9,44 @@
     <artifactId>hypermedia-action-sample</artifactId>
     <packaging>jar</packaging>
     <name>hypermedia-action-sample</name>
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
+                    <artifactId>hypermedia-action-server</artifactId>
+                    <version>${jersey-version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
+                    <artifactId>hypermedia-action-client</artifactId>
+                    <version>${jersey-version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
+                    <artifactId>hypermedia-action-server</artifactId>
+                    <version>${jersey-version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
+                    <artifactId>hypermedia-action-client</artifactId>
+                    <version>${jersey-version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
     <dependencies>
-        <dependency>
-            <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
-            <artifactId>hypermedia-action-server</artifactId>
-            <version>${jersey-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
-            <artifactId>hypermedia-action-client</artifactId>
-            <version>${jersey-version}</version>
-        </dependency>
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
@@ -43,7 +70,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
             </plugin>
-            
+
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
@@ -61,7 +88,7 @@
                     </execution>
                 </executions>
             </plugin>
-             <plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>1.1</version>
@@ -91,7 +118,7 @@
     </repositories>
     <version>1.6-SNAPSHOT</version>
     <description>Sample that shows the use of hypermedia annotations like @Action
-available in Jersey.</description>
+        available in Jersey.</description>
 </project>
 
 

@@ -59,6 +59,61 @@
         <osgi-version>4.2.0</osgi-version>
     </properties>
 
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <scope>test</scope>
+                    <version>${project.version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <scope>test</scope>
+                    <version>${project.version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
+                    <artifactId>bundle</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly</artifactId>
+                    <scope>test</scope>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <scope>test</scope>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
+                    <artifactId>bundle</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
@@ -93,56 +148,30 @@
             <scope>test</scope>
             <version>${osgi-version}</version>
         </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-grizzly</artifactId>
-            <scope>test</scope>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <scope>test</scope>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
-            <artifactId>bundle</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.eventadmin</artifactId>
             <scope>test</scope>
             <version>1.2.2</version>
         </dependency>
-
         <dependency>
             <groupId>org.eclipse.equinox</groupId>
             <artifactId>event</artifactId>
             <scope>test</scope>
             <version>1.0.100-v20070516</version>
         </dependency>
-
         <dependency>
             <groupId>com.sun.grizzly.osgi</groupId>
             <artifactId>grizzly-httpservice-bundle</artifactId>
             <scope>test</scope>
             <version>1.9.19-beta1</version>
         </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-jetty-bundle</artifactId>
             <scope>test</scope>
             <version>0.7.1</version>
         </dependency>
-
     </dependencies>
 
     <build>

@@ -41,8 +41,8 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
@@ -52,23 +52,116 @@
     <artifactId>generate-wadl</artifactId>
     <name>Generate WADL - Jersey sample</name>
     <packaging>jar</packaging>
-    
-    <dependencies>    
+
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>maven-wadl-plugin</artifactId>
+                    <version>${jersey-release-version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>wadl-resourcedoc-doclet</artifactId>
+                    <version>${jersey-release-version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>maven-wadl-plugin</artifactId>
+                    <version>${jersey-release-version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>wadl-resourcedoc-doclet</artifactId>
+                    <version>${jersey-release-version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>xsltproc</id>
+            <activation>
+                <file>
+                    <exists>/usr/bin/xsltproc</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <!--  Create/generate the application.html using xsltproc  -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1</version>
+                        <executions>
+                            <execution>
+                                <id>copy-docs-to-builddir</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>compile</phase>
+                                <configuration>
+                                    <executable>cp</executable>
+                                    <commandlineArgs>src/main/doc/*.xml target/classes/</commandlineArgs>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>prepare-xsltproc</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>cp</executable>
+                                    <commandlineArgs>src/main/xsd/schema.xsd target/classes/</commandlineArgs>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>exec-xsltproc: target/application.html</id>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <executable>xsltproc</executable>
+                                    <commandlineArgs>-o target/application.html src/main/doc/wadl_documentation.xsl target/classes/application.wadl</commandlineArgs>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>maven-wadl-plugin</artifactId>
+                    <version>${jersey-release-version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>wadl-resourcedoc-doclet</artifactId>
+                    <version>${jersey-release-version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+    <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-        </dependency>        
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>maven-wadl-plugin</artifactId>
-            <version>${jersey-release-version}</version>
-        </dependency>        
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>wadl-resourcedoc-doclet</artifactId>
-            <version>${jersey-release-version}</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
@@ -76,7 +169,7 @@
             <version>1.1</version>
         </dependency>
     </dependencies>
-    
+
     <build>
         <plugins>
             <plugin>
@@ -244,61 +337,6 @@
         <jersey-release-version>${project.version}</jersey-release-version>
     </properties>
 
-    <profiles>
-        <profile>
-            <id>xsltproc</id>
-            <activation>
-                <file>
-                    <exists>/usr/bin/xsltproc</exists>
-                </file>
-            </activation>
-            <build>
-                <plugins>
-                    <!--  Create/generate the application.html using xsltproc  -->
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <id>copy-docs-to-builddir</id>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <phase>compile</phase>
-                                <configuration>
-                                    <executable>cp</executable>
-                                    <commandlineArgs>src/main/doc/*.xml target/classes/</commandlineArgs>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>prepare-xsltproc</id>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <executable>cp</executable>
-                                    <commandlineArgs>src/main/xsd/schema.xsd target/classes/</commandlineArgs>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>exec-xsltproc: target/application.html</id>
-                                <goals>
-                                    <goal>exec</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <executable>xsltproc</executable>
-                                    <commandlineArgs>-o target/application.html src/main/doc/wadl_documentation.xsl target/classes/application.wadl</commandlineArgs>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
     <pluginRepositories>
         <pluginRepository>
             <id>maven2-repository.dev.java.net</id>

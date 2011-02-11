@@ -120,6 +120,61 @@
                 <module>osgi</module>
             </modules>
         </profile>
+        <profile>
+            <id>cobertura</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>cobertura-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>cobertura-instrument</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>instrument</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>cobertura-jar</id>
+                                <phase>post-integration-test</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>cobertura</classifier>
+                                    <classesDirectory>${basedir}/target/generated-classes/cobertura</classesDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-install-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>cobertura-install</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>install</goal>
+                                </goals>
+                                <configuration>
+                                    <classifier>cobertura</classifier>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
     <modules>
         <module>archetypes</module>
@@ -242,6 +297,11 @@
                         <xmlOutput>true</xmlOutput>
                     </configuration>
                 </plugin>
+                <plugin>
+                  <groupId>org.codehaus.mojo</groupId>
+                  <artifactId>cobertura-maven-plugin</artifactId>
+                  <version>2.4</version>
+                </plugin>
              </plugins>
         </pluginManagement>
         
@@ -254,6 +314,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
             </plugin>
         </plugins>
 
@@ -293,6 +358,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jaxb.version>2.2.3-1</jaxb.version>
         <jackson.version>1.7.1</jackson.version>
+        <cobertura.version>2.4</cobertura.version>
     </properties>
 
     <distributionManagement>

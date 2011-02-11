@@ -9,17 +9,44 @@
     <artifactId>hypermedia-action-sample</artifactId>
     <packaging>jar</packaging>
     <name>hypermedia-action-sample</name>
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
+                    <artifactId>hypermedia-action-server</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.experimental.view-client</groupId>
+                    <artifactId>jersey-view-client</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
+                    <artifactId>hypermedia-action-server</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.experimental.view-client</groupId>
+                    <artifactId>jersey-view-client</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
     <dependencies>
-        <dependency>
-            <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
-            <artifactId>hypermedia-action-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.experimental.view-client</groupId>
-            <artifactId>jersey-view-client</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>

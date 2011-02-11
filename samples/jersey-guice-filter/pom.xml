@@ -52,6 +52,96 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>jersey-guice</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
+                    <artifactId>jersey-test-framework-grizzly</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
+                    <artifactId>jersey-test-framework-http</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
+                    <artifactId>jersey-test-framework-inmemory</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
+                    <artifactId>jersey-test-framework-external</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>jersey-guice</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
+                    <artifactId>jersey-test-framework-grizzly</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
+                    <artifactId>jersey-test-framework-http</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
+                    <artifactId>jersey-test-framework-inmemory</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
+                    <artifactId>jersey-test-framework-external</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -59,48 +149,6 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-guice</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!--jersey-test-framework-grizzly
-            com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory
-            com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory
-            -->
-        <dependency>
-            <groupId>com.sun.jersey.jersey-test-framework</groupId>
-            <artifactId>jersey-test-framework-grizzly</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--jersey-test-framework-http
-            com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory
-         -->
-        <dependency>
-            <groupId>com.sun.jersey.jersey-test-framework</groupId>
-            <artifactId>jersey-test-framework-http</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--
-          jersey-test-framework-inmemory
-          com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory
-          -->
-        <dependency>
-            <groupId>com.sun.jersey.jersey-test-framework</groupId>
-            <artifactId>jersey-test-framework-inmemory</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <!--jersey-test-framework-embedded-glassfish
-            com.sun.jersey.test.framework.spi.container.embedded.glassfish.TestContainerFactory
-         -->
          <!--
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
@@ -109,14 +157,6 @@
             <scope>test</scope>
         </dependency>
         -->
-        <!--jersey-test-framework-external
-            com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -->
-        <dependency>
-            <groupId>com.sun.jersey.jersey-test-framework</groupId>
-            <artifactId>jersey-test-framework-external</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <properties>

@@ -23,37 +23,81 @@
     <packaging>jar</packaging>
     <name>ex11_1 EAR</name>
     <url>http://maven.apache.org</url>
+    <profiles>
+        <profile>
+            <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
+                    <artifactId>ex11_1</artifactId>
+                    <version>${project.version}</version>
+                    <type>ejb</type>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
+                    <artifactId>ex11_1-war</artifactId>
+                    <version>${project.version}</version>
+                    <type>war</type>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <!-- Adding explicit (yet "provided") dependencies to Jersey runtime -->
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                    <version>${project.version}</version>
+                    <scope>provided</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>provided</scope>
+                    <classifier>cobertura</classifier>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
+                    <artifactId>ex11_1</artifactId>
+                    <version>${project.version}</version>
+                    <type>ejb</type>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
+                    <artifactId>ex11_1-war</artifactId>
+                    <version>${project.version}</version>
+                    <type>war</type>
+                </dependency>
+                <!-- Adding explicit (yet "provided") dependencies to Jersey runtime -->
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                    <version>${project.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
-            <artifactId>ex11_1</artifactId>
-            <version>${project.version}</version>
-            <type>ejb</type>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
-            <artifactId>ex11_1-war</artifactId>
-            <version>${project.version}</version>
-            <type>war</type>
-        </dependency>
-        <!-- Adding explicit (yet "provided") dependencies to Jersey runtime -->
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
     <build>
