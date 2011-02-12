@@ -58,6 +58,27 @@
 
     <profiles>
         <profile>
+            <id>tools.jar</id>
+            <activation>
+                <!-- Activation should be done with <file>${java.home}/../lib/tools.jar</file
+                    But this is not working with maven as the property is not expansed.
+                -->
+                <property>
+                    <name>java.vendor</name>
+                    <value>Sun Microsystems Inc.</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>1.6</version>
+                    <scope>system</scope>
+                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
             <id>cobertura</id>
             <activation>
                 <property>
@@ -108,27 +129,4 @@
             </plugin>
         </plugins>
     </build>
-   <profiles>
-        <profile>
-            <id>tools.jar</id>
-            <activation>
-                <!-- Activation should be done with <file>${java.home}/../lib/tools.jar</file
-                    But this is not working with maven as the property is not expansed.
-                -->
-                <property>
-                    <name>java.vendor</name>
-                    <value>Sun Microsystems Inc.</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun</groupId>
-                    <artifactId>tools</artifactId>
-                    <version>1.6</version>
-                    <scope>system</scope>
-                    <systemPath>${java.home}/../lib/tools.jar</systemPath>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 </project>
