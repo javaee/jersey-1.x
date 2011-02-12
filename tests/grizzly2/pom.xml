@@ -150,7 +150,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <excludes>
-                        <!--<exclude>com/sun/jersey/impl/container/grizzly2/GZIPContentEncodingTest.java</exclude>-->
+                        <exclude>com/sun/jersey/impl/container/grizzly2/GZIPContentEncodingTest.java</exclude>
                     </excludes>
                     <forkMode>always</forkMode>
                     <enableAssertions>false</enableAssertions>
