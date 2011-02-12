@@ -2,8 +2,8 @@ release 1.6
 - Adding support for Cobertura based code coverage measurement.
   Use following maven targets to compile, instrument, test and
   generate reports:
-    mvn clean install -Pcobertura -Dmaven.test.skip=true
-    mvn cobertura:cobertura -Pcobertura
+    mvn clean install -Dcobertura -Dmaven.test.skip=true
+    mvn cobertura:cobertura -Dcobertura
 - Fixed issue 643
   http://java.net/jira/browse/JERSEY-643
   Allowing users to use different client implementation in Jersey test
