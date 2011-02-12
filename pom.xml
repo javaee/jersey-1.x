@@ -104,6 +104,13 @@
     <profiles>
         <profile>
             <id>release</id>
+            <modules>
+                <module>archetypes</module>
+                <module>archive</module>
+                <module>jersey-bundle</module>
+                <module>glassfish</module>
+                <module>ri</module>
+            </modules>
         </profile>
         <profile>
             <id>experimental</id>
@@ -112,12 +119,22 @@
             </activation>
             <modules>
                 <module>experimental</module>
+                <module>archetypes</module>
+                <module>archive</module>
+                <module>jersey-bundle</module>
+                <module>glassfish</module>
+                <module>ri</module>
             </modules>
         </profile>
         <profile>
             <id>osgi-tests</id>
             <modules>
                 <module>osgi</module>
+                <module>archetypes</module>
+                <module>archive</module>
+                <module>jersey-bundle</module>
+                <module>glassfish</module>
+                <module>ri</module>
             </modules>
         </profile>
         <profile>
@@ -185,12 +202,8 @@
         </profile>
     </profiles>
     <modules>
-        <module>archetypes</module>
-        <module>archive</module>
         <module>contribs</module>
-        <module>glassfish</module>
         <module>jersey-atom</module>
-        <module>jersey-bundle</module>
         <module>jersey-client</module>
         <module>jersey-core</module>
         <module>jersey-documentation</module>
@@ -203,7 +216,6 @@
         <module>jersey-server</module>
         <module>jersey-test-framework</module>
         <module>jersey-tests</module>
-        <module>ri</module>
         <module>samples</module>
         <module>tests</module>
     </modules>

@@ -404,8 +404,7 @@
                                 <spi>com.sun.jersey.spi.container.ContainerProvider</spi>
                                 <spi>com.sun.jersey.spi.container.ContainerRequestFilter</spi>
                                 <spi>com.sun.jersey.spi.container.ContainerResponseFilter</spi>
-                                <spi>com.sun.jersey.server.impl.model.method.dispatch.ResourceMethodDispatchProvider
-                                </spi>
+                                <spi>com.sun.jersey.server.impl.model.method.dispatch.ResourceMethodDispatchProvider</spi>
                                 <spi>com.sun.jersey.spi.container.WebApplicationProvider</spi>
                                 <spi>com.sun.jersey.spi.HeaderDelegateProvider</spi>
                                 <spi>com.sun.jersey.spi.inject.InjectableProvider</spi>
