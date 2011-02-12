@@ -45,11 +45,15 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.sun.jersey.samples</groupId>
+        <artifactId>osgi-http-service</artifactId>
+        <version>1.6-SNAPSHOT</version>
+    </parent>
+
     <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
     <artifactId>functional-test</artifactId>
-    <version>1.6-SNAPSHOT</version>
     <packaging>jar</packaging>
-
     <name>OSGi HttpService - Jersey Sample Test</name>
 
     <!-- we can use full maven properties incl. inheritance ! -->
@@ -62,6 +66,11 @@
     <profiles>
         <profile>
             <id>cobertura</id>
+            <activation>
+                <property>
+                    <name>cobertura</name>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>

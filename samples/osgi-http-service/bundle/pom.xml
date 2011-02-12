@@ -43,11 +43,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sun.jersey.samples</groupId>
+        <artifactId>osgi-http-service</artifactId>
+        <version>1.6-SNAPSHOT</version>
+    </parent>
 
     <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
     <artifactId>bundle</artifactId>
-    <version>1.6-SNAPSHOT</version>
-
     <name>OSGi HttpService - Jersey Sample Bundle</name>
 
     <packaging>bundle</packaging>
@@ -55,6 +58,11 @@
     <profiles>
         <profile>
             <id>cobertura</id>
+            <activation>
+                <property>
+                    <name>cobertura</name>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>

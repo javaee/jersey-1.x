@@ -13,7 +13,15 @@
  */
 package com.restfully.shop.domain;
 
-public class Customer {
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
+
+@XmlRootElement(name = "customer")
+@XmlType(propOrder = {"firstName", "lastName", "street", "city", "state", "zip", "country"})
+public class Customer
+{
    private int id;
    private String firstName;
    private String lastName;
@@ -23,67 +31,106 @@ public class Customer {
    private String zip;
    private String country;
 
-   public int getId() {
+   @XmlAttribute
+   public int getId()
+   {
       return id;
    }
 
-   public void setId(int id) {
+   public void setId(int id)
+   {
       this.id = id;
    }
 
-   public String getFirstName() {
+   @XmlElement(name = "first-name")
+   public String getFirstName()
+   {
       return firstName;
    }
 
-   public void setFirstName(String firstName) {
+   public void setFirstName(String firstName)
+   {
       this.firstName = firstName;
    }
 
-   public String getLastName() {
+   @XmlElement(name = "last-name")
+   public String getLastName()
+   {
       return lastName;
    }
 
-   public void setLastName(String lastName) {
+   public void setLastName(String lastName)
+   {
       this.lastName = lastName;
    }
 
-   public String getStreet() {
+   @XmlElement
+   public String getStreet()
+   {
       return street;
    }
 
-   public void setStreet(String street) {
+   public void setStreet(String street)
+   {
       this.street = street;
    }
 
-   public String getCity() {
+   @XmlElement
+   public String getCity()
+   {
       return city;
    }
 
-   public void setCity(String city) {
+   public void setCity(String city)
+   {
       this.city = city;
    }
 
-   public String getState() {
+   @XmlElement
+   public String getState()
+   {
       return state;
    }
 
-   public void setState(String state) {
+   public void setState(String state)
+   {
       this.state = state;
    }
 
-   public String getZip() {
+   @XmlElement
+   public String getZip()
+   {
       return zip;
    }
 
-   public void setZip(String zip) {
+   public void setZip(String zip)
+   {
       this.zip = zip;
    }
 
-   public String getCountry() {
+   @XmlElement
+   public String getCountry()
+   {
       return country;
    }
 
-   public void setCountry(String country) {
+   public void setCountry(String country)
+   {
       this.country = country;
+   }
+
+   @Override
+   public String toString()
+   {
+      return "Customer{" +
+              "id=" + id +
+              ", firstName='" + firstName + '\'' +
+              ", lastName='" + lastName + '\'' +
+              ", street='" + street + '\'' +
+              ", city='" + city + '\'' +
+              ", state='" + state + '\'' +
+              ", zip='" + zip + '\'' +
+              ", country='" + country + '\'' +
+              '}';
    }
 }

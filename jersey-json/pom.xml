@@ -73,6 +73,11 @@
         </profile>
         <profile>
             <id>cobertura</id>
+            <activation>
+                <property>
+                    <name>cobertura</name>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
@@ -98,11 +103,6 @@
     </profiles>
 
     <dependencies>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>

@@ -39,7 +39,7 @@
  */
 /**
  * Provides support for configuration of a 
- * {@link com.sun.jersey.client.apache.ApacheHttpClient}.
+ * {@link com.sun.jersey.client.apache.ApacheHttpClient4}.
  * <p>
  */
 package com.sun.jersey.client.apache.config;

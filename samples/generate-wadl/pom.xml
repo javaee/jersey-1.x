@@ -56,6 +56,11 @@
     <profiles>
         <profile>
             <id>cobertura</id>
+            <activation>
+                <property>
+                    <name>cobertura</name>
+                </property>
+            </activation>
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey.contribs</groupId>
