@@ -97,6 +97,14 @@
     <profiles>
         <profile>
             <id>cobertura</id>
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.cobertura</groupId>
+                    <artifactId>cobertura</artifactId>
+                    <optional>true</optional>
+                    <version>1.9.4.1</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>

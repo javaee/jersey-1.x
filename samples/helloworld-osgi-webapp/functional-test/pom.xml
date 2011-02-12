@@ -78,14 +78,6 @@
                     <version>${project.version}</version>
                     <classifier>cobertura</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
-                    <artifactId>war-bundle</artifactId>
-                    <type>war</type>
-                    <scope>test</scope>
-                    <version>${project.version}</version>
-                    <classifier>cobertura</classifier>
-                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -106,18 +98,18 @@
                     <scope>test</scope>
                     <version>${project.version}</version>
                 </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
-                    <artifactId>war-bundle</artifactId>
-                    <type>war</type>
-                    <scope>test</scope>
-                    <version>${project.version}</version>
-                </dependency>
             </dependencies>
         </profile>
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
+            <artifactId>war-bundle</artifactId>
+            <type>war</type>
+            <scope>test</scope>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam</artifactId>

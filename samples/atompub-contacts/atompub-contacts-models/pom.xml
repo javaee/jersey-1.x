@@ -45,10 +45,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.sun.jersey.samples</groupId>
+        <artifactId>atompub-contacts</artifactId>
+        <version>1.6-SNAPSHOT</version>
+    </parent>
+
     <groupId>com.sun.jersey.samples.atompub-contacts</groupId>
     <artifactId>atompub-contacts-models</artifactId>
-    <version>1.6-SNAPSHOT</version>
-
     <packaging>jar</packaging>
 
     <name>AtomPub Contacts Models - jersey sample</name>

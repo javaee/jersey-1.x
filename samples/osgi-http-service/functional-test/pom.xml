@@ -77,13 +77,6 @@
                     <version>${project.version}</version>
                     <classifier>cobertura</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
-                    <artifactId>bundle</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                    <classifier>cobertura</classifier>
-                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -104,17 +97,17 @@
                     <scope>test</scope>
                     <version>${project.version}</version>
                 </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
-                    <artifactId>bundle</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                </dependency>
             </dependencies>
         </profile>
     </profiles>
 
     <dependencies>
+        <dependency>
+            <groupId>com.sun.jersey.samples.osgi-http-service</groupId>
+            <artifactId>bundle</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam</artifactId>
