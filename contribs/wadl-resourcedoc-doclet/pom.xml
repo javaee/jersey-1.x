@@ -76,6 +76,11 @@
                     <scope>system</scope>
                     <systemPath>${java.home}/../lib/tools.jar</systemPath>
                 </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
             </dependencies>
         </profile>
         <profile>
