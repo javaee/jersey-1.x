@@ -44,7 +44,7 @@
  * The client API with the Apache HTTP client can be used as follows to make
  * simple GET and POST requests to a Web resource:
  * <blockquote><pre>
- *     Client c = ApacheHttpClient4.create();
+ *     Client c = ApacheHttpClient.create();
  *     WebResource r = c.resource("http://host/base");
  *     String s = r.get(String.class);
  *     s = r.post(String.class, s);
@@ -53,9 +53,9 @@
  * To support basic authentication with the user name "foo" and the password
  * "bar" the following configuration may be utilized:
  * <blockquote><pre>
- *     DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+ *     DefaultApacheHttpClientConfig config = new DefaultApacheHttpClientConfig();
  *     config.getState().setCredentials(null, null, -1, "foo", "bar");
- *     ApacheHttpClient4 c = ApacheHttpClient4.create(config);
+ *     ApacheHttpClient c = ApacheHttpClient.create(config);
  *     WebResource r = c.resource("http://host/base");
  *     String s = r.get(String.class);
  *     s = r.post(String.class, s);

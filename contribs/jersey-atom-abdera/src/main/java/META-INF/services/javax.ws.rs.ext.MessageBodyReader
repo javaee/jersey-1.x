@@ -1,12 +1,4 @@
-com.sun.jersey.json.impl.provider.entity.JSONRootElementProvider$App
-com.sun.jersey.json.impl.provider.entity.JSONRootElementProvider$General
-com.sun.jersey.json.impl.provider.entity.JSONJAXBElementProvider$App
-com.sun.jersey.json.impl.provider.entity.JSONJAXBElementProvider$General
-com.sun.jersey.json.impl.provider.entity.JSONListElementProvider$App
-com.sun.jersey.json.impl.provider.entity.JSONListElementProvider$General
-com.sun.jersey.json.impl.provider.entity.JSONArrayProvider$App
-com.sun.jersey.json.impl.provider.entity.JSONArrayProvider$General
-com.sun.jersey.json.impl.provider.entity.JSONObjectProvider$App
-com.sun.jersey.json.impl.provider.entity.JSONObjectProvider$General
-com.sun.jersey.json.impl.provider.entity.JacksonProviderProxy
-
+com.sun.jersey.atom.abdera.impl.provider.entity.CategoriesProvider
+com.sun.jersey.atom.abdera.impl.provider.entity.EntryProvider
+com.sun.jersey.atom.abdera.impl.provider.entity.FeedProvider
+com.sun.jersey.atom.abdera.impl.provider.entity.ServiceProvider

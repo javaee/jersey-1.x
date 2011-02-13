@@ -10,8 +10,16 @@ import javax.ws.rs.core.UriBuilder;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.samples.hypermedia.client.controller.CustomerController;
+import com.sun.jersey.samples.hypermedia.client.controller.OrderController;
 import com.sun.jersey.samples.hypermedia.client.model.Address;
+import com.sun.jersey.samples.hypermedia.client.model.Order;
 
+/**
+ * Main class.
+ *
+ * @author Santiago.PericasGeertsen@sun.com
+ */
 public class Main {
 
     public static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(9998).build();
@@ -23,7 +31,7 @@ public class Main {
                 "com.sun.jersey.samples.hypermedia.server.controller");
         initParams.put("com.sun.jersey.config.feature.Formatted", "true");
 
-        // Register HypermediaFilterFactory
+        // Register HypermediaFilterFactory 
         initParams.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES,
                 "com.sun.jersey.server.hypermedia.filter.HypermediaFilterFactory");
 
@@ -41,30 +49,42 @@ public class Main {
             Client client = new Client();
             client.addFilter(new LoggingFilter());
 
-            // Create order view
-            OrderView orderView = client.view("http://localhost:9998/orders/1",
-                    OrderView.class);
+            // Create proxy for order 1
+            OrderController orderCtrl = client.view(
+                    "http://localhost:9998/orders/1",
+                    OrderController.class);
 
             // Approve order
-            orderView = orderView.review("approve");
+            orderCtrl.review("approve");
+
+            // Refresh order
+            orderCtrl.refresh();
+
+            // Create proxy for customer in order 1
+            CustomerController customerCtrl = client.view(
+                    orderCtrl.getModel().getCustomer(),
+                    CustomerController.class);
 
             // Activate customer in order 1 (which was suspended)
-            CustomerView customerView = orderView.getCustomer();
-            if (!customerView.isActive()) {
-                customerView.activate();
-            }
+            customerCtrl.activate();
 
             // Pay order
-            orderView = orderView.pay("123456789");
+            orderCtrl.pay("123456789");
 
             // Ship order (returns new order)
             Address newAddress = new Address();
             newAddress.setCity("Springfield");
             newAddress.setStreet("Main");
-            orderView.ship(newAddress);
+            orderCtrl.ship(newAddress);
         }
         finally {
             threadSelector.stopEndpoint();
         }
+    }
+
+    private static void printOrder(Order order) {
+        System.out.flush();
+        System.out.println("### Order id: " + order.getId());
+        System.out.println("### Order status: " + order.getStatus().name());
     }
 }
