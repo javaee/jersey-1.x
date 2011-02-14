@@ -124,6 +124,13 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <instrumentation>
+                                <excludes>
+                                    <exclude>**/*.class</exclude>
+                                </excludes>
+                            </instrumentation>
+                        </configuration>
                     </plugin>
 
                     <plugin>
