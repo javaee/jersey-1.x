@@ -44,7 +44,7 @@ package com.sun.jersey.spring.tests.util;
  *
  * @author japod
  */
-public class TestHelper {
+public class JerseyTestHelper {
     
     public static int getEnvVariable(final String varName, int defaultValue) {
         if (null == varName) {

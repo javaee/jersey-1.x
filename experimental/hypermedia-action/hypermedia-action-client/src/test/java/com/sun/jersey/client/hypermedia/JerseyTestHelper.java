@@ -38,13 +38,13 @@
  * holder.
  */
 
-package com.sun.jersey.impl.test.util;
+package com.sun.jersey.client.hypermedia;
 
 /**
  *
  * @author japod
  */
-public class TestHelper {
+public class JerseyTestHelper {
     
     public static int getEnvVariable(final String varName, int defaultValue) {
         if (null == varName) {

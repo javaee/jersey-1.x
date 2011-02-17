@@ -45,7 +45,7 @@ import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 
 import com.sun.grizzly.http.embed.GrizzlyWebServer;
 import com.sun.grizzly.http.servlet.ServletAdapter;
-import com.sun.jersey.spring.tests.util.TestHelper;
+import com.sun.jersey.spring.tests.util.JerseyTestHelper;
 import java.net.URI;
 import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
@@ -68,7 +68,7 @@ public class AbstractTest {
      * @return the base URI.
      */
     private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/spring").port(TestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9998)).build();
+        return UriBuilder.fromUri("http://localhost/spring").port(JerseyTestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9998)).build();
     }
 
     /**

@@ -43,7 +43,7 @@ package com.sun.jersey.impl.container.grizzly.web;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
-import com.sun.jersey.impl.test.util.TestHelper;
+import com.sun.jersey.impl.test.util.JerseyTestHelper;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.io.IOException;
 import java.net.URI;
@@ -62,7 +62,7 @@ public abstract class AbstractGrizzlyWebContainerTester extends TestCase {
 
     private SelectorThread selectorThread;
 
-    private int port = TestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
+    private int port = JerseyTestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
     
     private String contextPath;
 
@@ -136,7 +136,7 @@ public abstract class AbstractGrizzlyWebContainerTester extends TestCase {
         }
         System.out.println("Started GrizzlyServer");
 
-        int timeToSleep = TestHelper.getEnvVariable("JERSEY_HTTP_SLEEP", 0);
+        int timeToSleep = JerseyTestHelper.getEnvVariable("JERSEY_HTTP_SLEEP", 0);
         if (timeToSleep > 0) {
             System.out.println("Sleeping for " + timeToSleep + " ms");
             try {

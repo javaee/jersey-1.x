@@ -120,7 +120,7 @@ public class ResourceDoclet {
         final String output = getOptionArg( root.options(), OPTION_OUTPUT );
         
         final String classpath = getOptionArg( root.options(), OPTION_CLASSPATH );
-        // LOG.info( "Have classpatch: " + classpath );
+        // LOG.info( "Have classpath: " + classpath );
         final String[] classpathElements = classpath.split( ":" );
         
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();

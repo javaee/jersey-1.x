@@ -41,6 +41,7 @@ package com.sun.jersey.spring;
 
 
 
+import com.sun.jersey.spring.tests.util.JerseyTestHelper;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
@@ -51,7 +52,7 @@ import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 
 import com.sun.grizzly.http.embed.GrizzlyWebServer;
 import com.sun.grizzly.http.servlet.ServletAdapter;
-import com.sun.jersey.spring.tests.util.TestHelper;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -83,7 +84,7 @@ public class AbstractResourceTest {
 
     public AbstractResourceTest(boolean springManaged) {
         _springConfig = System.getProperty( "applicationContext", APPLICATION_CONTEXT_SPRING25_XML );
-        _port = TestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9998);
+        _port = JerseyTestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9998);
         _servletPath = "/jersey-spring";
         this.springManaged = springManaged;
     }
