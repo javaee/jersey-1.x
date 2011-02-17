@@ -49,7 +49,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 
 /**
- * Extentions to {@link UriInfo}. 
+ * Extensions to {@link UriInfo}.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
