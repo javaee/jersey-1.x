@@ -55,7 +55,7 @@ import junit.framework.TestCase;
  */
 public class InheritanceTest extends TestCase {
 
-    final AnimalList one = TestHelper.createTestInstance(AnimalList.class);
+    final AnimalList one = JSONTestHelper.createTestInstance(AnimalList.class);
 
     public void testBadgerfish() throws Exception {
         System.out.println("\nTesting BadgerFish: ------------------------");

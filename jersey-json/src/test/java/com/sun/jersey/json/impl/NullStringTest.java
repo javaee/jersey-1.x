@@ -55,7 +55,7 @@ import junit.framework.TestCase;
  */
 public class NullStringTest extends TestCase {
 
-    final NullStringBean one = TestHelper.createTestInstance(NullStringBean.class);
+    final NullStringBean one = JSONTestHelper.createTestInstance(NullStringBean.class);
 
     @Override
     protected void setUp() throws Exception {

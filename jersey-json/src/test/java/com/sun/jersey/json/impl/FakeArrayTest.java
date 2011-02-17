@@ -60,7 +60,7 @@ public class FakeArrayTest extends TestCase {
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final StringWriter sw = new StringWriter();
 
-        final FakeArrayBean one = TestHelper.createTestInstance(FakeArrayBean.class);
+        final FakeArrayBean one = JSONTestHelper.createTestInstance(FakeArrayBean.class);
 
         jm.marshallToJSON(one, sw);
         String jsonResult = sw.toString();

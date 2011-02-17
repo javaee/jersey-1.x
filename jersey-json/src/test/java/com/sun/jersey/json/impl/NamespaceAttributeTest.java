@@ -55,7 +55,7 @@ import junit.framework.TestCase;
  */
 public class NamespaceAttributeTest extends TestCase {
 
-    final NamespaceBeanWithAttribute one = TestHelper.createTestInstance(NamespaceBeanWithAttribute.class);
+    final NamespaceBeanWithAttribute one = JSONTestHelper.createTestInstance(NamespaceBeanWithAttribute.class);
 
     public void _disabledFailing_testBadgerfish() throws Exception {
         tryConfiguration(JSONConfiguration.badgerFish().build());

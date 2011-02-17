@@ -61,7 +61,7 @@ public class RegisterMessageTest extends TestCase {
         final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
         final StringWriter sw = new StringWriter();
 
-        final RegisterMessage one = TestHelper.createTestInstance(RegisterMessage.class);
+        final RegisterMessage one = JSONTestHelper.createTestInstance(RegisterMessage.class);
         RegisterMessage two;
         jm.marshallToJSON(one, sw);
 

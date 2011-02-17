@@ -118,12 +118,12 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     }
     
     public void testSimpleBeanWithAttributes() throws Exception {
-        SimpleBeanWithAttributes bean = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        SimpleBeanWithAttributes bean = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
     }
 
     public void testSimpleBeanWithAttributesAsElems() throws Exception {
-        SimpleBeanWithAttributes bean = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        SimpleBeanWithAttributes bean = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         Collection<String> attrAsElems = new LinkedList<String>();
         addStringsToCollection("i", attrAsElems);
         addStringsToCollection("j", attrAsElems);
@@ -132,12 +132,12 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     }
 
     public void testSimpleBeanWithJustOneAttribute() throws Exception {
-        SimpleBeanWithJustOneAttribute bean = TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
+        SimpleBeanWithJustOneAttribute bean = JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
         tryBean(bean, "simpleBeanWithJustOneAttribute.json", true, null, null);
     }
 
     public void testSimpleBeanWithJustOneAttributeAsElem() throws Exception {
-        SimpleBeanWithJustOneAttribute bean = TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
+        SimpleBeanWithJustOneAttribute bean = JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
         Collection<String> attrAsElems = new LinkedList<String>();
         addStringsToCollection("uri", attrAsElems);
         //tryWritingBean(bean, "simpleBeanWithJustOneAttributeAsElem.json", true, null, null, attrAsElems);
@@ -145,12 +145,12 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     }
 
     public void testSimpleBeanWithJustOneAttributeAndValue() throws Exception {
-        SimpleBeanWithJustOneAttributeAndValue bean = TestHelper.createTestInstance(SimpleBeanWithJustOneAttributeAndValue.class);
+        SimpleBeanWithJustOneAttributeAndValue bean = JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttributeAndValue.class);
         tryBean(bean, "simpleBeanWithJustOneAttributeAndValue.json", true, null, null);
     }
 
     public void testSimpleBeanWithJustOneAttributeAsElemAndValue() throws Exception {
-        SimpleBeanWithJustOneAttributeAndValue bean = TestHelper.createTestInstance(SimpleBeanWithJustOneAttributeAndValue.class);
+        SimpleBeanWithJustOneAttributeAndValue bean = JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttributeAndValue.class);
         Collection<String> attrAsElems = new LinkedList<String>();
         addStringsToCollection("uri", attrAsElems);
         //tryWritingBean(bean, "simpleBeanWithJustOneAttributeAsElemAndValue.json", true, null, null, attrAsElems);
@@ -158,37 +158,37 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     }
 
     public void testComplexBeanWithAttributes() throws Exception {
-        ComplexBeanWithAttributes bean = TestHelper.createTestInstance(ComplexBeanWithAttributes.class);
+        ComplexBeanWithAttributes bean = JSONTestHelper.createTestInstance(ComplexBeanWithAttributes.class);
         tryBean(bean, "complexBeanWithAttributes.json", true, null, null);
     }
 
     public void testEmptyListWrapper() throws Exception {
-        ListWrapperBean bean = TestHelper.createTestInstance(ListWrapperBean.class);
+        ListWrapperBean bean = JSONTestHelper.createTestInstance(ListWrapperBean.class);
         tryBean(bean, "emptyListWrapper.json", false, null, null);
     }
     
     public void testTwoListsWrapper() throws Exception {
-        TwoListsWrapperBean bean = TestHelper.createTestInstance(TwoListsWrapperBean.class);
+        TwoListsWrapperBean bean = JSONTestHelper.createTestInstance(TwoListsWrapperBean.class);
         tryBean(bean, "twoListsWrapper.json", false, "property1, property2", null);
     }
 
     public void testListAndNonList() throws Exception {
-        ListAndNonListBean bean = TestHelper.createTestInstance(ListAndNonListBean.class);
+        ListAndNonListBean bean = JSONTestHelper.createTestInstance(ListAndNonListBean.class);
         tryBean(bean, "listAndNonList.json", true, "a", null);
     }
     
     public void testPureCharDataValue() throws Exception {
-        PureCharDataBean bean = TestHelper.createTestInstance(PureCharDataBean.class);
+        PureCharDataBean bean = JSONTestHelper.createTestInstance(PureCharDataBean.class);
         tryBean(bean, "pureCharDataValue.json", true, null, null);
     }
 
     public void testAttrAndCharDataValue() throws Exception {
-        AttrAndCharDataBean bean = TestHelper.createTestInstance(AttrAndCharDataBean.class);
+        AttrAndCharDataBean bean = JSONTestHelper.createTestInstance(AttrAndCharDataBean.class);
         tryBean(bean, "attrAndCharDataValue.json", true, null, null);
     }
     
     public void testAttrAndXmlVal() throws Exception {
-        SimpleBeanWithAttributes bean = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        SimpleBeanWithAttributes bean = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
     }
 
@@ -236,7 +236,7 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
 
     public void tryWritingBean(Object jaxbBean, String expectedJsonExprFilename, 
             JSONConfiguration config) throws Exception {
-        String expectedJsonExpr = TestHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
+        String expectedJsonExpr = JSONTestHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter resultWriter = new StringWriter();
         marshaller.marshal(jaxbBean, JsonXmlStreamWriter.createWriter(resultWriter, config));
@@ -249,7 +249,7 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         JAXBElement jaxbElement = unmarshaller.unmarshal(
                 new JsonXmlStreamReader(
-                    new StringReader(TestHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), config),
+                    new StringReader(JSONTestHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), config),
                 expectedJaxbBean.getClass());
         System.out.println("unmarshalled: " + jaxbElement.getValue().toString());
         assertEquals("MISMATCH:\n" + expectedJaxbBean + "\n" + jaxbElement.getValue() + "\n", 

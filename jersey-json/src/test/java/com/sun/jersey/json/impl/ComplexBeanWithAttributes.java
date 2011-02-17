@@ -67,10 +67,10 @@ public class ComplexBeanWithAttributes {
         instance.a2 = 31415926;
         instance.filler1 = "111";
         instance.filler2 = "222";
-        instance.b = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        instance.b = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         instance.list = new LinkedList<SimpleBeanWithAttributes>();
-        instance.list.add(TestHelper.createTestInstance(SimpleBeanWithAttributes.class));
-        instance.list.add(TestHelper.createTestInstance(SimpleBeanWithAttributes.class));
+        instance.list.add(JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class));
+        instance.list.add(JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class));
         return instance;
     }
     

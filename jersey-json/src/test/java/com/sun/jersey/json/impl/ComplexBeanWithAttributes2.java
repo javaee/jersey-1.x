@@ -40,7 +40,6 @@
 
 package com.sun.jersey.json.impl;
 
-import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -67,10 +66,10 @@ public class ComplexBeanWithAttributes2 {
         instance.a2 = 31415926;
         instance.filler1 = "111";
         instance.filler2 = "222";
-        instance.b = TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
+        instance.b = JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
         instance.list = new LinkedList<SimpleBeanWithJustOneAttribute>();
-        instance.list.add(TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class));
-        instance.list.add(TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class));
+        instance.list.add(JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class));
+        instance.list.add(JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class));
         return instance;
     }
     

@@ -47,7 +47,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.JAXBElement;
+
 import junit.framework.TestCase;
 
 /**
@@ -57,7 +57,7 @@ import junit.framework.TestCase;
 public class NamespaceElementTest extends TestCase {
 
     final boolean jsonEnabled = true;
-    final NamespaceBean one = TestHelper.createTestInstance(NamespaceBean.class);
+    final NamespaceBean one = JSONTestHelper.createTestInstance(NamespaceBean.class);
 
     public void _disabledFailingtestBadgerfish() throws Exception {
         tryConfiguration(JSONConfiguration.badgerFish().build());

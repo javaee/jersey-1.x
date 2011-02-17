@@ -54,8 +54,8 @@ public class ComplexBeanWithAttributes3 {
 
     public static Object createTestInstance() {
         ComplexBeanWithAttributes3 instance = new ComplexBeanWithAttributes3();
-        instance.b = TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
-        instance.c = TestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
+        instance.b = JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
+        instance.c = JSONTestHelper.createTestInstance(SimpleBeanWithJustOneAttribute.class);
         return instance;
     }
     

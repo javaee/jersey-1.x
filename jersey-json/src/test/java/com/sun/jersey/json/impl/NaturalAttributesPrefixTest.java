@@ -60,7 +60,7 @@ public class NaturalAttributesPrefixTest extends TestCase {
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final StringWriter sw = new StringWriter();
 
-        final SimpleBeanWithAttributes one = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        final SimpleBeanWithAttributes one = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         jm.marshallToJSON(one, sw);
         System.out.println(sw.toString());
 
@@ -73,7 +73,7 @@ public class NaturalAttributesPrefixTest extends TestCase {
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final StringWriter sw = new StringWriter();
 
-        final SimpleBeanWithAttributes one=TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        final SimpleBeanWithAttributes one= JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         jm.marshallToJSON(one, sw);
         System.out.println(sw.toString());
 
@@ -87,7 +87,7 @@ public class NaturalAttributesPrefixTest extends TestCase {
         final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
         final StringWriter sw = new StringWriter();
 
-        final SimpleBeanWithAttributes one = TestHelper.createTestInstance(SimpleBeanWithAttributes.class);
+        final SimpleBeanWithAttributes one = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         jm.marshallToJSON(one, sw);
         System.out.println(sw.toString());
         

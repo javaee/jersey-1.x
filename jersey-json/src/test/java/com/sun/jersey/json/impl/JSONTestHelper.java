@@ -48,7 +48,7 @@ import java.lang.reflect.Method;
  *
  * @author japod
  */
-public class TestHelper {
+public class JSONTestHelper {
 
     public static String getResourceAsString(String prefix, String resource) throws IOException {
         Reader reader = new InputStreamReader(
