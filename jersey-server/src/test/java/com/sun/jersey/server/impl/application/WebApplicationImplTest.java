@@ -38,9 +38,8 @@
  * holder.
  */
 
-package com.sun.jersey.server.application;
+package com.sun.jersey.server.impl.application;
 
-import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import org.junit.*;
 import static org.junit.Assert.*;
 import com.sun.jersey.spi.container.WebApplication;
