@@ -88,7 +88,7 @@
             </dependencies>
         </profile>
         <profile>
-            <id>coberture</id>
+            <id>cobertura</id>
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
