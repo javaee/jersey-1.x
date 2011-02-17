@@ -80,6 +80,11 @@
             </extension>
         </extensions>
     </build>
+
+    <properties>
+        <junit.version>4.8.2</junit.version>
+    </properties>
+
     <distributionManagement>
         <repository>
             <uniqueVersion>false</uniqueVersion>
