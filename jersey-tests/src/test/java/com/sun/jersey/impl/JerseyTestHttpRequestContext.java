@@ -37,40 +37,28 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl.template;
 
-import com.sun.jersey.api.view.Viewable;
-import com.sun.jersey.spi.template.ViewProcessor;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.net.URL;
-import javax.ws.rs.ext.Provider;
+package com.sun.jersey.impl;
+
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.core.header.InBoundHeaders;
+import com.sun.jersey.spi.container.WebApplication;
+import java.io.InputStream;
+import java.net.URI;
 
 /**
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-@Provider
-public class TestViewProcessor implements ViewProcessor<String> {
-
-    public String resolve(String path) {
-        if (!path.endsWith(".testp"))
-            path = path + ".testp";
+public class JerseyTestHttpRequestContext extends ContainerRequest {
+    
+    public JerseyTestHttpRequestContext(
+            WebApplication wa,
+            String method,
+            InputStream entity,
+            String completeUri,
+            String baseUri)  {
         
-        URL u = this.getClass().getResource(path);
-        if (u == null) return null;
-        return path;
+        super(wa, method, URI.create(baseUri), URI.create(completeUri), new InBoundHeaders(), entity);
     }
-
-    public void writeTo(String resolvedPath, Viewable viewable, OutputStream out) throws IOException {
-        PrintStream ps = new PrintStream(out);
-        ps.print("path=");
-        ps.print(resolvedPath);
-        ps.println();
-        ps.print("model=");
-        ps.print(viewable.getModel().toString());
-        ps.println();
-    }
-
 }

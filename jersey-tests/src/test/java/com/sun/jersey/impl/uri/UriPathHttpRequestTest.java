@@ -59,7 +59,7 @@ public class UriPathHttpRequestTest extends TestCase {
     
     public void testGeneral() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10", "/context/");
         UriInfo ui = new WebApplicationContext(wai, r, null);
@@ -70,7 +70,7 @@ public class UriPathHttpRequestTest extends TestCase {
     
     public void testEncoded() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets%20/%2010", "/context/");
         UriInfo ui = new WebApplicationContext(wai, r, null);

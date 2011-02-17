@@ -58,7 +58,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testGeneral() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?verbose=true&item=1&item=2", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -73,7 +73,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testEmpty() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -83,7 +83,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testSingleAmpersand() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?&", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -93,7 +93,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testMultipleAmpersand() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?&&%20=%20&&&", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -103,7 +103,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testInterspersedAmpersand() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?a=1&&b=2", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -113,7 +113,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testEmptyValues() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?one&two&three", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -125,7 +125,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testMultipleEmptyValues() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?one&one&one", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -138,7 +138,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testWhiteSpace() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x+=+1%20&%20y+=+2", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -149,7 +149,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
     
     public void testDecoded() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x+=+1%20&%20y+=+2", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).
@@ -157,7 +157,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
         assertEquals(" 1 ", p.getFirst("x "));
         assertEquals(" 2", p.getFirst(" y "));
         
-        r = new TestHttpRequestContext(wai,
+        r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x=1&y=1+%2B+2", "/context");
         p = new WebApplicationContext(wai, r, null)
@@ -165,7 +165,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
         assertEquals("1", p.getFirst("x"));
         assertEquals("1 + 2", p.getFirst("y"));
         
-        r = new TestHttpRequestContext(wai,
+        r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x=1&y=1+%26+2", "/context");
         p = new WebApplicationContext(wai, r, null)
@@ -173,7 +173,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
         assertEquals("1", p.getFirst("x"));
         assertEquals("1 & 2", p.getFirst("y"));
         
-        r = new TestHttpRequestContext(wai,
+        r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x=1&y=1+%7C%7C+2", "/context");
         p = new WebApplicationContext(wai, r, null)
@@ -184,7 +184,7 @@ public class QueryParametersHttpRequestTest extends TestCase {
         
     public void testEncoded() throws Exception {
         WebApplicationImpl wai = new WebApplicationImpl();
-        ContainerRequest r = new TestHttpRequestContext(wai,
+        ContainerRequest r = new JerseyTestHttpRequestContext(wai,
                 "GET", null,
                 "/context/widgets/10?x+=+1%20&%20y+=+2", "/context");
         MultivaluedMap<String, String> p = new WebApplicationContext(wai, r, null).

@@ -103,7 +103,7 @@ public class ExceptionViewProcessorTest extends AbstractResourceTester {
 
     public void testAbsoluteExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestViewProcessor.class, WebAppAbsoluteExceptionMapper.class);
+                JerseyTestViewProcessor.class, WebAppAbsoluteExceptionMapper.class);
         initiateWebApplication(rc);
         WebResource r = resource("/doesnotexist", false);
 
@@ -118,7 +118,7 @@ public class ExceptionViewProcessorTest extends AbstractResourceTester {
 
     public void testResolvingClassExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestViewProcessor.class, WebAppResolvingClassExceptionMapper.class);
+                JerseyTestViewProcessor.class, WebAppResolvingClassExceptionMapper.class);
         initiateWebApplication(rc);
         WebResource r = resource("/doesnotexist", false);
 

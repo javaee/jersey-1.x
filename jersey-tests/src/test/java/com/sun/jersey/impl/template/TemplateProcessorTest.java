@@ -86,7 +86,7 @@ public class TemplateProcessorTest extends AbstractResourceTester {
 
     public void testExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestTemplateProcessor.class);
+                JerseyTestTemplateProcessor.class);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
@@ -103,7 +103,7 @@ public class TemplateProcessorTest extends AbstractResourceTester {
 
     public void testExplicitAbsoluteTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestTemplateProcessor.class);
+                JerseyTestTemplateProcessor.class);
         initiateWebApplication(rc);
         WebResource r = resource("/absolute");
 
@@ -127,7 +127,7 @@ public class TemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitTemplate.class,
-                TestTemplateProcessor.class);
+                JerseyTestTemplateProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
@@ -155,7 +155,7 @@ public class TemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitExplicitTemplate.class,
-                TestTemplateProcessor.class);
+                JerseyTestTemplateProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
@@ -187,7 +187,7 @@ public class TemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitWithGetTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitWithGetTemplate.class,
-                TestTemplateProcessor.class);
+                JerseyTestTemplateProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
@@ -212,7 +212,7 @@ public class TemplateProcessorTest extends AbstractResourceTester {
 
     public void testImplicitWithSubResourceGetTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitWithSubResourceGetTemplate.class,
-                TestTemplateProcessor.class);
+                JerseyTestTemplateProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/sub");

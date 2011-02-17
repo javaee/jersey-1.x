@@ -73,7 +73,7 @@ public class ResolvingClassViewProcessorTest extends AbstractResourceTester {
 
     public void testExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 

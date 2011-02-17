@@ -150,7 +150,7 @@ public class ImplicitViewWithResourceFilterTest extends AbstractResourceTester {
 
     public void testImplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         FilterOne f1 = new FilterOne();
         FilterTwo f2 = new FilterTwo();

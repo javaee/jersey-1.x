@@ -63,12 +63,12 @@ import javax.ws.rs.core.MultivaluedMap;
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class TestResourceClientHandler extends TerminatingClientHandler {
+public class JerseyTestResourceClientHandler extends TerminatingClientHandler {
     private final WebApplication w;
     
     private final URI baseUri;
     
-    public TestResourceClientHandler(URI baseUri, WebApplication w) {
+    public JerseyTestResourceClientHandler(URI baseUri, WebApplication w) {
         this.baseUri = baseUri;
         this.w = w;
     }

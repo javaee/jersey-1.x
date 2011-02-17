@@ -83,7 +83,7 @@ public class FlatInheritedViewProcessorTest extends AbstractResourceTester {
 
     public void testExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
@@ -116,7 +116,7 @@ public class FlatInheritedViewProcessorTest extends AbstractResourceTester {
 
     public void testImplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");

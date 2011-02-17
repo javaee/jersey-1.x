@@ -39,7 +39,8 @@
  */
 package com.sun.jersey.impl.template;
 
-import com.sun.jersey.spi.template.TemplateProcessor;
+import com.sun.jersey.api.view.Viewable;
+import com.sun.jersey.spi.template.ViewProcessor;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -51,7 +52,7 @@ import javax.ws.rs.ext.Provider;
  * @author Paul.Sandoz@Sun.Com
  */
 @Provider
-public class TestTemplateProcessor implements TemplateProcessor {
+public class JerseyTestViewProcessor implements ViewProcessor<String> {
 
     public String resolve(String path) {
         if (!path.endsWith(".testp"))
@@ -62,13 +63,13 @@ public class TestTemplateProcessor implements TemplateProcessor {
         return path;
     }
 
-    public void writeTo(String resolvedPath, Object model, OutputStream out) throws IOException {
+    public void writeTo(String resolvedPath, Viewable viewable, OutputStream out) throws IOException {
         PrintStream ps = new PrintStream(out);
         ps.print("path=");
         ps.print(resolvedPath);
         ps.println();
         ps.print("model=");
-        ps.print(model.toString());
+        ps.print(viewable.getModel().toString());
         ps.println();
     }
 

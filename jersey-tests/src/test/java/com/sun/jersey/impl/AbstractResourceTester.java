@@ -133,8 +133,8 @@ public abstract class AbstractResourceTester extends TestCase implements Contain
     protected WebResource resource(String relativeUri, boolean checkStatus, 
             ClientConfig clientConfig) {
         Client c = (clientConfig == null) 
-            ? new Client(new TestResourceClientHandler(BASE_URI, w))
-            : new Client(new TestResourceClientHandler(BASE_URI, w), clientConfig);
+            ? new Client(new JerseyTestResourceClientHandler(BASE_URI, w))
+            : new Client(new JerseyTestResourceClientHandler(BASE_URI, w), clientConfig);
 
         if (checkStatus) {
             c.addFilter(new ClientFilter() {

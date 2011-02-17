@@ -76,7 +76,7 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
     public void testExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ExplicitTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         initiateWebApplication(rc);
         WebResource r = resource("/");
 
@@ -100,7 +100,7 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
     public void testImplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
@@ -128,7 +128,7 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
     public void testImplicitExplicitTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitExplicitTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
@@ -160,7 +160,7 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
     public void testImplicitWithGetTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitWithGetTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/");
@@ -185,7 +185,7 @@ public class FlatViewProcessorTest extends AbstractResourceTester {
 
     public void testImplicitWithSubResourceGetTemplate() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig(ImplicitWithSubResourceGetTemplate.class,
-                TestViewProcessor.class);
+                JerseyTestViewProcessor.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
         initiateWebApplication(rc);
         WebResource r = resource("/sub");
