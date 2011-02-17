@@ -50,7 +50,7 @@ import org.apache.abdera.model.Workspace;
 /**
  * <p>Shared helper classes for the unit test suite.</p>
  */
-public class TestingFactory {
+public class AtomTestingFactory {
 
 
     private static Abdera abdera = Abdera.getInstance();

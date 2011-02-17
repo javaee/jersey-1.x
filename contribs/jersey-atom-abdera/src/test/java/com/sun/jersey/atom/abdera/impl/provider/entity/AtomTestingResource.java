@@ -59,7 +59,7 @@ import org.apache.abdera.model.Entry;
  * <p>Server side resource class for the unit test suite.</p>
  */
 @Path("/test")
-public class TestingResource {
+public class AtomTestingResource {
 
     @Context
     ContentHelper contentHelper;
@@ -72,7 +72,7 @@ public class TestingResource {
     @Produces({"application/atomcat+xml", "application/xml", "text/xml", "application/atomcat+json", "application/json"})
     public Response getCategories() {
         dumpSelectedMediaType("getCategories");
-        return Response.ok(TestingFactory.createCategories()).build();
+        return Response.ok(AtomTestingFactory.createCategories()).build();
     }
 
     @GET
@@ -80,7 +80,7 @@ public class TestingResource {
     @Produces("application/xml")
     public Response getContent() {
         dumpSelectedMediaType("getContent");
-        Entry entry = TestingFactory.createEntry();
+        Entry entry = AtomTestingFactory.createEntry();
         ContentBean bean = new ContentBean("foo value", "bar value");
         contentHelper.setContentEntity(entry, MediaType.APPLICATION_XML_TYPE, bean);
         return Response.ok(entry).build();
@@ -91,7 +91,7 @@ public class TestingResource {
     @Produces({"application/atom", "application/atom+xml", "application/xml", "text/xml", "application/atom+json", "application/json"})
     public Response getEntry() {
         dumpSelectedMediaType("getEntry");
-        return Response.ok(TestingFactory.createEntry()).build();
+        return Response.ok(AtomTestingFactory.createEntry()).build();
     }
 
     @GET
@@ -99,7 +99,7 @@ public class TestingResource {
     @Produces({"application/atom", "application/atom+xml", "application/xml", "text/xml", "application/atom+json", "application/json"})
     public Response getFeed() {
         dumpSelectedMediaType("getFeed");
-        return Response.ok(TestingFactory.createFeed()).build();
+        return Response.ok(AtomTestingFactory.createFeed()).build();
     }
 
     @GET
@@ -107,7 +107,7 @@ public class TestingResource {
     @Produces({"application/atomsvc+xml", "application/xml", "text/xml", "application/atomsvc+json", "application/json"})
     public Response getService() {
         dumpSelectedMediaType("getService");
-        return Response.ok(TestingFactory.createService()).build();
+        return Response.ok(AtomTestingFactory.createService()).build();
     }
 
     private void dumpSelectedMediaType(String methodName) {

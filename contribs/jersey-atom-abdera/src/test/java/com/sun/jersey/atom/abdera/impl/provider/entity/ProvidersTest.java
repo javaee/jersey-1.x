@@ -151,7 +151,7 @@ public class ProvidersTest extends TestCase {
 
     public void testGetCategoriesEntity() {
         // FIXME - Abdera does not support parsing of JSON representations for Categories instances
-        Categories expected = TestingFactory.createCategories();
+        Categories expected = AtomTestingFactory.createCategories();
         for (String mediaType : CATEGORIES_MEDIA_TYPES_XML) {
             WebResource.Builder builder = client.resource(BASE_URI)
               .path("test").path("categories").accept(mediaType);
@@ -193,7 +193,7 @@ public class ProvidersTest extends TestCase {
 
     public void testGetEntryEntity() {
         // FIXME - Abdera does not support parsing of JSON representations for Entry instances
-        Entry expected = TestingFactory.createEntry();
+        Entry expected = AtomTestingFactory.createEntry();
         for (String mediaType : ENTRY_MEDIA_TYPES_XML) {
             WebResource.Builder builder = client.resource(BASE_URI)
               .path("test").path("entry").accept(mediaType);
@@ -223,7 +223,7 @@ public class ProvidersTest extends TestCase {
 
     public void testGetFeedEntity() {
         // FIXME - Abdera does not support parsing of JSON representations for Feed instances
-        Feed expected = TestingFactory.createFeed();
+        Feed expected = AtomTestingFactory.createFeed();
         for (String mediaType : FEED_MEDIA_TYPES_XML) {
             WebResource.Builder builder = client.resource(BASE_URI)
               .path("test").path("feed").accept(mediaType);
@@ -253,7 +253,7 @@ public class ProvidersTest extends TestCase {
 
     public void testGetServiceEntity() {
         // FIXME - Abdera does not support parsing of JSON representations for Service instances
-        Service expected = TestingFactory.createService();
+        Service expected = AtomTestingFactory.createService();
         for (String mediaType : SERVICE_MEDIA_TYPES_XML) {
             WebResource.Builder builder = client.resource(BASE_URI)
               .path("test").path("service").accept(mediaType);
