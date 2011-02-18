@@ -53,18 +53,18 @@ import java.util.List;
 public interface InjectableProviderContext {
 
     /**
-     * Check if an annotaton and context type is registered for injection.
+     * Check if an annotation and context type is registered for injection.
      *
      * @param ac the annotation class.
      * @param cc the context type.
-     * @return true if reigstered, otherwise false
+     * @return true if registered, otherwise false
      */
     public boolean isAnnotationRegistered(Class<? extends Annotation> ac,
             Class<?> cc);
 
     /*
      * Check if one or more injectable provider is registered to process an
-     * anotation and a context type for a given scope.
+     * annotation and a context type for a given scope.
      * 
      * @param ac the annotation class.
      * @param cc the context type.
