@@ -113,7 +113,7 @@ public final class HttpHelper {
      * Get the content language as a Locale instance.
      *
      * @param request The HTTP request.
-     * @return the content lanuage as a locale instance.
+     * @return the content language as a locale instance.
      */
     public static Locale getContentLanguageAsLocale(HttpRequestContext request) {
         return HttpHelper.getLanguageTagAsLocale(request.getRequestHeaders().
@@ -161,8 +161,8 @@ public final class HttpHelper {
      * <p>
      * @param request The HTTP request.
      * @return The list of MediaType. This list
-     *         is ordered with the highest quality acceptable Media type occuring first
-     *         (see {@link MediaTypes#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *         is ordered with the highest quality acceptable Media type occurring first
+     *         (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR} and {HttpHeaderReader#ACCEPT_MEDIA_TYPE_COMPARATOR}).
      *         If no "Accept" is present then a list with a single item of the Media
      *         type "*\\/*" is returned.
      */
@@ -197,7 +197,7 @@ public final class HttpHelper {
      * @deprecated see {@link #getAcceptLanguage(com.sun.jersey.api.core.HttpRequestContext) }.
      * @param request The HTTP request.
      * @return The list of LanguageTag. This list
-     *         is ordered with the highest quality acceptable language tag occuring first.
+     *         is ordered with the highest quality acceptable language tag occurring first.
      */
     @Deprecated
     public static List<AcceptableLanguageTag> getAcceptLangauge(HttpRequestContext request) {
@@ -209,7 +209,7 @@ public final class HttpHelper {
      * <p>
      * @param request The HTTP request.
      * @return The list of LanguageTag. This list
-     *         is ordered with the highest quality acceptable language tag occuring first.
+     *         is ordered with the highest quality acceptable language tag occurring first.
      */
     public static List<AcceptableLanguageTag> getAcceptLanguage(HttpRequestContext request) {
         final String acceptLanguage = request.getHeaderValue(HttpHeaders.ACCEPT_LANGUAGE);
@@ -228,7 +228,7 @@ public final class HttpHelper {
      * <p>
      * @param request The HTTP request.
      * @return The list of AcceptableToken. This list
-     *         is ordered with the highest quality acceptable charset occuring first.
+     *         is ordered with the highest quality acceptable charset occurring first.
      */
     public static List<AcceptableToken> getAcceptCharset(HttpRequestContext request) {
         final String acceptCharset = request.getHeaderValue(HttpHeaders.ACCEPT_CHARSET);
@@ -247,7 +247,7 @@ public final class HttpHelper {
      * <p>
      * @param request The HTTP request.
      * @return The list of AcceptableToken. This list
-     *         is ordered with the highest quality acceptable charset occuring first.
+     *         is ordered with the highest quality acceptable charset occurring first.
      */
     public static List<AcceptableToken> getAcceptEncoding(HttpRequestContext request) {
         final String acceptEncoding = request.getHeaderValue(HttpHeaders.ACCEPT_ENCODING);
@@ -272,8 +272,8 @@ public final class HttpHelper {
      *
      * @param contentType The Media type.
      * @param accept The list of Media types of entities that may be produced. This list
-     *        MUST be ordered with the highest quality acceptable Media type occuring first
-     *        (see {@link MediaTypes#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *        MUST be ordered with the highest quality acceptable Media type occurring first
+     *         (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR} and {HttpHeaderReader#ACCEPT_MEDIA_TYPE_COMPARATOR}).
      * @return true if the Media type can be produced, otherwise false.
      */
     public static boolean produces(MediaType contentType, List<MediaType> accept) {
