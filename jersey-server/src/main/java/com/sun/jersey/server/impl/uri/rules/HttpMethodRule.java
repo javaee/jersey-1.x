@@ -95,7 +95,7 @@ public final class HttpMethodRule implements UriRule {
             if (correctOrder(normal)) {
                 this.wildPriority = normal;
             } else {
-                this.wildPriority = new ArrayList(normal.size());
+                this.wildPriority = new ArrayList<ResourceMethod>(normal.size());
                 int i = 0;
                 for (ResourceMethod method : normal) {
                     if (method.consumesWild()) {
@@ -135,12 +135,12 @@ public final class HttpMethodRule implements UriRule {
         }
 
         boolean correctOrder(List<ResourceMethod> normal) {
-            boolean comsumesNonWild = false;
+            boolean consumesNonWild = false;
             for (ResourceMethod method : normal) {
                 if (method.consumesWild()) {
-                    if (comsumesNonWild) return false;
+                    if (consumesNonWild) return false;
                 } else {
-                    comsumesNonWild = true;
+                    consumesNonWild = true;
                 }
             }
 
@@ -327,10 +327,9 @@ public final class HttpMethodRule implements UriRule {
          *
          * @param methods the list of resource methods
          * @param contentType the 'Content-Type'.
-         * @param accept the 'Accept' as a list. This list
+         * @param acceptableMediaTypes the 'Accept' as a list. This list
          *        MUST be ordered with the highest quality acceptable Media type
-         *        occuring first (see
-         *        {@link com.sun.ws.rest.impl.model.MimeHelper#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+         *        occurring first (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR} and {HttpHeaderReader#ACCEPT_MEDIA_TYPE_COMPARATOR}).
          * @return the match status.
          */
         private MatchStatus match(
@@ -338,7 +337,7 @@ public final class HttpMethodRule implements UriRule {
                 MediaType contentType,
                 List<MediaType> acceptableMediaTypes) {
 
-            List<ResourceMethod> selected = null;
+            List<ResourceMethod> selected;
             if (contentType != null) {
                 // Find all methods that consume the MIME type of 'Content-Type'
                 for (ResourceMethod method : methods.normal)
@@ -378,8 +377,7 @@ public final class HttpMethodRule implements UriRule {
      * @return a singleton list containing the most specific media
      *         type for first media type in <code>priorityMediaTypes<code> that
      *         is compatible with an acceptable media type, otherwise the
-     *         list of acceptable media type as returned by
-     *         {@link #getAcceptableMediaTypes() }.
+     *         list of all acceptable media type is returned.
      *
      */
     public static List<MediaType> getSpecificAcceptableMediaTypes(
