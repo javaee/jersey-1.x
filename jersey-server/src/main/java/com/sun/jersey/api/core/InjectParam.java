@@ -59,8 +59,8 @@ import java.lang.annotation.Target;
  * that have JAX-RS/Jersey artifacts injected on them.
  * <p>
  * When Jersey is used with an IoC component provider, such as Guice or CDI,
- * this annotation may be used in conjuction with the Guice or JSR 330-based
- * @Inject when references to beans are obtained as parameters of
+ * this annotation may be used in conjunction with the Guice or JSR 330-based
+ * <code>@Inject</code> when references to beans are obtained as parameters of
  * resource methods, sub-resource methods or sub-resource locator methods.
  *
  * @author Paul.Sandoz@Oracle.Com
