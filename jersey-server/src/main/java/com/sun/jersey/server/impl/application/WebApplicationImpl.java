@@ -179,13 +179,6 @@ public final class WebApplicationImpl implements WebApplication {
             this.as = new HashSet<Annotation>(Arrays.asList(as));
         }
 
-        /**
-         * @return the c
-         */
-        public Class getClassKey() {
-            return c;
-        }
-
         @Override
         public int hashCode() {
             int hash = 5;
@@ -233,7 +226,7 @@ public final class WebApplicationImpl implements WebApplication {
     private ResourceFactory rcpFactory;
 
     private IoCComponentProviderFactory provider;
-    
+
     private List<IoCComponentProviderFactory> providerFactories;
 
     private Providers providers;
@@ -489,7 +482,7 @@ public final class WebApplicationImpl implements WebApplication {
     /* package */ UriRules<UriRule> getUriRules(final Class c) {
         assert c != null;
 
-        // Try the non-blocking read, the most common opertaion
+        // Try the non-blocking read, the most common operation
         UriRules<UriRule> r = rulesMap.get(c);
         if (r != null) {
             return r;
@@ -518,7 +511,7 @@ public final class WebApplicationImpl implements WebApplication {
     /* package */ ResourceComponentProvider getResourceComponentProvider(final Class c) {
         assert c != null;
 
-        // Try the non-blocking read, the most common opertaion
+        // Try the non-blocking read, the most common operation
         ResourceComponentProvider rcp = providerMap.get(c);
         if (rcp != null) {
             return rcp;
@@ -575,7 +568,7 @@ public final class WebApplicationImpl implements WebApplication {
         final ClassAnnotationKey cak = new ClassAnnotationKey(c,
                 cc.getAnnotations());
 
-        // Try the non-blocking read, the most common opertaion
+        // Try the non-blocking read, the most common operation
         ResourceComponentProvider rcp = providerWithAnnotationKeyMap.get(cak);
         if (rcp != null) {
             return rcp;
@@ -761,9 +754,7 @@ public final class WebApplicationImpl implements WebApplication {
         for (IoCComponentProviderFactory f : providerFactories) {
             IoCComponentProcessorFactory cpf = null;
             if (f instanceof IoCComponentProcessorFactoryInitializer) {
-                if (cpf == null) {
-                    cpf = new ComponentProcessorFactoryImpl();
-                }
+                cpf = new ComponentProcessorFactoryImpl();
                 IoCComponentProcessorFactoryInitializer i = (IoCComponentProcessorFactoryInitializer)f;
                 i.init(cpf);
             }
@@ -1093,7 +1084,7 @@ public final class WebApplicationImpl implements WebApplication {
 
             public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> c) {
                 if (Throwable.class.isAssignableFrom(c)) 
-                   return exceptionFactory.find((Class<Throwable>)c);
+                   return exceptionFactory.find(c);
                 else
                     return null;
             }
@@ -1389,9 +1380,9 @@ public final class WebApplicationImpl implements WebApplication {
     }
 
     private <T> T createProxy(Class<T> c, InvocationHandler i) {
-        return (T) Proxy.newProxyInstance(
+        return c.cast(Proxy.newProxyInstance(
                 this.getClass().getClassLoader(),
                 new Class[]{c},
-                i);
+                i));
     }
 }
