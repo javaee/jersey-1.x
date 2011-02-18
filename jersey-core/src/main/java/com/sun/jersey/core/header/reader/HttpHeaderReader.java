@@ -71,8 +71,8 @@ import javax.ws.rs.core.NewCookie;
 public abstract class HttpHeaderReader {
     
     public enum Event {
-        Token, QuotedString, Comment, Separator, Control;
-    };
+        Token, QuotedString, Comment, Separator, Control
+    }
     
     public abstract boolean hasNext();
     
