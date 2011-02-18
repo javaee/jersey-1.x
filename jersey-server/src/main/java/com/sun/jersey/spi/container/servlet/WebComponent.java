@@ -106,13 +106,13 @@ import java.util.logging.Logger;
 
 /**
  * An abstract Web component that may be extended a Servlet and/or
- * Filter implementation, or encapsulated by a Servlet or Filter implementaton.
+ * Filter implementation, or encapsulated by a Servlet or Filter implementation.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
 public class WebComponent implements ContainerListener {
     /**
-     * The servlet initializaton property whose value is a fully qualified
+     * The servlet initialization property whose value is a fully qualified
      * class name of a class that implements {@link ResourceConfig} or
      * {@link Application}.
      */
@@ -120,7 +120,7 @@ public class WebComponent implements ContainerListener {
             "javax.ws.rs.Application";
 
     /**
-     * The servlet initializaton property whose value is a fully qualified
+     * The servlet initialization property whose value is a fully qualified
      * class name of a class that implements {@link ResourceConfig} or
      * {@link Application}.
      */
@@ -149,8 +149,6 @@ public class WebComponent implements ContainerListener {
 
     
     private WebConfig config;
-
-    private ServletContext context;
 
     private ResourceConfig resourceConfig;
 
@@ -194,13 +192,10 @@ public class WebComponent implements ContainerListener {
      * Initiate the Web component.
      * 
      * @param webConfig the Web configuration.
-     * 
-     * @throws javax.servlet.ServletException
+     * @throws javax.servlet.ServletException in case of any initialization error
      */
     public void init(WebConfig webConfig) throws ServletException {
         config = webConfig;
-
-        context = config.getServletContext();
 
         if (resourceConfig == null)
             resourceConfig = createResourceConfig(config);
@@ -611,19 +606,20 @@ public class WebComponent implements ContainerListener {
      * Get the default resource configuration if one is not declared in the
      * web.xml.
      * <p>
-     * This implementaton returns an instance of {@link WebAppResourceConfig}
+     * This implementation returns an instance of {@link WebAppResourceConfig}
      * that scans in files and directories as declared by the
      * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
      * <p>
      * An inheriting class may override this method to supply a different
-     * default resource configuraton implementaton.
+     * default resource configuration implementation.
      *
-     * @param props the properties to pass to the resource configuraton.
+     * @param props the properties to pass to the resource configuration.
      * @param wc the web configuration.
-     * @return the default resource configuraton.
+     * @return the default resource configuration.
      *
-     * @throws javax.servlet.ServletException
+     * @throws javax.servlet.ServletException in case of any issues with providing \
+     *         the default resource configuration
      */
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
             WebConfig wc) throws ServletException  {
@@ -680,7 +676,7 @@ public class WebComponent implements ContainerListener {
             throws ServletException {
         // Check if the resource config class property is present
         String resourceConfigClassName = webConfig.getInitParameter(RESOURCE_CONFIG_CLASS);
-        // Otherwise check if the JAX-RS applicaion config class property is
+        // Otherwise check if the JAX-RS application config class property is
         // present
         if (resourceConfigClassName == null)
             resourceConfigClassName = webConfig.getInitParameter(APPLICATION_CONFIG_CLASS);
@@ -704,7 +700,7 @@ public class WebComponent implements ContainerListener {
         }
 
         try {
-            Class resourceConfigClass = ReflectionHelper.
+            Class<?> resourceConfigClass = ReflectionHelper.
                     classForNameWithException(resourceConfigClassName);
 
             // TODO add support for WebAppResourceConfig
@@ -728,9 +724,9 @@ public class WebComponent implements ContainerListener {
                     throw new ServletException(e);
                 }
 
-                return new DeferredResourceConfig(resourceConfigClass);
+                return new DeferredResourceConfig(resourceConfigClass.asSubclass(ResourceConfig.class));
             } else if (Application.class.isAssignableFrom(resourceConfigClass)) {
-                return new DeferredResourceConfig(resourceConfigClass);
+                return new DeferredResourceConfig(resourceConfigClass.asSubclass(Application.class));
             } else {
                 String message = "Resource configuration class, " + resourceConfigClassName +
                         ", is not a super class of " + Application.class;
@@ -754,6 +750,7 @@ public class WebComponent implements ContainerListener {
     }
 
     private String[] getPaths(String classpath) throws ServletException {
+        final ServletContext context = config.getServletContext();
         if (classpath == null) {
             String[] paths =  {
                 context.getRealPath("/WEB-INF/lib"),
@@ -815,6 +812,9 @@ public class WebComponent implements ContainerListener {
                                 "The instance will be registered as a singleton.");
                     }
                 } catch (NamingException ex) {
+                    LOGGER.log(Level.CONFIG,
+                            "JNDI lookup failed for Jersey application resource " + c.getName(),
+                            ex);
                 }
             }
         }
