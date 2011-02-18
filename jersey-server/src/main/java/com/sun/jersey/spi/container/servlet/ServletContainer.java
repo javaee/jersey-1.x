@@ -364,7 +364,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      *
      * @param webConfig the Web configuration.
      *
-     * @throws javax.servlet.ServletException
+     * @throws javax.servlet.ServletException in case of an initialization failure
      */
     protected void init(WebConfig webConfig) throws ServletException {
         webComponent = (app == null)
@@ -395,19 +395,19 @@ public class ServletContainer extends HttpServlet implements Filter {
      * Get the default resource configuration if one is not declared in the
      * web.xml.
      * <p>
-     * This implementaton returns an instance of {@link WebAppResourceConfig}
+     * This implementation returns an instance of {@link WebAppResourceConfig}
      * that scans in files and directories as declared by the
      * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
      * <p>
      * An inheriting class may override this method to supply a different
-     * default resource configuraton implementaton.
+     * default resource configuration implementation.
      *
-     * @param props the properties to pass to the resource configuraton.
+     * @param props the properties to pass to the resource configuration.
      * @param wc the web configuration.
-     * @return the default resource configuraton.
+     * @return the default resource configuration.
      *
-     * @throws javax.servlet.ServletException
+     * @throws javax.servlet.ServletException in case there was an error while retrieving the default resource config
      */
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
             WebConfig wc) throws ServletException  {
@@ -560,19 +560,19 @@ public class ServletContainer extends HttpServlet implements Filter {
      * Get the default resource configuration if one is not declared in the
      * web.xml.
      * <p>
-     * This implementaton returns an instance of {@link WebAppResourceConfig}
+     * This implementation returns an instance of {@link WebAppResourceConfig}
      * that scans in files and directories as declared by the
      * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
      * <p>
      * An inheriting class may override this method to supply a different
-     * default resource configuraton implementaton.
+     * default resource configuration implementation.
      *
-     * @param props the properties to pass to the resource configuraton.
+     * @param props the properties to pass to the resource configuration.
      * @param servletConfig the servlet configuration.
-     * @return the default resource configuraton.
+     * @return the default resource configuration.
      *
-     * @throws javax.servlet.ServletException
+     * @throws javax.servlet.ServletException in case there was an error while retrieving the default resource config
      * @deprecated methods should implement {@link #getDefaultResourceConfig(java.util.Map, com.sun.jersey.spi.container.servlet.WebConfig) }.
      */
     @Deprecated
@@ -681,7 +681,7 @@ public class ServletContainer extends HttpServlet implements Filter {
 
         if (!decodedBasePath.equals(encodedBasePath)) {
             throw new ContainerException("The servlet context path and/or the " +
-                    "servlet path contain characters that are percent enocded");
+                    "servlet path contain characters that are percent encoded");
         }
 
         final URI baseUri = absoluteUriBuilder.replacePath(encodedBasePath).
