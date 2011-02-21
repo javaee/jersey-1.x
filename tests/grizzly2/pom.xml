@@ -100,14 +100,14 @@
                     <artifactId>jersey-grizzly2</artifactId>
                     <version>${project.version}</version>
                     <scope>test</scope>
-                    <classifier>coberture</classifier>
+                    <classifier>cobertura</classifier>
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-client</artifactId>
                     <version>${project.version}</version>
                     <scope>test</scope>
-                    <classifier>coberture</classifier>
+                    <classifier>cobertura</classifier>
                 </dependency>
             </dependencies>
         </profile>
