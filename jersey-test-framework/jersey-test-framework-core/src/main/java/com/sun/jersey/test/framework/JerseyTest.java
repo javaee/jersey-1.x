@@ -68,10 +68,10 @@ import java.util.logging.Logger;
  * {@link TestContainer#start() } method is invoked. After the test method has
  * run the {@link TestContainer#stop() } method is invoked.
  * The test method can invoke the {@link #resource() } to obtain a
- * {@link WebResource} from which requests may be sent to and responses recieved
+ * {@link WebResource} from which requests may be sent to and responses received
  * from the Web application under test.
  * <p>
- * If a test container factory is not explictly declared using the appropriate
+ * If a test container factory is not explicitly declared using the appropriate
  * constructor (see {@link #JerseyTest(TestContainerFactory) }) then a default
  * test container factory will be obtained as follows.
  * If the system property {@literal jersey.test.containerFactory} is set and the
@@ -167,7 +167,7 @@ public abstract class JerseyTest {
     }
 
     /**
-     * Contruct a new instance with a test container factory.
+     * Construct a new instance with a test container factory.
      * <p>
      * An extending class must implement the {@link #configure()} method to 
      * provide an application descriptor.
@@ -188,7 +188,7 @@ public abstract class JerseyTest {
      * is configured.
      * <p>
      * If a constructor is utilized that does not supply an application
-     * descriptor then this method must be overriden to return an application
+     * descriptor then this method must be overridden to return an application
      * descriptor, otherwise an {@link UnsupportedOperationException} exception
      * will be thrown.
      * <p>
@@ -222,7 +222,7 @@ public abstract class JerseyTest {
      * Construct a new instance with an array or a colon separated
      * list of package names which contain resource and provider classes.
      * <p>
-     * This contructor builds an instance of {@link WebAppDescriptor} passing
+     * This constructor builds an instance of {@link WebAppDescriptor} passing
      * the package names to the constructor.
      * 
      * @param packages array or a colon separated list of package names which
@@ -387,7 +387,7 @@ public abstract class JerseyTest {
                         DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME);
 
                 try {
-                    defaultTestContainerFactoryClass = (Class<? extends TestContainerFactory>) Class.forName(tcfClassName);
+                    defaultTestContainerFactoryClass = Class.forName(tcfClassName).asSubclass(TestContainerFactory.class);
                 } catch (ClassNotFoundException ex) {
                     throw new TestContainerException(
                             "The default test container factory class name, " +
@@ -449,9 +449,7 @@ public abstract class JerseyTest {
         }
 
         //check if logging is required
-        boolean enableLogging = (System.getProperty("enableLogging") != null)
-                ? true
-                : false;
+        boolean enableLogging = System.getProperty("enableLogging") != null;
         
         if (enableLogging) {
                 c.addFilter(new LoggingFilter());
@@ -501,7 +499,7 @@ public abstract class JerseyTest {
 
     /**
      * Returns the port to be used in the base URI.
-     * @param defaultPort
+     * @param defaultPort default port
      * @return The HTTP port of the URI
      */
     protected int getPort(int defaultPort) {
