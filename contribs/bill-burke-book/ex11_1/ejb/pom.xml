@@ -44,7 +44,6 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-            <version>${jaxb.version}</version>
             <scope>provided</scope>
             <!--Should be part of GlassFish v3-->
         </dependency>

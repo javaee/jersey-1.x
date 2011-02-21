@@ -76,9 +76,15 @@
         <module>grizzly2</module>
     </modules>
 
-    <properties>
-        <junit.version>4.8.2</junit.version>
-    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.8.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <distributionManagement>
         <repository>
