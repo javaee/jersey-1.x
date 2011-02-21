@@ -827,7 +827,7 @@ public final class WebApplicationImpl implements WebApplication {
                                 } catch (ClassCastException ex) {
                                     throw new ContainerException(
                                             "The parent resource is expected to be of class " + inject.getName() +
-                                            " but is of class " + l.get(1).getClass().getName(),
+                                            " but is of class " + parent.getClass().getName(),
                                             ex);
                                 }
                             }
