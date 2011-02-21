@@ -329,7 +329,7 @@ public final class HttpMethodRule implements UriRule {
          * @param contentType the 'Content-Type'.
          * @param acceptableMediaTypes the 'Accept' as a list. This list
          *        MUST be ordered with the highest quality acceptable Media type
-         *        occurring first (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR} and {HttpHeaderReader#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+         *        occurring first (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR}).
          * @return the match status.
          */
         private MatchStatus match(

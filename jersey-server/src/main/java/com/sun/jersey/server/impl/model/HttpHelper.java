@@ -162,7 +162,7 @@ public final class HttpHelper {
      * @param request The HTTP request.
      * @return The list of MediaType. This list
      *         is ordered with the highest quality acceptable Media type occurring first
-     *         (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR} and {HttpHeaderReader#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *         (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR}).
      *         If no "Accept" is present then a list with a single item of the Media
      *         type "*\\/*" is returned.
      */
@@ -273,7 +273,7 @@ public final class HttpHelper {
      * @param contentType The Media type.
      * @param accept The list of Media types of entities that may be produced. This list
      *        MUST be ordered with the highest quality acceptable Media type occurring first
-     *         (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR} and {HttpHeaderReader#ACCEPT_MEDIA_TYPE_COMPARATOR}).
+     *         (see {@link MediaTypes#MEDIA_TYPE_COMPARATOR}).
      * @return true if the Media type can be produced, otherwise false.
      */
     public static boolean produces(MediaType contentType, List<MediaType> accept) {
