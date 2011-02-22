@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.jersey.impl.modelapi.annotation;
+package com.sun.jersey.server.impl.modelapi.annotation;
 
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.api.model.AbstractResource;
@@ -48,7 +48,9 @@ import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import java.util.logging.LogRecord;
 import junit.framework.*;
 import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.impl.modelapi.annotation.IntrospectionModellerTest.TestSubResourceOne;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -66,10 +68,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 
 /**
- *
  * @author japod
  */
-public class IntrospectionModellerTest extends TestCase {
+public class IntrospectionModellerTest {
 
     @Target(ElementType.PARAMETER)
     @Retention(RetentionPolicy.RUNTIME)
@@ -135,10 +136,6 @@ public class IntrospectionModellerTest extends TestCase {
         
     }
     
-    public IntrospectionModellerTest(String testName) {
-        super(testName);
-    }
-    
 //    private void printMimeTypes(List<MediaType> mediaTypes, PrintWriter pWriter) {
 //        boolean firstItem = true;
 //        for(MediaType mediaType : mediaTypes) {
@@ -180,12 +177,13 @@ public class IntrospectionModellerTest extends TestCase {
 //    }
     
     
+    @org.junit.Test
     public void testRootResource() {
         AbstractResource rootResource = IntrospectionModeller.createResource(TestRootResourceOne.class);
         assertEquals("/one", rootResource.getPath().getValue());
         assertEquals(1, rootResource.getResourceMethods().size());
-        assertEquals(1 ,rootResource.getSubResourceLocators().size());
-        assertEquals(3 ,rootResource.getSubResourceMethods().size());
+        assertEquals(1, rootResource.getSubResourceLocators().size());
+        assertEquals(3, rootResource.getSubResourceMethods().size());
         
         AbstractResourceMethod resourceMethod = rootResource.getResourceMethods().get(0);
 //        @HttpMethod
@@ -263,6 +261,7 @@ public class IntrospectionModellerTest extends TestCase {
         assertEquals("text/plain", getSubResMethod.getSupportedOutputTypes().get(0).toString());
     }
 
+    @Test
     public void testSubResource() {
         AbstractResource subResource = IntrospectionModeller.createResource(TestSubResourceOne.class);
         assertEquals(null, subResource.getPath());

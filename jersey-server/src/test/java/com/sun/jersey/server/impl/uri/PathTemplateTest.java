@@ -38,24 +38,36 @@
  * holder.
  */
 
-package com.sun.jersey.impl;
+package com.sun.jersey.server.impl.uri;
 
-import com.sun.jersey.server.impl.BuildId;
-import junit.framework.TestCase;
-
+import org.junit.*;
+import static org.junit.Assert.*;
+import com.sun.jersey.api.uri.UriTemplate;
 
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * @author Yegor Bugayenko (yegor256@java.net)
  */
-public class BuildIdTest extends TestCase {
-    
-    public void testBuildId() {
-        String s = BuildId.getBuildId();
-        assertFalse(s.equals("Jersey"));
-        // buildNumber is the maven property that should be replaced
-        // with the jersey version and date
-        assertFalse(s.contains("buildNumber"));
+public class PathTemplateTest {
+
+    @Test
+    public void testBasicOperations() throws Exception {
+        UriTemplate tmpl = new PathTemplate("/{id : \\d+}/test");
+        assertEquals(
+            "getNumberOfTemplateVariables() returned invalid number",
+            1,
+            tmpl.getNumberOfTemplateVariables()
+        );
+        assertEquals(
+            "getNumberOfExplicitRegexes() returned invalid number",
+            1,
+            tmpl.getNumberOfExplicitRegexes()
+        );
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    @Ignore("This test is not working yet, since there is no validation for NULL value in PathTemplate.prefixWithSlash()")
+    public void testInstantiatesWithNullPattern() throws Exception {
+        new PathTemplate(null);
     }
 
 }

@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.impl.modelapi.validation;
+package com.sun.jersey.server.impl.modelapi.validation;
 
 import com.sun.jersey.server.impl.modelapi.validation.BasicValidator;
 import com.sun.jersey.api.model.AbstractResource;
@@ -59,12 +59,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import junit.framework.TestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author japod
  */
-public class BasicValidatorTest extends TestCase {
+public class BasicValidatorTest {
 
     @Path("rootNonAmbigCtors")
     public static class TestRootResourceNonAmbigCtors {
@@ -82,6 +84,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testRootResourceNonAmbigConstructors() throws Exception {
         System.out.println(
                 "---\nNo issue should be reported if more public ctors exists with the same number of params, " +
@@ -133,6 +136,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testNonPublicRM() throws Exception {
         System.out.println("---\nAn issue should be reported if a resource method is not public:");
         AbstractResource ar = IntrospectionModeller.createResource(TestNonPublicRM.class);
@@ -156,6 +160,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testNonPublicRM1() throws Exception {
         System.out.println("---\nAn issue should be reported if a resource method is not public:");
         AbstractResource ar = IntrospectionModeller.createResource(TestNonPublicRM1.class);
@@ -189,6 +194,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetRMReturningVoid() throws Exception {
         System.out.println("---\nAn issue should be reported if a get method returns void:");
         AbstractResource ar = IntrospectionModeller.createResource(TestGetRMReturningVoid.class);
@@ -207,6 +213,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetRMConsumingEntity() throws Exception {
         System.out.println("---\nAn issue should be reported if a get method consumes an entity:");
         AbstractResource ar = IntrospectionModeller.createResource(TestGetRMConsumingEntity.class);
@@ -224,6 +231,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testSRLReturningVoid() throws Exception {
         System.out.println("---\nAn issue should be reported if a sub-resource locator returns void:");
         AbstractResource ar = IntrospectionModeller.createResource(TestSRLReturningVoid.class);
@@ -241,6 +249,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetSRMReturningVoid() throws Exception {
         System.out.println("---\nAn issue should be reported if a get sub-resource method returns void:");
         AbstractResource ar = IntrospectionModeller.createResource(TestGetSRMReturningVoid.class);
@@ -260,6 +269,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testGetSRMConsumingEntity() throws Exception {
         System.out.println("---\nAn issue should be reported if a get method consumes an entity:");
         AbstractResource ar = IntrospectionModeller.createResource(TestGetSRMConsumingEntity.class);
@@ -280,6 +290,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testMultipleHttpMethodDesignatorsRM() throws Exception {
         System.out.println("---\nAn issue should be reported if more than one HTTP method designator exist on a resource method:");
         AbstractResource ar = IntrospectionModeller.createResource(TestMultipleHttpMethodDesignatorsRM.class);
@@ -300,6 +311,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testMultipleHttpMethodDesignatorsSRM() throws Exception {
         System.out.println("---\nAn issue should be reported if more than one HTTP method designator exist on a sub-resource method:");
         AbstractResource ar = IntrospectionModeller.createResource(TestMultipleHttpMethodDesignatorsSRM.class);
@@ -318,6 +330,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testEntityParamOnSRL() throws Exception {
         System.out.println("---\nAn issue should be reported if an entity parameter exists on a sub-resource locator:");
         AbstractResource ar = IntrospectionModeller.createResource(TestEntityParamOnSRL.class);
@@ -354,6 +367,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testNonConflictingHttpMethodDelete() throws Exception {
         System.out.println("---\nNo issue should be reported if produced mime types differ");
         AbstractResource ar = IntrospectionModeller.createResource(TestNonConflictingHttpMethodDelete.class);
@@ -392,6 +406,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testAmbiguousParams() throws Exception {
         System.out.println("---\nA warning should be reported if ambiguous source of a parameter is seen");
         AbstractResource ar = IntrospectionModeller.createResource(TestAmbiguousParams.class);
@@ -411,6 +426,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testEmptyPathSegment() throws Exception {
         System.out.println("---\nA warning should be reported if @Path with \"/\" or empty string value is seen");
         AbstractResource ar = IntrospectionModeller.createResource(TestEmptyPathSegment.class);
@@ -450,6 +466,7 @@ public class BasicValidatorTest extends TestCase {
         }
     }
 
+    @Test
     public void testTypeVariableResource() throws Exception {
         System.out.println("---\n");
         AbstractResource ar = IntrospectionModeller.createResource(TypeVariableResource.class);
@@ -490,6 +507,7 @@ public class BasicValidatorTest extends TestCase {
     public static class ConcreteParameterizedTypeResource extends ParameterizedTypeResource<String, String> {
     }
 
+    @Test
     public void testParameterizedTypeResource() throws Exception {
         System.out.println("---\n");
         AbstractResource ar = IntrospectionModeller.createResource(ConcreteParameterizedTypeResource.class);
@@ -530,6 +548,7 @@ public class BasicValidatorTest extends TestCase {
     public static class ConcreteGenericArrayResource extends GenericArrayResource<String, String> {
     }
 
+    @Test
     public void testGenericArrayResource() throws Exception {
         System.out.println("---\n");
         AbstractResource ar = IntrospectionModeller.createResource(ConcreteGenericArrayResource.class);
