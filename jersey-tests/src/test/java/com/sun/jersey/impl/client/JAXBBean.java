@@ -40,7 +40,6 @@
 
 package com.sun.jersey.impl.client;
 
-import com.sun.jersey.impl.entity.*;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
