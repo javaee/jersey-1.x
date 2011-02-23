@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,57 +37,48 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.samples.guice.resources;
+package com.sun.jersey.samples.guice;
 
-import com.google.inject.Inject;
-import com.google.inject.servlet.RequestScoped;
-import java.util.logging.Level;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import java.security.Principal;
-import java.util.logging.Logger;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 
-//Create resource class, @Path("bound/perrequest"), using guice @RequestScoped
-@Path("bound/perrequest")
-@RequestScoped
-public class PerRequestResource {
+/**
+ * Custom security context
+ * 
+ * @author Marek Potociar (marek.potociar at oracle.com)
+ */
+public final class MySecurityContext implements SecurityContext {
 
-    private static final Logger LOGGER = Logger.getLogger(PerRequestResource.class.getName());
-    public static final String OK_RESPONSE = "OK";
-    //Inject URI info and query parameter "x"
-    @Context UriInfo ui;
-    @QueryParam("x") String x;
+    private static final class MyPrincipal implements Principal {
 
-    private final SingletonComponent sc;
-    private final Principal principal;
-
-    //Create singleton component and inject into resource at construction as well as principal
-    @Inject
-    public PerRequestResource(SingletonComponent sc, Principal principal) {
-        this.sc = sc;
-        this.principal = principal;
-    }
-
-    @GET
-    public String get() {
-        if (ui == null || sc == null || principal == null) {
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        @Override
+        public String getName() {
+            return "test-name";
         }
 
-        LOGGER.log(Level.INFO,
-                "GET invoked on {0} with injected query parameter x={1}, injected singleton component={2} and injected custom principal={3}",
-                new Object[]{
-                    ui.getPath(),
-                    (x != null) ? x : "[no value]",
-                    sc.toString(),
-                    principal.toString()
-        });
+        @Override
+        public String toString() {
+            return "MyPrincipal{" + getName() + '}';
+        }
+    }
 
-        return OK_RESPONSE;
+    @Override
+    public Principal getUserPrincipal() {
+        return new MyPrincipal();
+    }
+
+    @Override
+    public boolean isUserInRole(String role) {
+        return false;
+    }
+
+    @Override
+    public boolean isSecure() {
+        return false;
+    }
+
+    @Override
+    public String getAuthenticationScheme() {
+        return null;
     }
 }

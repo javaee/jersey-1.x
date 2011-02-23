@@ -39,32 +39,43 @@
  */
 package com.sun.jersey.samples.guice;
 
+import com.google.inject.servlet.GuiceFilter;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.samples.guice.resources.PerRequestResource;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+
 /**
+ * Simple set of tests exercising the guice-controlled component injection
  *
  * @author naresh
+ * @author Marek Potociar (marek.potociar at oracle.com)
  */
 public class GuiceFilterTest extends JerseyTest {
    
     public GuiceFilterTest() {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.guice.resources")
-                .contextListenerClass(com.sun.jersey.samples.guice.GuiceServletConfig.class)
-                .filterClass(com.google.inject.servlet.GuiceFilter.class)
+                .contextListenerClass(GuiceServletConfig.class)
+                .filterClass(GuiceFilter.class)
                 .contextPath("jersey-guice-filter")
                 .servletPath("/")
                 .build());
     }
 
     @Test
-    public void testGuice() {
+    public void testGuiceNoParam() {
         WebResource webResource = resource();
-        String response = resource().path("bound").path("perrequest").accept("text/plain").get(String.class);
-        System.out.println(response);
+        String response = webResource.path("bound").path("perrequest").accept("text/plain").get(String.class);
+        assertEquals("Unexpected response", PerRequestResource.OK_RESPONSE, response);
     }
 
+    @Test
+    public void testGuiceWithXParam() {
+        WebResource webResource = resource();
+        String response = webResource.path("bound").path("perrequest").queryParam("x", "test").accept("text/plain").get(String.class);
+        assertEquals("Unexpected response", PerRequestResource.OK_RESPONSE, response);
+    }
 }
