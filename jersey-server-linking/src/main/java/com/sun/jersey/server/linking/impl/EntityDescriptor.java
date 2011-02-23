@@ -44,6 +44,7 @@ import com.sun.jersey.server.linking.Link;
 import com.sun.jersey.server.linking.Links;
 import com.sun.jersey.server.linking.Ref;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -128,6 +129,12 @@ public class EntityDescriptor {
                     // TODO unsupported type
                 }
             } else {
+                // see issue http://java.net/jira/browse/JERSEY-625
+                if(((f.getModifiers() & Modifier.STATIC) > 0) ||
+                        f.getName().startsWith("java.") ||
+                        f.getName().startsWith("javax.")
+                        )
+                    continue;
                 nonLinkFields.put(f.getName(), new FieldDescriptor(f));
             }
         }

@@ -42,29 +42,31 @@ package com.sun.jersey.server.linking.impl;
 
 import com.sun.jersey.server.linking.Binding;
 import com.sun.jersey.server.linking.Ref;
-import com.sun.jersey.server.linking.impl.RefProcessor;
+
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Filter;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
-import junit.framework.TestCase;
+import javax.ws.rs.core.*;
+
+import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *
  * @author mh124079
  */
-public class RefProcessorTest extends TestCase {
+public class RefProcessorTest {
     
     UriInfo mockUriInfo;
 
-    public RefProcessorTest(String testName) {
-        super(testName);
+    public RefProcessorTest() {
         mockUriInfo = new UriInfo() {
 
             private final static String baseURI = "http://example.com/application/resources";
@@ -151,6 +153,7 @@ public class RefProcessorTest extends TestCase {
         private URI res2;
     }
 
+    @Test
     public void testProcessLinks() {
         System.out.println("Links");
         RefProcessor<TestClassD> instance = new RefProcessor(TestClassD.class);
@@ -177,6 +180,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testProcessLinksWithFields() {
         System.out.println("Links from field values");
         RefProcessor<TestClassE> instance = new RefProcessor(TestClassE.class);
@@ -202,6 +206,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testNesting() {
         System.out.println("Nesting");
         RefProcessor<TestClassF> instance = new RefProcessor(TestClassF.class);
@@ -212,6 +217,7 @@ public class RefProcessorTest extends TestCase {
         assertEquals("widgets/10", testClass.nested.link);
     }
 
+    @Test
     public void testArray() {
         System.out.println("Array");
         RefProcessor<TestClassE[]> instance = new RefProcessor(TestClassE[].class);
@@ -223,6 +229,7 @@ public class RefProcessorTest extends TestCase {
         assertEquals("widgets/20", array[1].link);
     }
 
+    @Test
     public void testCollection() {
         System.out.println("Collection");
         RefProcessor<List> instance = new RefProcessor(List.class);
@@ -258,6 +265,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testLinkStyles() {
         System.out.println("Link styles");
         RefProcessor<TestClassG> instance = new RefProcessor(TestClassG.class);
@@ -278,6 +286,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testComputedProperty() {
         System.out.println("Computed property");
         RefProcessor<TestClassH> instance = new RefProcessor(TestClassH.class);
@@ -295,6 +304,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testEL() {
         System.out.println("EL link");
         RefProcessor<TestClassI> instance = new RefProcessor(TestClassI.class);
@@ -312,6 +322,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testMixed() {
         System.out.println("Mixed EL and template vars link");
         RefProcessor<TestClassJ> instance = new RefProcessor(TestClassJ.class);
@@ -337,6 +348,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testELScopes() {
         System.out.println("EL scopes");
         RefProcessor<OuterBean> instance = new RefProcessor(OuterBean.class);
@@ -355,6 +367,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testELBinding() {
         System.out.println("EL binding");
         RefProcessor<BoundLinkBean> instance = new RefProcessor(BoundLinkBean.class);
@@ -383,6 +396,7 @@ public class RefProcessorTest extends TestCase {
         }
     }
 
+    @Test
     public void testCondition() {
         System.out.println("Condition");
         RefProcessor<ConditionalLinkBean> instance = new RefProcessor(ConditionalLinkBean.class);
@@ -406,6 +420,7 @@ public class RefProcessorTest extends TestCase {
         public String uri;
     }
 
+    @Test
     public void testSubresource() {
         System.out.println("Subresource");
         RefProcessor<SubResourceBean> instance = new RefProcessor(SubResourceBean.class);
@@ -414,4 +429,50 @@ public class RefProcessorTest extends TestCase {
         assertEquals("/application/resources/a/b", testClass.uri);
     }
 
+    public static class TestClassK {
+        public static final ZipEntry zipEntry = new ZipEntry("entry");
+    }
+
+    public static class TestClassL {
+        public final ZipEntry zipEntry = new ZipEntry("entry");
+    }
+
+    private class LoggingFilter implements Filter {
+        private int count = 0;
+        @Override
+        public synchronized boolean isLoggable(LogRecord logRecord) {
+            if(logRecord.getThrown() instanceof IllegalAccessException) {
+                count++;
+                return false;
+            }
+            return true;
+        }
+
+        public int getCount() {
+            return count;
+        }
+    }
+
+    @Test
+    public void testKL() {
+        final LoggingFilter lf = new LoggingFilter();
+
+        Logger.getLogger(FieldDescriptor.class.getName()).setFilter(lf);
+        assertTrue(lf.getCount() == 0);
+
+        RefProcessor<TestClassK> instanceK = new RefProcessor(TestClassK.class);
+        TestClassK testClassK = new TestClassK();
+        instanceK.processLinks(testClassK, mockUriInfo);
+
+        assertTrue(lf.getCount() == 0);
+
+        RefProcessor<TestClassL> instanceL = new RefProcessor(TestClassL.class);
+        TestClassL testClassL = new TestClassL();
+        instanceL.processLinks(testClassL, mockUriInfo);
+
+        assertTrue(lf.getCount() == 0);
+
+        Logger.getLogger(FieldDescriptor.class.getName()).setFilter(null);
+
+    }
 }

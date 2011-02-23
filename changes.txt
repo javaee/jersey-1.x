@@ -1,4 +1,9 @@
 release 1.6
+- Fixed issue 625
+  http://java.net/jira/browse/JERSEY-625
+  IllegalAccessException when using jersey-server-linking with
+  java.* and javax.* field types (unannotated). Excluding these
+  from recurive discovery algorithm.
 - Adding support for Cobertura based code coverage measurement.
   Use following maven targets to compile, instrument, test and
   generate reports:
