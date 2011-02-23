@@ -223,4 +223,7 @@
             <url>java-net:/maven2-repository/trunk/repository/</url>
         </repository>
     </distributionManagement>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 </project>
