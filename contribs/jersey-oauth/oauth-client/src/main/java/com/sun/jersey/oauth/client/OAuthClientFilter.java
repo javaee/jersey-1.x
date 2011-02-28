@@ -44,11 +44,16 @@ import javax.ws.rs.ext.Providers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.filter.ClientFilter;
+import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 import com.sun.jersey.oauth.signature.OAuthSignature;
 import com.sun.jersey.oauth.signature.OAuthSignatureException;
+import java.net.URI;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  * Client filter adding OAuth authorization header to the HTTP request, if no
@@ -80,6 +85,7 @@ import com.sun.jersey.oauth.signature.OAuthSignatureException;
  * </pre>
  *
  * @author Paul C. Bryan <pbryan@sun.com>
+ * @author Martin Matula <martin.matula@oracle.com>
  */
 public final class OAuthClientFilter extends ClientFilter {
 
@@ -92,6 +98,16 @@ public final class OAuthClientFilter extends ClientFilter {
     /** The OAuth secrets to be used in generating signature. */
     private final OAuthSecrets secrets;
 
+    private final URI requestTokenUri;
+    private final URI accessTokenUri;
+    private final URI authorizationUri;
+
+    private enum State {
+        UNMANAGED, UNAUTHORIZED, REQUEST_TOKEN, AUTHORIZED;
+    }
+
+    private State state;
+
     /**
      * Constructs a new OAuth client filter with the specified providers.
      *
@@ -101,9 +117,40 @@ public final class OAuthClientFilter extends ClientFilter {
      */
     public OAuthClientFilter(final Providers providers,
     final OAuthParameters parameters, final OAuthSecrets secrets) {
+        this(providers, parameters, secrets, null, null, null);
+    }
+
+    public OAuthClientFilter(Providers providers, OAuthParameters parameters,
+            OAuthSecrets secrets, String requestTokenUri, String accessTokenUri,
+            String authorizationUri) {
+        if (providers == null || parameters == null || secrets == null) {
+            throw new NullPointerException();
+        }
+        if ((requestTokenUri != null || accessTokenUri != null || authorizationUri != null) &&
+                (requestTokenUri == null || accessTokenUri == null || authorizationUri == null)) {
+            throw new NullPointerException();
+        }
         this.providers = providers;
         this.parameters = parameters;
         this.secrets = secrets;
+        
+        if (parameters.getSignatureMethod() == null) {
+            parameters.signatureMethod("HMAC-SHA1");
+        }
+
+        if (parameters.getVersion() == null) {
+            parameters.version();
+        }
+
+        if (requestTokenUri == null) {
+            this.requestTokenUri = this.accessTokenUri = this.authorizationUri = null;
+            state = State.UNMANAGED;
+        } else {
+            this.requestTokenUri = UriBuilder.fromUri(requestTokenUri).build();
+            this.accessTokenUri = UriBuilder.fromUri(accessTokenUri).build();
+            this.authorizationUri = UriBuilder.fromUri(authorizationUri).build();
+            state = parameters.getToken() == null ? State.UNAUTHORIZED : State.AUTHORIZED;
+        }
     }
 
     /**
@@ -111,10 +158,49 @@ public final class OAuthClientFilter extends ClientFilter {
      */
     @Override
     public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
-
         // secrets and parameters exist; no auth header already: sign request; add as authorization header
-        if (parameters != null && secrets != null && !request.getHeaders().containsKey("Authorization")) {
+        if (!request.getHeaders().containsKey("Authorization")) {
+            switch (state) {
+                case UNAUTHORIZED:
+                    // put together a request token request
+                    state = State.UNMANAGED;
+                    try {
+                        ClientResponse cr = handle(ClientRequest.create().build(requestTokenUri, HttpMethod.POST));
+                        Form response = cr.getEntity(Form.class);
+                        String token = response.getFirst(OAuthParameters.TOKEN);
+                        parameters.token(token);
+                        secrets.tokenSecret(response.getFirst(OAuthParameters.TOKEN_SECRET));
+                        state = State.REQUEST_TOKEN;
+                        throw new NeedAuthorizationException(parameters, authorizationUri);
+                    } finally {
+                        if (state == State.UNMANAGED) {
+                            state = State.UNAUTHORIZED;
+                        }
+                    }
+                case REQUEST_TOKEN:
+                    if (parameters.getVerifier() == null) {
+                        throw new NeedAuthorizationException(parameters, authorizationUri);
+                    }
+                    state = State.UNMANAGED;
+                    try {
+                        ClientResponse cr = handle(ClientRequest.create().build(accessTokenUri, HttpMethod.POST));
+                        Form response = cr.getEntity(Form.class);
+                        String token = response.getFirst(OAuthParameters.TOKEN);
+                        String secret = response.getFirst(OAuthParameters.TOKEN_SECRET);
+                        // TODO: add a method to persist the access token
+                        parameters.token(token);
+                        secrets.tokenSecret(secret);
+                        state = State.AUTHORIZED;
+                    } finally {
+                        parameters.remove(OAuthParameters.VERIFIER);
+                        if (state == State.UNMANAGED) {
+                            parameters.remove(OAuthParameters.TOKEN);
+                            secrets.tokenSecret(null);
+                            state = State.UNAUTHORIZED;
+                        }
+                    }
 
+            }
             final OAuthParameters p = (OAuthParameters)parameters.clone(); // make modifications to clone
 
             if (p.getTimestamp() == null) {
@@ -134,7 +220,29 @@ public final class OAuthClientFilter extends ClientFilter {
         }
 
         // next filter in chain
-        return getNext().handle(request);
+        ClientResponse response;
+        UniformInterfaceException uie = null;
+        try {
+            response = getNext().handle(request);
+        } catch (UniformInterfaceException e) {
+            response = e.getResponse();
+            uie = e;
+        }
+
+        if (state == State.AUTHORIZED && response.getClientResponseStatus() == ClientResponse.Status.UNAUTHORIZED) {
+            state = State.UNAUTHORIZED;
+            request.getHeaders().remove("Authorization");
+            parameters.remove(OAuthParameters.TOKEN);
+            secrets.tokenSecret(null);
+            uie = null;
+            return handle(request);
+        }
+
+        if (uie != null) {
+            throw uie;
+        }
+        
+        return response;
     }
 }
 
