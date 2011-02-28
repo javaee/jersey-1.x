@@ -90,7 +90,7 @@ public class IntrospectionModeller {
 
     private static final Logger LOGGER = Logger.getLogger(IntrospectionModeller.class.getName());
 
-    public static final AbstractResource createResource(Class<?> resourceClass) {
+    public static AbstractResource createResource(Class<?> resourceClass) {
         final Class<?> annotatedResourceClass = getAnnotatedResourceClass(resourceClass);
         final Path rPathAnnotation = annotatedResourceClass.getAnnotation(Path.class);
         final boolean isRootResourceClass = (null != rPathAnnotation);
@@ -136,7 +136,7 @@ public class IntrospectionModeller {
         return resource;
     }
     
-    private static final Class getAnnotatedResourceClass(Class rc) {
+    private static Class getAnnotatedResourceClass(Class rc) {
         if (rc.isAnnotationPresent(Path.class)) return rc;
 
         for (Class i : rc.getInterfaces())
@@ -145,7 +145,7 @@ public class IntrospectionModeller {
         return rc;
     }
     
-    private static final void addConsumes(
+    private static void addConsumes(
             AnnotatedMethod am,            
             AbstractResourceMethod resourceMethod, 
             Consumes consumeMimeAnnotation) {
@@ -158,7 +158,7 @@ public class IntrospectionModeller {
                 MediaTypes.createMediaTypes(consumeMimeAnnotation));
     }
 
-    private static final void addProduces(
+    private static void addProduces(
             AnnotatedMethod am,
             AbstractResourceMethod resourceMethod, 
             Produces produceMimeAnnotation) {
@@ -171,7 +171,7 @@ public class IntrospectionModeller {
                 MediaTypes.createQualitySourceMediaTypes(produceMimeAnnotation));
     }
 
-    private static final void workOutConstructorsList(
+    private static void workOutConstructorsList(
             AbstractResource resource, 
             Constructor[] ctorArray, 
             boolean isEncoded) {
@@ -190,7 +190,7 @@ public class IntrospectionModeller {
         }
     }
 
-    private static final void workOutFieldsList(
+    private static void workOutFieldsList(
             AbstractResource resource, 
             boolean isEncoded) {        
         Class c = resource.getResourceClass();
@@ -243,7 +243,7 @@ public class IntrospectionModeller {
         }
     }
 
-    private static final void workOutSetterMethodsList(
+    private static void workOutSetterMethodsList(
             AbstractResource resource, 
             MethodList methodList,
             boolean isEncoded) {
@@ -269,7 +269,7 @@ public class IntrospectionModeller {
         }        
     }
     
-    private static final void workOutResourceMethodsList(
+    private static void workOutResourceMethodsList(
             AbstractResource resource, 
             MethodList methodList, 
             boolean isEncoded,
@@ -303,7 +303,7 @@ public class IntrospectionModeller {
         return getGenericType(concreteClass, m.getDeclaringClass(), m.getReturnType(), m.getGenericReturnType());
     }
     
-    private static final void workOutSubResourceMethodsList(
+    private static void workOutSubResourceMethodsList(
             AbstractResource resource, 
             MethodList methodList, 
             boolean isEncoded,
@@ -357,7 +357,7 @@ public class IntrospectionModeller {
         }
     }
     
-    private static final void workOutSubResourceLocatorsList(
+    private static void workOutSubResourceLocatorsList(
             AbstractResource resource, 
             MethodList methodList, 
             boolean isEncoded) {
@@ -381,7 +381,7 @@ public class IntrospectionModeller {
         }
     }
 
-    private static final void processParameters(
+    private static void processParameters(
             Class concreteClass,
             Class declaringClass,
             Parameterized parametrized, 
@@ -406,7 +406,7 @@ public class IntrospectionModeller {
                 ctor.getParameterAnnotations());
     }
 
-    private static final void processParameters(
+    private static void processParameters(
             Class concreteClass,
             Class declaringClass,
             Parameterized parametrized, 
@@ -421,7 +421,7 @@ public class IntrospectionModeller {
                 method.getParameterAnnotations());
     }
 
-    private static final void processParameters(
+    private static void processParameters(
             Class concreteClass,
             Class declaringClass,
             Parameterized parametrized,
@@ -457,70 +457,84 @@ public class IntrospectionModeller {
         Map<Class, ParamAnnotationHelper> m = new WeakHashMap<Class, ParamAnnotationHelper>();
         m.put(Context.class, new ParamAnnotationHelper<Context>() {
 
+            @Override
             public String getValueOf(Context a) {
                 return null;
             }
 
+            @Override
             public Parameter.Source getSource() {
                 return Parameter.Source.CONTEXT;
             }
         });
         m.put(HeaderParam.class, new ParamAnnotationHelper<HeaderParam>() {
 
+            @Override
             public String getValueOf(HeaderParam a) {
                 return a.value();
             }
 
+            @Override
             public Parameter.Source getSource() {
                 return Parameter.Source.HEADER;
             }
         });
         m.put(CookieParam.class, new ParamAnnotationHelper<CookieParam>() {
 
+            @Override
             public String getValueOf(CookieParam a) {
                 return a.value();
             }
 
+            @Override
             public Parameter.Source getSource() {
                 return Parameter.Source.COOKIE;
             }
         });
         m.put(MatrixParam.class, new ParamAnnotationHelper<MatrixParam>() {
 
+            @Override
             public String getValueOf(MatrixParam a) {
                 return a.value();
             }
 
+            @Override
             public Parameter.Source getSource() {
                 return Parameter.Source.MATRIX;
             }
         });
         m.put(QueryParam.class, new ParamAnnotationHelper<QueryParam>() {
 
+            @Override
             public String getValueOf(QueryParam a) {
                 return a.value();
             }
 
+            @Override
             public Parameter.Source getSource() {
                 return Parameter.Source.QUERY;
             }
         });
         m.put(PathParam.class, new ParamAnnotationHelper<PathParam>() {
 
+            @Override
             public String getValueOf(PathParam a) {
                 return a.value();
             }
 
+            @Override
             public Parameter.Source getSource() {
                 return Parameter.Source.PATH;
             }
         });
         m.put(FormParam.class, new ParamAnnotationHelper<FormParam>() {
 
+            @Override
             public String getValueOf(FormParam a) {
                 return a.value();
             }
 
+            @Override
             public Parameter.Source getSource() {
                 return Parameter.Source.FORM;
             }
@@ -531,7 +545,7 @@ public class IntrospectionModeller {
             createParamAnotHelperMap();
 
     @SuppressWarnings("unchecked")
-    private static final Parameter createParameter(
+    private static Parameter createParameter(
             Class concreteClass,
             Class declaringClass,
             boolean isEncoded, 
@@ -587,7 +601,7 @@ public class IntrospectionModeller {
                 paramEncoded, paramDefault);
     }
 
-    private static final String getValue(Annotation a) {
+    private static String getValue(Annotation a) {
         try {
             Method m = a.annotationType().getMethod("value");
             if (m.getReturnType() != String.class)
