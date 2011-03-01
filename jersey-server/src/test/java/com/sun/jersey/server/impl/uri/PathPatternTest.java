@@ -40,62 +40,57 @@
 
 package com.sun.jersey.server.impl.uri;
 
-import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriTemplate;
-import com.sun.jersey.api.uri.UriTemplateParser;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 /**
- * A URI template for a URI path.
- *
- * @author Paul.Sandoz@Sun.Com
  * @author Yegor Bugayenko (yegor256@java.net)
  */
-public final class PathTemplate extends UriTemplate {
+public class PathPatternTest {
 
-    /**
-     * Internal parser of this PathTemplate.
-     * @see #PathTemplate(String)
-     */
-    private static final class PathTemplateParser extends UriTemplateParser {
-        /**
-         * Public constructor.
-         *
-         * @param path the URI path template
-         */
-        public PathTemplateParser(final String path) {
-            super(path);
-        }
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        protected String encodeLiteralCharacters(final String literalCharacters) {
-            return UriComponent.contextualEncode(
-                literalCharacters,
-                UriComponent.Type.PATH
-            );
-        }
+    @Test
+    public void testSimplePattern() throws Exception {
+        PathPattern pattern = new PathPattern(new UriTemplate("/test"));
+        assertNull(pattern.match("doesn't match"));
+        assertNotNull(pattern.match("/test/me"));
     }
 
-    /**
-     * Create a URI path template and encode (percent escape)
-     * any characters of the template that are not valid
-     * URI characters.
-     * @param path the URI path template
-     */
-    public PathTemplate(final String path) {
-        super(new PathTemplateParser(PathTemplate.prefixWithSlash(path)));
+    @Test
+    public void testSimplePatternWithRightHandSide() throws Exception {
+        PathPattern pattern = new PathPattern(
+            new UriTemplate("/test/"),
+            "/abc.*"
+        );
+        assertNull("Why matched?", pattern.match("/test/me"));
+        assertNotNull("Why not matched?", pattern.match("/test/abc-should_work"));
     }
 
-    /**
-     * Converts the path provided to a slash-leading
-     * form, no matter what is provided.
-     * @param path the URI path template
-     * @return prefixed path
-     * @see #PathTemplate(String)
-     */
-    private static String prefixWithSlash(final String path) {
-        return path.startsWith("/") ? path : "/" + path;
+    @Test(expected = IllegalArgumentException.class)
+    @Ignore("There is no validation for NULL value in PathPattern ctors")
+    public void testWithNullTemplate() throws Exception {
+        new PathPattern(null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    @Ignore("There is no validation for NULL value in PathPattern ctors")
+    public void testWithNullTemplateAndRightHandSide() throws Exception {
+        new PathPattern(null, "/abc.*");
+    }
+
+    @Test
+    public void testSetsAndGetsUriTemplate() throws Exception {
+        UriTemplate tmpl = new UriTemplate("/test");
+        PathPattern pattern = new PathPattern(tmpl);
+        assertEquals(
+            "We just injected the value, why it is different?",
+            tmpl,
+            pattern.getTemplate()
+        );
     }
 
 }

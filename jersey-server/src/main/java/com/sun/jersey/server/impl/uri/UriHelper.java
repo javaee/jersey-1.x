@@ -40,52 +40,89 @@
 
 package com.sun.jersey.server.impl.uri;
 
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
-import javax.ws.rs.core.UriBuilder;
 
 /**
+ * URI helper.
  *
  * @author Jakub Podlesak (japod at sun dot com)
+ * @author Yegor Bugayenko (yegor256@java.net)
  */
 public final class UriHelper {
-    
 
-    private static final String removeLeadingSlashesIfNeeded(String path, boolean preserveSlashes) {
+    /**
+     * Normalize the URI provided and return the normalized
+     * copy.
+     * @param uri The URI to normalize
+     * @param preserveContdSlashes Shall we preserve "///" slashes
+     * @return New normalized URI
+     */
+    public static URI normalize(URI uri, boolean preserveContdSlashes) {
+        if (!uri.getRawPath().contains("//")) {
+            return uri.normalize();
+        }
+        String np = UriHelper.removeDotSegments(
+            uri.getRawPath(),
+            preserveContdSlashes
+        );
+        if (np.equals(uri.getRawPath())) {
+            return uri;
+        }
+        return UriBuilder.fromUri(uri).replacePath(np).build();
+    }
+
+    /**
+     * Removal of leading slashes from the path.
+     * @param path The path
+     * @param preserveSlashes Shall we do anything?
+     * @return Path without any leading slashes
+     * @todo A better algorithm is required. Maybe we can use Apache StringUtils?
+     * @see #normalize(URI, boolean)
+     */
+    private static String removeLeadingSlashesIfNeeded(
+        final String path, final boolean preserveSlashes) {
         if (preserveSlashes) {
             return path;
         }
-        // TODO: need some better alg
-        while (path.startsWith("/")) {
-            path = path.substring(1);
+        String trimmed = path;
+        while (trimmed.startsWith("/")) {
+            trimmed = trimmed.substring(1);
         }
-        return path;
+        return trimmed;
     }
-    
-    // alg taken from http://gbiv.com/protocols/uri/rfc/rfc3986.html#relative-dot-segments
-    // the alg works as follows:
-    //       1. The input buffer is initialized with the now-appended path components and the output buffer is initialized to the empty string.
-    //   2. While the input buffer is not empty, loop as follows:
-    //         A. If the input buffer begins with a prefix of "../" or "./", then remove that prefix from the input buffer; otherwise,
-    //         B. if the input buffer begins with a prefix of "/./" 
-    //            or "/.", where "." is a complete path segment, then replace that prefix with "/" in the input buffer; otherwise,
-    //         C. if the input buffer begins with a prefix of "/../" 
-    //            or "/..", where ".." is a complete path segment, 
-    //            then replace that prefix with "/" in the input buffer and remove the last segment and its preceding "/" (if any) from the output buffer; otherwise,
-    //         D. if the input buffer consists only of "." or "..", then remove that from the input buffer; otherwise,
-    //         E. move the first path segment in the input buffer to the end of the output buffer, 
-    //            including the initial "/" character (if any) and any subsequent characters up to, but not including, 
-    //            the next "/" character or the end of the input buffer.
-    //   3. Finally, the output buffer is returned as the result of remove_dot_segments.
+
+    /**
+     * Remove dots from path.
+     *
+     * alg taken from http://gbiv.com/protocols/uri/rfc/rfc3986.html#relative-dot-segments
+     * the alg works as follows:
+     *       1. The input buffer is initialized with the now-appended path components and the output buffer is initialized to the empty string.
+     *   2. While the input buffer is not empty, loop as follows:
+     *         A. If the input buffer begins with a prefix of "../" or "./", then remove that prefix from the input buffer; otherwise,
+     *         B. if the input buffer begins with a prefix of "/./"
+     *            or "/.", where "." is a complete path segment, then replace that prefix with "/" in the input buffer; otherwise,
+     *         C. if the input buffer begins with a prefix of "/../"
+     *            or "/..", where ".." is a complete path segment,
+     *            then replace that prefix with "/" in the input buffer and remove the last segment and its preceding "/" (if any) from the output buffer; otherwise,
+     *         D. if the input buffer consists only of "." or "..", then remove that from the input buffer; otherwise,
+     *         E. move the first path segment in the input buffer to the end of the output buffer,
+     *            including the initial "/" character (if any) and any subsequent characters up to, but not including,
+     *            the next "/" character or the end of the input buffer.
+     *   3. Finally, the output buffer is returned as the result of remove_dot_segments.
+     *
+     * @param path Path provided
+     * @param preserveContdSlashes Shall we preserve "///" slashes
+     * @return New path
+     */
     public static String removeDotSegments(String path, boolean preserveContdSlashes) {
-        
         if (null == path) {
             return null;
         }
-        
-        List<String> outputSegments = new LinkedList<String>();
-        
+
+        final List<String> outputSegments = new LinkedList<String>();
         while (path.length() > 0) {
             if (path.startsWith("../")) {   // rule 2A
                 path = removeLeadingSlashesIfNeeded(path.substring(3), preserveContdSlashes);
@@ -123,27 +160,12 @@ public final class UriHelper {
                 path = path.substring(segLength);
             }
         }
-        
-        StringBuffer result = new StringBuffer();
+
+        final StringBuffer result = new StringBuffer();
         for (String segment : outputSegments) {
             result.append(segment);
         }
-        
         return result.toString();
     }
-    
-    
-    public static URI normalize(URI u, boolean preserveContdSlashes) {
-        if (!u.getRawPath().contains("//")) {
-            return u.normalize();
-        }
-        
-        String np = removeDotSegments(u.getRawPath(), preserveContdSlashes);
 
-        if (np.equals(u.getRawPath())) {
-            return u;
-        }
-        
-        return UriBuilder.fromUri(u).replacePath(np).build();
-    }
 }

@@ -46,70 +46,127 @@ import java.util.Comparator;
 
 /**
  * A URI pattern that is a regular expression generated from a URI path.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
+ * @author Yegor Bugayenko (yegor256@java.net)
  */
 public final class PathPattern extends UriPattern {
-    public static final PathPattern EMPTY_PATH = new PathPattern();
-    
+
     /**
-     * Defer to comparing the templates associated with the patterns
+     * Empty path.
+     * @see #PathPattern()
      */
-    static public final Comparator<PathPattern> COMPARATOR = new Comparator<PathPattern>() {
-        public int compare(PathPattern o1, PathPattern o2) {
-            return UriTemplate.COMPARATOR.compare(o1.template, o2.template);
-        }
-    };
+    public static final PathPattern EMPTY_PATH = new PathPattern();
 
     /**
      * The regular expression that represents the right hand side of
      * a URI path.
      */
     private static final String RIGHT_HAND_SIDE = "(/.*)?";
-        
+
+    /**
+     * Defer to comparing the templates associated with the patterns.
+     */
+    static public final Comparator<PathPattern> COMPARATOR = new Comparator<PathPattern>() {
+        public int compare(final PathPattern o1, final PathPattern o2) {
+            return UriTemplate.COMPARATOR.compare(o1.template, o2.template);
+        }
+    };
+
+    /**
+     * Empty UriTemplate, initialized just once in one of
+     * constructors.
+     * @see #PathPattern()
+     * @see #PathPattern(UriTemplate)
+     * @see #PathPattern(UriTemplate, String)
+     */
     private final UriTemplate template;
-    
+
+    /**
+     * Private constructor, used only to instantiate EMPTY_PATH.
+     */
     private PathPattern() {
         super();
         this.template = UriTemplate.EMPTY;
     }
-    
-    public PathPattern(UriTemplate template) {
-        super(postfixWithCapturingGroup(template.getPattern().getRegex()),
-            indexCapturingGroup(template.getPattern().getGroupIndexes()));
-        
-        this.template = template;
-    }
-    
-    public PathPattern(UriTemplate template, String rightHandSide) {
-        super(postfixWithCapturingGroup(template.getPattern().getRegex(), rightHandSide),
-            indexCapturingGroup(template.getPattern().getGroupIndexes()));
 
+    /**
+     * Public constructor.
+     * @param template The template
+     */
+    public PathPattern(final UriTemplate template) {
+        super(
+            PathPattern.postfixWithCapturingGroup(template.getPattern().getRegex()),
+            PathPattern.indexCapturingGroup(template.getPattern().getGroupIndexes())
+        );
         this.template = template;
     }
 
+    /**
+     * Public ctor.
+     * @param template The template
+     * @param rightHandSide Right hand side of the template
+     */
+    public PathPattern(final UriTemplate template, final String rightHandSide) {
+        super(
+            PathPattern.postfixWithCapturingGroup(
+                template.getPattern().getRegex(),
+                rightHandSide
+            ),
+            PathPattern.indexCapturingGroup(template.getPattern().getGroupIndexes())
+        );
+        this.template = template;
+    }
+
+    /**
+     * Get template.
+     * @return The template
+     */
     public UriTemplate getTemplate() {
-        return template;
-    }
-    
-    private static String postfixWithCapturingGroup(String regex) {
-        return postfixWithCapturingGroup(regex, RIGHT_HAND_SIDE);
+        return this.template;
     }
 
-    private static String postfixWithCapturingGroup(String regex, String rightHandSide) {
-        if (regex.endsWith("/"))
-            regex = regex.substring(0, regex.length() - 1);
-
-        return regex + rightHandSide;
+    /**
+     * Append tail-matching regex suffix to the regex provided.
+     * @param regex Regular expression
+     * @return The regex with the default suffix
+     * @see #PathPattern(UriTemplate)
+     */
+    private static String postfixWithCapturingGroup(final String regex) {
+        return PathPattern.postfixWithCapturingGroup(
+            regex,
+            PathPattern.RIGHT_HAND_SIDE
+        );
     }
 
-    private static int[] indexCapturingGroup(int[] indexes) {
-        if (indexes.length == 0) return indexes;
+    /**
+     * Append tail-matching regex suffix to the regex provided.
+     * @param regex Regular expression
+     * @param rightHandSide The suffix to append
+     * @return The regex with the provided suffix
+     * @see #PathPattern(UriTemplate, String)
+     */
+    private static String postfixWithCapturingGroup(final String regex, final String rightHandSide) {
+        return (regex.endsWith("/") ? regex.substring(0, regex.length() - 1) : regex)
+            + rightHandSide;
+    }
 
+    /**
+     * Extend the list of group indexes by adding one more element
+     * the end of array, which is equal to last element plus 1.
+     * @param indexes Array of indexes
+     * @return New array
+     * @see #PathPattern(UriTemplate)
+     * @see #PathPattern(UriTemplate, String)
+     */
+    private static int[] indexCapturingGroup(final int[] indexes) {
+        if (indexes.length == 0) {
+            return indexes;
+        }
         int[] cgIndexes = new int[indexes.length + 1];
         System.arraycopy(indexes, 0, cgIndexes, 0, indexes.length);
-        
         cgIndexes[indexes.length] = cgIndexes[indexes.length - 1] + 1;
         return cgIndexes;
     }
+
 }
