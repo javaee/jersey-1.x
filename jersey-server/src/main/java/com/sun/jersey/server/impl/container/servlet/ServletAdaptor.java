@@ -104,10 +104,12 @@ public class ServletAdaptor extends ServletContainer {
         }
         
         rc.getSingletons().add(new InjectableProvider<PersistenceUnit, Type>() {
+            @Override
             public ComponentScope getScope() {
                 return ComponentScope.Singleton;
             }
             
+            @Override
             public Injectable<EntityManagerFactory> getInjectable(ComponentContext ic, PersistenceUnit pu, Type c) {
                 if (!c.equals(EntityManagerFactory.class))
                     return null;
@@ -126,6 +128,7 @@ public class ServletAdaptor extends ServletContainer {
                         emfHandler);
                 
                 return new Injectable<EntityManagerFactory>() {
+                    @Override
                     public EntityManagerFactory getValue() {
                         return emf;
                     }                    

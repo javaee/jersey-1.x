@@ -86,6 +86,7 @@ public final class SubLocatorRule extends BaseRule {
         this.responseFilters = responseFilters;
     }
 
+    @Override
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         UriRuleProbeProvider.ruleAccept(SubLocatorRule.class.getSimpleName(), path,
                 resource);
@@ -153,7 +154,7 @@ public final class SubLocatorRule extends BaseRule {
 
         // Invoke the sub-locator method
         try {
-            if (is.size() == 0) {
+            if (is.isEmpty()) {
                 return m.invoke(resource);
             } else {
                 final Object[] params = new Object[is.size()];

@@ -46,7 +46,6 @@ import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import java.util.regex.MatchResult;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * Adapter to an existing rule that accepts the rule using the last capturing 
@@ -85,6 +84,7 @@ public class RightHandPathRule implements UriRule {
         this.rule = rule;
     }
     
+    @Override
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         UriRuleProbeProvider.ruleAccept(RightHandPathRule.class.getSimpleName(), path,
                 resource);

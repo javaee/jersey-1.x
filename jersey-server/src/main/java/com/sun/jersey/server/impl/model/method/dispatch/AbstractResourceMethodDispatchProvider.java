@@ -70,6 +70,7 @@ import javax.ws.rs.core.Response;
  */
 public abstract class AbstractResourceMethodDispatchProvider implements ResourceMethodDispatchProvider {
 
+    @Override
     public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
         
         final InjectableValuesProvider pp = getInjectableValuesProvider(abstractResourceMethod);
@@ -144,8 +145,8 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
             super(abstractResourceMethod, pp);
         }
 
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
+        @Override
+        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
             method.invoke(resource, params);
         }
@@ -160,8 +161,8 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
             this.t = abstractResourceMethod.getGenericReturnType();
         }
 
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
+        @Override
+        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
             final Object o = method.invoke(resource, params);
@@ -179,8 +180,8 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
             super(abstractResourceMethod, pp);
         }
 
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
+        @Override
+        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
             final Response r = (Response)method.invoke(resource, params);
@@ -209,8 +210,8 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
             }
         }
 
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
+        @Override
+        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
             final JResponse<?> r = (JResponse<?>)method.invoke(resource, params);
@@ -230,8 +231,8 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
             super(abstractResourceMethod, pp);
         }
 
-        public void _dispatch(Object resource, HttpContext context)
-        throws IllegalAccessException, InvocationTargetException {
+        @Override
+        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
             final Object o = method.invoke(resource, params);

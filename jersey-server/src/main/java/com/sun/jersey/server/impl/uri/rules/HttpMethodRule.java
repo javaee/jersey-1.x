@@ -83,7 +83,7 @@ public final class HttpMethodRule implements UriRule {
         this(methods, false);
     }
 
-    private static class ResourceMethodListPair {
+    private static final class ResourceMethodListPair {
         final List<ResourceMethod> normal;
 
         final List<ResourceMethod> wildPriority;
@@ -171,6 +171,7 @@ public final class HttpMethodRule implements UriRule {
         return s.toString();
     }
 
+    @Override
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         UriRuleProbeProvider.ruleAccept(HttpMethodRule.class.getSimpleName(), path,
                 resource);

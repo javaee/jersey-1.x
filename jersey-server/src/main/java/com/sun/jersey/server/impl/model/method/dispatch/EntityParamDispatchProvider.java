@@ -47,7 +47,6 @@ import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
-import com.sun.jersey.spi.container.ParamQualifier;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -119,6 +118,7 @@ public class EntityParamDispatchProvider extends AbstractResourceMethodDispatchP
             this.as = as;
         }
 
+        @Override
         public Object getValue(HttpContext context) {
             return context.getRequest().getEntity(c, t, as);
         }

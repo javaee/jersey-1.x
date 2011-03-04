@@ -69,6 +69,7 @@ public final class MatrixParamInjectableProvider extends BaseParamInjectableProv
             this.decode = decode;
         }
         
+        @Override
         public Object getValue(HttpContext context) {
             List<PathSegment> l = context.getUriInfo().getPathSegments(decode);
             PathSegment p = l.get(l.size() - 1);
@@ -85,6 +86,7 @@ public final class MatrixParamInjectableProvider extends BaseParamInjectableProv
         super(w);
     }
 
+    @Override
     public Injectable getInjectable(ComponentContext ic, MatrixParam a, Parameter c) {
         String parameterName = c.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {

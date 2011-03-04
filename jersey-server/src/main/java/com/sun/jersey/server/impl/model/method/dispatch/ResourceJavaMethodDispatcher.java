@@ -64,6 +64,7 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
         this.annotations = abstractResourceMethod.getAnnotations();        
     }    
     
+    @Override
     public final void dispatch(Object resource, HttpContext context) {
         // Invoke the method on the resource
         try {

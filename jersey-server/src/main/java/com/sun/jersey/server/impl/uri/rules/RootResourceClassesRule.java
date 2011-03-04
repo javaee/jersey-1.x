@@ -61,6 +61,7 @@ public final class RootResourceClassesRule implements UriRule {
         this.rules = UriRulesFactory.create(rulesMap);
     }
     
+    @Override
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         UriRuleProbeProvider.ruleAccept(RootResourceClassesRule.class.getSimpleName(), path,
                 resource);
