@@ -334,35 +334,35 @@ public class UriComponent {
     private static final String[] SCHEME = {"0-9", "A-Z", "a-z", "+", "-", "."};
     private static final String[] UNRESERVED = {"0-9", "A-Z", "a-z", "-", ".", "_", "~"};
     private static final String[] SUB_DELIMS = {"!", "$", "&", "'", "(", ")", "*", "+", ",", ";", "="};
-    private static final boolean[][] ENCODING_TABLES = creatingEncodingTables();
+    private static final boolean[][] ENCODING_TABLES = initEncodingTables();
 
-    private static boolean[][] creatingEncodingTables() {
+    private static boolean[][] initEncodingTables() {
         boolean[][] tables = new boolean[Type.values().length][];
 
         List<String> l = new ArrayList<String>();
         l.addAll(Arrays.asList(SCHEME));
-        tables[Type.SCHEME.ordinal()] = creatingEncodingTable(l);
+        tables[Type.SCHEME.ordinal()] = initEncodingTable(l);
 
         l.clear();
 
         l.addAll(Arrays.asList(UNRESERVED));
-        tables[Type.UNRESERVED.ordinal()] = creatingEncodingTable(l);
+        tables[Type.UNRESERVED.ordinal()] = initEncodingTable(l);
 
         l.addAll(Arrays.asList(SUB_DELIMS));
 
-        tables[Type.HOST.ordinal()] = creatingEncodingTable(l);
+        tables[Type.HOST.ordinal()] = initEncodingTable(l);
 
-        tables[Type.PORT.ordinal()] = creatingEncodingTable(Arrays.asList("0-9"));
+        tables[Type.PORT.ordinal()] = initEncodingTable(Arrays.asList("0-9"));
 
         l.add(":");
 
-        tables[Type.USER_INFO.ordinal()] = creatingEncodingTable(l);
+        tables[Type.USER_INFO.ordinal()] = initEncodingTable(l);
 
         l.add("@");
 
-        tables[Type.AUTHORITY.ordinal()] = creatingEncodingTable(l);
+        tables[Type.AUTHORITY.ordinal()] = initEncodingTable(l);
 
-        tables[Type.PATH_SEGMENT.ordinal()] = creatingEncodingTable(l);
+        tables[Type.PATH_SEGMENT.ordinal()] = initEncodingTable(l);
         tables[Type.PATH_SEGMENT.ordinal()][';'] = false;
 
         tables[Type.MATRIX_PARAM.ordinal()] = tables[Type.PATH_SEGMENT.ordinal()].clone();
@@ -370,15 +370,15 @@ public class UriComponent {
 
         l.add("/");
 
-        tables[Type.PATH.ordinal()] = creatingEncodingTable(l);
+        tables[Type.PATH.ordinal()] = initEncodingTable(l);
 
         l.add("?");
 
-        tables[Type.QUERY.ordinal()] = creatingEncodingTable(l);
+        tables[Type.QUERY.ordinal()] = initEncodingTable(l);
 
         tables[Type.FRAGMENT.ordinal()] = tables[Type.QUERY.ordinal()];
 
-        tables[Type.QUERY_PARAM.ordinal()] = creatingEncodingTable(l);
+        tables[Type.QUERY_PARAM.ordinal()] = initEncodingTable(l);
         tables[Type.QUERY_PARAM.ordinal()]['='] = false;
         tables[Type.QUERY_PARAM.ordinal()]['+'] = false;
         tables[Type.QUERY_PARAM.ordinal()]['&'] = false;
@@ -386,7 +386,7 @@ public class UriComponent {
         return tables;
     }
 
-    private static boolean[] creatingEncodingTable(List<String> allowed) {
+    private static boolean[] initEncodingTable(List<String> allowed) {
         boolean[] table = new boolean[0x80];
         for (String range : allowed) {
             if (range.length() == 1) {
@@ -547,10 +547,12 @@ public class UriComponent {
             this.matrixParameters = matrixParameters;
         }
 
+        @Override
         public String getPath() {
             return path;
         }
 
+        @Override
         public MultivaluedMap<String, String> getMatrixParameters() {
             return matrixParameters;
         }
@@ -808,9 +810,9 @@ public class UriComponent {
         }
         return v;
     }
-    private static final int[] HEX_TABLE = createHexTable();
+    private static final int[] HEX_TABLE = initHexTable();
 
-    private static int[] createHexTable() {
+    private static int[] initHexTable() {
         int[] table = new int[0x80];
         Arrays.fill(table, -1);
 
