@@ -77,7 +77,7 @@
     It is based on the <ulink url="http://jackson.codehaus.org/">Jackson library</ulink>.
     </para>
     <para>
-    To switch this method on, you will need to turn <emphasis>JSONConfiguration.FEATURE_POJO_MAPPING</emphasis> feature on.
+    To use this approach, you will need to turn the <emphasis>JSONConfiguration.FEATURE_POJO_MAPPING</emphasis> feature on.
     This could be done in <code>web.xml</code> using the following servlet init parameter:
 <example>
 <title>POJO JSON support web.xml configuration</title>
@@ -88,6 +88,12 @@
         &lt;/init-param&gt;
 </programlisting>
 </example>
+</para>
+<para>
+Jackson JSON processor could be futher controlled via providing custom Jackson <ulink url="http://jackson.codehaus.org/&jackson.javadoc.version;/javadoc/org/codehaus/jackson/map/ObjectMapper.html">ObjectMapper</ulink> instance. 
+This could be handy if you need to redefine the default Jackson behaviour and to fine-tune how your JSON data structures look like.
+Detailed description of all Jackson features is out of scope of this guide. The example bellow gives you a hint on how to wire 
+your ObjectMapper instance into your Jersey application. 
 </para>
 
 <para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jacksonjsonprovider/&version;/jacksonjsonprovider-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/jacksonjsonprovider/&version;/jacksonjsonprovider-&version;-project.zip</ulink>

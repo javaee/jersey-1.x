@@ -1,4 +1,6 @@
 release 1.6
+- JacksonJsonProvider example: added ObjectMapper resolver
+  to show how to use Jackon specific configuration options
 - Fixed issue 625
   http://java.net/jira/browse/JERSEY-625
   IllegalAccessException when using jersey-server-linking with

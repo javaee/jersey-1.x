@@ -49,6 +49,8 @@
 
 <!-- Jackson version -->
 <!ENTITY jackson.version "$jackson.version">
+<!-- TODO: need to get rid of this: -->
+<!ENTITY jackson.javadoc.version "1.7.0">
 
 <!-- API Links -->
 <!ENTITY jaxrs.ApplicationPath "<ulink url='&jsr311.javadoc.path;/ApplicationPath.html'>@ApplicationPath</ulink>">

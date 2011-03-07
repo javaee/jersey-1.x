@@ -1,14 +1,14 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
  * may not use this file except in compliance with the License.  You can
  * obtain a copy of the License at
- * http://glassfish.java.net/public/CDDL+GPL_1_1.html
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
  * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
@@ -40,28 +40,23 @@
 
 package com.sun.jersey.samples.jacksonjsonprovider;
 
-import java.util.HashSet;
-import java.util.Set;
-import javax.ws.rs.core.Application;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Provider;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.SerializationConfig.Feature;
 
 /**
  *
  * @author japod
  */
-public class MyApplication extends Application {
+@Provider
+public class MyObjectMapperProvider implements ContextResolver<ObjectMapper> {
 
     @Override
-    public Set<Class<?>> getClasses() {
+    public ObjectMapper getContext(Class<?> type) {
 
-        final Set<Class<?>> classes = new HashSet<Class<?>>();
-
-        // register root resources
-        classes.add(EmptyArrayResource.class);
-        classes.add(NonJAXBBeanResource.class);
-
-        // register Jackson ObjectMapper resolver
-        classes.add(MyObjectMapperProvider.class);
-
-        return classes;
+        ObjectMapper result = new ObjectMapper();
+        result.configure(Feature.INDENT_OUTPUT, true);
+        return result;
     }
 }
