@@ -8,7 +8,7 @@
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
  * may not use this file except in compliance with the License. You can obtain
- * a copy of the License at https://jersey.java.net/CDDL+GPL.html
+ * a copy of the License at http://jersey.java.net/CDDL+GPL.html
  * or jersey/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
