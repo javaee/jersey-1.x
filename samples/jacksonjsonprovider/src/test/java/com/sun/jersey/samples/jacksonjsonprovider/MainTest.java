@@ -62,8 +62,7 @@ public class MainTest extends JerseyTest {
     public void testEmptyArrayPresent() {
         WebResource r = resource();
         String responseMsg = r.path("emptyArrayResource").accept(MediaType.APPLICATION_JSON).get(String.class);
-        responseMsg.replaceAll("[ \t]", "");
-        assertTrue(responseMsg.contains("[]"));
+        assertTrue(responseMsg.replaceAll("[ \t]*", "").contains("[]"));
     }
 
     @Test
