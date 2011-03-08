@@ -41,6 +41,7 @@
 package com.sun.jersey.oauth.client;
 
 import javax.ws.rs.ext.Providers;
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
@@ -111,7 +112,7 @@ public final class OAuthClientFilter extends ClientFilter {
     /**
      * Constructs a new OAuth client filter with the specified providers.
      *
-     * @param providers the registered providers from Client.getProviders() method.
+     * @param providers the registered providers from {@link Client#getProviders()} method.
      * @param parameters the OAuth parameters to be used in signing requests.
      * @param secrets the OAuth secrets to be used in signing requests.
      */
@@ -120,6 +121,18 @@ public final class OAuthClientFilter extends ClientFilter {
         this(providers, parameters, secrets, null, null, null);
     }
 
+    /** Constructs a new OAuth client filter providing URI's for requesting
+     * request and access tokens and authorization. Passing these URI's will
+     * cause the filter will automatically attempt to obtain the tokens based
+     * if it receives 401 Unauthorized http status code.
+     *
+     * @param providers the registered providers from {@link Client#getProviders()} method.
+     * @param parameters the OAuthParameters to be used in signing requests.
+     * @param secrets the OAuth secrets to be used in signing requests.
+     * @param requestTokenUri URI for requesting new request tokens.
+     * @param accessTokenUri URI for requesting access tokens.
+     * @param authorizationUri URI for requesting authorization of request tokens.
+     */
     public OAuthClientFilter(Providers providers, OAuthParameters parameters,
             OAuthSecrets secrets, String requestTokenUri, String accessTokenUri,
             String authorizationUri) {
