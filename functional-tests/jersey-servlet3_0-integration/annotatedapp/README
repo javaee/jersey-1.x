@@ -1,0 +1,11 @@
+Tests that a web application which has an javax.ws.rs.core.Application sub-class annotated with @javax.ws.rs.ApplicationPath, and no servlets defined in the web.xml works fine after the Jersey Servlet 3.0 integration.
+
+Ex:
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
+
+@ApplicationPath("/oneonly")
+public class OneApplication extends Application {
+ ....
+
+}

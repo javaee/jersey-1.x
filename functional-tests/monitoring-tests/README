@@ -1,0 +1,19 @@
+All QE tests which test the monitoring support for GlassFish V3 go here.
+These are to be run only with GF v3.
+
+
+Monitoring needs to be enabled on GF v3 using the following command:
+---------------------------------------------------------------------
+asadmin set configs.config.server-config.monitoring-service.module-monitoring-levels.jersey=HIGH
+
+The values of the attributes being monitored for an application can be retieved through the admin console using the REST interface:
+--------------------------------------------------------------------
+http://localhost:4848/monitoring/domain/server/applications/helloworld-webapp/jersey/resources
+
+Steps to run:
+============
+1. mvn clean package -Dmaven.test.skip=true -Djersey.version=<JERSEY_VERSION> - from the monitoring-tests root.
+2. Deploy the test package war files.
+3. Run the tests from the monitoring-tests root as -
+    mvn test -Djersey.version=<JERSEY_VERSION> [-DJERSEY_ADMIN_PORT=<GF_ADMIN_PORT>] [-DJERSEY_HTTP_PORT=<GF_HTTP_PORT>] [-DenableLogging]
+

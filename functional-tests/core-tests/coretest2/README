@@ -1,0 +1,2 @@
+Tests that setting the FEATURE_DISABLE_WADL feature to 'true' really disables WADL generation. 
+Check it with a web application, using ClassNamesResourceConfig to specify the root resource class.

@@ -1,0 +1,7 @@
+1) Explain web.xml and GuiceServletConfig
+
+2) Create resource class, @Path("bound/perrequest"), using guice @RequestScoped
+
+3) Inject URI info and a query parameter
+
+4) Create singleton component and inject into resource at construction

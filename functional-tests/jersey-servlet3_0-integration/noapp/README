@@ -1,0 +1,1 @@
+This test checks that resource scanning/registration still works when the deployment descriptor declares javax.ws.rs.core.Application as a Servlet (even after the Servelt 3.0 integration)

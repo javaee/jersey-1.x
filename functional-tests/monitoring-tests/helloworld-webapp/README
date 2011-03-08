@@ -1,0 +1,3 @@
+The aim of this test is to check that the resource class hit count is being monitored correctly.
+
+The number of requests to be sent to the resource are specified using the System Property "resource_hits". If no value is set to this property, only one request would be sent to the resource.

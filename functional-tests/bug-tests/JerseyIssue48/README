@@ -1,0 +1,2 @@
+Tests the fix for issue https://jersey.dev.java.net/issues/show_bug.cgi?id=48, i.e., tests that an IllegalArgumentException is thorwn for a null value of path or uri in 
+UriBuilder.fromPath(...) or UriBuilder.fromUri(...).

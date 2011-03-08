@@ -1,0 +1,1 @@
+Tests that a regular web application which has an javax.ws.rs.core.Application sub-class defined as a Servlet in the web.xml, still works fine after the Jersey Servlet 3.0 integration.

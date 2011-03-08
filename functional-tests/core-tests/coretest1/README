@@ -1,0 +1,1 @@
+Tests that setting the FEATURE_DISABLE_WADL feature to 'true' really disables WADL generation.

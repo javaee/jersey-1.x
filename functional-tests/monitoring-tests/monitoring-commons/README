@@ -1,0 +1,9 @@
+The ResourceMonitor.java class has methods for getting the monitored data of the Jersey resources.
+
+The class currently has methods for retrieving the data using the asadmin REST interface, as well as the admin CLI. 
+
+Note:
+1. The ASADMIN REST interface is basically an URL which shows all the jersey relates monitored data of an application. For instance the URL for the REST interface of the helloworld-webapp application would be something like:
+http://localhost:4848/monitoring/domain/server/applications/helloworld-webapp/jersey/resources
+
+2. There has been some change in the asadmin REST interface which shows the monitored data, so the corresponding methods which retrieve the data may have to be modified accordingly. However, the methods which retrieve this data using the ASADMIN GET command are functioning correctly and all the monitoring tests are making calls to these methods. 

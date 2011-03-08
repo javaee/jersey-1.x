@@ -1,0 +1,4 @@
+All QE tests which test the Jersey Servlet 3.0 integration go here.
+
+Note:
+This support works from GF v3 build b61 onwards, hence tests are to be run on GF v3 b61 or higher version build.
