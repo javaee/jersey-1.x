@@ -79,14 +79,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-guice</artifactId>
             <version>${jersey-version}</version>
-        </dependency>
-        <!--
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-test-framework</artifactId>
-            <version>${jersey-version}</version>
-            <scope>test</scope>
-        </dependency>-->
+        </dependency>        
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
             <artifactId>jersey-test-framework-grizzly</artifactId>

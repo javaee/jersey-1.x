@@ -33,14 +33,7 @@
             <artifactId>jersey-test-framework-external</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency>
-        <!--
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-test-framework</artifactId>
-            <version>${jersey.version}</version>
-            <scope>test</scope>
-        </dependency>-->
+        </dependency>       
     </dependencies>
 
     <repositories>
