@@ -1,4 +1,9 @@
 release 1.6
+- Fixed issue 649
+  http://java.net/jira/browse/JERSEY-649
+  @Path("{id}") not matched for paths containing %2F
+  Introduced a new ResourceConfig feature, "com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature".
+  The feature allows to configure Grizzly to enable encoded slashes in URIs
 - Fixed issue 576
   http://java.net/jira/browse/JERSEY-576
   Grizzly upgraded to 1.9.31
