@@ -1,4 +1,7 @@
 release 1.6
+- Fixed issue 576
+  http://java.net/jira/browse/JERSEY-576
+  Grizzly upgraded to 1.9.31
 - JacksonJsonProvider example: added ObjectMapper resolver
   to show how to use Jackon specific configuration options
 - Fixed issue 625
