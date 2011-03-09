@@ -150,13 +150,19 @@
         </dependency>
     </dependencies>
     <repositories>
-         <repository>
+        <repository>
             <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
+            <name>java.net/maven/2 repository</name>
             <url>http://download.java.net/maven/2/</url>
             <layout>default</layout>
         </repository>
-    </repositories>
+         <repository>
+            <id>glassfish-repository.dev.java.net</id>
+            <name>java.net/maven/glassfish repository</name>
+            <url>http://download.java.net/maven/glassfish/</url>
+            <layout>default</layout>
+        </repository>
+     </repositories>
 </project>
 
 
