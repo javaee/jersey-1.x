@@ -58,7 +58,14 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
  */
 public final class GrizzlyServerFactory {
 
-    /**
+     /**
+     * {@link ResourceConfig feature to enable encoded slashes in URIs.
+     * If set to false (the default behavior), requests containing encoded slashes
+     * will get rejected by Grizzly and will never make it to the Jersey runtime.
+     */
+    public final static String AllowEncodedSlashFEATURE = "com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature";
+
+   /**
      * Creates a new {@link HttpServer} which will manage all root resource and
      * provider classes found by searching the classes referenced in the java
      * classpath.

@@ -44,6 +44,7 @@ import com.sun.grizzly.tcp.http11.GrizzlyAdapter;
 import com.sun.grizzly.tcp.http11.GrizzlyRequest;
 import com.sun.grizzly.tcp.http11.GrizzlyResponse;
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.grizzly.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.server.impl.ThreadLocalInvoker;
@@ -57,7 +58,6 @@ import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,7 +72,7 @@ import javax.ws.rs.core.GenericEntity;
  * @author Marc.Hadley@Sun.Com
  */
 public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerListener {
-    
+
     private WebApplication application;
     
     private String basePath = "/";
@@ -93,6 +93,8 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
 
     public GrizzlyContainer(ResourceConfig rc, WebApplication app) throws ContainerException {
         this.application = app;
+        
+        setAllowEncodedSlash(rc.getFeature(GrizzlyServerFactory.AllowEncodedSlashFEATURE));
 
         GenericEntity<ThreadLocal<GrizzlyRequest>> requestThreadLocal =
                 new GenericEntity<ThreadLocal<GrizzlyRequest>>(requestInvoker.getImmutableThreadLocal()) {};
@@ -234,6 +236,7 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
     
     // ContainerListener
     
+    @Override
     public void onReload() {
         WebApplication oldApplication = application;
         application = application.clone();

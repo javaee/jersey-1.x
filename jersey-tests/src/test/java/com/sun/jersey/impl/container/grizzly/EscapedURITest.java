@@ -43,7 +43,11 @@ package com.sun.jersey.impl.container.grizzly;
 import com.sun.jersey.api.client.Client;
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.grizzly.GrizzlyServerFactory;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import javax.ws.rs.GET;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
@@ -71,6 +75,14 @@ public class EscapedURITest extends AbstractGrizzlyServerTester {
         super(testName);
     }
     
+    @Path("escapedPathParam")
+    public static class EscapedPathParamResource {
+        @GET @Path("{id}")
+        public String get(@PathParam("id") String id) {
+            return id;
+        }
+    }
+
     public void testEscaped() {
         startServer(EscapedURIResource.class);
                 
@@ -86,4 +98,15 @@ public class EscapedURITest extends AbstractGrizzlyServerTester {
                 userInfo("x.y").path("x%20y").build());
         assertEquals("CONTENT", r.get(String.class));
     } 
+
+    public void testEscapedSlashInPathParam() {
+        ResourceConfig rc = new DefaultResourceConfig(EscapedPathParamResource.class);
+        rc.getFeatures().put(GrizzlyServerFactory.AllowEncodedSlashFEATURE, true);
+
+        startServer(rc);
+
+        WebResource r = Client.create().resource(getUri().
+                path("escapedPathParam/he%2Flo").build());
+        assertEquals("he/lo", r.get(String.class));
+    }
 }

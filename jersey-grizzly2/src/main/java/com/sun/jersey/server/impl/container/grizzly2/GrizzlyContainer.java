@@ -49,18 +49,21 @@ import java.util.Map;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.util.Charsets;
+
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.server.impl.ThreadLocalInvoker;
+
 import com.sun.jersey.spi.container.*;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import javax.ws.rs.core.UriBuilder;
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.util.Charsets;
 
 /**
  * Grizzly 2.0 Jersey container.
@@ -135,6 +138,8 @@ public final class GrizzlyContainer extends HttpHandler implements
     GrizzlyContainer(final ResourceConfig resourceConfig,
             final WebApplication application) {
         this.application = application;
+
+        setAllowEncodedSlash(resourceConfig.getFeature(GrizzlyServerFactory.AllowEncodedSlashFEATURE));
 
         final GenericEntity<ThreadLocal<Request>> requestThreadLocal =
                 new GenericEntity<ThreadLocal<Request>>(
