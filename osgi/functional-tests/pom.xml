@@ -58,6 +58,7 @@
         <pax-swissbox-version>1.2.0</pax-swissbox-version>
         <jetty-version>6.1.22</jetty-version>
         <jackson.version>1.7.1</jackson.version>
+        <osgi-version>4.2.0</osgi-version>
     </properties>
 
     <repositories>
@@ -168,12 +169,12 @@
             <artifactId>pax-swissbox-tinybundles</artifactId>
             <version>${pax-swissbox-version}</version>
         </dependency>
-        <!--dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <version>4.0.1</version>
+            <version>${osgi-version}</version>
             <scope>test</scope>
-        </dependency-->
+        </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
@@ -237,7 +238,7 @@
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.18-i</version>
+            <version>1.9.31</version>
             <scope>test</scope>
         </dependency>
         <dependency>

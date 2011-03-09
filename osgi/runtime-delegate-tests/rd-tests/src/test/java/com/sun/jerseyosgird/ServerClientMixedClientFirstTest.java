@@ -57,7 +57,7 @@ import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.felix;
-
+import static org.ops4j.pax.exam.CoreOptions.systemPackage;
 
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
@@ -140,6 +140,8 @@ public class ServerClientMixedClientFirstTest {
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
                 
+                systemPackage("sun.misc"),
+
                 // define maven repository
                 repositories(
                         "http://repo1.maven.org/maven2", 
@@ -182,7 +184,14 @@ public class ServerClientMixedClientFirstTest {
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-grizzly").versionAsInProject(),
         	mavenBundle().groupId("com.sun.jersey.test.osgi.runtime-delegate-tests").artifactId("runtime-delegate-test-bundle").versionAsInProject(),
 
-                mavenBundle("com.sun.grizzly", "grizzly-servlet-webserver", "1.9.18-i"),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-framework").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-rcm").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-portunif").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-utils").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-lzma").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http-servlet").versionAsInProject(),
 
                 // start felix framework
                 felix());

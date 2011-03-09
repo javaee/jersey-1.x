@@ -25,6 +25,7 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.systemPackage;
 
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
@@ -48,6 +49,7 @@ public class JsonTest {
         Option[] options = options(
                 //                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
+                systemPackage("sun.misc"),
                 // define maven repository
                 repositories(
                 "http://repo1.maven.org/maven2",
@@ -66,8 +68,17 @@ public class JsonTest {
                 //mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
 //                // tiny bundle
 //                mavenBundle().groupId("org.ops4j.pax.swissbox").artifactId("pax-swissbox-tinybundles").versionAsInProject(),
+                mavenBundle("org.apache.geronimo.specs","geronimo-servlet_2.5_spec","1.1.2"),
                 // load grizzly bundle
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-framework").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-rcm").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-portunif").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-utils").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-lzma").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http-servlet").versionAsInProject(),
+
                 // load Jersey bundles
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),

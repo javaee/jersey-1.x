@@ -20,6 +20,7 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.systemPackage;
 
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 import org.osgi.framework.BundleContext;
@@ -45,6 +46,7 @@ public class OsgiIntegrationTest {
         Option[] options = options(
                 //                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
+                systemPackage("sun.misc"),
                 // define maven repository
                 repositories(
                 "http://repo1.maven.org/maven2",
@@ -55,6 +57,14 @@ public class OsgiIntegrationTest {
                 "http://repository.springsource.com/maven/bundles/external"),
                 // load grizzly bundle
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-framework").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-rcm").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-portunif").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-utils").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-lzma").versionAsInProject(),
+                mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http-servlet").versionAsInProject(),
+
                 // asm bundle
                 mavenBundle().groupId("asm").artifactId("asm-all").versionAsInProject(),
                 // load Jersey bundles

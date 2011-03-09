@@ -62,7 +62,7 @@
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.18-i</version>
+            <version>1.9.31</version>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
