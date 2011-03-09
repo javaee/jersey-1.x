@@ -40,50 +40,23 @@
 
 package com.sun.jersey.server.impl.uri.rules;
 
-import com.sun.jersey.server.impl.uri.PathPattern;
-import com.sun.jersey.spi.uri.rules.UriRule;
-import com.sun.jersey.spi.uri.rules.UriRuleContext;
-import com.sun.jersey.spi.uri.rules.UriRules;
-import com.sun.jersey.server.probes.UriRuleProbeProvider;
-import java.util.Iterator;
-import java.util.Map;
+import java.io.*;
+import com.sun.jersey.spi.container.*;
 
 /**
- * The rule for accepting the root resource classes.
- * 
- * @author Paul.Sandoz@Sun.Com
+ * This class is used only in unit tests within this package,
+ * and is a "double" of a real-life ResponseWriter.
+ *
+ * @author Yegor Bugayenko (yegor256@java.net)
  */
-public final class RootResourceClassesRule implements UriRule {
+class ResponseWriterDbl implements ContainerResponseWriter {
 
-    private final UriRules<UriRule> rules;
-
-    /**
-     * Public constructor
-     * @param rulesMap Map of path patterns and URI rules
-     */
-    public RootResourceClassesRule(final Map<PathPattern, UriRule> rulesMap) {
-        this.rules = UriRulesFactory.create(rulesMap);
+    @Override
+    public void finish() {
+        /* do nothing */
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.ruleAccept(
-            RootResourceClassesRule.class.getSimpleName(),
-            path,
-            resource
-        );
-
-        if (context.isTracingEnabled()) {
-            context.trace("accept root resource classes: \"" + path + "\"");
-        }
-
-        final Iterator<UriRule> matches = rules.match(path, context);
-        while(matches.hasNext())
-            if(matches.next().accept(path, resource, context))
-                return true;
-        
-        return false;
+    public OutputStream writeStatusAndHeaders(long len, ContainerResponse rsp) {
+        return new ByteArrayOutputStream();
     }
 }

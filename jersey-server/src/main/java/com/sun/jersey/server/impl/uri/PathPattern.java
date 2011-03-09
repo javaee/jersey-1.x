@@ -48,7 +48,6 @@ import java.util.Comparator;
  * A URI pattern that is a regular expression generated from a URI path.
  *
  * @author Paul.Sandoz@Sun.Com
- * @author Yegor Bugayenko (yegor256@java.net)
  */
 public final class PathPattern extends UriPattern {
 
@@ -163,7 +162,7 @@ public final class PathPattern extends UriPattern {
         if (indexes.length == 0) {
             return indexes;
         }
-        int[] cgIndexes = new int[indexes.length + 1];
+        final int[] cgIndexes = new int[indexes.length + 1];
         System.arraycopy(indexes, 0, cgIndexes, 0, indexes.length);
         cgIndexes[indexes.length] = cgIndexes[indexes.length - 1] + 1;
         return cgIndexes;

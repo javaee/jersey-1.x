@@ -40,50 +40,31 @@
 
 package com.sun.jersey.server.impl.uri.rules;
 
-import com.sun.jersey.server.impl.uri.PathPattern;
-import com.sun.jersey.spi.uri.rules.UriRule;
+import org.junit.*;
+import static org.junit.Assert.*;
+import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
-import com.sun.jersey.spi.uri.rules.UriRules;
-import com.sun.jersey.server.probes.UriRuleProbeProvider;
-import java.util.Iterator;
-import java.util.Map;
 
 /**
- * The rule for accepting the root resource classes.
- * 
- * @author Paul.Sandoz@Sun.Com
+ * @author Yegor Bugayenko (yegor256@java.net)
  */
-public final class RootResourceClassesRule implements UriRule {
+public class BaseRuleTest {
 
-    private final UriRules<UriRule> rules;
-
-    /**
-     * Public constructor
-     * @param rulesMap Map of path patterns and URI rules
-     */
-    public RootResourceClassesRule(final Map<PathPattern, UriRule> rulesMap) {
-        this.rules = UriRulesFactory.create(rulesMap);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.ruleAccept(
-            RootResourceClassesRule.class.getSimpleName(),
-            path,
-            resource
-        );
-
-        if (context.isTracingEnabled()) {
-            context.trace("accept root resource classes: \"" + path + "\"");
+    private static class FooRule extends BaseRule {
+        public FooRule(final UriTemplate template) {
+            super(template);
         }
-
-        final Iterator<UriRule> matches = rules.match(path, context);
-        while(matches.hasNext())
-            if(matches.next().accept(path, resource, context))
-                return true;
-        
-        return false;
+        @Override
+        public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+            return true;
+        }
     }
+
+    @Test
+    public void testSavesAndRetrievesTemplate() throws Exception {
+        UriTemplate template = new UriTemplate("/test/{name}/{id}");
+        BaseRule rule = new FooRule(template);
+        assertEquals(template, rule.getTemplate());
+    }
+
 }

@@ -45,23 +45,42 @@ import com.sun.jersey.spi.uri.rules.UriRuleContext;
 
 /**
  * Abstract class for a rule that manages capturing group names.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class BaseRule implements UriRule {
+
+    /**
+     * The template to work with.
+     */
     private final UriTemplate template;
-    
-    public BaseRule(UriTemplate template) {
+
+    /**
+     * Public constructor.
+     * @param template The template of the URI
+     */
+    public BaseRule(final UriTemplate template) {
         assert template != null;
-        
         this.template = template;
     }
-    
-    protected final void pushMatch(UriRuleContext context) {
-        context.pushMatch(template, template.getTemplateVariables());
+
+    /**
+     * Push match to the provided context.
+     * @param context The URI rule context
+     */
+    protected final void pushMatch(final UriRuleContext context) {
+        context.pushMatch(
+            template,
+            template.getTemplateVariables()
+        );
     }
-    
+
+    /**
+     * Get URI template initialized in ctor.
+     * @return The template stored in the object
+     */
     protected final UriTemplate getTemplate() {
         return template;
     }
+
 }

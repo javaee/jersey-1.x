@@ -74,17 +74,17 @@ import javax.ws.rs.core.UriBuilder;
  */
 public final class WebApplicationContext implements UriRuleContext, ExtendedUriInfo {
     public static final String HTTP_METHOD_MATCH_RESOURCE = "com.sun.jersey.MATCH_RESOURCE";
-    
+
     private final WebApplicationImpl app;
 
     private final boolean isTraceEnabled;
 
     private ContainerRequest request;
-    
+
     private ContainerResponse response;
 
     private List<ContainerResponseFilter> responseFilters;
-    
+
     public WebApplicationContext(WebApplicationImpl app,
             ContainerRequest request, ContainerResponse response) {
         this.app = app;
@@ -94,14 +94,14 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         this.responseFilters = Collections.EMPTY_LIST;
 
         if (isTracingEnabled()) {
-            getProperties().put(TraceInformation.class.getName(), 
+            getProperties().put(TraceInformation.class.getName(),
                     new TraceInformation(this));
         }
     }
 
     public WebApplicationContext createMatchResourceContext(URI u) {
         final URI base = request.getBaseUri();
-        
+
         if (u.isAbsolute()) {
             // TODO check if base is a base of u
             URI r = base.relativize(u);
@@ -158,7 +158,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     }
 
     // Traceable
-    
+
     @Override
     public boolean isTracingEnabled() {
         return isTraceEnabled;
@@ -214,7 +214,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     public ContainerResponse getContainerResponse() {
         return response;
     }
-    
+
     @Override
     public void setContainerResponse(ContainerResponse response) {
         this.response = response;
@@ -246,7 +246,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
     @Override
     public void pushMatch(UriTemplate template, List<String> names) {
         matchResults.addFirst(matchResult);
-        
+
         templates.addFirst(template);
 
         if (encodedTemplateValues == null) {
@@ -265,7 +265,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
             }
         }
     }
-    
+
     @Override
     public void pushResource(Object resource) {
         resources.addFirst(resource);
@@ -283,11 +283,11 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
                 ep.length() - rhpathlen));
     }
 
-    
+
     // UriInfo, defer to HttpRequestContext
 
     private MultivaluedMapImpl encodedTemplateValues;
-    
+
     private MultivaluedMapImpl decodedTemplateValues;
 
     @Override
@@ -397,9 +397,9 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
         return resources;
     }
 
-    
+
     // ExtendedUriInfo
-    
+
     @Override
     public AbstractResourceMethod getMatchedMethod() {
         return arm;
@@ -438,7 +438,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
                 if (path.charAt(x) == '/') {
                     segmentsStart++;
                 }
-            }           
+            }
             int segmentsEnd = segmentsStart;
             for (int x = bounds[0]; x < bounds[1]; x++) {
                 if (path.charAt(x) == '/') {

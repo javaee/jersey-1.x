@@ -40,50 +40,40 @@
 
 package com.sun.jersey.server.impl.uri.rules;
 
-import com.sun.jersey.server.impl.uri.PathPattern;
-import com.sun.jersey.spi.uri.rules.UriRule;
-import com.sun.jersey.spi.uri.rules.UriRuleContext;
-import com.sun.jersey.spi.uri.rules.UriRules;
-import com.sun.jersey.server.probes.UriRuleProbeProvider;
-import java.util.Iterator;
-import java.util.Map;
+import java.net.URI;
+import java.util.*;
+import org.apache.commons.io.IOUtils;
+import com.sun.jersey.server.impl.application.WebApplicationContext;
+import com.sun.jersey.spi.container.*;
+import com.sun.jersey.spi.uri.rules.*;
+import com.sun.jersey.server.impl.application.WebApplicationImpl;
+import com.sun.jersey.core.header.InBoundHeaders;
 
 /**
- * The rule for accepting the root resource classes.
- * 
- * @author Paul.Sandoz@Sun.Com
+ * This class is used only in unit tests within this package,
+ * and is a "double" of a real-life JAX-RS resource.
+ *
+ * @author Yegor Bugayenko (yegor256@java.net)
  */
-public final class RootResourceClassesRule implements UriRule {
+class UriRuleContextDbl {
 
-    private final UriRules<UriRule> rules;
-
-    /**
-     * Public constructor
-     * @param rulesMap Map of path patterns and URI rules
-     */
-    public RootResourceClassesRule(final Map<PathPattern, UriRule> rulesMap) {
-        this.rules = UriRulesFactory.create(rulesMap);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.ruleAccept(
-            RootResourceClassesRule.class.getSimpleName(),
-            path,
-            resource
+    public static UriRuleContext make() throws Exception {
+        WebApplicationImpl app = new WebApplicationImpl();
+        ContainerRequest request = new ContainerRequest(
+            app, // web application requested
+            "GET", // HTTP method
+            new URI("/"), // base URI
+            new URI("/test"), // request URI
+            new InBoundHeaders(), // headers
+            IOUtils.toInputStream("") // incoming entity
         );
-
-        if (context.isTracingEnabled()) {
-            context.trace("accept root resource classes: \"" + path + "\"");
-        }
-
-        final Iterator<UriRule> matches = rules.match(path, context);
-        while(matches.hasNext())
-            if(matches.next().accept(path, resource, context))
-                return true;
-        
-        return false;
+        ContainerResponse response = new ContainerResponse(
+            app, // web application requested
+            request, // container request
+            new ResponseWriterDbl()
+        );
+        UriRuleContext context = new WebApplicationContext(app, request, response);
+        return context;
     }
+
 }

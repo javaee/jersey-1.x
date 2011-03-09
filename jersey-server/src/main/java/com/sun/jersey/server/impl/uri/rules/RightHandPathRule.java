@@ -70,25 +70,32 @@ public class RightHandPathRule implements UriRule {
     private final UriRule rule;
     
     /**
+     * Public constructor.
+     *
      * @param redirect if true return a temporary redirect response if the
      *        path does not end in '/' and the pattern ends in '/'.
      * @param patternEndsInSlash true if the pattern used to match with rule
      *        end in a '/', otherwise false.
      * @param rule the URI rule that is adapted.
      */
-    public RightHandPathRule(boolean redirect, boolean patternEndsInSlash, UriRule rule) {
+    public RightHandPathRule(final boolean redirect, final boolean patternEndsInSlash, final UriRule rule) {
         assert rule != null;
-        
         this.redirect = redirect;
         this.patternEndsInSlash = patternEndsInSlash;
         this.rule = rule;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public final boolean accept(CharSequence path, Object resource, UriRuleContext context) {
-        UriRuleProbeProvider.ruleAccept(RightHandPathRule.class.getSimpleName(), path,
-                resource);
-        
+        UriRuleProbeProvider.ruleAccept(
+            RightHandPathRule.class.getSimpleName(),
+            path,
+            resource
+        );
+
         String rhpath = getRightHandPath(context.getMatchResult());
 
         if (rhpath.length() == 0) {
@@ -97,13 +104,15 @@ public class RightHandPathRule implements UriRule {
             if (patternEndsInSlash && redirect) {
                 if (context.isTracingEnabled()) {
                     context.trace(
-                            String.format("accept right hand path redirect: \"%s\" to \"%s/\"",
+                        String.format(
+                            "accept right hand path redirect: \"%s\" to \"%s/\"",
                             path,
-                            path));
+                            path
+                        )
+                    );
                 }
                 return redirect(context);
             }
-            
             context.pushRightHandPathLength(0);
         } else if (rhpath.length() == 1) {
             // Path is '/', no match if pattern does not end in a '/'
@@ -125,13 +134,15 @@ public class RightHandPathRule implements UriRule {
         if (context.isTracingEnabled()) {
             CharSequence lhpath = path.subSequence(0, path.length() - rhpath.length());
             context.trace(
-                    String.format("accept right hand path %s: \"%s\" -> \"%s\" : \"%s\"",
+                String.format(
+                    "accept right hand path %s: \"%s\" -> \"%s\" : \"%s\"",
                     context.getMatchResult(),
                     path,
                     lhpath,
-                    rhpath));
+                    rhpath
+                )
+            );
         }
-
         // Accept using the right hand path
         return rule.accept(rhpath, resource, context);
     }
@@ -144,24 +155,26 @@ public class RightHandPathRule implements UriRule {
      * @return the right hand path, or the empty string if there is no last
      *         group.
      */
-    private String getRightHandPath(MatchResult mr) {        
+    private String getRightHandPath(final MatchResult mr) {
         final String rhp = (mr.groupCount() > 0) ? mr.group(mr.groupCount()) : "";
         return (rhp != null) ? rhp : "";
     }
 
     /**
      * Redirect to a URI that ends in a slash.
-     * 
+     * @param context The URI rule context
+     * @return Redirect or not?
+     *
      * TODO use the complete URI.
      */
-    private boolean redirect(UriRuleContext context) {
+    private boolean redirect(final UriRuleContext context) {
         final HttpResponseContext response = context.getResponse();
-        
         response.setResponse(
-                Response.temporaryRedirect(
-                    context.getUriInfo().getRequestUriBuilder().path("/").build()
-                ).build()
-            );
+            Response.temporaryRedirect(
+                context.getUriInfo().getRequestUriBuilder().path("/").build()
+            ).build()
+        );
         return true;
     }
+
 }

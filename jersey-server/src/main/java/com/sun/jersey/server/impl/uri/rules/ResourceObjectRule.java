@@ -49,41 +49,59 @@ import java.util.Iterator;
 
 /**
  * The rule for accepting a resource object.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class ResourceObjectRule extends BaseRule {
 
     private final Object resourceObject;
-    
-    public ResourceObjectRule(UriTemplate template, Object resourceObject) {
+
+    /**
+     * Public ctor.
+     * @param template The URI template
+     * @param resourceObject The object
+     */
+    public ResourceObjectRule(final UriTemplate template, final Object resourceObject) {
         super(template);
         this.resourceObject = resourceObject;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         // Set the template values
         pushMatch(context);
 
         if (context.isTracingEnabled()) {
-            context.trace(String.format("accept resource: \"%s\" -> @Path(\"%s\") %s",
+            context.trace(
+                String.format("accept resource: \"%s\" -> @Path(\"%s\") %s",
                     context.getUriInfo().getMatchedURIs().get(0),
                     getTemplate().getTemplate(),
-                    ReflectionHelper.objectToString(resourceObject)));
+                    ReflectionHelper.objectToString(resourceObject)
+                )
+            );
         }
 
         context.pushResource(resourceObject);
 
-        UriRuleProbeProvider.ruleAccept(ResourceObjectRule.class.getSimpleName(), path,
-                resourceObject);
+        UriRuleProbeProvider.ruleAccept(
+            ResourceObjectRule.class.getSimpleName(),
+            path,
+            resourceObject
+        );
 
         // Match sub-rules on the resource class
-        final Iterator<UriRule> matches = context.getRules(resourceObject.getClass()).
-                match(path, context);
-        while (matches.hasNext())
-            if (matches.next().accept(path, resourceObject, context))
+        final Iterator<UriRule> matches = context
+            .getRules(resourceObject.getClass())
+            .match(path, context);
+        while (matches.hasNext()) {
+            if (matches.next().accept(path, resourceObject, context)) {
                 return true;
-        
+            }
+        }
         return false;
     }
+
 }
