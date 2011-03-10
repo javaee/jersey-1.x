@@ -44,6 +44,9 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.spi.container.TestContainerException;
+import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -56,7 +59,18 @@ public class HelloWorldWebAppTest extends JerseyTest {
 
     public HelloWorldWebAppTest() throws Exception {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.helloworld.resources")
-                .contextPath("helloworld-webapp").build());
+                .contextPath("helloworld-webapp").build()); 
+    }
+
+
+    /**
+     * just redefining jersey test container factory here - so I don't need to use mvn 2.0.9
+     * @return
+     * @throws TestContainerException
+     */
+    @Override
+    protected TestContainerFactory getTestContainerFactory() throws TestContainerException {
+        return new EmbeddedGlassFishTestContainerFactory();
     }
 
     /**
@@ -67,9 +81,16 @@ public class HelloWorldWebAppTest extends JerseyTest {
     public void testHelloWorld() throws Exception {
         WebResource webResource = resource();
         String responseMsg = webResource.path("helloworld").get(String.class);
+
+        System.out.println("##########################");
+        System.out.println("##### GET " + webResource.path("helloworld").getURI() + " returned " + responseMsg + " #####");
+        System.out.println("##########################");
+
         Assert.assertEquals("Hello World", responseMsg);
     }
 
+    
+//    un-commenting this will be another step
     @Test
     public void testApplicationWadl() {
         WebResource webResource = resource();

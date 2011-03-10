@@ -39,28 +39,34 @@
  */
 package com.sun.jersey.test.framework.spi.container.embedded.glassfish;
 
-import com.sun.jersey.test.framework.impl.container.embedded.glassfish.WebXmlGenerator;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.impl.container.embedded.glassfish.WebXmlGenerator;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import org.glassfish.embeddable.CommandRunner;
+import org.glassfish.embeddable.CommandResult;
+import org.glassfish.embeddable.Deployer;
+import org.glassfish.embeddable.GlassFish;
+import org.glassfish.embeddable.GlassFishException;
+import org.glassfish.embeddable.GlassFishProperties;
+import org.glassfish.embeddable.GlassFishRuntime;
+import org.glassfish.embeddable.archive.ScatteredArchive;
+
+import javax.ws.rs.core.UriBuilder;
+import javax.xml.bind.JAXBException;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.logging.Logger;
-import javax.ws.rs.core.UriBuilder;
-import javax.xml.bind.JAXBException;
-import org.glassfish.embed.EmbeddedException;
-import org.glassfish.embed.EmbeddedInfo;
-import org.glassfish.embed.ScatteredArchive;
-import org.glassfish.embed.Server;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A Web-based test container factory for creating test container instances 
@@ -90,17 +96,19 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
         private static final Logger LOGGER =
                 Logger.getLogger(EmbeddedGlassFishTestContainer.class.getName());
 
-        private ScatteredArchive war;
-
-        private Server server;
-
-        private EmbeddedInfo embeddedInfo;
+        private ScatteredArchive warArchive;
+        
+        //GlassFish glassfish = GlassFishRuntime.bootstrap().newGlassFish();
+        private GlassFish glassfish;
+        //GlassFishRuntime gfr = GlassFishRuntime.bootstrap();
+        private GlassFishRuntime gfr;
         
         private WebAppDescriptor appDescriptor;
 
         final URI baseUri;
 
         final String WEB_XML = "web.xml";
+        final String SUN_WEB_XML = "sun-web.xml";
 
         final String WEB_INF_PATH= "WEB-INF";
 
@@ -109,11 +117,14 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
         final String SRC_WEBAPP_PATH = "src/main/webapp";
 
         final String TARGET_CLASSES_PATH = "target/classes";
+        //final String TARGET_PATH = "target/";
+        final String TARGET_PATH = "target";
+        final String CLASSES_PATH = "classes";        
 
         /**
          * Creates an instance of {@link EmbeddedGlassFishTestContainer}
-         * @param Base URI of the application
-         * @param An instance of {@link AppDescriptor}
+         * @param baseUri URI of the application
+         * @param ad instance of {@link AppDescriptor}
          */
         private EmbeddedGlassFishTestContainer(URI baseUri, WebAppDescriptor ad) {
             this.baseUri = UriBuilder.fromUri(baseUri)
@@ -135,44 +146,160 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             return this.baseUri;
         }
 
+        private void copyFile(FileInputStream fin, FileOutputStream fout) {
+            int i;
+            /*FileInputStream fin;
+            FileOutputStream fout;
+
+            fin = new FileInputStream(args[0]);
+            fout = new FileOutputStream(args[1]);*/
+            try {
+                do {
+                    i = fin.read();
+                    if (i != -1) {
+                        fout.write(i);
+                    }
+                } while (i != -1);
+
+                fin.close();
+                fout.close();
+            } catch (IOException ioeX) {
+                LOGGER.info("Encountered IOException [" + ioeX.getMessage() + "] trying to copyFile(InputStream,OutputStream) for [" + warArchive.toString() + "]");
+                throw new TestContainerException(ioeX);
+            }
+        }
+        
+        //Starts the embedded server, opening ports, and running the startup services.
         public void start() {
             LOGGER.info("Starting the EmbeddedGlassFish instance...");
             try {
-                server.start();
-                server.getDeployer().deploy(war, null);
-            } catch (EmbeddedException ex) {
+                glassfish.start();
+                
+                /*
+                DeployCommandParameters deployCommandParameters = new DeployCommandParameters();
+                deployCommandParameters.contextroot = this.appDescriptor.getContextPath();
+                String name = server.getDeployer().deploy(war, deployCommandParameters);
+                */
+                Deployer deployer = glassfish.getDeployer();
+                // Deploy my scattered web application
+                //deployer.deploy(archive.toURI());
+                if (warArchive == null) {
+                    LOGGER.info("warArchive is null, nothing deployed");
+                } else {
+                    LOGGER.info("About to deploy [" + warArchive.toURI().toString() + "] from path ["+warArchive.toURI().getPath()+ "]  to EmbeddedGlassFish instance [" + deployer.toString() + "] with context-root set to [" + this.appDescriptor.getContextPath() + "]");
+                    String deployedApp = deployer.deploy(warArchive.toURI());
+                    LOGGER.info("Deployed [" + deployedApp + "] to EmbeddedGlassFish instance [" + deployer.toString() + "] with context-root set to [" + this.appDescriptor.getContextPath() + "]");
+                }
+            } catch (org.glassfish.embeddable.GlassFishException ex) {
+                LOGGER.info("Caught GlassFishException ["+ex.getMessage()+ "] trying to start the embedded server instance");
                 throw new TestContainerException(ex);
-            }             
+            } catch (java.io.IOException ioe) {
+                LOGGER.info("Caught IOException ["+ioe.getMessage()+ "] trying to start the embedded server instance");
+                throw new TestContainerException(ioe);
+            } 
         }
 
+        private void undeployAllApplications() {
+            java.util.Collection<java.lang.String> deployedApps;
+            Deployer deployer;
+            try {
+                deployer = glassfish.getDeployer();
+                // Return names of all the deployed applications.                
+                deployedApps = deployer.getDeployedApplications();
+               
+            } catch (GlassFishException glassFishException) {
+                throw new TestContainerException(glassFishException);
+            }
+
+            //  undeploy each app in for-each loop
+            for (String deployedApp : deployedApps) {
+                try {
+                    //see http://java.net/jira/browse/EMBEDDED_GLASSFISH-123                    
+                    deployer.undeploy(deployedApp, "--droptables", "true");                    
+                } catch (GlassFishException glassFishException) {
+                    throw new TestContainerException(glassFishException);
+                }
+                LOGGER.info("Undeployed = " + deployedApp);
+            }
+        }
+
+        //  stops the embedded server instance, any deployed application
+        //  will be stopped ports will be closed and shutdown services will be run.
         public void stop() {
             LOGGER.info("Stopping the EmbeddedGlassFish instance...");
-            try {
-                server.getDeployer().undeployAll();
-                server.stop();
-            } catch (EmbeddedException ex) {
+            try {                
+                 undeployAllApplications();
+
+                 // this will stop and dispose all the glassfish instances created with this gfr
+                 // if you were to bootstrap GlassFishRuntime again, Shutdown GlassFish.
+                 // this will avoid "already bootstrapped" errors seen when running multiple tests
+                 // in same VM
+                 gfr.shutdown();                               
+
+            } catch (GlassFishException ex) {
                 throw new TestContainerException(ex);
-            }             
+            }
         }
 
         /**
          * Instantiates EmbeddedGlassFish
          */
         private void instantiateServer() {
-            embeddedInfo = new EmbeddedInfo();
-            embeddedInfo.setLogging(false);
-            embeddedInfo.setHttpPort(this.baseUri.getPort());
-            embeddedInfo.setServerName("EmbeddedGFServer");
 
-            //get an instance fof the server
-            server = Server.getServer("EmbeddedGFServer");
-            if(server == null) {
+             /*
+             See Usage example :
+             * from
+         http://embedded-glassfish.java.net/nonav/apidocs/org/glassfish/embeddable/archive/ScatteredArchive.html
+             */
+
+            if (gfr == null) {
                 try {
-                    server = new Server(embeddedInfo);
-                } catch (EmbeddedException ex) {
+                    LOGGER.info("Create instantiated GlassFishRuntime");
+                    gfr = GlassFishRuntime.bootstrap();
+                } catch (GlassFishException ex) {
                     throw new TestContainerException(ex);
                 }
-            }             
+            } else {
+                LOGGER.info("Re-use Already instantiated GlassFishRuntime");
+                // try doing gfr.shutdown() if you were to
+                // bootstrap GlassFishRuntime again.
+                // Shutdown GlassFish.
+                try {
+                    gfr.shutdown();
+                    // can comment out to see if this fixes 'already bootstrapped' error
+                    // but never reaches here on 2nd test
+                    gfr = GlassFishRuntime.bootstrap();
+                } catch (GlassFishException shutdownex) {
+                    throw new TestContainerException(shutdownex);
+                }
+            }
+
+            if (glassfish == null) {
+                try {                 
+                    GlassFishProperties gfProperties = new GlassFishProperties();
+                    gfProperties.setPort("http-listener", getBaseUri().getPort());
+
+                    glassfish = gfr.newGlassFish(gfProperties);
+                    // use glassfish
+                } catch (GlassFishException ngfex) {
+                    throw new TestContainerException(ngfex);
+                }
+            } else {
+                LOGGER.info("Dispose Already instantiated GlassFish");
+                try {
+                    // dispose it.
+                    glassfish.dispose();
+                } catch (GlassFishException disposeex) {
+                    throw new TestContainerException(disposeex);
+                }
+                LOGGER.info("Create another instantiated GlassFish");
+                try {
+                  glassfish = gfr.newGlassFish();
+                } catch (GlassFishException ngfex2) {
+                    throw new TestContainerException(ngfex2);
+                }                
+            }
+           
         }
 
         /**
@@ -210,27 +337,97 @@ public class EmbeddedGlassFishTestContainerFactory implements TestContainerFacto
             return webXml.exists();
         }
 
+        private boolean sunWebXmlExists() {
+            File sunWebXml = new File(SRC_WEBAPP_PATH + "/" + WEB_INF_PATH + "/"
+                    + SUN_WEB_XML);
+            return sunWebXml.exists();
+        }
+
         /**
          * Creates an archive of the application for deployment.
+         *
+         Deployer deployer = glassfish.getDeployer();
+         // Deploy my scattered web application
+         deployer.deploy(archive.toURI());
          */
         private void createArchive() {
             // create an archive of the deployment descriptor and test classes
             if ( !webXmlGeneratedOnTheFly() ) {
                 try {
-                    war = new ScatteredArchive(baseUri.getRawPath(),
-                            new File(SRC_WEBAPP_PATH),
-                            new File(SRC_WEBAPP_PATH + "/"  + WEB_INF_PATH + "/" + WEB_XML),
-                            Collections.singleton(new File(TARGET_CLASSES_PATH).toURI().toURL()));
-                } catch (MalformedURLException ex) {
+                    /*
+                    Construct a new scattered archive builder with the minimum information By default, 
+                     a scattered archive is not different from any other archive where all the files
+                     are located under a top level directory (topDir).
+                     **/
+                    LOGGER.info("#1 inside method createArchive ==> webXmlGeneratedOnTheFly ==> Creating scatteredArchive [" + SRC_WEBAPP_PATH + "]");                                      
+                   
+                     // Create a scattered web application.
+                     //ScatteredArchive archive = new ScatteredArchive("testapp", ScatteredArchive.Type.WAR);
+                     //use global variable
+                     //warArchive = new ScatteredArchive(baseUri.getRawPath()+File.separator+ SRC_WEBAPP_PATH+File.separator+"myWarArchive", ScatteredArchive.Type.WAR);
+                     warArchive = new ScatteredArchive(baseUri.getRawPath(), ScatteredArchive.Type.WAR);
+
+
+                     // required if exist already //The name for this metadata will be obtained by doing metadata.getName()
+                    try {
+                        warArchive.addMetadata(new File(SRC_WEBAPP_PATH+ "/"  + WEB_INF_PATH + "/", WEB_XML));
+                    } catch (java.io.IOException ioe) {
+                        LOGGER.info("Encountered IOException [" + ioe.getMessage() + "] trying to addMetadata [" + SRC_WEBAPP_PATH+ "/"  + WEB_INF_PATH + "/" + WEB_XML + "]");
+                        throw new TestContainerException(ioe);
+                    }
+
+                    //The name for this metadata will be obtained by doing metadata.getName() 
+                    //scatteredArchiveBuilder.addMetadata(new File(SRC_WEBAPP_PATH + "/"  + WEB_INF_PATH + "/" + SUN_WEB_XML));
+                    // resources/sun-web.xml is my WEB-INF/sun-web.xml
+                    //archive.addMetadata(new File("resources", "sun-web.xml"));
+                    try {
+                        warArchive.addMetadata(new File(SRC_WEBAPP_PATH+ "/"  + WEB_INF_PATH + "/", SUN_WEB_XML));
+                    } catch (java.io.IOException ioe) {
+                        LOGGER.info("Encountered IOException [" + ioe.getMessage() + "] trying to addMetadata [" + SUN_WEB_XML + "]");
+                        throw new TestContainerException(ioe);
+                    }
+                    // target/classes directory contains my complied servlets
+                    //archive.addClassPath(new File("target", "classes"));
+                    try {
+                        warArchive.addClassPath(new File(TARGET_PATH, CLASSES_PATH));
+                    } catch (java.io.IOException ioe) {
+                        LOGGER.info("Encountered IOException [" + ioe.getMessage() + "] trying to addClassPath [" + TARGET_PATH +"/"+ CLASSES_PATH+ "]");
+                        throw new TestContainerException(ioe);
+                    }
+                    // resources/MyLogFactory is my META-INF/services/org.apache.commons.logging.LogFactory
+                    //archive.addMetadata(new File("resources", "MyLogFactory"),
+                    //"META-INF/services/org.apache.commons.logging.LogFactory");
+                    LOGGER.info("#1 inside method createArchive ==> webXmlGeneratedOnTheFly ==> just created scatteredArchive [" + SRC_WEBAPP_PATH + "] using WEB-INF/web.xml from [" + warArchive.toString() + "]");
+                    System.out.println("jsb, #1 inside method createArchive ==> webXmlGeneratedOnTheFly ==> just created scatteredArchive [" + SRC_WEBAPP_PATH + "] using WEB-INF/web.xml from [" + warArchive.toString() + "]");
+                } catch (Exception ex) {
                     throw new TestContainerException(ex);
                 }
             } else {
-                try {
-                    war = new ScatteredArchive(baseUri.getRawPath(),
-                            new File(TARGET_WEBAPP_PATH),
-                            new File(TARGET_WEBAPP_PATH + "/" + WEB_INF_PATH + "/" + WEB_XML),
-                            Collections.singleton(new File(TARGET_CLASSES_PATH).toURI().toURL()));
-                } catch (MalformedURLException ex) {
+                try {                  
+                    LOGGER.info("#2 inside method createArchive ==> webXmlGeneratedOnTheFly ==> Creating scatteredArchive [" + TARGET_WEBAPP_PATH + "]");
+                    //use global variable
+                    //warArchive = new ScatteredArchive(baseUri.getRawPath()+File.separator+TARGET_WEBAPP_PATH+File.separator+"myWarArchive", ScatteredArchive.Type.WAR);
+                    warArchive = new ScatteredArchive(baseUri.getRawPath(), ScatteredArchive.Type.WAR);
+
+                    //The name for this metadata will be obtained by doing metadata.getName()
+                    try {
+                        warArchive.addMetadata(new File(TARGET_WEBAPP_PATH+ "/"  + WEB_INF_PATH + "/", WEB_XML));
+                    } catch (java.io.IOException ioe) {
+                        LOGGER.info("Encountered IOException [" + ioe.getMessage() + "] trying to addMetadata [" + TARGET_WEBAPP_PATH+ "/"  + WEB_INF_PATH + "/" + WEB_XML + "]");
+                        throw new TestContainerException(ioe);
+                    }
+
+                    // do i need to add sun-web.xml to scatteredArchive via addMetaData to set context-root correctly
+                    //scatteredArchiveBuilder.addMetadata(new File(TARGET_WEBAPP_PATH + "/"  + WEB_INF_PATH + "/" + SUN_WEB_XML));
+                    try { 
+                        warArchive.addClassPath(new File(TARGET_PATH, CLASSES_PATH));
+                    } catch (java.io.IOException ioe) {
+                        LOGGER.info("Encountered IOException [" + ioe.getMessage() + "] trying to addClassPath [" + TARGET_PATH +"/"+ CLASSES_PATH+ "]");
+                        throw new TestContainerException(ioe);
+                    }
+
+                    LOGGER.info("#2 inside method createArchive ==> webXmlGeneratedOnTheFly ==> just created scatteredArchive [" + TARGET_WEBAPP_PATH + "] using WEB-INF/web.xml from [" + warArchive.toString() + "]");
+                } catch (Exception ex) {
                     throw new TestContainerException(ex);
                 }
             }            
