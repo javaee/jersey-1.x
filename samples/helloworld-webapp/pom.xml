@@ -66,14 +66,6 @@
                     <!--<scope>provided</scope>-->
                     <classifier>cobertura</classifier>
                 </dependency>
-                <!--embedded GF -->
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-embedded-glassfish</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                    <classifier>cobertura</classifier>
-                </dependency>
                 <dependency>
                     <groupId>com.sun.jersey.jersey-test-framework</groupId>
                     <artifactId>jersey-test-framework-grizzly</artifactId>
@@ -102,13 +94,6 @@
                     <artifactId>jersey-server</artifactId>
                     <version>${project.version}</version>
                     <!--<scope>provided</scope>-->
-                </dependency>
-                <!--embedded GF -->
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-embedded-glassfish</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey.jersey-test-framework</groupId>
@@ -141,13 +126,13 @@
              <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.0</version>
                 <configuration>
                     <goalPrefix>embedded-glassfish</goalPrefix>
                     <app>${basedir}/target/helloworld-webapp.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <installRoot>./target/gfembeddedtmp</installRoot>
+                    <instanceRoot>./target/gfembeddedtmp</instanceRoot>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -217,20 +202,8 @@
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/glassfish/</url>
         </pluginRepository>
-        <pluginRepository>
-            <id>maven-repository.dev.java.net</id>
-            <name>Java.net Maven 1 Repository (legacy)</name>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </pluginRepository>
     </pluginRepositories>
     <repositories>
-        <repository>
-            <id>maven-repository.dev.java.net</id>
-            <name>Java.net Maven 1 Repository (legacy)</name>
-            <url>http://download.java.net/maven/1</url>
-            <layout>legacy</layout>
-        </repository>
         <repository>
             <id>glassfish-repository</id>
             <name>Java.net Repository for Glassfish</name>
