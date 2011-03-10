@@ -53,7 +53,7 @@
     <name>Bookstore - Jersey sample</name>
     <packaging>war</packaging>
     <dependencies>
-        <dependency>
+         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-grizzly</artifactId>
             <version>${project.version}</version>
@@ -125,6 +125,20 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-testCompile</id>
+                        <phase>test-compile</phase>
+                        <configuration>
+                            <testExcludes>
+                                <exclude>**/*.java</exclude>
+                            </testExcludes>
+                        </configuration>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -146,7 +160,7 @@
                     -->
                     <excludes>
                         <exclude>**/*</exclude>
-                    </excludes>                    
+                    </excludes>
                 </configuration>
             </plugin>
 

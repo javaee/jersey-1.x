@@ -40,10 +40,8 @@
 
 package com.sun.jersey.samples.helloworld;
 
-//import com.sun.grizzly.http.SelectorThread;
-//import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
-import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
-import com.sun.jersey.test.framework.spi.container.TestContainer;
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
@@ -70,7 +68,6 @@ public class Main {
 
     public static final URI BASE_URI = getBaseURI();
 
-    /*
     protected static SelectorThread startServer() throws IOException {
         final Map<String, String> initParams = new HashMap<String, String>();
 
@@ -78,32 +75,16 @@ public class Main {
                 "com.sun.jersey.samples.helloworld.resources");
 
         System.out.println("Starting grizzly...");
-        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);     
         return threadSelector;
-    }*/
-
-    //protected static SelectorThread startServer() throws IOException {
-    protected static TestContainer startServer() throws IOException {
-        final Map<String, String> initParams = new HashMap<String, String>();
-//EmbeddedGlassFishTestContainerFactory.create(BASE_URI, initParams);
-        initParams.put("com.sun.jersey.config.property.packages", 
-                "com.sun.jersey.samples.helloworld.resources");
-
-        System.out.println("Starting Embedded Glassfish...");
-        // 2nd param is AppDescriptor
-
-        TestContainer testContainer = new EmbeddedGlassFishTestContainerFactory().create(BASE_URI, initParams);
-        return testContainer;
     }
     
     public static void main(String[] args) throws IOException {
-        //SelectorThread threadSelector = startServer();
-        TestContainer testContainer = startServer();
+        SelectorThread threadSelector = startServer();
         System.out.println(String.format("Jersey app started with WADL available at "
                 + "%sapplication.wadl\nTry out %shelloworld\nHit enter to stop it...",
                 BASE_URI, BASE_URI));
         System.in.read();
-        //threadSelector.stopEndpoint();
-        testContainer.stop();
+        threadSelector.stopEndpoint();
     }    
 }
