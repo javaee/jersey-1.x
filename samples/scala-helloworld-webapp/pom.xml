@@ -154,7 +154,7 @@
              <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.1-b05</version>
+                <version>3.1</version>
                 <configuration>
                     <goalPrefix>embedded-glassfish</goalPrefix>
                     <app>${basedir}/target/scala-helloworld-webapp.war</app>
