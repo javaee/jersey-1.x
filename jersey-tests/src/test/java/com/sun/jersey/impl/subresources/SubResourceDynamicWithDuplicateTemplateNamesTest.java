@@ -74,7 +74,7 @@ public class SubResourceDynamicWithDuplicateTemplateNamesTest extends AbstractRe
         private StringBuilder buffer;
         
         public Child(String v) {
-            this.buffer = new StringBuilder(v);
+            this.buffer = new StringBuilder(v).append(" -> ");
         }
 
         @Override
@@ -84,13 +84,13 @@ public class SubResourceDynamicWithDuplicateTemplateNamesTest extends AbstractRe
 
         @GET
         public String getMe(@PathParam("v") String v) {
-            return this.buffer.append(".me() : ").append(v).toString();
+            return this.buffer.append("me() : ").append(v).toString();
         }
 
         @GET
         @Path("next/{v}")
         public String getMeAndNext(@PathParam("v") String next) {
-            return this.buffer.append(".next() : ").append(next).toString();
+            return this.buffer.append("next() : ").append(next).toString();
         }
 
         @GET
@@ -111,7 +111,7 @@ public class SubResourceDynamicWithDuplicateTemplateNamesTest extends AbstractRe
 
         @Path("{v}")
         public Child getChild(@PathParam("v") String v) {
-            this.buffer.append(" -> ").append(v);
+            this.buffer.append(v).append(" -> ");
 
             return this;
         }
@@ -120,17 +120,20 @@ public class SubResourceDynamicWithDuplicateTemplateNamesTest extends AbstractRe
     public void testSubResourceDynamicWithTemplates() {
         initiateWebApplication(Parent.class);
 
+        // Parent.getChild(...) -> Child.getMe(...)
+        assertEquals("parent -> me() : parent", resource("/parent/child").get(String.class));
+
         // Parent.getChild(...) -> Child.getChild(...) -> Child.getMe(...)
-        assertEquals("parent -> first.me() : first", resource("/parent/child/first").get(String.class));
+        assertEquals("parent -> first -> me() : first", resource("/parent/child/first").get(String.class));
 
         // Parent.getChild(...) -> Child.getChild(...) -> Child.getChild(...) -> Child.getMe(...)
-        assertEquals("parent -> first -> second.me() : second", resource("/parent/child/first/second").get(String.class));
+        assertEquals("parent -> first -> second -> me() : second", resource("/parent/child/first/second").get(String.class));
 
         // Parent.getChild(...) -> Child.getChild(...) -> Child.getChild(...) -> Child.getChild(...) -> Child.getMe(...)
-        assertEquals("parent -> first -> second -> third.me() : third", resource("/parent/child/first/second/third").get(String.class));
+        assertEquals("parent -> first -> second -> third -> me() : third", resource("/parent/child/first/second/third").get(String.class));
 
         // Parent.getChild(...) -> Child.getChild(...) -> Child.getChild(...) -> Child.getChild(...) -> Child.getMeAndNext(...)
-        assertEquals("parent -> first -> second -> third.next() : fourth", resource("/parent/child/first/second/third/next/fourth").get(String.class));
+        assertEquals("parent -> first -> second -> third -> next() : fourth", resource("/parent/child/first/second/third/next/fourth").get(String.class));
 
         // Parent.getChild(...) -> Child.getChild(...) -> Child.getChild(...) -> Child.getChild(...) -> Child.getChild(...) -> Child.getAllParams(...)
         assertEquals("Param 'v' values: fourth third second first parent", resource("/parent/child/first/second/third/fourth/all").get(String.class));
