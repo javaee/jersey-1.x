@@ -139,7 +139,7 @@ public final class GrizzlyContainer extends HttpHandler implements
             final WebApplication application) {
         this.application = application;
 
-        setAllowEncodedSlash(resourceConfig.getFeature(GrizzlyServerFactory.AllowEncodedSlashFEATURE));
+        setAllowEncodedSlash(resourceConfig.getFeature(GrizzlyServerFactory.FEATURE_ALLOW_ENCODED_SLASH));
 
         final GenericEntity<ThreadLocal<Request>> requestThreadLocal =
                 new GenericEntity<ThreadLocal<Request>>(

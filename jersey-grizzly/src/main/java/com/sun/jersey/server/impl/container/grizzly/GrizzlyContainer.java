@@ -94,7 +94,7 @@ public final class GrizzlyContainer extends GrizzlyAdapter implements ContainerL
     public GrizzlyContainer(ResourceConfig rc, WebApplication app) throws ContainerException {
         this.application = app;
         
-        setAllowEncodedSlash(rc.getFeature(GrizzlyServerFactory.AllowEncodedSlashFEATURE));
+        setAllowEncodedSlash(rc.getFeature(GrizzlyServerFactory.FEATURE_ALLOW_ENCODED_SLASH));
 
         GenericEntity<ThreadLocal<GrizzlyRequest>> requestThreadLocal =
                 new GenericEntity<ThreadLocal<GrizzlyRequest>>(requestInvoker.getImmutableThreadLocal()) {};

@@ -63,7 +63,7 @@ public final class GrizzlyServerFactory {
      * If set to false (the default behavior), requests containing encoded slashes
      * will get rejected by Grizzly and will never make it to the Jersey runtime.
      */
-    public final static String AllowEncodedSlashFEATURE = "com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature";
+    public final static String FEATURE_ALLOW_ENCODED_SLASH = "com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature";
 
    /**
      * Creates a new {@link HttpServer} which will manage all root resource and

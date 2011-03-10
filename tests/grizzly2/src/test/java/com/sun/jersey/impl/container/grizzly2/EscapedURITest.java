@@ -103,7 +103,7 @@ public class EscapedURITest extends AbstractGrizzlyServerTester {
 
     public void testEscapedSlashInPathParam() {
         ResourceConfig rc = new DefaultResourceConfig(EscapedPathParamResource.class);
-        rc.getFeatures().put(GrizzlyServerFactory.AllowEncodedSlashFEATURE, true);
+        rc.getFeatures().put(GrizzlyServerFactory.FEATURE_ALLOW_ENCODED_SLASH, true);
 
         startServer(rc);
 
