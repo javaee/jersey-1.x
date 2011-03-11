@@ -59,12 +59,16 @@ import javax.ws.rs.core.UriBuilder;
 /**
  * Client filter adding OAuth authorization header to the HTTP request, if no
  * authorization header is already present.
+ *
+ * If the URI's for requesting request and access tokens and authorization are
+ * provided, the filter also takes care of handling the OAuth authorization
+ * flow.
  * <p>
  * Note: This filter signs the request based on its request parameters.
  * For this reason, you should invoke this filter after any others that
  * modify any request parameters.
  * <p>
- * Example of usage:
+ * Example 1:
  *
  * <pre>
  * // baseline OAuth parameters for access to resource
@@ -83,6 +87,32 @@ import javax.ws.rs.core.UriBuilder;
  * resource.addFilter(filter);
  *
  * String response = resource.get(String.class);
+ * </pre>
+ * 
+ * <p>
+ * Example 2 (handling authorization flow):
+ * 
+ * <pre>
+ * OAuthClientFilter filter = new OAuthClientFilter(
+ *      client.getProviders(),
+ *      new OAuthParameters().consumerKey("key"),
+ *      new OAuthSecrets().consumerSecret("secret"),
+ *      "http://request.token.uri",
+ *      "http://access.token.uri",
+ *      "http://authorization.uri");
+ * 
+ * client.addFilter(filter);
+ * 
+ * WebResource resource = client.resource("http://my.service.uri/items");
+ * String response = null;
+ * 
+ * try {
+ *      response = resource.get(String.class);
+ * } catch (NeedAuthorizationException e) {
+ *      String verificationCode = askUserToGoToAuthUriAuthorizeAndEnterVerifier(e.getAuthorizationUri());
+ *      e.getOAuthParameters().verifier(verificationCode);
+ *      response = resource.get(String.class);
+ * }
  * </pre>
  *
  * @author Paul C. Bryan <pbryan@sun.com>
