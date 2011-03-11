@@ -40,10 +40,10 @@
 
 package com.sun.jersey.core.provider.jaxb;
 
+import com.sun.jersey.api.provider.jaxb.XmlHeader;
 import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
 import com.sun.jersey.core.util.FeaturesAndProperties;
-import org.xml.sax.InputSource;
-
+import javax.xml.bind.PropertyException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
@@ -55,8 +55,10 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.WeakHashMap;
+import org.xml.sax.InputSource;
 
 /**
  * A base class for implementing JAXB-based readers and writers.
@@ -123,7 +125,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         return getJAXBContext(type, mt).createUnmarshaller();
     }
     
-    private final Unmarshaller getUnmarshaller(Class type) throws JAXBException {
+    private Unmarshaller getUnmarshaller(Class type) throws JAXBException {
         if (mtUnmarshaller != null) {
             Unmarshaller u = mtUnmarshaller.getContext(type);
             if (u != null) return u;
@@ -149,7 +151,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
 
     }
     
-    private final Marshaller getMarshaller(Class type) throws JAXBException {
+    private Marshaller getMarshaller(Class type) throws JAXBException {
         if (mtMarshaller != null) {
             Marshaller u = mtMarshaller.getContext(type);
             if (u != null) return u;
@@ -161,7 +163,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         return m;
     }
     
-    private final JAXBContext getJAXBContext(Class type, MediaType mt) throws JAXBException {
+    private JAXBContext getJAXBContext(Class type, MediaType mt) throws JAXBException {
         final ContextResolver<JAXBContext> cr = ps.getContextResolver(JAXBContext.class, mt);
         if (cr != null) {
             JAXBContext c = cr.getContext(type);
@@ -171,7 +173,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         return getStoredJAXBContext(type);
     }
 
-    private final JAXBContext getJAXBContext(Class type) throws JAXBException {
+    private JAXBContext getJAXBContext(Class type) throws JAXBException {
         if (mtContext != null) {
             JAXBContext c = mtContext.getContext(type);
             if (c != null) return c;
@@ -208,5 +210,18 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
 
     protected boolean isXmlRootElementProcessing() {
         return xmlRootElementProcessing;
+    }
+
+    protected void setHeader(Marshaller m, Annotation[] annotations) throws PropertyException {
+        for (Annotation a : annotations) {
+            if (a instanceof XmlHeader) {
+                try {
+                    m.setProperty("com.sun.xml.bind.xmlHeaders", ((XmlHeader) a).value());
+                } catch (PropertyException e) {
+                    m.setProperty("com.sun.xml.internal.bind.xmlHeaders", ((XmlHeader) a).value());
+                }
+                break;
+            }
+        }
     }
 }

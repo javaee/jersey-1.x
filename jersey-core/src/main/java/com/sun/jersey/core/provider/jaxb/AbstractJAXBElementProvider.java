@@ -85,14 +85,17 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
         super(ps, mt);        
     }
     
+    @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type == JAXBElement.class && genericType instanceof ParameterizedType && isSupported(mediaType);
     }
     
+    @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return JAXBElement.class.isAssignableFrom(type) && isSupported(mediaType);
     }
             
+    @Override
     public final JAXBElement<?> readFrom(
             Class<JAXBElement<?>> type, 
             Type genericType, 
@@ -117,6 +120,7 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
             throws JAXBException;
     
     
+    @Override
     public final void writeTo(
             JAXBElement<?> t, 
             Class<?> type, 
@@ -131,6 +135,7 @@ public abstract class AbstractJAXBElementProvider extends AbstractJAXBProvider<J
             if (c != UTF8) {
                 m.setProperty(Marshaller.JAXB_ENCODING, c.name());
             }
+            setHeader(m, annotations);
             writeTo(t, mediaType, c, m, entityStream);
         } catch (JAXBException ex) {
             throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);

@@ -20,6 +20,8 @@
         <li>JAXBElement&lt;T&gt; where T is a JAXB xml type that may or may not be annotated with @XmlType</li>
         <li>List&lt;T&gt;, Collection&lt;T&gt;, and T[] where T is a JAXB class annotated with @XmlRootElement or @XmlRype</li>
     </ul>
+    <p>It also shows how to use @XmlHeader annotation to specify the header of the XML
+        responses.
     <h2>Contents</h2>
     <p>The mapping of the URI path space is presented in the following table:</p>
 	<table border="1">
@@ -34,49 +36,48 @@
 	<td>JAXBResource</td>
 	<td>GET, POST</td>
 	</tr>
-	<tr>
+
+        <tr>
+	<td>/jaxb/XmlRootElementWithHeader</td>
+	<td>JAXBResource</td>
+	<td>GET</td>
+	</tr>
 
 	<tr>
 	<td>/jaxb/JAXBElement</td>
 	<td>JAXBResource</td>
 	<td>GET, POST</td>
 	</tr>
-	<tr>
 
 	<tr>
 	<td>/jaxb/XmlType</td>
 	<td>JAXBResource</td>
 	<td>POST</td>
 	</tr>
-	<tr>
 
 	<tr>
 	<td>/jaxb/collection/XmlRootElement</td>
 	<td>JAXBCollectionResource</td>
 	<td>GET, POST</td>
 	</tr>
-	<tr>
 
 	<tr>
 	<td>/jaxb/collection/XmlType</td>
 	<td>JAXBCollectionResource</td>
 	<td>POST</td>
 	</tr>
-	<tr>
 
 	<tr>
 	<td>/jaxb/array/XmlRootElement</td>
 	<td>JAXBArrayResource</td>
 	<td>GET, POST</td>
 	</tr>
-	<tr>
 
 	<tr>
 	<td>/jaxb/array/XmlType</td>
 	<td>JAXBArrayResource</td>
 	<td>POST</td>
 	</tr>
-	<tr>
 
 	</table>
 

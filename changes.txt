@@ -1,4 +1,5 @@
 release 1.6
+- Added support for specifying XML header in XML responses by attaching XmlHeader annotation to the resource method.
 - Fixed issue 649
   http://java.net/jira/browse/JERSEY-649
   @Path("{id}") not matched for paths containing %2F

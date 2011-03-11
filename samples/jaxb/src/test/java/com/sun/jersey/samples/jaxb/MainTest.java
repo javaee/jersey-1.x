@@ -83,6 +83,17 @@ public class MainTest extends JerseyTest {
     }
 
     @Test
+    public void testRootElementWithHeader() {
+        WebResource webResource = resource();
+        String e1 = webResource.path("jaxb/XmlRootElement").
+                get(String.class);
+
+        String e2 = webResource.path("jaxb/XmlRootElementWithHeader").
+                get(String.class);
+        assertTrue(e2.contains("<?xml-stylesheet type='text/xsl' href='foobar.xsl' ?>") && e2.contains(e1.substring(e1.indexOf("?>") + 2)));
+    }
+
+    @Test
     public void testJAXBElement() {
         WebResource webResource = resource();
         GenericType<JAXBElement<JAXBXmlType>> genericType = 

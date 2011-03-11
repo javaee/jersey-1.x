@@ -144,6 +144,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
                 listClass.isAnnotationPresent(XmlType.class);        
     }
 
+    @Override
     public final void writeTo(
             Object t,
             Class<?> type, 
@@ -164,8 +165,10 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
 
             final Marshaller m = getMarshaller(elementType, mediaType);
             m.setProperty(Marshaller.JAXB_FRAGMENT, true);
-            if (charset != UTF8)
+            if (charset != UTF8) {
                 m.setProperty(Marshaller.JAXB_ENCODING, charsetName);
+            }
+            setHeader(m, annotations);
             writeList(elementType, c, mediaType, charset, m, entityStream);
         } catch (JAXBException ex) {
             throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
@@ -269,7 +272,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     
     private final Inflector inflector = Inflector.getInstance();
 
-    private final String convertToXmlName(final String name) {
+    private String convertToXmlName(final String name) {
         return name.replace("$", "_");
     }
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,65 +37,31 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.samples.jaxb;
 
-import com.sun.jersey.api.provider.jaxb.XmlHeader;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
+package com.sun.jersey.api.provider.jaxb;
 
-/**
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+/** Allows to specify XML header for XML output produced by a resource method
+ * it is attached to.
+ * <p>
+ * Example usage:
+ * <pre>
+ * @GET
+ * @Produces("application/xml")
+ * @XmlHeader("&lt;?xml-stylesheet type='text/xsl' href='foobar.xsl' ?&gt;")
+ * public JaxbBean get() {
+ *     ...
+ * }
+ * </pre>
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Martin Matula
  */
-@Path("jaxb")
-@Produces("application/xml")
-@Consumes("application/xml")
-public class JAXBResource {
-
-    @Path("XmlRootElement")
-    @GET
-    public JAXBXmlRootElement getRootElement() {
-        return new JAXBXmlRootElement("xml root element");
-    }
-
-    @Path("XmlRootElementWithHeader")
-    @GET
-    @XmlHeader("<?xml-stylesheet type='text/xsl' href='foobar.xsl' ?>")
-    public JAXBXmlRootElement getRootElementWithHeader() {
-        return new JAXBXmlRootElement("xml root element");
-    }
-
-    @Path("XmlRootElement")
-    @POST
-    public JAXBXmlRootElement postRootElement(JAXBXmlRootElement r) {
-        return r;
-    }
-    
-    @Path("JAXBElement")
-    @GET
-    public JAXBElement<JAXBXmlType> getJAXBElement() {
-        return new JAXBElement<JAXBXmlType>(
-                new QName("jaxbXmlRootElement"),
-                JAXBXmlType.class,
-                new JAXBXmlType("xml type"));
-    }
-
-    @Path("JAXBElement")
-    @POST
-    public JAXBElement<JAXBXmlType> postJAXBElement(JAXBElement<JAXBXmlType> e) {
-        return e;
-    }
-
-    
-    @Path("XmlType")
-    @POST
-    public JAXBElement<JAXBXmlType> postXmlType(JAXBXmlType r) {
-        return new JAXBElement<JAXBXmlType>(
-                new QName("jaxbXmlRootElement"), JAXBXmlType.class, r);
-    }
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface XmlHeader {
+    String value();
 }

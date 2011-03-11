@@ -54,6 +54,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -127,8 +128,19 @@ public class XMLListElementProvider extends AbstractListElementProvider {
 
         entityStream.write(
                 String.format("<?xml version=\"1.0\" encoding=\"%s\" standalone=\"yes\"?>", cName).getBytes(cName));
+        String property = "com.sun.xml.bind.xmlHeaders";
+        String header;
+        try {
+            header = (String) m.getProperty(property);
+        } catch (PropertyException e) {
+            property = "com.sun.xml.internal.bind.xmlHeaders";
+            header = (String) m.getProperty(property);
+        }
+        if (header != null) {
+            m.setProperty(property, "");
+            entityStream.write(header.getBytes(cName));
+        }
         entityStream.write(String.format("<%s>", rootElement).getBytes(cName));
-
         for (Object o : t)
             m.marshal(o, entityStream);
 
