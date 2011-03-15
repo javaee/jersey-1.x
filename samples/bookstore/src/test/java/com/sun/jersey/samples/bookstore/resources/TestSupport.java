@@ -45,7 +45,6 @@ import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
-import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.Assert.*;

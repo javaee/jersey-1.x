@@ -90,7 +90,7 @@
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
-            <artifactId>jersey-test-framework-grizzly2</artifactId>
+            <artifactId>jersey-test-framework-external</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency> <!--
@@ -125,7 +125,7 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
-                <executions>
+                <!--executions>
                     <execution>
                         <id>default-testCompile</id>
                         <phase>test-compile</phase>
@@ -138,7 +138,7 @@
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions-->
             </plugin>
 
             <plugin>
