@@ -42,16 +42,18 @@ package com.sun.jersey.guice;
 
 import com.google.inject.servlet.GuiceFilter;
 import com.google.inject.servlet.GuiceServletContextListener;
-import com.sun.grizzly.http.embed.GrizzlyWebServer;
-import com.sun.grizzly.http.servlet.ServletAdapter;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import junit.framework.TestCase;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.servlet.ServletHandler;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.core.UriBuilder;
-import junit.framework.TestCase;
 
 public abstract class AbstractGuiceGrizzlyTest extends TestCase {
     private static final Logger LOGGER = Logger.getLogger(AbstractGuiceGrizzlyTest.class.getName());
@@ -77,7 +79,7 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
 
     private final URI baseUri = getUri().build();
 
-    private GrizzlyWebServer ws;
+    private HttpServer httpServer;
 
     private GuiceFilter f;
 
@@ -88,9 +90,8 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
     public <T extends GuiceServletContextListener> void startServer(Class<T> c) {
         LOGGER.info("Starting grizzly...");
 
-        ws = new GrizzlyWebServer(port);
 
-        ServletAdapter sa = new ServletAdapter();
+        ServletHandler sa = new ServletHandler();
 
         sa.addServletListener(c.getName());
 
@@ -99,10 +100,9 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
 
         sa.setContextPath(baseUri.getRawPath());
 
-        ws.addGrizzlyAdapter(sa, new String[] {""} );
-
         try {
-            ws.start();
+            httpServer = GrizzlyServerFactory.createHttpServer(baseUri, sa);
+            httpServer.start();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -114,11 +114,11 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
      */
     private void stopGrizzly() throws Exception {
         try {
-            if (ws != null) {
+            if (httpServer != null) {
                 // Work around bug in Grizzly
                 f.destroy();
-                ws.stop();
-                ws = null;
+                httpServer.stop();
+                httpServer = null;
             }
         } catch( Exception e ) {
             LOGGER.log(Level.WARNING, "Could not stop grizzly...", e );

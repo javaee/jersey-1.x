@@ -75,7 +75,7 @@
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-grizzly</artifactId>
+                    <artifactId>jersey-test-framework-grizzly2</artifactId>
                     <version>${project.version}</version>
                     <scope>test</scope>
                     <classifier>cobertura</classifier>
@@ -108,7 +108,7 @@
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-grizzly</artifactId>
+                    <artifactId>jersey-test-framework-grizzly2</artifactId>
                     <version>${project.version}</version>
                     <scope>test</scope>
                 </dependency>

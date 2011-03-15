@@ -40,18 +40,12 @@
 
 package com.sun.jersey.atom.abdera.impl.provider.entity;
 
-import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
 import com.sun.jersey.atom.abdera.ContentHelper;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
 import junit.framework.TestCase;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Categories;
@@ -65,6 +59,13 @@ import org.apache.abdera.model.Link;
 import org.apache.abdera.model.Person;
 import org.apache.abdera.model.Service;
 import org.apache.abdera.model.Workspace;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Unit tests for the <code>jersey-atom2</code> module.</p>
@@ -84,7 +85,7 @@ public class ProvidersTest extends TestCase {
         initParams.put("com.sun.jersey.config.property.packages",
                        "com.sun.jersey.atom.abdera.impl.provider.entity");
         System.out.println("Starting grizzly ...");
-        selectorThread = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        httpServer = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
         ClientConfig config = new DefaultClientConfig();
         config.getClasses().add(ContentBeanProvider.class);
         client = Client.create(config);
@@ -96,16 +97,16 @@ public class ProvidersTest extends TestCase {
         providers = null;
         client = null;
         System.out.println("Stopping grizzly ...");
-        if (selectorThread.isRunning()) {
-            selectorThread.stopEndpoint();
+        if (httpServer.isStarted()) {
+            httpServer.stop();
         }
-        selectorThread = null;
+        httpServer = null;
         super.tearDown();
     }
 
     private Client client = null;
     private Providers providers = null;
-    private SelectorThread selectorThread = null;
+    private HttpServer httpServer = null;
 
     private static final String BASE_URI = "http://localhost:9997/";
     private static final String[] CATEGORIES_MEDIA_TYPES_JSON = {

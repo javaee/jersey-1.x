@@ -40,17 +40,11 @@
 
 package com.sun.jersey.samples.viewclient.atompubsimple;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
 import com.sun.jersey.client.view.exception.FailedUserAssumptionException;
 import com.sun.jersey.samples.viewclient.atompubsimple.provider.AtomEntryProvider;
 import com.sun.jersey.samples.viewclient.atompubsimple.provider.AtomFeedProvider;
@@ -61,6 +55,13 @@ import com.sun.jersey.samples.viewclient.atompubsimple.view.EntryHandler;
 import com.sun.jersey.samples.viewclient.atompubsimple.view.EntryStateView;
 import com.sun.jersey.samples.viewclient.atompubsimple.view.ServiceStateView;
 import org.apache.abdera.model.Entry;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Main class.
@@ -74,21 +75,20 @@ public class Main2 {
 	public static final URI SERVICE_URI = UriBuilder.fromUri("http://localhost/service").
 			port(9998).build();
 
-	public static SelectorThread startServer() throws IOException {
+	public static HttpServer startServer() throws IOException {
 		final Map<String, String> initParams = new HashMap<String, String>();
 
 		initParams.put("com.sun.jersey.config.property.packages",
 				"com.sun.jersey.samples.viewclient.atompubsimple.server,com.sun.jersey.samples.viewclient.atompubsimple.provider");
 
 		System.out.println("Starting grizzly...");
-		SelectorThread threadSelector = GrizzlyWebContainerFactory.create(
+		return GrizzlyWebContainerFactory.create(
 				BASE_URI, initParams);
-		return threadSelector;
 	}
 
 	public static void main(String[] args) throws Exception {
 		// Grizzly initialization
-		SelectorThread threadSelector = startServer();
+		HttpServer httpServer = startServer();
 
 		try {
 			final Client client;
@@ -152,7 +152,7 @@ public class Main2 {
 			
 
 		} finally {
-			threadSelector.stopEndpoint();
+			httpServer.stop();
 		}
 	}
 }

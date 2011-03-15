@@ -40,7 +40,6 @@
 
 package com.sun.jersey.samples.contacts.server;
 
-import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -49,11 +48,13 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.atom.abdera.ContentHelper;
 import com.sun.jersey.samples.contacts.models.User;
 import com.sun.jersey.samples.contacts.server.auth.Base64;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
 import junit.framework.TestCase;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Entry;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.Providers;
 
 /**
  * <p>Abstract base class for JUnit tests of the Contacts Service.</p>
@@ -68,7 +69,7 @@ public abstract class AbstractTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         System.out.println("Starting grizzly ...");
-        selectorThread = Server.startServer();
+        httpServer = Server.startServer();
         ClientConfig config = new DefaultClientConfig();
         client = Client.create(config);
         providers = client.getProviders();
@@ -83,10 +84,10 @@ public abstract class AbstractTest extends TestCase {
         providers = null;
         client = null;
         System.out.println("Stopping grizzly ...");
-        if (selectorThread.isRunning()) {
-            selectorThread.stopEndpoint();
+        if (httpServer.isStarted()) {
+            httpServer.stop();
         }
-        selectorThread = null;
+        httpServer = null;
         super.tearDown();
     }
 
@@ -95,7 +96,7 @@ public abstract class AbstractTest extends TestCase {
     Client client = null;
     ContentHelper helper = null;
     Providers providers = null;
-    SelectorThread selectorThread = null;
+    HttpServer httpServer = null;
     WebResource service = null;
 
     protected static final String CONTACTS_NAMESPACE = "http://example.com/contacts";

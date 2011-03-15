@@ -40,13 +40,14 @@
 
 package com.sun.jersey.samples.optimisticconcurrency;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  *
@@ -89,21 +90,20 @@ public class Main {
      * @throws java.io.IOException if there is an error starting the Grizzly
      *         HTTP container.
      */
-    protected static SelectorThread startServer() throws IOException {
+    protected static HttpServer startServer() throws IOException {
         final Map<String, String> initParams = new HashMap<String, String>();
 
         initParams.put("com.sun.jersey.config.property.packages",
                 "com.sun.jersey.samples.optimisticconcurrency.resources");
         System.out.println("Starting grizzly...");
-        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
-        return threadSelector;
+        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
     }
 
     public static void main(String[] args) throws IOException {
-        SelectorThread threadSelector = startServer();
+        HttpServer httpServer = startServer();
         System.out.println(String.format("Jersey app started with WADL at %s/application.wadl", BASE_URI));
         System.out.println("Hit return to stop...");
         System.in.read();
-        threadSelector.stopEndpoint();
+        httpServer.stop();
     }    
 }

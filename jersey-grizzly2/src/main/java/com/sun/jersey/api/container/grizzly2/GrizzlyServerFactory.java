@@ -39,20 +39,19 @@
  */
 package com.sun.jersey.api.container.grizzly2;
 
-import java.io.IOException;
-import java.net.URI;
-
+import com.sun.jersey.api.container.ContainerFactory;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
 
-import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import java.io.IOException;
+import java.net.URI;
 
 /**
- * Factory for creating Grizzly {@link HttpServer} instances.
+ * Factory for creating Grizzly 2 {@link HttpServer} instances.
  *
  * @author Matt Swift
  */
@@ -282,7 +281,7 @@ public final class GrizzlyServerFactory {
     }
 
     public static HttpServer createHttpServer(final URI u,
-            final HttpHandler handler) throws IOException,
+                                              final HttpHandler handler) throws IOException,
             IllegalArgumentException, NullPointerException {
         if (u == null) {
             throw new NullPointerException("The URI must not be null");

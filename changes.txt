@@ -1,4 +1,9 @@
 release 1.6
+- Grizzly 2.0 integration
+  Introduced GrizzlyWebContainerFactory in jersey-grizzly2
+  Introduced jersey-tests-framework-grizzly2 and made it default
+  option in test framework.
+  Changed (almost) all samples to use jersey-grizzly2 for test/run.
 - Added support for specifying XML header in XML responses by attaching XmlHeader annotation to the resource method.
 - Fixed issue 649
   http://java.net/jira/browse/JERSEY-649

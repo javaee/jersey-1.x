@@ -48,12 +48,13 @@ import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
-import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
+import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Logger;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * A low-level test container factory for creating test container instances
@@ -89,8 +90,8 @@ public class GrizzlyTestContainerFactory implements TestContainerFactory {
 
         /**
          * Creates an instance of {@link GrizzlyTestContainer}
-         * @param Base URI of the application
-         * @param An instance of {@link LowLevelAppDescriptor}
+         * @param baseUri URI of the application
+         * @param ad instance of {@link LowLevelAppDescriptor}
          */
         GrizzlyTestContainer(URI baseUri, LowLevelAppDescriptor ad) {
             this.baseUri = UriBuilder.fromUri(baseUri).path(ad.getContextPath()).build();

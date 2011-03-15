@@ -40,13 +40,14 @@
 
 package com.sun.jersey.samples.console;
 
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
-import com.sun.grizzly.http.SelectorThread;
+import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
 
 public class Main {
 
@@ -67,27 +68,26 @@ public class Main {
 
     public static final URI BASE_URI = getBaseURI();
 
-    protected static SelectorThread startServer() throws IOException {
+    protected static HttpServer startServer() throws IOException {
         final Map<String, String> initParams = new HashMap<String, String>();
 
         initParams.put("com.sun.jersey.config.property.packages",
                 "com.sun.jersey.samples.console");
 
         System.out.println("Starting grizzly...");
-        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
-        return threadSelector;
+        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
     }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        SelectorThread threadSelector = startServer();
+        HttpServer httpServer = startServer();
         System.out.println("Server running, visit: http://127.0.0.1:9998/resources/form, hit return to stop...");
         System.in.read();
         System.out.println("Stopping server");
         
-        threadSelector.stopEndpoint();
+        httpServer.stop();
         System.out.println("Server stopped");
     }
 }

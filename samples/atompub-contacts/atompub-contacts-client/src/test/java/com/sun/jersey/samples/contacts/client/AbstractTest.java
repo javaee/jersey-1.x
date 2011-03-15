@@ -40,10 +40,10 @@
 
 package com.sun.jersey.samples.contacts.client;
 
-import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.samples.contacts.server.Server;
 import junit.framework.TestCase;
 import org.apache.abdera.Abdera;
+import org.glassfish.grizzly.http.server.HttpServer;
 
 /**
  * <p>Abstract base class for JUnit tests of the Contacts Service.</p>
@@ -69,7 +69,7 @@ public abstract class AbstractTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         System.out.println("Starting grizzly ...");
-        selectorThread = Server.startServer();
+        httpServer = Server.startServer();
         client = new ContactsClient("http://localhost:" + getPort(9998), "admin", "password");
         abdera = Abdera.getInstance();
     }
@@ -79,15 +79,15 @@ public abstract class AbstractTest extends TestCase {
         abdera = null;
         client = null;
         System.out.println("Stopping grizzly ...");
-        if (selectorThread.isRunning()) {
-            selectorThread.stopEndpoint();
+        if (httpServer.isStarted()) {
+            httpServer.stop();
         }
-        selectorThread = null;
+        httpServer = null;
         super.tearDown();
     }
 
     protected Abdera abdera = null;
     protected ContactsClient client = null;
-    protected SelectorThread selectorThread = null;
+    protected HttpServer httpServer = null;
 
 }

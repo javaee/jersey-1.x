@@ -1,20 +1,10 @@
 package com.sun.jersey.samples.groovy
 
-import groovy.util.GroovyTestCase
-
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.grizzly.tcp.Adapter;
-import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.jersey.api.container.grizzly.GrizzlyServerFactory;
-
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
+import com.sun.jersey.api.client.Client
+import com.sun.jersey.api.container.ContainerFactory
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory
+import javax.ws.rs.core.UriBuilder
+import org.glassfish.grizzly.http.server.HttpHandler
 
 class GroovyResourceTest extends GroovyTestCase {
     private static getPort(defaultPort) {
@@ -32,27 +22,27 @@ class GroovyResourceTest extends GroovyTestCase {
         UriBuilder.fromUri("http://localhost/").port(getPort(9998)).build()
 
     private static startServer() throws IOException {
-        def adapter = ContainerFactory.createContainer(
-                    Adapter.class,
+        def handler = ContainerFactory.createContainer(
+                    HttpHandler.class,
                     GroovyResource.class)
-        return GrizzlyServerFactory.create(BASE_URI, adapter)
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, handler)
     }
 
-    private threadSelector
+    private httpServer
     
     private r
 
     void setUp() {
         super.setUp();
 
-        threadSelector = startServer();
+        httpServer = startServer();
         r = Client.create().resource(BASE_URI);
     }
 
     void tearDown() {
         super.tearDown();
 
-        threadSelector.stopEndpoint();
+        httpServer.stop();
     }
 
     void testGet() {

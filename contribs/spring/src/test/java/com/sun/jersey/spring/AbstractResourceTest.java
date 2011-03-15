@@ -40,19 +40,18 @@
 package com.sun.jersey.spring;
 
 
-
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.spring.tests.util.JerseyTestHelper;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.servlet.ServletHandler;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
-
-import com.sun.grizzly.http.embed.GrizzlyWebServer;
-import com.sun.grizzly.http.servlet.ServletAdapter;
-
+import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,7 +75,7 @@ public class AbstractResourceTest {
     private final String _servletPath;
     private final boolean springManaged;
     
-    private GrizzlyWebServer ws ;
+    private HttpServer httpServer;
 
     public AbstractResourceTest() {
         this(true);
@@ -106,8 +105,7 @@ public class AbstractResourceTest {
     */
     private void startGrizzly(int port, String servletPath) throws Exception {
         LOGGER.info("Starting grizzly...");
-        ws = new GrizzlyWebServer(port);
-        ServletAdapter sa = new ServletAdapter();
+        ServletHandler sa = new ServletHandler();
         sa.setServletInstance(SpringServlet.class.newInstance());
         sa.addServletListener("org.springframework.web.context.ContextLoaderListener");
         sa.addContextParameter("contextConfigLocation","classpath:"+_springConfig);
@@ -118,8 +116,8 @@ public class AbstractResourceTest {
                      "com.sun.jersey.spring.jerseymanaged" );
         }
         sa.setServletPath(servletPath);
-        ws.addGrizzlyAdapter(sa, new String[] {""} );
-        ws.start();
+        httpServer = GrizzlyServerFactory.createHttpServer(new URI("http://localhost:" + port + "/" + servletPath), sa);
+        httpServer.start();
     }
 
     /**
@@ -128,7 +126,7 @@ public class AbstractResourceTest {
      */
     private void stopGrizzly() throws Exception {
         try {
-            ws.stop();
+            httpServer.stop();
         } catch( Exception e ) {
             LOGGER.log(Level.WARNING, "Could not stop grizzly...", e );
         }

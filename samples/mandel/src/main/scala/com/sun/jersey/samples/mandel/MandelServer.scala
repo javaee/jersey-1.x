@@ -1,10 +1,11 @@
 package com.sun.jersey.samples.mandel
 
+import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+
 import java.net.URI;
 import java.util.HashMap;
 import javax.ws.rs.core.UriBuilder;
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
 
 
 object MandelServer {
@@ -38,7 +39,7 @@ object MandelServer {
     }
 
     def main(args: Array[String]) {
-        val selectorThread = startServer();
+        val httpServer = startServer();
 
         println("Server running");
         println("Visit: " + BASE_URI + "/(-2.2,-1.2),(0.8,1.2)");
@@ -49,7 +50,7 @@ object MandelServer {
         println("Hit return to stop...");
         System.in.read();
         println("Stopping server");
-        selectorThread.stopEndpoint();
+        httpServer.stop();
         println("Server stopped");
         System.exit(0);
     }

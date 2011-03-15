@@ -416,7 +416,7 @@ public abstract class JerseyTest {
     // a required runtime dependency for those that do not want to utilize
     // Grizzly.
     private static final String DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME =
-            "com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory";
+            "com.sun.jersey.test.framework.spi.container.grizzly2.web.GrizzlyWebTestContainerFactory";
 
     @Deprecated
     private static final String TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY =

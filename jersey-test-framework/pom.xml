@@ -57,6 +57,7 @@
     <modules>
         <module>jersey-test-framework-core</module>
         <module>jersey-test-framework-grizzly</module>
+        <module>jersey-test-framework-grizzly2</module>
         <module>jersey-test-framework-http</module>
         <module>jersey-test-framework-external</module>
         <module>jersey-test-framework-embedded-glassfish</module>

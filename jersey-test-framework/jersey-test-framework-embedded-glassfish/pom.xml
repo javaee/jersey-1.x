@@ -70,8 +70,8 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
                             <links>
-                                <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
-                                <link>https://jersey.dev.java.net/nonav/apidocs/${project.version}/jersey/</link>
+                                <link>http://jsr311.java.net/nonav/releases/1.1</link>
+                                <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
                             </links>
                             <excludePackageNames>com.sun.jersey.test.framework.impl</excludePackageNames>
                             <notimestamp>true</notimestamp>

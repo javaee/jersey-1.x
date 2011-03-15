@@ -1,19 +1,20 @@
 package com.sun.jersey.samples.hypermedia;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
-import java.io.IOException;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.samples.hypermedia.client.controller.CustomerController;
 import com.sun.jersey.samples.hypermedia.client.controller.OrderController;
 import com.sun.jersey.samples.hypermedia.client.model.Address;
 import com.sun.jersey.samples.hypermedia.client.model.Order;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Main class.
@@ -24,7 +25,7 @@ public class Main {
 
     public static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(9998).build();
 
-    public static SelectorThread startServer() throws IOException {
+    public static HttpServer startServer() throws IOException {
         final Map<String, String> initParams = new HashMap<String, String>();
 
         initParams.put("com.sun.jersey.config.property.packages",
@@ -36,13 +37,12 @@ public class Main {
                 "com.sun.jersey.server.hypermedia.filter.HypermediaFilterFactory");
 
         System.out.println("Starting grizzly...");
-        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
-        return threadSelector;
+        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
     }
 
     public static void main(String[] args) throws Exception {
-        // Grizzly initialization
-        SelectorThread threadSelector = startServer();
+        // Grizzly 2 initialization
+        HttpServer httpServer = startServer();
 
         try {
             // Create Client and configure it
@@ -78,7 +78,7 @@ public class Main {
             orderCtrl.ship(newAddress);
         }
         finally {
-            threadSelector.stopEndpoint();
+            httpServer.stop();
         }
     }
 

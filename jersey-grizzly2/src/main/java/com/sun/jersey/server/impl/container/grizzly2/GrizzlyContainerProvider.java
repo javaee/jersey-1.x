@@ -39,12 +39,11 @@
  */
 package com.sun.jersey.server.impl.container.grizzly2;
 
-import org.glassfish.grizzly.http.server.HttpHandler;
-
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.spi.container.ContainerProvider;
 import com.sun.jersey.spi.container.WebApplication;
+import org.glassfish.grizzly.http.server.HttpHandler;
 
 /**
  * Grizzly 2.0 Jersey container provider.

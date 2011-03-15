@@ -1,0 +1,2 @@
+com.sun.jersey.test.framework.spi.container.grizzly2.web.GrizzlyWebTestContainerFactory
+com.sun.jersey.test.framework.spi.container.grizzly2.GrizzlyTestContainerFactory

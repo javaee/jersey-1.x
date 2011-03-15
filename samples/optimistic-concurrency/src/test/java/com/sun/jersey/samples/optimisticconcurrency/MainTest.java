@@ -40,13 +40,14 @@
 
 package com.sun.jersey.samples.optimisticconcurrency;
 
-import com.sun.grizzly.http.SelectorThread;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
-import javax.ws.rs.core.MediaType;
 import junit.framework.TestCase;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.MediaType;
 
 /**
  *
@@ -54,7 +55,7 @@ import junit.framework.TestCase;
  */
 public class MainTest extends TestCase {
 
-    private SelectorThread threadSelector;
+    private HttpServer httpServer;
 
     private WebResource r;
 
@@ -67,7 +68,7 @@ public class MainTest extends TestCase {
         super.setUp();
 
         //start the Grizzly web container and create the client
-        threadSelector = Main.startServer();
+        httpServer = Main.startServer();
 
         Client c = Client.create();
         r = c.resource(Main.BASE_URI);
@@ -77,7 +78,7 @@ public class MainTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
 
-        threadSelector.stopEndpoint();
+        httpServer.stop();
     }
 
     /**

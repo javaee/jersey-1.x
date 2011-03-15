@@ -1,15 +1,15 @@
 
 package com.sun.jersey.samples.hypermedia;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.header.MediaTypes;
 import junit.framework.TestCase;
+import org.glassfish.grizzly.http.server.HttpServer;
 
 public class MainTest extends TestCase {
 
-    private SelectorThread threadSelector;
+    private HttpServer httpServer;
     
     private WebResource r;
 
@@ -21,7 +21,7 @@ public class MainTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         
-        threadSelector = Main.startServer();
+        httpServer = Main.startServer();
 
         Client c = Client.create();
         r = c.resource(Main.BASE_URI);
@@ -31,7 +31,7 @@ public class MainTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
 
-        threadSelector.stopEndpoint();
+        httpServer.stop();
     }
 
     public void testOrder() {

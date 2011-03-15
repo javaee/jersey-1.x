@@ -40,8 +40,6 @@
 
 package com.sun.jersey.samples.jsonfromjaxb;
 
-import com.sun.grizzly.http.SelectorThread;
-import junit.framework.TestCase;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
@@ -50,6 +48,9 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.samples.jsonfromjaxb.config.JAXBContextResolver;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.AircraftType;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
+import junit.framework.TestCase;
+import org.glassfish.grizzly.http.server.HttpServer;
+
 import java.util.List;
 /**
  *
@@ -57,7 +58,7 @@ import java.util.List;
  */
 public class MainTest extends TestCase {
     
-    private SelectorThread threadSelector;
+    private HttpServer httpServer;
     
     private WebResource r;
 
@@ -69,7 +70,7 @@ public class MainTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         
-        threadSelector = Main.startServer();
+        httpServer = Main.startServer();
 
         ClientConfig cc = new DefaultClientConfig();
         // use the following jaxb context resolver
@@ -82,7 +83,7 @@ public class MainTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
 
-        threadSelector.stopEndpoint();
+        httpServer.stop();
     }
 
     /**

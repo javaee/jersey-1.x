@@ -39,8 +39,9 @@
  */
 package com.sun.jersey.samples.sparklines;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.jersey.api.container.grizzly.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import org.glassfish.grizzly.http.server.HttpServer;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,11 +61,11 @@ public class Main {
                 "com.sun.jersey.samples.sparklines");
 
         System.out.println("Starting grizzly...");
-        SelectorThread threadSelector = GrizzlyWebContainerFactory.create(baseUri, initParams);
+        HttpServer httpServer = GrizzlyWebContainerFactory.create(baseUri, initParams);
         System.out.println(String.format("Jersey app started with WADL available at %sapplication.wadl\n" +
                 "Try out %sdiscrete?d=88,84,82,92,82,86,66,82,44,64,66,88,96,80,24,26,14,0,0,26,8,6,6,24,52,66,36,6,10,14,30\n" +
                 "Hit enter to stop it...", baseUri, baseUri));
         System.in.read();
-        threadSelector.stopEndpoint();
+        httpServer.stop();
     }    
 }

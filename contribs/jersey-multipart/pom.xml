@@ -62,12 +62,6 @@
             <version>1.4</version>
         </dependency>
         <dependency>
-            <groupId>com.sun.grizzly</groupId>
-            <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.31</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
             <scope>test</scope>
@@ -115,7 +109,7 @@
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-grizzly</artifactId>
+                    <artifactId>jersey-grizzly2</artifactId>
                     <version>${project.version}</version>
                     <optional>true</optional>
                     <classifier>cobertura</classifier>
@@ -149,7 +143,7 @@
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-grizzly</artifactId>
+                    <artifactId>jersey-grizzly2</artifactId>
                     <version>${project.version}</version>
                     <optional>true</optional>
                 </dependency>

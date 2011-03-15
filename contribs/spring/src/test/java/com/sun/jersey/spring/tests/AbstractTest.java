@@ -41,15 +41,16 @@ package com.sun.jersey.spring.tests;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
-
-import com.sun.grizzly.http.embed.GrizzlyWebServer;
-import com.sun.grizzly.http.servlet.ServletAdapter;
 import com.sun.jersey.spring.tests.util.JerseyTestHelper;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.servlet.ServletHandler;
+import org.testng.annotations.AfterClass;
+
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
-import org.testng.annotations.AfterClass;
 
 
 /**
@@ -61,7 +62,7 @@ import org.testng.annotations.AfterClass;
  */
 public class AbstractTest {
     
-    private GrizzlyWebServer ws ;
+    private HttpServer httpServer;
 
     /**
      * Get the base URI for the Web application.
@@ -87,8 +88,7 @@ public class AbstractTest {
         try {
             stop();
 
-            ws = new GrizzlyWebServer(BASE_URI.getPort());
-            ServletAdapter sa = new ServletAdapter();
+            ServletHandler sa = new ServletHandler();
             sa.setServletInstance(SpringServlet.class.newInstance());
             sa.setServletPath("/spring");
 
@@ -101,8 +101,8 @@ public class AbstractTest {
             sa.addServletListener("org.springframework.web.context.ContextLoaderListener");
             sa.addContextParameter("contextConfigLocation", "classpath:" + appConfig);
 
-            ws.addGrizzlyAdapter(sa, new String[] {""} );
-            ws.start();
+            httpServer = GrizzlyServerFactory.createHttpServer(BASE_URI, sa);
+            httpServer.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -110,11 +110,11 @@ public class AbstractTest {
 
     public void stop() throws Exception {
         try {
-            if (ws != null) {
-                ws.stop();
+            if (httpServer != null) {
+                httpServer.stop();
             }
         } finally {
-            ws = null;
+            httpServer = null;
         }
     }
     
