@@ -761,9 +761,4 @@ public class UriBuilderTest extends TestCase {
                 build();
         assertEquals(URI.create("http://localhost:8080/%7Ba%7D/%7Bb%7D?q=%7Bc%7D"), bu);
     }
-
-    public void testEncodePathParam() {
-        URI bu = UriBuilder.fromPath("http://localhost:8080/R/{id}").build("A/B");
-        assertEquals(URI.create("http://localhost:8080/R/A%2FB"), bu);
-    }
 }

@@ -619,7 +619,7 @@ public class UriTemplate {
         }
 
         if (path != null)
-            createURIComponent(UriComponent.Type.PATH_SEGMENT, path, values, encode, sb);
+            createURIComponent(UriComponent.Type.PATH, path, values, encode, sb);
 
         if (query != null && query.length() > 0) {
             sb.append('?');
@@ -825,7 +825,7 @@ public class UriTemplate {
         }
 
         if (path != null)
-            offset = createURIComponent(UriComponent.Type.PATH_SEGMENT, path, values,
+            offset = createURIComponent(UriComponent.Type.PATH, path, values,
                     offset, encode, mapValues, sb);
 
         if (query != null && query.length() > 0) {
@@ -842,7 +842,7 @@ public class UriTemplate {
         return sb.toString();
     }
 
-    private static int createURIComponent(final UriComponent.Type t,
+    private static int createURIComponent(final UriComponent.Type t, 
             String template,
             final String[] values, final int offset,
             final boolean encode, 
