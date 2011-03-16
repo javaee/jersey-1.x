@@ -58,6 +58,7 @@
 
         <itemizedlist>
             <listitem>jersey-test-framework-grizzly</listitem>
+            <listitem>jersey-test-framework-grizzly2</listitem>
             <listitem>jersey-test-framework-http</listitem>
             <listitem>jersey-test-framework-inmemory</listitem>
             <listitem>jersey-test-framework-embedded-glassfish</listitem>
@@ -125,14 +126,14 @@
 
                 &lt;dependency&gt;
                 &lt;groupId&gt;com.sun.jersey.jersey-test-framework&lt;/groupId&gt;
-                &lt;artifactId&gt;jersey-test-framework-grizzly&lt;/artifactId&gt;
+                &lt;artifactId&gt;jersey-test-framework-grizzly2&lt;/artifactId&gt;
                 &lt;version&gt;${project.version}&lt;/version&gt;
                 &lt;scope&gt;test&lt;/scope&gt;
                 &lt;/dependency&gt;
 
             </programlisting>
 
-            which means that Grizzly Web container will be used for testing.
+            which means that Grizzly Web container (version 2.x) will be used for testing.
         </para>
 
         <para>You can specify more than one module in dependencies and choose which
@@ -146,6 +147,15 @@
                     <para>
                         <literal>com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory</literal>
                         <literal>com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory</literal>
+                    </para>
+                </glossdef>
+            </glossentry>
+            <glossentry>
+                <glossterm>jersey-test-framework-grizzly2</glossterm>
+                <glossdef>
+                    <para>
+                        <literal>com.sun.jersey.test.framework.spi.container.grizzly2.web.GrizzlyWebTestContainerFactory</literal>
+                        <literal>com.sun.jersey.test.framework.spi.container.grizzly2.GrizzlyTestContainerFactory</literal>
                     </para>
                 </glossdef>
             </glossentry>
@@ -192,7 +202,7 @@
     if(factories.count == 1)
         use found factory
     else
-        if(GrizzlyWebTestContainerFactory is present)
+        if(com.sun.jersey.test.framework.spi.container.grizzly2.web.GrizzlyWebTestContainerFactory is present)
             use it // current default jersey test container factory
         else
             use first found and log warning
