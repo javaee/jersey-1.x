@@ -51,10 +51,10 @@ import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.model.Parameterized;
 import com.sun.jersey.api.model.ResourceModelIssue;
-import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.impl.ImplMessages;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -63,6 +63,7 @@ import java.lang.reflect.Type;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -78,11 +79,24 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 /**
+ * <p>Performs a basic check on abstract resources. Validity check populates a list of potential issues
+ * with the given resource. The issues are divided into two categories: fatal and non-fatal issues.
+ * The former type prevents the resource to be deployed and makes the whole web application
+ * deployment fail.
  *
- * @author japod
+ * <p>To check a single resource class, one could
+ * use the {@link IntrospectionModeller#createResource(java.lang.Class)} method
+ * to get an abstract resource model. {@link AbstractModelValidator#validate(com.sun.jersey.api.model.AbstractModelComponent)}
+ * method then populates the issue list, which could be then obtained by the {@link AbstractModelValidator#getIssueList()}.
+ * Unless you explicitly clear the list, subsequent calls to the validate method will add new items to the list,
+ * so that you can build the issue list for more than one resource. To clear the list, you may want to call
+ * {@link AbstractModelValidator#cleanIssueList()} method.
+ *
+ * @author jakub.podlesak@oracle.com
  */
 public class BasicValidator extends AbstractModelValidator {
 
+    @Override
     public void visitAbstractResource(AbstractResource resource) {
         // uri template of the resource, if present should not contain null value
         if (resource.isRootResource() && ((null == resource.getPath()) || (null == resource.getPath().getValue()))) {
@@ -95,20 +109,24 @@ public class BasicValidator extends AbstractModelValidator {
         checkNonPublicMethods(resource);
     }
 
+    @Override
     public void visitAbstractResourceConstructor(AbstractResourceConstructor constructor) {
         // TODO check parameters
     }
 
+    @Override
     public void visitAbstractField(AbstractField field) {
         final Field f = field.getField();
         checkParameter(field.getParameters().get(0), f, f.toGenericString(), f.getName());
     }
 
+    @Override
     public void visitAbstractSetterMethod(AbstractSetterMethod setterMethod) {
         final Method m = setterMethod.getMethod();
         checkParameter(setterMethod.getParameters().get(0), m, m.toGenericString(), "1");
     }
 
+    @Override
     public void visitAbstractResourceMethod(AbstractResourceMethod method) {
         checkParameters(method, method.getMethod());
 
@@ -158,6 +176,7 @@ public class BasicValidator extends AbstractModelValidator {
         }
     }
 
+    @Override
     public void visitAbstractSubResourceMethod(AbstractSubResourceMethod method) {
         // check the same things that are being checked for resource methods
         visitAbstractResourceMethod(method);
@@ -170,6 +189,7 @@ public class BasicValidator extends AbstractModelValidator {
         }
     }
 
+    @Override
     public void visitAbstractSubResourceLocator(AbstractSubResourceLocator locator) {
         checkParameters(locator, locator.getMethod());
         if (void.class == locator.getMethod().getReturnType()) {
@@ -264,9 +284,10 @@ public class BasicValidator extends AbstractModelValidator {
 
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             Class c = _c;
+            @Override
             public Object run() {
                 while (c != Object.class && c != null) {
-                    for (Method m : c.getDeclaredMethods()) ml.add(m);
+                    ml.addAll(Arrays.asList(c.getDeclaredMethods()));
                     c = c.getSuperclass();
                 }
                 return null;
