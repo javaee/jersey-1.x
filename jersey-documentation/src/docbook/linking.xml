@@ -179,7 +179,7 @@ URI offers;</programlisting>
         <para>Declarative hyperlinking support is provided in the form of a filter. First, the application
             must declare a dependency on the <literal>jersey-server-linking</literal> module:</para>
         <programlisting language="xml">&lt;dependency&gt;
-  &lt;groupId&gt;com.sun.jersey.experimental&lt;/groupId&gt;
+  &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
   &lt;artifactId&gt;jersey-server-linking&lt;/artifactId&gt;
   &lt;version&gt;${jersey-version}&lt;/version&gt;
 &lt;/dependency&gt;</programlisting>
