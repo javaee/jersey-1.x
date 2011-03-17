@@ -1,4 +1,7 @@
 release 1.6
+- Fixed issue 681
+  http://java.net/jira/browse/JERSEY-681
+  Missing repository declaration in quickstart-grizzly archetype
 - Grizzly 2.0 integration
   Introduced GrizzlyWebContainerFactory in jersey-grizzly2
   Introduced jersey-tests-framework-grizzly2 and made it default
