@@ -1,4 +1,5 @@
 release 1.6
+- Added support for lists and arrays of JAXBElement<?> objects.
 - Fixed issue 681
   http://java.net/jira/browse/JERSEY-681
   Missing repository declaration in quickstart-grizzly archetype
