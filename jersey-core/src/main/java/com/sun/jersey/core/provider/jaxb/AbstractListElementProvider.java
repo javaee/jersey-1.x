@@ -60,6 +60,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
@@ -67,6 +68,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import javax.xml.bind.JAXBElement;
 
 /**
  *
@@ -126,7 +128,8 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         type = type.getComponentType();
 
         return type.isAnnotationPresent(XmlRootElement.class) ||
-                type.isAnnotationPresent(XmlType.class);
+                type.isAnnotationPresent(XmlType.class) ||
+                JAXBElement.class.isAssignableFrom(type);
     }
 
     private boolean verifyGenericType(Type genericType) {
@@ -135,6 +138,14 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         final ParameterizedType pt = (ParameterizedType)genericType;
 
         if (pt.getActualTypeArguments().length > 1) return false;
+        
+        final Type ta = pt.getActualTypeArguments()[0];
+
+        if (ta instanceof ParameterizedType) {
+            ParameterizedType lpt = (ParameterizedType) ta;
+            return (lpt.getRawType() instanceof Class) &&
+                    JAXBElement.class.isAssignableFrom((Class) lpt.getRawType());
+        }
 
         if (!(pt.getActualTypeArguments()[0] instanceof Class)) return false;
 
@@ -157,9 +168,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             final Collection c = (type.isArray()) 
                     ? Arrays.asList((Object[])t)
                     : (Collection)t;
-            final Class elementType = (type.isArray()) 
-                    ? type.getComponentType()
-                    : getElementClass(type, genericType);
+            final Class elementType = getElementClass(type, genericType);
             final Charset charset = getCharset(mediaType);
             final String charsetName = charset.name();
 
@@ -201,12 +210,11 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             MultivaluedMap<String, String> httpHeaders, 
             InputStream entityStream) throws IOException {
         try {
-            final Class elementType = (type.isArray())
-                    ? type.getComponentType()
-                    : getElementClass(type, genericType);                
+            final Class elementType = getElementClass(type, genericType);                
             final Unmarshaller u = getUnmarshaller(elementType, mediaType);            
             final XMLStreamReader r = getXMLStreamReader(elementType, mediaType, u, entityStream);
             final List l = new ArrayList();
+            boolean jaxbElement = false;
 
             // Move to root element
             int event = r.next();
@@ -220,10 +228,14 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
                 event = r.next();
 
             while (event != XMLStreamReader.END_DOCUMENT) {
-                if (elementType.isAnnotationPresent(XmlRootElement.class))
+                if (elementType.isAnnotationPresent(XmlRootElement.class)) {
                     l.add(u.unmarshal(r));
-                else
+                } else if (elementType.isAnnotationPresent(XmlType.class)) {
                     l.add(u.unmarshal(r, elementType).getValue());
+                } else {
+                    l.add(u.unmarshal(r, elementType));
+                    jaxbElement = true;
+                }
 
                 // Move to next peer (if any)
                 event = r.getEventType();
@@ -233,7 +245,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             }
 
             return (type.isArray())
-                    ? createArray(l, elementType)
+                    ? createArray(l, jaxbElement ? JAXBElement.class : elementType)
                     : l;
         } catch (UnmarshalException ex) {
             throw new WebApplicationException(ex, Status.BAD_REQUEST);
@@ -266,8 +278,22 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             throws XMLStreamException;
 
     protected Class getElementClass(Class<?> type, Type genericType) {
-        ParameterizedType pt = (ParameterizedType)genericType;
-        return (Class)pt.getActualTypeArguments()[0];
+        Type ta;
+        if (genericType instanceof ParameterizedType) {
+            // List case
+            ta = ((ParameterizedType) genericType).getActualTypeArguments()[0];
+        } else if (genericType instanceof GenericArrayType) {
+            // GenericArray case
+            ta = ((GenericArrayType) genericType).getGenericComponentType();
+        } else {
+            // Array case
+            ta = type.getComponentType();
+        }
+        if (ta instanceof ParameterizedType) {
+            // JAXBElement case
+            ta = ((ParameterizedType) ta).getActualTypeArguments()[0];
+        }
+        return (Class) ta;
     }
     
     private final Inflector inflector = Inflector.getInstance();

@@ -658,6 +658,18 @@ public class ReflectionHelper {
                     } catch (Exception e) {
                     }
                     return null;
+                } else if (t instanceof ParameterizedType) {
+                    Type rt = ((ParameterizedType) t).getRawType();
+                    if (rt instanceof Class) {
+                        c = (Class) rt;
+                    } else {
+                        return null;
+                    }
+                    try {
+                        return new ClassTypePair(getArrayClass(c), t);
+                    } catch (Exception e) {
+                        return null;
+                    }
                 } else {
                     return null;
                 }

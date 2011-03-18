@@ -39,6 +39,8 @@
  */
 package com.sun.jersey.api.client;
 
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -96,6 +98,9 @@ public class GenericType<T> {
             if (parameterizedType.getRawType() instanceof Class) {
                 return (Class)parameterizedType.getRawType();
             }
+        } else if (type instanceof GenericArrayType) {
+            GenericArrayType array = (GenericArrayType) type;
+            return ReflectionHelper.getArrayClass((Class) ((ParameterizedType) array.getGenericComponentType()).getRawType());
         }
         throw new IllegalArgumentException("Type parameter not a class or " +
                 "parameterized type whose raw type is a class");        

@@ -89,6 +89,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -193,6 +194,62 @@ public class EntityTypesTest extends AbstractTypeTester {
 
     public void testJAXBElementBeanRepresentation() {
         _test(new JAXBBean("CONTENT"), JAXBElementBeanResource.class, MediaType.APPLICATION_XML_TYPE);
+    }
+
+    @Path("/")
+    @Produces({"application/xml", "application/json"})
+    @Consumes({"application/xml", "application/json"})
+    public static class JAXBElementListResource extends AResource<List<JAXBElement<String>>> {
+    }
+
+    private List<JAXBElement<String>> getJAXBElementList() {
+        return Arrays.asList(getJAXBElementArray());
+    }
+
+    public void testJAXBElementListXMLRepresentation() {
+        _testListOrArray(true, MediaType.APPLICATION_XML_TYPE);
+    }
+
+    public void _testListOrArray(boolean isList, MediaType mt) {
+        Object in = isList ? getJAXBElementList() : getJAXBElementArray();
+        GenericType gt = isList ? new GenericType<List<JAXBElement<String>>>() {} : new GenericType<JAXBElement<String>[]>() {};
+
+        initiateWebApplication(isList ? JAXBElementListResource.class : JAXBElementArrayResource.class);
+        WebResource r = resource("/");
+        Object out = r.type(mt).accept(mt).post(gt, new GenericEntity(in, gt.getType()));
+
+        List<JAXBElement<String>> inList = isList ? ((List<JAXBElement<String>>) in) : Arrays.asList((JAXBElement<String>[]) in);
+        List<JAXBElement<String>> outList = isList ? ((List<JAXBElement<String>>) out) : Arrays.asList((JAXBElement<String>[]) out);
+        assertEquals("Lengths differ", inList.size(), outList.size());
+        for (int i = 0; i < inList.size(); i++) {
+            assertEquals("Names of elements at index " + i + " differ", inList.get(i).getName(), outList.get(i).getName());
+            assertEquals("Values of elements at index " + i + " differ", inList.get(i).getValue(), outList.get(i).getValue());
+        }
+    }
+
+    public void testJAXBElementListJSONRepresentation() {
+        _testListOrArray(true, MediaType.APPLICATION_JSON_TYPE);
+    }
+
+    @Path("/")
+    @Produces({"application/xml", "application/json"})
+    @Consumes({"application/xml", "application/json"})
+    public static class JAXBElementArrayResource extends AResource<JAXBElement<String>[]> {
+    }
+
+    private JAXBElement<String>[] getJAXBElementArray() {
+        return new JAXBElement[] {
+            new JAXBElement(QName.valueOf("element1"), String.class, "ahoj"),
+            new JAXBElement(QName.valueOf("element2"), String.class, "nazdar")
+        };
+    }
+
+    public void testJAXBElementArrayXMLRepresentation() {
+        _testListOrArray(false, MediaType.APPLICATION_XML_TYPE);
+    }
+
+    public void testJAXBElementArrayJSONRepresentation() {
+        _testListOrArray(false, MediaType.APPLICATION_JSON_TYPE);
     }
 
     @Path("/")
