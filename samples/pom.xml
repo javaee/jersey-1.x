@@ -103,7 +103,8 @@
         <module>sparklines</module>
         <module>spring-annotations</module>
         <module>storage-service</module>
-    </modules>
+    <module>oauth-client-twitter</module>
+  </modules>
 
     <profiles>
         <profile>
