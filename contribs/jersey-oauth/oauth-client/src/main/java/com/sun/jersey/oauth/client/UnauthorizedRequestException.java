@@ -42,32 +42,46 @@ package com.sun.jersey.oauth.client;
 
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import java.net.URI;
-import javax.ws.rs.core.UriBuilder;
 
-/** Thrown from a client request by the OAuthClientFilter if
- * the request is not properly authorized. Client should redirect
- * user to the URI returned from {@link NeedAuthorizationException#getAuthorizationUri()}.
+/** Thrown from a client request by the {@link OAuthClientFilter} if
+ * the request is not properly authorized. I.e. either when the user authorization
+ * of a request token is required and has not been provided by the {@link OAuthClientFilter.AuthHandler}
+ * or if the request token got revoked by the user - i.e. the verifier provided by the
+ * {@link OAuthClientFilter.AuthHandler} was either null or invalid.
+ * In the first case, client may redirect user to the URI returned
+ * from {@link #getAuthorizationUri()}.
  * Once authorization is obtained, client should add verifier code returned
  * by the server into OAuth parameters object returned from
- * {@link NeedAuthorizationException#getOAuthParameters()}.
+ * {@link UnauthorizedRequestException#getOAuthParameters()}.
+ * In the second case {@link #getAuthorizationUri()} returns null.
  *
  * @author Martin Matula <martin.matula@oracle.com>
  */
-public class NeedAuthorizationException extends RuntimeException {
+public class UnauthorizedRequestException extends RuntimeException {
     private final OAuthParameters params;
     private final URI authUri;
 
-    public NeedAuthorizationException(OAuthParameters parameters, URI authorizationUri) {
+    public UnauthorizedRequestException(OAuthParameters parameters, URI authorizationUri) {
         params = parameters;
-        authUri = UriBuilder.fromUri(authorizationUri)
-                .queryParam(OAuthParameters.TOKEN, parameters.getToken())
-                .build();
+        authUri = authorizationUri;
     }
 
+    /** Returns OAuthParameters structure used by the {@link OAuthClientFilter}.
+     * Can be used to update parameters to make the next request not fail (i.e. set a new
+     * verification code).
+     *
+     * @return OAuth request parameters
+     */
     public OAuthParameters getOAuthParameters() {
         return params;
     }
 
+    /** Returns authorization URI the user can be redirected to to provide authorization,
+     * or null if there is no request token to be authorized (i.e. user revoked access
+     * to the request token obtained by the client).
+     *
+     * @return authorization URI or null
+     */
     public URI getAuthorizationUri() {
         return authUri;
     }
