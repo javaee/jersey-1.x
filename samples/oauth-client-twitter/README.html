@@ -38,7 +38,7 @@
         <h3>Running for the First Time</h3>
         <p>Enter the following on the command-line:</p>
         <pre>
-        mvn install java:exec -DconsumerKey=&lt;consumer key assigned to your app&gt; -DconsumerSecret=&lt;consumer secret assigned to your app&gt;
+        mvn clean compile java:exec -DconsumerKey=&lt;consumer key assigned to your app&gt; -DconsumerSecret=&lt;consumer secret assigned to your app&gt;
         </pre>
         <h3>Subsequent Runs</h3>
         <p>After you run the application for the first time, it stores the consumer key, secret and token and token secret
