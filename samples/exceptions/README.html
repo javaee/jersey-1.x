@@ -13,7 +13,9 @@
 <p>The example consists of just one Jersey resource:</p>
 <dl>
     <dt><code>com.sun.jersey.samples.exceptions.MyResource</code></dt>
-    <dd>that produces a textual response to an HTTP GET.</dd>
+    <dd>that produces a simple textual response to an HTTP GET <br/>
+        and contains a  bunch of sub-resource methods demonstrating <br/>
+        various exception processing scenarios</dd>
 </dl>
 <p>The mapping of the URI path space is presented in the following table:</p>
 <table border="1">
@@ -71,5 +73,13 @@
     <p></blockquote>
 <p>From a web browser, visit:</p>
 <blockquote><code><a href="http://localhost:9998/myresource">http://localhost:9998/myresource</a></code></blockquote>
+<blockquote><code><a href="http://localhost:9998/myresource/runtime?ex=java.lang.NullPointerException">http://localhost:9998/myresource/runtime?ex=java.lang.NullPointerException</a></code> (see stack trace)</blockquote>
+<blockquote><code><a href="http://localhost:9998/myresource/checked/ioexception">http://localhost:9998/myresource/checked/ioexception</a></code> (see stack trace)</blockquote>
+<blockquote><code><a href="http://localhost:9998/myresource/checked/mymappedexception">http://localhost:9998/myresource/checked/mymappedexception</a></code></blockquote>
+<blockquote><code><a href="http://localhost:9998/myresource/checked/mymappedruntimeexception">http://localhost:9998/myresource/checked/mymappedruntimeexception</a></code></blockquote>
+<blockquote><code><a href="http://localhost:9998/myresource/checked/mymappedthrowingexception">http://localhost:9998/myresource/checked/mymappedthrowingexception</a></code> (see stack trace)</blockquote>
+<blockquote><code><a href="http://localhost:9998/myresource/webapplicationexception/505?r=errrrorMsg">http://localhost:9998/myresource/webapplicationexception/505?r=errrrorMsg</a></code> (see stacktrace)</blockquote>
+
+Where suggested see stack trace for details on exception processing.
 </body>
 </html>
