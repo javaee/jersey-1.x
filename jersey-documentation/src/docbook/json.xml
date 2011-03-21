@@ -81,14 +81,23 @@
     This could be done in <code>web.xml</code> using the following servlet init parameter:
 <example>
 <title>POJO JSON support web.xml configuration</title>
-<programlisting language="xml" linenumbering="numbered">
-        &lt;init-param&gt;
+<programlisting language="xml" linenumbering="numbered">        &lt;init-param&gt;
             &lt;param-name&gt;com.sun.jersey.api.json.POJOMappingFeature&lt;/param-name&gt;
             &lt;param-value&gt;true&lt;/param-value&gt;
-        &lt;/init-param&gt;
-</programlisting>
+        &lt;/init-param&gt;</programlisting>
 </example>
 </para>
+
+<para>
+The following snippet shows how to use the POJO mapping feature on the client side:
+<example>
+<title>POJO JSON support client configuration</title>
+<programlisting language="xml" linenumbering="numbered">  ClientConfig clientConfig = new DefaultClientConfig();
+  clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+  Client client = Client.create(clientConfig);</programlisting>
+</example>
+</para>
+
 <para>
 Jackson JSON processor could be futher controlled via providing custom Jackson <ulink url="http://jackson.codehaus.org/&jackson.javadoc.version;/javadoc/org/codehaus/jackson/map/ObjectMapper.html">ObjectMapper</ulink> instance. 
 This could be handy if you need to redefine the default Jackson behaviour and to fine-tune how your JSON data structures look like.
