@@ -64,10 +64,10 @@ public class ClasspathResourceConfig extends ScanningResourceConfig {
      * ',' or ' ' (space). 
      * Each path MUST be an absolute or relative directory, or a Jar file. 
      * The contents of a directory, including Java class files, jars files 
-     * and sub-directories (recusively) are scanned. The Java class files of 
+     * and sub-directories (recursively) are scanned. The Java class files of
      * a jar file are scanned.
      * <p>
-     * Root resource clases MUST be present in the Java class path.
+     * Root resource classes MUST be present in the Java class path.
      */
     public static final String PROPERTY_CLASSPATH
             = "com.sun.jersey.config.property.classpath";
