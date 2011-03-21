@@ -138,7 +138,7 @@
                 <version>3.1</version>
                 <configuration>
                     <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>${basedir}/target/helloworld-webapp.war</app>
+                    <app>${basedir}/target/jersey-server-linking-sample.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
                     <installRoot>./target/gfembeddedtmp</installRoot>
