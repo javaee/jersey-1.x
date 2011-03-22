@@ -111,8 +111,29 @@
                     <app>${basedir}/target/jersey-cdi.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <installRoot>./target/gfembeddedtmp</installRoot>
                 </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>jersey-server</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish</groupId>
+                        <artifactId>javax.servlet</artifactId>
+                        <version>3.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish</groupId>
+                        <artifactId>javax.ejb</artifactId>
+                        <version>3.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.enterprise</groupId>
+                        <artifactId>cdi-api</artifactId>
+                        <version>1.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

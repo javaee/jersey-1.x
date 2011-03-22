@@ -200,13 +200,17 @@
                     <app>${basedir}/target/spring-annotations.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <installRoot>./target/gfembeddedtmp</installRoot>
                 </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>com.sun.jersey</groupId>
                         <artifactId>jersey-server</artifactId>
                         <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish</groupId>
+                        <artifactId>javax.servlet</artifactId>
+                        <version>3.1</version>
                     </dependency>
                 </dependencies>
             </plugin>

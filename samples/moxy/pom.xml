@@ -110,13 +110,22 @@
                     <app>${basedir}/target/moxy.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <installRoot>./target/gfembeddedtmp</installRoot>
                 </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>com.sun.jersey</groupId>
                         <artifactId>jersey-server</artifactId>
                         <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish</groupId>
+                        <artifactId>javax.servlet</artifactId>
+                        <version>3.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish</groupId>
+                        <artifactId>javax.ejb</artifactId>
+                        <version>3.1</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -137,14 +146,15 @@
     </build>
     <repositories>
         <repository>
-            <id>glassfish-maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository for GlassFish</name>
-            <url>http://download.java.net/maven/glassfish/</url>
+            <id>glassfish-repository</id>
+            <name>Java.net Repository for Glassfish</name>
+            <url>http://download.java.net/maven/glassfish</url>
         </repository>
         <repository>
             <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
+            <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/2/</url>
+            <layout>default</layout>
         </repository>
         <repository>
             <id>eclipselink-repository</id>
@@ -156,6 +166,12 @@
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net Repository for Maven</name>
             <url>http://download.java.net/maven/2/</url>
+            <layout>default</layout>
+        </pluginRepository>
+        <pluginRepository>
+            <id>maven2-glassfish-repository.dev.java.net</id>
+            <name>Java.net Repository for Maven</name>
+            <url>http://download.java.net/maven/glassfish/</url>
         </pluginRepository>
     </pluginRepositories>
     <profiles>
