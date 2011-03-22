@@ -48,17 +48,17 @@ START LEVEL 1
     2|Active     |    1|Apache Felix Gogo Command (0.6.1)
     3|Active     |    1|Apache Felix Gogo Runtime (0.6.1)
     4|Active     |    1|Apache Felix Gogo Shell (0.6.1)
-g! install http://apache.opensourceresources.org//felix/org.apache.felix.configadmin-1.2.8.jar
+g! install http://repo2.maven.org/maven2/org/apache/felix/org.apache.felix.configadmin/1.2.8/org.apache.felix.configadmin-1.2.8.jar
 Bundle ID: 5
-g! install http://apache.opensourceresources.org//felix/org.apache.felix.eventadmin-1.2.6.jar
+g! install http://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.eventadmin/1.2.10/org.apache.felix.eventadmin-1.2.10.jar
 Bundle ID: 6
 g! install http://repo2.maven.org/maven2/org/ops4j/pax/web/pax-web-jetty-bundle/0.7.1/pax-web-jetty-bundle-0.7.1.jar
 Bundle ID: 7
-g! install http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.5-SNAPSHOT/jersey-core-1.5-SNAPSHOT.jar
+g! install http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.6-ea06/jersey-core-1.6-ea06.jar
 Bundle ID: 8
-g! install http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.5-SNAPSHOT/jersey-server-1.5-SNAPSHOT.jar
+g! install http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.6-ea06/jersey-server-1.6-ea06.jar
 Bundle ID: 9
-g! install file:bundle-1.5-SNAPSHOT.jar
+g! install file:bundle-1.6-ea06.jar
 Bundle ID: 10 
 g! lb
 START LEVEL 1
@@ -71,31 +71,23 @@ START LEVEL 1
     5|Installed  |    1|Apache Felix Configuration Admin Service (1.2.8)
     6|Installed  |    1|Apache Felix EventAdmin (1.2.6)
     7|Installed  |    1|OPS4J Pax Web - Jetty Bundle (0.7.1)
-    8|Installed  |    1|jersey-core (1.5.0.SNAPSHOT)
-    9|Installed  |    1|jersey-server (1.5.0.SNAPSHOT)
-   10|Installed  |    1|OSGi HttpService - Jersey Sample Bundle (1.5.0.SNAPSHOT)
+    8|Installed  |    1|jersey-core (1.6.0.ea06)
+    9|Installed  |    1|jersey-server (1.6.0.ea06)
+   10|Installed  |    1|OSGi HttpService - Jersey Sample Bundle (1.6.0.ea06)
 g! start 5 6 7 8 9 10
-DEBUG: EventAdmin: org.apache.felix.eventadmin.CacheSize=30
-DEBUG: EventAdmin: org.apache.felix.eventadmin.ThreadPoolSize=20
-DEBUG: EventAdmin: org.apache.felix.eventadmin.Timeout=5000
-DEBUG: EventAdmin: org.apache.felix.eventadmin.RequireTopic=true
-DEBUG: EventAdmin: org.apache.felix.eventadmin.CacheSize=30
-DEBUG: EventAdmin: org.apache.felix.eventadmin.ThreadPoolSize=20
-DEBUG: EventAdmin: org.apache.felix.eventadmin.Timeout=5000
-DEBUG: EventAdmin: org.apache.felix.eventadmin.RequireTopic=true
-Nov 8, 2010 12:00:29 PM com.sun.jersey.samples.osgihttpservice.Activator start
+Mar 22, 2011 10:04:30 PM com.sun.jersey.samples.osgihttpservice.Activator start
 INFO: STARTING HTTP SERVICE BUNDLE
-Nov 8, 2010 12:00:29 PM com.sun.jersey.samples.osgihttpservice.Activator rawRegisterServlets
+Mar 22, 2011 10:04:30 PM com.sun.jersey.samples.osgihttpservice.Activator rawRegisterServlets
 INFO: JERSEY BUNDLE: REGISTERING SERVLETS
-Nov 8, 2010 12:00:29 PM com.sun.jersey.samples.osgihttpservice.Activator rawRegisterServlets
-INFO: JERSEY BUNDLE: HTTP SERVICE = org.ops4j.pax.web.service.internal.HttpServiceProxy@9ac5f13
-Nov 8, 2010 12:00:29 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
-INFO: Initiating Jersey application, version 'Jersey: 1.5-SNAPSHOT 10/22/2010 01:30 AM'
-Nov 8, 2010 12:00:29 PM com.sun.jersey.server.impl.application.DeferredResourceConfig$ApplicationHolder <init>
+Mar 22, 2011 10:04:30 PM com.sun.jersey.samples.osgihttpservice.Activator rawRegisterServlets
+INFO: JERSEY BUNDLE: HTTP SERVICE = org.ops4j.pax.web.service.internal.HttpServiceProxy@1d25d06e
+Mar 22, 2011 10:04:30 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
+INFO: Initiating Jersey application, version 'Jersey: 1.6-ea06 03/18/2011 02:33 PM'
+Mar 22, 2011 10:04:30 PM com.sun.jersey.server.impl.application.DeferredResourceConfig$ApplicationHolder <init>
 INFO: Instantiated the Application class com.sun.jersey.samples.osgihttpservice.JerseyApplication
-Nov 8, 2010 12:00:30 PM com.sun.jersey.samples.osgihttpservice.Activator rawRegisterServlets
+Mar 22, 2011 10:04:31 PM com.sun.jersey.samples.osgihttpservice.Activator rawRegisterServlets
 INFO: JERSEY BUNDLE: SERVLETS REGISTERED
-Nov 8, 2010 12:00:30 PM com.sun.jersey.samples.osgihttpservice.Activator start
+Mar 22, 2011 10:04:31 PM com.sun.jersey.samples.osgihttpservice.Activator start
 INFO: HTTP SERVICE BUNDLE STARTED
 </pre>
 
