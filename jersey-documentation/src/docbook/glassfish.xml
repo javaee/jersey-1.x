@@ -133,13 +133,9 @@ This directory gets created upon the first start of the GlassFish instance.
         </section>
 
         <section>
-            <title>GlassFish v3.1</title>
-            <para>GlassFish v3.1 is still a work in progress. We try to integrate Jersey promoted builds there on a weekly basis, so that GlassFish v3.1 nightlies always
-contain fresh Jersey bits. GlassFish v3.1 nightly builds could be downloaded from 
-                <ulink url="http://download.java.net/glassfish/v3.1/nightly/">http://download.java.net/glassfish/v3.1/nightly/</ulink>
-GlassFish v3.1 promoted builds are available at 
-                <ulink url="http://download.java.net/glassfish/v3.1/promoted/">http://download.java.net/glassfish/v3.1/promoted/</ulink>
- 
+            <title>GlassFish 3.1</title>
+            <para>GlassFish 3.1 is released.  GlassFish 3.1 builds can be downloaded from
+                <ulink url="http://glassfish.java.net/downloads/3.1-final.html">http://glassfish.java.net/downloads/3.1-final.html</ulink>
             </para>
             <para>
 If you want to update the Jersey bits in GlassFish with the latest Jersey snapshot version, or if you want to install Jersey documentation and examples, you would need
@@ -158,8 +154,7 @@ Stop all running server instances. Then remove the following files from the Glas
                     <listitem>glassfish/modules/jackson-core-asl.jar</listitem>
                     <listitem>glassfish/modules/jackson-mapper-asl.jar</listitem>
                     <listitem>glassfish/modules/jackson-jaxrs.jar</listitem>
-                    <listitem>glassfish/modules/jettison.jar</listitem>
-                    <listitem>glassfish/modules/mimepull.jar</listitem>
+                    <listitem>glassfish/modules/jettison.jar</listitem>                    
                 </itemizedlist>
 
 Download the new Jersey version archive from
