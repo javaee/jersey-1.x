@@ -32,10 +32,18 @@
       <p>To run the example, you would need to build the OSGi bundle in the <tt>bundle</tt> module 
       and install it to an OSGi runtime (e.g. Apache Felix) together with other OSGi bundles.
       Look at the attached <tt>functional-test</tt> module for details on the programmatical runtime configuration</p> 
-      
-      <p>After downloading and installing <a href="http://felix.apache.org/site/index.html">Felix</a>, you can also start the HTTP service manually as shown below. 
-      The following steps are known to work with the Felix version 3.0.6: 
+      To build the bundle jar file and run the tests, you can just launch 
+<pre>%mvn clean install
+</pre>
+</p>
+      <p>After <a href="http://felix.apache.org/site/downloads.cgi">downloading</a> 
+      and installing <a href="http://felix.apache.org/site/index.html">Felix</a>,
+      you can also start the HTTP service manually as shown below. 
+      The following steps are known to work with the Felix version 3.0.9: 
 <pre>      
+%unzip ~/Downloads/org.apache.felix.main.distribution-3.0.9.zip
+%cp bundle/target/bundle*jar felix-framework-3.0.9
+%cd felix-framework-3.0.9
 %java -jar bin/felix.jar
 ____________________________
 Welcome to Apache Felix Gogo
@@ -69,7 +77,7 @@ START LEVEL 1
     3|Active     |    1|Apache Felix Gogo Runtime (0.6.1)
     4|Active     |    1|Apache Felix Gogo Shell (0.6.1)
     5|Installed  |    1|Apache Felix Configuration Admin Service (1.2.8)
-    6|Installed  |    1|Apache Felix EventAdmin (1.2.6)
+    6|Installed  |    1|Apache Felix EventAdmin (1.2.10)
     7|Installed  |    1|OPS4J Pax Web - Jetty Bundle (0.7.1)
     8|Installed  |    1|jersey-core (1.6.0.ea06)
     9|Installed  |    1|jersey-server (1.6.0.ea06)

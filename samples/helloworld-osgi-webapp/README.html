@@ -42,11 +42,18 @@
       <h2>Running the Example</h2>
       <p>To run the example, you would need to build the WAR file 
       and install it to an OSGi runtime (e.g. Apache Felix) together with other OSGi modules.
-      Look at the attached <tt>functional-test</tt> module for details on the programatical runtime configuration.</p>
-
-      <p>After downloading and installing <a href="http://felix.apache.org/site/index.html">Felix</a>, you can also deploy the WAR manually as shown bellow.
-      The following steps are known to work with the Felix version 3.0.6: 
-<pre>      
+      Look at the attached <tt>functional-test</tt> module for details on the programatical runtime configuration.
+      To build the war archive and run the tests, you can just launch 
+<pre>%mvn clean install
+</pre>
+</p>
+      <p>After <a href="http://felix.apache.org/site/downloads.cgi">downloading</a> and installing <a href="http://felix.apache.org/site/index.html">Felix</a>, you can also deploy the WAR manually as shown bellow.
+      The following steps are known to work with the Felix version 3.0.9. The war archive built by the mvn command above 
+      should be located under the <tt>war-bundle/target subdirectory</tt>: 
+<pre>
+%unzip ~/Downloads/org.apache.felix.main.distribution-3.0.9.zip
+%cp war-bundle/target/war-bundle*war felix-framework-3.0.9
+%cd felix-framework-3.0.9
 %java -jar bin/felix.jar
 ____________________________
 Welcome to Apache Felix Gogo
@@ -54,51 +61,43 @@ Welcome to Apache Felix Gogo
 g! lb
 START LEVEL 1
    ID|State      |Level|Name
-    0|Active     |    0|System Bundle (3.0.6)
+    0|Active     |    0|System Bundle (3.0.9)
     1|Active     |    1|Apache Felix Bundle Repository (1.6.2)
-    2|Active     |    1|Apache Felix Gogo Command (0.6.1)
-    3|Active     |    1|Apache Felix Gogo Runtime (0.6.1)
-    4|Active     |    1|Apache Felix Gogo Shell (0.6.1)
-g! install http://apache.opensourceresources.org//felix/org.apache.felix.configadmin-1.2.8.jar
+    2|Active     |    1|Apache Felix Gogo Command (0.8.0)
+    3|Active     |    1|Apache Felix Gogo Runtime (0.8.0)
+    4|Active     |    1|Apache Felix Gogo Shell (0.8.0)
+g! install http://repo2.maven.org/maven2/org/apache/felix/org.apache.felix.configadmin/1.2.8/org.apache.felix.configadmin-1.2.8.jar
 Bundle ID: 5
-g! install http://apache.opensourceresources.org//felix/org.apache.felix.eventadmin-1.2.6.jar
+g! install http://repo1.maven.org/maven2/org/apache/felix/org.apache.felix.eventadmin/1.2.10/org.apache.felix.eventadmin-1.2.10.jar
 Bundle ID: 6
 g! install http://repo2.maven.org/maven2/org/ops4j/pax/web/pax-web-jetty-bundle/0.7.1/pax-web-jetty-bundle-0.7.1.jar
 Bundle ID: 7
 g! install http://repo2.maven.org/maven2/org/ops4j/pax/web/pax-web-extender-war/0.7.1/pax-web-extender-war-0.7.1.jar
 Bundle ID: 8
-g! install http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.5-SNAPSHOT/jersey-core-1.5-SNAPSHOT.jar
+g! install http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.6-ea06/jersey-core-1.6-ea06.jar
 Bundle ID: 9
-g! install http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.5-SNAPSHOT/jersey-server-1.5-SNAPSHOT.jar
+g! install http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.6-ea06/jersey-server-1.6-ea06.jar
 Bundle ID: 10
-g! install file:war-bundle-1.5-SNAPSHOT.war
+g! install file:war-bundle-1.6-ea06.war
 Bundle ID: 11
-g! lb        
+g! lb
 START LEVEL 1
    ID|State      |Level|Name
-    0|Active     |    0|System Bundle (3.0.6)
+    0|Active     |    0|System Bundle (3.0.9)
     1|Active     |    1|Apache Felix Bundle Repository (1.6.2)
-    2|Active     |    1|Apache Felix Gogo Command (0.6.1)
-    3|Active     |    1|Apache Felix Gogo Runtime (0.6.1)
-    4|Active     |    1|Apache Felix Gogo Shell (0.6.1)
+    2|Active     |    1|Apache Felix Gogo Command (0.8.0)
+    3|Active     |    1|Apache Felix Gogo Runtime (0.8.0)
+    4|Active     |    1|Apache Felix Gogo Shell (0.8.0)
     5|Installed  |    1|Apache Felix Configuration Admin Service (1.2.8)
-    6|Installed  |    1|Apache Felix EventAdmin (1.2.6)
+    6|Installed  |    1|Apache Felix EventAdmin (1.2.10)
     7|Installed  |    1|OPS4J Pax Web - Jetty Bundle (0.7.1)
     8|Installed  |    1|OPS4J Pax Web - Extender - WAR (0.7.1)
-    9|Installed  |    1|jersey-core (1.5.0.SNAPSHOT)
-   10|Installed  |    1|jersey-server (1.5.0.SNAPSHOT)
-   11|Installed  |    1|Helloworld OSGi WebApp - Jersey Sample WAR (1.5.0.SNAPSHOT)
+    9|Installed  |    1|jersey-core (1.6.0.ea06)
+   10|Installed  |    1|jersey-server (1.6.0.ea06)
+   11|Installed  |    1|Helloworld OSGi WebApp - Jersey Sample WAR (1.6.0.ea06)
 g! start 5 6 7 8 9 10 11
-DEBUG: EventAdmin: org.apache.felix.eventadmin.CacheSize=30
-DEBUG: EventAdmin: org.apache.felix.eventadmin.ThreadPoolSize=20
-DEBUG: EventAdmin: org.apache.felix.eventadmin.Timeout=5000
-DEBUG: EventAdmin: org.apache.felix.eventadmin.RequireTopic=true
-DEBUG: EventAdmin: org.apache.felix.eventadmin.CacheSize=30
-DEBUG: EventAdmin: org.apache.felix.eventadmin.ThreadPoolSize=20
-DEBUG: EventAdmin: org.apache.felix.eventadmin.Timeout=5000
-DEBUG: EventAdmin: org.apache.felix.eventadmin.RequireTopic=true
-Nov 8, 2010 12:20:11 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
-INFO: Initiating Jersey application, version 'Jersey: 1.5-SNAPSHOT 10/22/2010 01:30 AM'
+Mar 22, 2011 10:25:20 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
+INFO: Initiating Jersey application, version 'Jersey: 1.6-ea06 03/18/2011 02:33 PM'
 </pre>
 
 Now both Jersey resources should become available at:
