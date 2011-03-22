@@ -51,7 +51,7 @@
 <license name="1BAE3EA4">For Update Center Project:
 ---------------------------------------------------------
 This module is part of Project Update Center and is open-source.
-You can see https://updatecenter.dev.java.net/ for details.
+You can see http://java.net/projects/updatecenter/ for details.
 
 You may use the binary however you like. The source file license is:
 
@@ -59,10 +59,10 @@ The contents of this file are subject to the terms of the Common Development
 and Distribution License (the License). You may not use this file except in
 compliance with the License.
 
-You can obtain a copy of the License at  updatecenter/bootstrap/legal/CDDLv1.0.txt.
+You can obtain a copy of the License at  http://java.net/projects/updatecenter/sources/svn/content/trunk/bootstrap/legal/CDDLv1.0.txt?raw=true.
 
 When distributing Covered Code, include this CDDL Header Notice in each file
-and include the License file at https://updatecenter.dev.java.net/public/CDDLv1.0.txt.
+and include the License file at http://jersey.java.net/CDDLv1.0.txt.
 If applicable, add the following below the CDDL Header, with the fields
 enclosed by brackets [] replaced by your own identifying information:
 "Portions Copyrighted [year] [name of copyright owner]"
