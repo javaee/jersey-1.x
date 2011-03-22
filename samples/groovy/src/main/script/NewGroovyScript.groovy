@@ -9,7 +9,7 @@ handler = ContainerFactory.createContainer(
                 GroovyResource.class)
 
 baseUri = UriBuilder.fromUri("http://localhost/").port(9998).build()
-server = GrizzlyServerFactory.create(baseUri, handler)
+server = GrizzlyServerFactory.createHttpServer(baseUri, handler)
 
 System.out.println(String.format("Jersey app started with WADL available at "
         + "%sapplication.wadl\nTry out %sgroovy\nHit enter to stop it...",
