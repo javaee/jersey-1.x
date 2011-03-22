@@ -67,6 +67,20 @@
                     <classifier>cobertura</classifier>
                 </dependency>
                 <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-json</artifactId>
+                    <version>${project.version}</version>
+                    <!--<scope>provided</scope>-->
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>jersey-multipart</artifactId>
+                    <version>${project.version}</version>
+                    <!--<scope>provided</scope>-->
+                    <classifier>cobertura</classifier>
+                </dependency>
+                <dependency>
                     <groupId>com.sun.jersey.jersey-test-framework</groupId>
                     <artifactId>jersey-test-framework-grizzly2</artifactId>
                     <version>${project.version}</version>
@@ -92,6 +106,18 @@
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
                     <artifactId>jersey-server</artifactId>
+                    <version>${project.version}</version>
+                    <!--<scope>provided</scope>-->
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-json</artifactId>
+                    <version>${project.version}</version>
+                    <!--<scope>provided</scope>-->
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey.contribs</groupId>
+                    <artifactId>jersey-multipart</artifactId>
                     <version>${project.version}</version>
                     <!--<scope>provided</scope>-->
                 </dependency>
@@ -126,13 +152,12 @@
              <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.1</version>
                 <configuration>
                     <goalPrefix>embedded-glassfish</goalPrefix>
                     <app>${basedir}/target/helloworld-webapp.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <instanceRoot>./target/gfembeddedtmp</instanceRoot>
                 </configuration>
                 <dependencies>
                     <dependency>
