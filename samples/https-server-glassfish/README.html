@@ -31,23 +31,24 @@
       <p> create war package
       <blockquote><code>mvn clean package</code><p></blockquote>
 
-      <p> setup GlassFish v2.x and v3:
+      <p> setup GlassFish 3.1:
       <ul>
           <li>Add new security realm called "myRealm"</li>
           <ul>
-              <li>Admin console: Configuration -&gt; Security -&gt; Realms -&gt; New Realm</li>
-              <table border="1px"><tr><th>Name</th><td>myRealm</td></tr>
+              <li>Admin console: Configuration -&gt; server-config -&gt; Security -&gt; Realms, click on "New..."</li>
+              <table border="1px">
+                  <tr><th>Name</th><td>myRealm</td></tr>
                   <tr><th>Class Name</th><td>com.sun.enterprise.security.auth.realm.file.FileRealm</td></tr>
                   <tr><th>JAAS context</th><td>fileRealm</td></tr>
                   <tr><th>Key File</th><td>${com.sun.aas.instanceRoot}/config/myRealm-keyfile</td></tr>
               </table>
-              <li>Add at least one user (edit myRealm -&gt; Manage Users); <b>set users group to "Users"</b></li>
+              <li>Add at least one user (click on "myRealm", "Manage Users", "New..."); <b>set user group to "Users"</b></li>
           </ul>
           <li>Check web.xml and sun-web.xml</li>
           <li>Deploy httpsBasicAuth-webapp.war as a Web Application</li>
           <ul>
-              <li>Admin console: Applications -&gt; Web Applications -&gt; Deploy. Select file ./target/httpsBasicAuth-webapp.war</li>
-              <li>or you can use command line: <code>/path/to/glassfishv2/glassfish/bin/asadmin deploy ./target/httpsBasicAuth-webapp.war</code></li>
+              <li>Admin console: select Applications, click on "Deploy...". Select file ./target/httpsBasicAuth-webapp.war</li>
+              <li>or you can use command line: <code>bin/asadmin deploy ./target/httpsBasicAuth-webapp.war</code></li>
           </ul>
 
       </ul>
