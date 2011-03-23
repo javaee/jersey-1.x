@@ -107,7 +107,7 @@ mvn clean compile exec:java</pre></blockquote>
         <a href="http://grizzly.java.net/">Grizzly</a>
     </p>
     <p>A <a href="http://wadl.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
-    <blockquote><code><a href="http://127.0.0.1:9998/atom/application.wadl">http://127.0.0.1:9998/atom/application.wadl</a></code></blockquote>
+    <blockquote><code><a href="http://localhost:9998/atom/application.wadl">http://localhost:9998/atom/application.wadl</a></code></blockquote>
        <p>Following steps are using <a href="http://curl.haxx.se/">cURL</a> command line tool: 
     <p>Get the service document:</p>
     <blockquote><pre>curl http://127.0.0.1:9998/atom/service</pre></blockquote>
@@ -118,6 +118,9 @@ mvn clean compile exec:java</pre></blockquote>
         &lt;atom:title&gt;Service&lt;/atom:title&gt;
         &lt;collection href="http://localhost:9998/atom/collection"&gt;
             &lt;atom:title&gt;Entries&lt;/atom:title&gt;
+            &lt;categories&gt;
+                &lt;atom:category term="storage" scheme="urn:storage" label="storage" /&gt;
+            &lt;/categories&gt;
         &lt;/collection&gt;
     &lt;/workspace&gt;
 &lt;/service&gt;</pre></blockquote>
@@ -127,24 +130,21 @@ mvn clean compile exec:java</pre></blockquote>
     <p>Get the Atom Feed document:</p>
     <blockquote><pre>curl http://127.0.0.1:9998/atom/collection</pre></blockquote>
     <p>which returns the following:</p>
-    <blockquote><pre>&lt;feed xmlns="http://www.w3.org/2005/Atom" &gt;
-    &lt;title&gt;Feed&lt;/title&gt;
-    &lt;link rel="self"
-        href="http://localhost:9998/atom/collection" /&gt;
-    &lt;entry&gt;
-        &lt;title&gt;Media Entry&lt;/title&gt;
-        &lt;link rel="self"
-            href="http://localhost:9998/atom/collection/9b871a01-4780-40cf-b457-2c54c566b6b1"/&gt;
-        &lt;link rel="edit"
-            href="http://localhost:9998/atom/collection/edit/9b871a01-4780-40cf-b457-2c54c566b6b1"/&gt;
-        &lt;link rel="edit-media"
-            href="http://localhost:9998/atom/collection/edit/9b871a01-4780-40cf-b457-2c54c566b6b1/media"/&gt;
-        &lt;id&gt;9b871a01-4780-40cf-b457-2c54c566b6b1&lt;/id&gt;
-        &lt;updated&gt;2007-01-11T11:12:06Z&lt;/updated&gt;
-        &lt;content type="TEXT"
-            src="<b>http://localhost:9998/atom/collection/9b871a01-4780-40cf-b457-2c54c566b6b1/media</b>"/&gt;
-    &lt;/entry&gt;
-&lt;/feed&gt;</pre></blockquote>    
+    <blockquote><pre>    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+    &lt;feed xmlns="http://www.w3.org/2005/Atom" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"&gt;
+      &lt;title>Feed&lt;/title&gt;
+      &lt;link rel="self" href="http://127.0.0.1:9998/atom/collection" /&gt;
+      &lt;entry>
+        &lt;title>Media Entry&lt;/title&gt;
+        &lt;link rel="self" href="http://127.0.0.1:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd" /&gt;
+        &lt;link rel="edit" href="http://127.0.0.1:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd" /&gt;
+        &lt;link rel="edit-media" href="http://127.0.0.1:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media" /&gt;
+        &lt;id>bdac4727-cbc3-4c37-ad1e-206672bc48dd&lt;/id&gt;
+        &lt;updated>2011-03-23T05:51:28Z&lt;/updated&gt;
+        &lt;content type="TEXT" src="<b>http://127.0.0.1:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media</b>" /&gt;
+      &lt;/entry&gt;
+    &lt;/feed&gt;
+</pre></blockquote>
     <p>The Atom Feed document contains one Atom Media Link Entry. The 
     <code>atom:content</code> contains a link to the media. (Note that the UUIDs
     and hence the URIs will be different than those shown in this example. Substitute the UUID
@@ -156,37 +156,33 @@ mvn clean compile exec:java</pre></blockquote>
     for the <code>rel</code> attribute. The <code>id</code> element contains the
     unique ID of the entry, which is a UUID.
     </p><p>Get the media:</p>
-    <blockquote><pre>curl http://localhost:9998/atom/collection/9b871a01-4780-40cf-b457-2c54c566b6b1/media</pre></blockquote>
+    <blockquote><pre>curl http://127.0.0.1:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media</pre></blockquote>
     <p>which returns:</p>
     <blockquote><pre>Something is rotten in the state of Denmark</pre></blockquote>
     <p>Updating the media:</p>
-    <blockquote><pre>curl -X PUT --data "Hamlet said: Something is rotten in the state of Denmark" -HContent-type:text/plain http://127.0.0.1:9998/atom/collection/edit/9b871a01-4780-40cf-b457-2c54c566b6b1/media</pre></blockquote>
+    <blockquote><pre>curl -X PUT --data "Hamlet said: Something is rotten in the state of Denmark" -HContent-type:text/plain http://127.0.0.1:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media</pre></blockquote>
     <p>The entry now has an updated time when the entry is retrieved:</p>
-    <blockquote><pre>curl http://localhost:9998/atom/collection/9b871a01-4780-40cf-b457-2c54c566b6b1</pre></blockquote>
+    <blockquote><pre>curl http://127.0.0.1:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd</pre></blockquote>
     <p>which returns:</p>
-    <blockquote><pre>&lt;entry xmlns="http://www.w3.org/2005/Atom" &gt;
-    &lt;title&gt;Media Entry&lt;/title&gt;
-    &lt;link rel="self"
-        href="http://localhost:9998/atom/collection/9b871a01-4780-40cf-b457-2c54c566b6b1"/&gt;
-    &lt;link rel="edit"
-        href="http://localhost:9998/atom/collection/edit/9b871a01-4780-40cf-b457-2c54c566b6b1"/&gt;
-    &lt;link rel="edit-media"
-        href="http://localhost:9998/atom/collection/edit/9b871a01-4780-40cf-b457-2c54c566b6b1/media"/&gt;
-    &lt;id&gt;9b871a01-4780-40cf-b457-2c54c566b6b1&lt;/id&gt;
-    &lt;updated&gt;<b>2007-01-11T11:16:32Z</b>&lt;/updated&gt;
-    &lt;content type="TEXT"
-        src="http://localhost:9998/atom/collection/9b871a01-4780-40cf-b457-2c54c566b6b1/media"/&gt;
-&lt;/entry&gt;</pre></blockquote>    
+    <blockquote><pre>&lt;entry xmlns="http://www.w3.org/2005/Atom"&gt;
+  &lt;title>Media Entry&lt;/title&gt;
+  &lt;link rel="self" href="http://localhost:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd" /&gt;
+  &lt;link rel="edit-media" href="http://localhost:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media" /&gt;
+  &lt;link rel="edit" href="http://localhost:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd/" /&gt;
+  &lt;id>bdac4727-cbc3-4c37-ad1e-206672bc48dd&lt;/id&gt;
+  &lt;updated><b>2011-03-23T06:12:46Z</b>&lt;/updated&gt;
+  &lt;content type="TEXT" src="http://localhost:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media" /&gt;
+&lt;/entry&gt;</pre></blockquote>
     
     <p>Delete the Atom Entry:</p>
-    <blockquote><pre>curl -X DELETE http://localhost:9998/atom/collection/edit/9b871a01-4780-40cf-b457-2c54c566b6b1</pre></blockquote>
+    <blockquote><pre>curl -X DELETE http://localhost:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd</pre></blockquote>
     <p>The <code>edit</code> link is used to delete the entry. Retrieving
     the Atom Feed document:</p>
-    <blockquote><pre>curl http://127.0.0.1:9998/atom/collection</pre></blockquote>
+    <blockquote><pre>curl http://localhost:9998/atom/collection</pre></blockquote>
     <p>returns a feed with no entries:</p>
-    <blockquote><pre>&lt;feed xmlns="http://www.w3.org/2005/Atom" &gt;
-    &lt;title&gt;Feed&lt;/title&gt;
-    &lt;link rel="self"
-        href="http://localhost:9998/atom/collection" /&gt;
+    <blockquote><pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;feed xmlns="http://www.w3.org/2005/Atom" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"&gt;
+  &lt;title>Feed&lt;/title&gt;
+  &lt;link rel="self" href="http://localhost:9998/atom/collection" /&gt;
 &lt;/feed&gt;</pre></blockquote>
     </body></html>
