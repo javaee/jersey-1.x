@@ -31,30 +31,41 @@
       <p> create war package
       <blockquote><code>mvn clean package</code><p></blockquote>
 
-      <p> setup GlassFish 3.1:
+      <p> setup GlassFish 3.1 (installed at AS_HOME=<code>&lt;install_dir&gt;/glassfish3/glassfish</code>):
       <ul>
-          <li>Add new security realm called "myRealm"</li>
+          <li>Add new security realm called "<code>myRealm<code>"</li>
           <ul>
-              <li>Admin console: Configuration -&gt; server-config -&gt; Security -&gt; Realms, click on "New..."</li>
+              <li>Start GlassFish using asadmin <code>$AS_HOME/bin/asadmin start-domain</code> </li>
+              <li>Access Admin console, assuming using default admin port, here <a href="http://localhost:4848">http://localhost:4848</a></li>
+              <li>Navigate in Admin console to: <code>Configuration -&gt; server-config -&gt; Security -&gt; Realms</code>, click on "<code>New...</code>"</li>
               <table border="1px">
-                  <tr><th>Name</th><td>myRealm</td></tr>
-                  <tr><th>Class Name</th><td>com.sun.enterprise.security.auth.realm.file.FileRealm</td></tr>
-                  <tr><th>JAAS context</th><td>fileRealm</td></tr>
-                  <tr><th>Key File</th><td>${com.sun.aas.instanceRoot}/config/myRealm-keyfile</td></tr>
+                  <tr><th>Name</th><td><code>myRealm</code></td></tr>
+                  <tr><th>Class Name</th><td><code>com.sun.enterprise.security.auth.realm.file.FileRealm</code></td></tr>
+                  <tr><th>JAAS context</th><td><code>fileRealm</code></td></tr>
+                  <tr><th>Key File</th><td><code>${com.sun.aas.instanceRoot}/config/myRealm-keyfile</code></td></tr>
               </table>
-              <li>Add at least one user (click on "myRealm", "Manage Users", "New..."); <b>set user group to "Users"</b></li>
+              <li>Set password for user <code>myRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>myRole</code>"); <b>Ensure user group set to "<code>Users</code>"</li>
+              <li>Enter password <code>myRole</code> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</b></li>
+              <li>Add one other user name <code>joeRole</code> (click on "<code>myRealm</code>", "Manage Users</code>", "<code>New...</code>"); <b>Ensure user group set to "<code>Users</code>"</li>
+              <li>Enter password <code>joeRole</code> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</b></li>
           </ul>
-          <li>Check web.xml and sun-web.xml</li>
-          <li>Deploy httpsBasicAuth-webapp.war as a Web Application</li>
+          <li>Check <code>web.xml</code> and <code>sun-web.xml</code> to understand how role mappings are configured.  This blog is also helpful to clarify role mappings <a href="http://blogs.sun.com/bobby/entry/simplified_security_role_mapping">http://blogs.sun.com/bobby/entry/simplified_security_role_mapping</a> </li>
+          <li>Deploy <code>httpsBasicAuth-webapp.war</code> as a Web Application</li>
           <ul>
-              <li>Admin console: select Applications, click on "Deploy...". Select file ./target/httpsBasicAuth-webapp.war</li>
-              <li>or you can use command line: <code>bin/asadmin deploy ./target/httpsBasicAuth-webapp.war</code></li>
+              <li>Admin console: select <code>Applications</code>, click on "<code>Deploy...</code>". Select file <code>./target/httpsBasicAuth-webapp.war</code></li>
+              <li>or you can use command line: <code>$AS_HOME/bin/asadmin deploy ./target/httpsBasicAuth-webapp.war</code></li>
           </ul>
 
       </ul>
 
       <p>From a web browser, visit:</p>
-      <blockquote><code><a href="https://localhost:8181/httpsBasicAuth-webapp/helloworld">https://localhost:8181/httpsBasicAuth-webapp/helloworld</a></code> (you have to add security exception for GlassFish server certificate / ignore all warnings about security)</blockquote>
+           <ul>
+              <li><blockquote><code><a href="https://localhost:8181/httpsBasicAuth-webapp/helloworld">https://localhost:8181/httpsBasicAuth-webapp/helloworld</a></code> (you have to add security exception for GlassFish server certificate / ignore all warnings about security)</blockquote></li>
+              <li>Enter either Username <code>myRole</code> and Password <code>myRole</code> or, Username <code>joeRole</code> and Password <code>joeRole</code></li>
+              <li> If entered Username <code>myRole</code> and Password <code>myRole</code>, verify that <b>expected output</b>: <code>Sending "Hello World" to user "myRole"</code> was displayed</li>
+              <li> If entered Username <code>joeRole</code> and Password <code>joeRole</code>, verify that <b>expected output</b>: <code>Sending "Hello World" to user "joeRole"</code> was displayed</li>
+          </ul>
+      
 
  </body></html>
 
