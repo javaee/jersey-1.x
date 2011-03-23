@@ -106,4 +106,15 @@ Now both Jersey resources should become available at:
 <li><a href="http://localhost:8080/helloworld/webresources/another">http://localhost:8080/helloworld/webresources/another</a></li>
 </ul>
 </p>
+<h2>Troubleshooting</h2>
+<h3>HTTP Proxy</h3>
+<p>Behind a HTTP proxy, Apache Felix returns <tt>java.net.ConnectException: Connection timed out</tt> when
+installing bundles from the Internet. You will need to setup the following system properties:
+<ul>
+	<li>http.proxyHost - the name of the proxy host.</li>
+	<li>http.proxyPort - the port of the proxy host.</li>
+	<li>http.proxyAuth - the user name and password to use when connecting to the proxy; this string should be the user name and password separated by a colon (e.g., rickhall:mypassword).</li>
+</ul>
+
+These system properties can be set directly on the command line when starting the JVM using the standard "-D&lt;prop&gt;=&lt;value&gt;" syntax or you can put them in the lib/system.properties file of your Felix installation; see documentation on configuring Felix for more information.</p>
 </body></html>
