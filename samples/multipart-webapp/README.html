@@ -73,7 +73,7 @@
                     <td>POST message returning part filename string.</td>
                     <td><code><a href="http://localhost:8080/multipart-webapp/form/part-file-name">http://localhost:8080/multipart-webapp/form/part-file-name</a></code></td>
                     <!--<td><code>OTHER c d</code></td> ??? -->
-                    <td><code>curl -X POST -F "part=@pom.xml"  http://localhost:8080/multipart-webapp/form/part-file-name</code></td>
+                    <td><i>Be sure to execute this curl from project directory where pom.xml resides</i><br><code>curl -X POST -F "part=@pom.xml"  http://localhost:8080/multipart-webapp/form/part-file-name</code></td>
                 </tr>
                 <tr>
                     <td>POST message returning xml jaxb part string.</td>
