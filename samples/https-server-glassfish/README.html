@@ -31,12 +31,12 @@
       <p> create war package
       <blockquote><code>mvn clean package</code><p></blockquote>
 
-      <p> setup GlassFish 3.1 (installed at AS_HOME=<code>&lt;install_dir&gt;/glassfish3/glassfish</code>):
+      <p> setup GlassFish 3.1 (installed at <code>AS_HOME=&lt;install_dir&gt;/glassfish</code>):
       <ul>
-          <li>Add new security realm called "<code>myRealm<code>"</li>
+          <li>Add new security realm called "<code>myRealm</code>"</li>
           <ul>
               <li>Start GlassFish using asadmin <code>$AS_HOME/bin/asadmin start-domain</code> </li>
-              <li>Access Admin console, assuming using default admin port, here <a href="http://localhost:4848">http://localhost:4848</a></li>
+              <li>Access Admin console, assuming the use of default admin port, here <a href="http://localhost:4848">http://localhost:4848</a></li>
               <li>Navigate in Admin console to: <code>Configuration -&gt; server-config -&gt; Security -&gt; Realms</code>, click on "<code>New...</code>"</li>
               <table border="1px">
                   <tr><th>Name</th><td><code>myRealm</code></td></tr>
@@ -46,7 +46,7 @@
               </table>
               <li>Set password for user <code>myRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>myRole</code>"); <b>Ensure user group set to "<code>Users</code>"</li>
               <li>Enter password <code>myRole</code> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</b></li>
-              <li>Add one other user name <code>joeRole</code> (click on "<code>myRealm</code>", "Manage Users</code>", "<code>New...</code>"); <b>Ensure user group set to "<code>Users</code>"</li>
+              <li>Add one other user name <code>joeRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>New...</code>"); <b>Ensure user group set to "<code>Users</code>"</li>
               <li>Enter password <code>joeRole</code> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</b></li>
           </ul>
           <li>Check <code>web.xml</code> and <code>sun-web.xml</code> to understand how role mappings are configured.  This blog is also helpful to clarify role mappings <a href="http://blogs.sun.com/bobby/entry/simplified_security_role_mapping">http://blogs.sun.com/bobby/entry/simplified_security_role_mapping</a> </li>
