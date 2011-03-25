@@ -132,7 +132,7 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
      * list of {@link PathSegment}. This method is useful when the
      * path needs to be parsed, particularly when matrix parameters may be
      * present in the path. All sequences of escaped octets in path segments
-     * and matrix parmeter names and values are decoded,
+     * and matrix parameter names and values are decoded,
      * equivalent to <code>getPathSegments(true)</code>.
      * @return an unmodifiable list of {@link PathSegment}. The matrix parameter
      * map of each path segment is also unmodifiable.
@@ -216,7 +216,7 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
     /**
      * Get the cookie name value map.
      * 
-     * @return the cookie bame value map.
+     * @return the cookie name value map.
      */
     MultivaluedMap<String, String> getCookieNameValueMap();
     
@@ -238,8 +238,8 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
      * @param type the type of entity
      * @param genericType type the generic type of entity, it is the responsibility
      *        of the callee to ensure that the type and generic type are
-     *        consistent otherwise the behvaiour of this method is undefned.
-     * @param as the annoations associated with the type 
+     *        consistent otherwise the behaviour of this method is undefined.
+     * @param as the annotations associated with the type
      * @return the request entity or null
      * @throws WebApplicationException if the content of the request
      * cannot be mapped to an entity of the requested type
@@ -251,7 +251,7 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
      * Get the form parameters of the request entity.
      * <p>
      * This method will ensure that the request entity is buffered
-     * such that it may be consumed by the applicaton.
+     * such that it may be consumed by the application.
      *
      * @return the form parameters, if there is a request entity and the
      * content type is "application/x-www-form-urlencoded", otherwise an

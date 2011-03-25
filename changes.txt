@@ -1,4 +1,7 @@
 release 1.7
+- Fixed issue 693
+  http://java.net/jira/browse/JERSEY-693
+  Javadoc typos.
 
 release 1.6 (03-2011)
 - Added support for lists and arrays of JAXBElement<?> objects.
