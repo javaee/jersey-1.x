@@ -1,4 +1,6 @@
-release 1.6
+release 1.7
+
+release 1.6 (03-2011)
 - Added support for lists and arrays of JAXBElement<?> objects.
 - Fixed issue 681
   http://java.net/jira/browse/JERSEY-681
