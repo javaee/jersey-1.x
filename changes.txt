@@ -1,4 +1,7 @@
 release 1.7
+- Fixed issue 694
+  http://java.net/jira/browse/JERSEY-694
+  Typo.
 - Fixed issue 693
   http://java.net/jira/browse/JERSEY-693
   Javadoc typos.

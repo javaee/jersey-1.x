@@ -107,7 +107,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 public class ContainerRequest implements HttpRequestContext {
     private static final Logger LOGGER = Logger.getLogger(ContainerRequest.class.getName());
     
-    private static final Annotation[] EMTPTY_ANNOTATIONS = new Annotation[0];
+    private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
     public static final String VARY_HEADER = "Vary";
     
@@ -462,7 +462,7 @@ public class ContainerRequest implements HttpRequestContext {
     }
     
     public <T> T getEntity(Class<T> type) {
-        return getEntity(type, type, EMTPTY_ANNOTATIONS);
+        return getEntity(type, type, EMPTY_ANNOTATIONS);
     }
     
     public MediaType getAcceptableMediaType(List<MediaType> mediaTypes) {
