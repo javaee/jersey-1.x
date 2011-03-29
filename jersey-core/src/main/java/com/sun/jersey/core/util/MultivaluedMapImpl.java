@@ -64,7 +64,7 @@ public class MultivaluedMapImpl
 
     public MultivaluedMapImpl(MultivaluedMap<String, String> that) {
         for (Map.Entry<String, List<String>> e : that.entrySet()) {
-            this.put(e.getKey(), new ArrayList(e.getValue()));
+            this.put(e.getKey(), new ArrayList<String>(e.getValue()));
         }
     }
 
