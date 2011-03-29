@@ -87,11 +87,13 @@ public class UriTemplateParser {
     }
 
     private static final class StringCharacterIterator implements CharacterIterator {
-        int pos;
-        String s;
 
-        public StringCharacterIterator(String s) {
+        private int pos;
+        private String s;
+
+        public StringCharacterIterator(final String s) {
             this.s = s;
+            this.pos = 0;
         }
 
         @Override
@@ -113,15 +115,15 @@ public class UriTemplateParser {
                 throw new NoSuchElementException();
             }
 
-            return s.charAt(pos++);
+            return s.charAt(pos);
         }
 
         @Override
         public int pos() {
             if (pos == 0) {
-                return 0;
+                throw new IllegalStateException("Iterator not used yet.");
             }
-            
+
             return pos - 1;
         }
     }
@@ -411,11 +413,11 @@ public class UriTemplateParser {
         return regexBuffer.toString().trim();
     }
 
-    private char consumeWhiteSpace(CharacterIterator ci) {
-        char c = ci.next();
-        // Consume white space;
-        // TODO use correct c
-        while (c == ' ') c = ci.next();
+    private char consumeWhiteSpace(final CharacterIterator ci) {
+        char c;
+        do {
+            c = ci.next();
+        } while (Character.isWhitespace(c));
 
         return c;
     }
