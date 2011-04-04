@@ -40,16 +40,18 @@
 
 package com.sun.jersey.samples.https_grizzly;
         
-import com.sun.grizzly.SSLConfig;
-import com.sun.grizzly.http.embed.GrizzlyWebServer;
-import com.sun.grizzly.http.servlet.ServletAdapter;
-import com.sun.grizzly.ssl.SSLSelectorThread;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.samples.https_grizzly.auth.SecurityFilter;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  *
@@ -57,7 +59,7 @@ import javax.ws.rs.core.UriBuilder;
  */
 public class Server {
 
-    private static GrizzlyWebServer webServer;
+    private static HttpServer webServer;
 
     public static final URI BASE_URI = getBaseURI();
     public static final String CONTENT = "JERSEY HTTPS EXAMPLE\n";
@@ -79,11 +81,9 @@ public class Server {
 
     protected static void startServer() {
 
-        webServer = new GrizzlyWebServer(getPort(4463), ".", true);
-
         // add Jersey resource servlet
 
-        ServletAdapter jerseyAdapter = new ServletAdapter();
+        ServletHandler jerseyAdapter = new ServletHandler();
         jerseyAdapter.addInitParameter("com.sun.jersey.config.property.packages",
                 "com.sun.jersey.samples.https_grizzly.resource;com.sun.jersey.samples.https_grizzly.auth");
         jerseyAdapter.setContextPath("/");
@@ -94,28 +94,20 @@ public class Server {
         jerseyAdapter.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 SecurityFilter.class.getName());
 
-        webServer.addGrizzlyAdapter(jerseyAdapter, new String[]{"/"});
-
-
         // Grizzly ssl configuration
+
+        SSLContextConfigurator sslContext = new SSLContextConfigurator();
         
-        SSLConfig sslConfig = new SSLConfig();
-
-        // sslConfig.setNeedClientAuth(true); // don't work - known grizzly bug, will be fixed in 2.0.0
-
         // set up security context
-        sslConfig.setKeyStoreFile("./keystore_server"); // contains server keypair
-        sslConfig.setKeyStorePass("asdfgh");
-        sslConfig.setTrustStoreFile("./truststore_server"); // contains client certificate
-        sslConfig.setTrustStorePass("asdfgh");
-
-        webServer.setSSLConfig(sslConfig);
-
-        // turn server side client certificate authentication on
-
-        ((SSLSelectorThread) webServer.getSelectorThread()).setNeedClientAuth(true);
+        sslContext.setKeyStoreFile("./keystore_server"); // contains server keypair
+        sslContext.setKeyStorePass("asdfgh");
+        sslContext.setTrustStoreFile("./truststore_server"); // contains client certificate
+        sslContext.setTrustStorePass("asdfgh");
 
         try {
+
+            webServer = GrizzlyServerFactory.createHttpServer(getBaseURI(), jerseyAdapter, true, new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(true));
+
             // start Grizzly embedded server //
             System.out.println("Jersey app started. Try out " + BASE_URI + "\nHit CTRL + C to stop it...");
             webServer.start();

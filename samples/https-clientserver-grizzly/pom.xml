@@ -60,7 +60,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-grizzly</artifactId>
+                    <artifactId>jersey-grizzly2</artifactId>
                     <version>${project.version}</version>
                     <classifier>cobertura</classifier>
                 </dependency>
@@ -81,7 +81,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-grizzly</artifactId>
+                    <artifactId>jersey-grizzly2</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -94,11 +94,6 @@
         </profile>
     </profiles>
     <dependencies>
-        <dependency>
-            <groupId>com.sun.grizzly</groupId>
-            <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.31</version>
-        </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>

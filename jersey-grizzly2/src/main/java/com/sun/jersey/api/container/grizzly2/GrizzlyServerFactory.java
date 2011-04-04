@@ -46,6 +46,7 @@ import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.ServerConfiguration;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 
 import java.io.IOException;
 import java.net.URI;
@@ -57,14 +58,14 @@ import java.net.URI;
  */
 public final class GrizzlyServerFactory {
 
-     /**
+    /**
      * {@link ResourceConfig feature to enable encoded slashes in URIs.
      * If set to false (the default behavior), requests containing encoded slashes
      * will get rejected by Grizzly and will never make it to the Jersey runtime.
      */
     public final static String FEATURE_ALLOW_ENCODED_SLASH = "com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature";
 
-   /**
+    /**
      * Creates a new {@link HttpServer} which will manage all root resource and
      * provider classes found by searching the classes referenced in the java
      * classpath.
@@ -124,7 +125,8 @@ public final class GrizzlyServerFactory {
      * @throws NullPointerException
      *           If {@code u} was {@code null}.
      */
-    public static HttpServer createHttpServer(final String u,
+    public static HttpServer createHttpServer(
+            final String u,
             final ResourceConfig rc) throws IOException, IllegalArgumentException,
             NullPointerException {
         if (u == null) {
@@ -166,8 +168,10 @@ public final class GrizzlyServerFactory {
      * @throws NullPointerException
      *           If {@code u} was {@code null}.
      */
-    public static HttpServer createHttpServer(final String u,
-            final ResourceConfig rc, final IoCComponentProviderFactory factory)
+    public static HttpServer createHttpServer(
+            final String u,
+            final ResourceConfig rc,
+            final IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException, NullPointerException {
         if (u == null) {
             throw new NullPointerException("The URI must not be null");
@@ -272,26 +276,32 @@ public final class GrizzlyServerFactory {
      * @throws NullPointerException
      *           If {@code u} was {@code null}.
      */
-    public static HttpServer createHttpServer(final URI u,
-            final ResourceConfig rc, final IoCComponentProviderFactory factory)
+    public static HttpServer createHttpServer(
+            final URI u,
+            final ResourceConfig rc,
+            final IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException, NullPointerException {
         final HttpHandler processor = ContainerFactory.createContainer(
                 HttpHandler.class, rc, factory);
         return createHttpServer(u, processor);
     }
 
-    public static HttpServer createHttpServer(final URI u,
-                                              final HttpHandler handler) throws IOException,
+    public static HttpServer createHttpServer(
+            final URI u,
+            final HttpHandler handler,
+            final boolean secure,
+            final SSLEngineConfigurator sslEngineConfigurator
+    ) throws IOException,
             IllegalArgumentException, NullPointerException {
+
         if (u == null) {
             throw new NullPointerException("The URI must not be null");
         }
 
-        // TODO: support https.
         final String scheme = u.getScheme();
-        if (!scheme.equalsIgnoreCase("http")) {
+        if (!scheme.equalsIgnoreCase("http") && !scheme.equalsIgnoreCase("https")) {
             throw new IllegalArgumentException("The URI scheme, of the URI " + u
-                    + ", must be equal (ignoring case) to 'http'");
+                    + ", must be equal (ignoring case) to 'http' or 'https'");
         }
 
         final String host = (u.getHost() == null) ? NetworkListener.DEFAULT_NETWORK_HOST
@@ -301,6 +311,11 @@ public final class GrizzlyServerFactory {
         // Create the server.
         final HttpServer server = new HttpServer();
         final NetworkListener listener = new NetworkListener("grizzly", host, port);
+        listener.setSecure(secure);
+        if(sslEngineConfigurator != null) {
+            listener.setSSLEngineConfig(sslEngineConfigurator);
+        }
+
         server.addListener(listener);
 
         // Map the path to the processor.
@@ -310,6 +325,22 @@ public final class GrizzlyServerFactory {
         // Start the server.
         server.start();
         return server;
+    }
+
+    public static HttpServer createHttpServer(
+            final URI u,
+            final HttpHandler handler,
+            final boolean secure)
+            throws IOException, IllegalArgumentException, NullPointerException {
+        return createHttpServer(u, handler, secure, null);
+    }
+
+
+    public static HttpServer createHttpServer(
+            final URI u,
+            final HttpHandler handler)
+            throws IOException, IllegalArgumentException, NullPointerException {
+        return createHttpServer(u, handler, false, null);
     }
 
     // Prevent instantiation.

@@ -44,7 +44,17 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.client.urlconnection.HTTPSProperties;
+import junit.framework.TestCase;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.net.Socket;
@@ -55,14 +65,6 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509KeyManager;
-import javax.net.ssl.X509TrustManager;
-import junit.framework.TestCase;
 
 /**
  *
@@ -172,6 +174,8 @@ public class MainTest extends TestCase {
 
         WebResource r = c.resource(Server.BASE_URI);
 
+        r.addFilter(new LoggingFilter());
+
         String msg = null;
 
         try {
@@ -185,7 +189,7 @@ public class MainTest extends TestCase {
 
     /**
      *
-     * Test to see that SSLHandshakeException is thrown whether client don't have
+     * Test to see that SSLHandshakeException is thrown when client don't have
      * trusted key.
      */
     public void testSSLAuth1() {
@@ -217,6 +221,8 @@ public class MainTest extends TestCase {
         Client c = Client.create(dcc);
 
         WebResource r = c.resource(Server.BASE_URI);
+
+        r.addFilter(new LoggingFilter());
 
         String msg = null;
 
