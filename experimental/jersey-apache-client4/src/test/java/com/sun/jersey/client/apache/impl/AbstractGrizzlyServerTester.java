@@ -40,15 +40,16 @@
 
 package com.sun.jersey.client.apache.impl;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.grizzly.tcp.Adapter;
 import com.sun.jersey.api.container.ContainerFactory;
-import com.sun.jersey.api.container.grizzly.GrizzlyServerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
+import junit.framework.TestCase;
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import javax.ws.rs.core.UriBuilder;
-import junit.framework.TestCase;
 
 /**
  *
@@ -57,10 +58,10 @@ import junit.framework.TestCase;
 public abstract class AbstractGrizzlyServerTester extends TestCase {
     public static final String CONTEXT = "";
 
-    private SelectorThread selectorThread;
+    private HttpServer httpServer;
 
     private int port = getEnvVariable("JERSEY_HTTP_PORT", 9997);
-    
+
     private static int getEnvVariable(final String varName, int defaultValue) {
         if (null == varName) {
             return defaultValue;
@@ -79,29 +80,29 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
     public AbstractGrizzlyServerTester(String name) {
         super(name);
     }
-    
+
     public UriBuilder getUri() {
         return UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT);
     }
-    
+
     public void startServer(Class... resources) {
-        start(ContainerFactory.createContainer(Adapter.class, resources));
+        start(ContainerFactory.createContainer(HttpHandler.class, resources));
     }
-    
+
     public void startServer(ResourceConfig config) {
-        start(ContainerFactory.createContainer(Adapter.class, config));
+        start(ContainerFactory.createContainer(HttpHandler.class, config));
     }
-    
-    private void start(Adapter adapter) {
-        if (selectorThread != null && selectorThread.isRunning()){
+
+    private void start(HttpHandler handler) {
+        if (httpServer != null && httpServer.isStarted()){
             stopServer();
         }
 
         System.out.println("Starting GrizzlyServer port number = " + port);
-        
+
         URI u = UriBuilder.fromUri("http://localhost").port(port).build();
         try {
-            selectorThread = GrizzlyServerFactory.create(u, adapter);
+            httpServer = GrizzlyServerFactory.createHttpServer(u, handler);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -118,13 +119,13 @@ public abstract class AbstractGrizzlyServerTester extends TestCase {
             }
         }
     }
-    
+
     public void stopServer() {
-        if (selectorThread.isRunning()) {
-            selectorThread.stopEndpoint();
+        if (httpServer.isStarted()) {
+            httpServer.stop();
         }
     }
-    
+
     @Override
     public void tearDown() {
         stopServer();
