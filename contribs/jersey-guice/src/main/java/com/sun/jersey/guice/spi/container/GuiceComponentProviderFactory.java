@@ -40,7 +40,6 @@
 package com.sun.jersey.guice.spi.container;
 
 import com.google.inject.ConfigurationException;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Scope;
@@ -54,6 +53,8 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
+
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -92,7 +93,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
     /**
      * Registers any Guice-bound providers or root resources.
      *
-     * @param config the resource config
+     * @param config the resource configuration
      * @param injector the Guice injector
      */
     private void register(ResourceConfig config, Injector injector) {
@@ -102,10 +103,10 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
                 if (type instanceof Class) {
                     Class<?> c = (Class) type;
                     if (ResourceConfig.isProviderClass(c)) {
-                        LOGGER.info("Registering " + c.getName() + " as a provider class");
+                        LOGGER.log(Level.INFO, "Registering {0} as a provider class", c.getName());
                         config.getClasses().add(c);
                     } else if (ResourceConfig.isRootResourceClass(c)) {
-                        LOGGER.info("Registering " + c.getName() + " as a root resource class");
+                        LOGGER.log(Level.INFO, "Registering {0} as a root resource class", c.getName());
                         config.getClasses().add(c);
                     }
 
@@ -115,13 +116,15 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         }
     }
 
-    public IoCComponentProvider getComponentProvider(Class c) {
+    @Override
+    public IoCComponentProvider getComponentProvider(Class<?> c) {
         return getComponentProvider(null, c);
     }
 
-    public IoCComponentProvider getComponentProvider(ComponentContext cc, Class clazz) {
+    @Override
+    public IoCComponentProvider getComponentProvider(ComponentContext cc, Class<?> clazz) {
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("getComponentProvider(" + clazz.getName() + ")");
+            LOGGER.log(Level.FINE, "getComponentProvider({0})", clazz.getName());
         }
 
         Key<?> key = Key.get(clazz);
@@ -133,7 +136,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
                 try {
                     // If a binding is possible
                     if (injector.getBinding(key) != null) {
-                        LOGGER.info("Binding " + clazz.getName() + " to GuiceInstantiatedComponentProvider");
+                        LOGGER.log(Level.INFO, "Binding {0} to GuiceInstantiatedComponentProvider", clazz.getName());
                         return new GuiceInstantiatedComponentProvider(injector, clazz);
                     }
                 } catch (ConfigurationException e) {
@@ -147,7 +150,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
                 }
             // If @Inject is declared on field or method
             } else if (isGuiceFieldOrMethodInjected(clazz)) {
-                LOGGER.info("Binding " + clazz.getName() + " to GuiceInjectedComponentProvider");
+                LOGGER.log(Level.INFO, "Binding {0} to GuiceInjectedComponentProvider", clazz.getName());
                 return new GuiceInjectedComponentProvider(injector);
             } else {
                 return null;
@@ -155,9 +158,8 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         }
 
         ComponentScope componentScope = getComponentScope(key, i);
-        LOGGER.info("Binding " + clazz.getName() +
-                " to GuiceManagedComponentProvider with the scope \"" +
-                componentScope + "\"");
+        LOGGER.log(Level.INFO, "Binding {0} to GuiceManagedComponentProvider with the scope \"{1}\"",
+                new Object[]{clazz.getName(), componentScope});
         return new GuiceManagedComponentProvider(i, componentScope, clazz);
     }
 
@@ -165,21 +167,25 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         final Scope[] scope = new Scope[1];
         i.getBinding(key).acceptScopingVisitor(new BindingScopingVisitor<Void>() {
 
+            @Override
             public Void visitEagerSingleton() {
                 scope[0] = Scopes.SINGLETON;
                 return null;
             }
 
+            @Override
             public Void visitScope(Scope theScope) {
                 scope[0] = theScope;
                 return null;
             }
 
+            @Override
             public Void visitScopeAnnotation(Class scopeAnnotation) {
                 // This method is not invoked for Injector bindings
                 throw new UnsupportedOperationException();
             }
 
+            @Override
             public Void visitNoScoping() {
                 scope[0] = Scopes.NO_SCOPE;
                 return null;
@@ -213,7 +219,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
     /**
      * Determine if a class is an implicit Guice component that can be
-     * instatiated by Guice and the life-cycle managed by Jersey.
+     * instantiated by Guice and the life-cycle managed by Jersey.
      *
      * @param c the class.
      * @return true if the class is an implicit Guice component.
@@ -226,14 +232,14 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
     /**
      * Determine if a class is an implicit Guice component that can be
-     * instatiated by Guice and the life-cycle managed by Jersey.
+     * instantiated by Guice and the life-cycle managed by Jersey.
      * 
      * @param c the class.
      * @return true if the class is an implicit Guice component.
      */
     public boolean isGuiceConstructorInjected(Class<?> c) {
         for (Constructor<?> con : c.getConstructors()) {
-            if (con.isAnnotationPresent(Inject.class))
+            if (isInjectable(con))
                 return true;
         }
 
@@ -249,17 +255,22 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
      */
     public boolean isGuiceFieldOrMethodInjected(Class<?> c) {
         for (Method m : c.getDeclaredMethods()) {
-            if (m.isAnnotationPresent(Inject.class))
+            if (isInjectable(m))
                 return true;
         }
         for (Field f : c.getDeclaredFields()) {
-            if (f.isAnnotationPresent(Inject.class))
+            if (isInjectable(f))
                 return true;
         }
         if (!c.equals(Object.class)) {
             return isGuiceFieldOrMethodInjected(c.getSuperclass());
         }
         return false;
+    }
+
+    private static boolean isInjectable(AnnotatedElement element) {
+        return (element.isAnnotationPresent(com.google.inject.Inject.class)
+                    || element.isAnnotationPresent(javax.inject.Inject.class));
     }
 
     /**
@@ -283,15 +294,16 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
             this.injector = injector;
         }
 
+        @Override
         public Object getInstance() {
             throw new IllegalStateException();
         }
 
+        @Override
         public Object proxy(Object o) {
             injector.injectMembers(o);
             return o;
         }
-
     }
 
     /**
@@ -322,10 +334,12 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
         // IoCInstantiatedComponentProvider
         
+        @Override
         public Object getInjectableInstance(Object o) {
             return o;
         }
 
+        @Override
         public Object getInstance() {
             return injector.getInstance(clazz);
         }
@@ -353,6 +367,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
             this.scope = scope;
         }
 
+        @Override
         public ComponentScope getScope() {
             return scope;
         }

@@ -39,6 +39,10 @@
  */
 package com.sun.jersey.guice.spi.container.servlet;
 
+import java.util.Map;
+
+import javax.servlet.ServletException;
+
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Scope;
@@ -52,8 +56,6 @@ import com.sun.jersey.guice.spi.container.GuiceComponentProviderFactory;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import com.sun.jersey.spi.container.servlet.WebConfig;
-import java.util.Map;
-import javax.servlet.ServletException;
 
 /**
  * A {@link Servlet} or {@link Filter} for deploying root resource classes
@@ -78,9 +80,10 @@ import javax.servlet.ServletException;
  */
 @Singleton
 public class GuiceContainer extends ServletContainer {
+    
+    private static final long serialVersionUID = 1931878850157940335L;
 
     private final Injector injector;
-
     private WebApplication webapp;
 
     public class ServletGuiceComponentProviderFactory extends GuiceComponentProviderFactory {

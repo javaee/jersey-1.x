@@ -63,9 +63,19 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>${guice.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-servlet</artifactId>
-            <version>2.0</version>
+            <version>${guice.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -84,9 +94,9 @@
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
                             <links>
-                                <link>http://jsr311.java.net/nonav/releases/1.1</link>
+                                <link>http://jsr311.java.net/nonav/releases/1.1/</link>
                                 <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
-                                <link>http://google-guice.googlecode.com/svn/tags/2.0/javadoc/</link>
+                                <link>http://google-guice.googlecode.com/svn/tags/${guice.version}/javadoc/</link>
                             </links>
                             <notimestamp>true</notimestamp>
                         </configuration>
@@ -151,4 +161,8 @@
             </plugin>
         </plugins>
     </build>
+
+    <properties>
+        <guice.version>3.0</guice.version>
+    </properties>
 </project>
