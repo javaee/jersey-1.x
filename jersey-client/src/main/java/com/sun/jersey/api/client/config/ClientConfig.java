@@ -64,8 +64,8 @@ import java.util.Set;
  *     cc.getClasses().add(com.sun.jersey.impl.provider.entity.JSONRootElementProvider.class);
  *     Client c = Client.create(cc);
  * </pre></blockquote>
- * Alternatively an implementaton of ClientConfig could perform such
- * registeration.
+ * Alternatively an implementation of ClientConfig could perform such
+ * registration.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
@@ -136,7 +136,7 @@ public interface ClientConfig extends FeaturesAndProperties {
      * annotation declared on the class that implements a specific service 
      * interface.
      * 
-     * @return the mutable set of provider classes. After intialization of
+     * @return the mutable set of provider classes. After initialization of
      *         the client modification of this value will have no effect.
      *         The returned value shall never be null.
      */
@@ -146,10 +146,10 @@ public interface ClientConfig extends FeaturesAndProperties {
      * Get the singleton provider instances to be utilized by the client.
      * <p>
      * When the client is initialized the set of provider instances
-     * will be combined and take precendence over the instances of provider 
+     * will be combined and take precedence over the instances of provider
      * classes. 
      * 
-     * @return the mutable set of provider instances. After intialization of
+     * @return the mutable set of provider instances. After initialization of
      *         the client modification of this value will have no effect.
      *         The returned value shall never be null.
      */
