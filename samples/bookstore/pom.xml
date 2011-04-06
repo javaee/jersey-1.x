@@ -53,7 +53,12 @@
     <name>Bookstore - Jersey sample</name>
     <packaging>war</packaging>
     <dependencies>
-         <dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-multipart</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
@@ -161,7 +166,7 @@
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
                 </configuration>
-                <dependencies>
+                <dependencies>                   
                     <dependency>
                         <groupId>com.sun.jersey</groupId>
                         <artifactId>jersey-server</artifactId>
