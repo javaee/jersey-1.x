@@ -48,6 +48,7 @@ import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.spring.tests.util.JerseyTestHelper;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.servlet.ServletHandler;
+import org.junit.Ignore;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
@@ -81,6 +82,7 @@ public class AbstractResourceTest {
         this(true);
     }
 
+    @Ignore("")
     public AbstractResourceTest(boolean springManaged) {
         _springConfig = System.getProperty( "applicationContext", APPLICATION_CONTEXT_SPRING25_XML );
         _port = JerseyTestHelper.getEnvVariable("JERSEY_HTTP_PORT", 9998);
