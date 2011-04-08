@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.jersey.client.apache.impl;
+package com.sun.jersey.client.apache4.impl;
 
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;

@@ -37,20 +37,29 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.client.apache;
+package com.sun.jersey.client.apache4;
 
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.client.apache.config.ApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpParams;
 
+import java.net.URI;
 import java.util.Map;
 
 /**
@@ -63,7 +72,7 @@ import java.util.Map;
  * instance.
  * <p>
  * The following properties are only supported at construction of this class:
- * {@link com.sun.jersey.client.apache.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_AUTHENTICATION} and
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_AUTHENTICATION} and
  * {@link ClientConfig#PROPERTY_CONNECT_TIMEOUT}.
  * <p>
  * By default a request entity is buffered and repeatable such that
@@ -73,7 +82,7 @@ import java.util.Map;
  * is set to a value greater than 0 then chunked encoding will be enabled
  * and the request entity (if present) will not be buffered and is not
  * repeatable. For authorization to work in such scenarios the property
- * {@link com.sun.jersey.client.apache.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_AUTHENTICATION} must
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_AUTHENTICATION} must
  * be set to true.
  * <p>
  * If a response entity is obtained that is an instance of
@@ -85,7 +94,7 @@ import java.util.Map;
  * entity is not read from the response then
  * {@link com.sun.jersey.api.client.ClientResponse#close() } MUST be called 
  * after processing the response to release connection-based resources.
- * 
+ *
  * @author jorgeluisw@mac.com
  * @author Paul.Sandoz@Sun.Com
  * @author pavel.bucek@oracle.com
@@ -93,7 +102,7 @@ import java.util.Map;
 public class ApacheHttpClient4 extends Client {
 
     private ApacheHttpClient4Handler client4Handler;
-    
+
     /**
      * Create a new client instance.
      *
@@ -133,13 +142,15 @@ public class ApacheHttpClient4 extends Client {
      * @param provider the IoC component provider factory.
      */
     public ApacheHttpClient4(ApacheHttpClient4Handler root, ClientConfig config,
-            IoCComponentProviderFactory provider) {
+                             IoCComponentProviderFactory provider) {
         super(root, config, provider);
 
         this.client4Handler = root;
 
+
+
 //        HttpClient client = root.getHttpClient();
-        
+
 //        client.getParams().setAuthenticationPreemptive(
 //                config.getPropertyAsFeature(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_AUTHENTICATION));
 
@@ -151,7 +162,7 @@ public class ApacheHttpClient4 extends Client {
 
     /**
      * Get the Apache HTTP client handler.
-     * 
+     *
      * @return the Apache HTTP client handler.
      */
     public ApacheHttpClient4Handler getClientHandler() {
@@ -196,8 +207,36 @@ public class ApacheHttpClient4 extends Client {
      * @return a default Apache HTTP client handler.
      */
     private static ApacheHttpClient4Handler createDefaultClientHander(ClientConfig cc) {
-        final HttpClient client = new DefaultHttpClient();
+
+        Object connectionManager = null;
+        Object httpParams = null;
+
+        if(cc != null) {
+            connectionManager = cc.getProperties().get(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER);
+            if(connectionManager != null) {
+                if(!(connectionManager instanceof ClientConnectionManager)) {
+                    // TODO: log warning
+                    connectionManager = null;
+                }
+            }
+
+            httpParams = cc.getProperties().get(ApacheHttpClient4Config.PROPERTY_HTTP_PARAMS);
+            if(httpParams != null) {
+                if(!(httpParams instanceof HttpParams)) {
+                    // TODO: log warning
+                    httpParams = null;
+                }
+            }
+        }
+
+
+        final DefaultHttpClient client = new DefaultHttpClient(
+                (ClientConnectionManager)connectionManager,
+                (HttpParams)httpParams
+        );
+
         CookieStore cookieStore = null;
+        boolean preemptiveBasicAuth = false;
 
         if(cc != null) {
             for(Map.Entry<String, Object> entry : cc.getProperties().entrySet())
@@ -205,13 +244,51 @@ public class ApacheHttpClient4 extends Client {
 
             if (cc.getPropertyAsFeature(ApacheHttpClient4Config.PROPERTY_DISABLE_COOKIES))
                 client.getParams().setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.IGNORE_COOKIES);
+
+            Object credentialsProvider = cc.getProperty(ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER);
+            if(credentialsProvider != null && (credentialsProvider instanceof CredentialsProvider)) {
+                client.setCredentialsProvider((CredentialsProvider)credentialsProvider);
+            }
+
+            Object proxyUri = cc.getProperties().get(ApacheHttpClient4Config.PROPERTY_PROXY_URI);
+            if(proxyUri != null) {
+                URI u = getProxyUri(proxyUri);
+
+                HttpHost proxy = new HttpHost(u.getHost(), u.getPort(), u.getScheme());
+
+                if(cc.getProperties().containsKey(ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME) &&
+                        cc.getProperties().containsKey(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD)) {
+
+                    client.getCredentialsProvider().setCredentials(
+                            new AuthScope(u.getHost(), u.getPort()),
+                            new UsernamePasswordCredentials(
+                                    cc.getProperty(ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME).toString(),
+                                    cc.getProperty(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD).toString())
+                    );
+
+                    client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
+                }
+            }
+
+            preemptiveBasicAuth = cc.getPropertyAsFeature(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION);
         }
 
         if(client.getParams().getParameter(ClientPNames.COOKIE_POLICY) == null || !client.getParams().getParameter(ClientPNames.COOKIE_POLICY).equals(CookiePolicy.IGNORE_COOKIES)) {
             cookieStore = new BasicCookieStore();
-            ((DefaultHttpClient)client).setCookieStore(cookieStore);
+            client.setCookieStore(cookieStore);
         }
 
-        return new ApacheHttpClient4Handler(client, cookieStore);
+        return new ApacheHttpClient4Handler(client, cookieStore, preemptiveBasicAuth);
     }
+
+    private static URI getProxyUri(Object proxy) {
+        if (proxy instanceof URI) {
+            return (URI) proxy;
+        } else if (proxy instanceof String) {
+            return URI.create((String) proxy);
+        } else {
+            throw new ClientHandlerException("The proxy URI property MUST be an instance of String or URI");
+        }
+    }
+
 }

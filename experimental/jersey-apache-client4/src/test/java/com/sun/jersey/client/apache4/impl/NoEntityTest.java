@@ -38,32 +38,84 @@
  * holder.
  */
 
-package com.sun.jersey.client.apache.impl;
+package com.sun.jersey.client.apache4.impl;
 
-import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.client.apache.ApacheHttpClient4;
-import com.sun.jersey.client.apache.config.ApacheHttpClient4Config;
+import com.sun.jersey.api.client.ClientResponse;
+
+import javax.ws.rs.Path;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-public class HttpMethodWithClientFilterTest extends HttpMethodTest {
-    public HttpMethodWithClientFilterTest(String testName) {
+public class NoEntityTest extends AbstractGrizzlyServerTester {
+    @Path("/test")
+    public static class HttpMethodResource {
+        @GET
+        public Response get() {
+            return Response.status(Status.CONFLICT).build();
+        }
+
+        @POST
+        public void post(String entity) {
+        }
+    }
+
+    public NoEntityTest(String testName) {
         super(testName);
     }
 
-    @Override
     protected ApacheHttpClient4 createClient() {
-        ApacheHttpClient4 ac = ApacheHttpClient4.create();
-        ac.addFilter(new LoggingFilter());
-        return ac;
+        return ApacheHttpClient4.create();
     }
 
-    @Override
     protected ApacheHttpClient4 createClient(ApacheHttpClient4Config cc) {
-        ApacheHttpClient4 ac = ApacheHttpClient4.create(cc);
-        ac.addFilter(new LoggingFilter());
-        return ac;
+        return ApacheHttpClient4.create(cc);
+    }
+
+    public void testGet() {
+        startServer(HttpMethodResource.class);
+        WebResource r = createClient().resource(getUri().path("test").build());
+
+        for (int i = 0; i < 5; i++) {
+            ClientResponse cr = r.get(ClientResponse.class);
+        }
+    }
+
+    public void testGetWithClose() {
+        startServer(HttpMethodResource.class);
+        WebResource r = createClient().resource(getUri().path("test").build());
+
+        for (int i = 0; i < 5; i++) {
+            ClientResponse cr = r.get(ClientResponse.class);
+            cr.close();
+        }
+    }
+
+    public void testPost() {
+        startServer(HttpMethodResource.class);
+        WebResource r = createClient().resource(getUri().path("test").build());
+
+        for (int i = 0; i < 5; i++) {
+            ClientResponse cr = r.post(ClientResponse.class);
+        }
+    }
+
+    public void testPostWithClose() {
+        startServer(HttpMethodResource.class);
+        WebResource r = createClient().resource(getUri().path("test").build());
+
+        for (int i = 0; i < 5; i++) {
+            ClientResponse cr = r.post(ClientResponse.class);
+            cr.close();
+        }
     }
 }

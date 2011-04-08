@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.jersey.client.apache.impl;
+package com.sun.jersey.client.apache4.impl;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -46,9 +46,9 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.client.apache.ApacheHttpClient4;
-import com.sun.jersey.client.apache.config.ApacheHttpClient4Config;
-import com.sun.jersey.client.apache.config.DefaultApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -232,19 +232,6 @@ public class HttpMethodTest extends AbstractGrizzlyServerTester {
         assertTrue(cr.hasEntity());
         cr.close();
     }
-
-    // HttpDelete does not allow entity
-
-//    public void testDeleteWithEntity() {
-//        startServer(HttpMethodResource.class);
-//        WebResource r = createClient().resource(getUri().path("test/withentity").build());
-//        r.addFilter(new com.sun.jersey.api.client.filter.LoggingFilter());
-//        assertEquals("DELETE with entity", r.delete(String.class, "DELETE with entity"));
-//
-//        ClientResponse cr = r.delete(ClientResponse.class, "DELETE with entity");
-//        assertTrue(cr.hasEntity());
-//        cr.close();
-//    }
 
     public void testPatch() {
         startServer(HttpMethodResource.class);

@@ -37,28 +37,21 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+package com.sun.jersey.client.apache4.config;
+
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+
 /**
- * Provides support for the Client API that utilizes the Apache HTTP client to
- * send and receive HTTP request and responses.
+ * A default client configuration for clients that utilizes the
+ * Apache HTTP client to send and receive HTTP request and responses.
  * <p>
- * The client API with the Apache HTTP client can be used as follows to make
- * simple GET and POST requests to a Web resource:
- * <blockquote><pre>
- *     Client c = ApacheHttpClient4.create();
- *     WebResource r = c.resource("http://host/base");
- *     String s = r.get(String.class);
- *     s = r.post(String.class, s);
- * </pre></blockquote>
- * <p>
- * To support basic authentication with the user name "foo" and the password
- * "bar" the following configuration may be utilized:
- * <blockquote><pre>
- *     DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
- *     config.getState().setCredentials(null, null, -1, "foo", "bar");
- *     ApacheHttpClient4 c = ApacheHttpClient4.create(config);
- *     WebResource r = c.resource("http://host/base");
- *     String s = r.get(String.class);
- *     s = r.post(String.class, s);
- * </pre></blockquote>
+ * This class may be extended for specific configuration purposes.
+ *
+ * @author jorgeluisw@mac.com
+ * @author Paul.Sandoz@Sun.Com
+ * @author pavel.bucek@oracle.com
  */
-package com.sun.jersey.client.apache;
+public class DefaultApacheHttpClient4Config extends DefaultClientConfig
+        implements ApacheHttpClient4Config {
+
+}

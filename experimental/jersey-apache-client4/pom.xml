@@ -106,7 +106,7 @@
                                 <link>https://jsr311.java.net/nonav/releases/1.1</link>
                                 <link>https://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
                             </links>
-                            <excludePackageNames>com.sun.jersey.client.apache.impl</excludePackageNames>
+                            <excludePackageNames>com.sun.jersey.client.apache4.impl</excludePackageNames>
                             <notimestamp>true</notimestamp>
                         </configuration>
                     </plugin>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.1</version>
+            <version>4.1.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

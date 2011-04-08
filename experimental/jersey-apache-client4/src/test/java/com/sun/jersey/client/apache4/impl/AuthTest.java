@@ -38,7 +38,7 @@
  * holder.
  */
 
-package com.sun.jersey.client.apache.impl;
+package com.sun.jersey.client.apache4.impl;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -46,15 +46,14 @@ import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.client.apache.ApacheHttpClient4;
-import com.sun.jersey.client.apache.config.ApacheHttpClient4Config;
-import com.sun.jersey.client.apache.config.DefaultApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import com.sun.jersey.spi.resource.Singleton;
-import org.apache.http.auth.AuthScheme;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.junit.Ignore;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -92,35 +91,57 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         }
     }
 
-//    public void testPreemptiveAuth() {
-//        ResourceConfig rc = new DefaultResourceConfig(PreemptiveAuthResource.class);
-//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-//                LoggingFilter.class.getName());
-//        startServer(rc);
-//
-//        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
-//        config.getState().setCredentials(null, null, -1, "name", "password");
-//        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
-//        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
-//
-//        WebResource r = c.resource(getUri().build());
-//        assertEquals("GET", r.get(String.class));
-//    }
+    public void testPreemptiveAuth() {
+        ResourceConfig rc = new DefaultResourceConfig(PreemptiveAuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
 
-//    public void testPreemptiveAuthPost() {
-//        ResourceConfig rc = new DefaultResourceConfig(PreemptiveAuthResource.class);
-//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-//                LoggingFilter.class.getName());
-//        startServer(rc);
-//
-//        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
-//        config.getState().setCredentials(null, null, -1, "name", "password");
-//        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_AUTHENTICATION, true);
-//        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
-//
-//        WebResource r = c.resource(getUri().build());
-//        assertEquals("POST", r.post(String.class, "POST"));
-//    }
+        CredentialsProvider credentialsProvider = new org.apache.http.impl.client.BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials("name", "password")
+        );
+
+        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+        config.getProperties().put(
+                ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                credentialsProvider
+        );
+
+        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true);
+
+        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
+
+        WebResource r = c.resource(getUri().build());
+        assertEquals("GET", r.get(String.class));
+    }
+
+    public void testPreemptiveAuthPost() {
+        ResourceConfig rc = new DefaultResourceConfig(PreemptiveAuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+
+        CredentialsProvider credentialsProvider = new org.apache.http.impl.client.BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials("name", "password")
+        );
+
+        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+        config.getProperties().put(
+                ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                credentialsProvider
+        );
+
+        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION, true);
+
+        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
+
+        WebResource r = c.resource(getUri().build());
+        assertEquals("POST", r.post(String.class, "POST"));
+    }
 
     @Path("/test")
     @Singleton
@@ -209,19 +230,28 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         }
     }
 
-//    public void testAuthGet() {
-//        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
-//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-//                LoggingFilter.class.getName());
-//        startServer(rc);
-//
-//        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
-//        config.getState().setCredentials(null, null, -1, "name", "password");
-//        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
-//
-//        WebResource r = c.resource(getUri().path("test").build());
-//        assertEquals("GET", r.get(String.class));
-//    }
+    public void testAuthGet() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+
+        CredentialsProvider credentialsProvider = new org.apache.http.impl.client.BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials("name", "password")
+        );
+
+        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+        config.getProperties().put(
+                ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                credentialsProvider
+        );
+        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
+
+        WebResource r = c.resource(getUri().path("test").build());
+        assertEquals("GET", r.get(String.class));
+    }
 
     public void testAuthGetWithClientFilter() {
         ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
@@ -237,19 +267,31 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         assertEquals("GET", r.get(String.class));
     }
 
-//    public void testAuthPost() {
-//        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
-//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-//                LoggingFilter.class.getName());
-//        startServer(rc);
-//
-//        DefaultApacheHttpClient4Config config = new DefaultApacheHttp4ClientConfig();
-//        config.getState().setCredentials(null, null, -1, "name", "password");
-//        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
-//
-//        WebResource r = c.resource(getUri().path("test").build());
-//        assertEquals("POST", r.post(String.class, "POST"));
-//    }
+    // doesn't work - apache http client uses interactive auth by default
+    // and currently ends with NonRepeatableRequestException: Cannot retry request with a non-repeatable request entity.
+    @Ignore
+    public void _testAuthPost() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+
+        CredentialsProvider credentialsProvider = new org.apache.http.impl.client.BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials("name", "password")
+        );
+
+        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+        config.getProperties().put(
+                ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                credentialsProvider
+        );
+        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
+
+        WebResource r = c.resource(getUri().path("test").build());
+        assertEquals("POST", r.post(String.class, "POST"));
+    }
 
     public void testAuthPostWithClientFilter() {
         ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
@@ -265,21 +307,31 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         assertEquals("POST", r.post(String.class, "POST"));
     }
 
-//    public void testAuthDelete() {
-//        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
-//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-//                LoggingFilter.class.getName());
-//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
-//                LoggingFilter.class.getName());
-//        startServer(rc);
-//        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
-//        config.getState().setCredentials(null, null, -1, "name", "password");
-//        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
-//
-//        WebResource r = c.resource(getUri().path("test").build());
-//        ClientResponse response = r.delete(ClientResponse.class);
-//        assertEquals(response.getStatus(), 204);
-//    }
+    public void testAuthDelete() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
+
+        CredentialsProvider credentialsProvider = new org.apache.http.impl.client.BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials("name", "password")
+        );
+
+        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+        config.getProperties().put(
+                ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                credentialsProvider
+        );
+        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
+
+        WebResource r = c.resource(getUri().path("test").build());
+        ClientResponse response = r.delete(ClientResponse.class);
+        assertEquals(response.getStatus(), 204);
+    }
 
     public void testAuthDeleteWithClientFilter() {
         ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
@@ -299,6 +351,7 @@ public class AuthTest extends AbstractGrizzlyServerTester {
     }
 
     // test disabled; DELETE with entity is no longer supported
+    @Ignore
     public void _testAuthDeleteWithEntityUsingClientFilter() {
         ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
@@ -315,55 +368,51 @@ public class AuthTest extends AbstractGrizzlyServerTester {
         assertEquals("DELETE", response.getEntity(String.class));
     }
 
-    static class BasicCredentialsProvider implements CredentialsProvider {
-        @Override
-        public void setCredentials(AuthScope authScope, Credentials credentials) {
+    public void testAuthInteractiveGet() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
 
-        }
+        CredentialsProvider credentialsProvider = new org.apache.http.impl.client.BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials("name", "password")
+        );
 
-        @Override
-        public Credentials getCredentials(AuthScope authScope) {
-            return new UsernamePasswordCredentials("name",
-                                                    "password");
-        }
+        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+        config.getProperties().put(
+                ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                credentialsProvider
+        );
+        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
 
-        @Override
-        public void clear() {
-            //To change body of implemented methods use File | Settings | File Templates.
-        }
+        WebResource r = c.resource(getUri().path("test").build());
+        assertEquals("GET", r.get(String.class));
     }
 
-//    public void testAuthInteractiveGet() {
-//        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
-//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-//                LoggingFilter.class.getName());
-//        startServer(rc);
-//
-//        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
-//        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_INTERACTIVE, true);
-//        BasicCredentialsProvider bcp = new BasicCredentialsProvider();
-//        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER, bcp);
-//        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
-//
-//        WebResource r = c.resource(getUri().path("test").build());
-//        assertEquals("GET", r.get(String.class));
-//        assertTrue(bcp.isCalled());
-//    }
+    // disabled - interactive POST is not good thing to do by design - we don't want to send entity twice
+    @Ignore
+    public void _testAuthInteractivePost() {
+        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                LoggingFilter.class.getName());
+        startServer(rc);
 
-//    public void testAuthInteractivePost() {
-//        ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
-//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-//                LoggingFilter.class.getName());
-//        startServer(rc);
-//
-//        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
-//        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_INTERACTIVE, true);
-//        BasicCredentialsProvider bcp = new BasicCredentialsProvider();
-//        config.getProperties().put(ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER, bcp);
-//        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
-//
-//        WebResource r = c.resource(getUri().path("test").build());
-//        assertEquals("POST", r.post(String.class, "POST"));
-//        assertTrue(bcp.isCalled());
-//    }
+        CredentialsProvider credentialsProvider = new org.apache.http.impl.client.BasicCredentialsProvider();
+        credentialsProvider.setCredentials(
+                AuthScope.ANY,
+                new UsernamePasswordCredentials("name", "password")
+        );
+
+        DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+        config.getProperties().put(
+                ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                credentialsProvider
+        );
+        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
+
+        WebResource r = c.resource(getUri().path("test").build());
+        assertEquals("POST", r.post(String.class, "POST"));
+    }
 }

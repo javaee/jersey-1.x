@@ -38,16 +38,16 @@
 * holder.
 */
 
-package com.sun.jersey.client.apache.impl;
+package com.sun.jersey.client.apache4.impl;
 
 import javax.ws.rs.Path;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.client.apache.ApacheHttpClient4;
-import com.sun.jersey.client.apache.config.ApacheHttpClient4Config;
-import com.sun.jersey.client.apache.config.DefaultApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.ApacheHttpClient4;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
+import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.core.Context;

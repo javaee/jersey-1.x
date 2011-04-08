@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.client.apache;
+package com.sun.jersey.client.apache4;
 
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
@@ -50,6 +50,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -60,7 +61,11 @@ import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.protocol.BasicHttpContext;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.BufferedInputStream;
@@ -108,15 +113,19 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
     
     private final HttpClient client;
     private final CookieStore cookieStore;
+    private final boolean preemptiveBasicAuth;
 
     /**
      * Create a new root handler with an {@link HttpClient}.
      *
      * @param client the {@link HttpClient}.
+     * @param cookieStore {@link CookieStore} instance
+     * @param preemptiveBasicAuth turns on preemptive basic authentication
      */
-    public ApacheHttpClient4Handler(HttpClient client, CookieStore cookieStore) {
+    public ApacheHttpClient4Handler(HttpClient client, CookieStore cookieStore, boolean preemptiveBasicAuth) {
         this.client = client;
         this.cookieStore = cookieStore;
+        this.preemptiveBasicAuth = preemptiveBasicAuth;
     }
 
     /**
@@ -305,7 +314,19 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
         try {
 
-            final HttpResponse response = client.execute(getHost(request), request);
+            HttpResponse response;
+
+            if(preemptiveBasicAuth) {
+                AuthCache authCache = new BasicAuthCache();
+                BasicScheme basicScheme = new BasicScheme();
+                authCache.put(getHost(request), basicScheme);
+                BasicHttpContext localContext = new BasicHttpContext();
+                localContext.setAttribute(ClientContext.AUTH_CACHE, authCache);
+
+                response = getHttpClient().execute(getHost(request), request, localContext);
+            } else {
+                response = getHttpClient().execute(getHost(request), request);
+            }
 
             ClientResponse r = new ClientResponse(response.getStatusLine().getStatusCode(),
                     getInBoundHeaders(response),
@@ -469,16 +490,6 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 //        }
 //    }
 
-    private URI getProxyUri(Object proxy) {
-        if (proxy instanceof URI) {
-            return (URI) proxy;
-        } else if (proxy instanceof String) {
-            return URI.create((String) proxy);
-        } else {
-            throw new ClientHandlerException("The proxy URI property MUST be an instance of String or URI");
-        }
-    }
-
     private void writeOutBoundHeaders(MultivaluedMap<String, Object> headers, HttpUriRequest request) {
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
             List<Object> vs = e.getValue();
@@ -526,7 +537,6 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         public void close()
                 throws IOException {
             super.close();
-//            client.getConnectionManager().closeIdleConnections(1, TimeUnit.MILLISECONDS); // .shutdown(); // !!! TODO XXX UGLY
         }
     }
 
