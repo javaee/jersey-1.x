@@ -171,164 +171,204 @@ public class WebResource extends Filterable implements
 
     // UniformInterface
     
+    @Override
     public ClientResponse head() {
         return getHeadHandler().handle(new ClientRequestImpl(getURI(), "HEAD"));
     }
         
+    @Override
     public <T> T options(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
         
+    @Override
     public <T> T options(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "OPTIONS"));            
     }
         
+    @Override
     public <T> T get(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "GET"));
     }
             
+    @Override
     public <T> T get(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "GET"));            
     }
         
+    @Override
     public void put() throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "PUT", null));
     }
     
+    @Override
     public void put(Object requestEntity) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
     
+    @Override
     public <T> T put(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "PUT"));
     }
 
+    @Override
     public <T> T put(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "PUT"));
     }
 
+    @Override
     public <T> T put(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
             
+    @Override
     public <T> T put(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
 
+    @Override
     public void post() throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "POST"));
     }
     
+    @Override
     public void post(Object requestEntity) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
     
+    @Override
     public <T> T post(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "POST"));
     }
 
+    @Override
     public <T> T post(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "POST"));
     }
     
+    @Override
     public <T> T post(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
             
+    @Override
     public <T> T post(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
     
+    @Override
     public void delete() throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "DELETE"));
     }
     
+    @Override
     public void delete(Object requestEntity) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
     
+    @Override
     public <T> T delete(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "DELETE"));    
     }
 
+    @Override
     public <T> T delete(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "DELETE"));
     }
     
+    @Override
     public <T> T delete(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
       
+    @Override
     public <T> T delete(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
     
+    @Override
     public void method(String method) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), method));        
     }
     
+    @Override
     public void method(String method, Object requestEntity) throws UniformInterfaceException {
         voidHandle(new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
+    @Override
     public <T> T method(String method, Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), method));            
     }
     
+    @Override
     public <T> T method(String method, GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), method));            
     }
     
+    @Override
     public <T> T method(String method, Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
+    @Override
     public <T> T method(String method, GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), method, requestEntity));        
     }
     
     // RequestBuilder<WebResource.Builder>
     
+    @Override
     public Builder entity(Object entity) {
         return getRequestBuilder().entity(entity);
     }
 
+    @Override
     public Builder entity(Object entity, MediaType type) {
         return getRequestBuilder().entity(entity, type);
     }
 
+    @Override
     public Builder entity(Object entity, String type) {
         return getRequestBuilder().entity(entity, type);
     }
 
+    @Override
     public Builder type(MediaType type) {
         return getRequestBuilder().type(type);
     }
         
+    @Override
     public Builder type(String type) {
         return getRequestBuilder().type(type);
     }
     
+    @Override
     public Builder accept(MediaType... types) {
         return getRequestBuilder().accept(types);
     }
 
+    @Override
     public Builder accept(String... types) {
         return getRequestBuilder().accept(types);
     }
 
+    @Override
     public Builder acceptLanguage(Locale... locales) {
         return getRequestBuilder().acceptLanguage(locales);
     }
 
+    @Override
     public Builder acceptLanguage(String... locales) {
         return getRequestBuilder().acceptLanguage(locales);
     }
 
+    @Override
     public Builder cookie(Cookie cookie) {
         return getRequestBuilder().cookie(cookie);
     }
     
+    @Override
     public Builder header(String name, Object value) {
         return getRequestBuilder().header(name, value);
     }
@@ -443,118 +483,147 @@ public class WebResource extends Filterable implements
         
         // UniformInterface
         
+        @Override
         public ClientResponse head() {
             return getHeadHandler().handle(build("HEAD"));
         }
         
+        @Override
         public <T> T options(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("OPTIONS"));
         }
                 
+        @Override
         public <T> T options(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("OPTIONS"));            
         }
         
+        @Override
         public <T> T get(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("GET"));
         }
                 
+        @Override
         public <T> T get(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("GET"));            
         }
         
+        @Override
         public void put() throws UniformInterfaceException {
             voidHandle(build("PUT"));
         }
 
+        @Override
         public void put(Object requestEntity) throws UniformInterfaceException {
             voidHandle(build("PUT", requestEntity));
         }
         
+        @Override
         public <T> T put(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("PUT"));
         }
         
+        @Override
         public <T> T put(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("PUT"));
         }
 
+        @Override
         public <T> T put(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("PUT", requestEntity));
         }
         
+        @Override
         public <T> T put(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("PUT", requestEntity));
         }
 
+        @Override
         public void post() throws UniformInterfaceException {
             voidHandle(build("POST"));
         }
 
+        @Override
         public void post(Object requestEntity) throws UniformInterfaceException {
             voidHandle(build("POST", requestEntity));
         }
 
+        @Override
         public <T> T post(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("POST"));
         }
                 
+        @Override
         public <T> T post(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("POST"));
         }
 
+        @Override
         public <T> T post(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("POST", requestEntity));
         }
         
+        @Override
         public <T> T post(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("POST", requestEntity));
         }
     
+        @Override
         public void delete() throws UniformInterfaceException {
             voidHandle(build("DELETE"));
         }
 
+        @Override
         public void delete(Object requestEntity) throws UniformInterfaceException {
             voidHandle(build("DELETE", requestEntity));
         }
         
+        @Override
         public <T> T delete(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("DELETE"));
         }
         
+        @Override
         public <T> T delete(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("DELETE"));
         }
 
+        @Override
         public <T> T delete(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("DELETE", requestEntity));
         }
         
+        @Override
         public <T> T delete(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("DELETE", requestEntity));
         }
     
+        @Override
         public void method(String method) throws UniformInterfaceException {
             voidHandle(build(method));
         }
 
+        @Override
         public void method(String method, Object requestEntity) throws UniformInterfaceException {
             voidHandle(build(method, requestEntity));
         }
 
+        @Override
         public <T> T method(String method, Class<T> c) throws UniformInterfaceException {
             return handle(c, build(method));
         }
 
+        @Override
         public <T> T method(String method, GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build(method));
         }
 
+        @Override
         public <T> T method(String method, Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build(method, requestEntity));
         }        
         
+        @Override
         public <T> T method(String method, GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build(method, requestEntity));
         }        
@@ -573,7 +642,7 @@ public class WebResource extends Filterable implements
     /**
      * Gets WebResource related properties.
      *
-     * <p>Properties are inherited, so setting propeties on "parent" WebResource
+     * <p>Properties are inherited, so setting properties on "parent" WebResource
      * instance, creating child (for example via WebResource.path("subpath"))
      * will set parents properties on it. However changing child properties
      * won't cause change in parent's properties.
@@ -581,7 +650,7 @@ public class WebResource extends Filterable implements
      * <p>Methods entrySet(), keySet() and values() are returning read-only
      * results (via Collection.unmodifiableMap).
      *
-     * @return map containg all properties.
+     * @return map containing all properties.
      */
     public Map<String, Object> getProperties() {
         if (properties == null) {
