@@ -1,4 +1,7 @@
 release 1.7
+- Fixed issue
+  http://java.net/jira/browse/JERSEY-704
+  Typo.
 - Fixed issue 694
   http://java.net/jira/browse/JERSEY-694
   Typo.

@@ -43,6 +43,17 @@ import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.provider.CompletableReader;
 import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.spi.MessageBodyWorkers;
+
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.NewCookie;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status.Family;
+import javax.ws.rs.core.Response.StatusType;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.RuntimeDelegate;
+import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -61,16 +72,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Logger;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.NewCookie;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status.Family;
-import javax.ws.rs.core.Response.StatusType;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.RuntimeDelegate;
-import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 /**
  * A client (in-bound) HTTP response.
@@ -499,7 +500,7 @@ public class ClientResponse {
      * @return an instance of the type <code>c</code>.
      *
      * @throws ClientHandlerException if there is an error processing the response.
-     * @throws UniformInterfaceException if the response status is 204 (No Contnet).
+     * @throws UniformInterfaceException if the response status is 204 (No Content).
      */
     public <T> T getEntity(Class<T> c) throws ClientHandlerException, UniformInterfaceException {
         return getEntity(c, c);
