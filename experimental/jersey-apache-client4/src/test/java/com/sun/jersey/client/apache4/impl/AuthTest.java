@@ -309,10 +309,10 @@ public class AuthTest extends AbstractGrizzlyServerTester {
 
     public void testAuthDelete() {
         ResourceConfig rc = new DefaultResourceConfig(AuthResource.class);
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-                LoggingFilter.class.getName());
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
-                LoggingFilter.class.getName());
+//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+//                LoggingFilter.class.getName());
+//        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS,
+//                LoggingFilter.class.getName());
         startServer(rc);
 
         CredentialsProvider credentialsProvider = new org.apache.http.impl.client.BasicCredentialsProvider();
