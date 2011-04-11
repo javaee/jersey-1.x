@@ -52,7 +52,7 @@ import java.nio.charset.Charset;
 import javax.ws.rs.core.MediaType;
 
 /**
- * A utlity class for reading and writing using byte and character streams.
+ * A utility class for reading and writing using byte and character streams.
  * <p>
  * If a byte or character array is utilized then the size of the array
  * is by default the value of {@link #DEFAULT_BUFFER_SIZE}. This value can
