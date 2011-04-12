@@ -729,6 +729,18 @@
            for testing with Web-based Grizzly.
         </listitem>
 
+         <listitem>
+          <code>com.sun.jersey.test.framework.spi.container.grizzly2.GrizzlyTestContainerFactory</code>
+
+           for testing with low-level Grizzly2.
+        </listitem>
+
+        <listitem>
+          <code>com.sun.jersey.test.framework.spi.container.grizzly2.web.GrizzlyWebTestContainerFactory</code>
+
+           for testing with Web-based Grizzly2.
+        </listitem>
+
         <listitem>
           <code>com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory</code>
 
@@ -753,7 +765,7 @@
     GlassFish, create the war file then deploy as follows (assuming that the
     pom file is set up for deployment): <programlisting>mvn clean package -Dmaven.test.skip=true
 </programlisting> Then execute the tests as follows: <programlisting>mvn test \ -Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.embedded.glassfish.external.ExternalTestContainerFactory \
--DJERSEY_HTTP_PORT=&amp;lt;HTTP_PORT&amp;gt;
+-DJERSEY_HTTP_PORT=&lt;HTTP_PORT&gt;
 </programlisting></para>
 
     <para><emphasis>Breaking changes from 1.1.1-ea to
