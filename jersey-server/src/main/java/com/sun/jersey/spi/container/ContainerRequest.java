@@ -40,7 +40,6 @@
 package com.sun.jersey.spi.container;
 
 import com.sun.jersey.api.MessageException;
-import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpRequestContext;
@@ -48,17 +47,33 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.TraceInformation;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.api.uri.UriComponent;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.server.impl.VariantSelector;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
+import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.MatchingEntityTag;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
 import com.sun.jersey.core.util.ReaderWriter;
+import com.sun.jersey.server.impl.VariantSelector;
 import com.sun.jersey.server.impl.model.HttpHelper;
 import com.sun.jersey.spi.MessageBodyWorkers;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.Variant;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -76,102 +91,90 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.Variant;
-import javax.ws.rs.ext.MessageBodyReader;
 
 /**
  * An in-bound HTTP request to be processed by the web application.
- * <p>
+ * <p/>
  * Containers instantiate, or inherit, and provide an instance to the
  * {@link WebApplication}.
- * <p>
+ * <p/>
  * By default the implementation of {@link SecurityContext} will throw
  * {@link UnsupportedOperationException} if the methods are invoked.
  * Containers SHOULD use the method {@link #setSecurityContext(javax.ws.rs.core.SecurityContext) }
  * to define security context behaviour rather than extending from this class
  * and overriding the methods.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
+ * @author pavel.bucek@oracle.com
  */
 public class ContainerRequest implements HttpRequestContext {
     private static final Logger LOGGER = Logger.getLogger(ContainerRequest.class.getName());
-    
+
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
 
     public static final String VARY_HEADER = "Vary";
-    
+
     private final WebApplication wa;
 
     private final boolean isTraceEnabled;
-    
+
     private Map<String, Object> properties;
-    
+
     private String method;
-    
+
     private InputStream entity;
-    
+
     private URI baseUri;
-    
+
     private URI requestUri;
-    
+
     private URI absolutePathUri;
-    
+
     private String encodedPath;
-    
+
     private String decodedPath;
 
     private List<PathSegment> decodedPathSegments;
 
     private List<PathSegment> encodedPathSegments;
-    
+
     private MultivaluedMap<String, String> decodedQueryParameters;
 
     private MultivaluedMap<String, String> encodedQueryParameters;
-    
+
     private InBoundHeaders headers;
 
     private int headersModCount;
-    
+
     private MediaType contentType;
-    
+
     private List<MediaType> accept;
-    
+
     private List<Locale> acceptLanguages;
-    
+
     private Map<String, Cookie> cookies;
-    
+
     private MultivaluedMap<String, String> cookieNames;
 
     private SecurityContext securityContext;
-    
+
     /**
      * Create a new container request.
-     * <p>
-     * The base URI and the request URI must contain the same scheme, user info, 
-     * host and port components. 
-     * 
-     * The base URI must not contain the query and fragment components. The 
-     * encoded path component of the request URI must start with the encoded 
-     * path component of the base URI. The encoded path component of the base 
+     * <p/>
+     * The base URI and the request URI must contain the same scheme, user info,
+     * host and port components.
+     * <p/>
+     * The base URI must not contain the query and fragment components. The
+     * encoded path component of the request URI must start with the encoded
+     * path component of the base URI. The encoded path component of the base
      * URI must end in a '/' character.
-     * 
-     * @param wa the web application
-     * @param method the HTTP method
-     * @param baseUri the base URI of the request
+     *
+     * @param wa         the web application
+     * @param method     the HTTP method
+     * @param baseUri    the base URI of the request
      * @param requestUri the request URI
-     * @param headers the request headers
-     * @param entity the InputStream of the request entity
+     * @param headers    the request headers
+     * @param entity     the InputStream of the request entity
      */
     public ContainerRequest(
             WebApplication wa,
@@ -187,7 +190,7 @@ public class ContainerRequest implements HttpRequestContext {
         this.requestUri = requestUri;
         this.headers = headers;
         this.headersModCount = headers.getModCount();
-        this.entity = entity;        
+        this.entity = entity;
     }
 
     /* package */ ContainerRequest(ContainerRequest r) {
@@ -196,10 +199,10 @@ public class ContainerRequest implements HttpRequestContext {
     }
 
     // ContainerRequest
-    
+
     /**
      * Get the mutable properties.
-     * <p>
+     * <p/>
      * Care should be taken not to clear the properties or remove properties
      * that are unknown otherwise unspecified behaviour may result.
      *
@@ -215,6 +218,7 @@ public class ContainerRequest implements HttpRequestContext {
 
     /**
      * Set the HTTP method.
+     *
      * @param method the method.
      */
     public void setMethod(String method) {
@@ -223,24 +227,24 @@ public class ContainerRequest implements HttpRequestContext {
 
     /**
      * Set the base and request URI.
-     * 
-     * @param baseUri the base URI.
+     *
+     * @param baseUri    the base URI.
      * @param requestUri the (complete) request URI.
      */
     public void setUris(URI baseUri, URI requestUri) {
         this.baseUri = baseUri;
         this.requestUri = requestUri;
-        
+
         // reset state
         absolutePathUri = null;
-        
+
         encodedPath = decodedPath = null;
 
         decodedPathSegments = encodedPathSegments = null;
-        
+
         decodedQueryParameters = encodedQueryParameters = null;
     }
-    
+
     /**
      * Get the input stream of the entity.
      *
@@ -249,30 +253,30 @@ public class ContainerRequest implements HttpRequestContext {
     public InputStream getEntityInputStream() {
         return entity;
     }
-    
+
     /**
      * Set the input stream of the entity.
-     * 
+     *
      * @param entity the input stream of the entity.
      */
     public void setEntityInputStream(InputStream entity) {
         this.entity = entity;
     }
-            
+
     /**
      * Set the request headers.
-     * 
+     *
      * @param headers the request headers.
      */
     public void setHeaders(InBoundHeaders headers) {
         this.headers = headers;
         this.headersModCount = headers.getModCount();
-        
+
         // reset state
         contentType = null;
         accept = null;
         cookies = null;
-        cookieNames = null;        
+        cookieNames = null;
     }
 
     /**
@@ -283,10 +287,10 @@ public class ContainerRequest implements HttpRequestContext {
     public void setSecurityContext(SecurityContext securityContext) {
         this.securityContext = securityContext;
     }
-    
+
     /**
      * Get the message body workers.
-     * 
+     *
      * @return the message body workers.
      */
     public MessageBodyWorkers getMessageBodyWorkers() {
@@ -294,11 +298,12 @@ public class ContainerRequest implements HttpRequestContext {
     }
 
     // Traceable
-
+    @Override
     public boolean isTracingEnabled() {
         return isTraceEnabled;
     }
 
+    @Override
     public void trace(String message) {
         if (!isTracingEnabled())
             return;
@@ -307,50 +312,57 @@ public class ContainerRequest implements HttpRequestContext {
                 !getRequestHeaders().containsKey("X-Jersey-Trace-Accept"))
             return;
 
-        TraceInformation ti = (TraceInformation)getProperties().
+        TraceInformation ti = (TraceInformation) getProperties().
                 get(TraceInformation.class.getName());
         ti.trace(message);
     }
 
 
     // HttpRequestContext
-    
+    @Override
     public URI getBaseUri() {
         return baseUri;
     }
-       
+
+    @Override
     public UriBuilder getBaseUriBuilder() {
         return UriBuilder.fromUri(getBaseUri());
     }
-    
+
+    @Override
     public URI getRequestUri() {
         return requestUri;
     }
-    
+
+    @Override
     public UriBuilder getRequestUriBuilder() {
         return UriBuilder.fromUri(getRequestUri());
     }
-    
+
+    @Override
     public URI getAbsolutePath() {
         if (absolutePathUri != null) return absolutePathUri;
-        
+
         return absolutePathUri = UriBuilder.fromUri(requestUri).
                 replaceQuery("").fragment("").
-                build();        
+                build();
     }
-    
+
+    @Override
     public UriBuilder getAbsolutePathBuilder() {
         return UriBuilder.fromUri(getAbsolutePath());
     }
 
+    @Override
     public String getPath() {
         return getPath(true);
     }
-    
+
+    @Override
     public String getPath(boolean decode) {
         if (decode) {
             if (decodedPath != null) return decodedPath;
-            
+
             return decodedPath = UriComponent.decode(
                     getEncodedPath(),
                     UriComponent.Type.PATH);
@@ -358,61 +370,66 @@ public class ContainerRequest implements HttpRequestContext {
             return getEncodedPath();
         }
     }
-    
+
     private String getEncodedPath() {
         if (encodedPath != null) return encodedPath;
-        
-        return encodedPath  = getRequestUri().getRawPath().substring(
+
+        return encodedPath = getRequestUri().getRawPath().substring(
                 getBaseUri().getRawPath().length());
     }
-    
+
+    @Override
     public List<PathSegment> getPathSegments() {
         return getPathSegments(true);
     }
-    
+
+    @Override
     public List<PathSegment> getPathSegments(boolean decode) {
         if (decode) {
             if (decodedPathSegments != null)
                 return decodedPathSegments;
-            
+
             return decodedPathSegments = UriComponent.decodePath(getPath(false), true);
         } else {
             if (encodedPathSegments != null)
                 return encodedPathSegments;
-            
+
             return encodedPathSegments = UriComponent.decodePath(getPath(false), false);
         }
     }
-    
+
+    @Override
     public MultivaluedMap<String, String> getQueryParameters() {
         return getQueryParameters(true);
     }
-    
+
+    @Override
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
         if (decode) {
             if (decodedQueryParameters != null)
                 return decodedQueryParameters;
-            
+
             return decodedQueryParameters = UriComponent.decodeQuery(
                     getRequestUri(), true);
         } else {
             if (encodedQueryParameters != null)
                 return encodedQueryParameters;
-            
+
             return encodedQueryParameters = UriComponent.decodeQuery(
                     getRequestUri(), false);
         }
     }
-    
+
+    @Override
     public String getHeaderValue(String name) {
         final List<String> v = getRequestHeaders().get(name);
 
         if (v == null) return null;
-        
+
         if (v.isEmpty()) return "";
-                
+
         if (v.size() == 1) return v.get(0);
-        
+
         StringBuilder sb = new StringBuilder(v.get(0));
         for (int i = 1; i < v.size(); i++) {
             final String s = v.get(i);
@@ -422,6 +439,7 @@ public class ContainerRequest implements HttpRequestContext {
         return sb.toString();
     }
 
+    @Override
     public <T> T getEntity(Class<T> type, Type genericType, Annotation[] as) {
         MediaType mediaType = getMediaType();
         if (mediaType == null) {
@@ -434,12 +452,12 @@ public class ContainerRequest implements HttpRequestContext {
         if (bw == null) {
             String message = "A message body reader for Java class " + type.getName() +
                     ", and Java type " + genericType +
-                    ", and MIME media type " + mediaType + " was not found";
-            LOGGER.severe(message);
+                    ", and MIME media type " + mediaType + " was not found.\n";
             Map<MediaType, List<MessageBodyReader>> m = getMessageBodyWorkers().
                     getReaders(mediaType);
-            LOGGER.severe("The registered message body readers compatible with the MIME media type are:\n" +
-                    getMessageBodyWorkers().readersToString(m));
+            message += "The registered message body readers compatible with the MIME media type are:\n" +
+                    getMessageBodyWorkers().readersToString(m);
+            LOGGER.severe(message);
             throw new WebApplicationException(
                     new MessageException(message),
                     Responses.unsupportedMediaType().build());
@@ -460,30 +478,88 @@ public class ContainerRequest implements HttpRequestContext {
             throw new MappableContainerException(e);
         }
     }
-    
+
+    /**
+     * Set the request entity.
+     *
+     * @param type        the class of object that is to be written.
+     * @param genericType the type of object to be written, obtained either
+     *                    by reflection of a resource method return type or by inspection
+     *                    of the returned instance. {@link javax.ws.rs.core.GenericEntity}
+     *                    provides a way to specify this information at runtime.
+     * @param annotations an array of the annotations on the resource
+     *                    method that returns the object.
+     * @param mediaType   the media type of the HTTP entity.
+     * @param httpHeaders a mutable map of the HTTP response headers.
+     * @param entity      the entity instance to write.
+     * @throws MappableContainerException encapsulates exceptions thrown while
+     *                    serializing the entity.
+     */
+    public <T> void setEntity(final Class<T> type, final Type genericType,
+                              final Annotation annotations[], final MediaType mediaType,
+                              final MultivaluedMap<String, Object> httpHeaders, final T entity) {
+
+        final MessageBodyWriter<T> writer = getMessageBodyWorkers().getMessageBodyWriter(type, genericType, annotations, mediaType);
+
+        if (writer == null) {
+            String message = "A message body writer for Java class " + type.getName() +
+                    ", and Java type " + genericType +
+                    ", and MIME media type " + mediaType + " was not found.\n";
+            Map<MediaType, List<MessageBodyReader>> m = getMessageBodyWorkers().
+                    getReaders(mediaType);
+            message += "The registered message body readers compatible with the MIME media type are:\n" +
+                    getMessageBodyWorkers().readersToString(m);
+            LOGGER.severe(message);
+            throw new WebApplicationException(
+                    new MessageException(message),
+                    Responses.unsupportedMediaType().build());
+        }
+
+        if (isTracingEnabled()) {
+            trace(String.format("matched message body writer: %s, \"%s\" -> %s",
+                    genericType,
+                    mediaType,
+                    ReflectionHelper.objectToString(writer)));
+        }
+
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        try {
+            writer.writeTo(entity, type, genericType, annotations, mediaType, httpHeaders, byteArrayOutputStream);
+        } catch (IOException e) {
+            throw new MappableContainerException(e);
+        }
+
+        this.entity = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+    }
+
+    @Override
     public <T> T getEntity(Class<T> type) {
         return getEntity(type, type, EMPTY_ANNOTATIONS);
     }
-    
+
+    @Override
     public MediaType getAcceptableMediaType(List<MediaType> mediaTypes) {
         if (mediaTypes.isEmpty())
             return getAcceptableMediaTypes().get(0);
-        
+
         for (MediaType a : getAcceptableMediaTypes()) {
             if (a.getType().equals(MediaType.MEDIA_TYPE_WILDCARD))
                 return mediaTypes.get(0);
-            
+
             for (MediaType m : mediaTypes)
-                if (m.isCompatible(a) && !m.isWildcardType() && !m.isWildcardSubtype()) 
+                if (m.isCompatible(a) && !m.isWildcardType() && !m.isWildcardSubtype())
                     return m;
-        }        
+        }
         return null;
     }
 
+    @Override
     public List<MediaType> getAcceptableMediaTypes(List<QualitySourceMediaType> priorityMediaTypes) {
         return new ArrayList<MediaType>(HttpHelper.getAccept(this, priorityMediaTypes));
     }
 
+    @Override
     public MultivaluedMap<String, String> getCookieNameValueMap() {
         if (cookieNames == null || headersModCount != headers.getModCount()) {
             cookieNames = new MultivaluedMapImpl();
@@ -491,29 +567,30 @@ public class ContainerRequest implements HttpRequestContext {
                 cookieNames.putSingle(e.getKey(), e.getValue().getValue());
             }
         }
-        
+
         return cookieNames;
     }
-    
+
+    @Override
     public Form getFormParameters() {
         if (MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, getMediaType())) {
             InputStream in = getEntityInputStream();
             if (in.getClass() != ByteArrayInputStream.class) {
                 // Buffer input
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 try {
-                    ReaderWriter.writeTo(in, baos);
+                    ReaderWriter.writeTo(in, byteArrayOutputStream);
                 } catch (IOException e) {
                     throw new IllegalArgumentException(e);
                 }
 
-                in = new ByteArrayInputStream(baos.toByteArray());
+                in = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
                 setEntityInputStream(in);
             }
 
-            ByteArrayInputStream bais = (ByteArrayInputStream)in;
+            ByteArrayInputStream byteArrayInputStream = (ByteArrayInputStream) in;
             Form f = getEntity(Form.class);
-            bais.reset();
+            byteArrayInputStream.reset();
             return f;
         } else {
             return new Form();
@@ -522,50 +599,56 @@ public class ContainerRequest implements HttpRequestContext {
 
 
     // HttpHeaders
-    
+    @Override
     public MultivaluedMap<String, String> getRequestHeaders() {
         return headers;
     }
 
+    @Override
     public List<String> getRequestHeader(String name) {
         return headers.get(name);
     }
-    
+
+    @Override
     public List<MediaType> getAcceptableMediaTypes() {
         if (accept == null || headersModCount != headers.getModCount())
-            accept = new ArrayList<MediaType>(HttpHelper.getAccept(this));            
-        
+            accept = new ArrayList<MediaType>(HttpHelper.getAccept(this));
+
         return accept;
     }
-    
+
+    @Override
     public List<Locale> getAcceptableLanguages() {
         if (acceptLanguages == null || headersModCount != headers.getModCount()) {
-             List<AcceptableLanguageTag> alts = HttpHelper.getAcceptLangauge(this);
-             
-             acceptLanguages = new ArrayList<Locale>(alts.size());
-             for(AcceptableLanguageTag alt : alts) {
-                 acceptLanguages.add(alt.getAsLocale());
-             }
+            List<AcceptableLanguageTag> alts = HttpHelper.getAcceptLangauge(this);
+
+            acceptLanguages = new ArrayList<Locale>(alts.size());
+            for (AcceptableLanguageTag alt : alts) {
+                acceptLanguages.add(alt.getAsLocale());
+            }
         }
-        
+
         return acceptLanguages;
     }
-    
+
+    @Override
     public MediaType getMediaType() {
         if (contentType == null || headersModCount != headers.getModCount())
             contentType = HttpHelper.getContentType(this);
-        
+
         return contentType;
     }
-    
+
+    @Override
     public Locale getLanguage() {
         return HttpHelper.getContentLanguageAsLocale(this);
     }
-    
+
+    @Override
     public Map<String, Cookie> getCookies() {
         if (cookies == null || headersModCount != headers.getModCount()) {
             cookies = new HashMap<String, Cookie>();
-            
+
             List<String> cl = getRequestHeaders().get(HttpHeaders.COOKIE);
             if (cl != null) {
                 for (String cookie : cl) {
@@ -573,28 +656,30 @@ public class ContainerRequest implements HttpRequestContext {
                         cookies.putAll(
                                 HttpHeaderReader.readCookies(cookie));
                 }
-            }            
+            }
         }
-        
+
         return cookies;
     }
-    
-    
+
+
     // Request
-    
+    @Override
     public String getMethod() {
         return method;
     }
 
+    @Override
     public Variant selectVariant(List<Variant> variants) {
-        if (variants == null || variants.isEmpty()) 
+        if (variants == null || variants.isEmpty())
             throw new IllegalArgumentException("The list of variants is null or empty");
-    
+
         // TODO mark the Vary header to be added to the response
-        
+
         return VariantSelector.selectVariant(this, variants);
     }
 
+    @Override
     public ResponseBuilder evaluatePreconditions() {
         Set<MatchingEntityTag> matchingTags = HttpHelper.getIfMatch(this);
         if (matchingTags == null) {
@@ -606,6 +691,7 @@ public class ContainerRequest implements HttpRequestContext {
         return Responses.preconditionFailed();
     }
 
+    @Override
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
         ResponseBuilder r = evaluateIfMatch(eTag);
         if (r != null)
@@ -614,6 +700,7 @@ public class ContainerRequest implements HttpRequestContext {
         return evaluateIfNoneMatch(eTag);
     }
 
+    @Override
     public ResponseBuilder evaluatePreconditions(Date lastModified) {
         final long lastModifiedTime = lastModified.getTime();
         ResponseBuilder r = evaluateIfUnmodifiedSince(lastModifiedTime);
@@ -622,7 +709,8 @@ public class ContainerRequest implements HttpRequestContext {
 
         return evaluateIfModifiedSince(lastModifiedTime);
     }
-    
+
+    @Override
     public ResponseBuilder evaluatePreconditions(Date lastModified, EntityTag eTag) {
         ResponseBuilder r = evaluateIfMatch(eTag);
         if (r != null)
@@ -653,11 +741,11 @@ public class ContainerRequest implements HttpRequestContext {
             if (r != null)
                 r.tag(eTag);
         }
-        
-        return r;        
+
+        return r;
     }
-        
-    private ResponseBuilder evaluateIfMatch(EntityTag eTag) {        
+
+    private ResponseBuilder evaluateIfMatch(EntityTag eTag) {
         Set<MatchingEntityTag> matchingTags = HttpHelper.getIfMatch(this);
         if (matchingTags == null) {
             return null;
@@ -671,19 +759,19 @@ public class ContainerRequest implements HttpRequestContext {
         }
 
         if (matchingTags != MatchingEntityTag.ANY_MATCH &&
-            !matchingTags.contains(eTag)) {
+                !matchingTags.contains(eTag)) {
             // 412 Precondition Failed
             return Responses.preconditionFailed();
         }
-        
+
         return null;
     }
-    
+
     private ResponseBuilder evaluateIfNoneMatch(EntityTag eTag) {
         Set<MatchingEntityTag> matchingTags = HttpHelper.getIfNoneMatch(this);
         if (matchingTags == null)
             return null;
-        
+
         final String httpMethod = getMethod();
         return evaluateIfNoneMatch(
                 eTag,
@@ -721,10 +809,10 @@ public class ContainerRequest implements HttpRequestContext {
                 return Responses.preconditionFailed();
             }
         }
-        
+
         return null;
     }
-    
+
     private ResponseBuilder evaluateIfUnmodifiedSince(long lastModified) {
         String ifUnmodifiedSinceHeader = getRequestHeaders().getFirst("If-Unmodified-Since");
         if (ifUnmodifiedSinceHeader != null) {
@@ -738,10 +826,10 @@ public class ContainerRequest implements HttpRequestContext {
                 // Ignore the header if parsing error
             }
         }
-        
+
         return null;
     }
-    
+
     private ResponseBuilder evaluateIfModifiedSince(long lastModified) {
         String ifModifiedSinceHeader = getRequestHeaders().getFirst("If-Modified-Since");
         if (ifModifiedSinceHeader == null)
@@ -769,13 +857,13 @@ public class ContainerRequest implements HttpRequestContext {
         } catch (ParseException ex) {
             // Ignore the header if parsing error
         }
-        
+
         return null;
     }
 
     /**
      * Round down the time to the nearest second.
-     * 
+     *
      * @param time the time to round down.
      * @return the rounded down time.
      */
@@ -784,25 +872,29 @@ public class ContainerRequest implements HttpRequestContext {
     }
 
     // SecurityContext
-    
+
+    @Override
     public Principal getUserPrincipal() {
         if (securityContext == null)
             throw new UnsupportedOperationException();
         return securityContext.getUserPrincipal();
     }
-    
+
+    @Override
     public boolean isUserInRole(String role) {
         if (securityContext == null)
             throw new UnsupportedOperationException();
         return securityContext.isUserInRole(role);
     }
-    
+
+    @Override
     public boolean isSecure() {
         if (securityContext == null)
             throw new UnsupportedOperationException();
         return securityContext.isSecure();
     }
-    
+
+    @Override
     public String getAuthenticationScheme() {
         if (securityContext == null)
             throw new UnsupportedOperationException();
