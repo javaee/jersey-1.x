@@ -66,7 +66,7 @@ public class AnnotatedParameterImpl<T> extends AnnotatedImpl implements Annotate
         this.position = position;
     }
 
-    public AnnotatedParameterImpl(AnnotatedParameter<T> param, AnnotatedCallable<T> declaringCallable) {
+    public AnnotatedParameterImpl(AnnotatedParameter<? super T> param, AnnotatedCallable<T> declaringCallable) {
         this(param.getBaseType(),
              param.getTypeClosure(),
              param.getAnnotations(),
@@ -74,7 +74,7 @@ public class AnnotatedParameterImpl<T> extends AnnotatedImpl implements Annotate
              param.getPosition());
     }
 
-    public AnnotatedParameterImpl(AnnotatedParameter<T> param, Set<Annotation> annotations, AnnotatedCallable<T> declaringCallable) {
+    public AnnotatedParameterImpl(AnnotatedParameter<? super T> param, Set<Annotation> annotations, AnnotatedCallable<T> declaringCallable) {
         this(param.getBaseType(),
              param.getTypeClosure(),
              annotations,

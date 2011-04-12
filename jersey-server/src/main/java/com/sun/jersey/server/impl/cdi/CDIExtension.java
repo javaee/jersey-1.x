@@ -82,6 +82,7 @@ import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -177,7 +178,7 @@ public class CDIExtension implements Extension {
 
     public CDIExtension() {}
     
-    private void initialize() {
+    private void initialize(BeanManager manager) {
         // initialize in a separate method because Weld creates a proxy for the extension
         // and we don't want to waste time initializing it
 
@@ -252,9 +253,9 @@ public class CDIExtension implements Extension {
         toBeInitializedLater = new ArrayList<InitializedLater>();
     }
 
-    void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event) {
+    void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event, BeanManager manager) {
         LOGGER.fine("Handling BeforeBeanDiscovery event");
-        initialize();
+        initialize(manager);
 
         // turn JAX-RS injection annotations into CDI qualifiers
         for (Class<? extends Annotation> qualifier : knownParameterQualifiers) {
@@ -327,7 +328,7 @@ public class CDIExtension implements Extension {
         boolean classHasEncodedAnnotation = type.isAnnotationPresent(Encoded.class);
 
         Set<AnnotatedConstructor<T>> mustPatchConstructors = new HashSet<AnnotatedConstructor<T>>();
-        Map<AnnotatedParameter<T>, PatchInformation> parameterToPatchInfoMap = new HashMap<AnnotatedParameter<T>, PatchInformation>();
+        Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap = new HashMap<AnnotatedParameter<? super T>, PatchInformation>();
 
         for (AnnotatedConstructor<T> constructor : type.getConstructors()) {
             if (processAnnotatedConstructor(constructor, classHasEncodedAnnotation, parameterToPatchInfoMap)) {
@@ -335,26 +336,21 @@ public class CDIExtension implements Extension {
             }
         }
 
-        Set<AnnotatedField<T>> mustPatchFields = new HashSet<AnnotatedField<T>>();
-        Map<AnnotatedField<T>, PatchInformation> fieldToPatchInfoMap = new HashMap<AnnotatedField<T>, PatchInformation>();
+        Set<AnnotatedField<? super T>> mustPatchFields = new HashSet<AnnotatedField<? super T>>();
+        Map<AnnotatedField<? super T>, PatchInformation> fieldToPatchInfoMap = new HashMap<AnnotatedField<? super T>, PatchInformation>();
 
-        outer:
         for (AnnotatedField<? super T> field : type.getFields()) {
-            if (field.getDeclaringType() == type) {
-                if (processAnnotatedField((AnnotatedField<T>) field, classHasEncodedAnnotation, fieldToPatchInfoMap)) {
-                    mustPatchFields.add((AnnotatedField<T>)field);
-                }
+            if (processAnnotatedField(field, type.getJavaClass(), classHasEncodedAnnotation, fieldToPatchInfoMap)) {
+                mustPatchFields.add(field);
             }
         }
 
-        Set<AnnotatedMethod<T>> mustPatchMethods = new HashSet<AnnotatedMethod<T>>();
-        Set<AnnotatedMethod<T>> setterMethodsWithoutInject = new HashSet<AnnotatedMethod<T>>();
+        Set<AnnotatedMethod<? super T>> mustPatchMethods = new HashSet<AnnotatedMethod<? super T>>();
+        Set<AnnotatedMethod<? super T>> setterMethodsWithoutInject = new HashSet<AnnotatedMethod<? super T>>();
 
         for (AnnotatedMethod<? super T> method : type.getMethods()) {
-            if (method.getDeclaringType() == type) {
-                if (processAnnotatedMethod((AnnotatedMethod<T>)method, classHasEncodedAnnotation, parameterToPatchInfoMap, setterMethodsWithoutInject)) {
-                    mustPatchMethods.add((AnnotatedMethod<T>)method);
-                }
+            if (processAnnotatedMethod(method, type.getJavaClass(), classHasEncodedAnnotation, parameterToPatchInfoMap, setterMethodsWithoutInject)) {
+                mustPatchMethods.add(method);
             }
         }
 
@@ -378,74 +374,61 @@ public class CDIExtension implements Extension {
 
             Set<AnnotatedField<? super T>> newFields = new HashSet<AnnotatedField<? super T>>();
             for (AnnotatedField<? super T> field : type.getFields()) {
-                if (field.getDeclaringType() == type) {
-                    if (mustPatchFields.contains((AnnotatedField<T>)field)) {
-                        PatchInformation patchInfo = fieldToPatchInfoMap.get((AnnotatedField<T>)field);
-                        Set<Annotation> annotations = new HashSet<Annotation>();
-                        if (patchInfo.mustAddInject()) {
-                           annotations.add(injectAnnotationLiteral);
-                        }
-                        if (patchInfo.getSyntheticQualifier() != null) {
-                           annotations.add(patchInfo.getSyntheticQualifier());
-                           Annotation skippedQualifier = patchInfo.getParameter().getAnnotation();
-                           for (Annotation annotation : field.getAnnotations()) {
-                               if (annotation != skippedQualifier) {
-                                   annotations.add(annotation);
-                               }
+                if (mustPatchFields.contains(field)) {
+                    PatchInformation patchInfo = fieldToPatchInfoMap.get(field);
+                    Set<Annotation> annotations = new HashSet<Annotation>();
+                    if (patchInfo.mustAddInject()) {
+                       annotations.add(injectAnnotationLiteral);
+                    }
+                    if (patchInfo.getSyntheticQualifier() != null) {
+                       annotations.add(patchInfo.getSyntheticQualifier());
+                       Annotation skippedQualifier = patchInfo.getParameter().getAnnotation();
+                       for (Annotation annotation : field.getAnnotations()) {
+                           if (annotation != skippedQualifier) {
+                               annotations.add(annotation);
                            }
-                        }
-                        else {
-                            annotations.addAll(field.getAnnotations());
-                        }
-                        if (patchInfo.getAnnotation() != null) {
-                            annotations.add(patchInfo.getAnnotation());
-                        }
-                        newFields.add(new AnnotatedFieldImpl<T>(field, annotations, newType));
+                       }
                     }
                     else {
-                        // copy and reparent
-                        newFields.add(new AnnotatedFieldImpl<T>(field, newType));
+                        annotations.addAll(field.getAnnotations());
                     }
+                    if (patchInfo.getAnnotation() != null) {
+                        annotations.add(patchInfo.getAnnotation());
+                    }
+                    newFields.add(new AnnotatedFieldImpl<T>(field, annotations, newType));
                 }
                 else {
-                    // simple copy
-                    newFields.add(field);
+                    // copy and reparent
+                    newFields.add(new AnnotatedFieldImpl<T>(field, newType));
                 }
             }
-
+            
             Set<AnnotatedMethod<? super T>> newMethods = new HashSet<AnnotatedMethod<? super T>>();
             for (AnnotatedMethod<? super T> method : type.getMethods()) {
-                if (method.getDeclaringType() == type) {
-                    if (mustPatchMethods.contains((AnnotatedMethod<T>)method)) {
-                        if (setterMethodsWithoutInject.contains((AnnotatedMethod<T>)method)) {
-                            Set<Annotation> annotations = new HashSet<Annotation>();
-                            annotations.add(injectAnnotationLiteral);
-                            for (Annotation annotation : method.getAnnotations()) {
-                                if (!knownParameterQualifiers.contains(annotation.annotationType())) {
-                                    annotations.add(annotation);
-                                }
+                if (mustPatchMethods.contains((AnnotatedMethod<T>)method)) {
+                    if (setterMethodsWithoutInject.contains((AnnotatedMethod<T>)method)) {
+                        Set<Annotation> annotations = new HashSet<Annotation>();
+                        annotations.add(injectAnnotationLiteral);
+                        for (Annotation annotation : method.getAnnotations()) {
+                            if (!knownParameterQualifiers.contains(annotation.annotationType())) {
+                                annotations.add(annotation);
                             }
-                            AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, annotations, newType);
-                            patchAnnotatedCallable((AnnotatedMethod<T>)method, newMethod, parameterToPatchInfoMap);
-                            newMethods.add(newMethod);
                         }
-                         else {
-                            AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, newType);
-                            patchAnnotatedCallable((AnnotatedMethod<T>)method, newMethod, parameterToPatchInfoMap);
-                            newMethods.add(newMethod);
-                        }
+                        AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, annotations, newType);
+                        patchAnnotatedCallable(method, newMethod, parameterToPatchInfoMap);
+                        newMethods.add(newMethod);
                     }
-                    else {
+                     else {
                         AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, newType);
-                        copyParametersOfAnnotatedCallable((AnnotatedMethod<T>)method, newMethod);
+                        patchAnnotatedCallable(method, newMethod, parameterToPatchInfoMap);
                         newMethods.add(newMethod);
                     }
                 }
                 else {
-                    // simple copy
-                    newMethods.add(method);
+                    AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, newType);
+                    copyParametersOfAnnotatedCallable(method, newMethod);
+                    newMethods.add(newMethod);
                 }
-
             }
 
             newType.setConstructors(newConstructors);
@@ -459,7 +442,7 @@ public class CDIExtension implements Extension {
 
     private <T> boolean processAnnotatedConstructor(AnnotatedConstructor<T> constructor,
                                                  boolean classHasEncodedAnnotation,
-                                                 Map<AnnotatedParameter<T>, PatchInformation> parameterToPatchInfoMap) {
+                                                 Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap) {
         boolean mustPatch = false;
 
         if (constructor.getAnnotation(Inject.class) != null) {
@@ -493,10 +476,11 @@ public class CDIExtension implements Extension {
         return mustPatch;
     }
 
-    private <T> boolean processAnnotatedMethod(AnnotatedMethod<T> method,
+    private <T> boolean processAnnotatedMethod(AnnotatedMethod<? super T> method,
+												 Class<T> token,
                                                  boolean classHasEncodedAnnotation,
-                                                 Map<AnnotatedParameter<T>, PatchInformation> parameterToPatchInfoMap,
-                                                 Set<AnnotatedMethod<T>> setterMethodsWithoutInject) {
+                                                 Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap,
+                                                 Set<AnnotatedMethod<? super T>> setterMethodsWithoutInject) {
         boolean mustPatch = false;
 
         if (method.getAnnotation(Inject.class) != null) {
@@ -505,7 +489,7 @@ public class CDIExtension implements Extension {
             // a synthetic qualifier so as to take @DefaultValue and @Encoded into
             // account
             boolean methodHasEncodedAnnotation = method.isAnnotationPresent(Encoded.class);
-            for (AnnotatedParameter<T> parameter : method.getParameters()) {
+            for (AnnotatedParameter<? super T> parameter : method.getParameters()) {
                 for (Annotation annotation : parameter.getAnnotations()) {
                     Set<DiscoveredParameter> discovered = discoveredParameterMap.get(annotation.annotationType());
                     if (discovered != null) {
@@ -542,7 +526,7 @@ public class CDIExtension implements Extension {
                         if (knownParameterQualifiers.contains(annotation.annotationType())) {
                             mustPatch = true;
                             setterMethodsWithoutInject.add(method);
-                            for (AnnotatedParameter<T> parameter : method.getParameters()) {
+                            for (AnnotatedParameter<? super T> parameter : method.getParameters()) {
                                 boolean encoded = parameter.isAnnotationPresent(Encoded.class) || methodHasEncodedAnnotation || classHasEncodedAnnotation;
                                 DefaultValue defaultValue = parameter.getAnnotation(DefaultValue.class);
                                 if (defaultValue == null) {
@@ -580,9 +564,10 @@ public class CDIExtension implements Extension {
         return false;
     }
 
-    private <T> boolean processAnnotatedField(AnnotatedField<T> field,
+    private <T> boolean processAnnotatedField(AnnotatedField<? super T> field,
+		 			                          Class<T> token,
                                               boolean classHasEncodedAnnotation,
-                                              Map<AnnotatedField<T>, PatchInformation> fieldToPatchInfoMap) {
+                                              Map<AnnotatedField<? super T>, PatchInformation> fieldToPatchInfoMap) {
         boolean mustPatch = false;
         for (Annotation annotation : field.getAnnotations()) {
             if (knownParameterQualifiers.contains(annotation.annotationType())) {
@@ -610,11 +595,11 @@ public class CDIExtension implements Extension {
         return mustPatch;
     }
 
-    private <T> void patchAnnotatedCallable(AnnotatedCallable<T> callable,
+    private <T> void patchAnnotatedCallable(AnnotatedCallable<? super T> callable,
                                             AnnotatedCallableImpl<T> newCallable,
-                                            Map<AnnotatedParameter<T>, PatchInformation> parameterToPatchInfoMap) {
+		 			                        Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap) {
         List<AnnotatedParameter<T>> newParams = new ArrayList<AnnotatedParameter<T>>();
-        for (AnnotatedParameter<T> parameter : callable.getParameters()) {
+        for (AnnotatedParameter<? super T> parameter : callable.getParameters()) {
             PatchInformation patchInfo = parameterToPatchInfoMap.get(parameter);
             if (patchInfo != null) {
                 Set<Annotation> annotations = new HashSet<Annotation>();
@@ -638,7 +623,7 @@ public class CDIExtension implements Extension {
                 if (patchInfo.getAnnotation() != null) {
                     annotations.add(patchInfo.getAnnotation());
                 }
-                newParams.add(new AnnotatedParameterImpl<T>(parameter, annotations, callable));
+                newParams.add(new AnnotatedParameterImpl<T>(parameter, annotations, newCallable));
             }
             else {
                 newParams.add(new AnnotatedParameterImpl<T>(parameter, newCallable));
@@ -647,10 +632,10 @@ public class CDIExtension implements Extension {
         newCallable.setParameters(newParams);
     }
 
-    private <T> void copyParametersOfAnnotatedCallable(AnnotatedCallable<T> callable, AnnotatedCallableImpl<T> newCallable) {
+    private <T> void copyParametersOfAnnotatedCallable(AnnotatedCallable<? super T> callable, AnnotatedCallableImpl<T> newCallable) {
         // copy and reparent all the parameters
         List<AnnotatedParameter<T>> newParams = new ArrayList<AnnotatedParameter<T>>();
-        for (AnnotatedParameter<T> parameter : callable.getParameters()) {
+        for (AnnotatedParameter<? super T> parameter : callable.getParameters()) {
             newParams.add(new AnnotatedParameterImpl<T>(parameter, newCallable));
         }
         newCallable.setParameters(newParams);
@@ -865,7 +850,7 @@ public class CDIExtension implements Extension {
      * By contrast, all the CDI driven code earlier in this source file
      * runs before Jersey gets a chance to initialize itself.
      */
-    void lateInitialize() {        
+    void lateInitialize() {
         try {
             for (InitializedLater object : toBeInitializedLater) {
                 object.later();
