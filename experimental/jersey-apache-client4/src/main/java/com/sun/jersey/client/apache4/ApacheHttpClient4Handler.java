@@ -44,6 +44,7 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.util.ReaderWriter;
 import org.apache.http.Header;
@@ -63,6 +64,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.AbstractHttpEntity;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.protocol.BasicHttpContext;
@@ -86,7 +88,7 @@ import java.util.Map;
  * Client operations are thread safe, the HTTP connection may
  * be shared between different threads.
  * <p>
- * If a response entity is obtained that is an instance of {@link Closeable} 
+ * If a response entity is obtained that is an instance of {@link Closeable}
  * then the instance MUST be closed after processing the entity to release
  * connection-based resources.
  * <p>
@@ -110,7 +112,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
 //    private static final DefaultCredentialsProvider DEFAULT_CREDENTIALS_PROVIDER =
 //            new DefaultCredentialsProvider();
-    
+
     private final HttpClient client;
     private final CookieStore cookieStore;
     private final boolean preemptiveBasicAuth;
@@ -146,171 +148,13 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
     public CookieStore getCookieStore() {
         return cookieStore;
     }
-    
+
     public ClientResponse handle(final ClientRequest cr)
             throws ClientHandlerException {
 
-        final Map<String, Object> props = cr.getProperties();
-
         final HttpUriRequest request = getUriHttpRequest(cr);
 
-//        request.setDoAuthentication(true);
-
-//        final HttpMethodParams methodParams = request.getParams();
-
-//        // Set the handle cookies property
-//        if (!cr.getPropertyAsFeature(ApacheHttpClient4Config.PROPERTY_HANDLE_COOKIES)) {
-//            methodParams.setCookiePolicy(CookiePolicy.IGNORE_COOKIES);
-//        }
-//
-//        // Set the interactive and credential provider properties
-//        if (cr.getPropertyAsFeature(ApacheHttpClient4Config.PROPERTY_INTERACTIVE)) {
-//            CredentialsProvider provider = (CredentialsProvider)props.get(ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER);
-//            if (provider == null) {
-//                provider = DEFAULT_CREDENTIALS_PROVIDER;
-//            }
-//            methodParams.setParameter(CredentialsProvider.PROVIDER, provider);
-//        } else {
-//            methodParams.setParameter(CredentialsProvider.PROVIDER, null);
-//        }
-
-//        // Set the read timeout
-//        final Integer readTimeout = (Integer)props.get(ApacheHttpClient4Config.PROPERTY_READ_TIMEOUT);
-//        if (readTimeout != null) {
-//            methodParams.setSoTimeout(readTimeout);
-//        }
-
-//        if (request instanceof EntityEnclosingMethod) {
-//            final EntityEnclosingMethod entMethod = (EntityEnclosingMethod) request;
-//
-//            if (cr.getEntity() != null) {
-//                final RequestEntityWriter re = getRequestEntityWriter(cr);
-//                final Integer chunkedEncodingSize = (Integer)props.get(ApacheHttpClient4Config.PROPERTY_CHUNKED_ENCODING_SIZE);
-//                if (chunkedEncodingSize != null) {
-//                    // There doesn't seems to be a way to set the chunk size.
-//                    entMethod.setContentChunked(true);
-//
-//                    // It is not possible for a MessageBodyWriter to modify
-//                    // the set of headers before writing out any bytes to
-//                    // the OutputStream
-//                    // This makes it impossible to use the multipart
-//                    // writer that modifies the content type to add a boundary
-//                    // parameter
-//                    writeOutBoundHeaders(cr.getHeaders(), request);
-//
-//                    // Do not buffer the request entity when chunked encoding is
-//                    // set
-//                    entMethod.setRequestEntity(new RequestEntity() {
-//                        public boolean isRepeatable() {
-//                            return false;
-//                        }
-//
-//                        public void writeRequest(OutputStream out) throws IOException {
-//                            re.writeRequestEntity(out);
-//                        }
-//
-//                        public long getContentLength() {
-//                            return re.getSize();
-//                        }
-//
-//                        public String getContentType() {
-//                            return re.getMediaType().toString();
-//                        }
-//
-//                    });
-//
-//                } else {
-//                    entMethod.setContentChunked(false);
-//
-//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                    try {
-//                        re.writeRequestEntity(new CommittingOutputStream(baos) {
-//                            @Override
-//                            protected void commit() throws IOException {
-//                                writeOutBoundHeaders(cr.getMetadata(), request);
-//                            }
-//                        });
-//                    } catch (IOException ex) {
-//                        throw new ClientHandlerException(ex);
-//                    }
-//
-//                    final byte[] content = baos.toByteArray();
-//                    entMethod.setRequestEntity(new RequestEntity() {
-//                        public boolean isRepeatable() {
-//                            return true;
-//                        }
-//
-//                        public void writeRequest(OutputStream out) throws IOException {
-//                            out.write(content);
-//                        }
-//
-//                        public long getContentLength() {
-//                            return content.length;
-//                        }
-//
-//                        public String getContentType() {
-//                            return re.getMediaType().toString();
-//                        }
-//
-//                    });
-//                }
-//
-//            }
-//        } else {
-//            writeOutBoundHeaders(cr.getHeaders(), request);
-//
-//            // Follow redirects
-//            request.setFollowRedirects(cr.getPropertyAsFeature(ApacheHttpClient4Config.PROPERTY_FOLLOW_REDIRECTS));
-//        }
-
         writeOutBoundHeaders(cr.getHeaders(), request);
-
-//        ManagedClientConnection conn = null;
-//
-//        try {
-//            ClientConnectionRequest connRequest = client.getConnectionManager().requestConnection(new HttpRoute(getHost(request)), null);
-//            conn = connRequest.getConnection(10, TimeUnit.SECONDS);
-//
-//            conn.sendRequestHeader(request);
-//            final HttpResponse response = conn.receiveResponseHeader();
-//            conn.receiveResponseEntity(response);
-//            HttpEntity entity = response.getEntity();
-//            if (entity != null) {
-//                BasicManagedEntity managedEntity = new BasicManagedEntity(entity, conn, false);
-//                // Replace entity
-//                response.setEntity(managedEntity);
-//            }
-//
-//
-//            ClientResponse r = new ClientResponse(response.getStatusLine().getStatusCode(),
-//                    getInBoundHeaders(response),
-//                    new HttpClientResponseInputStream(response),
-//                    getMessageBodyWorkers());
-//            if (!r.hasEntity()) {
-//                r.bufferEntity();
-//                r.close();
-//            }
-//
-//            conn.releaseConnection();
-//
-//            return r;
-//
-//        } catch (IOException ex) {
-//            // Abort connection upon an I/O error.
-//            try {
-//                conn.abortConnection();
-//            } catch (IOException e) {
-//                throw new ClientHandlerException(e);
-//            }
-//            throw new ClientHandlerException(ex);
-//        } catch (Exception e) {
-//            try {
-//                conn.abortConnection();
-//            } catch (IOException ex) {
-//                throw new ClientHandlerException(ex);
-//            }
-//            throw new ClientHandlerException(e);
-//        }
 
         try {
 
@@ -341,7 +185,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         } catch (Exception e) {
             throw new ClientHandlerException(e);
         }
-        
+
     }
 
     private HttpHost getHost(HttpUriRequest request) {
@@ -393,102 +237,51 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
     private HttpEntity getHttpEntity(ClientRequest cr) {
         final Object entity = cr.getEntity();
 
-
         if(entity == null)
             return null;
 
-
         final RequestEntityWriter requestEntityWriter = getRequestEntityWriter(cr);
 
-//        if(entity instanceof ...)
-//            return new ...
-
         try {
-            return new AbstractHttpEntity() {
-                @Override
-                public boolean isRepeatable() {
-                    return false;
-                }
+            HttpEntity httpEntity = new AbstractHttpEntity() {
+                    @Override
+                    public boolean isRepeatable() {
+                        return false;
+                    }
 
-                @Override
-                public long getContentLength() {
-                    return requestEntityWriter.getSize();
-                }
+                    @Override
+                    public long getContentLength() {
+                        return requestEntityWriter.getSize();
+                    }
 
-                @Override
-                public InputStream getContent() throws IOException, IllegalStateException {
-                    return null;
-                }
+                    @Override
+                    public InputStream getContent() throws IOException, IllegalStateException {
+                        return null;
+                    }
 
-                @Override
-                public void writeTo(OutputStream outputStream) throws IOException {
-                    requestEntityWriter.writeRequestEntity(outputStream);
-                }
+                    @Override
+                    public void writeTo(OutputStream outputStream) throws IOException {
+                        requestEntityWriter.writeRequestEntity(outputStream);
+                    }
 
-                @Override
-                public boolean isStreaming() {
-                    return false;
-                }
-            };
-        } catch (Exception ignored) {}
+                    @Override
+                    public boolean isStreaming() {
+                        return requestEntityWriter.getSize() == -1;
+                    }
+                };
+
+            if(cr.getProperties().get(ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE) != null) {
+                // TODO return InputStreamEntity
+                return httpEntity;
+            } else {
+                return new BufferedHttpEntity(httpEntity);
+            }
+        } catch (Exception ex) {
+            // TODO warning/error?
+        }
 
         return null;
     }
-
-//    private static class CustomMethod extends EntityEnclosingMethod {
-//        private String method;
-//
-//        CustomMethod(String method, String uri) {
-//            super(uri);
-//
-//            this.method = method;
-//        }
-//
-//        @Override
-//        public String getName() {
-//            return method;
-//        }
-//    }
-//
-//    private HostConfiguration getHostConfiguration(HttpClient client, Map<String, Object> props) {
-//        Object proxy = props.get(ApacheHttpClient4Config.PROPERTY_PROXY_URI);
-//        if (proxy != null) {
-//            URI proxyUri = getProxyUri(proxy);
-//
-//            String proxyHost = proxyUri.getHost();
-//            if (proxyHost == null) {
-//                proxyHost = "localhost";
-//            }
-//
-//            int proxyPort = proxyUri.getPort();
-//            if (proxyPort == -1) {
-//                proxyPort = 8080;
-//            }
-//
-//            HostConfiguration hostConfig = new HostConfiguration(client.getHostConfiguration());
-//            String setHost = hostConfig.getProxyHost();
-//            int setPort = hostConfig.getProxyPort();
-//
-//            if ((setHost == null) ||
-//                    (!setHost.equals(proxyHost)) ||
-//                    (setPort == -1) ||
-//                    (setPort != proxyPort)) {
-//                hostConfig.setProxyHost(new ProxyHost(proxyHost, proxyPort));
-//            }
-//            return hostConfig;
-//        } else {
-//            return null;
-//        }
-//    }
-//
-//    private HttpState getHttpState(Map<String, Object> props) {
-//        ApacheHttpClient4State httpState = (ApacheHttpClient4State) props.get(DefaultApacheHttpClient4Config.PROPERTY_HTTP_STATE);
-//        if (httpState != null) {
-//            return httpState.getHttpState();
-//        } else {
-//            return null;
-//        }
-//    }
 
     private void writeOutBoundHeaders(MultivaluedMap<String, Object> headers, HttpUriRequest request) {
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {

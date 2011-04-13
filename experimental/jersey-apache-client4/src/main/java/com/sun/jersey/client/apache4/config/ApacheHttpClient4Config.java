@@ -88,13 +88,23 @@ public interface ApacheHttpClient4Config extends ClientConfig {
     public static final String PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION =
             "com.sun.jersey.impl.client.httpclient.preemptiveBasicAuthentication";
 
-
+    /**
+     * Connection Manager which will be used to create {@link org.apache.http.client.HttpClient}.
+     *
+     * The value MUST be an instance of {@link org.apache.http.conn.ClientConnectionManager}.
+     * If the property is absent a default Connection Manager will be used.
+     */
     public static final String PROPERTY_CONNECTION_MANAGER =
             "com.sun.jersey.impl.client.httpclient.connectionManager";
 
+    /**
+     * Http parameters which will be used to create {@link org.apache.http.client.HttpClient}.
+     *
+     * The value MUST be an instance of {@link org.apache.http.params.HttpParams}.
+     * If the property is absent default http parameters will be used.
+     */
     public static final String PROPERTY_HTTP_PARAMS =
             "com.sun.jersey.impl.client.httpclient.httpParams";
-
 
     /**
      * A value of a URI to configure the proxy host and proxy port to proxy

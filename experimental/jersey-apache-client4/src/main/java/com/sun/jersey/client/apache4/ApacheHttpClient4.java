@@ -50,7 +50,6 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.conn.ClientConnectionManager;
@@ -66,14 +65,16 @@ import java.util.Map;
  * A {@link Client} that utilizes the Apache HTTP client to send and receive
  * HTTP request and responses.
  * <p>
- * If an {@link ApacheHttpClient4Handler} is not explicitly passed as a
- * constructor or method parameter then by default an instance is created with
- * an {@link HttpClient} constructed with a {@link MultiThreadedHttpConnectionManager}
- * instance.
- * <p>
  * The following properties are only supported at construction of this class:
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_AUTHENTICATION} and
- * {@link ClientConfig#PROPERTY_CONNECT_TIMEOUT}.
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_CONNECTION_MANAGER}
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_HTTP_PARAMS}
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_CREDENTIALS_PROVIDER}
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_DISABLE_COOKIES}
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_URI}
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_USERNAME}
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_PASSWORD}
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION}
+ * {@link com.sun.jersey.api.client.config.ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE}
  * <p>
  * By default a request entity is buffered and repeatable such that
  * authorization may be performed automatically in response to a 401 response.
@@ -82,13 +83,8 @@ import java.util.Map;
  * is set to a value greater than 0 then chunked encoding will be enabled
  * and the request entity (if present) will not be buffered and is not
  * repeatable. For authorization to work in such scenarios the property
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_AUTHENTICATION} must
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION} must
  * be set to true.
- * <p>
- * If a response entity is obtained that is an instance of
- * {@link java.io.Closeable}
- * then the instance MUST be closed after processing the entity to release
- * connection-based resources.
  * <p>
  * If a {@link com.sun.jersey.api.client.ClientResponse} is obtained and an
  * entity is not read from the response then
@@ -108,7 +104,7 @@ public class ApacheHttpClient4 extends Client {
      *
      */
     public ApacheHttpClient4() {
-        this(createDefaultClientHander(null), new DefaultClientConfig(), null);
+        this(createDefaultClientHandler(null), new DefaultClientConfig(), null);
     }
 
     /**
@@ -146,18 +142,6 @@ public class ApacheHttpClient4 extends Client {
         super(root, config, provider);
 
         this.client4Handler = root;
-
-
-
-//        HttpClient client = root.getHttpClient();
-
-//        client.getParams().setAuthenticationPreemptive(
-//                config.getPropertyAsFeature(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_AUTHENTICATION));
-
-//        final Integer connectTimeout = (Integer)config.getProperty(ApacheHttpClient4Config.PROPERTY_CONNECT_TIMEOUT);
-//        if (connectTimeout != null) {
-//            client.getConnectionManager(). .getParams().setConnectionTimeout(connectTimeout);
-//        }
     }
 
     /**
@@ -175,7 +159,7 @@ public class ApacheHttpClient4 extends Client {
      * @return a default client.
      */
     public static ApacheHttpClient4 create() {
-        return new ApacheHttpClient4(createDefaultClientHander(null));
+        return new ApacheHttpClient4(createDefaultClientHandler(null));
     }
 
     /**
@@ -185,7 +169,7 @@ public class ApacheHttpClient4 extends Client {
      * @return a default client.
      */
     public static ApacheHttpClient4 create(ClientConfig cc) {
-        return new ApacheHttpClient4(createDefaultClientHander(cc), cc);
+        return new ApacheHttpClient4(createDefaultClientHandler(cc), cc);
     }
 
     /**
@@ -196,7 +180,7 @@ public class ApacheHttpClient4 extends Client {
      * @return a default client.
      */
     public static ApacheHttpClient4 create(ClientConfig cc, IoCComponentProviderFactory provider) {
-        return new ApacheHttpClient4(createDefaultClientHander(cc), cc, provider);
+        return new ApacheHttpClient4(createDefaultClientHandler(cc), cc, provider);
     }
 
     /**
@@ -206,7 +190,7 @@ public class ApacheHttpClient4 extends Client {
      *
      * @return a default Apache HTTP client handler.
      */
-    private static ApacheHttpClient4Handler createDefaultClientHander(ClientConfig cc) {
+    private static ApacheHttpClient4Handler createDefaultClientHandler(ClientConfig cc) {
 
         Object connectionManager = null;
         Object httpParams = null;
