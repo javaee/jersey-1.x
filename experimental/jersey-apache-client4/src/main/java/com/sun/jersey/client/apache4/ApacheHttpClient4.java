@@ -60,6 +60,8 @@ import org.apache.http.params.HttpParams;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A {@link Client} that utilizes the Apache HTTP client to send and receive
@@ -74,7 +76,6 @@ import java.util.Map;
  * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_USERNAME}
  * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_PASSWORD}
  * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION}
- * {@link com.sun.jersey.api.client.config.ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE}
  * <p>
  * By default a request entity is buffered and repeatable such that
  * authorization may be performed automatically in response to a 401 response.
@@ -97,7 +98,7 @@ import java.util.Map;
  */
 public class ApacheHttpClient4 extends Client {
 
-    private ApacheHttpClient4Handler client4Handler;
+    private final ApacheHttpClient4Handler client4Handler;
 
     /**
      * Create a new client instance.
@@ -113,7 +114,7 @@ public class ApacheHttpClient4 extends Client {
      * @param root the root client handler for dispatching a request and
      *        returning a response.
      */
-    public ApacheHttpClient4(ApacheHttpClient4Handler root) {
+    public ApacheHttpClient4(final ApacheHttpClient4Handler root) {
         this(root, new DefaultClientConfig(), null);
     }
 
@@ -124,7 +125,7 @@ public class ApacheHttpClient4 extends Client {
      *        returning a response.
      * @param config the client configuration.
      */
-    public ApacheHttpClient4(ApacheHttpClient4Handler root, ClientConfig config) {
+    public ApacheHttpClient4(final ApacheHttpClient4Handler root, final ClientConfig config) {
         this(root, config, null);
     }
 
@@ -137,8 +138,8 @@ public class ApacheHttpClient4 extends Client {
      * @param config the client configuration.
      * @param provider the IoC component provider factory.
      */
-    public ApacheHttpClient4(ApacheHttpClient4Handler root, ClientConfig config,
-                             IoCComponentProviderFactory provider) {
+    public ApacheHttpClient4(final ApacheHttpClient4Handler root, final ClientConfig config,
+                             final IoCComponentProviderFactory provider) {
         super(root, config, provider);
 
         this.client4Handler = root;
@@ -168,7 +169,7 @@ public class ApacheHttpClient4 extends Client {
      * @param cc the client configuration.
      * @return a default client.
      */
-    public static ApacheHttpClient4 create(ClientConfig cc) {
+    public static ApacheHttpClient4 create(final ClientConfig cc) {
         return new ApacheHttpClient4(createDefaultClientHandler(cc), cc);
     }
 
@@ -179,7 +180,7 @@ public class ApacheHttpClient4 extends Client {
      * @param provider the IoC component provider factory.
      * @return a default client.
      */
-    public static ApacheHttpClient4 create(ClientConfig cc, IoCComponentProviderFactory provider) {
+    public static ApacheHttpClient4 create(final ClientConfig cc, final IoCComponentProviderFactory provider) {
         return new ApacheHttpClient4(createDefaultClientHandler(cc), cc, provider);
     }
 
@@ -190,7 +191,7 @@ public class ApacheHttpClient4 extends Client {
      *
      * @return a default Apache HTTP client handler.
      */
-    private static ApacheHttpClient4Handler createDefaultClientHandler(ClientConfig cc) {
+    private static ApacheHttpClient4Handler createDefaultClientHandler(final ClientConfig cc) {
 
         Object connectionManager = null;
         Object httpParams = null;
@@ -199,7 +200,12 @@ public class ApacheHttpClient4 extends Client {
             connectionManager = cc.getProperties().get(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER);
             if(connectionManager != null) {
                 if(!(connectionManager instanceof ClientConnectionManager)) {
-                    // TODO: log warning
+                    Logger.getLogger(ApacheHttpClient4.class.getName()).log(
+                            Level.WARNING,
+                            "Ignoring value of property " + ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER +
+                                    " (" + connectionManager.getClass().getName() +
+                                     ") - not instance of org.apache.http.conn.ClientConnectionManager."
+                    );
                     connectionManager = null;
                 }
             }
@@ -207,7 +213,12 @@ public class ApacheHttpClient4 extends Client {
             httpParams = cc.getProperties().get(ApacheHttpClient4Config.PROPERTY_HTTP_PARAMS);
             if(httpParams != null) {
                 if(!(httpParams instanceof HttpParams)) {
-                    // TODO: log warning
+                    Logger.getLogger(ApacheHttpClient4.class.getName()).log(
+                            Level.WARNING,
+                            "Ignoring value of property " + ApacheHttpClient4Config.PROPERTY_HTTP_PARAMS +
+                                    " (" + httpParams.getClass().getName() +
+                                     ") - not instance of org.apache.http.params.HttpParams."
+                    );
                     httpParams = null;
                 }
             }
@@ -234,11 +245,10 @@ public class ApacheHttpClient4 extends Client {
                 client.setCredentialsProvider((CredentialsProvider)credentialsProvider);
             }
 
-            Object proxyUri = cc.getProperties().get(ApacheHttpClient4Config.PROPERTY_PROXY_URI);
+            final Object proxyUri = cc.getProperties().get(ApacheHttpClient4Config.PROPERTY_PROXY_URI);
             if(proxyUri != null) {
-                URI u = getProxyUri(proxyUri);
-
-                HttpHost proxy = new HttpHost(u.getHost(), u.getPort(), u.getScheme());
+                final URI u = getProxyUri(proxyUri);
+                final HttpHost proxy = new HttpHost(u.getHost(), u.getPort(), u.getScheme());
 
                 if(cc.getProperties().containsKey(ApacheHttpClient4Config.PROPERTY_PROXY_USERNAME) &&
                         cc.getProperties().containsKey(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD)) {
@@ -265,13 +275,14 @@ public class ApacheHttpClient4 extends Client {
         return new ApacheHttpClient4Handler(client, cookieStore, preemptiveBasicAuth);
     }
 
-    private static URI getProxyUri(Object proxy) {
+    private static URI getProxyUri(final Object proxy) {
         if (proxy instanceof URI) {
             return (URI) proxy;
         } else if (proxy instanceof String) {
             return URI.create((String) proxy);
         } else {
-            throw new ClientHandlerException("The proxy URI property MUST be an instance of String or URI");
+            throw new ClientHandlerException("The proxy URI (" + ApacheHttpClient4Config.PROPERTY_PROXY_URI +
+                    ") property MUST be an instance of String or URI");
         }
     }
 

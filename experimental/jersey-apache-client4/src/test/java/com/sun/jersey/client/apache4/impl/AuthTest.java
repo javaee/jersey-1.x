@@ -40,6 +40,7 @@
 
 package com.sun.jersey.client.apache4.impl;
 
+import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
@@ -247,7 +248,7 @@ public class AuthTest extends AbstractGrizzlyServerTester {
                 ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
                 credentialsProvider
         );
-        ApacheHttpClient4 c = ApacheHttpClient4.create(config);
+        Client c = ApacheHttpClient4.create(config);
 
         WebResource r = c.resource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class));

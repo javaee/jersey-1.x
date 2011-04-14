@@ -44,7 +44,6 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.util.ReaderWriter;
 import org.apache.http.Header;
@@ -124,7 +123,9 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
      * @param cookieStore {@link CookieStore} instance
      * @param preemptiveBasicAuth turns on preemptive basic authentication
      */
-    public ApacheHttpClient4Handler(HttpClient client, CookieStore cookieStore, boolean preemptiveBasicAuth) {
+    public ApacheHttpClient4Handler(final HttpClient client,
+                                    final CookieStore cookieStore,
+                                    final boolean preemptiveBasicAuth) {
         this.client = client;
         this.cookieStore = cookieStore;
         this.preemptiveBasicAuth = preemptiveBasicAuth;
@@ -174,7 +175,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
             ClientResponse r = new ClientResponse(response.getStatusLine().getStatusCode(),
                     getInBoundHeaders(response),
-                    new HttpClientResponseInputStream(response, client),
+                    new HttpClientResponseInputStream(response),
                     getMessageBodyWorkers());
             if (!r.hasEntity()) {
                 r.bufferEntity();
@@ -188,11 +189,11 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
     }
 
-    private HttpHost getHost(HttpUriRequest request) {
+    private HttpHost getHost(final HttpUriRequest request) {
         return new HttpHost(request.getURI().getHost(), request.getURI().getPort());
     }
 
-    private HttpUriRequest getUriHttpRequest(ClientRequest cr) {
+    private HttpUriRequest getUriHttpRequest(final ClientRequest cr) {
         final String strMethod = cr.getMethod();
         final URI uri = cr.getURI();
 
@@ -234,7 +235,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         return request;
     }
 
-    private HttpEntity getHttpEntity(ClientRequest cr) {
+    private HttpEntity getHttpEntity(final ClientRequest cr) {
         final Object entity = cr.getEntity();
 
         if(entity == null)
@@ -266,7 +267,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
                     @Override
                     public boolean isStreaming() {
-                        return requestEntityWriter.getSize() == -1;
+                        return false;
                     }
                 };
 
@@ -283,7 +284,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         return null;
     }
 
-    private void writeOutBoundHeaders(MultivaluedMap<String, Object> headers, HttpUriRequest request) {
+    private void writeOutBoundHeaders(final MultivaluedMap<String, Object> headers, final HttpUriRequest request) {
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
             List<Object> vs = e.getValue();
             if (vs.size() == 1) {
@@ -301,9 +302,9 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         }
     }
 
-    private InBoundHeaders getInBoundHeaders(HttpResponse response) {
-        InBoundHeaders headers = new InBoundHeaders();
-        Header[] respHeaders = response.getAllHeaders();
+    private InBoundHeaders getInBoundHeaders(final HttpResponse response) {
+        final InBoundHeaders headers = new InBoundHeaders();
+        final Header[] respHeaders = response.getAllHeaders();
         for (Header header : respHeaders) {
             List<String> list = headers.get(header.getName());
             if (list == null) {
@@ -317,13 +318,8 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
     private static final class HttpClientResponseInputStream extends FilterInputStream {
 
-        private final HttpClient client;
-        private final HttpResponse response;
-
-        HttpClientResponseInputStream(HttpResponse response, HttpClient client) throws IOException {
+        HttpClientResponseInputStream(final HttpResponse response) throws IOException {
             super(getInputStream(response));
-            this.client = client;
-            this.response = response;
         }
 
         @Override
@@ -333,12 +329,12 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         }
     }
 
-    private static InputStream getInputStream(HttpResponse response) throws IOException {
+    private static InputStream getInputStream(final HttpResponse response) throws IOException {
 
         if(response.getEntity() == null) {
             return new ByteArrayInputStream(new byte[0]);
         } else {
-            InputStream i = response.getEntity().getContent();
+            final InputStream i = response.getEntity().getContent();
             if(i.markSupported())
                 return i;
             return new BufferedInputStream(i, ReaderWriter.BUFFER_SIZE);

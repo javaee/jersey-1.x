@@ -53,12 +53,21 @@
  * To support basic authentication with the user name "foo" and the password
  * "bar" the following configuration may be utilized:
  * <blockquote><pre>
- *     DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
- *     config.getState().setCredentials(null, null, -1, "foo", "bar");
- *     ApacheHttpClient4 c = ApacheHttpClient4.create(config);
- *     WebResource r = c.resource("http://host/base");
- *     String s = r.get(String.class);
- *     s = r.post(String.class, s);
+ * CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+ * credentialsProvider.setCredentials(
+ *         AuthScope.ANY,
+ *         new UsernamePasswordCredentials("foo", "bar")
+ * );
+ *
+ * DefaultApacheHttpClient4Config config = new DefaultApacheHttpClient4Config();
+ * config.getProperties().put(
+ *         ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+ *         credentialsProvider
+ * );
+ * Client c = ApacheHttpClient4.create(config);
+ * WebResource r = c.resource("http://host/base");
+ * String s = r.get(String.class);
+ * s = r.post(String.class, s);
  * </pre></blockquote>
  */
 package com.sun.jersey.client.apache4;
