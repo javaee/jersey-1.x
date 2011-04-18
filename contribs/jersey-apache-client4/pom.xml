@@ -44,13 +44,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>jersey-experimental</artifactId>
-        <groupId>com.sun.jersey.experimental</groupId>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-contribs</artifactId>
         <version>1.7-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-apache-client4</artifactId>
     <packaging>jar</packaging>
-    <name>Jersey Apache HTTP Client</name>
+    <name>Jersey Apache HTTP Client 4.x</name>
     <profiles>
         <profile>
             <id>cobertura</id>
@@ -123,11 +123,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

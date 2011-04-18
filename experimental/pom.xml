@@ -60,6 +60,5 @@
     <modules>
         <module>hypermedia-action</module>
         <module>view-client</module>
-        <module>jersey-apache-client4</module>
     </modules>
 </project>

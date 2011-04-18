@@ -65,6 +65,7 @@
         <module>jersey-multipart</module>
         <module>jersey-atom-abdera</module>
         <module>jersey-apache-client</module>
+        <module>jersey-apache-client4</module>
         <module>jersey-simple-server</module>
         <module>jersey-guice</module>
         <module>jersey-oauth</module>
