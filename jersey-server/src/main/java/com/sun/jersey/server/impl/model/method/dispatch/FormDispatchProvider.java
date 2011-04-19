@@ -40,6 +40,8 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
+import com.sun.jersey.spi.container.JavaMethodInvokerFactory;
+import com.sun.jersey.spi.container.JavaMethodInvoker;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -68,11 +70,16 @@ public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider
     
     @Override
     public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
+        return this.create(abstractResourceMethod, JavaMethodInvokerFactory.getDefault());
+    }
+
+    @Override
+    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod, JavaMethodInvoker invoker) {
         if ("GET".equals(abstractResourceMethod.getHttpMethod())) {
             return null;
         }
 
-        return super.create(abstractResourceMethod);
+        return super.create(abstractResourceMethod, invoker);
     }
             
     @Override
@@ -139,6 +146,7 @@ public class FormDispatchProvider extends AbstractResourceMethodDispatchProvider
             this.as = as;
         }
 
+        @Override
         public Object getValue(HttpContext context) {
             return context.getProperties().get(FORM_PROPERTY);
         }

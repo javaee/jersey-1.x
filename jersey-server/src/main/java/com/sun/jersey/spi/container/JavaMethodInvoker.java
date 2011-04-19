@@ -1,14 +1,14 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
  * may not use this file except in compliance with the License.  You can
  * obtain a copy of the License at
- * http://glassfish.java.net/public/CDDL+GPL_1_1.html
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
  * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
@@ -37,41 +37,16 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.spi.container;
 
-import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.spi.dispatch.RequestDispatcher;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
- * Service-provider interface for creating {@link RequestDispatcher} instances.
- * <p>
- * An implementation (a service-provider) identifies itself by placing a 
- * provider-configuration file (if not already present), 
- * "com.sun.research.ws.rest.spi.invoker.ResourceMethodDispatchProvider" in the 
- * resource directory <tt>META-INF/services</tt>, and including the fully qualified
- * service-provider-class of the implementation in the file.
- * <p>
- * A provider will examine the model of the Web resource method and 
- * determine if an invoker can be created for that Web resource method.
- * <p>
- * Multiple providers can specify the support for different Web resource method
- * patterns, ranging from simple patterns (such as void return and input 
- * parameters) to complex patterns that take type URI and query arguments 
- * and HTTP request headers as typed parameters.
- * 
- * 
- * @author Paul.Sandoz@Sun.Com
+ *
+ * @author Jakub.Podlesak@Oracle.com
  */
-public interface ResourceMethodDispatchProvider {
-    
-    /**
-     * Create a {@link RequestDispatcher} for a resource method of
-     * a resource.
-     * 
-     * @param abstractResourceMethod the abstract resource method.
-     * @return the request dispatcher, otherwise null if it could not be created
-     *         for the abstract resource method.
-     */
-    RequestDispatcher create(AbstractResourceMethod abstractResourceMethod);    
+public interface JavaMethodInvoker {
+
+    public Object invoke(Method m, Object o, Object... parameters) throws InvocationTargetException, IllegalAccessException;
 }

@@ -1,14 +1,14 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
  * and Distribution License("CDDL") (collectively, the "License").  You
  * may not use this file except in compliance with the License.  You can
  * obtain a copy of the License at
- * http://glassfish.java.net/public/CDDL+GPL_1_1.html
+ * https://glassfish.dev.java.net/public/CDDL+GPL_1_1.html
  * or packager/legal/LICENSE.txt.  See the License for the specific
  * language governing permissions and limitations under the License.
  *
@@ -38,57 +38,54 @@
  * holder.
  */
 
-package com.sun.jersey.server.impl.model.method.dispatch;
+package com.sun.jersey.spi.container;
 
-import com.sun.jersey.spi.container.JavaMethodInvokerFactory;
 import com.sun.jersey.spi.container.JavaMethodInvoker;
+import com.sun.jersey.spi.container.ResourceMethodCustomInvokerDispatchProvider;
 import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.impl.ImplMessages;
+import com.sun.jersey.server.impl.application.ResourceMethodDispatcherFactory;
 import com.sun.jersey.spi.dispatch.RequestDispatcher;
-import com.sun.jersey.spi.inject.Injectable;
-import java.util.List;
+import com.sun.jersey.spi.inject.Errors;
+import com.sun.jersey.spi.service.ServiceFinder;
+import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.core.MediaType;
-
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author japod
  */
-public class MultipartFormDispatchProvider extends FormDispatchProvider {
-    private static final Logger LOGGER = Logger.getLogger(MultipartFormDispatchProvider.class.getName());
+public class ResourceMethodCustomInvokerDispatchFactory {
 
-    private static MediaType MULTIPART_FORM_DATA = new MediaType("multipart", "form-data");
+    private static final Logger LOGGER = Logger.getLogger(ResourceMethodDispatcherFactory.class.getName());
 
-    @Override
-    public RequestDispatcher create(AbstractResourceMethod method) {
-        return this.create(method, JavaMethodInvokerFactory.getDefault());
-    }
+    static final ResourceMethodCustomInvokerDispatchProvider[] customInvokerDispatchProviders = ServiceFinder.find(ResourceMethodCustomInvokerDispatchProvider.class).toArray();
 
-    @Override
-    public RequestDispatcher create(AbstractResourceMethod method, JavaMethodInvoker invoker) {
-        boolean found = false;
-        for (MediaType m : method.getSupportedInputTypes()) {
-            found = (!m.isWildcardSubtype() && m.isCompatible(MULTIPART_FORM_DATA));
-            if (found) break;
-        }
-        if (!found)
+    // this is to address EJB integration issues in WLS/GF:
+    public static RequestDispatcher getDispatcher(AbstractResourceMethod abstractResourceMethod, JavaMethodInvoker invoker) {
+        if (invoker == null) {
             return null;
-        
-        return super.create(method, invoker);
-    }
-        
-    @Override
-    protected List<Injectable> getInjectables(AbstractResourceMethod method) {
-        for (int i = 0; i < method.getParameters().size(); i++) {
-            Parameter p = method.getParameters().get(i);
-            
-             if (p.getAnnotation().annotationType() == FormParam.class) {
-                LOGGER.severe("Resource methods utilizing @FormParam "
-                        + "and consuming \"multipart/form-data\" are no longer supported. See @FormDataParam.");
+        }
+        // Mark the errors so it is possible to reset
+        Errors.mark();
+        for (ResourceMethodCustomInvokerDispatchProvider rmdp : customInvokerDispatchProviders) {
+
+            try {
+                RequestDispatcher d = rmdp.create(abstractResourceMethod, invoker);
+                if (d != null) {
+                    // Reset any errors, if any, produced from previous dispatch
+                    // providers
+                    Errors.reset();
+                    return d;
+                }
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, ImplMessages.ERROR_PROCESSING_METHOD(
+                        abstractResourceMethod.getMethod(),
+                        rmdp.getClass().getName()), e);
             }
         }
+
+        Errors.unmark();
         return null;
     }
 }

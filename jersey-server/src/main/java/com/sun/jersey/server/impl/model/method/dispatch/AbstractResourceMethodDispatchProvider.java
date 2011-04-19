@@ -40,6 +40,9 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
+import com.sun.jersey.spi.container.JavaMethodInvokerFactory;
+import com.sun.jersey.spi.container.JavaMethodInvoker;
+import com.sun.jersey.spi.container.ResourceMethodCustomInvokerDispatchProvider;
 import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.api.JResponse;
 import com.sun.jersey.api.core.HttpContext;
@@ -68,10 +71,15 @@ import javax.ws.rs.core.Response;
  * 
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractResourceMethodDispatchProvider implements ResourceMethodDispatchProvider {
+public abstract class AbstractResourceMethodDispatchProvider implements ResourceMethodDispatchProvider, ResourceMethodCustomInvokerDispatchProvider {
 
     @Override
     public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
+        return this.create(abstractResourceMethod, JavaMethodInvokerFactory.getDefault());
+    }
+
+    @Override
+    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod, JavaMethodInvoker invoker) {
         
         final InjectableValuesProvider pp = getInjectableValuesProvider(abstractResourceMethod);
         if (pp == null) {
@@ -90,15 +98,17 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
 
         final Class<?> returnType = abstractResourceMethod.getReturnType();
         if (Response.class.isAssignableFrom(returnType)) {
-            return new ResponseOutInvoker(abstractResourceMethod, pp);
+            return new ResponseOutInvoker(abstractResourceMethod, pp, invoker);
         } else if (JResponse.class.isAssignableFrom(returnType)) {
-            return new JResponseOutInvoker(abstractResourceMethod, pp);
-        } else if (returnType == void.class) {
-            return new VoidOutInvoker(abstractResourceMethod, pp);
-        } else if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
-            return new ObjectOutInvoker(abstractResourceMethod, pp);
+            return new JResponseOutInvoker(abstractResourceMethod, pp, invoker);
+        } else if (returnType != void.class) {
+            if (returnType == Object.class || GenericEntity.class.isAssignableFrom(returnType)) {
+                return new ObjectOutInvoker(abstractResourceMethod, pp, invoker);
+            } else {
+                return new TypeOutInvoker(abstractResourceMethod, pp, invoker);
+            }
         } else {
-            return new TypeOutInvoker(abstractResourceMethod, pp);
+            return new VoidOutInvoker(abstractResourceMethod, pp, invoker);
         }
     }
 
@@ -130,7 +140,12 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
 
         EntityParamInInvoker(AbstractResourceMethod abstractResourceMethod,
                 InjectableValuesProvider pp) {
-            super(abstractResourceMethod);
+            this(abstractResourceMethod, pp, JavaMethodInvokerFactory.getDefault());
+        }
+
+        EntityParamInInvoker(AbstractResourceMethod abstractResourceMethod,
+                InjectableValuesProvider pp, JavaMethodInvoker invoker) {
+            super(abstractResourceMethod, invoker);
             this.pp = pp;
         }
 
@@ -141,14 +156,15 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
 
     private static final class VoidOutInvoker extends EntityParamInInvoker {
         VoidOutInvoker(AbstractResourceMethod abstractResourceMethod,
-                InjectableValuesProvider pp) {
-            super(abstractResourceMethod, pp);
+                InjectableValuesProvider pp, JavaMethodInvoker invoker) {
+            super(abstractResourceMethod, pp, invoker);
         }
 
         @Override
-        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpContext context)
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
-            method.invoke(resource, params);
+            invoker.invoke(method, resource, params);
         }
     }
 
@@ -156,16 +172,17 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         private final Type t;
 
         TypeOutInvoker(AbstractResourceMethod abstractResourceMethod,
-                InjectableValuesProvider pp) {
-            super(abstractResourceMethod, pp);
+                InjectableValuesProvider pp, JavaMethodInvoker invoker) {
+            super(abstractResourceMethod, pp, invoker);
             this.t = abstractResourceMethod.getGenericReturnType();
         }
 
         @Override
-        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpContext context)
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
-            final Object o = method.invoke(resource, params);
+            final Object o = invoker.invoke(method, resource, params);
             if (o != null) {
                 Response r = new ResponseBuilderImpl().
                         entityWithType(o, t).status(200).build();
@@ -176,15 +193,16 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
 
     private static final class ResponseOutInvoker extends EntityParamInInvoker {
         ResponseOutInvoker(AbstractResourceMethod abstractResourceMethod,
-                InjectableValuesProvider pp) {
-            super(abstractResourceMethod, pp);
+                InjectableValuesProvider pp, JavaMethodInvoker invoker) {
+            super(abstractResourceMethod, pp, invoker);
         }
 
         @Override
-        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpContext context)
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
-            final Response r = (Response)method.invoke(resource, params);
+            final Response r = (Response)invoker.invoke(method, resource, params);
             if (r != null) {
                 context.getResponse().setResponse(r);
             }
@@ -195,7 +213,7 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         private final Type t;
 
         JResponseOutInvoker(AbstractResourceMethod abstractResourceMethod,
-                InjectableValuesProvider pp) {
+                InjectableValuesProvider pp, JavaMethodInvoker invoker) {
             super(abstractResourceMethod, pp);
             final Type jResponseType = abstractResourceMethod.getGenericReturnType();
             if (jResponseType instanceof ParameterizedType) {
@@ -211,10 +229,11 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
         }
 
         @Override
-        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpContext context)
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
-            final JResponse<?> r = (JResponse<?>)method.invoke(resource, params);
+            final JResponse<?> r = (JResponse<?>)invoker.invoke(method, resource, params);
             if (r != null) {
                 if (t == null) {
                     context.getResponse().setResponse(r.toResponse());
@@ -227,15 +246,16 @@ public abstract class AbstractResourceMethodDispatchProvider implements Resource
 
     private static final class ObjectOutInvoker extends EntityParamInInvoker {
         ObjectOutInvoker(AbstractResourceMethod abstractResourceMethod,
-                InjectableValuesProvider pp) {
-            super(abstractResourceMethod, pp);
+                InjectableValuesProvider pp, JavaMethodInvoker invoker) {
+            super(abstractResourceMethod, pp, invoker);
         }
 
         @Override
-        public void _dispatch(Object resource, HttpContext context) throws IllegalAccessException, InvocationTargetException {
+        public void _dispatch(Object resource, HttpContext context)
+        throws IllegalAccessException, InvocationTargetException {
             final Object[] params = getParams(context);
 
-            final Object o = method.invoke(resource, params);
+            final Object o = invoker.invoke(method, resource, params);
 
             if (o instanceof Response) {
                 context.getResponse().setResponse((Response)o);

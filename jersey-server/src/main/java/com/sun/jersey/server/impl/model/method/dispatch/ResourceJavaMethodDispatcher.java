@@ -40,6 +40,7 @@
 
 package com.sun.jersey.server.impl.model.method.dispatch;
 
+import com.sun.jersey.spi.container.JavaMethodInvoker;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.HttpContext;
@@ -55,13 +56,16 @@ import java.lang.reflect.Method;
  */
 public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher {
 
+    protected final JavaMethodInvoker invoker;
+
     protected final Method method;
     
     private final Annotation[] annotations;
     
-    public ResourceJavaMethodDispatcher(AbstractResourceMethod abstractResourceMethod) {
+    public ResourceJavaMethodDispatcher(AbstractResourceMethod abstractResourceMethod, JavaMethodInvoker invoker) {
         this.method = abstractResourceMethod.getMethod();
-        this.annotations = abstractResourceMethod.getAnnotations();        
+        this.annotations = abstractResourceMethod.getAnnotations();
+        this.invoker = invoker;
     }    
     
     @Override
@@ -81,8 +85,7 @@ public abstract class ResourceJavaMethodDispatcher implements RequestDispatcher 
         }
     }
     
-    protected abstract void _dispatch(Object resource, HttpContext context)
-            throws IllegalAccessException, InvocationTargetException;
+    protected abstract void _dispatch(Object resource, HttpContext context) throws InvocationTargetException, IllegalAccessException;
 
     @Override
     public String toString() {

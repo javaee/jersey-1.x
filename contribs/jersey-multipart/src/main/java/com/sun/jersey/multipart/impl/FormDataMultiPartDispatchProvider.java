@@ -55,6 +55,8 @@ import com.sun.jersey.multipart.FormDataParam;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
 import com.sun.jersey.server.impl.inject.InjectableValuesProvider;
 import com.sun.jersey.server.impl.model.method.dispatch.AbstractResourceMethodDispatchProvider;
+import com.sun.jersey.spi.container.JavaMethodInvoker;
+import com.sun.jersey.spi.container.JavaMethodInvokerFactory;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.MessageBodyWorkers;
@@ -86,7 +88,12 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
 
 
     @Override
-    public RequestDispatcher create(AbstractResourceMethod method) {
+    public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
+        return this.create(abstractResourceMethod, JavaMethodInvokerFactory.getDefault());
+    }
+
+    @Override
+    public RequestDispatcher create(AbstractResourceMethod method, JavaMethodInvoker invoker) {
         if ("GET".equals(method.getHttpMethod())) {
             return null;
         }
@@ -102,7 +109,7 @@ public class FormDataMultiPartDispatchProvider extends AbstractResourceMethodDis
             return null;
         }
         
-        return super.create(method);
+        return super.create(method, invoker);
     }
 
     private static final class FormDataInjectableValuesProvider extends InjectableValuesProvider {
