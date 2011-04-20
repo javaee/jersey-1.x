@@ -49,10 +49,31 @@
             <param-name>com.sun.jersey.config.property.packages</param-name>
             <param-value>com.sun.jersey.samples.jersey_cdi</param-value>
         </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.feature.Trace</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+            <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+            <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>com.sun.jersey.config.feature.logging.DisableEntitylogging</param-name>
+            <param-value>false</param-value>
+        </init-param>        
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>Jersey Web Application</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
+    <env-entry>
+        <env-entry-name>injectedResource</env-entry-name>
+        <env-entry-type>java.lang.Integer</env-entry-type>
+        <env-entry-value>1</env-entry-value>
+    </env-entry>
 </web-app>

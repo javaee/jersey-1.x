@@ -45,4 +45,9 @@
 <sun-web-app error-url="">
   <context-root>/jersey-cdi</context-root>
   <class-loader delegate="false"/>
+  <jsp-config>
+    <property name="keepgenerated" value="true">
+      <description>Keep a copy of the generated servlet class' java code.</description>
+    </property>
+  </jsp-config>
 </sun-web-app>

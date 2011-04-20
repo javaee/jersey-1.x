@@ -99,6 +99,30 @@
                     <td><code><a href="http://localhost:8080/jersey-cdi/echo/a">http://localhost:8080/jersey-cdi/echo/a</a></code></td>
                     <td><code>ECHO a</code></td>
                 </tr>
+                <tr>
+                    <td>Shows injection of context objects into the fields of a EJB Stateless Session bean.</td>
+                    <td><code><a href="http://localhost:8080/jersey-cdi/ejb/stateless">http://localhost:8080/jersey-cdi/ejb/stateless</a></code></td>
+                    <td><code>1</code></td>
+                </tr>
+                <tr>
+                    <td>Shows injection of query parameters into the fields of a managed bean.</td>
+                    <td><code><a href="http://localhost:8080/jersey-cdi/jcdibean/per-request">http://localhost:8080/jersey-cdi/jcdibean/per-request</a></code></td>
+                    <td><code>null1</code></td>
+                </tr>
+                <tr>
+                    <td>Shows injection of context objects into the fields of a managed bean.</td>
+                    <td><code><a href="http://localhost:8080/jersey-cdi/jcdibean/singleton">http://localhost:8080/jersey-cdi/jcdibean/singleton</a></code></td>
+                    <td><code>1</code></td>
+                </tr>
+                <tr>
+                    <td>Shows injection of context objects and query parameters into the fields of a managed bean.</td>
+                    <td><code><a href="http://localhost:8080/jersey-cdi/jcdibean/dependent/per-request">http://localhost:8080/jersey-cdi/jcdibean/dependent/per-request</a></code></td>
+                    <td><code>null1</code></td>
+                </tr><tr>
+                    <td>Shows injection of context objects into the fields of a managed bean.</td>
+                    <td><code><a href="http://localhost:8080/jersey-cdi/jcdibean/dependent/singleton">http://localhost:8080/jersey-cdi/jcdibean/dependent/singleton</a></code></td>
+                    <td><code>1</code></td>
+                </tr>
             </table>
         </blockquote>
     </body>

@@ -81,8 +81,7 @@
         <module>https-clientserver-grizzly</module>
         <module>https-server-glassfish</module>
         <module>jacksonjsonprovider</module>
-        <module>jaxb</module>
-        <module>jcdi-beans-webapp</module>
+        <module>jaxb</module>        
         <module>jersey-cdi</module>
         <module>jersey-ejb</module>
         <module>jersey-guice-filter</module>

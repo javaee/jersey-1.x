@@ -195,7 +195,7 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>com.sun.jersey.samples</groupId>
-                                            <artifactId>jcdi-beans-webapp</artifactId>
+                                            <artifactId>jersey-cdi</artifactId>
                                             <version>${project.version}</version>
                                             <type>zip</type>
                                             <classifier>gf-project</classifier>
@@ -331,7 +331,7 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>com.sun.jersey.samples</groupId>
-                                            <artifactId>jcdi-beans-webapp</artifactId>
+                                            <artifactId>jersey-cdi</artifactId>
                                             <version>${project.version}</version>
                                             <type>zip</type>
                                             <classifier>gf-project</classifier>

@@ -43,14 +43,17 @@ package com.sun.jersey.samples.jersey_cdi.test;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.api.client.filter.LoggingFilter;
 import org.junit.Test;
 
 import java.net.URI;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  *
@@ -58,9 +61,158 @@ import static org.junit.Assert.assertTrue;
 public class SimpleTest extends JerseyTest {
 
     public SimpleTest() throws Exception {
-        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.jersey_cdi.resources")
-                .contextPath("jersey-cdi")
-                .build());
+        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.jersey_cdi.resources").contextPath("jersey-cdi").build());        
+    }
+
+    @Test
+    public void testPerRequestResource() throws Exception {
+        WebResource webResource = resource().path("jcdibean/per-request").queryParam("x", "x");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("x1", responseMsg);
+
+        responseMsg = webResource.get(String.class);
+        assertEquals("x1", responseMsg);
+    }
+
+    @Test
+    public void testSingletonResource() throws Exception {
+        WebResource webResource = resource().path("jcdibean/singleton");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("1", responseMsg);
+
+        responseMsg = webResource.get(String.class);
+        assertEquals("2", responseMsg);
+
+        responseMsg = webResource.get(String.class);
+        assertEquals("3", responseMsg);
+    }
+
+    @Test
+    public void testDependentPerRequestResource() throws Exception {
+        WebResource webResource = resource().path("jcdibean/dependent/per-request").queryParam("x", "x");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("x1", responseMsg);
+
+        responseMsg = webResource.get(String.class);
+        assertEquals("x1", responseMsg);
+    }
+
+    @Test
+    public void testDependentSingletonResource() throws Exception {
+        WebResource webResource = resource().path("jcdibean/dependent/singleton");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("1", responseMsg);
+
+        responseMsg = webResource.get(String.class);
+        assertEquals("2", responseMsg);
+
+        responseMsg = webResource.get(String.class);
+        assertEquals("3", responseMsg);
+    }
+
+    @Test
+    public void testExceptionMapper() throws Exception {
+        WebResource webResource = resource().path("/jcdibean/singleton/exception");
+        webResource.addFilter(new LoggingFilter());
+        ClientResponse cr = webResource.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("JDCIBeanException", cr.getEntity(String.class));
+    }
+    
+    @Test
+    public void testDependentExceptionMapper() throws Exception {
+        WebResource webResource = resource().path("/inherited");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.path("a").get(String.class);
+        assertEquals("inherited/a", responseMsg);
+
+        responseMsg = webResource.path("b").get(String.class);
+        assertEquals("inherited/b", responseMsg);
+
+        responseMsg = webResource.path("a/c").get(String.class);
+        assertEquals("inherited/a/c", responseMsg);
+    }
+
+    @Test
+    public void testInherited() throws Exception {
+        WebResource webResource = resource().path("/jcdibean/dependent/singleton/exception");
+        webResource.addFilter(new LoggingFilter());
+        ClientResponse cr = webResource.get(ClientResponse.class);
+        assertEquals(500, cr.getStatus());
+        assertEquals("JDCIBeanDependentException", cr.getEntity(String.class));
+    }
+
+    @Test
+    public void testApplicationWadl() {
+        WebResource webResource = resource();
+        webResource.addFilter(new LoggingFilter());
+        String serviceWadl = webResource.path("application.wadl").
+                accept(MediaTypes.WADL).get(String.class);
+
+        assertTrue(serviceWadl.length() > 0);
+    }
+
+    // A managed bean with no use of injection whatsoever.
+    @Test
+    public void testManagedBeanWithNoUseOfInjectionWhatsoeverResource() throws Exception {
+        WebResource webResource = resource().path("/helloworld");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("Hello World", responseMsg);
+    }
+
+    //Shows injection of context objects into the fields of a managed bean
+    @Test
+    public void testManagedBeanWithUseOfInjectionOfContextObjectsIntoFieldsResource() throws Exception {
+        WebResource webResource = resource().path("/simple");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        //grab port from environment when running inside hudson and port is changed
+        // otherwise, fall back to default port 8080
+        String httpPort = System.getenv("HTTP_PORT");
+        if (httpPort.equals(null)) {
+            httpPort="8080";
+        }
+        assertEquals("OK GET http://localhost:"+httpPort+"/jersey-cdi/simple", responseMsg);
+    }
+
+    //Shows injection of context objects and path parameters into the fields of a managed
+    @Test
+    public void testManagedBeanWithUseOfInjectionOfContextObjectsAndPathParamsIntoFieldsResource() throws Exception {
+        WebResource webResource = resource().path("other/c/d");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("OTHER c d", responseMsg);
+    }
+
+    //Shows constructor injection of a path parameter in a managed bean.
+    @Test
+    public void testConstructorInjectionOfAPathParamInAManagedBeanResource() throws Exception {
+        WebResource webResource = resource().path("echoconstructor/a");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("ECHO a", responseMsg);
+    }
+
+    //Shows injection of path and query parameters into the fields of a managed bean
+    @Test
+    public void testManagedBeanWithUseOfInjectionOfPathAndQueryParamsIntoFieldsResource() throws Exception {
+        WebResource webResource = resource().path("echofield/b");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("ECHO null b", responseMsg);
+    }
+
+    //A managed bean that uses (but does not inject) a path parameter.
+    @Test
+    public void testManagedBeanThatUsesButDoesNotInjectAPathParamResource() throws Exception {
+        WebResource webResource = resource().path("echo/a");
+        webResource.addFilter(new LoggingFilter());
+        String responseMsg = webResource.get(String.class);
+        assertEquals("ECHO a", responseMsg);
     }
 }
-
