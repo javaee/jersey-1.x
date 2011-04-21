@@ -68,14 +68,14 @@ import java.util.logging.Logger;
  * HTTP request and responses.
  * <p>
  * The following properties are only supported at construction of this class:
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_CONNECTION_MANAGER}
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_HTTP_PARAMS}
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_CREDENTIALS_PROVIDER}
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_DISABLE_COOKIES}
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_URI}
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_USERNAME}
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_PASSWORD}
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION}
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_CONNECTION_MANAGER}<br>
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_HTTP_PARAMS}}<br>
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_CREDENTIALS_PROVIDER}}<br>
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_DISABLE_COOKIES}}<br>
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_URI}}<br>
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_USERNAME}}<br>
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_PASSWORD}}<br>
+ * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION}}<br>
  * <p>
  * By default a request entity is buffered and repeatable such that
  * authorization may be performed automatically in response to a 401 response.
