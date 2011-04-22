@@ -173,7 +173,7 @@ public class SimpleTest extends JerseyTest {
         String responseMsg = webResource.get(String.class);
         //grab port from environment when running inside hudson and port is changed
         // otherwise, fall back to default port 8080
-        String httpPort = System.getenv("HTTP_PORT");
+        String httpPort = System.getProperty("jersey.test.port");
         if (httpPort.equals(null)) {
             httpPort="8080";
         }
