@@ -75,6 +75,7 @@ import com.sun.jersey.server.impl.wadl.WadlFactory;
 import com.sun.jersey.spi.container.ResourceFilter;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.inject.Errors;
+import com.sun.jersey.spi.monitoring.MonitoringProvider;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 
@@ -102,20 +103,24 @@ public final class ResourceUriRules {
 
     private final WadlFactory wadlFactory;
 
+    private final MonitoringProvider monitoringProvider;
+
     public ResourceUriRules(
             final ResourceConfig resourceConfig,
             final ResourceMethodDispatchProvider dp,
             final ServerInjectableProviderContext injectableContext,
             final FilterFactory ff,
             final WadlFactory wadlFactory,
+            final MonitoringProvider monitoringProvider,
             final AbstractResource resource
-            ) {
+    ) {
         this.resourceConfig = resourceConfig;
         this.dp = dp;
         this.injectableContext = injectableContext;
         this.ff = ff;
         this.wadlFactory = wadlFactory;
-        
+        this.monitoringProvider = monitoringProvider;
+
         final boolean implicitViewables = resourceConfig.getFeature(
                 ResourceConfig.FEATURE_IMPLICIT_VIEWABLES);
         List<QualitySourceMediaType> implictProduces = null;
@@ -150,7 +155,7 @@ public final class ResourceUriRules {
 
         // Create the atomic rules, at most only one will be matched
         final UriRules<UriRule> atomicRules = UriRulesFactory.create(rulesMap);
-        
+
         // Create the end sequential rules, zero or more may be matched
         List<PatternRulePair<UriRule>> patterns = new ArrayList<PatternRulePair<UriRule>>();
         if (resourceConfig.getFeature(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES)) {
@@ -166,30 +171,30 @@ public final class ResourceUriRules {
 
             // The matching rule for a sub-resource template
             patterns.add(new PatternRulePair<UriRule>(
-                    new UriPattern("/([^/]+)"), r));        
+                    new UriPattern("/([^/]+)"), r));
             // The matching rule for an index template
             patterns.add(new PatternRulePair<UriRule>(
-                    UriPattern.EMPTY, r));                    
-        }         
+                    UriPattern.EMPTY, r));
+        }
         // The terminating rule when the path is not fully consumed and accepted
         patterns.add(new PatternRulePair<UriRule>(
                 new UriPattern(".*"), new TerminatingRule()));
         // The terminating rule when the path is fully consumed and accepted
         patterns.add(new PatternRulePair<UriRule>(
-                UriPattern.EMPTY, new TerminatingRule()));        
+                UriPattern.EMPTY, new TerminatingRule()));
         // Create the sequential rules
         final UriRules<UriRule> sequentialRules =
                 new SequentialMatchingPatterns<UriRule>(patterns);
-        
+
         // Combined the atomic and sequential rules, the former will be matched
         // first
         final UriRules<UriRule> combiningRules =
                 new CombiningMatchingPatterns<UriRule>(
-                Arrays.asList(atomicRules, sequentialRules));
-        
+                        Arrays.asList(atomicRules, sequentialRules));
+
         this.rules = combiningRules;
     }
-        
+
     public UriRules<UriRule> getRules() {
         return rules;
     }
@@ -229,20 +234,21 @@ public final class ResourceUriRules {
                     }
                 }
             }
-            
+
             final List<ResourceFilter> resourceFilters = ff.getResourceFilters(locator);
             final UriRule r = new SubLocatorRule(
                     p.getTemplate(),
                     locator.getMethod(),
                     is,
                     FilterFactory.getRequestFilters(resourceFilters),
-                    FilterFactory.getResponseFilters(resourceFilters));
+                    FilterFactory.getResponseFilters(resourceFilters),
+                    monitoringProvider);
 
-            rulesMap.put(p, 
+            rulesMap.put(p,
                     new RightHandPathRule(
-                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                    p.getTemplate().endsWithSlash(),
-                    r));
+                            resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                            p.getTemplate().endsWithSlash(),
+                            r));
         }
     }
 
@@ -255,7 +261,7 @@ public final class ResourceUriRules {
 
         for (final AbstractSubResourceMethod method : resource.getSubResourceMethods()) {
 
-            PathPattern p = null;
+            PathPattern p;
             try {
                 p = new PathPattern(new PathTemplate(method.getPath().getValue()), "(/)?");
             } catch (IllegalArgumentException ex) {
@@ -274,7 +280,7 @@ public final class ResourceUriRules {
             if (isValidResourceMethod(rm, rmm)) {
                 rmm.put(rm);
             }
-         
+
             rmm.put(rm);
         }
 
@@ -289,12 +295,12 @@ public final class ResourceUriRules {
             processOptions(rmm, resource, p);
 
             rmm.sort();
-            
+
             rulesMap.put(p,
                     new RightHandPathRule(
-                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                    p.getTemplate().endsWithSlash(),
-                    new HttpMethodRule(rmm, true)));
+                            resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                            p.getTemplate().endsWithSlash(),
+                            new HttpMethodRule(rmm, true, monitoringProvider)));
         }
     }
 
@@ -321,7 +327,7 @@ public final class ResourceUriRules {
         if (!rmm.isEmpty()) {
             // No need to adapt with the RightHandPathRule as the URI path
             // will be consumed when such a rule is accepted
-            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(rmm));
+            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(rmm, monitoringProvider));
         }
     }
 
@@ -392,7 +398,7 @@ public final class ResourceUriRules {
     /**
      * Determine if a the resource method list contains a method that
      * has the same consume/produce media as another resource method.
-     * 
+     *
      * @param methods the resource methods
      * @param method the resource method to check
      * @return true if the list contains a method with the same media as method.

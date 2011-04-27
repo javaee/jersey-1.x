@@ -50,40 +50,45 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.monitoring.MonitoringProvider;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 
+import javax.ws.rs.WebApplicationException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
-import javax.ws.rs.WebApplicationException;
 
 /**
  * The rule for accepting a sub-locator method.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class SubLocatorRule extends BaseRule {
 
     private final List<AbstractHttpContextInjectable> is;
-    
+
     private final Method m;
 
     private final List<ContainerRequestFilter> requestFilters;
 
     private final List<ContainerResponseFilter> responseFilters;
-    
+
+    private final MonitoringProvider monitoringProvider;
+
     public SubLocatorRule(UriTemplate template,
-            Method m, 
-            List<Injectable> is,
-            List<ContainerRequestFilter> requestFilters,
-            List<ContainerResponseFilter> responseFilters) {
+                          Method m,
+                          List<Injectable> is,
+                          List<ContainerRequestFilter> requestFilters,
+                          List<ContainerResponseFilter> responseFilters,
+                          MonitoringProvider monitoringProvider) {
         super(template);
         this.m = m;
         this.is = AbstractHttpContextInjectable.transform(is);
         this.requestFilters = requestFilters;
         this.responseFilters = responseFilters;
+        this.monitoringProvider = monitoringProvider;
     }
 
     @Override
@@ -109,8 +114,11 @@ public final class SubLocatorRule extends BaseRule {
             // If so then get the instance of that class
             subResource = context.getResource((Class)subResource);
         }
+
+        monitoringProvider.requestSubResourcePreDispatch(Thread.currentThread().getId(), subResource.getClass());
+
         context.pushResource(subResource);
-        
+
         if (context.isTracingEnabled()) {
             trace(resource, subResource, context);
         }
@@ -122,7 +130,7 @@ public final class SubLocatorRule extends BaseRule {
             if(matches.next().accept(path, subResource, context))
                 return true;
 
-        return false;            
+        return false;
     }
 
     private void trace(Object resource, Object subResource, UriRuleContext context) {
@@ -131,18 +139,18 @@ public final class SubLocatorRule extends BaseRule {
 
         context.trace(
                 String.format("accept sub-resource locator: \"%s\" : \"%s\" -> @Path(\"%s\") " +
-                    "%s = %s",
-                prevPath,
-                currentPath.substring(prevPath.length()),
-                getTemplate().getTemplate(),
-                ReflectionHelper.methodInstanceToString(resource, m),
-                subResource));
+                        "%s = %s",
+                        prevPath,
+                        currentPath.substring(prevPath.length()),
+                        getTemplate().getTemplate(),
+                        ReflectionHelper.methodInstanceToString(resource, m),
+                        subResource));
     }
-    
+
     private Object invokeSubLocator(Object resource, UriRuleContext context) {
         // Push the response filters
         context.pushContainerResponseFilters(responseFilters);
-        
+
         // Process the request filter
         if (!requestFilters.isEmpty()) {
             ContainerRequest containerRequest = context.getContainerRequest();
@@ -160,9 +168,9 @@ public final class SubLocatorRule extends BaseRule {
                 final Object[] params = new Object[is.size()];
                 int index = 0;
                 for (AbstractHttpContextInjectable i : is) {
-                    params[index++] = i.getValue(context);                        
+                    params[index++] = i.getValue(context);
                 }
-                
+
                 return m.invoke(resource, params);
             }
         } catch (InvocationTargetException e) {

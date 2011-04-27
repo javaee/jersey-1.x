@@ -40,28 +40,30 @@
 
 package com.sun.jersey.server.impl.uri.rules;
 
-import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.server.impl.model.method.ResourceMethod;
-import com.sun.jersey.api.Responses;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.impl.application.WebApplicationContext;
+import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.sun.jersey.spi.monitoring.MonitoringProvider;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 
 /**
  * The rule for accepting an HTTP method.
@@ -78,9 +80,11 @@ public final class HttpMethodRule implements UriRule {
 
     private final boolean isSubResource;
 
+    private final MonitoringProvider monitoringProvider;
+
     public HttpMethodRule(
-            Map<String, List<ResourceMethod>> methods) {
-        this(methods, false);
+            Map<String, List<ResourceMethod>> methods, MonitoringProvider monitoringProvider) {
+        this(methods, false, monitoringProvider);
     }
 
     private static final class ResourceMethodListPair {
@@ -150,14 +154,16 @@ public final class HttpMethodRule implements UriRule {
 
     public HttpMethodRule(
             Map<String, List<ResourceMethod>> methods,
-            boolean isSubResource) {
+            boolean isSubResource,
+            MonitoringProvider monitoringProvider) {
         this.map = new HashMap<String, ResourceMethodListPair>();
         for (Map.Entry<String, List<ResourceMethod>> e : methods.entrySet()) {
-           this.map.put(e.getKey(), new ResourceMethodListPair(e.getValue()));
+            this.map.put(e.getKey(), new ResourceMethodListPair(e.getValue()));
         }
 
         this.isSubResource = isSubResource;
         this.allow = getAllow(methods);
+        this.monitoringProvider = monitoringProvider;
     }
 
     private String getAllow(Map<String, List<ResourceMethod>> methods) {
@@ -175,7 +181,7 @@ public final class HttpMethodRule implements UriRule {
     public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
         UriRuleProbeProvider.ruleAccept(HttpMethodRule.class.getSimpleName(), path,
                 resource);
-        
+
         // If the path is not empty then do not accept
         if (path.length() > 0) return false;
 
@@ -185,7 +191,7 @@ public final class HttpMethodRule implements UriRule {
         if (request.getMethod().equals(WebApplicationContext.HTTP_METHOD_MATCH_RESOURCE)) {
             return true;
         }
-        
+
         if (context.isTracingEnabled()) {
             final String currentPath = context.getUriInfo().getMatchedURIs().get(0);
             if (isSubResource) {
@@ -204,7 +210,7 @@ public final class HttpMethodRule implements UriRule {
         }
 
         final HttpResponseContext response = context.getResponse();
-        
+
         // Get the list of resource methods for the HTTP method
         ResourceMethodListPair methods = map.get(request.getMethod());
         if (methods == null) {
@@ -274,9 +280,11 @@ public final class HttpMethodRule implements UriRule {
             }
 
             context.pushMethod(method.getAbstractResourceMethod());
-            
+
             // Dispatch to the resource method
             try {
+                monitoringProvider.requestResourceMethodPreDispatch(Thread.currentThread().getId(), method.getAbstractResourceMethod());
+
                 method.getDispatcher().dispatch(resource, context);
             } catch (RuntimeException e) {
                 if (m.rmSelected.isProducesDeclared() &&
@@ -299,7 +307,7 @@ public final class HttpMethodRule implements UriRule {
                     !m.mSelected.isWildcardSubtype()) {
                 response.getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, m.mSelected);
             }
-            
+
             return true;
         } else if (s == MatchStatus.NO_MATCH_FOR_CONSUME) {
             response.setResponse(Responses.unsupportedMediaType().build());

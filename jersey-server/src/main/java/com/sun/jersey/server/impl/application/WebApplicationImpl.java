@@ -111,6 +111,8 @@ import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.inject.ServerSide;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.sun.jersey.spi.monitoring.MonitoringProvider;
+import com.sun.jersey.spi.monitoring.MonitoringProviderFactory;
 import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
@@ -153,13 +155,13 @@ import java.util.logging.Logger;
 /**
  * A Web application that contains a set of resources, each referenced by 
  * an absolute URI template.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class WebApplicationImpl implements WebApplication {
 
     private static final Logger LOGGER = Logger.getLogger(WebApplicationImpl.class.getName());
-    
+
     private final Map<Class, AbstractResource> abstractResourceMap =
             new HashMap<Class, AbstractResource>();
 
@@ -210,15 +212,15 @@ public final class WebApplicationImpl implements WebApplication {
             new ConcurrentHashMap<ClassAnnotationKey, ResourceComponentProvider>();
 
     private final ThreadLocalHttpContext context;
-    
+
     private final CloseableServiceFactory closeableFactory;
 
     private boolean initiated;
-    
+
     private ResourceConfig resourceConfig;
-    
+
     private RootResourceClassesRule rootsRule;
-    
+
     private ServerInjectableProviderFactory injectableFactory;
 
     private ProviderFactory cpFactory;
@@ -230,17 +232,17 @@ public final class WebApplicationImpl implements WebApplication {
     private List<IoCComponentProviderFactory> providerFactories;
 
     private Providers providers;
-    
+
     private MessageBodyFactory bodyFactory;
 
     private StringReaderFactory stringReaderFactory;
-    
+
     private TemplateContext templateContext;
-    
+
     private ExceptionMapperFactory exceptionFactory;
-    
+
     private ResourceMethodDispatchProvider dispatcherFactory;
-    
+
     private ResourceContext resourceContext;
 
     private FilterFactory filterFactory;
@@ -249,11 +251,13 @@ public final class WebApplicationImpl implements WebApplication {
 
     private boolean isTraceEnabled;
 
+    private MonitoringProvider monitoringProvider;
+
     public WebApplicationImpl() {
         this.context = new ThreadLocalHttpContext();
 
         InvocationHandler requestHandler = new InvocationHandler() {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {                
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                 try {
                     return method.invoke(context.getRequest(), args);
                 } catch (IllegalAccessException ex) {
@@ -274,14 +278,14 @@ public final class WebApplicationImpl implements WebApplication {
                 }
             }
         };
-        
+
         // Create injectable provider factory
         this.injectableFactory = new ServerInjectableProviderFactory();
         injectableFactory.add(new ContextInjectableProvider<InjectableProviderContext>(
                 InjectableProviderContext.class, injectableFactory));
         injectableFactory.add(new ContextInjectableProvider<ServerInjectableProviderContext>(
                 ServerInjectableProviderContext.class, injectableFactory));
-        
+
         // Add proxied injectables
         final Map<Type, Object> m = new HashMap<Type, Object>();
         m.put(HttpContext.class, context);
@@ -289,12 +293,12 @@ public final class WebApplicationImpl implements WebApplication {
         m.put(UriInfo.class, createProxy(UriInfo.class, uriInfoHandler));
         m.put(ExtendedUriInfo.class, createProxy(ExtendedUriInfo.class, uriInfoHandler));
         m.put(Request.class, createProxy(Request.class, requestHandler));
-        m.put(SecurityContext.class, createProxy(SecurityContext.class, requestHandler));        
+        m.put(SecurityContext.class, createProxy(SecurityContext.class, requestHandler));
         injectableFactory.add(new InjectableProvider<Context, Type>() {
             public ComponentScope getScope() {
                 return ComponentScope.Singleton;
             }
-            
+
             public Injectable getInjectable(ComponentContext ic, Context a, Type c) {
                 final Object o = m.get(c);
                 if (o != null) {
@@ -419,7 +423,7 @@ public final class WebApplicationImpl implements WebApplication {
             rci.inject(context.get(), o);
         }
     }
-    
+
     private static final IoCComponentProcessor NULL_COMPONENT_PROCESSOR = new IoCComponentProcessor() {
         public void preConstruct() {
         }
@@ -435,7 +439,7 @@ public final class WebApplicationImpl implements WebApplication {
         public ComponentScope getScope(Class c) {
             return rcpFactory.getScope(c);
         }
-        
+
         public IoCComponentProcessor get(final Class c, final ComponentScope scope) {
             IoCComponentProcessor cp = componentProcessorMap.get(c);
             if (cp != null) {
@@ -451,7 +455,7 @@ public final class WebApplicationImpl implements WebApplication {
                 final ResourceComponentInjector rci = Errors.processWithErrors(new Errors.Closure<ResourceComponentInjector>() {
                     public ResourceComponentInjector f() {
                         return new ResourceComponentInjector(
-                        injectableFactory, scope, getAbstractResource(c));
+                                injectableFactory, scope, getAbstractResource(c));
                     }
                 });
 
@@ -466,7 +470,7 @@ public final class WebApplicationImpl implements WebApplication {
             return cp;
         }
     }
- 
+
     @Override
     public FeaturesAndProperties getFeaturesAndProperties() {
         return resourceConfig;
@@ -564,7 +568,7 @@ public final class WebApplicationImpl implements WebApplication {
                     return getResourceComponentProvider(c);
             }
         }
-        
+
         final ClassAnnotationKey cak = new ClassAnnotationKey(c,
                 cc.getAnnotations());
 
@@ -635,7 +639,7 @@ public final class WebApplicationImpl implements WebApplication {
 
     private ResourceUriRules newResourceUriRules(final AbstractResource ar) {
         assert null != ar;
-        
+
         BasicValidator validator = new BasicValidator();
         validator.validate(ar);
         for (ResourceModelIssue issue : validator.getIssueList()) {
@@ -647,6 +651,7 @@ public final class WebApplicationImpl implements WebApplication {
                 injectableFactory,
                 filterFactory,
                 wadlFactory,
+                monitoringProvider,
                 ar);
     }
 
@@ -654,10 +659,15 @@ public final class WebApplicationImpl implements WebApplication {
         return dispatcherFactory;
     }
 
+    @Override
+    public MonitoringProvider getMonitoringProvider() {
+        return monitoringProvider;
+    }
+
     /* package */ AbstractResource getAbstractResource(Object o) {
         return getAbstractResource(o.getClass());
     }
-    
+
     /* package */ AbstractResource getAbstractResource(Class c) {
         AbstractResource ar = abstractResourceMap.get(c);
         if (ar == null) {
@@ -684,7 +694,7 @@ public final class WebApplicationImpl implements WebApplication {
     public void initiate(ResourceConfig resourceConfig) {
         initiate(resourceConfig, null);
     }
-    
+
     @Override
     public void initiate(final ResourceConfig rc, final IoCComponentProviderFactory _provider) {
         Errors.processWithErrors(new Errors.Closure<Void>() {
@@ -716,7 +726,7 @@ public final class WebApplicationImpl implements WebApplication {
                 StringBuilder b = new StringBuilder();
                 b.append("Adding the following classes declared in META-INF/services/jersey-server-components to the resource configuration:");
                 for (Class c : components)
-                        b.append('\n').append("  ").append(c);
+                    b.append('\n').append("  ").append(c);
                 LOGGER.log(Level.INFO, b.toString());
             }
 
@@ -760,7 +770,7 @@ public final class WebApplicationImpl implements WebApplication {
             }
 
         }
-         
+
         this.resourceContext = new ResourceContext() {
             public ExtendedUriInfo matchUriInfo(URI u) throws ContainerException {
                 try {
@@ -804,7 +814,7 @@ public final class WebApplicationImpl implements WebApplication {
         // Add injectable provider for @ParentRef
 
         injectableFactory.add(
-            new InjectableProvider<ParentRef, Type>() {
+                new InjectableProvider<ParentRef, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.PerRequest;
                     }
@@ -827,7 +837,7 @@ public final class WebApplicationImpl implements WebApplication {
                                 } catch (ClassCastException ex) {
                                     throw new ContainerException(
                                             "The parent resource is expected to be of class " + inject.getName() +
-                                            " but is of class " + parent.getClass().getName(),
+                                                    " but is of class " + parent.getClass().getName(),
                                             ex);
                                 }
                             }
@@ -850,7 +860,7 @@ public final class WebApplicationImpl implements WebApplication {
         // Add injectable provider for @Inject
 
         injectableFactory.add(
-            new InjectableProvider<Inject, Type>() {
+                new InjectableProvider<Inject, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.PerRequest;
                     }
@@ -871,7 +881,7 @@ public final class WebApplicationImpl implements WebApplication {
                 });
 
         injectableFactory.add(
-            new InjectableProvider<Inject, Type>() {
+                new InjectableProvider<Inject, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.Undefined;
                     }
@@ -883,7 +893,7 @@ public final class WebApplicationImpl implements WebApplication {
                         final ResourceComponentProvider rcp = getResourceComponentProvider(cc, (Class)t);
                         if (rcp.getScope() == ComponentScope.PerRequest)
                             return null;
-                        
+
                         return new Injectable<Object>() {
                             public Object getValue() {
                                 return rcp.getInstance(context);
@@ -894,7 +904,7 @@ public final class WebApplicationImpl implements WebApplication {
                 });
 
         injectableFactory.add(
-            new InjectableProvider<Inject, Type>() {
+                new InjectableProvider<Inject, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.Singleton;
                     }
@@ -915,11 +925,11 @@ public final class WebApplicationImpl implements WebApplication {
                     }
 
                 });
-        
+
         // Add injectable provider for @ResourceRef
 
         injectableFactory.add(
-            new InjectableProvider<InjectParam, Type>() {
+                new InjectableProvider<InjectParam, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.PerRequest;
                     }
@@ -940,7 +950,7 @@ public final class WebApplicationImpl implements WebApplication {
                 });
 
         injectableFactory.add(
-            new InjectableProvider<InjectParam, Type>() {
+                new InjectableProvider<InjectParam, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.Undefined;
                     }
@@ -963,7 +973,7 @@ public final class WebApplicationImpl implements WebApplication {
                 });
 
         injectableFactory.add(
-            new InjectableProvider<InjectParam, Type>() {
+                new InjectableProvider<InjectParam, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.Singleton;
                     }
@@ -993,7 +1003,7 @@ public final class WebApplicationImpl implements WebApplication {
         // Since the resourceConfig reference can change refer to the
         // reference directly.
         injectableFactory.add(
-            new InjectableProvider<Context, Type>() {
+                new InjectableProvider<Context, Type>() {
                     public ComponentScope getScope() {
                         return ComponentScope.Singleton;
                     }
@@ -1012,7 +1022,7 @@ public final class WebApplicationImpl implements WebApplication {
         // Allow injection of resource context
         injectableFactory.add(new ContextInjectableProvider<ResourceContext>(
                 ResourceContext.class, resourceContext));
-        
+
         // Configure the injectable factory with declared providers
         injectableFactory.configure(providerServices);
 
@@ -1050,7 +1060,7 @@ public final class WebApplicationImpl implements WebApplication {
             providerServices.update(resourceConfig.getProviderClasses(),
                     resourceConfig.getProviderSingletons(), injectableFactory);
         }
-            
+
         // Obtain all the templates
         this.templateContext = new TemplateFactory(providerServices);
         // Allow injection of template context
@@ -1068,23 +1078,23 @@ public final class WebApplicationImpl implements WebApplication {
                 getFeaturesAndProperties().getFeature(FeaturesAndProperties.FEATURE_PRE_1_4_PROVIDER_PRECEDENCE));
         injectableFactory.add(
                 new ContextInjectableProvider<MessageBodyWorkers>(
-                MessageBodyWorkers.class, bodyFactory));
-        
+                        MessageBodyWorkers.class, bodyFactory));
+
         // Injection of Providers
         this.providers = new Providers() {
-            public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t, 
-                    Annotation[] as, MediaType m) {
+            public <T> MessageBodyReader<T> getMessageBodyReader(Class<T> c, Type t,
+                                                                 Annotation[] as, MediaType m) {
                 return bodyFactory.getMessageBodyReader(c, t, as, m);
             }
 
-            public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> c, Type t, 
-                    Annotation[] as, MediaType m) {
+            public <T> MessageBodyWriter<T> getMessageBodyWriter(Class<T> c, Type t,
+                                                                 Annotation[] as, MediaType m) {
                 return bodyFactory.getMessageBodyWriter(c, t, as, m);
             }
 
             public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> c) {
-                if (Throwable.class.isAssignableFrom(c)) 
-                   return exceptionFactory.find(c);
+                if (Throwable.class.isAssignableFrom(c))
+                    return exceptionFactory.find(c);
                 else
                     return null;
             }
@@ -1095,20 +1105,20 @@ public final class WebApplicationImpl implements WebApplication {
         };
         injectableFactory.add(
                 new ContextInjectableProvider<Providers>(
-                Providers.class, providers));
-        
+                        Providers.class, providers));
+
         // Obtain all String readers
         this.stringReaderFactory = new StringReaderFactory();
         injectableFactory.add(
                 new ContextInjectableProvider<StringReaderWorkers>(
-                StringReaderWorkers.class, stringReaderFactory));
+                        StringReaderWorkers.class, stringReaderFactory));
 
         MultivaluedParameterExtractorProvider mpep =
                 new MultivaluedParameterExtractorFactory(stringReaderFactory);
         // Add the multi-valued parameter extractor provider
         injectableFactory.add(
                 new ContextInjectableProvider<MultivaluedParameterExtractorProvider>(
-                MultivaluedParameterExtractorProvider.class, mpep));
+                        MultivaluedParameterExtractorProvider.class, mpep));
 
         // Add per-request-based injectable providers
         injectableFactory.add(new CookieParamInjectableProvider(mpep));
@@ -1125,9 +1135,12 @@ public final class WebApplicationImpl implements WebApplication {
         // Initiate resource method dispatchers
         dispatcherFactory = ResourceMethodDispatcherFactory.create(providerServices);
 
+        // Initiate monitoring provider
+        monitoringProvider = MonitoringProviderFactory.create(providerServices);
+
         // Initiate the WADL factory
         this.wadlFactory = new WadlFactory(resourceConfig);
-        
+
         // Initiate filter
         filterFactory.init(resourceConfig);
         if (!resourceConfig.getMediaTypeMappings().isEmpty() ||
@@ -1148,7 +1161,7 @@ public final class WebApplicationImpl implements WebApplication {
                         "present in the list of request filters.");
             }
         }
-        
+
         // Initiate context resolvers
         crf.init(providerServices, injectableFactory);
 
@@ -1173,7 +1186,7 @@ public final class WebApplicationImpl implements WebApplication {
                 listener.onWebApplicationReady();
             }
         }
-                
+
         // Obtain all root resource rules
         RulesMap<UriRule> rootRules = new RootResourceUriRules(this,
                 resourceConfig, wadlFactory, injectableFactory).getRules();
@@ -1202,9 +1215,9 @@ public final class WebApplicationImpl implements WebApplication {
     public ServerInjectableProviderFactory getServerInjectableProviderFactory() {
         return injectableFactory;
     }
-        
+
     @Override
-    public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
+    public void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter)
             throws IOException {
         final ContainerResponse response = new ContainerResponse(
                 this,
@@ -1212,7 +1225,7 @@ public final class WebApplicationImpl implements WebApplication {
                 responseWriter);
         handleRequest(request, response);
     }
-    
+
     @Override
     public void handleRequest(ContainerRequest request, ContainerResponse response) throws IOException {
         final WebApplicationContext localContext = new
@@ -1268,7 +1281,7 @@ public final class WebApplicationImpl implements WebApplication {
     }
 
     private void _handleRequest(final WebApplicationContext localContext,
-            ContainerRequest request, ContainerResponse response) throws IOException {
+                                ContainerRequest request, ContainerResponse response) throws IOException {
         try {
             _handleRequest(localContext, request);
         } catch (WebApplicationException e) {
@@ -1321,7 +1334,7 @@ public final class WebApplicationImpl implements WebApplication {
     }
 
     private void _handleRequest(final WebApplicationContext localContext,
-            ContainerRequest request) {
+                                ContainerRequest request) {
         for (ContainerRequestFilter f : filterFactory.getRequestFilters()) {
             request = f.filter(request);
             localContext.setContainerRequest(request);

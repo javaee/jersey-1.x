@@ -39,17 +39,17 @@
  */
 package com.sun.jersey.api.model;
 
+import javax.ws.rs.core.MediaType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.core.MediaType;
 
 /**
  * Abstraction for a resource method
  */
-public class AbstractResourceMethod extends AbstractMethod 
+public class AbstractResourceMethod extends AbstractMethod
         implements Parameterized, AbstractModelComponent {
     private String httpMethod;
     private List<MediaType> consumeMimeList;
@@ -127,22 +127,25 @@ public class AbstractResourceMethod extends AbstractMethod
         }
         return false;
     }
-    
+
+    @Override
     public List<Parameter> getParameters() {
         return parameters;
     }
 
+    @Override
     public void accept(AbstractModelVisitor visitor) {
         visitor.visitAbstractResourceMethod(this);
     }
-    
+
+    @Override
     public List<AbstractModelComponent> getComponents() {
         return null;
     }
 
     @Override
     public String toString() {
-        return "AbstractResourceMethod(" 
+        return "AbstractResourceMethod("
                 + getMethod().getDeclaringClass().getSimpleName() + "#" + getMethod().getName() + ")";
     }
 

@@ -72,6 +72,7 @@ import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import com.sun.jersey.spi.monitoring.MonitoringProvider;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
@@ -107,7 +108,7 @@ import java.util.logging.Logger;
 /**
  * An abstract Web component that may be extended a Servlet and/or
  * Filter implementation, or encapsulated by a Servlet or Filter implementation.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class WebComponent implements ContainerListener {
@@ -130,24 +131,24 @@ public class WebComponent implements ContainerListener {
     /**
      * The base path in the Web Pages where JSP templates, associated with
      * viewables of resource classes, are located.
-     * <p>
+     * <p/>
      * If this property is not set then the base path will be the root path
      * of the Web Pages.
      */
     public static final String JSP_TEMPLATES_BASE_PATH =
             "com.sun.jersey.config.property.JSPTemplatesBasePath";
 
-    
+
     private static final Logger LOGGER =
             Logger.getLogger(WebComponent.class.getName());
-    
+
     private final ThreadLocalInvoker<HttpServletRequest> requestInvoker =
             new ThreadLocalInvoker<HttpServletRequest>();
 
     private final ThreadLocalInvoker<HttpServletResponse> responseInvoker =
             new ThreadLocalInvoker<HttpServletResponse>();
 
-    
+
     private WebConfig config;
 
     private ResourceConfig resourceConfig;
@@ -162,9 +163,9 @@ public class WebComponent implements ContainerListener {
     public WebComponent(Application app) {
         if (app == null)
             throw new IllegalArgumentException();
-        
+
         if (app instanceof ResourceConfig) {
-            resourceConfig = (ResourceConfig)app;
+            resourceConfig = (ResourceConfig) app;
         } else {
             resourceConfig = new ApplicationAdapter(app);
         }
@@ -190,7 +191,7 @@ public class WebComponent implements ContainerListener {
 
     /**
      * Initiate the Web component.
-     * 
+     *
      * @param webConfig the Web configuration.
      * @throws javax.servlet.ServletException in case of any initialization error
      */
@@ -225,14 +226,14 @@ public class WebComponent implements ContainerListener {
 
     /**
      * Destroy this Web component.
-     * <p>
+     * <p/>
      * This will destroy the Web application created by this this Web component.
      */
     public void destroy() {
         if (application != null)
             application.destroy();
     }
-    
+
     private final static class Writer extends OutputStream implements ContainerResponseWriter {
         final HttpServletResponse response;
 
@@ -252,7 +253,7 @@ public class WebComponent implements ContainerListener {
         }
 
         public OutputStream writeStatusAndHeaders(long contentLength,
-                ContainerResponse cResponse) throws IOException {
+                                                  ContainerResponse cResponse) throws IOException {
             this.contentLength = contentLength;
             this.cResponse = cResponse;
             this.statusAndHeadersWritten = false;
@@ -337,7 +338,7 @@ public class WebComponent implements ContainerListener {
 
         void writeHeaders() {
             if (contentLength != -1 && contentLength < Integer.MAX_VALUE)
-                response.setContentLength((int)contentLength);
+                response.setContentLength((int) contentLength);
 
             MultivaluedMap<String, Object> headers = cResponse.getHttpHeaders();
             for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
@@ -351,24 +352,24 @@ public class WebComponent implements ContainerListener {
     /**
      * Dispatch client requests to a resource class.
      *
-     * @param baseUri the base URI of the request.
+     * @param baseUri    the base URI of the request.
      * @param requestUri the URI of the request.
-     * @param request the {@link HttpServletRequest} object that
-     *        contains the request the client made to
-     *	      the Web component.
-     * @param response the {@link HttpServletResponse} object that
-     *        contains the response the Web component returns
-     *        to the client.
+     * @param request    the {@link HttpServletRequest} object that
+     *                   contains the request the client made to
+     *                   the Web component.
+     * @param response   the {@link HttpServletResponse} object that
+     *                   contains the response the Web component returns
+     *                   to the client.
      * @return the status code of the response.
-     * @exception IOException if an input or output error occurs
-     *            while the Web component is handling the
-     *            HTTP request.
-     * @exception ServletException if the HTTP request cannot
-     *            be handled.
+     * @throws IOException      if an input or output error occurs
+     *                          while the Web component is handling the
+     *                          HTTP request.
+     * @throws ServletException if the HTTP request cannot
+     *                          be handled.
      */
     public int service(URI baseUri, URI requestUri,
-            final HttpServletRequest request,
-            final HttpServletResponse response)
+                       final HttpServletRequest request,
+                       final HttpServletResponse response)
             throws ServletException, IOException {
         // Copy the application field to local instance to ensure that the
         // currently loaded web application is used to process
@@ -380,7 +381,7 @@ public class WebComponent implements ContainerListener {
                 request,
                 baseUri,
                 requestUri);
-        
+
         cRequest.setSecurityContext(new SecurityContext() {
             public Principal getUserPrincipal() {
                 return request.getUserPrincipal();
@@ -404,43 +405,52 @@ public class WebComponent implements ContainerListener {
         // This can happen if a filter calls request.getParameter(...)
         filterFormParameters(request, cRequest);
 
+        final MonitoringProvider monitoringProvider = _application.getMonitoringProvider();
+
         try {
             UriRuleProbeProvider.requestStart(requestUri);
+
+            monitoringProvider.requestStart(Thread.currentThread().getId(), request);
 
             requestInvoker.set(request);
             responseInvoker.set(response);
 
             final Writer w = new Writer(useSetStatusOn404, response);
             _application.handleRequest(cRequest, w);
+            monitoringProvider.requestEnd(Thread.currentThread().getId(), response);
             return w.cResponse.getStatus();
         } catch (MappableContainerException ex) {
             traceOnException(cRequest, response);
             throw new ServletException(ex.getCause());
         } catch (ContainerException ex) {
             traceOnException(cRequest, response);
+            monitoringProvider.error(Thread.currentThread().getId(), ex);
             throw new ServletException(ex);
         } catch (RuntimeException ex) {
             traceOnException(cRequest, response);
+            monitoringProvider.error(Thread.currentThread().getId(), ex);
             throw ex;
         } finally {
             UriRuleProbeProvider.requestEnd();
+            monitoringProvider.requestEnd(Thread.currentThread().getId(), response);
 
             requestInvoker.set(null);
-            responseInvoker.set(null);            
+            responseInvoker.set(null);
         }
     }
 
     /**
      * Extension point for creating your custom container request.
-     * @param app			the web app
-     * @param request		the current servlet api request
-     * @param baseUri		the base uri
-     * @param requestUri		the request uri
-     * @return				the request container
-     * @throws IOException	if any error occurs when getting the input stream
+     *
+     * @param app        the web app
+     * @param request    the current servlet api request
+     * @param baseUri    the base uri
+     * @param requestUri the request uri
+     * @return the request container
+     * @throws IOException if any error occurs when getting the input stream
      */
     protected ContainerRequest createRequest(WebApplication app,
-			HttpServletRequest request, URI baseUri, URI requestUri) throws IOException {
+                                             HttpServletRequest request, URI baseUri, URI requestUri) throws IOException {
         return new ContainerRequest(
                 app,
                 request.getMethod(),
@@ -452,7 +462,7 @@ public class WebComponent implements ContainerListener {
 
     private void traceOnException(final ContainerRequest cRequest, final HttpServletResponse response) {
         if (cRequest.isTracingEnabled()) {
-            final TraceInformation ti = (TraceInformation)cRequest.getProperties().
+            final TraceInformation ti = (TraceInformation) cRequest.getProperties().
                     get(TraceInformation.class.getName());
 
             ti.addTraceHeaders(new TraceInformation.TraceHeaderListener() {
@@ -462,7 +472,7 @@ public class WebComponent implements ContainerListener {
             });
         }
     }
-    
+
     /**
      * Create a new instance of a {@link WebApplication}.
      *
@@ -475,7 +485,7 @@ public class WebComponent implements ContainerListener {
     /**
      * A helper class for creating an injectable provider that supports
      * {@link Context} with a type and constant value.
-     * 
+     *
      * @param <T> the type of the constant value.
      */
     protected static class ContextInjectableProvider<T> extends
@@ -483,8 +493,8 @@ public class WebComponent implements ContainerListener {
 
         /**
          * Create a new instance.
-         * 
-         * @param type the type of the constant value.
+         *
+         * @param type     the type of the constant value.
          * @param instance the constant value.
          */
         protected ContextInjectableProvider(Type type, T instance) {
@@ -494,28 +504,28 @@ public class WebComponent implements ContainerListener {
 
     /**
      * Configure the {@link ResourceConfig}.
-     * <p>
+     * <p/>
      * The {@link ResourceConfig} is configured such that the following classes
      * may be injected onto the field of a root resource class or a parameter
      * of a method of root resource class that is annotated with
      * {@link javax.ws.rs.core.Context}: {@link HttpServletRequest}, {@link HttpServletResponse}
      * , {@link ServletContext} and {@link WebConfig}.
-     * <p>
+     * <p/>
      * Any root resource class in registered in the resource configuration
      * that is an interface is processed as follows.
      * If the class is an interface and there exists a JNDI named object
      * with the fully qualified class name as the JNDI name then that named
      * object is added as a singleton root resource and the class is removed
      * from the set of root resource classes.
-     * <p>
+     * <p/>
      * An inheriting class may override this method to configure the
      * {@link ResourceConfig} to provide alternative or additional instances
      * that are resource or provider classes or instances, and may modify the
      * features and properties of the {@link ResourceConfig}. For an inheriting
      * class to extend configuration behaviour the overriding method MUST call
-     * <code>super.configure(servletConfig, rc, wa)</code> as the first statement 
+     * <code>super.configure(servletConfig, rc, wa)</code> as the first statement
      * of that method.
-     * <p>
+     * <p/>
      * This method will be called only once at initiation. Subsequent
      * reloads of the Web application will not result in subsequence calls to
      * this method.
@@ -526,28 +536,30 @@ public class WebComponent implements ContainerListener {
      */
     protected void configure(WebConfig wc, ResourceConfig rc, WebApplication wa) {
         configureJndiResources(rc);
-        
+
         rc.getSingletons().add(new ContextInjectableProvider<HttpServletRequest>(
                 HttpServletRequest.class,
-                (HttpServletRequest)Proxy.newProxyInstance(
+                (HttpServletRequest) Proxy.newProxyInstance(
                         this.getClass().getClassLoader(),
-                        new Class[] { HttpServletRequest.class },
+                        new Class[]{HttpServletRequest.class},
                         requestInvoker)));
 
         rc.getSingletons().add(new ContextInjectableProvider<HttpServletResponse>(
                 HttpServletResponse.class,
-                (HttpServletResponse)Proxy.newProxyInstance(
+                (HttpServletResponse) Proxy.newProxyInstance(
                         this.getClass().getClassLoader(),
-                        new Class[] { HttpServletResponse.class },
+                        new Class[]{HttpServletResponse.class},
                         responseInvoker)));
 
         GenericEntity<ThreadLocal<HttpServletRequest>> requestThreadLocal =
-                new GenericEntity<ThreadLocal<HttpServletRequest>>(requestInvoker.getImmutableThreadLocal()) {};
+                new GenericEntity<ThreadLocal<HttpServletRequest>>(requestInvoker.getImmutableThreadLocal()) {
+                };
         rc.getSingletons().add(new ContextInjectableProvider<ThreadLocal<HttpServletRequest>>(
                 requestThreadLocal.getType(), requestThreadLocal.getEntity()));
 
         GenericEntity<ThreadLocal<HttpServletResponse>> responseThreadLocal =
-                new GenericEntity<ThreadLocal<HttpServletResponse>>(responseInvoker.getImmutableThreadLocal()) {};
+                new GenericEntity<ThreadLocal<HttpServletResponse>>(responseInvoker.getImmutableThreadLocal()) {
+                };
         rc.getSingletons().add(new ContextInjectableProvider<ThreadLocal<HttpServletResponse>>(
                 responseThreadLocal.getType(), responseThreadLocal.getEntity()));
 
@@ -570,16 +582,16 @@ public class WebComponent implements ContainerListener {
         // TODO
         // If CDI is enabled then no need to initialize managed beans
         ManagedBeanComponentProviderFactoryInitilizer.initialize(rc);
-        
+
         GlassFishMonitoringInitializer.initialize();
     }
 
     /**
      * Initiate the {@link WebApplication}.
-     * <p>
+     * <p/>
      * This method will be called once at initiation and for
      * each reload of the Web application.
-     * <p>
+     * <p/>
      * An inheriting class may override this method to initiate the
      * Web application with different parameters.
      *
@@ -589,8 +601,8 @@ public class WebComponent implements ContainerListener {
     protected void initiate(ResourceConfig rc, WebApplication wa) {
         wa.initiate(rc);
     }
-    
-    
+
+
     /**
      * Load the Web application. This will create, configure and initiate
      * the web application.
@@ -605,40 +617,40 @@ public class WebComponent implements ContainerListener {
     /**
      * Get the default resource configuration if one is not declared in the
      * web.xml.
-     * <p>
+     * <p/>
      * This implementation returns an instance of {@link WebAppResourceConfig}
      * that scans in files and directories as declared by the
      * {@link ClasspathResourceConfig#PROPERTY_CLASSPATH} if present, otherwise
      * in the "WEB-INF/lib" and "WEB-INF/classes" directories.
-     * <p>
+     * <p/>
      * An inheriting class may override this method to supply a different
      * default resource configuration implementation.
      *
      * @param props the properties to pass to the resource configuration.
-     * @param wc the web configuration.
+     * @param wc    the web configuration.
      * @return the default resource configuration.
-     *
      * @throws javax.servlet.ServletException in case of any issues with providing \
-     *         the default resource configuration
+     *                                        the default resource configuration
      */
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
-            WebConfig wc) throws ServletException  {
+                                                      WebConfig wc) throws ServletException {
         return getWebAppResourceConfig(props, wc);
     }
 
-    
+
     // ContainerListener
+
     /**
      * Reload the Web application. This will create and initiate the web
      * application using the same {@link ResourceConfig} implementation
      * that was used to load the Web application.
-     * <p>
+     * <p/>
      * This method may be called at runtime, more than once, to reload the
      * Web application. For example, if a {@link ResourceConfig} implementation
      * is capable of detecting changes to resource classes (addition or removal)
      * or providers then this method may be invoked to reload the web
      * application for such changes to take effect.
-     * <p>
+     * <p/>
      * If this method is called when there are pending requests then such
      * requests will be processed using the previously loaded web application.
      */
@@ -648,18 +660,18 @@ public class WebComponent implements ContainerListener {
         initiate(resourceConfig, newApplication);
         application = newApplication;
 
-        if(resourceConfig instanceof ReloadListener)
+        if (resourceConfig instanceof ReloadListener)
             ((ReloadListener) resourceConfig).onReload();
 
         oldApplication.destroy();
-        
+
     }
 
 
     //
-    
+
     /* package */ ResourceConfig getWebAppResourceConfig(Map<String, Object> props,
-            WebConfig webConfig) throws ServletException  {
+                                                         WebConfig webConfig) throws ServletException {
         // Default to using Web app resource config
         return new WebAppResourceConfig(props, webConfig.getServletContext());
     }
@@ -695,7 +707,7 @@ public class WebComponent implements ContainerListener {
             ResourceConfig defaultConfig = webConfig.getDefaultResourceConfig(props);
             if (defaultConfig != null)
                 return defaultConfig;
-            
+
             return getDefaultResourceConfig(props, webConfig);
         }
 
@@ -717,7 +729,7 @@ public class WebComponent implements ContainerListener {
                                 ClasspathResourceConfig.PROPERTY_CLASSPATH));
                         props.put(ClasspathResourceConfig.PROPERTY_CLASSPATH, paths);
                     }
-                    return (ResourceConfig)constructor.newInstance(props);
+                    return (ResourceConfig) constructor.newInstance(props);
                 } catch (NoSuchMethodException ex) {
                     // Pass through and try the default constructor
                 } catch (Exception e) {
@@ -742,8 +754,8 @@ public class WebComponent implements ContainerListener {
     private Map<String, Object> getInitParams(WebConfig webConfig) {
         Map<String, Object> props = new HashMap<String, Object>();
         Enumeration names = webConfig.getInitParameterNames();
-        while(names.hasMoreElements()) {
-            String name = (String)names.nextElement();
+        while (names.hasMoreElements()) {
+            String name = (String) names.nextElement();
             props.put(name, webConfig.getInitParameter(name));
         }
         return props;
@@ -752,9 +764,9 @@ public class WebComponent implements ContainerListener {
     private String[] getPaths(String classpath) throws ServletException {
         final ServletContext context = config.getServletContext();
         if (classpath == null) {
-            String[] paths =  {
-                context.getRealPath("/WEB-INF/lib"),
-                context.getRealPath("/WEB-INF/classes")
+            String[] paths = {
+                    context.getRealPath("/WEB-INF/lib"),
+                    context.getRealPath("/WEB-INF/classes")
             };
             if (paths[0] == null && paths[1] == null) {
                 String message = "The default deployment configuration that scans for " +
@@ -808,8 +820,8 @@ public class WebComponent implements ContainerListener {
                         rc.getSingletons().add(o);
                         LOGGER.log(Level.INFO,
                                 "An instance of the class " + c.getName() +
-                                " is found by JNDI look up using the class name as the JNDI name. " +
-                                "The instance will be registered as a singleton.");
+                                        " is found by JNDI look up using the class name as the JNDI name. " +
+                                        "The instance will be registered as a singleton.");
                     }
                 } catch (NamingException ex) {
                     LOGGER.log(Level.CONFIG,
@@ -828,7 +840,7 @@ public class WebComponent implements ContainerListener {
 
             Enumeration e = hsr.getParameterNames();
             while (e.hasMoreElements()) {
-                String name = (String)e.nextElement();
+                String name = (String) e.nextElement();
                 String[] values = hsr.getParameterValues(name);
 
                 f.put(name, Arrays.asList(values));
@@ -838,13 +850,13 @@ public class WebComponent implements ContainerListener {
                 cr.getProperties().put(FormDispatchProvider.FORM_PROPERTY, f);
                 if (LOGGER.isLoggable(Level.WARNING)) {
                     LOGGER.log(Level.WARNING,
-                     "A servlet POST request, to the URI " + cr.getRequestUri() + ", " +
-                     "contains form parameters in " +
-                     "the request body but the request body has been consumed " +
-                     "by the servlet or a servlet filter accessing the request " +
-                     "parameters. Only resource methods using @FormParam " +
-                     "will work as expected. Resource methods consuming the " +
-                     "request body by other means will not work as expected.");
+                            "A servlet POST request, to the URI " + cr.getRequestUri() + ", " +
+                                    "contains form parameters in " +
+                                    "the request body but the request body has been consumed " +
+                                    "by the servlet or a servlet filter accessing the request " +
+                                    "parameters. Only resource methods using @FormParam " +
+                                    "will work as expected. Resource methods consuming the " +
+                                    "request body by other means will not work as expected.");
                 }
             }
         }
@@ -865,14 +877,14 @@ public class WebComponent implements ContainerListener {
             return true;
         }
     }
-    
+
     private InBoundHeaders getHeaders(HttpServletRequest request) {
         InBoundHeaders rh = new InBoundHeaders();
 
-        for (Enumeration<String> names = request.getHeaderNames() ; names.hasMoreElements() ;) {
+        for (Enumeration<String> names = request.getHeaderNames(); names.hasMoreElements();) {
             String name = names.nextElement();
             List<String> valueList = new LinkedList<String>();
-            for (Enumeration<String> values = request.getHeaders(name); values.hasMoreElements() ;) {
+            for (Enumeration<String> values = request.getHeaders(name); values.hasMoreElements();) {
                 valueList.add(values.nextElement());
             }
             rh.put(name, valueList);

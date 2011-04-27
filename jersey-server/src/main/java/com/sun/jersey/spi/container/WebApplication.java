@@ -49,15 +49,17 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
 import com.sun.jersey.spi.MessageBodyWorkers;
-import java.io.IOException;
+import com.sun.jersey.spi.monitoring.MonitoringProvider;
+
 import javax.ws.rs.ext.Providers;
+import java.io.IOException;
 
 /**
  * A Web application that manages a set of resource classes.
  * <p>
  * The web application will dispatch HTTP requests to the matching resource
  * method on the matching resource class.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface WebApplication extends Traceable {
@@ -79,15 +81,15 @@ public interface WebApplication extends Traceable {
      * @throws ContainerException if a second or further call to the method 
      *         is invoked.
      */
-    void initiate(ResourceConfig resourceConfig) 
+    void initiate(ResourceConfig resourceConfig)
             throws IllegalArgumentException, ContainerException;
-    
+
     /**
      * Initiate the Web application.
      * <p>
      * This method can only be called once. Further calls will result in an
      * exception.
-     * 
+     *
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
      * @param provider the IoC component provider factory to use, if null the default
@@ -98,7 +100,7 @@ public interface WebApplication extends Traceable {
      */
     void initiate(ResourceConfig resourceConfig, IoCComponentProviderFactory provider)
             throws IllegalArgumentException, ContainerException;
-    
+
     /**
      * Clone the WebApplication instance.
      * <p>
@@ -112,7 +114,7 @@ public interface WebApplication extends Traceable {
 
     /**
      * Get the features and properties.
-     * 
+     *
      * @return the features and properties.
      */
     FeaturesAndProperties getFeaturesAndProperties();
@@ -124,11 +126,11 @@ public interface WebApplication extends Traceable {
      * @since 1.3
      */
     Providers getProviders();
-    
+
     /**
      * Get the message body workers that can be used for getting
      * message body readers and writers. 
-     * 
+     *
      * @return the message body workers. The return value is 
      *         undefined before the web application is initialized.
      */
@@ -141,11 +143,11 @@ public interface WebApplication extends Traceable {
      * @return the exception mapper context.
      */
     ExceptionMapperContext getExceptionMapperContext();
-    
+
     /**
      * Get an instance of {@link HttpContext} that is a proxy to
      * a thread local instance of {@link HttpContext}.
-     * 
+     *
      * @return the thread local instance of HttpContext.
      */
     HttpContext getThreadLocalHttpContext();
@@ -158,6 +160,14 @@ public interface WebApplication extends Traceable {
     ServerInjectableProviderFactory getServerInjectableProviderFactory();
 
     /**
+     * Get an instance of {@link MonitoringProvider} that should be
+     * used to monitor request processing.
+     *
+     * @return the actual monitoring provider
+     */
+    MonitoringProvider getMonitoringProvider();
+
+    /**
      * Handle an HTTP request by dispatching the request to the appropriate
      * matching Web resource that produces the response or otherwise producing 
      * the appropriate HTTP error response.
@@ -166,9 +176,9 @@ public interface WebApplication extends Traceable {
      * @param responseWriter the HTTP container response writer.
      * @throws IOException if there is an IO error handling the request.
      */
-    void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter) 
+    void handleRequest(ContainerRequest request, ContainerResponseWriter responseWriter)
             throws IOException;
-    
+
     /**
      * Handle an HTTP request by dispatching the request to the appropriate
      * matching Web resource that produces the response or otherwise producing 
@@ -178,7 +188,7 @@ public interface WebApplication extends Traceable {
      * @param response the HTTP container response.
      * @throws IOException if there is an IO error handling the request.
      */
-    void handleRequest(ContainerRequest request, ContainerResponse response) 
+    void handleRequest(ContainerRequest request, ContainerResponse response)
             throws IOException;
 
     /**
