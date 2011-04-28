@@ -49,6 +49,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 
 
 /**
@@ -87,6 +88,8 @@ public class ResourceMethodCustomInvokerTest extends AbstractResourceTester {
     public static class MyDispatchProvider implements
             ResourceMethodDispatchProvider {
 
+        @Context ResourceMethodCustomInvokerDispatchFactory rmcidFactory;
+
         static class MyJavaMethodInvoker implements JavaMethodInvoker {
 
             @Override
@@ -98,7 +101,7 @@ public class ResourceMethodCustomInvokerTest extends AbstractResourceTester {
         @Override
         public RequestDispatcher create(AbstractResourceMethod abstractResourceMethod) {
             if (isTheMethodOurs(abstractResourceMethod)) {
-                return ResourceMethodCustomInvokerDispatchFactory.getDispatcher(abstractResourceMethod, new MyJavaMethodInvoker());
+                return rmcidFactory.getDispatcher(abstractResourceMethod, new MyJavaMethodInvoker());
             }
             return null;
         }
