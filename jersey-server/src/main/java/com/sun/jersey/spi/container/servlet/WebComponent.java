@@ -417,7 +417,6 @@ public class WebComponent implements ContainerListener {
 
             final Writer w = new Writer(useSetStatusOn404, response);
             _application.handleRequest(cRequest, w);
-            monitoringProvider.requestEnd(Thread.currentThread().getId(), response);
             return w.cResponse.getStatus();
         } catch (MappableContainerException ex) {
             traceOnException(cRequest, response);
