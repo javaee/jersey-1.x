@@ -102,6 +102,7 @@ import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.ExceptionMapperContext;
+import com.sun.jersey.spi.container.ResourceMethodCustomInvokerDispatchFactory;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationListener;
 import com.sun.jersey.spi.inject.Errors;
@@ -810,6 +811,9 @@ public final class WebApplicationImpl implements WebApplication {
 
         injectableFactory.add(new ContextInjectableProvider<ProviderServices>(
                 ProviderServices.class, providerServices));
+
+        injectableFactory.add(new ContextInjectableProvider<ResourceMethodCustomInvokerDispatchFactory>(
+                ResourceMethodCustomInvokerDispatchFactory.class, new ResourceMethodCustomInvokerDispatchFactory(providerServices)));
 
         // Add injectable provider for @ParentRef
 
