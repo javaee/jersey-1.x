@@ -282,7 +282,7 @@ public void postClichedMessage(String message) {
 
     <para><example>
 <title>Deployment agnostic application model</title>
-<programlisting language="java" linenumbering="numbered">public class MyApplicaton extends Application {
+<programlisting language="java" linenumbering="numbered">public class MyApplication extends Application {
     public Set&lt;Class&lt;?&gt;&gt; getClasses() {
         Set&lt;Class&lt;?&gt;&gt; s = new HashSet&lt;Class&lt;?&gt;&gt;();
         s.add(HelloWorldResource.class);
@@ -337,7 +337,7 @@ public class MyApplication extends PackagesResourceConfig {
     ...
 &lt;/web-app&gt;</programlisting>
     </example></para>    
-    <para>Note that the <literal>&lt;servlet-class&gt;</literal> element is ommited from the servlet declaration. 
+    <para>Note that the <literal>&lt;servlet-class&gt;</literal> element is omitted from the servlet declaration. 
     This is a correct declaration utilizing the Servlet 3.0 extension mechanism. Also note that 
     <literal>&lt;servlet-mapping&gt;</literal> is used to define the base resource URI.</para>    
     <para>When running in a Servlet 2.x then instead it is necessary to declare the Jersey
