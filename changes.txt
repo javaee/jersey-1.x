@@ -1,13 +1,25 @@
 release 1.7
-- Fixed issue
+- Fixed issue 713
+  http://java.net/jira/browse/JERSEY-713
+  UserGuide docs typo.
+- Fixed issue 712
+  http://java.net/jira/browse/JERSEY-712
+  Document cobertura profile usage in samples
+- Fixed issue 704
   http://java.net/jira/browse/JERSEY-704
   Typo.
+- Fixed issue 696
+  http://java.net/jira/browse/JERSEY-696
+  add missing dependency to pom.xml when sun-web.xml <class-loader delegate="false"/>
 - Fixed issue 694
   http://java.net/jira/browse/JERSEY-694
   Typo.
 - Fixed issue 693
   http://java.net/jira/browse/JERSEY-693
   Javadoc typos.
+- Fixed issue 668
+  http://java.net/jira/browse/JERSEY-668
+  Removed duplicate copy of form.html in simple-console Jersey example
 
 release 1.6 (03-2011)
 - Added support for lists and arrays of JAXBElement<?> objects.
