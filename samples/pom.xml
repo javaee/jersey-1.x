@@ -106,6 +106,7 @@
   </modules>
 
     <profiles>
+        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" --> 
         <profile>
             <id>cobertura</id>
             <activation>
