@@ -44,6 +44,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.impl.AbstractResourceTester;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +52,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 /**
@@ -64,50 +66,64 @@ public class MonitoringProviderTest extends AbstractResourceTester {
     }
 
     @Provider
-    public static class DummyMonitor implements MonitoringProviderAdapter {
+    public static class DummyMonitor implements RequestListenerAdapter, DispatchingListenerAdapter, ResponseListenerAdapter {
 
-        public static class DummyMonitoringProvider implements MonitoringProvider {
+        public static class DummyMonitoringProvider implements RequestListener, ResponseListener, DispatchingListener {
 
             public static int reqStart;
             public static int reqEnd;
             public static int resMethodPreDispatch;
-            public static int subResourcePreDispatch;
             public static int error;
 
-
             @Override
-            public void requestStart(long id, HttpServletRequest request) {
-                reqStart++;
+            public void onSubResource(long id, Class subResource) {
             }
 
             @Override
-            public void requestSubResourcePreDispatch(long id, Class subResource) {
+            public void onSubResourceLocator(long id, AbstractSubResourceLocator locator) {
             }
 
             @Override
-            public void requestResourceMethodPreDispatch(long id, AbstractResourceMethod method) {
+            public void onResourceMethod(long id, AbstractResourceMethod method) {
                 resMethodPreDispatch++;
             }
 
             @Override
-            public void error(long id, Throwable ex) {
+            public void onRequest(long id, HttpServletRequest request) {
+                reqStart++;
+            }
+
+            @Override
+            public void onError(long id, Throwable ex) {
                 error++;
             }
 
             @Override
-            public void requestEnd(long id, HttpServletResponse response) {
+            public void onResponse(long id, HttpServletResponse response) {
                 reqEnd++;
             }
 
+            @Override
+            public void onMappedException(long id, Throwable exception, ExceptionMapper mapper) {
+            }
+        }
 
+        private final DummyMonitoringProvider dummyMonitoringProvider = new DummyMonitoringProvider();
+
+        @Override
+        public DispatchingListener adapt(DispatchingListener dispatchingListener) {
+            return dummyMonitoringProvider;
         }
 
         @Override
-        public MonitoringProvider adapt(MonitoringProvider provider) {
-            return new DummyMonitoringProvider();
+        public RequestListener adapt(RequestListener requestListener) {
+            return dummyMonitoringProvider;
         }
 
-
+        @Override
+        public ResponseListener adapt(ResponseListener responseListener) {
+            return dummyMonitoringProvider;
+        }
     }
 
     @Path("dummy")
@@ -135,5 +151,4 @@ public class MonitoringProviderTest extends AbstractResourceTester {
 
         assertTrue(DummyMonitor.DummyMonitoringProvider.resMethodPreDispatch == 1);
     }
-
 }

@@ -40,21 +40,36 @@
 
 package com.sun.jersey.spi.monitoring;
 
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
+
 /**
- * A provider that can adapt a @{link MonitoringProvider}.
- *
- * @author Jakub.Podlesak@Oracle.Com
+ * @author @author Marek Potociar (marek.potociar at oracle.com)
  */
-public interface MonitoringProviderAdapter {
+public interface DispatchingListener {
 
     /**
-     * Adapt a {@link MonitoringProvider}. Returned {@link MonitoringProvider} is
-     * responsible and MUST call corresponding methods from the other provided in
-     * method parameter.
+     * Called when Jersey finds suitable sub resource which will
+     * be used during request processing.
      *
-     * @param provider the provider to adapt.
-     * @return the adapted provider.
+     * @param id Context ID.
+     * @param subResource class representing matched sub resource.
      */
-    public MonitoringProvider adapt(MonitoringProvider provider);
+    void onSubResource(long id, Class subResource);
 
+    /**
+     * Called right before sub resource locator method is invoked.
+     *
+     * @param id Context ID.
+     * @param locator locator used for locating sub-resource.
+     */
+    void onSubResourceLocator(long id, AbstractSubResourceLocator locator);
+
+    /**
+     * Called right before resource method invocation.
+     *
+     * @param id Context ID.
+     * @param method method used for dispatching. It MUST NOT be modified.
+     */
+    void onResourceMethod(long id, AbstractResourceMethod method);
 }

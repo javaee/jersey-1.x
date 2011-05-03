@@ -49,7 +49,9 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
 import com.sun.jersey.spi.MessageBodyWorkers;
-import com.sun.jersey.spi.monitoring.MonitoringProvider;
+import com.sun.jersey.spi.monitoring.DispatchingListener;
+import com.sun.jersey.spi.monitoring.RequestListener;
+import com.sun.jersey.spi.monitoring.ResponseListener;
 
 import javax.ws.rs.ext.Providers;
 import java.io.IOException;
@@ -160,12 +162,28 @@ public interface WebApplication extends Traceable {
     ServerInjectableProviderFactory getServerInjectableProviderFactory();
 
     /**
-     * Get an instance of {@link MonitoringProvider} that should be
+     * Get an instance of {@link RequestListener} that should be
      * used to monitor request processing.
      *
-     * @return the actual monitoring provider
+     * @return the actual request listener
      */
-    MonitoringProvider getMonitoringProvider();
+    RequestListener getRequestListener();
+
+    /**
+     * Get an instance of {@link DispatchingListener} that should be
+     * used to monitor request processing.
+     *
+     * @return the actual dispatching listener
+     */
+    DispatchingListener getDispatchingListener();
+
+    /**
+     * Get an instance of {@link ResponseListener} that should be
+     * used to monitor request processing.
+     *
+     * @return the actual response listener
+     */
+    ResponseListener getResponseListener();
 
     /**
      * Handle an HTTP request by dispatching the request to the appropriate

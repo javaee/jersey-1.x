@@ -58,7 +58,6 @@ import com.sun.jersey.server.impl.model.method.ResourceHeadWrapperMethod;
 import com.sun.jersey.server.impl.model.method.ResourceHttpMethod;
 import com.sun.jersey.server.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
-import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.server.impl.template.ViewableRule;
 import com.sun.jersey.server.impl.uri.PathPattern;
@@ -73,9 +72,12 @@ import com.sun.jersey.server.impl.uri.rules.TerminatingRule;
 import com.sun.jersey.server.impl.uri.rules.UriRulesFactory;
 import com.sun.jersey.server.impl.wadl.WadlFactory;
 import com.sun.jersey.spi.container.ResourceFilter;
-import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.inject.Errors;
-import com.sun.jersey.spi.monitoring.MonitoringProvider;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.monitoring.DispatchingListener;
+import com.sun.jersey.spi.monitoring.RequestListener;
+import com.sun.jersey.spi.monitoring.ResponseListener;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 
@@ -103,7 +105,7 @@ public final class ResourceUriRules {
 
     private final WadlFactory wadlFactory;
 
-    private final MonitoringProvider monitoringProvider;
+    private final DispatchingListener dispatchingListener;
 
     public ResourceUriRules(
             final ResourceConfig resourceConfig,
@@ -111,7 +113,7 @@ public final class ResourceUriRules {
             final ServerInjectableProviderContext injectableContext,
             final FilterFactory ff,
             final WadlFactory wadlFactory,
-            final MonitoringProvider monitoringProvider,
+            final DispatchingListener dispatchingListener,
             final AbstractResource resource
     ) {
         this.resourceConfig = resourceConfig;
@@ -119,7 +121,8 @@ public final class ResourceUriRules {
         this.injectableContext = injectableContext;
         this.ff = ff;
         this.wadlFactory = wadlFactory;
-        this.monitoringProvider = monitoringProvider;
+
+        this.dispatchingListener = dispatchingListener;
 
         final boolean implicitViewables = resourceConfig.getFeature(
                 ResourceConfig.FEATURE_IMPLICIT_VIEWABLES);
@@ -238,11 +241,11 @@ public final class ResourceUriRules {
             final List<ResourceFilter> resourceFilters = ff.getResourceFilters(locator);
             final UriRule r = new SubLocatorRule(
                     p.getTemplate(),
-                    locator.getMethod(),
                     is,
                     FilterFactory.getRequestFilters(resourceFilters),
                     FilterFactory.getResponseFilters(resourceFilters),
-                    monitoringProvider);
+                    dispatchingListener,
+                    locator);
 
             rulesMap.put(p,
                     new RightHandPathRule(
@@ -300,7 +303,7 @@ public final class ResourceUriRules {
                     new RightHandPathRule(
                             resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
                             p.getTemplate().endsWithSlash(),
-                            new HttpMethodRule(rmm, true, monitoringProvider)));
+                            new HttpMethodRule(rmm, true, dispatchingListener)));
         }
     }
 
@@ -327,7 +330,7 @@ public final class ResourceUriRules {
         if (!rmm.isEmpty()) {
             // No need to adapt with the RightHandPathRule as the URI path
             // will be consumed when such a rule is accepted
-            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(rmm, monitoringProvider));
+            rulesMap.put(PathPattern.EMPTY_PATH, new HttpMethodRule(rmm, dispatchingListener));
         }
     }
 

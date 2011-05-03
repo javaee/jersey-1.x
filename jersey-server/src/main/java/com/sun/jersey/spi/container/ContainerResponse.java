@@ -436,6 +436,12 @@ public class ContainerResponse implements HttpResponseContext {
         ExceptionMapper em = wa.getExceptionMapperContext().find(e.getClass());
         if (em == null) return false;
 
+        wa.getResponseListener().onMappedException(
+                Thread.currentThread().getId(),
+                e,
+                em
+        );
+
         if (request.isTracingEnabled()) {
             request.trace(String.format("matched exception mapper: %s -> %s",
                     ReflectionHelper.objectToString(e),

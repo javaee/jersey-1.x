@@ -75,7 +75,6 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderFactory;
 import com.sun.jersey.server.impl.model.ResourceUriRules;
 import com.sun.jersey.server.impl.model.RulesMap;
-import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.server.impl.model.parameter.CookieParamInjectableProvider;
 import com.sun.jersey.server.impl.model.parameter.FormParamInjectableProvider;
 import com.sun.jersey.server.impl.model.parameter.HeaderParamInjectableProvider;
@@ -103,6 +102,7 @@ import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.ExceptionMapperContext;
 import com.sun.jersey.spi.container.ResourceMethodCustomInvokerDispatchFactory;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationListener;
 import com.sun.jersey.spi.inject.Errors;
@@ -112,8 +112,10 @@ import com.sun.jersey.spi.inject.InjectableProvider;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.inject.ServerSide;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import com.sun.jersey.spi.monitoring.MonitoringProvider;
+import com.sun.jersey.spi.monitoring.DispatchingListener;
 import com.sun.jersey.spi.monitoring.MonitoringProviderFactory;
+import com.sun.jersey.spi.monitoring.RequestListener;
+import com.sun.jersey.spi.monitoring.ResponseListener;
 import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
@@ -252,7 +254,11 @@ public final class WebApplicationImpl implements WebApplication {
 
     private boolean isTraceEnabled;
 
-    private MonitoringProvider monitoringProvider;
+    private RequestListener requestListener;
+
+    private DispatchingListener dispatchingListener;
+
+    private ResponseListener responseListener;
 
     public WebApplicationImpl() {
         this.context = new ThreadLocalHttpContext();
@@ -652,7 +658,7 @@ public final class WebApplicationImpl implements WebApplication {
                 injectableFactory,
                 filterFactory,
                 wadlFactory,
-                monitoringProvider,
+                dispatchingListener,
                 ar);
     }
 
@@ -661,8 +667,18 @@ public final class WebApplicationImpl implements WebApplication {
     }
 
     @Override
-    public MonitoringProvider getMonitoringProvider() {
-        return monitoringProvider;
+    public RequestListener getRequestListener() {
+        return requestListener;
+    }
+
+    @Override
+    public DispatchingListener getDispatchingListener() {
+        return dispatchingListener;
+    }
+
+    @Override
+    public ResponseListener getResponseListener() {
+        return responseListener;
     }
 
     /* package */ AbstractResource getAbstractResource(Object o) {
@@ -1139,8 +1155,9 @@ public final class WebApplicationImpl implements WebApplication {
         // Initiate resource method dispatchers
         dispatcherFactory = ResourceMethodDispatcherFactory.create(providerServices);
 
-        // Initiate monitoring provider
-        monitoringProvider = MonitoringProviderFactory.create(providerServices);
+        requestListener = MonitoringProviderFactory.createRequestListener(providerServices);
+        dispatchingListener = MonitoringProviderFactory.createDispatchingListener(providerServices);
+        responseListener = MonitoringProviderFactory.createResponseListener(providerServices);
 
         // Initiate the WADL factory
         this.wadlFactory = new WadlFactory(resourceConfig);

@@ -40,48 +40,82 @@
 package com.sun.jersey.spi.monitoring;
 
 import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.core.spi.component.ProviderServices;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.ext.ExceptionMapper;
 
 /**
  * @author Jakub.Podlesak@Oracle.Com
  */
-public class MonitoringProviderFactory {
+public final class MonitoringProviderFactory {
 
+    private MonitoringProviderFactory() {}
 
-    private final static MonitoringProvider EMPTY_PROVIDER = new MonitoringProvider() {
-
+    private static class EmptyListener implements RequestListener, ResponseListener, DispatchingListener {
         @Override
-        public void requestStart(long id, HttpServletRequest request) {
-        }
-
-        @Override
-        public void requestSubResourcePreDispatch(long id, Class subResource) {
+        public void onSubResource(long id, Class subResource) {
         }
 
         @Override
-        public void requestResourceMethodPreDispatch(long id, AbstractResourceMethod method) {
+        public void onSubResourceLocator(long id, AbstractSubResourceLocator locator) {
         }
 
         @Override
-        public void error(long id, Throwable ex) {
+        public void onResourceMethod(long id, AbstractResourceMethod method) {
         }
 
         @Override
-        public void requestEnd(long id, HttpServletResponse response) {
+        public void onRequest(long id, HttpServletRequest request) {
         }
-    };
 
-    public static MonitoringProvider create(ProviderServices providerServices) {
-
-        MonitoringProvider p = EMPTY_PROVIDER;
-
-        for (MonitoringProviderAdapter a :
-                providerServices.getProvidersAndServices(MonitoringProviderAdapter.class)) {
-            p = a.adapt(p);
+        @Override
+        public void onError(long id, Throwable ex) {
         }
-        return p;
+
+        @Override
+        public void onResponse(long id, HttpServletResponse response) {
+        }
+
+        @Override
+        public void onMappedException(long id, Throwable exception, ExceptionMapper mapper) {
+        }
+    }
+
+    private final static EmptyListener EMPTY_LISTENER = new EmptyListener();
+
+    public static RequestListener createRequestListener(ProviderServices providerServices) {
+
+        RequestListener requestListener = EMPTY_LISTENER;
+
+        for(RequestListenerAdapter a : providerServices.getProvidersAndServices(RequestListenerAdapter.class)) {
+            requestListener = a.adapt(requestListener);
+        }
+
+        return requestListener;
+    }
+
+    public static DispatchingListener createDispatchingListener(ProviderServices providerServices) {
+
+        DispatchingListener dispatchingListener = EMPTY_LISTENER;
+
+        for(DispatchingListenerAdapter a : providerServices.getProvidersAndServices(DispatchingListenerAdapter.class)) {
+            dispatchingListener = a.adapt(dispatchingListener);
+        }
+
+        return dispatchingListener;
+    }
+
+    public static ResponseListener createResponseListener(ProviderServices providerServices) {
+
+        ResponseListener responseListener = EMPTY_LISTENER;
+
+        for(ResponseListenerAdapter a : providerServices.getProvidersAndServices(ResponseListenerAdapter.class)) {
+            responseListener = a.adapt(responseListener);
+        }
+
+        return responseListener;
     }
 }

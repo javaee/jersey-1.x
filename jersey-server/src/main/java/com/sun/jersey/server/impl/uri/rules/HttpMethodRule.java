@@ -52,7 +52,7 @@ import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.monitoring.MonitoringProvider;
+import com.sun.jersey.spi.monitoring.DispatchingListener;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 
@@ -80,11 +80,11 @@ public final class HttpMethodRule implements UriRule {
 
     private final boolean isSubResource;
 
-    private final MonitoringProvider monitoringProvider;
+    private final DispatchingListener dispatchingListener;
 
     public HttpMethodRule(
-            Map<String, List<ResourceMethod>> methods, MonitoringProvider monitoringProvider) {
-        this(methods, false, monitoringProvider);
+            Map<String, List<ResourceMethod>> methods, DispatchingListener dispatchingListener) {
+        this(methods, false, dispatchingListener);
     }
 
     private static final class ResourceMethodListPair {
@@ -155,7 +155,7 @@ public final class HttpMethodRule implements UriRule {
     public HttpMethodRule(
             Map<String, List<ResourceMethod>> methods,
             boolean isSubResource,
-            MonitoringProvider monitoringProvider) {
+            DispatchingListener dispatchingListener) {
         this.map = new HashMap<String, ResourceMethodListPair>();
         for (Map.Entry<String, List<ResourceMethod>> e : methods.entrySet()) {
             this.map.put(e.getKey(), new ResourceMethodListPair(e.getValue()));
@@ -163,7 +163,7 @@ public final class HttpMethodRule implements UriRule {
 
         this.isSubResource = isSubResource;
         this.allow = getAllow(methods);
-        this.monitoringProvider = monitoringProvider;
+        this.dispatchingListener = dispatchingListener;
     }
 
     private String getAllow(Map<String, List<ResourceMethod>> methods) {
@@ -283,7 +283,7 @@ public final class HttpMethodRule implements UriRule {
 
             // Dispatch to the resource method
             try {
-                monitoringProvider.requestResourceMethodPreDispatch(Thread.currentThread().getId(), method.getAbstractResourceMethod());
+                dispatchingListener.onResourceMethod(Thread.currentThread().getId(), method.getAbstractResourceMethod());
 
                 method.getDispatcher().dispatch(resource, context);
             } catch (RuntimeException e) {

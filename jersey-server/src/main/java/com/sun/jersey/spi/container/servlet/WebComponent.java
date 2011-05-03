@@ -54,10 +54,10 @@ import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.server.impl.InitialContextHelper;
+import com.sun.jersey.server.impl.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.server.impl.cdi.CDIComponentProviderFactoryInitializer;
 import com.sun.jersey.server.impl.container.servlet.JSPTemplateProcessor;
-import com.sun.jersey.server.impl.ThreadLocalInvoker;
 import com.sun.jersey.server.impl.ejb.EJBComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.managedbeans.ManagedBeanComponentProviderFactoryInitilizer;
 import com.sun.jersey.server.impl.model.method.dispatch.FormDispatchProvider;
@@ -72,7 +72,8 @@ import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import com.sun.jersey.spi.monitoring.MonitoringProvider;
+import com.sun.jersey.spi.monitoring.RequestListener;
+import com.sun.jersey.spi.monitoring.ResponseListener;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
@@ -405,12 +406,14 @@ public class WebComponent implements ContainerListener {
         // This can happen if a filter calls request.getParameter(...)
         filterFormParameters(request, cRequest);
 
-        final MonitoringProvider monitoringProvider = _application.getMonitoringProvider();
+
+        final RequestListener requestListener = _application.getRequestListener();
+        final ResponseListener responseListener = _application.getResponseListener();
 
         try {
             UriRuleProbeProvider.requestStart(requestUri);
 
-            monitoringProvider.requestStart(Thread.currentThread().getId(), request);
+            requestListener.onRequest(Thread.currentThread().getId(), request);
 
             requestInvoker.set(request);
             responseInvoker.set(response);
@@ -423,15 +426,15 @@ public class WebComponent implements ContainerListener {
             throw new ServletException(ex.getCause());
         } catch (ContainerException ex) {
             traceOnException(cRequest, response);
-            monitoringProvider.error(Thread.currentThread().getId(), ex);
+            responseListener.onError(Thread.currentThread().getId(), ex);
             throw new ServletException(ex);
         } catch (RuntimeException ex) {
             traceOnException(cRequest, response);
-            monitoringProvider.error(Thread.currentThread().getId(), ex);
+            responseListener.onError(Thread.currentThread().getId(), ex);
             throw ex;
         } finally {
             UriRuleProbeProvider.requestEnd();
-            monitoringProvider.requestEnd(Thread.currentThread().getId(), response);
+            responseListener.onResponse(Thread.currentThread().getId(), response);
 
             requestInvoker.set(null);
             responseInvoker.set(null);

@@ -42,6 +42,7 @@ package com.sun.jersey.server.impl.uri.rules;
 
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.uri.UriTemplate;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
@@ -50,7 +51,7 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.monitoring.MonitoringProvider;
+import com.sun.jersey.spi.monitoring.DispatchingListener;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
 
@@ -75,20 +76,23 @@ public final class SubLocatorRule extends BaseRule {
 
     private final List<ContainerResponseFilter> responseFilters;
 
-    private final MonitoringProvider monitoringProvider;
+    private final DispatchingListener dispatchingListener;
+
+    private final AbstractSubResourceLocator locator;
 
     public SubLocatorRule(UriTemplate template,
-                          Method m,
                           List<Injectable> is,
                           List<ContainerRequestFilter> requestFilters,
                           List<ContainerResponseFilter> responseFilters,
-                          MonitoringProvider monitoringProvider) {
+                          DispatchingListener dispatchingListener,
+                          AbstractSubResourceLocator locator) {
         super(template);
-        this.m = m;
         this.is = AbstractHttpContextInjectable.transform(is);
         this.requestFilters = requestFilters;
         this.responseFilters = responseFilters;
-        this.monitoringProvider = monitoringProvider;
+        this.dispatchingListener = dispatchingListener;
+        this.locator = locator;
+        this.m = locator.getMethod();
     }
 
     @Override
@@ -115,7 +119,7 @@ public final class SubLocatorRule extends BaseRule {
             subResource = context.getResource((Class)subResource);
         }
 
-        monitoringProvider.requestSubResourcePreDispatch(Thread.currentThread().getId(), subResource.getClass());
+        dispatchingListener.onSubResource(Thread.currentThread().getId(), subResource.getClass());
 
         context.pushResource(subResource);
 
@@ -163,6 +167,7 @@ public final class SubLocatorRule extends BaseRule {
         // Invoke the sub-locator method
         try {
             if (is.isEmpty()) {
+                dispatchingListener.onSubResourceLocator(Thread.currentThread().getId(), locator);
                 return m.invoke(resource);
             } else {
                 final Object[] params = new Object[is.size()];
@@ -171,6 +176,7 @@ public final class SubLocatorRule extends BaseRule {
                     params[index++] = i.getValue(context);
                 }
 
+                dispatchingListener.onSubResourceLocator(Thread.currentThread().getId(), locator);
                 return m.invoke(resource, params);
             }
         } catch (InvocationTargetException e) {
