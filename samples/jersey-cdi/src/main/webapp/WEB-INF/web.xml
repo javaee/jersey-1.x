@@ -41,14 +41,12 @@
 
 -->
 
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+      version="3.0"> 
     <servlet>
-        <servlet-name>Jersey Web Application</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>com.sun.jersey.samples.jersey_cdi</param-value>
-        </init-param>
+        <servlet-name>com.sun.jersey.samples.jersey_cdi.resources.MyApplication</servlet-name>        
         <init-param>
             <param-name>com.sun.jersey.config.feature.Trace</param-name>
             <param-value>true</param-value>
@@ -68,7 +66,7 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Jersey Web Application</servlet-name>
+        <servlet-name>com.sun.jersey.samples.jersey_cdi.resources.MyApplication</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
     <env-entry>
