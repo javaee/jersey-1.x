@@ -89,7 +89,7 @@ public class MasterResourceBeanTest extends JerseyTest {
         assertEquals("Response status 200 not found for request to resource 1", 200, responseStatus);
         String responseText = webResource.path("resource1")
                 .accept(MediaType.TEXT_PLAIN).get(String.class);
-        String expectedText = "Hello World from resource 1 in servlet: 'Jersey Web Application', path: '/resources'";
+        String expectedText = "Hello World from resource 1 in servlet: 'com.sun.jersey.samples.servlet.resources.MyApplication', path: '/resources'";
         // check that the expected reponse is seen
         assertEquals("Expected response not seen for the GET on resource 1", expectedText, responseText);
     }
