@@ -1,6 +1,6 @@
 pkg = {
     "name"          : "jersey-docs-and-examples",
-    "version"       : "1.7,0-0.11",
+    "version"       : "1.7,0-0.13",
     "attributes"    : { "pkg.summary" : "Jersey Examples And Documentation, RESTful Web services for GlassFish",
                         "pkg.description" : 
 "This package contains Jersey API javadocs and examples. Once installed, \
@@ -13,7 +13,7 @@ pkg = {
                      "info.classification" : "Web Services"  },
     "dirtrees" : [ "glassfish" ],
     "depends" : { 
-                  "pkg:/jersey@1.7,0-0.11" : {"type" : "require" }
+                  "pkg:/jersey@1.7,0-0.13" : {"type" : "require" }
                 },
     "licenses" : { "glassfish/jersey/LICENSE.txt" : { "license" : "CDDL+GPL" }}
 }
