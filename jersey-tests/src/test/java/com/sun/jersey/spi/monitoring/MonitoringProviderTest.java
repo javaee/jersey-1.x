@@ -46,6 +46,8 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -89,7 +91,7 @@ public class MonitoringProviderTest extends AbstractResourceTester {
             }
 
             @Override
-            public void onRequest(long id, HttpServletRequest request) {
+            public void onRequest(long id, ContainerRequest request) {
                 reqStart++;
             }
 
@@ -99,7 +101,7 @@ public class MonitoringProviderTest extends AbstractResourceTester {
             }
 
             @Override
-            public void onResponse(long id, HttpServletResponse response) {
+            public void onResponse(long id, ContainerResponse response) {
                 reqEnd++;
             }
 

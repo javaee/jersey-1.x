@@ -42,9 +42,9 @@ package com.sun.jersey.spi.monitoring;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.core.spi.component.ProviderServices;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ext.ExceptionMapper;
 
 /**
@@ -68,7 +68,7 @@ public final class MonitoringProviderFactory {
         }
 
         @Override
-        public void onRequest(long id, HttpServletRequest request) {
+        public void onRequest(long id, ContainerRequest request) {
         }
 
         @Override
@@ -76,7 +76,7 @@ public final class MonitoringProviderFactory {
         }
 
         @Override
-        public void onResponse(long id, HttpServletResponse response) {
+        public void onResponse(long id, ContainerResponse response) {
         }
 
         @Override

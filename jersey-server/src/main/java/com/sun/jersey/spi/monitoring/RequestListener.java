@@ -40,7 +40,7 @@
 
 package com.sun.jersey.spi.monitoring;
 
-import javax.servlet.http.HttpServletRequest;
+import com.sun.jersey.spi.container.ContainerRequest;
 
 /**
  * @author Marek Potociar (marek.potociar at oracle.com)
@@ -53,5 +53,5 @@ public interface RequestListener {
      * @param id Context ID.
      * @param request request instance. It MUST NOT be modified.
      */
-    void onRequest(long id, HttpServletRequest request);
+    void onRequest(long id, ContainerRequest request);
 }

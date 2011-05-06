@@ -39,12 +39,12 @@
  */
 package com.sun.jersey.monitoring.events;
 
-import javax.servlet.http.HttpServletResponse;
+import com.sun.jersey.spi.container.ContainerResponse;
 
 /**
  * @author pavel.bucek@oracle.com
  */
 public class ResponseEvent extends AbstractEvent {
-    public ResponseEvent(HttpServletResponse response) {
+    public ResponseEvent(ContainerResponse response) {
     }
 }

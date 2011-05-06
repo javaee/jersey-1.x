@@ -410,17 +410,20 @@ public class WebComponent implements ContainerListener {
         final RequestListener requestListener = _application.getRequestListener();
         final ResponseListener responseListener = _application.getResponseListener();
 
+        ContainerResponse cResponse = null;
+
         try {
             UriRuleProbeProvider.requestStart(requestUri);
 
-            requestListener.onRequest(Thread.currentThread().getId(), request);
+            requestListener.onRequest(Thread.currentThread().getId(), cRequest);
 
             requestInvoker.set(request);
             responseInvoker.set(response);
 
             final Writer w = new Writer(useSetStatusOn404, response);
             _application.handleRequest(cRequest, w);
-            return w.cResponse.getStatus();
+            cResponse = w.cResponse;
+            return cResponse.getStatus();
         } catch (MappableContainerException ex) {
             traceOnException(cRequest, response);
             throw new ServletException(ex.getCause());
@@ -434,7 +437,7 @@ public class WebComponent implements ContainerListener {
             throw ex;
         } finally {
             UriRuleProbeProvider.requestEnd();
-            responseListener.onResponse(Thread.currentThread().getId(), response);
+            responseListener.onResponse(Thread.currentThread().getId(), cResponse);
 
             requestInvoker.set(null);
             responseInvoker.set(null);

@@ -49,12 +49,12 @@ import com.sun.jersey.monitoring.events.ResourceMethodEvent;
 import com.sun.jersey.monitoring.events.ResponseEvent;
 import com.sun.jersey.monitoring.events.SubResourceEvent;
 import com.sun.jersey.monitoring.events.SubResourceLocatorEvent;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.monitoring.DispatchingListener;
 import com.sun.jersey.spi.monitoring.RequestListener;
 import com.sun.jersey.spi.monitoring.ResponseListener;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.ArrayList;
 
@@ -75,7 +75,7 @@ public final class MonitoringListener implements RequestListener, DispatchingLis
 
 
     @Override
-    public void onRequest(long id, HttpServletRequest request) {
+    public void onRequest(long id, ContainerRequest request) {
         jerseyJMXBean.getContext().put(new Long(id), new ArrayList<AbstractEvent>());
         jerseyJMXBean.getContext().get(new Long(id)).add(new RequestEvent(request));
 
@@ -112,7 +112,7 @@ public final class MonitoringListener implements RequestListener, DispatchingLis
     }
 
     @Override
-    public void onResponse(long id, HttpServletResponse response) {
+    public void onResponse(long id, ContainerResponse response) {
         jerseyJMXBean.getContext().get(new Long(id)).add(new ResponseEvent(response));
 
         for(AbstractEvent event : jerseyJMXBean.getContext().get(new Long(id)))

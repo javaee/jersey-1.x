@@ -40,14 +40,13 @@
 package com.sun.jersey.monitoring.events;
 
 import com.sun.jersey.monitoring.JerseyJMXBean;
-
-import javax.servlet.http.HttpServletRequest;
+import com.sun.jersey.spi.container.ContainerRequest;
 
 /**
  * @author pavel.bucek@oracle.com
  */
 public class RequestEvent extends AbstractEvent {
-    public RequestEvent(HttpServletRequest request) {
+    public RequestEvent(ContainerRequest request) {
     }
 
     @Override

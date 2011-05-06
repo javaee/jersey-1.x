@@ -40,7 +40,8 @@
 
 package com.sun.jersey.spi.monitoring;
 
-import javax.servlet.http.HttpServletResponse;
+import com.sun.jersey.spi.container.ContainerResponse;
+
 import javax.ws.rs.ext.ExceptionMapper;
 
 /**
@@ -62,7 +63,7 @@ public interface ResponseListener {
      * @param id Context ID.
      * @param response response instance. It MUST NOT be modified.
      */
-    void onResponse(long id, HttpServletResponse response);
+    void onResponse(long id, ContainerResponse response);
 
     /**
      * Called when Jersey has finalized response and handles it back to container.
