@@ -68,16 +68,17 @@ public class OAuthProviderInjectionProvider implements Injectable<OAuthProvider>
         Iterator<OAuthProvider> providers = ps.getProviders(OAuthProvider.class).iterator();
 
         if (!providers.hasNext()) {
-            throw new RuntimeException("No OAuthProvider implementation found in the list of providers.");
-        }
-        instance = providers.next();
-        if (providers.hasNext()) {
-            StringBuilder sb = new StringBuilder("More than one OAuthProvider implementations registered: ");
-            sb.append(instance.getClass().getName());
-            while (providers.hasNext()) {
-                sb.append(", ").append(providers.next().getClass().getName());
+            instance = null;
+        } else {
+            instance = providers.next();
+            if (providers.hasNext()) {
+                StringBuilder sb = new StringBuilder("More than one OAuthProvider implementations registered: ");
+                sb.append(instance.getClass().getName());
+                while (providers.hasNext()) {
+                    sb.append(", ").append(providers.next().getClass().getName());
+                }
+                LOGGER.warning(sb.toString());
             }
-            LOGGER.warning(sb.toString());
         }
     }
 
@@ -93,7 +94,7 @@ public class OAuthProviderInjectionProvider implements Injectable<OAuthProvider>
 
     @Override
     public Injectable getInjectable(ComponentContext cc, Context a, Type t) {
-        if (t instanceof Class) {
+        if ((instance != null) && (t instanceof Class)) {
             Class c = (Class) t;
             if (OAuthProvider.class.isAssignableFrom(c) && c.isInstance(instance)) {
                 return this;
