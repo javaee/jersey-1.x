@@ -87,7 +87,7 @@ public class MonitoringProviderTest extends AbstractResourceTester {
             put(RP.SubResourceLocatorResourceMethod, EnumSet.of(MH.Request, MH.SubResourceLocator, MH.SubResource, MH.ResourceMethod, MH.Response));
             put(RP.SubResourceLocatorMappedErrorResourceMethod, EnumSet.of(MH.Request, MH.SubResourceLocator, MH.SubResource, MH.ResourceMethod, MH.MappedException, MH.Response));
             put(RP.MappedErrorResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.MappedException, MH.Response));
-            put(RP.MappedErrorSubResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.Response));
+            put(RP.MappedErrorSubResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.MappedException, MH.Response));
         }
     };
 
@@ -229,7 +229,7 @@ public class MonitoringProviderTest extends AbstractResourceTester {
 
     public void testGet() throws Exception {
 
-        ResourceConfig rc = new DefaultResourceConfig(MonitoredResource.class);
+        ResourceConfig rc = new DefaultResourceConfig(MonitoredResource.class, MonitoredMappedErrorResource.class);
         final MyMonitor myMonitor = new MyMonitor();
 
         rc.getSingletons().add(myMonitor);
@@ -257,11 +257,11 @@ public class MonitoringProviderTest extends AbstractResourceTester {
 
         WebResource er = resource("/error-root", false);
         myMonitor.resetPattern();
-        er.get(String.class);
+        er.get(ClientResponse.class);
         assertEquals(myMonitor.requestPattern, PatternMap.get(RP.MappedErrorResourceMethod));
 
         myMonitor.resetPattern();
-        er.path("sub-resource-method").get(String.class);
+        er.path("sub-resource-method").get(ClientResponse.class);
         assertEquals(myMonitor.requestPattern, PatternMap.get(RP.MappedErrorSubResourceMethod));
     }
 }

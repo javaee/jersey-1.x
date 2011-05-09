@@ -888,19 +888,15 @@ public final class WebApplicationImpl implements WebApplication {
         injectableFactory.add(new ContextInjectableProvider<ResourceMethodCustomInvokerDispatchFactory>(
                 ResourceMethodCustomInvokerDispatchFactory.class, new ResourceMethodCustomInvokerDispatchFactory(providerServices)));
 
-        createAbstractResourceModelStructures();
-        callAbstractResourceModelListenersOnCreated(providerServices);
-
         // Add injectable provider for @ParentRef
-
         injectableFactory.add(
                 new InjectableProvider<ParentRef, Type>() {
-            @Override
+                    @Override
                     public ComponentScope getScope() {
                         return ComponentScope.PerRequest;
                     }
 
-            @Override
+                    @Override
                     public Injectable<Object> getInjectable(ComponentContext cc, ParentRef a, Type t) {
                         if (!(t instanceof Class))
                             return null;
@@ -908,7 +904,7 @@ public final class WebApplicationImpl implements WebApplication {
                         final Class target = ReflectionHelper.getDeclaringClass(cc.getAccesibleObject());
                         final Class inject = (Class)t;
                         return new Injectable<Object>() {
-                    @Override
+                            @Override
                             public Object getValue() {
                                 final UriInfo ui = context.getUriInfo();
                                 final List l = ui.getMatchedResources();
@@ -944,12 +940,12 @@ public final class WebApplicationImpl implements WebApplication {
 
         injectableFactory.add(
                 new InjectableProvider<Inject, Type>() {
-            @Override
+                    @Override
                     public ComponentScope getScope() {
                         return ComponentScope.PerRequest;
                     }
 
-            @Override
+                    @Override
                     public Injectable<Object> getInjectable(ComponentContext cc, Inject a, Type t) {
                         if (!(t instanceof Class))
                             return null;
@@ -957,7 +953,7 @@ public final class WebApplicationImpl implements WebApplication {
                         final ResourceComponentProvider rcp = getResourceComponentProvider(cc, (Class)t);
 
                         return new Injectable<Object>() {
-                    @Override
+                            @Override
                             public Object getValue() {
                                 return rcp.getInstance(context);
                             }
@@ -968,12 +964,12 @@ public final class WebApplicationImpl implements WebApplication {
 
         injectableFactory.add(
                 new InjectableProvider<Inject, Type>() {
-            @Override
+                    @Override
                     public ComponentScope getScope() {
                         return ComponentScope.Undefined;
                     }
 
-            @Override
+                    @Override
                     public Injectable<Object> getInjectable(ComponentContext cc, Inject a, Type t) {
                         if (!(t instanceof Class))
                             return null;
@@ -983,7 +979,7 @@ public final class WebApplicationImpl implements WebApplication {
                             return null;
 
                         return new Injectable<Object>() {
-                    @Override
+                            @Override
                             public Object getValue() {
                                 return rcp.getInstance(context);
                             }
@@ -994,12 +990,12 @@ public final class WebApplicationImpl implements WebApplication {
 
         injectableFactory.add(
                 new InjectableProvider<Inject, Type>() {
-            @Override
+                    @Override
                     public ComponentScope getScope() {
                         return ComponentScope.Singleton;
                     }
 
-            @Override
+                    @Override
                     public Injectable<Object> getInjectable(ComponentContext cc, Inject a, Type t) {
                         if (!(t instanceof Class))
                             return null;
@@ -1009,7 +1005,7 @@ public final class WebApplicationImpl implements WebApplication {
                             return null;
 
                         return new Injectable<Object>() {
-                    @Override
+                            @Override
                             public Object getValue() {
                                 return rcp.getInstance(context);
                             }
@@ -1022,12 +1018,12 @@ public final class WebApplicationImpl implements WebApplication {
 
         injectableFactory.add(
                 new InjectableProvider<InjectParam, Type>() {
-            @Override
+                    @Override
                     public ComponentScope getScope() {
                         return ComponentScope.PerRequest;
                     }
 
-            @Override
+                    @Override
                     public Injectable<Object> getInjectable(ComponentContext cc, InjectParam a, Type t) {
                         if (!(t instanceof Class))
                             return null;
@@ -1035,7 +1031,7 @@ public final class WebApplicationImpl implements WebApplication {
                         final ResourceComponentProvider rcp = getResourceComponentProvider(cc, (Class)t);
 
                         return new Injectable<Object>() {
-                    @Override
+                            @Override
                             public Object getValue() {
                                 return rcp.getInstance(context);
                             }
@@ -1046,12 +1042,12 @@ public final class WebApplicationImpl implements WebApplication {
 
         injectableFactory.add(
                 new InjectableProvider<InjectParam, Type>() {
-            @Override
+                    @Override
                     public ComponentScope getScope() {
                         return ComponentScope.Undefined;
                     }
 
-            @Override
+                    @Override
                     public Injectable<Object> getInjectable(ComponentContext cc, InjectParam a, Type t) {
                         if (!(t instanceof Class))
                             return null;
@@ -1061,7 +1057,7 @@ public final class WebApplicationImpl implements WebApplication {
                             return null;
 
                         return new Injectable<Object>() {
-                    @Override
+                            @Override
                             public Object getValue() {
                                 return rcp.getInstance(context);
                             }
@@ -1072,12 +1068,12 @@ public final class WebApplicationImpl implements WebApplication {
 
         injectableFactory.add(
                 new InjectableProvider<InjectParam, Type>() {
-            @Override
+                    @Override
                     public ComponentScope getScope() {
                         return ComponentScope.Singleton;
                     }
 
-            @Override
+                    @Override
                     public Injectable<Object> getInjectable(ComponentContext cc, InjectParam a, Type t) {
                         if (!(t instanceof Class))
                             return null;
@@ -1087,7 +1083,7 @@ public final class WebApplicationImpl implements WebApplication {
                             return null;
 
                         return new Injectable<Object>() {
-                    @Override
+                            @Override
                             public Object getValue() {
                                 return rcp.getInstance(context);
                             }
@@ -1105,17 +1101,17 @@ public final class WebApplicationImpl implements WebApplication {
         // reference directly.
         injectableFactory.add(
                 new InjectableProvider<Context, Type>() {
-            @Override
+                    @Override
                     public ComponentScope getScope() {
                         return ComponentScope.Singleton;
                     }
 
-            @Override
+                    @Override
                     public Injectable<ResourceConfig> getInjectable(ComponentContext cc, Context a, Type t) {
                         if (t != ResourceConfig.class)
                             return null;
                         return new Injectable<ResourceConfig>() {
-                    @Override
+                            @Override
                             public ResourceConfig getValue() {
                                 return resourceConfig;
                             }
@@ -1295,6 +1291,9 @@ public final class WebApplicationImpl implements WebApplication {
                 listener.onWebApplicationReady();
             }
         }
+
+        createAbstractResourceModelStructures();
+        callAbstractResourceModelListenersOnLoaded(providerServices);
 
         // Obtain all root resource rules
         RulesMap<UriRule> rootRules = new RootResourceUriRules(this,
@@ -1536,7 +1535,7 @@ public final class WebApplicationImpl implements WebApplication {
         explicitAbstractRootResources = Collections.unmodifiableMap(explicitRootARs);
     }
 
-    private void callAbstractResourceModelListenersOnCreated(ProviderServices providerServices) {
+    private void callAbstractResourceModelListenersOnLoaded(ProviderServices providerServices) {
         for (AbstractResourceModelListener aml : providerServices.getProviders(AbstractResourceModelListener.class)) {
             aml.onLoaded(armContext);
         }
