@@ -406,39 +406,30 @@ public class WebComponent implements ContainerListener {
         // This can happen if a filter calls request.getParameter(...)
         filterFormParameters(request, cRequest);
 
-
-        final RequestListener requestListener = _application.getRequestListener();
-        final ResponseListener responseListener = _application.getResponseListener();
-
-        ContainerResponse cResponse = null;
-
         try {
             UriRuleProbeProvider.requestStart(requestUri);
-
-            requestListener.onRequest(Thread.currentThread().getId(), cRequest);
 
             requestInvoker.set(request);
             responseInvoker.set(response);
 
             final Writer w = new Writer(useSetStatusOn404, response);
             _application.handleRequest(cRequest, w);
-            cResponse = w.cResponse;
-            return cResponse.getStatus();
+            return w.cResponse.getStatus();
         } catch (MappableContainerException ex) {
             traceOnException(cRequest, response);
             throw new ServletException(ex.getCause());
         } catch (ContainerException ex) {
             traceOnException(cRequest, response);
-            responseListener.onError(Thread.currentThread().getId(), ex);
+            // TODO: this needs to become generic (not servlet specific only)
+            //            responseListener.onError(Thread.currentThread().getId(), ex);
             throw new ServletException(ex);
         } catch (RuntimeException ex) {
             traceOnException(cRequest, response);
-            responseListener.onError(Thread.currentThread().getId(), ex);
+            // TODO: this needs to become generic (not servlet specific only)
+            //            responseListener.onError(Thread.currentThread().getId(), ex);
             throw ex;
         } finally {
             UriRuleProbeProvider.requestEnd();
-            responseListener.onResponse(Thread.currentThread().getId(), cResponse);
-
             requestInvoker.set(null);
             responseInvoker.set(null);
         }

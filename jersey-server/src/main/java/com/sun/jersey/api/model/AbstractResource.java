@@ -118,6 +118,7 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
         return uriPath != null;
     }
 
+    @Override
     public PathValue getPath() {
         return uriPath;
     }
@@ -125,15 +126,15 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
     public List<AbstractResourceConstructor> getConstructors() {
         return constructors;
     }
-    
+
     public List<AbstractField> getFields() {
         return fields;
     }
-    
+
     public List<AbstractSetterMethod> getSetterMethods() {
         return setterMethods;
     }
-    
+
     /**
      * Provides a non-null list of resource methods available on the resource
      * 
@@ -175,42 +176,46 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
         return preDestroyMethods;
     }
 
+    @Override
     public void accept(AbstractModelVisitor visitor) {
         visitor.visitAbstractResource(this);
     }
 
-
-    // Annotaed element
-
+    // Annotated element
+    @Override
     public boolean isAnnotationPresent(Class<? extends Annotation> a) {
         return resourceClass.isAnnotationPresent(a);
     }
 
+    @Override
     public <T extends Annotation> T getAnnotation(Class<T> a) {
         return resourceClass.getAnnotation(a);
     }
 
+    @Override
     public Annotation[] getAnnotations() {
         return resourceClass.getAnnotations();
     }
 
+    @Override
     public Annotation[] getDeclaredAnnotations() {
         return resourceClass.getDeclaredAnnotations();
     }
 
     @Override
     public String toString() {
-        return "AbstractResource(" 
+        return "AbstractResource("
                 + ((null == getPath()) ? "" : ("\"" + getPath().getValue() + "\", - "))
-                + getResourceClass().getSimpleName() + ": " 
-                + getConstructors().size() + " constructors, " 
-                + getFields().size() + " fields, " 
-                + getSetterMethods().size() + " setter methods, " 
-                + getResourceMethods().size() + " res methods, " 
-                + getSubResourceMethods().size() + " subres methods, " 
+                + getResourceClass().getSimpleName() + ": "
+                + getConstructors().size() + " constructors, "
+                + getFields().size() + " fields, "
+                + getSetterMethods().size() + " setter methods, "
+                + getResourceMethods().size() + " res methods, "
+                + getSubResourceMethods().size() + " subres methods, "
                 + getSubResourceLocators().size() + " subres locators " + ")";
     }
 
+    @Override
     public List<AbstractModelComponent> getComponents() {
         List<AbstractModelComponent> components = new LinkedList<AbstractModelComponent>();
         components.addAll(getConstructors());
@@ -221,5 +226,4 @@ public class AbstractResource implements PathAnnotated, AbstractModelComponent, 
         components.addAll(getSubResourceLocators());
         return components;
     }
-
 }

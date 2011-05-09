@@ -56,10 +56,6 @@ import com.sun.jersey.server.impl.wadl.WadlFactory;
 import com.sun.jersey.server.impl.wadl.WadlResource;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.uri.rules.UriRule;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -103,38 +99,11 @@ public class RootResourceUriRules {
             throw new ContainerException(ImplMessages.NO_ROOT_RES_IN_RES_CFG());
         }
 
-
-        final Set<AbstractResource> rootResourcesSet =
-                new HashSet<AbstractResource>();
-
-        // Add declared singleton instances of root resource classes
-        for (final Object o : singletons) {
-            rootResourcesSet.add(wa.getAbstractResource(o));
-        }
-
-        // Add declared root resource classes
-        for (final Class<?> c : classes) {
-            rootResourcesSet.add(wa.getAbstractResource(c));
-        }
-
-        // Add explicit declared root resource classes
-        final Map<String, AbstractResource> explicitRootResources =
-                new HashMap<String, AbstractResource>();
-        for (final Map.Entry<String, Object> e : resourceConfig.getExplicitRootResources().entrySet()) {
-            final Object o = e.getValue();
-            final Class c = (o instanceof Class) ? (Class)o : o.getClass();
-
-            final AbstractResource ar = new AbstractResource(e.getKey(),
-                    wa.getAbstractResource(c));
-
-            rootResourcesSet.add(ar);
-            explicitRootResources.put(e.getKey(), ar);
-        }
-
+        final Set<AbstractResource> rootResourcesSet = wa.getAbstractRootResources();
+        final Map<String, AbstractResource> explicitRootResources = wa.getExplicitAbstractRootResources();
 
         // Initiate the WADL with the root resources
         initWadl(rootResourcesSet);
-
 
         // Process singleton instances of root resource classes
         for (final Object o : singletons) {
