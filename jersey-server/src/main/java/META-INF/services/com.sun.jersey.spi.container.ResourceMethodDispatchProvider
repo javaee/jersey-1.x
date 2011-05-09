@@ -1,4 +1,3 @@
-#com.sun.jersey.server.impl.ejb.EJBRequestDispatcherProvider
 com.sun.jersey.server.impl.model.method.dispatch.VoidVoidDispatchProvider
 com.sun.jersey.server.impl.model.method.dispatch.HttpReqResDispatchProvider
 com.sun.jersey.server.impl.model.method.dispatch.MultipartFormDispatchProvider
