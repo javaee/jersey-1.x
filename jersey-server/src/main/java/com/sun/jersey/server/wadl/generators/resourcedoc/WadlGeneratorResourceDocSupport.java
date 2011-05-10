@@ -39,16 +39,6 @@
  */
 package com.sun.jersey.server.wadl.generators.resourcedoc;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.List;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
-
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -74,6 +64,15 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.namespace.QName;
+import java.io.File;
+import java.io.InputStream;
+import java.util.List;
+
 /**
  * A {@link WadlGenerator} implementation that enhances the generated wadl by
  * information read from a resourcedoc (containing javadoc information about resource
@@ -92,7 +91,7 @@ import com.sun.research.ws.wadl.Response;
  * @version $Id$
  */
 public class WadlGeneratorResourceDocSupport implements WadlGenerator {
-    
+
     public static final String RESOURCE_DOC_FILE = "resourcedoc.xml";
 
     private WadlGenerator _delegate;

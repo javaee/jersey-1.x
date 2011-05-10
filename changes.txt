@@ -1,4 +1,7 @@
 release 1.7
+- Fixed issue 721
+  http://java.net/jira/browse/JERSEY-721
+  NullPointerException during WADL generation with @Autowired Spring beans
 - Fixed issue 709
   http://java.net/jira/browse/JERSEY-709
   Avoid throwing RuntimeException eagerly when oauth-server.jar on the classpath but no OAuthProvider is registered.  

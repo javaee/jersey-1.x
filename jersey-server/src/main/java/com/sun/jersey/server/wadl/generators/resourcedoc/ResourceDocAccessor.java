@@ -39,9 +39,6 @@
  */
 package com.sun.jersey.server.wadl.generators.resourcedoc;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.AnnotationDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.ClassDocType;
@@ -51,6 +48,9 @@ import com.sun.jersey.server.wadl.generators.resourcedoc.model.ParamDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.RepresentationDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.ResourceDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.ResponseDocType;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 /**
  * A class providing access to information stored in a {@link ResourceDocType}.<br>
@@ -80,7 +80,7 @@ public class ResourceDocAccessor {
         final ClassDocType classDoc = getClassDoc( resourceClass );
         if ( classDoc != null ) {
             for ( MethodDocType methodDocType : classDoc.getMethodDocs() ) {
-                if ( method.getName().equals( methodDocType.getMethodName() ) ) {
+                if (method != null && method.getName().equals(methodDocType.getMethodName())) {
                     return methodDocType;
                 }
             }
@@ -103,7 +103,7 @@ public class ResourceDocAccessor {
                 for ( AnnotationDocType annotationDocType : paramDocType.getAnnotationDocs() ) {
                     final Class<? extends Annotation> annotationType = p.getAnnotation().annotationType();
                     if ( annotationType != null ) {
-                        final String sourceName = getSourceName( p, paramDocType, annotationDocType );
+                        final String sourceName = getSourceName(annotationDocType);
                         if ( sourceName != null && sourceName.equals( p.getSourceName() ) ) {
                             return paramDocType;
                         }
@@ -132,8 +132,7 @@ public class ResourceDocAccessor {
                 ? methodDoc.getResponseDoc() : null;
     }
 
-    private String getSourceName( Parameter p, ParamDocType paramDocType,
-            AnnotationDocType annotationDocType ) {
+    private String getSourceName(AnnotationDocType annotationDocType ) {
         if ( annotationDocType.hasAttributeDocs() ) {
             for ( NamedValueType namedValueType : annotationDocType.getAttributeDocs() ) {
                 /* the value of the "value"-attribute is the param.sourceName...
