@@ -40,6 +40,7 @@
 
 package com.sun.jersey.oauth.server;
 
+import com.sun.jersey.oauth.server.spi.OAuthConsumer;
 import com.sun.jersey.oauth.server.spi.OAuthToken;
 import com.sun.jersey.oauth.signature.OAuthParameters;
 import java.security.Principal;
@@ -51,22 +52,30 @@ import javax.ws.rs.core.SecurityContext;
  * @author Martin Matula
  */
 public class OAuthSecurityContext implements SecurityContext {
+    private final OAuthConsumer consumer;
     private final OAuthToken token;
     private final boolean isSecure;
 
+    public OAuthSecurityContext(OAuthConsumer consumer, boolean isSecure) {
+        this.consumer = consumer;
+        this.token = null;
+        this.isSecure = isSecure;
+    }
+
     public OAuthSecurityContext(OAuthToken token, boolean isSecure) {
+        this.consumer = null;
         this.token = token;
         this.isSecure = isSecure;
     }
 
     @Override
     public Principal getUserPrincipal() {
-        return token.getPrincipal();
+        return consumer == null ? token.getPrincipal() : consumer.getPrincipal();
     }
 
     @Override
     public boolean isUserInRole(String string) {
-        return token.isInRole(string);
+        return consumer == null ? token.isInRole(string) : consumer.isInRole(string);
     }
 
     @Override

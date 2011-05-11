@@ -193,7 +193,7 @@ public class OAuthServerFilter implements ContainerRequestFilter {
 
         // get required OAuth parameters
         String consumerKey = requiredOAuthParam(params.getConsumerKey());
-        String token = requiredOAuthParam(params.getToken());
+        String token = params.getToken();
         String timestamp = requiredOAuthParam(params.getTimestamp());
         String nonce = requiredOAuthParam(params.getNonce());
 
@@ -207,27 +207,41 @@ public class OAuthServerFilter implements ContainerRequestFilter {
             throw newUnauthorizedException();
         }
 
-        OAuthToken accessToken = provider.getAccessToken(token);
-        if (accessToken == null) {
-            throw newUnauthorizedException();
-        }
+        OAuthSecrets secrets = new OAuthSecrets().consumerSecret(consumer.getSecret());
+        OAuthSecurityContext sc;
+        String nonceKey;
 
-        OAuthConsumer atConsumer = accessToken.getConsumer();
-        if (atConsumer == null || !atConsumer.getSecret().equals(consumer.getSecret())) {
-            throw newUnauthorizedException();
-        }
+        if (token == null) {
+            if (consumer.getPrincipal() == null) {
+                throw newUnauthorizedException();
+            }
+            nonceKey = "c:" + consumerKey;
+            sc = new OAuthSecurityContext(consumer, request.isSecure());
+        } else {
+            OAuthToken accessToken = provider.getAccessToken(token);
+            if (accessToken == null) {
+                throw newUnauthorizedException();
+            }
 
-        OAuthSecrets secrets = new OAuthSecrets().consumerSecret(consumer.getSecret()).tokenSecret(accessToken.getSecret());
+            OAuthConsumer atConsumer = accessToken.getConsumer();
+            if (atConsumer == null || !atConsumer.getSecret().equals(consumer.getSecret())) {
+                throw newUnauthorizedException();
+            }
+
+            nonceKey = "t:" + token;
+            secrets.tokenSecret(accessToken.getSecret());
+            sc = new OAuthSecurityContext(accessToken, request.isSecure());
+        }
 
         if (!verifySignature(osr, params, secrets)) {
             throw newUnauthorizedException();
         }
 
-        if (!nonces.verify(token, timestamp, nonce)) {
+        if (!nonces.verify(nonceKey, timestamp, nonce)) {
             throw newUnauthorizedException();
         }
 
-        return new OAuthSecurityContext(accessToken, request.isSecure());
+        return sc;
     }
 
     private static String defaultInitParam(ResourceConfig config, String name, String value) {

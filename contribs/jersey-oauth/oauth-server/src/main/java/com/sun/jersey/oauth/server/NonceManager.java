@@ -55,8 +55,7 @@ import java.util.TreeMap;
  * @author Paul C. Bryan <pbryan@sun.com>
  * @author Martin Matula
  */
-public class NonceManager
-{
+public class NonceManager {
     /** The maximum valid age of a nonce timestamp, in milliseconds. */
     private final long maxAge;
 
@@ -78,8 +77,7 @@ public class NonceManager
      * @param maxAge the maximum valid age of a nonce timestamp, in milliseconds.
      * @param gcPeriod verifications to perform on average before performing garbage collection.
      */
-    public NonceManager(long maxAge, int gcPeriod)
-    {
+    public NonceManager(long maxAge, int gcPeriod) {
         if (maxAge <= 0 || gcPeriod <= 0) {
             throw new IllegalArgumentException();
         }
@@ -96,8 +94,7 @@ public class NonceManager
      * @param nonce the oauth_nonce value for a given consumer request.
      * @return true if the timestamp/nonce are valid.
      */
-    public synchronized boolean verify(String key, String timestamp, String nonce)
-    {
+    public synchronized boolean verify(String key, String timestamp, String nonce) {
         long now = System.currentTimeMillis();
 
         // convert timestap to milliseconds since epoch to deal with uniformly

@@ -232,6 +232,16 @@ public class DefaultOAuthProvider implements OAuthProvider {
         public MultivaluedMap<String, String> getAttributes() {
             return attribs;
         }
+
+        @Override
+        public Principal getPrincipal() {
+            return null;
+        }
+
+        @Override
+        public boolean isInRole(String role) {
+            return false;
+        }
     }
 
     /** Simple immutable implementation of {@link OAuthToken}.
