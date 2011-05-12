@@ -384,12 +384,24 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
 
     @Override
     public List<String> getMatchedURIs() {
-        return paths;
+        return getMatchedURIs(true);
     }
 
     @Override
     public List<String> getMatchedURIs(boolean decode) {
-        throw new UnsupportedOperationException();
+        List<String> result;
+        if (decode) {
+            result = new ArrayList<String>(paths.size());
+
+            for (String path : paths) {
+                result.add(UriComponent.decode(
+                    path,
+                    UriComponent.Type.PATH));
+            }
+        } else {
+            result = paths;
+        }
+        return Collections.unmodifiableList(result);
     }
 
     @Override

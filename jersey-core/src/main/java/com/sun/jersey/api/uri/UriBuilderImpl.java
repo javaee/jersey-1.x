@@ -379,6 +379,10 @@ public class UriBuilderImpl extends UriBuilder {
     public UriBuilder replaceMatrixParam(String name, Object... values) {
         checkSsp();
         
+        if (name == null) {
+            throw new IllegalArgumentException("Name parameter is null");
+        }
+
         if (matrixParams == null) {
             int i = path.lastIndexOf("/");
             if (i != -1) i = 0;
@@ -389,11 +393,13 @@ public class UriBuilderImpl extends UriBuilder {
         
         name = encode(name, UriComponent.Type.MATRIX_PARAM);
         matrixParams.remove(name);
-        for (Object value : values) {
-            if (value == null)
-                throw new IllegalArgumentException("One or more of matrix value parameters are null");
+        if (values != null) {
+            for (Object value : values) {
+                if (value == null)
+                    throw new IllegalArgumentException("One or more of matrix value parameters are null");
 
-            matrixParams.add(name, encode(value.toString(), UriComponent.Type.MATRIX_PARAM));
+                matrixParams.add(name, encode(value.toString(), UriComponent.Type.MATRIX_PARAM));
+            }
         }
         return this;
     }

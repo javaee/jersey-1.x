@@ -1,4 +1,13 @@
 release 1.7
+- Fixed issue 717
+  http://java.net/jira/browse/JERSEY-717
+  Fixed UriInfo.getMatchedURIs() and getMatchedURIs(boolean)
+- Fixed issue 715
+  http://java.net/jira/browse/JERSEY-715
+  NullPointerException instead of IllegalArgumentException when passing null name to UriBuilder.replaceMatrixParam()
+- Fixed issue 716
+  http://java.net/jira/browse/JERSEY-716
+  NullPointerException when passing null to values argument of UriBuilder.replaceMatrixParam()
 - *Breaking change*: Added support for 2-legged OAuth in oauth-server module. As a result, 2 new methods were added to the OAuthConsumer interface: getPrincipal() and isInRole() - these are used by the security context in case of 2-legged oauth (i.e. no token in the oauth header). Existing users of the previous versions of the oauth-server module should add a simple implementation of getPrincipal() always returning null to their impl. of the OAuthConsumer interface, and an implementation of isInRole() method always returning false.
 - Fixed issue 721
   http://java.net/jira/browse/JERSEY-721
