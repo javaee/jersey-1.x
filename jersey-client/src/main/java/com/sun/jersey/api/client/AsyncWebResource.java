@@ -87,7 +87,7 @@ public class AsyncWebResource extends Filterable implements
         AsyncUniformInterface {    
     private static final Logger LOGGER = Logger.getLogger(AsyncWebResource.class.getName());
 
-    private final ExecutorService es;
+    private final ExecutorService executorService;
 
     private final URI u;
 
@@ -95,14 +95,14 @@ public class AsyncWebResource extends Filterable implements
 
     /* package */ AsyncWebResource(Client c,  CopyOnWriteHashMap<String, Object> properties, URI u) {
         super((ClientHandler)c);
-        this.es = c.getExecutorService();
+        this.executorService = c.getExecutorService();
         this.u = u;
         this.properties = properties.clone();
     }
     
     private AsyncWebResource(AsyncWebResource that, UriBuilder ub) {
         super(that);
-        this.es = that.es;
+        this.executorService = that.executorService;
         this.u = ub.build();
     }
     
@@ -810,7 +810,7 @@ public class AsyncWebResource extends Filterable implements
             }
         };
 
-        es.submit(ft);
+        executorService.submit(ft);
         return ft;
     }
 }

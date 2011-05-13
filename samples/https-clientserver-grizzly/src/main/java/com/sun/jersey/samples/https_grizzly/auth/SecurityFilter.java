@@ -16,7 +16,7 @@ import javax.ws.rs.core.UriInfo;
 
 /**
  *
- * Simplier version of Security filter from Atom example
+ * Simpler version of Security filter from Atom example
  */
 public class SecurityFilter implements ContainerRequestFilter {
 

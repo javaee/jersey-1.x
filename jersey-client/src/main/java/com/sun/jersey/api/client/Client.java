@@ -125,7 +125,7 @@ public class Client extends Filterable implements ClientHandler {
 
     private boolean destroyed = false;
 
-    private LazyVal<ExecutorService> es;
+    private LazyVal<ExecutorService> executorService;
     
     private CopyOnWriteHashMap<String, Object> properties;
 
@@ -197,10 +197,16 @@ public class Client extends Filterable implements ClientHandler {
     private void init(ClientHandler root, ClientConfig config,
             IoCComponentProviderFactory provider) {
 
-        this.es = new LazyVal<ExecutorService>() {
+        final Object threadpoolSize = config.getProperties().get(ClientConfig.PROPERTY_THREADPOOL_SIZE);
+
+        this.executorService = new LazyVal<ExecutorService>() {
                 @Override
                 protected ExecutorService instance() {
-                    return Executors.newCachedThreadPool();
+                    if(threadpoolSize != null && threadpoolSize instanceof Integer && (Integer)threadpoolSize > 0) {
+                        return Executors.newFixedThreadPool((Integer) threadpoolSize);
+                    } else {
+                        return Executors.newCachedThreadPool();
+                    }
                 }
             };
         
@@ -544,7 +550,7 @@ public class Client extends Filterable implements ClientHandler {
         if (es == null)
             throw new IllegalArgumentException("ExecutorService service MUST not be null");
 
-        this.es.set(es);
+        this.executorService.set(es);
     }
 
     /**
@@ -559,7 +565,7 @@ public class Client extends Filterable implements ClientHandler {
      * @since 1.4
      */
     public ExecutorService getExecutorService() {
-        return es.get();
+        return executorService.get();
     }
 
     /**

@@ -67,21 +67,21 @@ public class AsyncViewResource extends Filterable implements
     
     private final Client client;
 
-    private final ExecutorService es;
+    private final ExecutorService executorService;
 
     private final URI u;
         
     /* package */ AsyncViewResource(Client c, URI u) {
         super((ClientHandler)c);
         this.client = c;
-        this.es = c.getExecutorService();
+        this.executorService = c.getExecutorService();
         this.u = u;
     }
 
     private AsyncViewResource(AsyncViewResource that, UriBuilder ub) {
         super(that);
         this.client = that.client;
-        this.es = that.es;
+        this.executorService = that.executorService;
         this.u = ub.build();
     }
     
@@ -532,7 +532,7 @@ public class AsyncViewResource extends Filterable implements
             }
         };
 
-        es.submit(ft);
+        executorService.submit(ft);
         return ft;
     }
 }

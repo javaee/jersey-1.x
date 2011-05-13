@@ -129,6 +129,20 @@ public interface ClientConfig extends FeaturesAndProperties {
             "com.sun.jersey.client.property.bufferResponseEntityOnException";
 
     /**
+     * Threadpool size property.
+     *
+     * The value MUST be an instance of {@link java.lang.Integer}.
+     *
+     * If the property is absent then threadpool used for async requests will
+     * be initialized as default cached threadpool, which creates new thread
+     * for every new request, see {@link java.util.concurrent.Executors}. When
+     * value bigger than zero is provided, cached threadpool limited to that
+     * number of threads will be utilized.
+     */
+    public static final String PROPERTY_THREADPOOL_SIZE =
+            "com.sun.jersey.client.property.threadpoolSize";
+
+    /**
      * Get the set of provider classes to be instantiated in the scope
      * of the Client
      * <p>
