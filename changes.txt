@@ -1,4 +1,13 @@
 release 1.7
+- Fixed issue 647
+  http://java.net/jira/browse/JERSEY-647
+  NullPointerException in AbstractImplicitViewMethod.toString now fixed.
+- Fixed issue 695
+  http://java.net/jira/browse/JERSEY-695
+  For query parameters of a primitive type blank value is now taken as if the value is not present at all - i.e. default value will be used.
+- Fixed issue 703
+  http://java.net/jira/browse/JERSEY-703
+  Fixed a typo in UriTemplate javadoc.
 - Fixed issue 717
   http://java.net/jira/browse/JERSEY-717
   Fixed UriInfo.getMatchedURIs() and getMatchedURIs(boolean)
