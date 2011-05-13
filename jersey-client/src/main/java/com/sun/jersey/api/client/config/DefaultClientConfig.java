@@ -62,41 +62,83 @@ public class DefaultClientConfig implements ClientConfig {
     
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
+    /**
+     * Create a new DefaultClientConfig instance
+     *
+     */
     public DefaultClientConfig() {}
-    
-    public DefaultClientConfig(Class<?>... cs) {
-        Collections.addAll(providers, cs);
+
+    /**
+     * Create a new DefaultClientConfig instance
+     *
+     * @param providers provider classes used during request processing.
+     */
+    public DefaultClientConfig(Class<?>... providers) {
+        Collections.addAll(this.providers, providers);
     }
 
-    public DefaultClientConfig(Set<Class<?>> cs) {
-       providers.addAll(cs);
+    /**
+     * Create a new DefaultClientConfig instance
+     *
+     * @param providers set of provider classes used during request processing.
+     */
+    public DefaultClientConfig(Set<Class<?>> providers) {
+       this.providers.addAll(providers);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Set<Class<?>> getClasses() {
         return providers;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Set<Object> getSingletons() {
         return providerInstances;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, Boolean> getFeatures() {
         return features;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean getFeature(String featureName) {
         final Boolean v = features.get(featureName);
         return (v != null) ? v : false;
     }
     
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Map<String, Object> getProperties() {
         return properties;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Object getProperty(String propertyName) {
         return properties.get(propertyName);
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean getPropertyAsFeature(String name) {
         Boolean v = (Boolean)getProperties().get(name);
         return (v != null) ? v : false;
