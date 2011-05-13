@@ -96,7 +96,7 @@ final class PrimitiveValueOfExtractor
 
     public Object extract(MultivaluedMap<String, String> parameters) {
         String v = parameters.getFirst(parameter);
-        if (v != null) {
+        if (v != null && !v.trim().isEmpty()) {
             return getValue(v);
         } else if (defaultValue != null) {
             // TODO do we need to clone the default value
