@@ -315,7 +315,23 @@ public class MyApplication extends PackagesResourceConfig {
     }    
     ...
 }</programlisting>
-    </example></para>        
+    </example></para>      
+    <para>You also need to set maven-war-plugin attribute &maven-war-plugin.failOnMissingWebXml; to false in pom.xml when building .war without web.xml file using maven:</para>
+    <para><example>
+        <title>Configuration of maven-war-plugin in <literal>pom.xml</literal> with Servlet 3.0</title>
+        <programlisting language="xml" linenumbering="numbered">&lt;plugins&gt;
+ ...
+ &lt;plugin&gt;
+   &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+   &lt;artifactId&gt;maven-war-plugin&lt;/artifactId&gt;
+   &lt;version&gt;2.1.1&lt;/version&gt;    
+   &lt;configuration&gt;
+       &lt;failOnMissingWebXml&gt;false&lt;/failOnMissingWebXml&gt;        
+   &lt;/configuration&gt;
+   &lt;/plugin&gt;
+ ...
+ &lt;/plugins&gt;</programlisting>
+    </example></para>    
     <para>Another deployment option is to declare JAX-RS application details in the <literal>web.xml</literal>.
     This is usually suitable in case of more complex deployments, e.g. when security model needs to be properly defined 
     or when additional initialization parameters have to be passed to Jersey runtime.

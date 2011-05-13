@@ -52,6 +52,11 @@
 <!-- TODO: need to get rid of this: -->
 <!ENTITY jackson.javadoc.version "1.7.0">
 
+<!-- Maven maven-war-plugin failOnMissingWebXml Links -->
+<!ENTITY maven-war-plugin.path "http://maven.apache.org/plugins/maven-war-plugin/war-mojo.html">
+<!ENTITY failOnMissingWebXml.path "&maven-war-plugin.path;#failOnMissingWebXml">
+<!ENTITY maven-war-plugin.failOnMissingWebXml "<ulink url='&failOnMissingWebXml.path;'>failOnMissingWebXml</ulink>">
+
 <!-- API Links -->
 <!ENTITY jaxrs.ApplicationPath "<ulink url='&jsr311.javadoc.path;/ApplicationPath.html'>@ApplicationPath</ulink>">
 <!ENTITY jaxrs.Consumes "<ulink url='&jsr311.javadoc.path;/Consumes.html'>@Consumes</ulink>">
