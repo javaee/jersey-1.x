@@ -1,4 +1,10 @@
 release 1.7
+- Fixed issue 707
+  http://java.net/jira/browse/JERSEY-707
+  Added human readable http status to URLConnectionResponse.toString()
+- Fixed issue 690
+  http://java.net/jira/browse/JERSEY-690
+  Added javadoc to DefaultClientConfig constructors
 - Fixed issue 647
   http://java.net/jira/browse/JERSEY-647
   NullPointerException in AbstractImplicitViewMethod.toString now fixed.

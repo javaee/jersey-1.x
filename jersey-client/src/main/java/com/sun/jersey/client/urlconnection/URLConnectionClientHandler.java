@@ -115,7 +115,8 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
 
         @Override
         public String toString() {
-            return uc.getRequestMethod() + " " + uc.getURL() + " returned a response status of " + this.getStatus();
+            return uc.getRequestMethod() + " " + uc.getURL() + " returned a response status of " + this.getStatus() +
+                    " " + this.getClientResponseStatus();
         }
     }
 
