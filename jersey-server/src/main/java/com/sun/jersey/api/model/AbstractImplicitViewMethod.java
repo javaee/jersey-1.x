@@ -55,6 +55,6 @@ public class AbstractImplicitViewMethod extends AbstractMethod {
     @Override
     public String toString() {
         return "AbstractImplicitViewMethod("
-                + getMethod().getDeclaringClass().getSimpleName() + ")";
+                + getResource().getResourceClass().getSimpleName() + ")";
     }
 }
