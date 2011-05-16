@@ -41,12 +41,12 @@ package com.sun.jersey.guice.spi.container.servlet;
 
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.servlet.ServletException;
 
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Scope;
-import com.google.inject.Singleton;
 import com.google.inject.servlet.ServletScopes;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;

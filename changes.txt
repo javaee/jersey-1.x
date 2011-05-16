@@ -1,4 +1,7 @@
 release 1.7
+- Fixed issue 700
+  http://java.net/jira/browse/JERSEY-700
+  Guice-specific annotations replaced with their JSR330 standard counterparts.
 - Introduced new property ClientConfig.PROPERTY_THREADPOOL_SIZE for limiting
   thread pool size used for handling asynchronous requests.
 - Apache HTTP Client 4.x integration
