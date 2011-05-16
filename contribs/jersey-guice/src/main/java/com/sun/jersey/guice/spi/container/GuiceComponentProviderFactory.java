@@ -39,6 +39,16 @@
  */
 package com.sun.jersey.guice.spi.container;
 
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -54,16 +64,6 @@ import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
 
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * The Guice-based {@link IoCComponentProviderFactory}.
  *
@@ -74,9 +74,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
     private static final Logger LOGGER =
             Logger.getLogger(GuiceComponentProviderFactory.class.getName());
-
     private final Map<Scope, ComponentScope> scopeMap = createScopeMap();
-
     private final Injector injector;
 
     /**
@@ -148,7 +146,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
                     // Jersey from trying to handle injection.
                     throw e;
                 }
-            // If @Inject is declared on field or method
+                // If @Inject is declared on field or method
             } else if (isGuiceFieldOrMethodInjected(clazz)) {
                 LOGGER.log(Level.INFO, "Binding {0} to GuiceInjectedComponentProvider", clazz.getName());
                 return new GuiceInjectedComponentProvider(injector);
@@ -164,57 +162,42 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
     }
 
     private ComponentScope getComponentScope(Key<?> key, Injector i) {
-        final Scope[] scope = new Scope[1];
-        i.getBinding(key).acceptScopingVisitor(new BindingScopingVisitor<Void>() {
+        return i.getBinding(key).acceptScopingVisitor(new BindingScopingVisitor<ComponentScope>() {
 
             @Override
-            public Void visitEagerSingleton() {
-                scope[0] = Scopes.SINGLETON;
-                return null;
+            public ComponentScope visitEagerSingleton() {
+                return ComponentScope.Singleton;
             }
 
             @Override
-            public Void visitScope(Scope theScope) {
-                scope[0] = theScope;
-                return null;
+            public ComponentScope visitScope(Scope theScope) {
+                ComponentScope cs = scopeMap.get(theScope);
+                return (cs != null) ? cs : ComponentScope.Undefined;
             }
 
             @Override
-            public Void visitScopeAnnotation(Class scopeAnnotation) {
+            public ComponentScope visitScopeAnnotation(Class scopeAnnotation) {
                 // This method is not invoked for Injector bindings
                 throw new UnsupportedOperationException();
             }
 
             @Override
-            public Void visitNoScoping() {
-                scope[0] = Scopes.NO_SCOPE;
-                return null;
+            public ComponentScope visitNoScoping() {
+                return ComponentScope.PerRequest;
             }
         });
-        assert (scope[0] != null);
-        return getComponentScope(scope[0]);
     }
 
     private Injector findInjector(Key<?> key) {
         Injector i = injector;
         while (i != null) {
-            if (i.getBindings().containsKey(key))
+            if (i.getBindings().containsKey(key)) {
                 return i;
+            }
 
             i = i.getParent();
         }
         return null;
-    }
-
-    /**
-     * Converts a Guice scope to Jersey scope.
-     *
-     * @param scope the guice scope
-     * @return the Jersey scope
-     */
-    private ComponentScope getComponentScope(Scope scope) {
-        ComponentScope cs = scopeMap.get(scope);
-        return (cs != null) ? cs : ComponentScope.Undefined;
     }
 
     /**
@@ -239,8 +222,9 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
      */
     public boolean isGuiceConstructorInjected(Class<?> c) {
         for (Constructor<?> con : c.getConstructors()) {
-            if (isInjectable(con))
+            if (isInjectable(con)) {
                 return true;
+            }
         }
 
         return false;
@@ -255,22 +239,27 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
      */
     public boolean isGuiceFieldOrMethodInjected(Class<?> c) {
         for (Method m : c.getDeclaredMethods()) {
-            if (isInjectable(m))
+            if (isInjectable(m)) {
                 return true;
+            }
         }
+        
         for (Field f : c.getDeclaredFields()) {
-            if (isInjectable(f))
+            if (isInjectable(f)) {
                 return true;
+            }
         }
+        
         if (!c.equals(Object.class)) {
             return isGuiceFieldOrMethodInjected(c.getSuperclass());
         }
+        
         return false;
     }
 
     private static boolean isInjectable(AnnotatedElement element) {
         return (element.isAnnotationPresent(com.google.inject.Inject.class)
-                    || element.isAnnotationPresent(javax.inject.Inject.class));
+                || element.isAnnotationPresent(javax.inject.Inject.class));
     }
 
     /**
@@ -333,7 +322,6 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
         }
 
         // IoCInstantiatedComponentProvider
-        
         @Override
         public Object getInjectableInstance(Object o) {
             return o;

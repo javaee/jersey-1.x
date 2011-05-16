@@ -1,4 +1,7 @@
 release 1.7
+- Fixed issue 699
+  http://java.net/jira/browse/JERSEY-699
+  Cleaner implementation of BindingScopingVisitor using ComponentScope as the underlying generic type.
 - Fixed issue 700
   http://java.net/jira/browse/JERSEY-700
   Guice-specific annotations replaced with their JSR330 standard counterparts.
