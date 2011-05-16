@@ -1,4 +1,7 @@
 release 1.7
+- Fixed issue 722
+  http://java.net/jira/browse/JERSEY-722
+  PostConstruct and PreDestroy are now invoked in superclasses as well. PostConstruct in a top-down fashion (base class first), PreDestroy bottom up (subclass first).
 - Fixed issue 699
   http://java.net/jira/browse/JERSEY-699
   Cleaner implementation of BindingScopingVisitor using ComponentScope as the underlying generic type.
