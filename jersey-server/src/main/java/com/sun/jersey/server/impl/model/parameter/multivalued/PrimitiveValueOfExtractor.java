@@ -69,10 +69,12 @@ final class PrimitiveValueOfExtractor
         this.defaultDefaultValue = defaultDefaultValue;
     }
 
+    @Override
     public String getName() {
         return parameter;
     }
 
+    @Override
     public String getDefaultStringValue() {
         return defaultStringValue;
     }
@@ -94,6 +96,7 @@ final class PrimitiveValueOfExtractor
         }
     }
 
+    @Override
     public Object extract(MultivaluedMap<String, String> parameters) {
         String v = parameters.getFirst(parameter);
         if (v != null && !v.trim().isEmpty()) {

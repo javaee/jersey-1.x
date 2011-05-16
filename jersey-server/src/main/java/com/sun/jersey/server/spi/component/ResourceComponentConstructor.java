@@ -51,6 +51,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -69,7 +70,7 @@ public class ResourceComponentConstructor {
     
     private final Constructor constructor;
 
-    private final Method postConstruct;
+    private final List<Method> postConstructs = new ArrayList<Method>();
     
     private final List<AbstractHttpContextInjectable> injectables;
 
@@ -145,11 +146,7 @@ public class ResourceComponentConstructor {
                 scope,
                 ar);
 
-        if (ar.getPostConstructMethods().size() > 0) {
-            this.postConstruct = ar.getPostConstructMethods().get(0);
-        } else {
-            this.postConstruct = null;
-        }
+        this.postConstructs.addAll(ar.getPostConstructMethods());
         
         ConstructorInjectablePair cip = getConstructor(sipc, scope, ar);
         if (cip == null) {
@@ -181,8 +178,9 @@ public class ResourceComponentConstructor {
             IllegalArgumentException, InvocationTargetException {
         final Object o = _construct(hc);
         rci.inject(hc, o);
-        if (postConstruct != null)
+        for (Method postConstruct : postConstructs) {
             postConstruct.invoke(o);
+        }
         return o;
     }
     

@@ -54,6 +54,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -96,6 +98,7 @@ public class ComponentConstructor<T> {
     }
     
     private static class ConstructorComparator<T> implements Comparator<ConstructorInjectablePair<T>> {
+        @Override
         public int compare(ConstructorInjectablePair<T> o1, ConstructorInjectablePair<T> o2) {
             int p = Collections.frequency(o1.is, null) - Collections.frequency(o2.is, null);
             if (p != 0)
@@ -109,7 +112,7 @@ public class ComponentConstructor<T> {
 
     private final Class<T> c;
 
-    private final Method postConstruct;
+    private final List<Method> postConstructs;
 
     private final ComponentInjector<T> ci;
     
@@ -117,22 +120,29 @@ public class ComponentConstructor<T> {
         this.ipc = ipc;
         this.c = c;
         this.ci = ci;
-        this.postConstruct = getPostConstructMethod(c);
+        this.postConstructs = getPostConstructMethods(c);
     }
 
-    private static Method getPostConstructMethod(Class c) {
+    private static List<Method> getPostConstructMethods(Class c) {
         Class postConstructClass = ReflectionHelper.classForName("javax.annotation.PostConstruct");
+        LinkedList<Method> list = new LinkedList<Method>();
+        HashSet<String> names = new HashSet<String>();
         if (postConstructClass != null) {
             MethodList methodList = new MethodList(c, true);
             for (AnnotatedMethod m : methodList.
                     hasAnnotation(postConstructClass).
                     hasNumParams(0).
                     hasReturnType(void.class)) {
-                ReflectionHelper.setAccessibleMethod(m.getMethod());
-                return m.getMethod();
+                Method method = m.getMethod();
+                // only add method if not hidden/overridden
+                if (names.add(method.getName())) {
+                    ReflectionHelper.setAccessibleMethod(method);
+                    // methods from the superclass should go first, so inserting at the beginning
+                    list.addFirst(method);
+                }
             }
         }
-        return null;
+        return list;
     }
 
     /**
@@ -168,8 +178,9 @@ public class ComponentConstructor<T> {
         
         final T t = _getInstance();
         ci.inject(t);
-        if (postConstruct != null)
+        for (Method postConstruct : postConstructs) {
             postConstruct.invoke(t);
+        }
         return t;
     }
 
@@ -177,7 +188,7 @@ public class ComponentConstructor<T> {
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         ConstructorInjectablePair<T> cip = getConstructor();
-        if (cip == null || cip.is.size() == 0) {
+        if (cip == null || cip.is.isEmpty()) {
             return c.newInstance();
         } else {
             if (cip.is.contains(null)) {

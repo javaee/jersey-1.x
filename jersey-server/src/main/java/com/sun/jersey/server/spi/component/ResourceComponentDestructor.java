@@ -42,6 +42,8 @@ package com.sun.jersey.server.spi.component;
 import com.sun.jersey.api.model.AbstractResource;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A destructor of a resource class instance.
@@ -49,19 +51,16 @@ import java.lang.reflect.Method;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ResourceComponentDestructor {
-    private final Method preDestroy;
+    private final List<Method> preDestroys = new ArrayList<Method>();
     
     public ResourceComponentDestructor(AbstractResource ar) {
-        if (ar.getPreDestroyMethods().size() > 0) {
-            this.preDestroy = ar.getPreDestroyMethods().get(0);
-        } else {
-            this.preDestroy = null;
-        }
+        preDestroys.addAll(ar.getPreDestroyMethods());
     }
 
     public void destroy(Object o) throws IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-        if (preDestroy != null)
+        for (Method preDestroy : preDestroys) {
             preDestroy.invoke(o);
+        }
     }
  }

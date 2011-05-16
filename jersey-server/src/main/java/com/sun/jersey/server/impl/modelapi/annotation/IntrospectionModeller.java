@@ -64,6 +64,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -226,20 +227,30 @@ public class IntrospectionModeller {
         Class preDestroy = ReflectionHelper.classForName("javax.annotation.PreDestroy");
 
         final MethodList methodList = new MethodList(resource.getResourceClass(), true);
+        HashSet<String> names = new HashSet<String>();
         for (AnnotatedMethod m : methodList.
                 hasAnnotation(postConstruct).
                 hasNumParams(0).
                 hasReturnType(void.class)) {
-            ReflectionHelper.setAccessibleMethod(m.getMethod());
-            resource.getPostConstructMethods().add(m.getMethod());
+            Method method = m.getMethod();
+            // only add method if not hidden/overridden
+            if (names.add(method.getName())) {
+                ReflectionHelper.setAccessibleMethod(method);
+                resource.getPostConstructMethods().add(0, method);
+            }
         }
 
+        names = new HashSet<String>();
         for (AnnotatedMethod m : methodList.
                 hasAnnotation(preDestroy).
                 hasNumParams(0).
                 hasReturnType(void.class)) {
-            ReflectionHelper.setAccessibleMethod(m.getMethod());
-            resource.getPreDestroyMethods().add(m.getMethod());
+            Method method = m.getMethod();
+            // only add method if not hidden/overridden
+            if (names.add(method.getName())) {
+                ReflectionHelper.setAccessibleMethod(method);
+                resource.getPreDestroyMethods().add(method);
+            }
         }
     }
 

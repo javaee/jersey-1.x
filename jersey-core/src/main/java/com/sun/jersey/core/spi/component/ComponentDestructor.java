@@ -44,6 +44,10 @@ import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A destructor of a component.
@@ -51,7 +55,7 @@ import java.lang.reflect.Method;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ComponentDestructor {
-    private final Method preDestroy;
+    private final List<Method> preDestroys;
 
     /**
      * Create a component destructor.
@@ -59,27 +63,34 @@ public class ComponentDestructor {
      * @param c the class of instances to destruct.
      */
     public ComponentDestructor(Class c) {
-        this.preDestroy = getPreDestroyMethod(c);
+        this.preDestroys = getPreDestroyMethods(c);
     }
 
-    private static Method getPreDestroyMethod(Class c) {
+    private static List<Method> getPreDestroyMethods(Class c) {
         Class preDestroyClass = ReflectionHelper.classForName("javax.annotation.PreDestroy");
+        List<Method> list = new ArrayList<Method>();
+        HashSet<String> names = new HashSet<String>();
         if (preDestroyClass != null) {
             MethodList methodList = new MethodList(c, true);
             for (AnnotatedMethod m : methodList.
                     hasAnnotation(preDestroyClass).
                     hasNumParams(0).
                     hasReturnType(void.class)) {
-                ReflectionHelper.setAccessibleMethod(m.getMethod());
-                return m.getMethod();
+                Method method = m.getMethod();
+                // only add method if not hidden/overridden
+                if (names.add(method.getName())) {
+                    ReflectionHelper.setAccessibleMethod(method);
+                    list.add(method);
+                }
             }
         }
-        return null;
+        return list;
     }
 
     public void destroy(Object o) throws IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
-        if (preDestroy != null)
+        for (Method preDestroy : preDestroys) {
             preDestroy.invoke(o);
+        }
     }
 }
