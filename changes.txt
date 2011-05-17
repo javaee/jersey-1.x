@@ -1,4 +1,6 @@
 release 1.7
+- Fixed bug related to init param propagation when Application class name is specified in
+  servlet-name element and servlet-class is not used at all (see sample 2.11 from user guide).
 - Fixed issue 697
   http://java.net/jira/browse/JERSEY-697
   Scope of the dependency on Jersey Grizzly2 module in Jersey Guice module updated to "test".

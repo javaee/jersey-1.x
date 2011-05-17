@@ -40,15 +40,10 @@
 package com.sun.jersey.server.impl.container.servlet;
 
 import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
+
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -57,6 +52,14 @@ import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /*
 It is RECOMMENDED that implementations support the Servlet 3 framework 
@@ -222,8 +225,15 @@ public class JerseyServletContainerInitializer implements ServletContainerInitia
     private void addServletWithExistingRegistration(ServletContext sc, ServletRegistration sr,
             Class<? extends Application> a, Set<Class<?>> classes) {
         if (sr.getClassName() == null) {
-            final ServletContainer s = new ServletContainer(
-                    new DeferredResourceConfig(a, getRootResourceAndProviderClasses(classes)));
+
+            final ResourceConfig rc = new DeferredResourceConfig(a, getRootResourceAndProviderClasses(classes));
+            final Map<String, Object> initParams = new HashMap<String, Object>();
+            for(Map.Entry<String, String> entry : sr.getInitParameters().entrySet())
+                initParams.put(entry.getKey(), entry.getValue());
+
+            rc.setPropertiesAndFeatures(initParams);
+
+            final ServletContainer s = new ServletContainer(rc);
             sr = sc.addServlet(a.getName(), s);
             if (sr.getMappings().isEmpty()) {
                 final ApplicationPath ap = a.getAnnotation(ApplicationPath.class);
