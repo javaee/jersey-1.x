@@ -40,7 +40,6 @@
  
 package com.sun.jersey.server.impl.cdi;
  
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.HttpRequestContext;
@@ -93,6 +92,8 @@ import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.naming.InitialContext;
+import javax.naming.Name;
+import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
@@ -147,7 +148,8 @@ public class CDIExtension implements Extension {
     
     private List<InitializedLater> toBeInitializedLater;
 
-    private static String JNDI_CDIEXTENSION_NAME = "/com.sun.jersey.config/CDIExtension";
+    private static String JNDI_CDIEXTENSION_NAME = "CDIExtension";
+    private static String JNDI_CDIEXTENSION_CTX = "com/sun/jersey/config";
 
     /*
      * Setting this system property to "true" will force use of the BeanManager to look up the bean for the active CDIExtension,
@@ -170,7 +172,7 @@ public class CDIExtension implements Extension {
             if (ic == null) {
                 throw new RuntimeException();
             }
-            return (CDIExtension)ic.lookup(JNDI_CDIEXTENSION_NAME);
+            return (CDIExtension)lookupJerseyConfigJNDIContext(ic).lookup(JNDI_CDIEXTENSION_NAME);
         } catch (NamingException ex) {
             throw new RuntimeException(ex);
         }
@@ -187,7 +189,8 @@ public class CDIExtension implements Extension {
             try {
                 InitialContext ic = InitialContextHelper.getInitialContext();
                 if (ic != null) {
-                    ic.rebind(JNDI_CDIEXTENSION_NAME, this);
+                    javax.naming.Context jerseyConfigJNDIContext = createJerseyConfigJNDIContext(ic);
+                    jerseyConfigJNDIContext.rebind(JNDI_CDIEXTENSION_NAME, this);
                 }
             } catch (NamingException ex) {
                 throw new RuntimeException(ex);
@@ -251,6 +254,42 @@ public class CDIExtension implements Extension {
         // things to do in a second time, i.e. once Jersey has been initialized,
         // as opposed to when CDI delivers the SPI events to its extensions
         toBeInitializedLater = new ArrayList<InitializedLater>();
+    }
+
+    private static interface JNDIContextDiver {
+        javax.naming.Context stepInto(javax.naming.Context currentContext, String currentName) throws NamingException;
+    }
+
+    private static javax.naming.Context diveIntoJNDIContext(javax.naming.Context initialContext, JNDIContextDiver diver) throws NamingException {
+        Name jerseyConfigCtxName = initialContext.getNameParser("").parse(JNDI_CDIEXTENSION_CTX);
+        javax.naming.Context currentContext = initialContext;
+        for (int i=0; i<jerseyConfigCtxName.size(); i++) {
+            currentContext = diver.stepInto(currentContext, jerseyConfigCtxName.get(i));
+        }
+        return currentContext;
+    }
+
+    private static javax.naming.Context createJerseyConfigJNDIContext(javax.naming.Context initialContext) throws NamingException {
+        return diveIntoJNDIContext(initialContext, new JNDIContextDiver() {
+
+            @Override
+            public javax.naming.Context stepInto(javax.naming.Context ctx, String name) throws NamingException {
+                try {
+                    return (javax.naming.Context) ctx.lookup(name);
+                } catch (NamingException e) {
+                    return ctx.createSubcontext(name);
+                }
+            }
+        });
+    }
+
+    private static javax.naming.Context lookupJerseyConfigJNDIContext(javax.naming.Context initialContext) throws NamingException {
+        return diveIntoJNDIContext(initialContext, new JNDIContextDiver() {
+            @Override
+            public javax.naming.Context stepInto(javax.naming.Context ctx, String name) throws NamingException {
+                    return (javax.naming.Context) ctx.lookup(name);
+            }
+        });
     }
 
     void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event, BeanManager manager) {
@@ -862,7 +901,7 @@ public class CDIExtension implements Extension {
                 try {
                     InitialContext ic = InitialContextHelper.getInitialContext();
                     if (ic != null) {
-                        ic.unbind(JNDI_CDIEXTENSION_NAME);
+                        lookupJerseyConfigJNDIContext(ic).unbind(JNDI_CDIEXTENSION_NAME);
                     }
                 } catch (NamingException ex) {
                     throw new RuntimeException(ex);
