@@ -589,7 +589,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         assertTrue(response.getStatus() == 404);
 
         response = r.path("root").options(ClientResponse.class);
-        assertTrue(response.getStatus() == 404);
+        assertTrue(response.getStatus() == 204);
 
         r.path("root/switch").post();
 

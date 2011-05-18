@@ -108,7 +108,7 @@ import java.util.Map;
                         Response.ok(a, MediaTypes.WADL).header("Allow", allow).build());
             } else {
                 if(!wadlApplicationContext.isWadlGenerationEnabled())
-                    context.getResponse().setResponse(Response.status(Response.Status.NOT_FOUND).build());
+                    context.getResponse().setResponse(Response.status(Response.Status.NO_CONTENT).header("Allow", allow).build());
             }
         }
     }
