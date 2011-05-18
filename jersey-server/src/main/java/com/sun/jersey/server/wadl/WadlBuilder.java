@@ -39,17 +39,6 @@
  */
 package com.sun.jersey.server.wadl;
 
-import com.sun.jersey.api.model.AbstractField;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.ws.rs.FormParam;
-import javax.ws.rs.core.MediaType;
-import javax.xml.namespace.QName;
-
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -68,15 +57,24 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+
+import javax.ws.rs.FormParam;
+import javax.ws.rs.core.MediaType;
+import javax.xml.namespace.QName;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class implements the algorithm how the wadl is built for one or more
  * {@link AbstractResource} classes. Wadl artifacts are created by a
  * {@link WadlGenerator}.
  * Created on: Jun 18, 2008<br>
- * 
+ *
  * @author Marc Hadley
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
@@ -150,7 +148,7 @@ public class WadlBuilder {
     private void addVersion(Application wadlApplication) {
         // Include Jersey version as doc element with generatedBy attribute
         Doc d = new Doc();
-        d.getOtherAttributes().put(new QName("http://jersey.dev.java.net/", "generatedBy", "jersey"),
+        d.getOtherAttributes().put(new QName("http://jersey.java.net/", "generatedBy", "jersey"),
                 BuildId.getBuildId());
         wadlApplication.getDoc().add(0, d);
     }
@@ -171,7 +169,7 @@ public class WadlBuilder {
     }
 
     private Request generateRequest(AbstractResource r, final AbstractResourceMethod m,
-            Map<String, Param> wadlResourceParams) {
+                                    Map<String, Param> wadlResourceParams) {
         if (m.getParameters().isEmpty()) {
             return null;
         }
@@ -239,8 +237,8 @@ public class WadlBuilder {
      * @return the wadl request representation for the specified {@link MediaType}.
      */
     private RepresentationType setRepresentationForMediaType(AbstractResource r,
-            final AbstractResourceMethod m, MediaType mediaType,
-            Request wadlRequest) {
+                                                             final AbstractResourceMethod m, MediaType mediaType,
+                                                             Request wadlRequest) {
         RepresentationType wadlRepresentation = getRepresentationByMediaType(wadlRequest.getRepresentation(), mediaType);
         if (wadlRepresentation == null) {
             wadlRepresentation = _wadlGenerator.createRequestRepresentation(r, m, mediaType);

@@ -45,16 +45,19 @@ import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
-import java.util.Set;
+
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.util.Set;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class WadlApplicationContextImpl implements WadlApplicationContext {
+
+    private boolean wadlGenerationEnabled = true;
 
     private final Set<AbstractResource> rootResources;
     private final WadlGenerator wadlGenerator;
@@ -91,6 +94,15 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
     }
 
     public WadlBuilder getWadlBuilder() {
-        return new WadlBuilder(wadlGenerator);
+        return (this.wadlGenerationEnabled ? new WadlBuilder(wadlGenerator) : null);
+    }
+
+    @Override
+    public void setWadlGenerationEnabled(boolean wadlGenerationEnabled) {
+        this.wadlGenerationEnabled = wadlGenerationEnabled;
+    }
+
+    public boolean isWadlGenerationEnabled() {
+        return wadlGenerationEnabled;
     }
 }

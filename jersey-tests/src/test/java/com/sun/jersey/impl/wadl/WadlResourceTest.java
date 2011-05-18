@@ -45,20 +45,32 @@
 package com.sun.jersey.impl.wadl;
 
 import com.sun.jersey.api.client.ClientResponse;
-import java.io.File;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Properties;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.impl.entity.JAXBBean;
+import com.sun.jersey.server.wadl.WadlApplicationContext;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
@@ -74,35 +86,24 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.impl.entity.JAXBBean;
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.QueryParam;
+import java.util.Properties;
 
 /**
  *
  * @author mh124079
  */
 public class WadlResourceTest extends AbstractResourceTester {
-    
+
     public WadlResourceTest(String testName) {
         super(testName);
     }
-    
+
     @Path("foo")
     public static class ExtraResource {
         @GET
@@ -151,7 +152,7 @@ public class WadlResourceTest extends AbstractResourceTester {
             return new ExtraResource();
         }
     }
-    
+
     public void testDisableWadl() {
         ResourceConfig rc = new DefaultResourceConfig(WidgetsResource.class, ExtraResource.class);
         rc.getFeatures().put(ResourceConfig.FEATURE_DISABLE_WADL, true);
@@ -350,27 +351,34 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets/3']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"3");
     }
-    
+
     @Path("root")
     public static class RootResource {
         @Path("loc")
         public Object getSub() {
             return new SubResource();
         }
+
+        @Path("switch")
+        @POST
+        public void switchMethod(@Context WadlApplicationContext wadlApplicationContext) {
+            wadlApplicationContext.setWadlGenerationEnabled(!wadlApplicationContext.isWadlGenerationEnabled());
+
+        }
     }
-    
+
     public static class SubResource {
         @Path("loc")
         public Object getSub() {
             return new SubResource();
         }
-        
+
         @GET
         @Produces("text/plain")
         public String hello() {
             return "Hello World !";
         }
-        
+
         @GET
         @Path("sub")
         @Produces("text/plain")
@@ -378,7 +386,7 @@ public class WadlResourceTest extends AbstractResourceTester {
             return "Hello World !";
         }
     }
-    
+
     public void testRecursive() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(RootResource.class);
         WebResource r = resource("/root/loc");
@@ -546,10 +554,10 @@ public class WadlResourceTest extends AbstractResourceTester {
         @MatrixParam("mp")
         public void setMp(String mp) {};
 
-        @PathParam("pp") 
+        @PathParam("pp")
         public void setPP(String pp) {};
 
-        @QueryParam("q") 
+        @QueryParam("q")
         public void setQ(String q) {};
 
         @GET
@@ -562,6 +570,34 @@ public class WadlResourceTest extends AbstractResourceTester {
 
     public void testSetterParam() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         _testFieldAndSetterParam(SetterParamResource.class, "setterParam");
+    }
+
+    public void testEnableDisableRuntime() {
+        initiateWebApplication(RootResource.class);
+        WebResource r = resource("/", false);
+        r.addFilter(new LoggingFilter());
+
+        ClientResponse response = r.path("application.wadl").get(ClientResponse.class);
+        assertTrue(response.getStatus() == 200);
+
+        response = r.path("root").options(ClientResponse.class);
+        assertTrue(response.getStatus() == 200);
+
+        r.path("root/switch").post();
+
+        response = r.path("application.wadl").get(ClientResponse.class);
+        assertTrue(response.getStatus() == 404);
+
+        response = r.path("root").options(ClientResponse.class);
+        assertTrue(response.getStatus() == 404);
+
+        r.path("root/switch").post();
+
+        response = r.path("application.wadl").get(ClientResponse.class);
+        assertTrue(response.getStatus() == 200);
+
+        response = r.path("root").options(ClientResponse.class);
+        assertTrue(response.getStatus() == 200);
     }
 
     private void _testFieldAndSetterParam(Class resourceClass, String path) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
@@ -621,10 +657,10 @@ public class WadlResourceTest extends AbstractResourceTester {
 
         @Override
         public String getNamespaceURI(String prefix) {
-             if (prefix.equals(this.prefix))
-                 return this.nsURI;
-             else
-                 return XMLConstants.NULL_NS_URI;
+            if (prefix.equals(this.prefix))
+                return this.nsURI;
+            else
+                return XMLConstants.NULL_NS_URI;
         }
 
         @Override
@@ -640,7 +676,7 @@ public class WadlResourceTest extends AbstractResourceTester {
             return null;
         }
     }
-    
+
     private static void printSource(Source source) {
         try {
             System.out.println("---------------------");

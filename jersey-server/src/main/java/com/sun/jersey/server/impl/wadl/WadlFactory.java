@@ -40,12 +40,6 @@
 
 package com.sun.jersey.server.impl.wadl;
 
-import com.sun.jersey.server.wadl.WadlGenerator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Logger;
-
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfigLoader;
@@ -53,26 +47,32 @@ import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.server.impl.uri.PathPattern;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
+import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
+
 import javax.ws.rs.core.Context;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class WadlFactory {
-    
+
     private static final Logger LOGGER = Logger.getLogger(WadlFactory.class.getName());
 
     private final boolean isWadlEnabled;
 
     private final WadlGenerator wadlGenerator;
-    
+
+    private WadlApplicationContext wadlApplicationContext;
+
     public WadlFactory(ResourceConfig resourceConfig) {
         isWadlEnabled = isWadlEnabled(resourceConfig);
-        
+
         if (isWadlEnabled) {
             wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig(resourceConfig);
         }
@@ -94,73 +94,43 @@ public final class WadlFactory {
     public void init(InjectableProviderFactory ipf, Set<AbstractResource> rootResources) {
         if (!isSupported()) return;
 
-        WadlApplicationContext w = new WadlApplicationContextImpl(rootResources, wadlGenerator);
+        wadlApplicationContext = new WadlApplicationContextImpl(rootResources, wadlGenerator);
 
         ipf.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>(
-                WadlApplicationContext.class, w) {});
+                WadlApplicationContext.class, wadlApplicationContext) {});
     }
-    
+
     /**
      * Create the WADL resource method for OPTIONS.
      * <p>
      * This is created using reflection so that there is no runtime
      * dependency on JAXB. If the JAXB jars are not in the class path
      * then WADL generation will not be supported.
-     * 
+     *
      * @param resource the resource model
      * @return the WADL resource OPTIONS method
      */
     public ResourceMethod createWadlOptionsMethod(
-            Map<String, List<ResourceMethod>> methods, 
+            Map<String, List<ResourceMethod>> methods,
             AbstractResource resource, PathPattern p) {
         if (!isSupported()) return null;
-        
+
         if (p == null) {
-            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null, wadlGenerator);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null, wadlGenerator, wadlApplicationContext);
         } else {
             // Remove the '/' from the beginning
             String path = p.getTemplate().getTemplate().substring(1);
-            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path, wadlGenerator);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path, wadlGenerator, wadlApplicationContext);
         }
-    }        
-    
+    }
+
     /**
      * Check if JAXB is present in the class path
-     * @return 
-     * 
+     * @return
+     *
      * @throws java.lang.ClassNotFoundException
      */
     private static boolean isWadlEnabled(ResourceConfig resourceConfig) {
-        if (resourceConfig.getFeature(ResourceConfig.FEATURE_DISABLE_WADL)) {
-            return false;
-        }
-        
-        try {
-            Class.forName("javax.xml.bind.JAXBElement");
-
-            // TODO WadlFactory should be turned into a component
-            // Attempt to use JAXB, deployment on Google App Engine will
-            // result in a LinkageError
-            Class jaxbContext = Class.forName("javax.xml.bind.DatatypeConverter");
-            Method m = jaxbContext.getMethod("parseInt", String.class);
-            m.invoke(null, "1");
-            
-            return true;
-        } catch(ClassNotFoundException e) {
-            LOGGER.log(Level.CONFIG,
-                    "WADL generation is disabled " +
-                    "because JAXB jars are not " + 
-                    "included in the java class path. " +
-                    "To enable WADL include JAXB 2.x jars in the java class path.");
-            return false;
-        } catch (LinkageError e) {
-            LOGGER.log(Level.CONFIG,
-                    "WADL generation is disabled.", e);
-            return false;
-        } catch (Exception e) {
-            LOGGER.log(Level.CONFIG,
-                    "WADL generation is disabled.", e);
-            return false;
-        }
+        return !resourceConfig.getFeature(ResourceConfig.FEATURE_DISABLE_WADL);
     }
 }

@@ -76,8 +76,6 @@ import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.monitoring.DispatchingListener;
-import com.sun.jersey.spi.monitoring.RequestListener;
-import com.sun.jersey.spi.monitoring.ResponseListener;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 

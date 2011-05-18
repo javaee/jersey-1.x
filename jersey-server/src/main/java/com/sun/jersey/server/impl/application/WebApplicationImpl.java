@@ -1293,12 +1293,13 @@ public final class WebApplicationImpl implements WebApplication {
         }
 
         createAbstractResourceModelStructures();
-        callAbstractResourceModelListenersOnLoaded(providerServices);
 
         // Obtain all root resource rules
         RulesMap<UriRule> rootRules = new RootResourceUriRules(this,
                 resourceConfig, wadlFactory, injectableFactory).getRules();
         this.rootsRule = new RootResourceClassesRule(rootRules);
+
+        callAbstractResourceModelListenersOnLoaded(providerServices);
 
         this.isTraceEnabled = resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE) |
                 resourceConfig.getFeature(ResourceConfig.FEATURE_TRACE_PER_REQUEST);

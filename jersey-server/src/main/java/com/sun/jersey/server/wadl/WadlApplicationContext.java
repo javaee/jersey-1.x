@@ -46,7 +46,7 @@ import javax.xml.bind.JAXBContext;
 
 /**
  * A context to obtain WADL-based information.
- * 
+ *
  * @author Paul.Sandoz
  */
 public interface WadlApplicationContext {
@@ -61,7 +61,7 @@ public interface WadlApplicationContext {
     /**
      * Get a new instance of a JAXB WADL {@link Application} corresponding to all
      * the root resource classes.
-     * 
+     *
      * @return the application, the contents may be modified.
      */
     Application getApplication();
@@ -90,4 +90,21 @@ public interface WadlApplicationContext {
      * @return the default JAXB context.
      */
     String getJAXBContextPath();
+
+    /**
+     * Enable/disable WADL generation.
+     *
+     * @param wadlGenerationEnabled if wadlGenerationEnabled is true and
+     * {@link com.sun.jersey.api.core.ResourceConfig#FEATURE_DISABLE_WADL}
+     * is false, WADL generation is enabled. In all other cases is disabled.
+     */
+    void setWadlGenerationEnabled(boolean wadlGenerationEnabled);
+
+    /**
+     * Get WADL generation status.
+     *
+     * @return true when WADL generation is enabled. Does not take
+     * {@link com.sun.jersey.api.core.ResourceConfig#FEATURE_DISABLE_WADL}
+     */
+    boolean isWadlGenerationEnabled();
 }

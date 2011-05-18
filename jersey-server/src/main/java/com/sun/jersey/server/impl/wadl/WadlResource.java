@@ -43,16 +43,17 @@ package com.sun.jersey.server.impl.wadl;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.research.ws.wadl.Application;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.Marshaller;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -78,6 +79,10 @@ public final class WadlResource {
 
     @GET
     public synchronized Response getWadl(@Context UriInfo uriInfo) {
+        if(!wadlContext.isWadlGenerationEnabled()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
         if (wadlXmlRepresentation == null) {
             if (application.getResources().getBase() == null) {
                 application.getResources().setBase(uriInfo.getBaseUri().toString());
