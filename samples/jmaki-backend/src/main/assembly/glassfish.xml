@@ -53,6 +53,8 @@
       <excludes>
         <exclude>**/target/**</exclude>
         <exclude>pom.xml</exclude>
+        <exclude>**/sun-web.xml</exclude>
+        <exclude>**/web.xml</exclude>
       </excludes>
     </fileSet>
      <fileSet>
