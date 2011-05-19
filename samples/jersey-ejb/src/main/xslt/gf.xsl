@@ -58,6 +58,27 @@
               	</xsl:if>
             	</xsl:copy>
           </xsl:template>
+          
+                   <!-- remove <packagingExcludes>WEB-INF/glassfish-web.xml</packagingExcludes>
+               as this file is required in Glassfish bundle since <class-loader> 
+               is defined in it -->
+          <xsl:template match="pom:plugin[pom:artifactId='maven-war-plugin']/pom:configuration[pom:packagingExcludes]">
+          </xsl:template>
+          
+          <!--build war even if web.xml is missing as it's not required, 
+              <packagingIncludes> defaults to 'all' so it includes 
+              <packagingIncludes>WEB-INF/glassfish-web.xml</packagingIncludes> 
+              to pick up <class-loader> -->
+          <xsl:template match="pom:plugin[pom:artifactId='maven-war-plugin']">
+            	<xsl:copy>
+              	<xsl:apply-templates/>              	
+                <xsl:if test="count(pom:configuration)=1">
+                    <configuration>
+                      <failOnMissingWebXml>false</failOnMissingWebXml>                                            
+                    </configuration>                   
+              	</xsl:if>
+            	</xsl:copy>
+          </xsl:template>
 
           <xsl:template match="comment()">
             <xsl:comment><xsl:value-of select="."/></xsl:comment>

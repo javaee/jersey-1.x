@@ -54,6 +54,8 @@
         <exclude>**/target/**</exclude>
         <exclude>**/*jersey*</exclude>
         <exclude>pom.xml</exclude>
+        <exclude>**/sun-web.xml</exclude>
+        <exclude>**/web.xml</exclude>
       </excludes>
     </fileSet>
      <fileSet>
