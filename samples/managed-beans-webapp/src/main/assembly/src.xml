@@ -51,8 +51,7 @@
       <outputDirectory></outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
       <excludes>
-        <exclude>**/target/**</exclude>
-        <exclude>**/glassfish-web.xml</exclude>
+        <exclude>**/target/**</exclude>        
       </excludes>
     </fileSet>
   </fileSets>

@@ -52,9 +52,7 @@
       <useDefaultExcludes>true</useDefaultExcludes>
       <excludes>
         <exclude>**/target/**</exclude>
-        <exclude>pom.xml</exclude>
-        <exclude>**/sun-web.xml</exclude>
-        <exclude>**/web.xml</exclude>
+        <exclude>pom.xml</exclude>       
       </excludes>
     </fileSet>
      <fileSet>
