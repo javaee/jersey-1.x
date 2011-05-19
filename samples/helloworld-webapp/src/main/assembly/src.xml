@@ -52,6 +52,7 @@
       <useDefaultExcludes>true</useDefaultExcludes>
       <excludes>
         <exclude>**/target/**</exclude>
+        <exclude>**/glassfish-web.xml</exclude>
       </excludes>
     </fileSet>
   </fileSets>

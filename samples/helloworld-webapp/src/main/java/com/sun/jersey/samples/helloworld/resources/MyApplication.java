@@ -43,11 +43,13 @@ package com.sun.jersey.samples.helloworld.resources;
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.core.Application;
+import javax.ws.rs.ApplicationPath;
 
 /**
  *
  * @author Jonathan Benoit
  */
+@ApplicationPath("/")
 public class MyApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
