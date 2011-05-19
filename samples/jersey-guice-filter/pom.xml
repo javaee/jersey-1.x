@@ -75,7 +75,6 @@
                     <app>${basedir}/target/jersey-guice-filter.war</app>
                     <autoDelete>true</autoDelete>
                     <port>8080</port>
-                    <installRoot>./target/gfembeddedtmp</installRoot>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -91,6 +90,11 @@
                     <dependency>
                         <groupId>org.glassfish</groupId>
                         <artifactId>javax.ejb</artifactId>
+                        <version>3.1</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.glassfish</groupId>
+                        <artifactId>javax.servlet</artifactId>
                         <version>3.1</version>
                     </dependency>
                 </dependencies>
