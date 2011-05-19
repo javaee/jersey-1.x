@@ -117,7 +117,6 @@ public class Server {
             System.out.println("Jersey app started. Try out " + BASE_URI + "\nHit CTRL + C to stop it...");
             webServer.start();
 
-            System.in.read();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
@@ -129,6 +128,8 @@ public class Server {
 
     public static void main(String[] args) throws InterruptedException, IOException {
         startServer();
+
+        System.in.read();
     }
 }
 
