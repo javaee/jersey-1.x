@@ -58,8 +58,7 @@
           <dt><code>com.sun.jersey.samples.helloworld.AnotherResource</code></dt>
           <dd>that produces a different textual response to an HTTP GET.
               The purpose of this resource is to show how to define multiple
-              web resources within a web application, as in the OSGi environment
-              the package name based configuration is not working yet</dd>
+              web resources within a web application.</dd>
       </dl>
     <p>The mapping of the URI path space is presented in the following table:</p>
 	<table border="1">
@@ -115,11 +114,11 @@ g! install http://repo2.maven.org/maven2/org/ops4j/pax/web/pax-web-jetty-bundle/
 Bundle ID: 7
 g! install http://repo2.maven.org/maven2/org/ops4j/pax/web/pax-web-extender-war/0.7.1/pax-web-extender-war-0.7.1.jar
 Bundle ID: 8
-g! install http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.6-ea06/jersey-core-1.6-ea06.jar
+g! install http://download.java.net/maven/2/com/sun/jersey/jersey-core/1.7/jersey-core-1.7.jar
 Bundle ID: 9
-g! install http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.6-ea06/jersey-server-1.6-ea06.jar
+g! install http://download.java.net/maven/2/com/sun/jersey/jersey-server/1.7/jersey-server-1.7.jar
 Bundle ID: 10
-g! install file:war-bundle-1.6-ea06.war
+g! install file:war-bundle-1.7.war
 Bundle ID: 11
 g! lb
 START LEVEL 1
@@ -133,14 +132,14 @@ START LEVEL 1
     6|Installed  |    1|Apache Felix EventAdmin (1.2.10)
     7|Installed  |    1|OPS4J Pax Web - Jetty Bundle (0.7.1)
     8|Installed  |    1|OPS4J Pax Web - Extender - WAR (0.7.1)
-    9|Installed  |    1|jersey-core (1.6.0.ea06)
-   10|Installed  |    1|jersey-server (1.6.0.ea06)
-   11|Installed  |    1|Helloworld OSGi WebApp - Jersey Sample WAR (1.6.0.ea06)
+    9|Installed  |    1|jersey-core (1.7.0)
+   10|Installed  |    1|jersey-server (1.7.0)
+   11|Installed  |    1|Helloworld OSGi WebApp - Jersey Sample WAR (1.7.0)
 g! start 5 6 7 8 9 10 11
 Mar 22, 2011 10:25:20 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
-INFO: Initiating Jersey application, version 'Jersey: 1.6-ea06 03/18/2011 02:33 PM'
+INFO: Initiating Jersey application, version 'Jersey: 1.7 05/19/2011 12:46 AM'
 </pre>
-
+      <b>Note</b>: The version string can be updated to install another Jersey version runtime.<br><br> 
 Now both Jersey resources should become available at:
 <ul>
 <li><a href="http://localhost:8080/helloworld/webresources/helloworld">http://localhost:8080/helloworld/webresources/helloworld</a></li>
