@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.samples.guice;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.google.inject.servlet.GuiceFilter;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.samples.guice.resources.PerRequestResource;
@@ -68,14 +69,30 @@ public class GuiceFilterTest extends JerseyTest {
     @Test
     public void testGuiceNoParam() {
         WebResource webResource = resource();
-        String response = webResource.path("bound").path("perrequest").accept("text/plain").get(String.class);
-        assertEquals("Unexpected response", PerRequestResource.OK_RESPONSE, response);
+        ClientResponse response = webResource.path("bound").path("perrequest").accept("text/plain").get(ClientResponse.class);
+        assertEquals("Unexpected status code", 200, response.getStatus());
+        final String responseEntityBody = response.getEntity(String.class);
+        assertTrue("Unexpected query param value", responseEntityBody.contains("x=[no value]"));
+        assertTrue("Unexpected user principal", responseEntityBody.contains(new MySecurityContext().getUserPrincipal().toString()));
+        String singletonHash = getSingletonHash(responseEntityBody);
+        assertEquals("Singleton hash should stay the same among multiple requests", getSingletonHash(webResource.path("bound").path("perrequest").accept("text/plain").get(String.class)), singletonHash);
     }
 
     @Test
     public void testGuiceWithXParam() {
         WebResource webResource = resource();
-        String response = webResource.path("bound").path("perrequest").queryParam("x", "test").accept("text/plain").get(String.class);
-        assertEquals("Unexpected response", PerRequestResource.OK_RESPONSE, response);
+        ClientResponse response = webResource.path("bound").path("perrequest").queryParam("x", "test").accept("text/plain").get(ClientResponse.class);
+        assertEquals("Unexpected status code", 200, response.getStatus());
+        final String responseEntityBody = response.getEntity(String.class);
+        assertTrue("Unexpected query param value", responseEntityBody.contains("x=test"));
+        assertTrue("Unexpected user principal", responseEntityBody.contains(new MySecurityContext().getUserPrincipal().toString()));
+        String singletonHash = getSingletonHash(responseEntityBody);
+        assertEquals("Singleton hash should stay the same among multiple requests", getSingletonHash(webResource.path("bound").path("perrequest").accept("text/plain").get(String.class)), singletonHash);
+    }
+
+    private static String getSingletonHash(String s) {
+        final String singletonLabel = "SINGLETON:";
+        int startHashIdx = s.indexOf(singletonLabel) + singletonLabel.length();
+        return s.substring(startHashIdx, startHashIdx + 9);
     }
 }

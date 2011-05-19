@@ -58,7 +58,6 @@ import javax.ws.rs.core.Response.Status;
 public class PerRequestResource {
 
     private static final Logger LOGGER = Logger.getLogger(PerRequestResource.class.getName());
-    public static final String OK_RESPONSE = "OK";
     //Inject URI info and query parameter "x"
     @Context UriInfo ui;
     @QueryParam("x") String x;
@@ -79,15 +78,11 @@ public class PerRequestResource {
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
 
-        LOGGER.log(Level.INFO,
-                "GET invoked on {0} with injected query parameter x={1}, injected singleton component={2} and injected custom principal={3}",
-                new Object[]{
+        return String.format("GET invoked on %s with injected query parameter x=%s, injected singleton component=%s and injected custom principal=%s",
                     ui.getPath(),
                     (x != null) ? x : "[no value]",
                     sc.toString(),
                     principal.toString()
-        });
-
-        return OK_RESPONSE;
+        );
     }
 }
