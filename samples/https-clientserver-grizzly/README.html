@@ -117,7 +117,7 @@ keytool -import -alias serverCert -file ./server.cert -keystore ./truststore_cli
 <blockquote><code><a href="https://localhost:4463/">https://localhost:4463/</a></code></blockquote>
 <b style="color: red">[*]</b> Your web browser needs have and use generated
 client keys. Or you have to disable server side client
-authentication - remove line (or set NeedClientAuth to false) <b>((SSLSelectorThread) webServer.getSelectorThread()).setNeedClientAuth(true);</b>
+authentication - set NeedClientAuth to false: <b>new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(<span style="color:red">false</span>)</b>
 in <i>Server.java</i>. Then ignore any security warning (self-signed certificates
     aren't trusted in general) and login with username "user" and password "password".
     Text "JERSEY HTTPS EXAMPLE" should appear.

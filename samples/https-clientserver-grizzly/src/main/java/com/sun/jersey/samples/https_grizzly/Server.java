@@ -106,11 +106,18 @@ public class Server {
 
         try {
 
-            webServer = GrizzlyServerFactory.createHttpServer(getBaseURI(), jerseyAdapter, true, new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(true));
+            webServer = GrizzlyServerFactory.createHttpServer(
+                    getBaseURI(),
+                    jerseyAdapter,
+                    true,
+                    new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(false)
+            );
 
             // start Grizzly embedded server //
             System.out.println("Jersey app started. Try out " + BASE_URI + "\nHit CTRL + C to stop it...");
             webServer.start();
+
+            System.in.read();
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
         }
