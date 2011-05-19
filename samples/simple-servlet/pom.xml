@@ -192,28 +192,28 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
                 <executions>
-                	<execution>
-                		<id>update-gf-deps</id>
+                    <execution>
+                        <id>update-gf-deps</id>
                         <phase>package</phase> <!-- append to the packaging phase. -->
                         <goals>
                             <goal>transform</goal> <!-- goals == mojos -->
                         </goals>
-                 		<configuration>
-                			<xslFile>src/main/xslt/gf.xsl</xslFile>
-                			<srcDir>.</srcDir>
-                			<srcIncludes>pom.xml</srcIncludes>
-                			<destDir>target/gf-pom-file</destDir>
-                		</configuration>
-                	</execution>
+                        <configuration>
+                            <xslFile>src/main/xslt/gf.xsl</xslFile>
+                            <srcDir>.</srcDir>
+                            <srcIncludes>pom.xml</srcIncludes>
+                            <destDir>target/gf-pom-file</destDir>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>
+                <version>2.1.1</version>  
                 <configuration>
-                  <failOnMissingWebXml>false</failOnMissingWebXml>
-                 </configuration>
+                    <packagingExcludes>WEB-INF/glassfish-web.xml</packagingExcludes>                     
+                </configuration>
             </plugin>
              <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
