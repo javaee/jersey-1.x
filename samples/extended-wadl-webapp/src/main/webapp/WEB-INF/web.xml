@@ -41,13 +41,13 @@
 
 -->
 
-<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     <servlet>
-        <servlet-name>Jersey Web Application</servlet-name>
+        <servlet-name>com.sun.jersey.samples.extendedwadl.resources.MyApplication</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
-            <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>com.sun.jersey.samples.extendedwadl.resources</param-value>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>com.sun.jersey.samples.extendedwadl.resources.MyApplication</param-value>
         </init-param>
         <init-param>
             <param-name>com.sun.jersey.config.property.WadlGeneratorConfig</param-name>
@@ -56,7 +56,7 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
-        <servlet-name>Jersey Web Application</servlet-name>
+        <servlet-name>com.sun.jersey.samples.extendedwadl.resources.MyApplication</servlet-name>
         <url-pattern>/*</url-pattern>
     </servlet-mapping>
 </web-app>
