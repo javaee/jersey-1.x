@@ -52,8 +52,7 @@
       <useDefaultExcludes>true</useDefaultExcludes>
       <excludes>
         <exclude>**/target/**</exclude>
-        <exclude>**/*jersey*</exclude>
-        <exclude>**/glassfish-web.xml</exclude>
+        <exclude>**/*jersey*</exclude>        
       </excludes>
     </fileSet>
   </fileSets>
