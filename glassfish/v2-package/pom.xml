@@ -46,7 +46,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.glassfish.v2</groupId>
     <artifactId>glassfish-packages</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.8-SNAPSHOT</version>
     <name>Jersey GFv2 UC Modules</name>
     <packaging>pom</packaging>
     <modules>

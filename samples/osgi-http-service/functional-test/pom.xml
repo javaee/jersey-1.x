@@ -48,7 +48,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>osgi-http-service</artifactId>
-        <version>1.7-SNAPSHOT</version>
+        <version>1.8-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sun.jersey.samples.osgi-http-service</groupId>

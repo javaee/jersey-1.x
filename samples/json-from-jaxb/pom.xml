@@ -47,7 +47,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.7-SNAPSHOT</version>
+        <version>1.8-SNAPSHOT</version>
     </parent>
     <artifactId>json-from-jaxb</artifactId>
     <name>JSON From JAXB - Jersey sample</name>
