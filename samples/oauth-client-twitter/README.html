@@ -78,8 +78,9 @@
         </ol>
         <h3>Running for the First Time</h3>
         <p>Enter the following on the command-line:</p>
-        <pre>
-        mvn clean compile java:exec -DconsumerKey=&lt;consumer key assigned to your app&gt; -DconsumerSecret=&lt;consumer secret assigned to your app&gt;
+        
+	<pre>
+        mvn clean compile exec:java -DforkMode=never -DconsumerKey=&lt;consumer key assigned to your app&gt; -DconsumerSecret=&lt;consumer secret assigned to your app&gt;
         </pre>
         <h3>Subsequent Runs</h3>
         <p>After you run the application for the first time, it stores the consumer key, secret and token and token secret
@@ -87,7 +88,18 @@
         The following command is good enough for running the application after it was built, run for the first time and
         the property file was created:</p>
         <pre>
-        mvn java:exec
+        mvn exec:java
         </pre>
+<h2>Troubleshooting</h2>
+<h3>HTTP Proxy</h3>
+<p>Behind a HTTP proxy, you will need to setup the following system properties to communicate with the Twitter server:
+<ul>
+	<li>http.proxyHost - the name of the proxy host.</li>
+	<li>http.proxyPort - the port of the proxy host.</li>
+	<li>http.proxyAuth - the user name and password to use when connecting to the proxy; this string should be the user name and password separated by a colon (e.g., rickhall:mypassword).</li>
+</ul>
+
+These system properties can be set directly on the command line when starting the JVM using the standard "-D&lt;prop&gt;=&lt;value&gt;" syntax.</p>
+
     </body>
 </html>
