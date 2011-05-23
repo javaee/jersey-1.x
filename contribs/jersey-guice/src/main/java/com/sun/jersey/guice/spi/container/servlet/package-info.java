@@ -70,23 +70,23 @@
  *     import com.google.inject.servlet.GuiceServletContextListener;
  *     import com.google.inject.servlet.ServletModule;
  *     import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
- *     import foo.GuiceResource
+ *     import com.sun.jersey.guice.JerseyServletModule;
+ *     import foo.GuiceResource;
  *     
  *     public class MyGuiceConfig extends GuiceServletContextListener {
- *
+ * 
  *         &#64;Override
  *         protected Injector getInjector() {
  *             return Guice.createInjector(new JerseyServletModule() {
- *
+ * 
  *                 &#64;Override
  *                 protected void configureServlets() {
  *                     bind(GuiceResource.class);
- *
+ * 
  *                     serve("/*").with(GuiceContainer.class);
  *                 }
- *             }
  *         });
- *     }
+ *     } 
  * }
  * </blockquote></pre>
  * Notice that one class <code>GuiceResource</code> is bound and the
@@ -101,17 +101,25 @@
  * using Guice defined scopes. For example the <code>GuiceResource</code>
  * could be as follows:
  * <blockquote><pre>
+ *    package foo;
+ * 
+ *    import javax.ws.rs.GET;
+ *    import javax.ws.rs.Produces;
+ *    import javax.ws.rs.Path;
+ *    import javax.ws.rs.QueryParam;
+ *    import javax.enterprise.context.RequestScoped;
+ * 
  *    &#64;Path("bound/perrequest")
  *    &#64;RequestScoped
- *    public static class GuiceResource {
- *
+ *    public class GuiceResource {
+ * 
  *        &#64;QueryParam("x") String x;
- *
+ * 
  *        &#64;GET
  *        &#64;Produces("text/plain")
  *        public String getIt() {
  *            return "Hello From Guice: " + x;
- *        }
+ *        }     
  *    }
  * </blockquote></pre>
  * <p>
@@ -129,16 +137,17 @@
  *     import com.google.inject.servlet.ServletModule;
  *     import com.sun.jersey.api.core.PackagesResourceConfig;
  *     import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
- *     import foo.GuiceResource
+ *     import com.sun.jersey.guice.JerseyServletModule;
+ *     import foo.GuiceResource;
  *     import java.util.HashMap;
- *     import java.util.Map;
+ *     import java.util.Map; 
  * 
  *     public class GuiceServletConfig extends GuiceServletContextListener {
- *
+ * 
  *         &#64;Override
  *         protected Injector getInjector() {
  *             return Guice.createInjector(new JerseyServletModule() {
- *
+ * 
  *                 &#64;Override
  *                 protected void configureServlets() {
  *                     bind(GuiceResource.class);
@@ -147,10 +156,9 @@
  *                     params.put(PackagesResourceConfig.PROPERTY_PACKAGES, "unbound");
  *                     serve("/*").with(GuiceContainer.class, params);
  *                 }
- *             }
- *         });
+ *             });
+ *         }
  *     }
- * }
  * </blockquote></pre>
  * <p>
  * Any root resource or provider classes found in the package <code>unbound</code>
