@@ -1,4 +1,7 @@
 release 1.8
+- Fixed issue 724
+  http://java.net/jira/browse/JERSEY-724
+  Sample code in Guice documentation does not compile.
 
 release 1.7 (05-2011)
 - Added methods to WadlApplicationContext which can control WADL generation in runtime.
