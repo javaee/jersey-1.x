@@ -273,7 +273,7 @@ public final class WebApplicationImpl implements WebApplication {
 
     private RequestListener requestListener;
 
-    private DispatchingListener dispatchingListener;
+    private DispatchingListenerProxy dispatchingListener;
 
     private ResponseListener responseListener;
 
@@ -834,7 +834,7 @@ public final class WebApplicationImpl implements WebApplication {
 
         // Initiate IoCComponentProcessorFactoryInitializer
         for (IoCComponentProviderFactory f : providerFactories) {
-            IoCComponentProcessorFactory cpf = null;
+            IoCComponentProcessorFactory cpf;
             if (f instanceof IoCComponentProcessorFactoryInitializer) {
                 cpf = new ComponentProcessorFactoryImpl();
                 IoCComponentProcessorFactoryInitializer i = (IoCComponentProcessorFactoryInitializer)f;
@@ -1241,38 +1241,7 @@ public final class WebApplicationImpl implements WebApplication {
         // Initiate resource method dispatchers
         dispatcherFactory = ResourceMethodDispatcherFactory.create(providerServices);
 
-        dispatchingListener = new DispatchingListener() {
-            private DispatchingListener dispListener;
-
-            @Override
-            public void onSubResource(long id, Class subResource) {
-                if(dispListener == null)
-                    initiate();
-
-                dispListener.onSubResource(id, subResource);
-            }
-
-            @Override
-            public void onSubResourceLocator(long id, AbstractSubResourceLocator locator) {
-                if(dispListener == null)
-                    initiate();
-
-                dispListener.onSubResourceLocator(id, locator);
-            }
-
-            @Override
-            public void onResourceMethod(long id, AbstractResourceMethod method) {
-                if(dispListener == null)
-                    initiate();
-
-                dispListener.onResourceMethod(id, method);
-            }
-
-            private synchronized void initiate() {
-                if(dispListener == null)
-                    dispListener = MonitoringProviderFactory.createDispatchingListener(providerServices);
-            }
-        };
+        dispatchingListener = new DispatchingListenerProxy();
 
         // Initiate the WADL factory
         this.wadlFactory = new WadlFactory(resourceConfig);
@@ -1332,6 +1301,7 @@ public final class WebApplicationImpl implements WebApplication {
 
         requestListener = MonitoringProviderFactory.createRequestListener(providerServices);
         responseListener = MonitoringProviderFactory.createResponseListener(providerServices);
+        dispatchingListener.init(providerServices);
 
         callAbstractResourceModelListenersOnLoaded(providerServices);
 
@@ -1581,5 +1551,28 @@ public final class WebApplicationImpl implements WebApplication {
                 this.getClass().getClassLoader(),
                 new Class[]{c},
                 i));
+    }
+
+    private class DispatchingListenerProxy implements DispatchingListener {
+        private DispatchingListener dispatchingListener;
+
+        @Override
+        public void onSubResource(long id, Class subResource) {
+            dispatchingListener.onSubResource(id, subResource);
+        }
+
+        @Override
+        public void onSubResourceLocator(long id, AbstractSubResourceLocator locator) {
+            dispatchingListener.onSubResourceLocator(id, locator);
+        }
+
+        @Override
+        public void onResourceMethod(long id, AbstractResourceMethod method) {
+            dispatchingListener.onResourceMethod(id, method);
+        }
+
+        public void init(final ProviderServices providerServices) {
+            dispatchingListener = MonitoringProviderFactory.createDispatchingListener(providerServices);
+        }
     }
 }
