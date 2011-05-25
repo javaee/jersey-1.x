@@ -65,7 +65,7 @@ import javax.ws.rs.core.Variant;
  * <p>
  * JResponse is a type safe alternative to {@link Response} that preserves the
  * type information of response entity thus it is not necessary to utilize
- * {@link GenericEntity}. It provides equivalent functonality to
+ * {@link GenericEntity}. It provides equivalent functionality to
  * {@link Response}.
  * <p>
  * JResponse may be extended in combination with {@link AJResponseBuilder}

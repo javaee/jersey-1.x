@@ -50,9 +50,11 @@ import com.sun.jersey.api.core.ParentRef;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceConfigurator;
 import com.sun.jersey.api.core.ResourceContext;
-import com.sun.jersey.api.model.AbstractResourceModelListener;
 import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.AbstractResourceModelContext;
+import com.sun.jersey.api.model.AbstractResourceModelListener;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.ResourceModelIssue;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ComponentContext;
@@ -89,6 +91,7 @@ import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParamet
 import com.sun.jersey.server.impl.model.parameter.multivalued.StringReaderFactory;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.impl.modelapi.validation.BasicValidator;
+import com.sun.jersey.server.impl.monitoring.MonitoringProviderFactory;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.server.impl.template.TemplateFactory;
 import com.sun.jersey.server.impl.uri.rules.RootResourceClassesRule;
@@ -115,7 +118,6 @@ import com.sun.jersey.spi.inject.InjectableProviderContext;
 import com.sun.jersey.spi.inject.ServerSide;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.monitoring.DispatchingListener;
-import com.sun.jersey.server.impl.monitoring.MonitoringProviderFactory;
 import com.sun.jersey.spi.monitoring.RequestListener;
 import com.sun.jersey.spi.monitoring.ResponseListener;
 import com.sun.jersey.spi.service.ServiceFinder;
@@ -876,7 +878,7 @@ public final class WebApplicationImpl implements WebApplication {
             }
         };
 
-        ProviderServices providerServices = new ProviderServices(
+        final ProviderServices providerServices = new ProviderServices(
                 ServerSide.class,
                 this.cpFactory,
                 resourceConfig.getProviderClasses(),
@@ -1239,9 +1241,38 @@ public final class WebApplicationImpl implements WebApplication {
         // Initiate resource method dispatchers
         dispatcherFactory = ResourceMethodDispatcherFactory.create(providerServices);
 
-        requestListener = MonitoringProviderFactory.createRequestListener(providerServices);
-        dispatchingListener = MonitoringProviderFactory.createDispatchingListener(providerServices);
-        responseListener = MonitoringProviderFactory.createResponseListener(providerServices);
+        dispatchingListener = new DispatchingListener() {
+            private DispatchingListener dispListener;
+
+            @Override
+            public void onSubResource(long id, Class subResource) {
+                if(dispListener == null)
+                    initiate();
+
+                dispListener.onSubResource(id, subResource);
+            }
+
+            @Override
+            public void onSubResourceLocator(long id, AbstractSubResourceLocator locator) {
+                if(dispListener == null)
+                    initiate();
+
+                dispListener.onSubResourceLocator(id, locator);
+            }
+
+            @Override
+            public void onResourceMethod(long id, AbstractResourceMethod method) {
+                if(dispListener == null)
+                    initiate();
+
+                dispListener.onResourceMethod(id, method);
+            }
+
+            private synchronized void initiate() {
+                if(dispListener == null)
+                    dispListener = MonitoringProviderFactory.createDispatchingListener(providerServices);
+            }
+        };
 
         // Initiate the WADL factory
         this.wadlFactory = new WadlFactory(resourceConfig);
@@ -1298,6 +1329,9 @@ public final class WebApplicationImpl implements WebApplication {
         RulesMap<UriRule> rootRules = new RootResourceUriRules(this,
                 resourceConfig, wadlFactory, injectableFactory).getRules();
         this.rootsRule = new RootResourceClassesRule(rootRules);
+
+        requestListener = MonitoringProviderFactory.createRequestListener(providerServices);
+        responseListener = MonitoringProviderFactory.createResponseListener(providerServices);
 
         callAbstractResourceModelListenersOnLoaded(providerServices);
 
