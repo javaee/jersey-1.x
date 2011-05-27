@@ -57,15 +57,15 @@ import static org.junit.Assert.fail;
  * <p>Unit tests for user access in the Contacts Service.</p>
  */
 public class UsersTest extends AbstractTest {   
-
+  
     @Override
-    public void setUp() throws Exception {  
+    public void setUp() throws Exception {
         super.setUp();
     }
 
     @Override
-    public void tearDown() throws Exception { 
-        super.setUp();
+    public void tearDown() throws Exception {
+        super.tearDown();
     }
 
     private static final QName USER_QNAME = new QName("http://example.com/contacts", "user");
