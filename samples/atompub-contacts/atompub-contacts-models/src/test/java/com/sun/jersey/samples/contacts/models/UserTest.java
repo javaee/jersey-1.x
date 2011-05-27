@@ -45,38 +45,37 @@ import java.io.StringWriter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * <p>Test case for {@link User}</p>
  */
-public class UserTest extends TestCase {
+public class UserTest {
 
-    public UserTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         context = JAXBContext.newInstance("com.sun.jersey.samples.contacts.models");
         marshaller = context.createMarshaller();
         marshaller.setProperty("jaxb.fragment", Boolean.TRUE);
         unmarshaller = context.createUnmarshaller();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         unmarshaller = null;
         marshaller = null;
-        context = null;
-        super.tearDown();
+        context = null;       
     }
 
     JAXBContext context = null;
     Marshaller marshaller = null;
     Unmarshaller unmarshaller = null;
 
+    @Test
     public void testComplexSerialization() throws Exception {
         User expected = new User();
         expected.setUsername("newuser");
@@ -84,6 +83,7 @@ public class UserTest extends TestCase {
         check(expected);
     }
 
+    @Test
     public void testSimpleSerialization() throws Exception {
         User expected = new User();
         check(expected);

@@ -41,20 +41,17 @@
 package com.sun.jersey.samples.contacts.client;
 
 import com.sun.jersey.samples.contacts.server.Server;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.After;
 import org.apache.abdera.Abdera;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 /**
  * <p>Abstract base class for JUnit tests of the Contacts Service.</p>
  */
-public abstract class AbstractTest extends TestCase {
-
-    public AbstractTest(String testName) {
-        super(testName);
-    }
-
-        protected int getPort(int defaultPort) {
+public abstract class AbstractTest {   
+   
+    protected int getPort(int defaultPort) {
         String port = System.getenv("JERSEY_HTTP_PORT");
         if (null != port) {
             try {
@@ -65,25 +62,23 @@ public abstract class AbstractTest extends TestCase {
         return defaultPort;
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         System.out.println("Starting grizzly ...");
         httpServer = Server.startServer();
         client = new ContactsClient("http://localhost:" + getPort(9998), "admin", "password");
         abdera = Abdera.getInstance();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         abdera = null;
         client = null;
         System.out.println("Stopping grizzly ...");
         if (httpServer.isStarted()) {
             httpServer.stop();
         }
-        httpServer = null;
-        super.tearDown();
+        httpServer = null;       
     }
 
     protected Abdera abdera = null;

@@ -48,7 +48,9 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.atom.abdera.ContentHelper;
 import com.sun.jersey.samples.contacts.models.User;
 import com.sun.jersey.samples.contacts.server.auth.Base64;
-import junit.framework.TestCase;
+import org.junit.Before;
+import org.junit.After;
+import static org.junit.Assert.fail;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Entry;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -59,15 +61,10 @@ import javax.ws.rs.ext.Providers;
 /**
  * <p>Abstract base class for JUnit tests of the Contacts Service.</p>
  */
-public abstract class AbstractTest extends TestCase {
+public abstract class AbstractTest {
     
-    public AbstractTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         System.out.println("Starting grizzly ...");
         httpServer = Server.startServer();
         ClientConfig config = new DefaultClientConfig();
@@ -77,8 +74,8 @@ public abstract class AbstractTest extends TestCase {
         helper = new ContentHelper(providers);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         helper = null;
         service = null;
         providers = null;
@@ -87,8 +84,7 @@ public abstract class AbstractTest extends TestCase {
         if (httpServer.isStarted()) {
             httpServer.stop();
         }
-        httpServer = null;
-        super.tearDown();
+        httpServer = null;        
     }
 
     protected static final Abdera abdera = Abdera.getInstance();

@@ -48,7 +48,12 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.samples.jsonfromjaxb.config.JAXBContextResolver;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.AircraftType;
 import com.sun.jersey.samples.jsonfromjaxb.jaxb.Flights;
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import java.util.List;
@@ -56,20 +61,14 @@ import java.util.List;
  *
  * @author japod
  */
-public class MainTest extends TestCase {
+public class MainTest {
     
     private HttpServer httpServer;
     
     private WebResource r;
-
-    public MainTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-        
+   
+    @Before
+    public void setUp() throws Exception {
         httpServer = Main.startServer();
 
         ClientConfig cc = new DefaultClientConfig();
@@ -79,16 +78,15 @@ public class MainTest extends TestCase {
         r = c.resource(Main.BASE_URI);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    @After
+    public void tearDown() throws Exception {
         httpServer.stop();
     }
 
     /**
      * Test checks that the application.wadl is reachable.
      */
+    @Test
     public void testApplicationWadl() {
         String applicationWadl = r.path("application.wadl").get(String.class);
         assertTrue("Something wrong. Returned wadl length is not > 0",
@@ -98,6 +96,7 @@ public class MainTest extends TestCase {
     /**
      * Test check GET on the "flights" resource in "application/json" format.
      */
+    @Test
     public void testGetOnFlightsJSONFormat() {
         // get the initial representation
         Flights flights = r.path("flights").
@@ -110,6 +109,7 @@ public class MainTest extends TestCase {
     /**
      * Test checks PUT on the "flights" resource in "application/json" format.
      */
+    @Test
     public void testPutOnFlightsJSONFormat() {
         // get the initial representation
         Flights flights = r.path("flights").
@@ -144,6 +144,7 @@ public class MainTest extends TestCase {
     /**
      * Test checks GET on "flights" resource with mime-type "application/xml".
      */
+    @Test
     public void testGetOnFlightsXMLFormat() {
         // get the initial representation
         Flights flights = r.path("flights").
@@ -156,6 +157,7 @@ public class MainTest extends TestCase {
     /**
      * Test checks PUT on "flights" resource with mime-type "application/xml".
      */
+    @Test
     public void testPutOnFlightsXMLFormat() {
         // get the initial representation
         Flights flights = r.path("flights").
@@ -190,6 +192,7 @@ public class MainTest extends TestCase {
     /**
      * Test check GET on the "aircrafts" resource in "application/json" format.
      */
+    @Test
     public void testGetOnAircraftsJSONFormat() {
         GenericType<List<AircraftType>> genericType =
                 new GenericType<List<AircraftType>>() {};

@@ -58,7 +58,7 @@ import java.util.Map;
 public class Server {
 
     private static int getPort(int defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
+        String port = System.getProperty("jersey.test.port");
         if (null != port) {
             try {
                 return Integer.parseInt(port);

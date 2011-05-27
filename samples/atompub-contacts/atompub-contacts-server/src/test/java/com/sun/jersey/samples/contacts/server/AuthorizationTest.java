@@ -45,24 +45,22 @@ import com.sun.jersey.api.client.WebResource;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.axiom.om.util.Base64;
+import static org.junit.Assert.fail;
+import org.junit.Test;
 
 /**
  * <p>Unit tests for authorization in the Contacts Service.</p>
  */
-public class AuthorizationTest extends AbstractTest {
-
-    public AuthorizationTest(String testName) {
-        super(testName);
-    }
+public class AuthorizationTest extends AbstractTest {    
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
         createUser(adminCredentials(), "application/atom+xml;type=entry", "newuser", "newpass");
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         deleteUser(adminCredentials(), "newuser");
         super.tearDown();
     }
@@ -111,6 +109,7 @@ public class AuthorizationTest extends AbstractTest {
         Feed.class,
     };
 
+    @Test
     public void testAuthorizationAdminPositive() {
         String credentials = adminCredentials();
         for (int i = 0; i < ADMIN_POSITIVE_URIS.length; i++) {
@@ -125,6 +124,7 @@ public class AuthorizationTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testAuthorizationUserNegative() {
         String credentials = userCredentials("newuser", "newpass");
         for (int i = 0; i < NEWUSER_NEGATIVE_URIS.length; i++) {
@@ -144,6 +144,7 @@ public class AuthorizationTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testAuthorizationUserPositive() {
         String credentials = userCredentials("newuser", "newpass");
         for (int i = 0; i < NEWUSER_POSITIVE_URIS.length; i++) {

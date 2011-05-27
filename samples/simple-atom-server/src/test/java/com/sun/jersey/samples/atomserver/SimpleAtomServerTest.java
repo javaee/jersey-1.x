@@ -46,7 +46,11 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.syndication.feed.atom.Entry;
 import com.sun.syndication.feed.atom.Feed;
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.MediaType;
@@ -58,30 +62,22 @@ import java.util.List;
  *
  * @author Naresh
  */
-public class SimpleAtomServerTest extends TestCase {
+public class SimpleAtomServerTest {
 
     private HttpServer httpServer;
 
     private WebResource r;
 
-    public SimpleAtomServerTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
         httpServer = Server.startServer();
 
         Client c = Client.create();
         r = c.resource(Server.BASE_URI);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    @After
+    public void tearDown() throws Exception {
         httpServer.stop();
     }
 
@@ -89,6 +85,7 @@ public class SimpleAtomServerTest extends TestCase {
      * Test if a WADL document is available at the relative path
      * "application.wadl".
      */
+    @Test
     public void testApplicationWadl() {
         String serviceWadl = r.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
@@ -99,6 +96,7 @@ public class SimpleAtomServerTest extends TestCase {
      * Test checks that expected response is seen for a request to the resource
      * "service".
      */
+    @Test
     public void testServiceResource() {
         String serviceAtomXml = r.path("service").accept("application/atomserv+xml")
                 .get(String.class);
@@ -109,6 +107,7 @@ public class SimpleAtomServerTest extends TestCase {
      * Test checks that POST, GET, PUT and DELETE work as expected in the
      * collection resource and its sub-resources.
      */
+    @Test
     public void testCollectionResource() {
         //create a media link entry
         String pushText = "Something is rotten in the state of Denmark";

@@ -42,26 +42,27 @@ package com.sun.jersey.samples.contacts.client;
 
 import com.sun.jersey.samples.contacts.models.Contact;
 import java.util.List;
+import org.junit.Test;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
 
 /**
  * <p>Unit tests for client access to the Contacts Service.</p>
  */
 public class ContactsClientTest extends AbstractTest {
 
-    public ContactsClientTest(String testName) {
-        super(testName);
-    }
-
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         super.tearDown();
     }
 
+    @Test
     public void testCreateUpdateDeleteContact() {
         Contact contact = new Contact();
         contact.setId("new_id");
@@ -103,6 +104,7 @@ public class ContactsClientTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testAuthenticationNegative() {
         try {
             client = new ContactsClient("http://localhost:" + getPort(9998), "badusername", "badpassword");
@@ -113,6 +115,7 @@ public class ContactsClientTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testFindContactNegative() {
         try {
             client.findContact("admin", "badid");
@@ -123,6 +126,7 @@ public class ContactsClientTest extends AbstractTest {
     }
 
 
+    @Test
     public void testFindContactsNegative() {
         try {
             client.findContacts("badusername");
@@ -133,6 +137,7 @@ public class ContactsClientTest extends AbstractTest {
     }
 
 
+    @Test
     public void testFindContactsPositive() {
         List<Contact> contacts = client.findContacts("admin");
         assertEquals(0, contacts.size());

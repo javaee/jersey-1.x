@@ -44,7 +44,11 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.MediaType;
@@ -53,20 +57,15 @@ import javax.ws.rs.core.MediaType;
  *
  * @author Naresh (srinivas.bhimisetty@sun.com)
  */
-public class MainTest extends TestCase {
+public class MainTest {
 
     private HttpServer httpServer;
 
-    private WebResource r;
+    private WebResource r;    
 
-    public MainTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
+        
         //start the Grizzly web container and create the client
         httpServer = Main.startServer();
 
@@ -74,16 +73,15 @@ public class MainTest extends TestCase {
         r = c.resource(Main.BASE_URI);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    @After
+    public void tearDown() throws Exception {       
         httpServer.stop();
     }
 
     /**
      * Test checks that an application.wadl file is present for the resource.
      */
+    @Test
     public void testApplicationWadl() {
         String serviceWadl = r.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
@@ -95,6 +93,7 @@ public class MainTest extends TestCase {
      * Test checks that an xml content is shown for the client request to
      * resource "item".
      */
+    @Test
     public void testItemResource() {
         String serviceXml = r.path("item").
                 accept(MediaType.APPLICATION_XML).get(String.class);
@@ -106,6 +105,7 @@ public class MainTest extends TestCase {
      * Test checks that the initial content seen in the response
      * is the same as what is expected.
      */
+    @Test
     public void testItemContentResource() {
         String itemContent = r.path("item").path("content").
                 accept(MediaType.TEXT_PLAIN).get(String.class);
@@ -118,6 +118,7 @@ public class MainTest extends TestCase {
      * Test checks the PUT on resource item/content works,
      * and is allowed only once per content item.
      */
+    @Test
     public void testOnUpdateItemContent() {
         // Create a child WebResource
         WebResource content = r.path("item").path("content");

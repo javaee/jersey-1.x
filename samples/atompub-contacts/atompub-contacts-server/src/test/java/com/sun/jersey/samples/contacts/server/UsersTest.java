@@ -47,24 +47,25 @@ import javax.xml.namespace.QName;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 
 /**
  * <p>Unit tests for user access in the Contacts Service.</p>
  */
-public class UsersTest extends AbstractTest {
-
-    public UsersTest(String testName) {
-        super(testName);
-    }
+public class UsersTest extends AbstractTest {   
 
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {  
         super.setUp();
     }
 
     @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    public void tearDown() throws Exception { 
+        super.setUp();
     }
 
     private static final QName USER_QNAME = new QName("http://example.com/contacts", "user");
@@ -87,6 +88,7 @@ public class UsersTest extends AbstractTest {
         "text/xml",
     };
 
+    @Test
     public void testGetEntryNegative() {
         String credentials = adminCredentials();
         // Negative test -- invalid username
@@ -104,6 +106,7 @@ public class UsersTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testGetEntryPositive() {
         String credentials = adminCredentials();
         for (String mediaType : ENTRY_MEDIA_TYPES) {
@@ -117,6 +120,7 @@ public class UsersTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testGetFeed() {
         String credentials = adminCredentials();
         for (String mediaType : FEED_MEDIA_TYPES) {
@@ -137,6 +141,7 @@ public class UsersTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testPostFeedPositive() {
         String credentials = adminCredentials();
         Feed feed = null;
@@ -158,6 +163,7 @@ public class UsersTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testPutEntryPositive() {
         String credentials = adminCredentials();
         for (String mediaType : ENTRY_MEDIA_TYPES) {

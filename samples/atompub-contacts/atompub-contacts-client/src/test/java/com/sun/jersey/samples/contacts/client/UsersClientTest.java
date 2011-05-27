@@ -43,26 +43,27 @@ package com.sun.jersey.samples.contacts.client;
 import com.sun.jersey.samples.contacts.models.Contact;
 import com.sun.jersey.samples.contacts.models.User;
 import java.util.List;
+import org.junit.Test;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * <p>Unit tests for client access to the Contacts Service.</p>
  */
 public class UsersClientTest extends AbstractTest {
 
-    public UsersClientTest(String testName) {
-        super(testName);
-    }
-
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         super.tearDown();
     }
 
+    @Test
     public void testCreateUpdateDeleteUser() {
         List<User> users = client.findUsers();
         assertEquals(1, users.size());
@@ -98,6 +99,7 @@ public class UsersClientTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testAuthenticationNegative() {
         try {
             client = new ContactsClient("http://localhost:" + getPort(9998), "badusername", "badpassword");
@@ -108,6 +110,7 @@ public class UsersClientTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testFindUserNegative() {
         try {
             client.findUser("badid");
@@ -117,6 +120,7 @@ public class UsersClientTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testFindUsersPositive() {
         List<User> users = client.findUsers();
         assertEquals(1, users.size());

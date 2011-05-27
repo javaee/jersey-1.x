@@ -40,28 +40,26 @@
 
 package com.sun.jersey.samples.contacts.models;
 
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+import static org.junit.Assert.assertTrue;
 import org.apache.abdera.model.Entry;
 
 /**
  * <p>Test case for {@link Contact} and its subordinate data models.</p>
  */
-public class ContactTest extends TestCase {
+public class ContactTest {
     
-    public ContactTest(String testName) {
-        super(testName);
+   @Before
+    public void setUp() throws Exception {        
     }
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @After
+    public void tearDown() throws Exception {        
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testComplexSerialization() {
 
         Contact contact1 = new Contact();
@@ -88,6 +86,7 @@ public class ContactTest extends TestCase {
 
     }
 
+    @Test
     public void testSimpleSerialization() {
         Contact contact1 = new Contact();
         Entry entry1 = contact1.asEntry();

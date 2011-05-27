@@ -45,7 +45,12 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.EntityTag;
@@ -58,7 +63,7 @@ import java.util.Date;
  *
  * @author Naresh (srinivas.bhimisetty@sun.com)
  */
-public class MainTest extends TestCase {
+public class MainTest {
 
     private HttpServer httpServer;
 
@@ -66,14 +71,9 @@ public class MainTest extends TestCase {
 
     private Client c;
 
-    public MainTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+    @Before
+    public void setUp() throws Exception {
+        
         //start the Grizzly web container and create the client
         httpServer = Main.startServer();
 
@@ -81,16 +81,16 @@ public class MainTest extends TestCase {
         r = c.resource(Main.BASE_URI);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    @After
+    public void tearDown() throws Exception {
+        
         httpServer.stop();
     }
 
     /**
      * Test checks that an application.wadl file is present for the resource.
      */
+    @Test
     public void testApplicationWadl() {
         String serviceWadl = r.path("application.wadl").
                 accept(MediaTypes.WADL).get(String.class);
@@ -102,6 +102,7 @@ public class MainTest extends TestCase {
      * Test checks that an xml content is shown for the client request to
      * resource "containers".
      */
+    @Test
     public void testContainersResource() {
         Containers containers = r.path("containers").
                 accept(MediaType.APPLICATION_XML).get(Containers.class);
@@ -113,6 +114,7 @@ public class MainTest extends TestCase {
      * It also checks that the number of items in the container is the same
      * as the number which were added by PUT.
      */
+    @Test
     public void testPutOnContainerAndItemResource() {
         // Create a child WebResource for the container "quotes"
         WebResource content = r.path("containers").path("quotes");
@@ -159,6 +161,7 @@ public class MainTest extends TestCase {
     }
 
 
+    @Test
     public void testUpdateItem3() {
         WebResource content = r.path("containers").path("quotes");
 
@@ -201,6 +204,7 @@ public class MainTest extends TestCase {
      * Test deletes the item 3, which is the only one which supposedly has the word "king"
      * and then searches for the word in the other items of the container.
      */
+    @Test
     public void testDeleteItem3AndSearchForKing() {
         WebResource content = r.path("containers").path("quotes");
 
@@ -230,6 +234,7 @@ public class MainTest extends TestCase {
      * Test DELETEs the container "quotes" and sees that a 404 error is seen
      * on subsequent requests for the container.
      */
+    @Test
     public void testDeleteContainerQuotes() {
         WebResource content = r.path("containers").path("quotes");
 

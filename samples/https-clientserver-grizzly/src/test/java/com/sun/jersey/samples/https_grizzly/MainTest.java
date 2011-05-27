@@ -46,7 +46,11 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.HTTPBasicAuthFilter;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.client.urlconnection.HTTPSProperties;
-import junit.framework.TestCase;
+import org.junit.Test;
+import org.junit.Before;
+import org.junit.After;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
@@ -70,29 +74,22 @@ import java.security.cert.X509Certificate;
  *
  * @author pavel.bucek@sun.com
  */
-public class MainTest extends TestCase {
-
-    public MainTest(String testName) {
-        super(testName);
-    }
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-
+public class MainTest {
+   
+    @Before
+    public void setUp() throws Exception {
         Server.startServer();
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
+    @After
+    public void tearDown() throws Exception {
         Server.stopServer();
     }
 
     /**
      * Test to see that the message "JERSEY HTTPS EXAMPLE" is sent in the response.
      */
+    @Test
     public void testSSLWithAuth() {
 
         TrustManager mytm[] = null;
@@ -140,6 +137,7 @@ public class MainTest extends TestCase {
      * Test to see that HTTP 401 is returned when client tries to GET without
      * proper credentials.
      */
+    @Test
     public void testHTTPBasicAuth1() {
 
         TrustManager mytm[] = null;
@@ -192,6 +190,7 @@ public class MainTest extends TestCase {
      * Test to see that SSLHandshakeException is thrown when client don't have
      * trusted key.
      */
+    @Test
     public void testSSLAuth1() {
 
         TrustManager mytm[] = null;

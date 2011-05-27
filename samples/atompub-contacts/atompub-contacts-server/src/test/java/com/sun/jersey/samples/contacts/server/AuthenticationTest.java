@@ -45,23 +45,21 @@ import com.sun.jersey.api.client.WebResource;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.axiom.om.util.Base64;
+import static org.junit.Assert.fail;
+import org.junit.Test;
 
 /**
  * <p>Unit tests for authentication in the Contacts Service.</p>
  */
 public class AuthenticationTest extends AbstractTest {
-    
-    public AuthenticationTest(String testName) {
-        super(testName);
-    }
-
+      
     @Override
-    protected void setUp() throws Exception {
+    public void setUp() throws Exception {
         super.setUp();
     }
 
     @Override
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         super.tearDown();
     }
 
@@ -81,6 +79,7 @@ public class AuthenticationTest extends AbstractTest {
         Feed.class,
     };
 
+    @Test
     public void testAuthenticationAdmin() {
         String credentials = adminCredentials();
         for (int i = 0; i < AUTHENTICATION_ERROR_URIS.length; i++) {
@@ -95,6 +94,7 @@ public class AuthenticationTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testAuthenticationInvalid() {
         String credentials = Base64.encode("invalid-username:invalid-password".getBytes());
         for (String[] paths : AUTHENTICATION_ERROR_URIS) {
@@ -114,6 +114,7 @@ public class AuthenticationTest extends AbstractTest {
         }
     }
 
+    @Test
     public void testAuthenticationMissing() {
         for (String[] paths : AUTHENTICATION_ERROR_URIS) {
             WebResource resource = resource(paths);
