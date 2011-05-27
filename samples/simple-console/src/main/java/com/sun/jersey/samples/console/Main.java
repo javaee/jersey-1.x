@@ -52,7 +52,7 @@ import java.util.Map;
 public class Main {
 
     private static int getPort(int defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
+        String port = System.getProperty("jersey.test.port");
         if (null != port) {
             try {
                 return Integer.parseInt(port);
@@ -63,10 +63,11 @@ public class Main {
     }
 
     private static URI getBaseURI() {
-        return UriBuilder.fromUri("http://localhost/resources").port(getPort(9998)).build();
+        return UriBuilder.fromUri("http://localhost/resources").port(getPort(defaultPort)).build();
     }
 
     public static final URI BASE_URI = getBaseURI();
+    public static final int defaultPort = 9998;
 
     protected static HttpServer startServer() throws IOException {
         final Map<String, String> initParams = new HashMap<String, String>();
@@ -83,7 +84,10 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         HttpServer httpServer = startServer();
-        System.out.println("Server running, visit: http://127.0.0.1:9998/resources/form, hit return to stop...");
+        //port can change value based on jersey.http.port, don't hard code in println
+        int port = getPort(defaultPort);
+        String portString = Integer.toString(port);
+        System.out.println("Server running, visit: http://127.0.0.1:"+portString+"/resources/form, hit return to stop...");        
         System.in.read();
         System.out.println("Stopping server");
         

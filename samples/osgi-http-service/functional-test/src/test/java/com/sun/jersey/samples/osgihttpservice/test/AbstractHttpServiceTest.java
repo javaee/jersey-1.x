@@ -142,7 +142,7 @@ public abstract class AbstractHttpServiceTest {
 
     final Semaphore semaphore = new Semaphore(0);
 
-    private static final int port = getEnvVariable("JERSEY_HTTP_PORT", 8080);
+    private static final int port = getProperty("jersey.test.port", 8080);    
     private static final String CONTEXT = "/jersey-http-service";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
     private static final String BundleLocationProperty = "jersey.bundle.location";
@@ -177,12 +177,12 @@ public abstract class AbstractHttpServiceTest {
         System.out.println("JERSEY RESULT = " + result);
         assertEquals("active", result);
     }
-
-    public static int getEnvVariable(final String varName, int defaultValue) {
+      
+    public static int getProperty(final String varName, int defaultValue) {
         if (null == varName) {
             return defaultValue;
         }
-        String varValue = System.getenv(varName);
+        String varValue = System.getProperty(varName);
         if (null != varValue) {
             try {
                 return Integer.parseInt(varValue);

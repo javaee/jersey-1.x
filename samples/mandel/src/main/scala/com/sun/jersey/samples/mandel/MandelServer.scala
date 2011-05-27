@@ -10,7 +10,7 @@ import javax.ws.rs.core.UriBuilder;
 
 object MandelServer {
     private def getPort(defaultPort : Int) = {
-        val port = System.getenv("JERSEY_HTTP_PORT");
+        val port = System.getProperty("jersey.test.port");;
 
         if (null != port)
             try  {

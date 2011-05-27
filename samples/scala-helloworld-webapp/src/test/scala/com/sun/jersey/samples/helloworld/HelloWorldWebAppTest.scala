@@ -50,7 +50,7 @@ import org.glassfish.embed.{ScatteredWar, GlassFish};
 
 object HelloWorldWebAppTest {
     def getPort(defaultPort: Int) : Int = {
-        val port = System.getenv("JERSEY_HTTP_PORT");
+        val port = System.getProperty("jersey.test.port");;
 
         if (null != port)
             try  {

@@ -8,7 +8,7 @@ import org.glassfish.grizzly.http.server.HttpHandler
 
 class GroovyResourceTest extends GroovyTestCase {
     private static getPort(defaultPort) {
-        String port = System.getenv("JERSEY_HTTP_PORT");
+        String port = System.getProperty("jersey.test.port");;
         if (null != port) {
             try {
                 return Integer.parseInt(port);
