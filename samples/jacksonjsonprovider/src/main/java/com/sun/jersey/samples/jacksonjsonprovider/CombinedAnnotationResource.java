@@ -40,29 +40,22 @@
 
 package com.sun.jersey.samples.jacksonjsonprovider;
 
-import java.util.HashSet;
-import java.util.Set;
-import javax.ws.rs.core.Application;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 /**
  *
  * @author japod
  */
-public class MyApplication extends Application {
+@Path("combinedAnnotations")
+public class CombinedAnnotationResource {
 
-    @Override
-    public Set<Class<?>> getClasses() {
-
-        final Set<Class<?>> classes = new HashSet<Class<?>>();
-
-        // register root resources
-        classes.add(EmptyArrayResource.class);
-        classes.add(NonJAXBBeanResource.class);
-        classes.add(CombinedAnnotationResource.class);
-
-        // register Jackson ObjectMapper resolver
-        classes.add(MyObjectMapperProvider.class);
-
-        return classes;
+    @Produces(MediaType.APPLICATION_JSON)
+    @GET
+    public CombinedAnnotationBean getAccount() {
+        return new CombinedAnnotationBean(12);
     }
+
 }

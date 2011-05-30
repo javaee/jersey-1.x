@@ -41,23 +41,27 @@
 package com.sun.jersey.json.impl.provider.entity;
 
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentInjector;
+import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.spi.inject.Injectable;
+import com.sun.jersey.spi.inject.InjectableProviderContext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
 import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  *
@@ -75,14 +79,53 @@ public class JacksonProviderProxy implements MessageBodyReader<Object>, MessageB
         jacksonEntityProviderFeatureSet = fp.getFeature(JSONConfiguration.FEATURE_POJO_MAPPING);
     }
 
+    private static class ProvidersInjectableProviderContext implements InjectableProviderContext {
+
+        final Providers p;
+        final Injectable i;
+
+        private ProvidersInjectableProviderContext(final Providers p) {
+            this.p = p;
+            this.i = new Injectable() {
+
+                @Override
+                public Object getValue() {
+                    return p;
+                }
+            };
+        }
+
+        @Override
+        public boolean isAnnotationRegistered(Class<? extends Annotation> ac, Class<?> cc) {
+            return ac == Context.class;
+        }
+
+        @Override
+        public boolean isInjectableProviderRegistered(Class<? extends Annotation> ac, Class<?> cc, ComponentScope s) {
+            return isAnnotationRegistered(ac, cc);
+        }
+
+        @Override
+        public <A extends Annotation, C> Injectable getInjectable(Class<? extends Annotation> ac, ComponentContext ic, A a, C c, ComponentScope s) {
+            return  (c == Providers.class) ? i : null;
+        }
+
+        @Override
+        public <A extends Annotation, C> Injectable getInjectable(Class<? extends Annotation> ac, ComponentContext ic, A a, C c, List<ComponentScope> ls) {
+            return  (c == Providers.class) ? i : null;
+        }
+
+        @Override
+        public <A extends Annotation, C> InjectableScopePair getInjectableWithScope(Class<? extends Annotation> ac, ComponentContext ic, A a, C c, List<ComponentScope> ls) {
+            return (c == Providers.class) ?  new InjectableScopePair(i, ls.get(0)) : null;
+        }
+
+    }
+
     @Context
     public void setProviders(Providers p) {
-        final ContextResolver<ObjectMapper> omResolver = p.getContextResolver(ObjectMapper.class, MediaType.APPLICATION_JSON_TYPE);
-        if (omResolver != null) {
-            final ObjectMapper mapper = omResolver.getContext(ObjectMapper.class);
-            pojoProvider.setMapper(mapper);
-            jaxbProvider.setMapper(mapper);
-        }
+        new ComponentInjector<JacksonJsonProvider>(new ProvidersInjectableProviderContext(p), JacksonJsonProvider.class).inject(pojoProvider);
+        new ComponentInjector<JacksonJaxbJsonProvider>(new ProvidersInjectableProviderContext(p), JacksonJaxbJsonProvider.class).inject(jaxbProvider);
     }
 
     @Override

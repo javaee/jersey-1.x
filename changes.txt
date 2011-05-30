@@ -1,4 +1,6 @@
 release 1.8
+- Fixed issue 726
+  JSON POJO mapping feature does not allow to register custom object mappers for different types
 - jersey-grizzly2: Grizzly update 2.1 -> 2.1.1, Servlet 3.0 -> 3.1
 - Fixed issue 724
   http://java.net/jira/browse/JERSEY-724

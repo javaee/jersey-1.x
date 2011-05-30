@@ -37,32 +37,26 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.samples.jacksonjsonprovider;
 
-import java.util.HashSet;
-import java.util.Set;
-import javax.ws.rs.core.Application;
+import javax.xml.bind.annotation.XmlRootElement;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  *
  * @author japod
  */
-public class MyApplication extends Application {
+@XmlRootElement(name = "account")
+public class CombinedAnnotationBean {
 
-    @Override
-    public Set<Class<?>> getClasses() {
+    @JsonProperty("value")
+    int x;
 
-        final Set<Class<?>> classes = new HashSet<Class<?>>();
+    public CombinedAnnotationBean(int x) {
+        this.x = x;
+    }
 
-        // register root resources
-        classes.add(EmptyArrayResource.class);
-        classes.add(NonJAXBBeanResource.class);
-        classes.add(CombinedAnnotationResource.class);
-
-        // register Jackson ObjectMapper resolver
-        classes.add(MyObjectMapperProvider.class);
-
-        return classes;
+    public CombinedAnnotationBean() {
+        this(15);
     }
 }

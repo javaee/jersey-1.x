@@ -79,6 +79,13 @@ public class MainTest extends JerseyTest {
         assertTrue(!responseMsg.contains("jsonSource"));
     }
 
+    @Test
+    public void testCombinedAnnotationResource() {
+        WebResource r = resource();
+        String responseMsg = r.path("combinedAnnotations").accept("application/json").get(String.class);
+        assertTrue(responseMsg.contains("account") && responseMsg.contains("value"));
+    }
+
     /**
      * Test if a WADL document is available at the relative path
      * "application.wadl".
