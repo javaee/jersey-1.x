@@ -39,17 +39,19 @@
  */
 package com.sun.jersey.impl;
 
-import com.sun.jersey.core.header.InBoundHeaders;
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.TerminatingClientHandler;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
 import com.sun.jersey.spi.container.WebApplication;
+
+import javax.ws.rs.core.MultivaluedMap;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -57,7 +59,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *
@@ -138,7 +139,7 @@ public class TstResourceClientHandler extends TerminatingClientHandler {
 
         for (Map.Entry<String, List<Object>> e : outBound.entrySet()) {
             for (Object v : e.getValue()) {
-                inBound.add(e.getKey(), headerValueToString(v));
+                inBound.add(e.getKey(), ClientRequest.getHeaderValue(v));
             }
         }
 
