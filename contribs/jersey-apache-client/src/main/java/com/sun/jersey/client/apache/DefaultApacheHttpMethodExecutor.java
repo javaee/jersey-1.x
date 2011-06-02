@@ -269,14 +269,14 @@ public class DefaultApacheHttpMethodExecutor extends RequestWriter implements Ap
         for (Map.Entry<String, List<Object>> e : metadata.entrySet()) {
             List<Object> vs = e.getValue();
             if (vs.size() == 1) {
-                method.setRequestHeader(e.getKey(), headerValueToString(vs.get(0)));
+                method.setRequestHeader(e.getKey(), ClientRequest.getHeaderValue(vs.get(0)));
             } else {
                 StringBuilder b = new StringBuilder();
                 for (Object v : e.getValue()) {
                     if (b.length() > 0) {
                         b.append(',');
                     }
-                    b.append(headerValueToString(v));
+                    b.append(ClientRequest.getHeaderValue(v));
                 }
                 method.setRequestHeader(e.getKey(), b.toString());
             }

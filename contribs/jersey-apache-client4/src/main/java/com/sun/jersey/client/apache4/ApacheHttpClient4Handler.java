@@ -288,14 +288,14 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
             List<Object> vs = e.getValue();
             if (vs.size() == 1) {
-                request.addHeader(e.getKey(), headerValueToString(vs.get(0)));
+                request.addHeader(e.getKey(), ClientRequest.getHeaderValue(vs.get(0)));
             } else {
                 StringBuilder b = new StringBuilder();
                 for (Object v : e.getValue()) {
                     if (b.length() > 0) {
                         b.append(',');
                     }
-                    b.append(headerValueToString(v));
+                    b.append(ClientRequest.getHeaderValue(v));
                 }
                 request.addHeader(e.getKey(), b.toString());
             }

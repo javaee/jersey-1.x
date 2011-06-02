@@ -273,14 +273,14 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         for (Map.Entry<String, List<Object>> e : metadata.entrySet()) {
             List<Object> vs = e.getValue();
             if (vs.size() == 1) {
-                uc.setRequestProperty(e.getKey(), headerValueToString(vs.get(0)));
+                uc.setRequestProperty(e.getKey(), ClientRequest.getHeaderValue(vs.get(0)));
             } else {
                 StringBuilder b = new StringBuilder();
                 boolean add = false;
                 for (Object v : e.getValue()) {
                     if (add) b.append(',');
                     add = true;
-                    b.append(headerValueToString(v));
+                    b.append(ClientRequest.getHeaderValue(v));
                 }
                 uc.setRequestProperty(e.getKey(), b.toString());
             }

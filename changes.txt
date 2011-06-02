@@ -1,4 +1,7 @@
 release 1.8
+- Breaking change in client API - removed RequestWriter.headerValueToString().
+  Also changed constructors of AsyncWebResource and AsyncViewResource to
+  protected (from package private and private).
 - Fixed issue 726
   JSON POJO mapping feature does not allow to register custom object mappers for different types
 - jersey-grizzly2: Grizzly update 2.1 -> 2.1.1, Servlet 3.0 -> 3.1

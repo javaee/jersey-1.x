@@ -40,6 +40,13 @@
 package com.sun.jersey.api.client;
 
 import com.sun.jersey.spi.MessageBodyWorkers;
+
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
@@ -47,12 +54,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.ext.MessageBodyWriter;
 
 /**
  * A request writer for writing header values and a request entity.
@@ -238,24 +239,12 @@ public class RequestWriter {
     }
 
     /**
-     * Convert a header value to a String instance.
-     * <p>
-     * This method defers to {@link ClientRequest#getHeaderValue(java.lang.Object) }.
-     * 
-     * @param headerValue the header value.
-     * @return the string instance.
-     */
-    protected String headerValueToString(Object headerValue) {
-        return ClientRequest.getHeaderValue(headerValue);
-    }
-
-    /**
      * Get a request entity writer capable of writing the request entity.
      * 
      * @param ro the client request.
      * @return the request entity writer.
      */
-    protected RequestEntityWriter getRequestEntityWriter(ClientRequest ro) {
+    protected RequestEntityWriter getRequestEntityWriter(final ClientRequest ro) {
         return new RequestEntityWriterImpl(ro);
     }
 

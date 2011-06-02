@@ -44,6 +44,11 @@ import com.sun.jersey.api.client.async.AsyncClientHandler;
 import com.sun.jersey.api.client.async.FutureListener;
 import com.sun.jersey.api.client.filter.Filterable;
 import com.sun.jersey.client.impl.ClientRequestImpl;
+
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -54,49 +59,45 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriBuilder;
 
 public class AsyncViewResource extends Filterable implements
         RequestBuilder<AsyncViewResource.Builder>,
         AsyncViewUniformInterface,
         AsyncClientHandler {
     private static final Logger LOGGER = Logger.getLogger(AsyncWebResource.class.getName());
-    
+
     private final Client client;
 
     private final ExecutorService executorService;
 
     private final URI u;
-        
-    /* package */ AsyncViewResource(Client c, URI u) {
+
+    protected AsyncViewResource(Client c, URI u) {
         super((ClientHandler)c);
         this.client = c;
         this.executorService = c.getExecutorService();
         this.u = u;
     }
 
-    private AsyncViewResource(AsyncViewResource that, UriBuilder ub) {
+    protected AsyncViewResource(AsyncViewResource that, UriBuilder ub) {
         super(that);
         this.client = that.client;
         this.executorService = that.executorService;
         this.u = ub.build();
     }
-    
+
     /**
      * Get the URI to the resource.
-     * 
+     *
      * @return the URI.
      */
     public URI getURI() {
         return u;
     }
-    
+
     /**
      * Get the URI builder to the resource.
-     * 
+     *
      * @return the URI builder.
      */
     public UriBuilder getUriBuilder() {
@@ -125,7 +126,7 @@ public class AsyncViewResource extends Filterable implements
      * <p>
      * The hash code is the hash code of URI of this
      * <code>WebResource</code>.
-     * 
+     *
      * @return a hash code for this <code>WebResource</code>.
      */
     @Override
@@ -155,7 +156,7 @@ public class AsyncViewResource extends Filterable implements
     }
 
     // ViewUniformInterface
-    
+
     public <T> Future<T> head(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "HEAD"));
     }
@@ -164,7 +165,7 @@ public class AsyncViewResource extends Filterable implements
         return handle(t, new ClientRequestImpl(getURI(), "HEAD"));
     }
 
-        
+
     public <T> Future<T> options(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
@@ -182,7 +183,7 @@ public class AsyncViewResource extends Filterable implements
         return handle(t, new ClientRequestImpl(getURI(), "GET"));
     }
 
-    
+
     public <T> Future<T> put(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "PUT"));
     }
@@ -198,8 +199,8 @@ public class AsyncViewResource extends Filterable implements
     public <T> Future<T> put(T t, Object requestEntity) {
         return handle(t, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
-        
-        
+
+
     public <T> Future<T> post(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "POST"));
     }
@@ -249,10 +250,10 @@ public class AsyncViewResource extends Filterable implements
     public <T> Future<T> method(String method, T t, Object requestEntity) {
         return handle(t, new ClientRequestImpl(getURI(), method, requestEntity));
     }
-    
-    
+
+
     // RequestBuilder<WebResource.Builder>
-    
+
     public Builder entity(Object entity) {
         return getRequestBuilder().entity(entity);
     }
@@ -268,11 +269,11 @@ public class AsyncViewResource extends Filterable implements
     public Builder type(MediaType type) {
         return getRequestBuilder().type(type);
     }
-        
+
     public Builder type(String type) {
         return getRequestBuilder().type(type);
     }
-    
+
     public Builder accept(MediaType... types) {
         return getRequestBuilder().accept(types);
     }
@@ -292,13 +293,13 @@ public class AsyncViewResource extends Filterable implements
     public Builder cookie(Cookie cookie) {
         return getRequestBuilder().cookie(cookie);
     }
-    
+
     public Builder header(String name, Object value) {
         return getRequestBuilder().header(name, value);
     }
 
     // URI specific building
-    
+
     /**
      * Create a new WebResource from this web resource with an additional path
      * added to the URI of this web resource.
@@ -307,7 +308,7 @@ public class AsyncViewResource extends Filterable implements
      * may cause undefined behaviour.
      *
      * @param path the additional path.
-     * 
+     *
      * @return the new web resource.
      */
     public AsyncViewResource path(String path) {
@@ -326,7 +327,7 @@ public class AsyncViewResource extends Filterable implements
      * <p>
      * Any filters on this web resource are inherited. Removal of filters
      * may cause undefined behaviour.
-     * 
+     *
      * @param uri the URI.
      * @return the new web resource.
      */
@@ -342,7 +343,7 @@ public class AsyncViewResource extends Filterable implements
         }
         String query = uri.getRawQuery();
         if (query != null && query.length() > 0) {
-            b.replaceQuery(query);        
+            b.replaceQuery(query);
         }
         return new AsyncViewResource(this, b);
     }
@@ -378,33 +379,33 @@ public class AsyncViewResource extends Filterable implements
     }
 
     // Builder that builds client request and handles it
-    
+
     /**
      * The builder for building a {@link ClientRequest} instance and 
      * handling the request using the {@link UniformInterface}. The methods
      * of the {@link UniformInterface} are the build methods of the builder.
      */
-    public final class Builder extends PartialRequestBuilder<Builder> 
+    public final class Builder extends PartialRequestBuilder<Builder>
             implements AsyncViewUniformInterface {
 
 
         private Builder() {
         }
-        
+
         private ClientRequest build(String method) {
             ClientRequest ro = new ClientRequestImpl(u, method, entity, metadata);
             entity = null;
             metadata = null;
             return ro;
         }
-        
+
         private ClientRequest build(String method, Object e) {
             ClientRequest ro = new ClientRequestImpl(u, method, e, metadata);
             entity = null;
             metadata = null;
             return ro;
         }
-        
+
         // ViewUniformInterface
 
         public <T> Future<T> head(Class<T> c) {

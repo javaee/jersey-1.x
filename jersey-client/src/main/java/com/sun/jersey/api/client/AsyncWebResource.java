@@ -77,14 +77,14 @@ import java.util.logging.Logger;
  * <p>
  * Methods to create a request and return a response are thread-safe. Methods
  * that modify filters are not guaranteed to be thread-safe.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  * @see com.sun.jersey.api.client
  */
 public class AsyncWebResource extends Filterable implements
         AsyncClientHandler,
         RequestBuilder<AsyncWebResource.Builder>,
-        AsyncUniformInterface {    
+        AsyncUniformInterface {
     private static final Logger LOGGER = Logger.getLogger(AsyncWebResource.class.getName());
 
     private final ExecutorService executorService;
@@ -93,28 +93,28 @@ public class AsyncWebResource extends Filterable implements
 
     private CopyOnWriteHashMap<String, Object> properties;
 
-    /* package */ AsyncWebResource(Client c,  CopyOnWriteHashMap<String, Object> properties, URI u) {
+    protected AsyncWebResource(Client c,  CopyOnWriteHashMap<String, Object> properties, URI u) {
         super((ClientHandler)c);
         this.executorService = c.getExecutorService();
         this.u = u;
         this.properties = properties.clone();
     }
-    
-    private AsyncWebResource(AsyncWebResource that, UriBuilder ub) {
+
+    protected AsyncWebResource(AsyncWebResource that, UriBuilder ub) {
         super(that);
         this.executorService = that.executorService;
         this.u = ub.build();
     }
-    
+
     /**
      * Get the URI to the resource.
-     * 
+     *
      * @return the URI.
      */
     public URI getURI() {
         return u;
     }
-    
+
     /**
      * Get the URI builder to the resource.
      *
@@ -125,10 +125,10 @@ public class AsyncWebResource extends Filterable implements
     public UriBuilder getBuilder() {
         return UriBuilder.fromUri(u);
     }
-    
+
     /**
      * Get the URI builder to the resource.
-     * 
+     *
      * @return the URI builder.
      */
     public UriBuilder getUriBuilder() {
@@ -151,7 +151,7 @@ public class AsyncWebResource extends Filterable implements
     public String toString() {
         return u.toString();
     }
-    
+
     /**
      * Returns a hash code for this <code>WebResource</code>.
      * <p>
@@ -187,11 +187,11 @@ public class AsyncWebResource extends Filterable implements
     }
 
     // AsyncUniformInterface
-    
+
     public Future<ClientResponse> head() {
         return handle(ClientResponse.class, new ClientRequestImpl(getURI(), "HEAD"));
     }
-        
+
     public Future<ClientResponse> head(ITypeListener<ClientResponse> l) {
         return handle(l, new ClientRequestImpl(getURI(), "HEAD"));
     }
@@ -199,7 +199,7 @@ public class AsyncWebResource extends Filterable implements
     public <T> Future<T> options(Class<T> c) {
         return handle(c, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
-        
+
     public <T> Future<T> options(GenericType<T> gt) {
         return handle(gt, new ClientRequestImpl(getURI(), "OPTIONS"));
     }
@@ -211,7 +211,7 @@ public class AsyncWebResource extends Filterable implements
     public <T> Future<T> get(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "GET"));
     }
-            
+
     public <T> Future<T> get(GenericType<T> gt) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "GET"));
     }
@@ -223,11 +223,11 @@ public class AsyncWebResource extends Filterable implements
     public Future<?> put() throws UniformInterfaceException {
         return voidHandle(new ClientRequestImpl(getURI(), "PUT", null));
     }
-    
+
     public Future<?> put(Object requestEntity) throws UniformInterfaceException {
         return voidHandle(new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
-    
+
     public <T> Future<T> put(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "PUT"));
     }
@@ -243,7 +243,7 @@ public class AsyncWebResource extends Filterable implements
     public <T> Future<T> put(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
-            
+
     public <T> Future<T> put(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "PUT", requestEntity));
     }
@@ -255,11 +255,11 @@ public class AsyncWebResource extends Filterable implements
     public Future<?> post() throws UniformInterfaceException {
         return voidHandle(new ClientRequestImpl(getURI(), "POST"));
     }
-    
+
     public Future<?> post(Object requestEntity) throws UniformInterfaceException {
         return voidHandle(new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
-    
+
     public <T> Future<T> post(Class<T> c) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "POST"));
     }
@@ -275,7 +275,7 @@ public class AsyncWebResource extends Filterable implements
     public <T> Future<T> post(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
-            
+
     public <T> Future<T> post(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "POST", requestEntity));
     }
@@ -287,17 +287,17 @@ public class AsyncWebResource extends Filterable implements
     public Future<?> delete() throws UniformInterfaceException {
         return voidHandle(new ClientRequestImpl(getURI(), "DELETE"));
     }
-    
+
     public Future<?> delete(Object requestEntity) throws UniformInterfaceException {
         return voidHandle(new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
-    
+
     public <T> Future<T> delete(Class<T> c) throws UniformInterfaceException {
-        return handle(c, new ClientRequestImpl(getURI(), "DELETE"));    
+        return handle(c, new ClientRequestImpl(getURI(), "DELETE"));
     }
 
     public <T> Future<T> delete(GenericType<T> gt) throws UniformInterfaceException {
-        return handle(gt, new ClientRequestImpl(getURI(), "DELETE"));    
+        return handle(gt, new ClientRequestImpl(getURI(), "DELETE"));
     }
 
     public <T> Future<T> delete(ITypeListener<T> l) {
@@ -307,7 +307,7 @@ public class AsyncWebResource extends Filterable implements
     public <T> Future<T> delete(Class<T> c, Object requestEntity) throws UniformInterfaceException {
         return handle(c, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
-      
+
     public <T> Future<T> delete(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
         return handle(gt, new ClientRequestImpl(getURI(), "DELETE", requestEntity));
     }
@@ -317,19 +317,19 @@ public class AsyncWebResource extends Filterable implements
     }
 
     public Future<?> method(String method) throws UniformInterfaceException {
-        return voidHandle(new ClientRequestImpl(getURI(), method));        
+        return voidHandle(new ClientRequestImpl(getURI(), method));
     }
-    
+
     public Future<?> method(String method, Object requestEntity) throws UniformInterfaceException {
-        return voidHandle(new ClientRequestImpl(getURI(), method, requestEntity));        
+        return voidHandle(new ClientRequestImpl(getURI(), method, requestEntity));
     }
-    
+
     public <T> Future<T> method(String method, Class<T> c) throws UniformInterfaceException {
-        return handle(c, new ClientRequestImpl(getURI(), method));            
+        return handle(c, new ClientRequestImpl(getURI(), method));
     }
-    
+
     public <T> Future<T> method(String method, GenericType<T> gt) throws UniformInterfaceException {
-        return handle(gt, new ClientRequestImpl(getURI(), method));            
+        return handle(gt, new ClientRequestImpl(getURI(), method));
     }
 
     public <T> Future<T> method(String method, ITypeListener<T> l) {
@@ -337,20 +337,20 @@ public class AsyncWebResource extends Filterable implements
     }
 
     public <T> Future<T> method(String method, Class<T> c, Object requestEntity) throws UniformInterfaceException {
-        return handle(c, new ClientRequestImpl(getURI(), method, requestEntity));        
+        return handle(c, new ClientRequestImpl(getURI(), method, requestEntity));
     }
-    
+
     public <T> Future<T> method(String method, GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
-        return handle(gt, new ClientRequestImpl(getURI(), method, requestEntity));        
+        return handle(gt, new ClientRequestImpl(getURI(), method, requestEntity));
     }
-    
+
     public <T> Future<T> method(String method, ITypeListener<T> l, Object requestEntity) {
         return handle(l, new ClientRequestImpl(getURI(), method, requestEntity));
     }
 
-    
+
     // RequestBuilder<WebResource.Builder>
-    
+
     public Builder entity(Object entity) {
         return getRequestBuilder().entity(entity);
     }
@@ -366,11 +366,11 @@ public class AsyncWebResource extends Filterable implements
     public Builder type(MediaType type) {
         return getRequestBuilder().type(type);
     }
-        
+
     public Builder type(String type) {
         return getRequestBuilder().type(type);
     }
-    
+
     public Builder accept(MediaType... types) {
         return getRequestBuilder().accept(types);
     }
@@ -390,13 +390,13 @@ public class AsyncWebResource extends Filterable implements
     public Builder cookie(Cookie cookie) {
         return getRequestBuilder().cookie(cookie);
     }
-    
+
     public Builder header(String name, Object value) {
         return getRequestBuilder().header(name, value);
     }
 
     // URI specific building
-    
+
     /**
      * Create a new AsyncWebResource from this web resource with an additional path
      * added to the URI of this web resource.
@@ -405,7 +405,7 @@ public class AsyncWebResource extends Filterable implements
      * may cause undefined behaviour.
      *
      * @param path the additional path.
-     * 
+     *
      * @return the new web resource.
      */
     public AsyncWebResource path(String path) {
@@ -424,7 +424,7 @@ public class AsyncWebResource extends Filterable implements
      * <p>
      * Any filters on this web resource are inherited. Removal of filters
      * may cause undefined behaviour.
-     * 
+     *
      * @param uri the URI.
      * @return the new web resource.
      */
@@ -440,11 +440,11 @@ public class AsyncWebResource extends Filterable implements
         }
         String query = uri.getRawQuery();
         if (query != null && query.length() > 0) {
-            b.replaceQuery(query);        
+            b.replaceQuery(query);
         }
         return new AsyncWebResource(this, b);
     }
-    
+
     /**
      * Create a new WebResource from this web resource with an additional
      * query parameter added to the URI of this web resource.
@@ -476,7 +476,7 @@ public class AsyncWebResource extends Filterable implements
     }
 
     // Builder that builds client request and handles it
-    
+
     /**
      * The builder for building a {@link ClientRequest} instance and 
      * handling the request using the {@link UniformInterface}. The methods
@@ -487,27 +487,27 @@ public class AsyncWebResource extends Filterable implements
 
         private Builder() {
         }
-        
+
         private ClientRequest build(String method) {
             ClientRequest ro = new ClientRequestImpl(u, method, entity, metadata);
             entity = null;
             metadata = null;
             return ro;
         }
-        
+
         private ClientRequest build(String method, Object e) {
             ClientRequest ro = new ClientRequestImpl(u, method, e, metadata);
             entity = null;
             metadata = null;
             return ro;
         }
-        
+
         // UniformInterface
-        
+
         public Future<ClientResponse> head() {
             return handle(ClientResponse.class, build("HEAD"));
         }
-        
+
         public Future<ClientResponse> head(ITypeListener<ClientResponse> l) {
             return handle(l, build("HEAD"));
         }
@@ -515,7 +515,7 @@ public class AsyncWebResource extends Filterable implements
         public <T> Future<T> options(Class<T> c) {
             return handle(c, build("OPTIONS"));
         }
-                
+
         public <T> Future<T> options(GenericType<T> gt) {
             return handle(gt, build("OPTIONS"));
         }
@@ -527,7 +527,7 @@ public class AsyncWebResource extends Filterable implements
         public <T> Future<T> get(Class<T> c) {
             return handle(c, build("GET"));
         }
-                
+
         public <T> Future<T> get(GenericType<T> gt) {
             return handle(gt, build("GET"));
         }
@@ -543,11 +543,11 @@ public class AsyncWebResource extends Filterable implements
         public Future<?> put(Object requestEntity) throws UniformInterfaceException {
             return voidHandle(build("PUT", requestEntity));
         }
-        
+
         public <T> Future<T> put(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("PUT"));
         }
-        
+
         public <T> Future<T> put(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("PUT"));
         }
@@ -559,7 +559,7 @@ public class AsyncWebResource extends Filterable implements
         public <T> Future<T> put(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("PUT", requestEntity));
         }
-        
+
         public <T> Future<T> put(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("PUT", requestEntity));
         }
@@ -579,7 +579,7 @@ public class AsyncWebResource extends Filterable implements
         public <T> Future<T> post(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("POST"));
         }
-                
+
         public <T> Future<T> post(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("POST"));
         }
@@ -591,7 +591,7 @@ public class AsyncWebResource extends Filterable implements
         public <T> Future<T> post(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("POST", requestEntity));
         }
-        
+
         public <T> Future<T> post(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("POST", requestEntity));
         }
@@ -607,11 +607,11 @@ public class AsyncWebResource extends Filterable implements
         public Future<?> delete(Object requestEntity) throws UniformInterfaceException {
             return voidHandle(build("DELETE", requestEntity));
         }
-        
+
         public <T> Future<T> delete(Class<T> c) throws UniformInterfaceException {
             return handle(c, build("DELETE"));
         }
-        
+
         public <T> Future<T> delete(GenericType<T> gt) throws UniformInterfaceException {
             return handle(gt, build("DELETE"));
         }
@@ -623,7 +623,7 @@ public class AsyncWebResource extends Filterable implements
         public <T> Future<T> delete(Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build("DELETE", requestEntity));
         }
-        
+
         public <T> Future<T> delete(GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build("DELETE", requestEntity));
         }
@@ -655,7 +655,7 @@ public class AsyncWebResource extends Filterable implements
         public <T> Future<T> method(String method, Class<T> c, Object requestEntity) throws UniformInterfaceException {
             return handle(c, build(method, requestEntity));
         }
-        
+
         public <T> Future<T> method(String method, GenericType<T> gt, Object requestEntity) throws UniformInterfaceException {
             return handle(gt, build(method, requestEntity));
         }
@@ -700,7 +700,7 @@ public class AsyncWebResource extends Filterable implements
             ro.setProperties(properties);
         }
     }
-    
+
     private <T> Future<T> handle(final Class<T> c, final ClientRequest request) {
         setProperties(request);
         final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
@@ -736,7 +736,7 @@ public class AsyncWebResource extends Filterable implements
 
         return ftw;
     }
-    
+
     private <T> Future<T> handle(final ITypeListener<T> l, final ClientRequest request) {
         setProperties(request);
         final FutureClientResponseListener<T> ftw = new FutureClientResponseListener<T>() {
@@ -777,7 +777,7 @@ public class AsyncWebResource extends Filterable implements
             protected Object get(ClientResponse response) {
                 if (response.getStatus() >= 300)
                     throw new UniformInterfaceException(response,
-                        request.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
+                            request.getPropertyAsFeature(ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION, true));
                 response.close();
                 return null;
             }
@@ -789,7 +789,7 @@ public class AsyncWebResource extends Filterable implements
     }
 
     // AsyncClientHandler
-    
+
     public Future<ClientResponse> handle(final ClientRequest request, final FutureListener<ClientResponse> l) {
         setProperties(request);
         Callable<ClientResponse> c = new Callable<ClientResponse>() {

@@ -138,7 +138,7 @@ public class TestResourceClientHandler extends TerminatingClientHandler {
 
         for (Map.Entry<String, List<Object>> e : outBound.entrySet()) {
             for (Object v : e.getValue()) {
-                inBound.add(e.getKey(), headerValueToString(v));
+                inBound.add(e.getKey(), ClientRequest.getHeaderValue(v));
             }
         }
 
