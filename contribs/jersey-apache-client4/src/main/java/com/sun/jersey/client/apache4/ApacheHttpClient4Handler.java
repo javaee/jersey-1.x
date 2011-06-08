@@ -109,9 +109,6 @@ import java.util.Map;
  */
 public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
-//    private static final DefaultCredentialsProvider DEFAULT_CREDENTIALS_PROVIDER =
-//            new DefaultCredentialsProvider();
-
     private final HttpClient client;
     private final CookieStore cookieStore;
     private final boolean preemptiveBasicAuth;
@@ -190,7 +187,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
     }
 
     private HttpHost getHost(final HttpUriRequest request) {
-        return new HttpHost(request.getURI().getHost(), request.getURI().getPort());
+        return new HttpHost(request.getURI().getHost(), request.getURI().getPort(), request.getURI().getScheme());
     }
 
     private HttpUriRequest getUriHttpRequest(final ClientRequest cr) {
