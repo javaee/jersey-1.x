@@ -64,7 +64,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A {@link Client} that utilizes the Apache HTTP client to send and receive
+ * A {@link Client} that utilizes the Apache HTTP Client to send and receive
  * HTTP request and responses.
  * <p>
  * The following properties are only supported at construction of this class:
@@ -91,6 +91,8 @@ import java.util.logging.Logger;
  * entity is not read from the response then
  * {@link com.sun.jersey.api.client.ClientResponse#close() } MUST be called 
  * after processing the response to release connection-based resources.
+ *
+ * @see ApacheHttpClient4Config#PROPERTY_CONNECTION_MANAGER
  *
  * @author jorgeluisw@mac.com
  * @author Paul.Sandoz@Sun.Com
@@ -204,7 +206,7 @@ public class ApacheHttpClient4 extends Client {
                             Level.WARNING,
                             "Ignoring value of property " + ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER +
                                     " (" + connectionManager.getClass().getName() +
-                                     ") - not instance of org.apache.http.conn.ClientConnectionManager."
+                                    ") - not instance of org.apache.http.conn.ClientConnectionManager."
                     );
                     connectionManager = null;
                 }
@@ -217,7 +219,7 @@ public class ApacheHttpClient4 extends Client {
                             Level.WARNING,
                             "Ignoring value of property " + ApacheHttpClient4Config.PROPERTY_HTTP_PARAMS +
                                     " (" + httpParams.getClass().getName() +
-                                     ") - not instance of org.apache.http.params.HttpParams."
+                                    ") - not instance of org.apache.http.params.HttpParams."
                     );
                     httpParams = null;
                 }
@@ -285,5 +287,4 @@ public class ApacheHttpClient4 extends Client {
                     ") property MUST be an instance of String or URI");
         }
     }
-
 }

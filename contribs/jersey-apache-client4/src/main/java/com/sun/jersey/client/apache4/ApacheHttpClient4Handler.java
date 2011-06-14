@@ -82,7 +82,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A root handler with Jakarta Commons HttpClient acting as a backend.
+ * A root handler with Apache HTTP Client acting as a backend.
  * <p>
  * Client operations are thread safe, the HTTP connection may
  * be shared between different threads.

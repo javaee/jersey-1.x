@@ -92,7 +92,9 @@ public interface ApacheHttpClient4Config extends ClientConfig {
      * Connection Manager which will be used to create {@link org.apache.http.client.HttpClient}.
      *
      * The value MUST be an instance of {@link org.apache.http.conn.ClientConnectionManager}.
-     * If the property is absent a default Connection Manager will be used.
+     * If the property is absent a default Connection Manager will be used ({@link org.apache.http.impl.conn.SingleClientConnManager}).
+     * If you want to use this client in multi-threaded environment, be sure you override
+     * default value with {@link org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager} instance.
      */
     public static final String PROPERTY_CONNECTION_MANAGER =
             "com.sun.jersey.impl.client.httpclient.connectionManager";
