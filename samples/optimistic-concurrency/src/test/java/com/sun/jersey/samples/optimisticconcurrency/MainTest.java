@@ -97,7 +97,7 @@ public class MainTest {
     public void testItemResource() {
         String serviceXml = r.path("item").
                 accept(MediaType.APPLICATION_XML).get(String.class);
-        assertTrue("Looks like the fiven xml response is not the expected one",
+        assertTrue("Looks like the given xml response is not the expected one",
                 serviceXml.length() > 0);
     }
 
