@@ -1,4 +1,7 @@
 release 1.8
+- Fixed GlassFish issue 16199
+  http://java.net/jira/browse/GLASSFISH-16199
+  IllegalArgumentException: object is not an instance of declaring class - on a REST / EJB Service
 - Breaking change in client API - removed RequestWriter.headerValueToString().
   Also changed constructors of AsyncWebResource and AsyncViewResource to
   protected (from package private and private).
