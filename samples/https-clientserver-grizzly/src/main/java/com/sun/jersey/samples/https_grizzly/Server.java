@@ -110,7 +110,7 @@ public class Server {
                     getBaseURI(),
                     jerseyAdapter,
                     true,
-                    new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(false)
+                    new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(true)
             );
 
             // start Grizzly embedded server //
