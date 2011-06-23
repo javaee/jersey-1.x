@@ -50,7 +50,7 @@
           		<scope>provided</scope>
           </xsl:template>
 
-          <xsl:template match="pom:dependency[pom:groupId='com.sun.jersey' or pom:groupId='com.sun.xml.bind']/pom:scope[text()!=test]">
+          <xsl:template match="pom:profile[pom:id='default']/pom:dependencies/pom:dependency[pom:groupId='com.sun.jersey' or pom:groupId='com.sun.xml.bind']/pom:scope[text()!=test]">
           		<scope>provided</scope>
           </xsl:template>
 
@@ -63,7 +63,7 @@
             	</xsl:copy>
           </xsl:template>
 
-          <xsl:template match="pom:dependency[pom:groupId='com.sun.jersey'  or pom:groupId='com.sun.xml.bind']">
+          <xsl:template match="pom:profile[pom:id='default']/pom:dependencies/pom:dependency[pom:groupId='com.sun.jersey'  or pom:groupId='com.sun.xml.bind']">
             	<xsl:copy>
               	<xsl:apply-templates/>
               	<xsl:if test="count(pom:scope)=0">
