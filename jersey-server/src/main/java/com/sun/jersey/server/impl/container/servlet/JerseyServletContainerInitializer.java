@@ -109,12 +109,13 @@ If not using the Servlet 3 framework pluggability mechanism
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@HandlesTypes({Path.class, Provider.class, Application.class})
+@HandlesTypes({Path.class, Provider.class, Application.class, ApplicationPath.class})
 public class JerseyServletContainerInitializer implements ServletContainerInitializer {
 
     private static final Logger LOGGER =
             Logger.getLogger(JerseyServletContainerInitializer.class.getName());
 
+    @Override
     public void onStartup(Set<Class<?>> classes, ServletContext sc) {
         if (classes == null) {
             classes = Collections.<Class<?>>emptySet();
