@@ -85,9 +85,9 @@
                   <tr><th>JAAS context</th><td><code>fileRealm</code></td></tr>
                   <tr><th>Key File</th><td><code>${com.sun.aas.instanceRoot}/config/myRealm-keyfile</code></td></tr>
               </table>
-              <li>Set password for user <code>myRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>myRole</code>"); <b>Ensure user group set to "<code>Users</code>"</li>
+              <li>Create user and set password for user <code>myRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>New...</code>"); <b>Ensure "<code>User ID:</code>" set to "<code>myRole</code>" and "<code>Group List:</code>" set to "<code>Users</code>"</li>
               <li>Enter password <code>myRole</code> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</b></li>
-              <li>Add one other user name <code>joeRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>New...</code>"); <b>Ensure user group set to "<code>Users</code>"</li>
+              <li>Add one other user name <code>joeRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>New...</code>"); <b>Ensure "<code>User ID:</code>" set to "<code>joeRole</code>" and "<code>Group List:</code>" set to "<code>Users</code>"</li>
               <li>Enter password <code>joeRole</code> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</b></li>
           </ul>
           <li>Check <code>web.xml</code> and <code>sun-web.xml</code> to understand how role mappings are configured.  This blog is also helpful to clarify role mappings <a href="http://blogs.sun.com/bobby/entry/simplified_security_role_mapping">http://blogs.sun.com/bobby/entry/simplified_security_role_mapping</a> </li>
