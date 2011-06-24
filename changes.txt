@@ -1,4 +1,6 @@
-release 1.8
+release 1.9
+
+release 1.8 (06-2011)
 - Fixed GlassFish issue 16199
   http://java.net/jira/browse/GLASSFISH-16199
   IllegalArgumentException: object is not an instance of declaring class - on a REST / EJB Service

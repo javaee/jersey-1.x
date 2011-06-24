@@ -46,7 +46,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.test</groupId>
     <artifactId>functional-tests</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Project Jersey tests</name>
     <description>
