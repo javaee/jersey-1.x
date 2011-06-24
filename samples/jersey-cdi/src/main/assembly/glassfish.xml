@@ -53,7 +53,7 @@
       <excludes>
         <exclude>**/target/**</exclude>
         <exclude>**/*jersey*</exclude>
-        <exclude>pom.xml</exclude>
+        <!--<exclude>pom.xml</exclude>-->
       </excludes>
     </fileSet>
      <fileSet>
