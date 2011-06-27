@@ -60,5 +60,6 @@
     <modules>
         <module>hypermedia-action</module>
         <module>view-client</module>
+        <module>jersey-non-blocking-client</module>
     </modules>
 </project>
