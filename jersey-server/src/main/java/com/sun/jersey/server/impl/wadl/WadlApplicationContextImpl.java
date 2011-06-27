@@ -45,6 +45,7 @@ import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Resources;
 
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
@@ -81,7 +82,8 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 
     public Application getApplication(UriInfo ui) {
         Application a = getWadlBuilder().generate(rootResources);
-        a.getResources().setBase(ui.getBaseUri().toString());
+        for(Resources resources : a.getResources())
+            resources.setBase(ui.getBaseUri().toString());
         return a;
     }
 

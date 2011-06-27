@@ -41,7 +41,7 @@
 
 -->
 
-<grammars xmlns="http://research.sun.com/wadl/2006/10"
+<grammars xmlns="http://wadl.dev.java.net/2009/02"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:xi="http://www.w3.org/1999/XML/xinclude">
     <include href="schema.xsd" />

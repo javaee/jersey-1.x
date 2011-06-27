@@ -39,12 +39,20 @@
  */
 package com.sun.jersey.api.wadl;
 
-import com.sun.research.ws.wadl.Application;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.wadl.WadlBuilder;
+import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Resources;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.types.Reference;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,12 +64,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.types.Path;
-import org.apache.tools.ant.types.Reference;
 
 /**
  * Ant task for generating WADL for root resource classes.
@@ -138,8 +140,9 @@ public class WadlGeneratorTask extends Task {
         
         try {
             Application a = createApplication(classpath.list());
-            a.getResources().setBase(baseUri);
-            JAXBContext c = JAXBContext.newInstance("com.sun.research.ws.wadl", 
+            for(Resources resources : a.getResources())
+                    resources.setBase(baseUri);
+            JAXBContext c = JAXBContext.newInstance("com.sun.research.ws.wadl",
                     this.getClass().getClassLoader());
             Marshaller m = c.createMarshaller();
             OutputStream out = new BufferedOutputStream(new FileOutputStream(wadlFile));

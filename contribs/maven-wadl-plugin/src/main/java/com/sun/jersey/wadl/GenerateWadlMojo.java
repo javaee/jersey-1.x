@@ -39,6 +39,21 @@
  */
 package com.sun.jersey.wadl;
 
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.server.wadl.WadlBuilder;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGeneratorImpl;
+import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Resources;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,24 +65,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
-import com.sun.jersey.server.wadl.WadlBuilder;
-import com.sun.jersey.server.wadl.WadlGenerator;
-import com.sun.jersey.server.wadl.WadlGeneratorImpl;
-import com.sun.research.ws.wadl.Application;
+import java.util.Set;
 
 /**
  * This mojo generates a wadl file, without the need of a running webapp.<br />
@@ -144,8 +143,9 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
             wadlGenerator.init();
             
             final Application a = createApplication( _packagesResourceConfig, wadlGenerator );
-            a.getResources().setBase( _baseUri );
-            
+            for(Resources resources : a.getResources())
+                resources.setBase(_baseUri);
+
             final JAXBContext c = JAXBContext.newInstance( wadlGenerator.getRequiredJaxbContextPath(), 
                     Thread.currentThread().getContextClassLoader() );
             final Marshaller m = c.createMarshaller();
@@ -180,7 +180,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
     // When processing xml that doesn't use namespaces, simply omit the
     // namespace prefix as shown in the third CDataElement below.
         of.setCDataElements(
-                new String[] { "http://research.sun.com/wadl/2006/10^doc",   // <ns1:foo>
+                new String[] { "http://wadl.dev.java.net/2009/02^doc",   // <ns1:foo>
                        "ns2^doc",   // <ns2:bar>
                        "^doc"
                        /*,

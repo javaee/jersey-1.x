@@ -39,13 +39,6 @@
  */
 package com.sun.jersey.server.wadl.generators;
 
-import java.io.File;
-import java.io.InputStream;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -55,11 +48,17 @@ import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
-import com.sun.research.ws.wadl.RepresentationType;
+import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+import java.io.File;
+import java.io.InputStream;
 
 /**
  * This {@link WadlGenerator} adds all doc elements provided by {@link ApplicationDocs#getDocs()}
@@ -166,7 +165,7 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return representation type
      * @see com.sun.jersey.server.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
      */
-    public RepresentationType createRequestRepresentation(AbstractResource r,
+    public Representation createRequestRepresentation(AbstractResource r,
             AbstractResourceMethod m, MediaType mediaType) {
         return _delegate.createRequestRepresentation(r, m, mediaType);
     }

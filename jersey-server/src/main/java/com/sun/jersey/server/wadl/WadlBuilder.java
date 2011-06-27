@@ -52,7 +52,7 @@ import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Doc;
 import com.sun.research.ws.wadl.Param;
 import com.sun.research.ws.wadl.ParamStyle;
-import com.sun.research.ws.wadl.RepresentationType;
+import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
@@ -105,7 +105,7 @@ public class WadlBuilder {
             Resource wadlResource = generateResource(r, null);
             wadlResources.getResource().add(wadlResource);
         }
-        wadlApplication.setResources(wadlResources);
+        wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
         return wadlApplication;
@@ -121,7 +121,7 @@ public class WadlBuilder {
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateResource(resource, null);
         wadlResources.getResource().add(wadlResource);
-        wadlApplication.setResources(wadlResources);
+        wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
         return wadlApplication;
@@ -139,7 +139,7 @@ public class WadlBuilder {
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateSubResource(resource, path);
         wadlResources.getResource().add(wadlResource);
-        wadlApplication.setResources(wadlResources);
+        wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
         return wadlApplication;
@@ -163,7 +163,7 @@ public class WadlBuilder {
         // generate the response part
         Response wadlResponse = generateResponse(r, m);
         if (wadlResponse != null) {
-            wadlMethod.setResponse(wadlResponse);
+            wadlMethod.getResponse().add(wadlResponse);
         }
         return wadlMethod;
     }
@@ -190,7 +190,7 @@ public class WadlBuilder {
                 }
 
                 for (MediaType mediaType : supportedInputTypes) {
-                    final RepresentationType wadlRepresentation = setRepresentationForMediaType(r, m, mediaType, wadlRequest);
+                    final Representation wadlRepresentation = setRepresentationForMediaType(r, m, mediaType, wadlRequest);
                     if (getParamByName(wadlRepresentation.getParam(), p.getSourceName()) == null) {
                         final Param wadlParam = generateParam(r, m, p);
                         if (wadlParam != null) {
@@ -227,7 +227,7 @@ public class WadlBuilder {
     }
 
     /**
-     * Create the wadl {@link RepresentationType} for the specified {@link MediaType} if not yet
+     * Create the wadl {@link Representation} for the specified {@link MediaType} if not yet
      * existing for the wadl {@link Request} and return it.
      * @param r the resource
      * @param m the resource method
@@ -236,10 +236,10 @@ public class WadlBuilder {
      * @author Martin Grotzke
      * @return the wadl request representation for the specified {@link MediaType}.
      */
-    private RepresentationType setRepresentationForMediaType(AbstractResource r,
+    private Representation setRepresentationForMediaType(AbstractResource r,
                                                              final AbstractResourceMethod m, MediaType mediaType,
                                                              Request wadlRequest) {
-        RepresentationType wadlRepresentation = getRepresentationByMediaType(wadlRequest.getRepresentation(), mediaType);
+        Representation wadlRepresentation = getRepresentationByMediaType(wadlRequest.getRepresentation(), mediaType);
         if (wadlRepresentation == null) {
             wadlRepresentation = _wadlGenerator.createRequestRepresentation(r, m, mediaType);
             wadlRequest.getRepresentation().add(wadlRepresentation);
@@ -247,9 +247,9 @@ public class WadlBuilder {
         return wadlRepresentation;
     }
 
-    private RepresentationType getRepresentationByMediaType(
-            final List<RepresentationType> representations, MediaType mediaType) {
-        for (RepresentationType representation : representations) {
+    private Representation getRepresentationByMediaType(
+            final List<Representation> representations, MediaType mediaType) {
+        for (Representation representation : representations) {
             if (mediaType.toString().equals(representation.getMediaType())) {
                 return representation;
             }

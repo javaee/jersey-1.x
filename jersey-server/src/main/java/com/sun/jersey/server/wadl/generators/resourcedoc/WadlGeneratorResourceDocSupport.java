@@ -58,7 +58,7 @@ import com.sun.research.ws.wadl.Doc;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
 import com.sun.research.ws.wadl.ParamStyle;
-import com.sun.research.ws.wadl.RepresentationType;
+import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
@@ -66,9 +66,7 @@ import com.sun.research.ws.wadl.Response;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.namespace.QName;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
@@ -210,12 +208,12 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
      * @param r
      * @param m
      * @param mediaType
-     * @return the enhanced {@link RepresentationType}
+     * @return the enhanced {@link Representation}
      * @see com.sun.jersey.server.wadl.WadlGenerator#createRequestRepresentation(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod, javax.ws.rs.core.MediaType)
      */
-    public RepresentationType createRequestRepresentation( AbstractResource r,
+    public Representation createRequestRepresentation( AbstractResource r,
             AbstractResourceMethod m, MediaType mediaType ) {
-        final RepresentationType result = _delegate.createRequestRepresentation( r, m, mediaType );
+        final Representation result = _delegate.createRequestRepresentation( r, m, mediaType );
         final RepresentationDocType requestRepresentation = _resourceDoc.getRequestRepresentation( r.getResourceClass(), m.getMethod(), result.getMediaType() );
         if ( requestRepresentation != null ) {
             result.setElement( requestRepresentation.getElement() );
@@ -248,19 +246,14 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
             
             for ( RepresentationDocType representationDoc : responseDoc.getRepresentations() ) {
                 
-                final RepresentationType wadlRepresentation = new RepresentationType();
+                final Representation wadlRepresentation = new Representation();
                 wadlRepresentation.setElement( representationDoc.getElement() );
-                wadlRepresentation.getStatus().add( representationDoc.getStatus() );
                 wadlRepresentation.setMediaType( representationDoc.getMediaType() );
                 addDocForExample( wadlRepresentation.getDoc(), representationDoc.getExample() );
                 addDoc( wadlRepresentation.getDoc(), representationDoc.getDoc() );
-                
-                JAXBElement<RepresentationType> element = new JAXBElement<RepresentationType>(
-                        new QName("http://research.sun.com/wadl/2006/10","representation"),
-                        RepresentationType.class,
-                        wadlRepresentation);
-                
-                response.getRepresentationOrFault().add(element);
+
+                response.getStatus().add(representationDoc.getStatus());
+                response.getRepresentation().add(wadlRepresentation);
             }
             
             return response;

@@ -1,4 +1,8 @@
 release 1.9
+- *Breaking change*
+   Updating wadl namespace from "http://research.sun.com/wadl/2006/10" to
+    "http://wadl.dev.java.net/2009/02". WADL format changed slightly too, see
+    http://wadl.java.net/wadl20090202.xsd
 
 release 1.8 (06-2011)
 - Fixed GlassFish issue 16199

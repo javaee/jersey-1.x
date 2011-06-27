@@ -51,6 +51,7 @@ import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Resource;
+import com.sun.research.ws.wadl.Resources;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -118,14 +119,17 @@ import java.util.Map;
         Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(resource) :
                 new WadlBuilder( wadlGenerator ).generate(resource, path);
 
-        a.getResources().setBase(info.getBaseUri().toString());
+        for(Resources resources : a.getResources())
+            resources.setBase(info.getBaseUri().toString());
 
-        final Resource r = a.getResources().getResource().get(0);
-        r.setPath(info.getBaseUri().relativize(
-                info.getAbsolutePath()).toString());
+        for(Resources resources : a.getResources()) {
+            final Resource r = resources.getResource().get(0);
+            r.setPath(info.getBaseUri().relativize(
+                    info.getAbsolutePath()).toString());
 
-        // remove path params since path is fixed at this point
-        r.getParam().clear();
+            // remove path params since path is fixed at this point
+            r.getParam().clear();
+        }
 
         return a;
     }
