@@ -119,7 +119,7 @@ public final class NonBlockingClientHandler extends TerminatingClientHandler {
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
 
         if(cc != null) {
-            Object o = cc.getProperty(NonBlockingClientConfig.PROPERTY_THREADPOOL_SIZE);
+            Object o = cc.getProperty(NonBlockingClientConfig.PROPERTY_EXECUTOR_SERVICE);
             if(o != null && (o instanceof ExecutorService)) {
                 builder = builder.setExecutorService((ExecutorService)o);
                 this.executorService = (ExecutorService)o;
