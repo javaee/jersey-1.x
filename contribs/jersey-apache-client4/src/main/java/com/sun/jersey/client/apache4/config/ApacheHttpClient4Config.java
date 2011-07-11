@@ -126,7 +126,7 @@ public interface ApacheHttpClient4Config extends ClientConfig {
      * If the property absent then no proxy authentication will be utilized.
      */
     public static final String PROPERTY_PROXY_USERNAME =
-            "com.sun.jersey.impl.client.httpclient.proxyURI";
+            "com.sun.jersey.impl.client.httpclient.proxyUsername";
 
     /**
      * Password which will be used for proxy authentication.
@@ -135,7 +135,6 @@ public interface ApacheHttpClient4Config extends ClientConfig {
      * If the property absent then no proxy authentication will be utilized.
      */
     public static final String PROPERTY_PROXY_PASSWORD =
-            "com.sun.jersey.impl.client.httpclient.proxyURI";
-
+            "com.sun.jersey.impl.client.httpclient.proxyPassword";
 
 }
