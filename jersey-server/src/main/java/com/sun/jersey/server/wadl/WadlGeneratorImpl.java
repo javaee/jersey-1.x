@@ -41,6 +41,14 @@
 package com.sun.jersey.server.wadl;
 
 import com.sun.jersey.api.model.AbstractMethod;
+
+import java.util.Map;
+
+import javax.ws.rs.FormParam;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -53,13 +61,12 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.namespace.QName;
+import java.util.HashMap;
 
 /**
  * This WadlGenerator creates the basic wadl artifacts.<br>
  * Created on: Jun 16, 2008<br>
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
@@ -187,7 +194,12 @@ public class WadlGeneratorImpl implements WadlGenerator {
         final Response response = new Response();
 
         for (MediaType mediaType: m.getSupportedOutputTypes()) {
-            response.getRepresentation().add(createResponseRepresentation( r, m, mediaType ));
+            Representation wadlRepresentation = createResponseRepresentation( r, m, mediaType );
+//            JAXBElement<Representation> element = new JAXBElement<Representation>(
+//                    new QName("http://wadl.dev.java.net/2009/02","representation"),
+//                    Representation.class,
+//                    wadlRepresentation);
+            response.getRepresentation().add(wadlRepresentation);
         }
         
         return response;
@@ -199,4 +211,11 @@ public class WadlGeneratorImpl implements WadlGenerator {
         return wadlRepresentation;
     }
     
+    
+    // ================ methods for post build actions =======================
+    
+    public Map<String, ApplicationDescription.ExternalGrammar> createExternalGrammar() {
+        // Return an empty list to add to
+        return new HashMap<String, ApplicationDescription.ExternalGrammar>();
+    }    
 }

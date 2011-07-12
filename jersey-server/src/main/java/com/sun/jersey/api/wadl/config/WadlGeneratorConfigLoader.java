@@ -43,6 +43,8 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Loads a {@link WadlGeneratorConfig} and provides access to the {@link WadlGenerator}
@@ -66,26 +68,26 @@ public class WadlGeneratorConfigLoader {
      * </p>
      * 
      * @param resourceConfig
-     * @return the initialized {@link WadlGenerator}.
+     * @return a configure {@link WadlGeneratorConfig}.
      */
-    public static WadlGenerator loadWadlGeneratorsFromConfig( ResourceConfig resourceConfig ) {
+    public static WadlGeneratorConfig loadWadlGeneratorsFromConfig( ResourceConfig resourceConfig ) {
         final Object wadlGeneratorConfigProperty = resourceConfig.getProperty(
                 ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG );
         if ( wadlGeneratorConfigProperty == null ) {
-            final WadlGenerator wadlGenerator = new WadlGeneratorImpl();
-            try {
-                wadlGenerator.init();
-                return wadlGenerator;
-            } catch ( Exception e ) {
-                throw new RuntimeException( "Could not init the " + wadlGenerator.getClass().getName(), e );
-            }
+            WadlGeneratorConfig config = new WadlGeneratorConfig() {
+                        @Override
+                        public List<WadlGeneratorDescription> configure() {
+                            return Collections.EMPTY_LIST;
+                        }
+                    };
+            return config;
         }
         else {
 
             try {
                 
                 if ( wadlGeneratorConfigProperty instanceof WadlGeneratorConfig ) {
-                    return ( (WadlGeneratorConfig)wadlGeneratorConfigProperty ).getWadlGenerator();
+                    return ( (WadlGeneratorConfig)wadlGeneratorConfigProperty );
                 }
 
                 final Class<? extends WadlGeneratorConfig> configClazz;
@@ -106,7 +108,7 @@ public class WadlGeneratorConfigLoader {
                 
                 final WadlGeneratorConfig config = configClazz.newInstance();
                 
-                return config.getWadlGenerator();
+                return config;
                 
             } catch ( Exception e ) {
                 throw new RuntimeException( "Could not load WadlGeneratorConfiguration," +

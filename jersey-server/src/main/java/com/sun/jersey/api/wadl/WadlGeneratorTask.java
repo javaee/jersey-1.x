@@ -43,6 +43,7 @@ import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Resources;
@@ -139,21 +140,53 @@ public class WadlGeneratorTask extends Task {
         }
         
         try {
-            Application a = createApplication(classpath.list());
-            for(Resources resources : a.getResources())
-                    resources.setBase(baseUri);
-            JAXBContext c = JAXBContext.newInstance("com.sun.research.ws.wadl",
-                    this.getClass().getClassLoader());
-            Marshaller m = c.createMarshaller();
-            OutputStream out = new BufferedOutputStream(new FileOutputStream(wadlFile));
-            m.marshal(a, out);
-            out.close();
+            ApplicationDescription ad = createApplication(classpath.list());
+            
+            WRITE_OUT_WADL : {
+                Application a = ad.getApplication();
+                for(Resources resources : a.getResources())
+                        resources.setBase(baseUri);
+                JAXBContext c = JAXBContext.newInstance("com.sun.research.ws.wadl", 
+                        this.getClass().getClassLoader());
+                Marshaller m = c.createMarshaller();
+                OutputStream out = new BufferedOutputStream(new FileOutputStream(wadlFile));
+                try {
+                    m.marshal(a, out);
+                }
+                finally {
+                    out.close();
+                }
+            }
+            
+            WRITE_OUT_EXTERNAL_DATA : {
+                // TODO work out how to reconsile the different paths
+                File wadlChildren = new File(wadlFile.getPath() + "-/");
+                wadlChildren.mkdirs();
+                for (String key : ad.getExternalMetadataKeys()) {
+                    
+                    // Create the next file based on the key
+                    //
+                    File nextFile = new File(wadlChildren, "key");
+                    ApplicationDescription.ExternalGrammar em = ad.getExternalGrammar( key );
+
+                    // Write a copy to disk
+                    //
+                    OutputStream out = new BufferedOutputStream(new FileOutputStream(nextFile));
+                    try {
+                        out.write( em.getContent() );
+                    }
+                    finally {
+                        out.close();
+                    }
+                }
+            }
+            
         } catch (Exception e) {
             throw new BuildException(e);            
         }
     }
 
-    private Application createApplication(String[] paths) {
+    private ApplicationDescription createApplication(String[] paths) {
         final ClassLoader cl = Thread.currentThread().getContextClassLoader();
         final ClassLoader ncl = new Loader(classpath.list(), this.getClass().getClassLoader());
         Thread.currentThread().setContextClassLoader(ncl);
@@ -164,6 +197,7 @@ public class WadlGeneratorTask extends Task {
             for (Class c : rc.getRootResourceClasses()) {
                 s.add(IntrospectionModeller.createResource(c));
             }
+            
             return new WadlBuilder().generate(s);
         } catch(Exception e) {
             throw new BuildException(e);

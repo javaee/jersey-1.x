@@ -57,11 +57,9 @@ import com.sun.jersey.server.wadl.generators.resourcedoc.WadlGeneratorResourceDo
  * <p>
  * <strong>Creating a WadlGeneratorConfig</strong><br/>
  * <br/>
- * If you want to create an instance at runtime you have two options:
- * <ul>
- * <li>Configure the WadlGenerator class and property names/values</li>
- * <li>Create your {@link WadlGenerator} instances by yourself</li>
- * </ul>
+ * If you want to create an instance at runtime you can configure the 
+ * WadlGenerator class and property names/values. A new instance of the 
+ * Generator is created for each generation action.
  * 
  * The first option would look like this:
  * <pre><code>WadlGeneratorConfig config = WadlGeneratorConfig
@@ -73,12 +71,6 @@ import com.sun.jersey.server.wadl.generators.resourcedoc.WadlGeneratorResourceDo
           .build();
  * </code></pre>
  * 
- * The second option, creating the {@link WadlGenerator}s by yourself, would look like the following:
- * <pre><code>WadlGeneratorConfig config = WadlGeneratorConfig
-            .generator( generator )
-            .generator( generator2 )
-            .build();
- * </code></pre>
  * <br/>
  * If you want to specify the {@link WadlGeneratorConfig} in the web.xml you have
  * to subclass it and set the servlet init-param {@link ResourceConfig#PROPERTY_WADL_GENERATOR_CONFIG}
@@ -131,6 +123,7 @@ import com.sun.jersey.server.wadl.generators.resourcedoc.WadlGeneratorResourceDo
  * <ul>
  *  <li>{@link WadlGeneratorApplicationDoc}</li>
  *  <li>{@link WadlGeneratorGrammarsSupport}</li>
+ *  <li>{@link WadlGeneratorJAXBGrammarGenerator}</li>
  *  <li>{@link WadlGeneratorResourceDocSupport}</li>
  * </ul>
  * </p>
@@ -159,39 +152,38 @@ public abstract class WadlGeneratorConfig {
 
     // private static final Logger LOGGER = Logger.getLogger( WadlGeneratorConfig.class.getName() );
 
-    private WadlGenerator _wadlGenerator;
+//    private WadlGenerator _wadlGenerator;
     
     public WadlGeneratorConfig() {
     }
 
-    /**
-     * Creates a new WadlGeneratorConfig from the provided wadlGenerator (must already be initialized).
-     * @param wadlGenerator the wadl generator to provide, must not be null.
-     */
-    public WadlGeneratorConfig( WadlGenerator wadlGenerator ) {
-        if ( wadlGenerator == null ) {
-            throw new IllegalArgumentException( "The wadl generator must not be null." );
-        }
-        _wadlGenerator = wadlGenerator;
-    }
+//    /**
+//     * Creates a new WadlGeneratorConfig from the provided wadlGenerator (must already be initialized).
+//     * @param wadlGenerator the wadl generator to provide, must not be null.
+//     */
+//    public WadlGeneratorConfig( WadlGenerator wadlGenerator ) {
+//        if ( wadlGenerator == null ) {
+//            throw new IllegalArgumentException( "The wadl generator must not be null." );
+//        }
+//        _wadlGenerator = wadlGenerator;
+//    }
     
     public abstract List<WadlGeneratorDescription> configure();
 
     /**
-     * Get or load the initialized {@link WadlGenerator}, based on the {@link WadlGeneratorDescription}s
-     * provided by {@link #configure()}.
-     * @return the initialized {@link WadlGenerator}.
+     * Create a new instance of {@link WadlGenerator}, based on the {@link WadlGeneratorDescription}s
+     * provided by {@link #configure()}. 
+     * @return the initialized {@link WadlGenerator}
      */
-    public synchronized WadlGenerator getWadlGenerator() {
-        if ( _wadlGenerator == null ) {
-            final List<WadlGeneratorDescription> wadlGeneratorDescriptions = configure();
-            try {
-                _wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( wadlGeneratorDescriptions );
-            } catch ( Exception e ) {
-                throw new RuntimeException( "Could not load wadl generators from wadlGeneratorDescriptions.", e );
-            }
+    public WadlGenerator createWadlGenerator() {
+        WadlGenerator wadlGenerator = null;
+        final List<WadlGeneratorDescription> wadlGeneratorDescriptions = configure();
+        try {
+            wadlGenerator = WadlGeneratorLoader.loadWadlGeneratorDescriptions( wadlGeneratorDescriptions );
+        } catch ( Exception e ) {
+            throw new RuntimeException( "Could not load wadl generators from wadlGeneratorDescriptions.", e );
         }
-        return _wadlGenerator;
+        return wadlGenerator;
     }
 
     /**
@@ -210,15 +202,15 @@ public abstract class WadlGeneratorConfig {
         return new WadlGeneratorConfigDescriptionBuilder().generator( generatorClass );
     }
 
-    /**
-     * Start to build an instance of {@link WadlGeneratorConfig}:
-     * <pre><code>generator(&lt;generator&gt;).generator(&lt;generator&gt;).build()</code></pre>
-     * @param generator the configured wadl generator
-     * @return an instance of {@link WadlGeneratorConfigBuilder}.
-     */
-    public static WadlGeneratorConfigBuilder generator( WadlGenerator generator ) {
-        return new WadlGeneratorConfigBuilder().generator( generator );
-    }
+//    /**
+//     * Start to build an instance of {@link WadlGeneratorConfig}:
+//     * <pre><code>generator(&lt;generator&gt;).generator(&lt;generator&gt;).build()</code></pre>
+//     * @param generator the configured wadl generator
+//     * @return an instance of {@link WadlGeneratorConfigBuilder}.
+//     */
+//    public static WadlGeneratorConfigBuilder generator( WadlGenerator generator ) {
+//        return new WadlGeneratorConfigBuilder().generator( generator );
+//    }
     
     public static class WadlGeneratorConfigDescriptionBuilder {
         
@@ -322,56 +314,56 @@ public abstract class WadlGeneratorConfig {
         
     }
     
-    public static class WadlGeneratorConfigBuilder {
-        
-        private List<WadlGenerator> _generators;
-
-        public WadlGeneratorConfigBuilder() {
-            _generators = new ArrayList<WadlGenerator>();
-        }
-        
-        public WadlGeneratorConfigBuilder generator( WadlGenerator generator ) {
-            if ( generator == null ) {
-                throw new IllegalArgumentException( "The wadl generator must not be null." );
-            }
-            _generators.add( generator );
-            return this;
-        }
-
-        public WadlGeneratorConfig build() {
-            try {
-                final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGenerators( _generators );
-                return new WadlGeneratorConfigGeneratorImpl( wadlGenerator ) {
-                    
-                };
-            } catch ( Exception e ) {
-                throw new RuntimeException( "Could not load wadl generators.", e );
-            }
-        }
-        
-    }
+//    public static class WadlGeneratorConfigBuilder {
+//        
+//        private List<WadlGenerator> _generators;
+//
+//        public WadlGeneratorConfigBuilder() {
+//            _generators = new ArrayList<WadlGenerator>();
+//        }
+//        
+//        public WadlGeneratorConfigBuilder generator( WadlGenerator generator ) {
+//            if ( generator == null ) {
+//                throw new IllegalArgumentException( "The wadl generator must not be null." );
+//            }
+//            _generators.add( generator );
+//            return this;
+//        }
+//
+//        public WadlGeneratorConfig build() {
+//            try {
+//                final WadlGenerator wadlGenerator = WadlGeneratorLoader.loadWadlGenerators( _generators );
+//                return new WadlGeneratorConfigGeneratorImpl( wadlGenerator ) {
+//                    
+//                };
+//            } catch ( Exception e ) {
+//                throw new RuntimeException( "Could not load wadl generators.", e );
+//            }
+//        }
+//        
+//    }
     
-    static class WadlGeneratorConfigGeneratorImpl extends WadlGeneratorConfig {
-        
-        private final WadlGenerator _wadlGenerator;
-
-        public WadlGeneratorConfigGeneratorImpl(WadlGenerator wadlGenerator) {
-            _wadlGenerator = wadlGenerator;
-        }
-
-        @Override
-        public List<WadlGeneratorDescription> configure() {
-            throw new UnsupportedOperationException( "Must not be called" );
-        }
-
-        /* (non-Javadoc)
-         * @see com.sun.jersey.server.impl.wadl.config.WadlGeneratorConfig#getWadlGenerator()
-         */
-        @Override
-        public synchronized WadlGenerator getWadlGenerator() {
-            return _wadlGenerator;
-        }
-        
-    }
+//    static class WadlGeneratorConfigGeneratorImpl extends WadlGeneratorConfig {
+//        
+//        private final WadlGenerator _wadlGenerator;
+//
+//        public WadlGeneratorConfigGeneratorImpl(WadlGenerator wadlGenerator) {
+//            _wadlGenerator = wadlGenerator;
+//        }
+//
+//        @Override
+//        public List<WadlGeneratorDescription> configure() {
+//            throw new UnsupportedOperationException( "Must not be called" );
+//        }
+//
+//        /* (non-Javadoc)
+//         * @see com.sun.jersey.server.impl.wadl.config.WadlGeneratorConfig#createWadlGenerator()
+//         */
+//        @Override
+//        public synchronized WadlGenerator createWadlGenerator() {
+//            return _wadlGenerator;
+//        }
+//        
+//    }
 
 }

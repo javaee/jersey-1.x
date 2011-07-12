@@ -44,6 +44,7 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
+import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.ClassDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.MethodDocType;
@@ -63,6 +64,8 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
@@ -332,6 +335,12 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
 
     private boolean isEmpty( String text ) {
         return text == null || text.length() == 0 || "".equals( text.trim() );
+    }
+
+    // ================ methods for post build actions =======================
+    
+    public Map<String, ApplicationDescription.ExternalGrammar> createExternalGrammar() {
+        return _delegate.createExternalGrammar();
     }
 
 }

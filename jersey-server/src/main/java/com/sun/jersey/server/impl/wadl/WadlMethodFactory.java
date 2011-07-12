@@ -66,14 +66,14 @@ import java.util.Map;
 
     public static final class WadlOptionsMethod extends ResourceMethod {
         public WadlOptionsMethod(Map<String, List<ResourceMethod>> methods,
-                                 AbstractResource resource, String path, WadlGenerator wadlGenerator,
+                                 AbstractResource resource, String path,
                                  WadlApplicationContext wadlApplicationContext) {
             super("OPTIONS",
                     UriTemplate.EMPTY,
                     MediaTypes.GENERAL_MEDIA_TYPE_LIST,
                     MediaTypes.GENERAL_MEDIA_TYPE_LIST,
                     false,
-                    new WadlOptionsMethodDispatcher(methods, resource, path, wadlGenerator, wadlApplicationContext));
+                    new WadlOptionsMethodDispatcher(methods, resource, path, wadlApplicationContext));
         }
 
         @Override
@@ -86,30 +86,28 @@ import java.util.Map;
             ResourceHttpOptionsMethod.OptionsRequestDispatcher {
         private final AbstractResource resource;
         private final String path;
-        private final WadlGenerator wadlGenerator;
         private final WadlApplicationContext wadlApplicationContext;
 
         WadlOptionsMethodDispatcher(Map<String, List<ResourceMethod>> methods,
-                                    AbstractResource resource, String path, WadlGenerator wadlGenerator,
+                                    AbstractResource resource, String path, 
                                     WadlApplicationContext wadlApplicationContext) {
             super(methods);
             this.resource = resource;
             this.path = path;
-            this.wadlGenerator = wadlGenerator;
             this.wadlApplicationContext = wadlApplicationContext;
         }
 
         @Override
         public void dispatch(final Object o, final HttpContext context) {
             if(wadlApplicationContext.isWadlGenerationEnabled()) {
-                final Application a = generateApplication(context.getUriInfo(),
-                        resource, path, wadlGenerator);
+                final Application a = wadlApplicationContext.getApplication(
+                        context.getUriInfo(),
+                        resource, path);
 
                 context.getResponse().setResponse(
                         Response.ok(a, MediaTypes.WADL).header("Allow", allow).build());
             } else {
-                if(!wadlApplicationContext.isWadlGenerationEnabled())
-                    context.getResponse().setResponse(Response.status(Response.Status.NO_CONTENT).header("Allow", allow).build());
+                context.getResponse().setResponse(Response.status(Response.Status.NO_CONTENT).header("Allow", allow).build());
             }
         }
     }

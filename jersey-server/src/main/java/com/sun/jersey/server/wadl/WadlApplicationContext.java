@@ -40,6 +40,7 @@
 
 package com.sun.jersey.server.wadl;
 
+import com.sun.jersey.api.model.AbstractResource;
 import com.sun.research.ws.wadl.Application;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
@@ -50,32 +51,44 @@ import javax.xml.bind.JAXBContext;
  * @author Paul.Sandoz
  */
 public interface WadlApplicationContext {
-    /**
-     * Get a WADL builder initiated with the configured {@link WadlGenerator}
-     * for the Web application.
-     *
-     * @return the WADL builder.
-     */
-    WadlBuilder getWadlBuilder();
+//    /**
+//     * Get a WADL builder initiated with the configured {@link WadlGenerator}
+//     * for the Web application.
+//     *
+//     * @return the WADL builder.
+//     */
+//    WadlBuilder getWadlBuilder();
+
+//    /**
+//     * Get a new instance of a  {@link ApplicationDescription} corresponding to all
+//     * the root resource classes.
+//     *
+//     * @return the application description, the contents may be modified.
+//     */
+//    ApplicationDescription getApplication();
 
     /**
-     * Get a new instance of a JAXB WADL {@link Application} corresponding to all
-     * the root resource classes.
-     *
-     * @return the application, the contents may be modified.
-     */
-    Application getApplication();
-
-    /**
-     * Get a new instance of a JAXB WADL {@link Application} corresponding to all
+     * Get a new instance of a {@link ApplicationDescription} corresponding to all
      * the root resource classes, and configure the base URI.
      *
      * @param ui the URI information from which the base URI is set on the
      *        WADL application.
-     * @return the application, the contents may be modified.
+     * @return the application description, the contents may be modified.
      */
-    Application getApplication(UriInfo ui);
+    ApplicationDescription getApplication(UriInfo ui);
 
+    /**
+     * Get a new instance of {@link Application} for a particular resource
+     * @param info the URI information from which the base URI is set on the
+     *        WADL application.
+     * @param resource the resource to build the Application for
+     * @param path the path to this resource
+     * @return the application for this resource
+     */
+    Application getApplication(UriInfo info,
+                                      AbstractResource resource, 
+                                      String path);
+    
     /**
      * Get the default JAXB context associated with the {@link WadlGenerator}
      * for the Web application.
@@ -84,12 +97,12 @@ public interface WadlApplicationContext {
      */
     JAXBContext getJAXBContext();
 
-    /**
-     * Get the default JAXB context path to create a {@link JAXBContext}.
-     *
-     * @return the default JAXB context.
-     */
-    String getJAXBContextPath();
+//    /**
+//     * Get the default JAXB context path to create a {@link JAXBContext}.
+//     *
+//     * @return the default JAXB context.
+//     */
+//    String getJAXBContextPath();
 
     /**
      * Enable/disable WADL generation.

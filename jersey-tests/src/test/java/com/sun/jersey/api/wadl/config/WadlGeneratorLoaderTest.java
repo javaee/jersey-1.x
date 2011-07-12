@@ -44,12 +44,25 @@
 
 package com.sun.jersey.api.wadl.config;
 
+import javax.ws.rs.core.MediaType;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.util.Properties;
+import java.util.Map;
+
+
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
@@ -59,14 +72,8 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
-import javax.ws.rs.core.MediaType;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-import java.util.Properties;
+
+
 
 /**
  * Test the {@link WadlGeneratorLoader}.
@@ -248,6 +255,11 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
 
         public String getRequiredJaxbContextPath() {
             return null;
+        }
+
+        @Override
+        public Map<String, ExternalGrammar> createExternalGrammar() {
+            return _delegate.createExternalGrammar();
         }
         
     }

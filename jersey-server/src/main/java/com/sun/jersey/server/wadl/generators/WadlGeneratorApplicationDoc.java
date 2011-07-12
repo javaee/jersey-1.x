@@ -39,11 +39,21 @@
  */
 package com.sun.jersey.server.wadl.generators;
 
+import java.io.File;
+import java.io.InputStream;
+
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
+import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
@@ -218,5 +228,11 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      */
     public Resources createResources() {
         return _delegate.createResources();
+    }
+
+    // ================ methods for post build actions =======================
+    
+    public Map<String, ApplicationDescription.ExternalGrammar> createExternalGrammar() {
+        return _delegate.createExternalGrammar();
     }
 }

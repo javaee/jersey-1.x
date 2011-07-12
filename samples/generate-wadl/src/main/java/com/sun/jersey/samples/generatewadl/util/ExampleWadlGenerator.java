@@ -39,6 +39,24 @@
  */
 package com.sun.jersey.samples.generatewadl.util;
 
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
+import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
+import java.io.File;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -169,6 +187,16 @@ public class ExampleWadlGenerator implements WadlGenerator {
     public Response createResponse( AbstractResource arg0,
             AbstractResourceMethod arg1 ) {
         return _delegate.createResponse( arg0, arg1 );
+    }
+
+    
+    /**
+     * Delegate the creation of an external grammar.
+     * @return 
+     */
+    @Override
+    public Map<String, ExternalGrammar> createExternalGrammar() {
+        return _delegate.createExternalGrammar();
     }
 
 }

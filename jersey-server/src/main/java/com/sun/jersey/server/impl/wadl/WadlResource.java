@@ -40,6 +40,7 @@
 
 package com.sun.jersey.server.impl.wadl;
 
+import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.research.ws.wadl.Application;
@@ -56,12 +57,14 @@ import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
-@Produces({"application/vnd.sun.wadl+xml", "application/xml"})
 @Singleton
 public final class WadlResource {
 
@@ -69,20 +72,23 @@ public final class WadlResource {
 
     private WadlApplicationContext wadlContext;
 
-    private Application application;
 
     private byte[] wadlXmlRepresentation;
 
     public WadlResource(@Context WadlApplicationContext wadlContext) {
         this.wadlContext = wadlContext;
-        this.application = wadlContext.getApplication();
     }
 
+    @Produces({"application/vnd.sun.wadl+xml", "application/xml"})
     @GET
     public synchronized Response getWadl(@Context UriInfo uriInfo) {
         if(!wadlContext.isWadlGenerationEnabled()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
+        
+        ApplicationDescription applicationDescription =
+                wadlContext.getApplication(uriInfo);
+        Application application = applicationDescription.getApplication();
 
         if (wadlXmlRepresentation == null) {
             for(Resources resources : application.getResources())
@@ -98,10 +104,39 @@ public final class WadlResource {
                 os.close();
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Could not marshal wadl Application.", e);
-                return Response.ok(application).build();
+                return Response.ok(applicationDescription).build();
             }
         }
 
         return Response.ok(new ByteArrayInputStream(wadlXmlRepresentation)).build();
+    }
+    
+    @Produces({"application/xml"})
+    @GET
+    @Path("{path}")
+    public synchronized Response geExternalGramar(
+        @Context UriInfo uriInfo,
+        @PathParam("path") String path) {
+
+        // Fail if wadl generation is disabled
+        if(!wadlContext.isWadlGenerationEnabled()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        ApplicationDescription applicationDescription =
+            wadlContext.getApplication(uriInfo);
+
+        // Fail is we don't have any metadata for this path
+        ApplicationDescription.ExternalGrammar externalMetadata = applicationDescription.getExternalGrammar( path );
+
+        if( externalMetadata==null ) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        
+        // Return the data
+
+        return Response.ok().type( externalMetadata.getType() )
+            .entity( externalMetadata.getContent() )
+            .build();
     }
 }

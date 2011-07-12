@@ -44,6 +44,14 @@
 package com.sun.jersey.api.wadl.config;
 
 import com.sun.jersey.api.model.AbstractMethod;
+import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+
+import junit.framework.TestCase;
+
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -56,7 +64,7 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
-import junit.framework.TestCase;
+import java.util.HashMap;
 
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -75,14 +83,14 @@ public class WadlGeneratorConfigTest extends TestCase {
     }
 
     public void testBuildWadlGeneratorFromGenerators() {
-        final MyWadlGenerator generator = new MyWadlGenerator();
-        final MyWadlGenerator2 generator2 = new MyWadlGenerator2();
+        final Class<MyWadlGenerator> generator = MyWadlGenerator.class;
+        final Class<MyWadlGenerator2> generator2 = MyWadlGenerator2.class;
         WadlGeneratorConfig config = WadlGeneratorConfig.
                 generator(generator).
                 generator(generator2).
                 build();
 
-        WadlGenerator wadlGenerator = config.getWadlGenerator();
+        WadlGenerator wadlGenerator = config.createWadlGenerator();
 
         assertEquals(MyWadlGenerator2.class, wadlGenerator.getClass());
         assertEquals(MyWadlGenerator.class, ((MyWadlGenerator2) wadlGenerator).getDelegate().getClass());
@@ -93,7 +101,7 @@ public class WadlGeneratorConfigTest extends TestCase {
         WadlGeneratorConfig config = WadlGeneratorConfig.generator(MyWadlGenerator.class).
                 prop("foo", propValue).
                 build();
-        WadlGenerator wadlGenerator = config.getWadlGenerator();
+        WadlGenerator wadlGenerator = config.createWadlGenerator();
         assertEquals(MyWadlGenerator.class, wadlGenerator.getClass());
         assertEquals(((MyWadlGenerator) wadlGenerator).getFoo(), propValue);
 
@@ -102,7 +110,7 @@ public class WadlGeneratorConfigTest extends TestCase {
                 prop("foo", propValue).generator(MyWadlGenerator2.class).
                 prop("bar", propValue2).
                 build();
-        wadlGenerator = config.getWadlGenerator();
+        wadlGenerator = config.createWadlGenerator();
         assertEquals(MyWadlGenerator2.class, wadlGenerator.getClass());
         final MyWadlGenerator2 wadlGenerator2 = (MyWadlGenerator2) wadlGenerator;
         assertEquals(wadlGenerator2.getBar(), propValue2);
@@ -128,7 +136,7 @@ public class WadlGeneratorConfigTest extends TestCase {
         }
 
         WadlGeneratorConfig config = new MyWadlGeneratorConfig();
-        WadlGenerator wadlGenerator = config.getWadlGenerator();
+        WadlGenerator wadlGenerator = config.createWadlGenerator();
 
         assertEquals(MyWadlGenerator2.class, wadlGenerator.getClass());
         final MyWadlGenerator2 wadlGenerator2 = (MyWadlGenerator2) wadlGenerator;
@@ -187,6 +195,11 @@ public class WadlGeneratorConfigTest extends TestCase {
 
         public void setWadlGeneratorDelegate(WadlGenerator delegate) {
         }
+        
+        public Map<String, ExternalGrammar> createExternalGrammar() {
+           return new HashMap<String, ExternalGrammar>();
+        }
+
     }
 
     static class MyWadlGenerator extends BaseWadlGenerator {
@@ -206,6 +219,7 @@ public class WadlGeneratorConfigTest extends TestCase {
         public void setFoo(String foo) {
             _foo = foo;
         }
+
     }
 
     static class MyWadlGenerator2 extends BaseWadlGenerator {
@@ -273,7 +287,7 @@ public class WadlGeneratorConfigTest extends TestCase {
                 generator(MyWadlGenerator3.class).
                 prop("foo", "string").
                 prop("bar", new Bar()).build();
-        WadlGenerator wadlGenerator = config.getWadlGenerator();
+        WadlGenerator wadlGenerator = config.createWadlGenerator();
 
         assertEquals(MyWadlGenerator3.class, wadlGenerator.getClass());
 

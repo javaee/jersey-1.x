@@ -44,6 +44,13 @@
 
 package com.sun.jersey.api.wadl.config;
 
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractMethod;
@@ -52,6 +59,7 @@ import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
@@ -61,9 +69,8 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
-import javax.ws.rs.core.MediaType;
-import java.net.URISyntaxException;
-import java.util.List;
+
+
 
 /**
  * TODO: DESCRIBE ME<br>
@@ -83,20 +90,20 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
         final ResourceConfig resourceConfig = new DefaultResourceConfig();
         resourceConfig.getProperties().put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, MyWadlGeneratorConfig.class.getName() );
         
-        final WadlGenerator wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig );
+        final WadlGenerator wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig ).createWadlGenerator();
         assertEquals( MyWadlGenerator.class, wadlGenerator.getClass() );
 
     }
     
     public void testLoadConfigInstance() {
         
-        final WadlGeneratorConfig config = WadlGeneratorConfig.generator( new MyWadlGenerator() ).build();
+        final WadlGeneratorConfig config = WadlGeneratorConfig.generator( MyWadlGenerator.class ).build();
         
         final ResourceConfig resourceConfig = new DefaultResourceConfig();
         resourceConfig.getProperties().put( ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, config );
         
-        final WadlGenerator wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig );
-        assertEquals( config.getWadlGenerator(), wadlGenerator );
+        final WadlGenerator wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig( resourceConfig ).createWadlGenerator();
+        assertTrue( config.createWadlGenerator() instanceof MyWadlGenerator );
     }
     
     static class MyWadlGenerator implements WadlGenerator {
@@ -163,6 +170,12 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
         }
 
         public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
+        }
+
+        
+        @Override
+        public Map<String, ExternalGrammar> createExternalGrammar() {
+            throw new UnsupportedOperationException("Not supported yet.");
         }
         
     }

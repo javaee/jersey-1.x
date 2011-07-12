@@ -96,7 +96,7 @@ public class WadlBuilder {
      * @param resources the set of resources
      * @return the JAXB WADL application bean
      */
-    public Application generate(Set<AbstractResource> resources) {
+    public ApplicationDescription generate(Set<AbstractResource> resources) {
         Application wadlApplication = _wadlGenerator.createApplication();
         Resources wadlResources = _wadlGenerator.createResources();
 
@@ -108,7 +108,15 @@ public class WadlBuilder {
         wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
-        return wadlApplication;
+        
+        // Build any external grammars
+        
+        Map<String, ApplicationDescription.ExternalGrammar> external =
+            _wadlGenerator.createExternalGrammar();
+        
+        // Return the description of the application
+        
+        return new ApplicationDescription(wadlApplication, external);
     }
 
     /**

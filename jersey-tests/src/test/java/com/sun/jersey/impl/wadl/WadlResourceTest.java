@@ -37,10 +37,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 
 package com.sun.jersey.impl.wadl;
 
@@ -643,37 +639,6 @@ public class WadlResourceTest extends AbstractResourceTester {
             // check the style of the param
             String style = (String)xp.evaluate(paramXPath + "/@style", d, XPathConstants.STRING);
             assertEquals(pStyle, style );
-        }
-    }
-
-    private static class NSResolver implements NamespaceContext {
-        private String prefix;
-        private String nsURI;
-
-        public NSResolver(String prefix, String nsURI) {
-            this.prefix = prefix;
-            this.nsURI = nsURI;
-        }
-
-        @Override
-        public String getNamespaceURI(String prefix) {
-            if (prefix.equals(this.prefix))
-                return this.nsURI;
-            else
-                return XMLConstants.NULL_NS_URI;
-        }
-
-        @Override
-        public String getPrefix(String namespaceURI) {
-            if (namespaceURI.equals(this.nsURI))
-                return this.prefix;
-            else
-                return null;
-        }
-
-        @Override
-        public Iterator getPrefixes(String namespaceURI) {
-            return null;
         }
     }
 

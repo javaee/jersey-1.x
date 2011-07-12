@@ -66,19 +66,22 @@ public final class WadlFactory {
 
     private final boolean isWadlEnabled;
 
-    private final WadlGenerator wadlGenerator;
+//    private final WadlGenerator wadlGenerator;
+    
+    private final ResourceConfig _resourceConfig;
 
     private WadlApplicationContext wadlApplicationContext;
 
     public WadlFactory(ResourceConfig resourceConfig) {
         isWadlEnabled = isWadlEnabled(resourceConfig);
+        _resourceConfig = resourceConfig;
 
-        if (isWadlEnabled) {
-            wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig(resourceConfig);
-        }
-        else {
-            wadlGenerator = null;
-        }
+//        if (isWadlEnabled) {
+//            wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig(resourceConfig);
+//        }
+//        else {
+//            wadlGenerator = null;
+//        }
     }
 
     public boolean isSupported() {
@@ -88,13 +91,13 @@ public final class WadlFactory {
     public WadlApplicationContext createWadlApplicationContext(Set<AbstractResource> rootResources) {
         if (!isSupported()) return null;
 
-        return new WadlApplicationContextImpl(rootResources, wadlGenerator);
+        return new WadlApplicationContextImpl(rootResources, _resourceConfig);
     }
 
     public void init(InjectableProviderFactory ipf, Set<AbstractResource> rootResources) {
         if (!isSupported()) return;
 
-        wadlApplicationContext = new WadlApplicationContextImpl(rootResources, wadlGenerator);
+        wadlApplicationContext = new WadlApplicationContextImpl(rootResources, _resourceConfig);
 
         ipf.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>(
                 WadlApplicationContext.class, wadlApplicationContext) {});
@@ -116,11 +119,11 @@ public final class WadlFactory {
         if (!isSupported()) return null;
 
         if (p == null) {
-            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null, wadlGenerator, wadlApplicationContext);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, null, wadlApplicationContext);
         } else {
             // Remove the '/' from the beginning
             String path = p.getTemplate().getTemplate().substring(1);
-            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path, wadlGenerator, wadlApplicationContext);
+            return new WadlMethodFactory.WadlOptionsMethod(methods, resource, path, wadlApplicationContext);
         }
     }
 

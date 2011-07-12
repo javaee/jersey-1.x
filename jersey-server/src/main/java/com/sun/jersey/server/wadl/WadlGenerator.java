@@ -41,6 +41,12 @@
 package com.sun.jersey.server.wadl;
 
 import com.sun.jersey.api.model.AbstractMethod;
+
+import java.util.Map;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlRegistry;
+
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -54,6 +60,7 @@ import com.sun.research.ws.wadl.Response;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRegistry;
+
 
 /**
  * A WadlGenerator creates artifacts related to wadl. This is designed as an interface,
@@ -126,4 +133,13 @@ public interface WadlGenerator {
     public Param createParam(AbstractResource r, 
             AbstractMethod m,
             Parameter p);
+
+    // ================ methods for post build actions =======================
+    
+    /**
+     * Perform any post create functions such as generating grammars.
+     * @return A map of extra files to the content of those file encoded in UTF-8
+     * @throws Exception
+     */
+    public Map<String, ApplicationDescription.ExternalGrammar> createExternalGrammar();
 }
