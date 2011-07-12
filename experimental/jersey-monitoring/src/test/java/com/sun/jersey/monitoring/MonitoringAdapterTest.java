@@ -49,11 +49,15 @@ import javax.management.MBeanException;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
+import javax.management.openmbean.CompositeDataSupport;
+import javax.management.openmbean.TabularDataSupport;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import java.lang.management.ManagementFactory;
+import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author pavel.bucek@oracle.com
@@ -73,11 +77,26 @@ public class MonitoringAdapterTest extends JerseyTest {
     }
 
     @Test
-    public void simpleTest() throws InterruptedException, MalformedObjectNameException, InstanceNotFoundException, ReflectionException, AttributeNotFoundException, MBeanException {
+    public void requestCountTest() throws InterruptedException, MalformedObjectNameException, InstanceNotFoundException, ReflectionException, AttributeNotFoundException, MBeanException {
         resource().path("test").get(String.class);
 
         final Object requestCount = ManagementFactory.getPlatformMBeanServer().getAttribute(new ObjectName("com.sun.jersey.monitoring:pp=/,type=com.sun.jersey.monitoring.JerseyJMXBean,name=context-root"), "RequestCount");
 
         assertEquals(requestCount.toString(), "1");
+    }
+
+    @Test
+    public void statusCountTest() throws InterruptedException, MalformedObjectNameException, InstanceNotFoundException, ReflectionException, AttributeNotFoundException, MBeanException {
+        resource().path("test").get(String.class);
+        resource().path("test").get(String.class);
+        resource().path("test").get(String.class);
+
+        final Object requestCount = ManagementFactory.getPlatformMBeanServer().getAttribute(new ObjectName("com.sun.jersey.monitoring:pp=/,type=com.sun.jersey.monitoring.JerseyJMXBean,name=context-root"), "StatusCount");
+
+        TabularDataSupport tabularDataSupport = (TabularDataSupport)requestCount;
+
+        Iterator iter = ((CompositeDataSupport) tabularDataSupport.values().iterator().next()).values().iterator();
+        assertEquals(iter.next().toString(), "200"); // status
+        assertTrue(iter.hasNext());
     }
 }

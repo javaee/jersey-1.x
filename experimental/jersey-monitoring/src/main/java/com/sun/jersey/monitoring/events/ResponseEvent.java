@@ -39,12 +39,21 @@
  */
 package com.sun.jersey.monitoring.events;
 
+import com.sun.jersey.monitoring.JerseyJMXBean;
 import com.sun.jersey.spi.container.ContainerResponse;
 
 /**
  * @author pavel.bucek@oracle.com
  */
 public class ResponseEvent extends AbstractEvent {
+    private int status;
+
     public ResponseEvent(ContainerResponse response) {
+        status = response.getStatus();
+    }
+
+    @Override
+    public void process(JerseyJMXBean jerseyJMXBean) {
+        jerseyJMXBean.incStatusCount(status);
     }
 }

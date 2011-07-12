@@ -39,54 +39,50 @@
  */
 package com.sun.jersey.monitoring;
 
-import com.sun.jersey.monitoring.events.AbstractEvent;
-import org.glassfish.gmbal.ManagedAttribute;
-import org.glassfish.gmbal.ManagedObject;
+import com.sun.jersey.test.framework.JerseyTest;
+import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.spi.container.TestContainerException;
+import org.junit.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import java.lang.management.ManagementFactory;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author pavel.bucek@oracle.com
  */
+public class ApplicationNameTest extends JerseyTest {
 
-@ManagedObject
-public class JerseyJMXBean {
+    public static final String APP_NAME = "testAppName";
 
-    private final Map<Long, List<AbstractEvent>> context;
-
-    public JerseyJMXBean() {
-        context = Collections.synchronizedMap(new HashMap<Long, List<AbstractEvent>>());
-    }
-
-    public Map<Long, List<AbstractEvent>> getContext() {
-        return context;
-    }
-
-    private int requestCount;
-    private Map<Integer, Integer> statuses = new HashMap<Integer, Integer>();
-
-    @ManagedAttribute
-    public int getRequestCount() {
-        return requestCount;
-    }
-
-    @ManagedAttribute
-    public Map<Integer, Integer> getStatusCount() {
-        return statuses;
-    }
-
-    public synchronized void incRequestCount() {
-        this.requestCount++;
-    }
-
-    public synchronized void incStatusCount(int status) {
-        if(statuses.containsKey(status)) {
-            statuses.put(status, statuses.get(status) + 1);
-        } else {
-            statuses.put(status, 1);
+    @Path("appNameTest")
+    public static class Hello {
+        @GET
+        public String get() {
+            return "hi";
         }
+    }
+
+    public ApplicationNameTest() throws TestContainerException {
+        super(new WebAppDescriptor.Builder(ApplicationNameTest.class.getPackage().getName())
+                .initParam(MonitoringAdapter.PROPERTY_MONITORING_APP_NAME, APP_NAME)
+                .build());
+    }
+
+    @Test
+    public void appNameTest() throws InterruptedException, MalformedObjectNameException, InstanceNotFoundException, ReflectionException, AttributeNotFoundException, MBeanException {
+        resource().path("appNameTest").get(String.class);
+
+        final Object requestCount = ManagementFactory.getPlatformMBeanServer().getAttribute(new ObjectName("com.sun.jersey.monitoring:pp=/,type=com.sun.jersey.monitoring.JerseyJMXBean,name=" + APP_NAME), "RequestCount");
+
+        assertEquals(requestCount.toString(), "1");
     }
 }

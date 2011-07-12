@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.monitoring;
 
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.spi.monitoring.DispatchingListener;
 import com.sun.jersey.spi.monitoring.DispatchingListenerAdapter;
 import com.sun.jersey.spi.monitoring.RequestListener;
@@ -48,6 +49,7 @@ import com.sun.jersey.spi.monitoring.ResponseListenerAdapter;
 import org.glassfish.gmbal.ManagedObjectManager;
 import org.glassfish.gmbal.ManagedObjectManagerFactory;
 
+import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
 /**
@@ -56,14 +58,27 @@ import javax.ws.rs.ext.Provider;
 @Provider
 public final class MonitoringAdapter implements RequestListenerAdapter, DispatchingListenerAdapter, ResponseListenerAdapter {
 
+    /**
+     * Application name which will be used to register JMX Bean.
+     *
+     * Value should be String or should produce application name
+     * when toString() method is called. Default value is "context-root".
+     */
+    public static final String PROPERTY_MONITORING_APP_NAME =
+            "com.sun.jersey.monitoring.app.name";
+
     private final MonitoringListener monitoringListener;
     private final JerseyJMXBean jerseyJMXBean;
 
-    public  MonitoringAdapter() {
+    public  MonitoringAdapter(@Context FeaturesAndProperties featuresAndProperties) {
         this.jerseyJMXBean = new JerseyJMXBean();
 
         final ManagedObjectManager managedObjectManager = ManagedObjectManagerFactory.createStandalone("com.sun.jersey.monitoring");
-        managedObjectManager.createRoot(jerseyJMXBean, "context-root");
+        if(featuresAndProperties.getProperties().containsKey(PROPERTY_MONITORING_APP_NAME)) {
+            managedObjectManager.createRoot(jerseyJMXBean, featuresAndProperties.getProperty(PROPERTY_MONITORING_APP_NAME).toString());
+        } else {
+            managedObjectManager.createRoot(jerseyJMXBean, "context-root");
+        }
 
         this.monitoringListener = new MonitoringListener(jerseyJMXBean);
     }
