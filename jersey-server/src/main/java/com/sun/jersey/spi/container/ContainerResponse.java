@@ -518,6 +518,7 @@ public class ContainerResponse implements HttpResponseContext {
     
     // HttpResponseContext
     
+    @Override
     public Response getResponse() {
         if (response == null) {
             setResponse((Response)null);
@@ -526,6 +527,7 @@ public class ContainerResponse implements HttpResponseContext {
         return response;
     }
     
+    @Override
     public void setResponse(Response response) {
         this.isCommitted = false;
         this.out = null;
@@ -544,42 +546,52 @@ public class ContainerResponse implements HttpResponseContext {
         }
     }
     
+    @Override
     public boolean isResponseSet() {
         return response != null;
     }
     
+    @Override
     public Throwable getMappedThrowable() {
         return mappedThrowable;
     }
 
+    @Override
     public StatusType getStatusType() {
         return statusType;
     }
 
+    @Override
     public void setStatusType(StatusType statusType) {
         this.statusType = statusType;
     }
 
+    @Override
     public int getStatus() {
         return statusType.getStatusCode();
     }
     
+    @Override
     public void setStatus(int status) {
         this.statusType = ResponseImpl.toStatusType(status);
     }
     
+    @Override
     public Object getEntity() {
         return entity;
     }
     
+    @Override
     public Type getEntityType() {
         return entityType;
     }
     
+    @Override
     public Object getOriginalEntity() {
         return originalEntity;
     }
 
+    @Override
     public void setEntity(Object entity) {
         setEntity(entity, (entity == null) ? null : entity.getClass());
     }
@@ -594,20 +606,24 @@ public class ContainerResponse implements HttpResponseContext {
         }
     }
 
+    @Override
     public Annotation[] getAnnotations() {
         return annotations;
     }
 
+    @Override
     public void setAnnotations(Annotation[] annotations) {
         this.annotations = (annotations != null) ? annotations : EMPTY_ANNOTATIONS;
     }
     
+    @Override
     public MultivaluedMap<String, Object> getHttpHeaders() {
         if (headers == null)
             headers = new OutBoundHeaders();
         return headers;
     }
     
+    @Override
     public MediaType getMediaType() {
         final Object mediaTypeHeader = getHttpHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
         if (mediaTypeHeader instanceof MediaType) {
@@ -619,6 +635,7 @@ public class ContainerResponse implements HttpResponseContext {
         return null;
     }
     
+    @Override
     public OutputStream getOutputStream() throws IOException {
         if (out == null)
             out = new CommittingOutputStream(-1);
@@ -626,6 +643,7 @@ public class ContainerResponse implements HttpResponseContext {
         return out;
     }
     
+    @Override
     public boolean isCommitted() {
         return isCommitted;
     }
