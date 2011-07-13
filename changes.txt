@@ -1,4 +1,7 @@
 release 1.9
+- Suport for Generating XML Schema from JAX-B classes
+  Added wadl decorator WadlGeneratorJAXBGrammarGenerator that looks at attached JAX-B classes and automatically
+  generates schemas for them.
 - Fixed issue 737
   http://java.net/jira/browse/JERSEY-737
   javadoc typo
@@ -6,6 +9,7 @@ release 1.9
    Updating wadl namespace from "http://research.sun.com/wadl/2006/10" to
     "http://wadl.dev.java.net/2009/02". WADL format changed slightly too, see
     http://wadl.java.net/wadl20090202.xsd
+    
 
 release 1.8 (06-2011)
 - Fixed GlassFish issue 16199

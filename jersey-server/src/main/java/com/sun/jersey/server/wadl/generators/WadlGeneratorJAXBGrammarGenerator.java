@@ -444,6 +444,15 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                 // as it leads to cleaner code
 
                 Class<?> parameterClass = nextType.getPrimaryClass();
+                
+                // Fix those specific generic types
+                if (SPECIAL_GENERIC_TYPES.contains(parameterClass)) {
+                    parameterClass = (Class)
+                            ((ParameterizedType)nextType.getType())
+                               .getActualTypeArguments()[0];
+                }
+
+                
                 Object parameterClassInstance = null;
                 try {
                     parameterClassInstance = parameterClass.newInstance();

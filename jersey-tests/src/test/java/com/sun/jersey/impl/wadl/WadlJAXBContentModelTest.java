@@ -407,6 +407,18 @@ public class WadlJAXBContentModelTest extends AbstractResourceTester {
                 .createUnmarshaller()
                 .unmarshal(cr.getEntityInputStream());
         
+        
+        // Verify that the QName type is set
+        
+        Resource resource = a.getResources().get(0).getResource().get(0);
+        Method put = (Method)resource.getMethodOrResource().get(0);
+        QName responseType  = put.getResponse().get(0).getRepresentation().get(0).getElement();
+        assertEquals(ResponseMessage.name, responseType);
+        
+        
+        // Check we have grammars present
+        //
+        
         Grammars g = a.getGrammars();
         assertNotNull("Should have a grammar defined", g);
         
