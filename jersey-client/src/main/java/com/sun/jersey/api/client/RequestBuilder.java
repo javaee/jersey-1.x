@@ -40,9 +40,9 @@
 
 package com.sun.jersey.api.client;
 
-import java.util.Locale;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import java.util.Locale;
 
 /**
  * An interface for building requests. The build methods for constructing
@@ -68,7 +68,7 @@ public interface RequestBuilder<T extends RequestBuilder> {
     T entity(Object entity);
 
     /**
-     * Set the request entity it's media type.
+     * Set the request entity with its media type.
      * <p>
      * Any Java type instance for a request entity, that is supported by the client
      * configuration of the client, can be passed. If generic information is
@@ -82,7 +82,7 @@ public interface RequestBuilder<T extends RequestBuilder> {
     T entity(Object entity, MediaType type);
 
     /**
-     * Set the request entity it's media type.
+     * Set the request entity with its media type.
      * <p>
      * Any Java type instance for a request entity, that is supported by the client
      * configuration of the client, can be passed. If generic information is
