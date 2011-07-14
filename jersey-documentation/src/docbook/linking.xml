@@ -157,7 +157,7 @@ URI offers;</programlisting>
 
     <section>
         <title>Link Headers</title>
-        <para><ulink url="http://tools.ietf.org/html/draft-nottingham-http-link-header-09">HTTP Link
+        <para><ulink url="http://tools.ietf.org/html/rfc5988#section-5">HTTP Link
                 headers</ulink> can also be added to responses using annotations. Instead of
             annotating the fields of an entity class with <literal>@Ref</literal>, you instead
             annotate the entity class itself with <literal>@Link</literal>. E.g.:</para>
