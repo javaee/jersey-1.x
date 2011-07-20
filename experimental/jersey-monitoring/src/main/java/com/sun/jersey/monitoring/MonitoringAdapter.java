@@ -46,7 +46,6 @@ import com.sun.jersey.spi.monitoring.RequestListener;
 import com.sun.jersey.spi.monitoring.RequestListenerAdapter;
 import com.sun.jersey.spi.monitoring.ResponseListener;
 import com.sun.jersey.spi.monitoring.ResponseListenerAdapter;
-import org.glassfish.gmbal.ManagedObjectManager;
 import org.glassfish.gmbal.ManagedObjectManagerFactory;
 
 import javax.ws.rs.core.Context;
@@ -68,17 +67,18 @@ public final class MonitoringAdapter implements RequestListenerAdapter, Dispatch
             "com.sun.jersey.monitoring.app.name";
 
     private final MonitoringListener monitoringListener;
-    private final JerseyJMXBean jerseyJMXBean;
 
     public  MonitoringAdapter(@Context FeaturesAndProperties featuresAndProperties) {
-        this.jerseyJMXBean = new JerseyJMXBean();
+        JMXRegistrator jmxRegistrator;
 
-        final ManagedObjectManager managedObjectManager = ManagedObjectManagerFactory.createStandalone("com.sun.jersey.monitoring");
         if(featuresAndProperties.getProperties().containsKey(PROPERTY_MONITORING_APP_NAME)) {
-            managedObjectManager.createRoot(jerseyJMXBean, featuresAndProperties.getProperty(PROPERTY_MONITORING_APP_NAME).toString());
+            jmxRegistrator = new JMXRegistrator(featuresAndProperties.getProperty(PROPERTY_MONITORING_APP_NAME).toString());
         } else {
-            managedObjectManager.createRoot(jerseyJMXBean, "context-root");
+            jmxRegistrator = new JMXRegistrator("context-root");
         }
+
+        final JerseyJMXGlobalBean jerseyJMXBean = new JerseyJMXGlobalBean(jmxRegistrator);
+        jmxRegistrator.registerJerseyJMXGlobalBean(jerseyJMXBean);
 
         this.monitoringListener = new MonitoringListener(jerseyJMXBean);
     }

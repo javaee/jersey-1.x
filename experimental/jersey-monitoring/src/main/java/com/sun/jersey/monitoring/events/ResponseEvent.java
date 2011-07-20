@@ -39,7 +39,7 @@
  */
 package com.sun.jersey.monitoring.events;
 
-import com.sun.jersey.monitoring.JerseyJMXBean;
+import com.sun.jersey.monitoring.JerseyJMXGlobalBean;
 import com.sun.jersey.spi.container.ContainerResponse;
 
 /**
@@ -53,7 +53,7 @@ public class ResponseEvent extends AbstractEvent {
     }
 
     @Override
-    public void process(JerseyJMXBean jerseyJMXBean) {
+    public void process(JerseyJMXGlobalBean jerseyJMXBean) {
         jerseyJMXBean.incStatusCount(status);
     }
 }

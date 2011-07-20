@@ -47,17 +47,21 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author pavel.bucek@oracle.com
  */
 
 @ManagedObject
-public class JerseyJMXBean {
+public class JerseyJMXGlobalBean {
 
+    private final JMXRegistrator jmxRegistrator;
     private final Map<Long, List<AbstractEvent>> context;
 
-    public JerseyJMXBean() {
+
+    public JerseyJMXGlobalBean(JMXRegistrator jmxRegistrator) {
+        this.jmxRegistrator = jmxRegistrator;
         context = Collections.synchronizedMap(new HashMap<Long, List<AbstractEvent>>());
     }
 
@@ -66,7 +70,7 @@ public class JerseyJMXBean {
     }
 
     private int requestCount;
-    private Map<Integer, Integer> statuses = new HashMap<Integer, Integer>();
+    private final Map<Integer, JerseyJMXStatusBean> returnedStatusCount = new HashMap<Integer, JerseyJMXStatusBean>();
 
     @ManagedAttribute
     public int getRequestCount() {
@@ -74,8 +78,8 @@ public class JerseyJMXBean {
     }
 
     @ManagedAttribute
-    public Map<Integer, Integer> getStatusCount() {
-        return statuses;
+    public Set<Integer> getMonitoredStatuses() {
+        return returnedStatusCount.keySet();
     }
 
     public synchronized void incRequestCount() {
@@ -83,10 +87,12 @@ public class JerseyJMXBean {
     }
 
     public synchronized void incStatusCount(int status) {
-        if(statuses.containsKey(status)) {
-            statuses.put(status, statuses.get(status) + 1);
+        if(returnedStatusCount.containsKey(status)) {
+            returnedStatusCount.get(status).incResponseCount();
         } else {
-            statuses.put(status, 1);
+            JerseyJMXStatusBean statusBean = new JerseyJMXStatusBean();
+            jmxRegistrator.registerJerseyJMXStatusBean(this, statusBean, Integer.toString(status));
+            returnedStatusCount.put(status, statusBean);
         }
     }
 }

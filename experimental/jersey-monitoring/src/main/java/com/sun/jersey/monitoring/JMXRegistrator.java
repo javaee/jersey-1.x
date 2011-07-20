@@ -39,55 +39,27 @@
  */
 package com.sun.jersey.monitoring;
 
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.spi.container.TestContainerException;
-import org.junit.Test;
-
-import javax.management.AttributeNotFoundException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import java.lang.management.ManagementFactory;
-
-import static org.junit.Assert.assertEquals;
+import org.glassfish.gmbal.ManagedObjectManager;
+import org.glassfish.gmbal.ManagedObjectManagerFactory;
 
 /**
  * @author pavel.bucek@oracle.com
  */
-public class MonitoringAdapterTest extends JerseyTest {
+public class JMXRegistrator {
 
-    @Path("test")
-    public static class Hello {
-        @GET
-        public String get() {
-            return "hi";
-        }
+    private final String appName;
+    private final ManagedObjectManager managedObjectManager = ManagedObjectManagerFactory.createStandalone("com.sun.jersey.monitoring");
+
+
+    public JMXRegistrator(String appName) {
+        this.appName = appName;
     }
 
-    public MonitoringAdapterTest() throws TestContainerException {
-        super(MonitoringAdapterTest.class.getPackage().getName());
+    public void registerJerseyJMXGlobalBean(JerseyJMXGlobalBean jerseyJMXGlobalBean) {
+        managedObjectManager.createRoot(jerseyJMXGlobalBean, appName);
     }
 
-    @Test
-    public void requestCountTest() throws InterruptedException, MalformedObjectNameException, InstanceNotFoundException, ReflectionException, AttributeNotFoundException, MBeanException {
-        resource().path("test").get(String.class);
-
-        Object requestCount = ManagementFactory.getPlatformMBeanServer().getAttribute(new ObjectName("com.sun.jersey.monitoring:pp=/,type=com.sun.jersey.monitoring.JerseyJMXGlobalBean,name=context-root"), "RequestCount");
-
-        assertEquals(requestCount.toString(), "1");
-
-        resource().path("test").get(String.class);
-        resource().path("test").get(String.class);
-        resource().path("test").get(String.class);
-
-        requestCount = ManagementFactory.getPlatformMBeanServer().getAttribute(new ObjectName("com.sun.jersey.monitoring:pp=/com.sun.jersey.monitoring.JerseyJMXGlobalBean[context-root],type=com.sun.jersey.monitoring.JerseyJMXStatusBean,name=200"), "ResponseCount");
-
-        System.out.println("---> " + requestCount.toString());
-
-        assertEquals(requestCount.toString(), "4");
+    public void registerJerseyJMXStatusBean(JerseyJMXGlobalBean jerseyJMXGlobalBean, JerseyJMXStatusBean jerseyJMXStatusBean, String status) {
+        managedObjectManager.register(jerseyJMXGlobalBean, jerseyJMXStatusBean, status);
     }
 }

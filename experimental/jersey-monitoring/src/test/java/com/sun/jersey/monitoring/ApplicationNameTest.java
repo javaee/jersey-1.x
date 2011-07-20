@@ -81,7 +81,7 @@ public class ApplicationNameTest extends JerseyTest {
     public void appNameTest() throws InterruptedException, MalformedObjectNameException, InstanceNotFoundException, ReflectionException, AttributeNotFoundException, MBeanException {
         resource().path("appNameTest").get(String.class);
 
-        final Object requestCount = ManagementFactory.getPlatformMBeanServer().getAttribute(new ObjectName("com.sun.jersey.monitoring:pp=/,type=com.sun.jersey.monitoring.JerseyJMXBean,name=" + APP_NAME), "RequestCount");
+        final Object requestCount = ManagementFactory.getPlatformMBeanServer().getAttribute(new ObjectName("com.sun.jersey.monitoring:pp=/,type=com.sun.jersey.monitoring.JerseyJMXGlobalBean,name=" + APP_NAME), "RequestCount");
 
         assertEquals(requestCount.toString(), "1");
     }

@@ -39,11 +39,11 @@
  */
 package com.sun.jersey.monitoring.events;
 
-import com.sun.jersey.monitoring.JerseyJMXBean;
+import com.sun.jersey.monitoring.JerseyJMXGlobalBean;
 
 /**
  * @author pavel.bucek@oracle.com
  */
 public abstract class AbstractEvent {
-    public void process(JerseyJMXBean jerseyJMXBean) {}
+    public void process(JerseyJMXGlobalBean jerseyJMXBean) {}
 }

@@ -67,9 +67,9 @@ public final class MonitoringListener implements RequestListener, DispatchingLis
     private DispatchingListener dispatchingListener;
     private ResponseListener responseListener;
 
-    private final JerseyJMXBean jerseyJMXBean;
+    private final JerseyJMXGlobalBean jerseyJMXBean;
 
-    MonitoringListener(JerseyJMXBean jerseyJMXBean) {
+    MonitoringListener(JerseyJMXGlobalBean jerseyJMXBean) {
         this.jerseyJMXBean = jerseyJMXBean;
     }
 
