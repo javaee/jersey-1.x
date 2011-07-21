@@ -55,6 +55,7 @@ import junit.framework.TestCase;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
@@ -196,9 +197,16 @@ public class WadlGeneratorConfigTest extends TestCase {
         public void setWadlGeneratorDelegate(WadlGenerator delegate) {
         }
         
-        public Map<String, ExternalGrammar> createExternalGrammar() {
-           return new HashMap<String, ExternalGrammar>();
+        @Override
+        public ExternalGrammarDefinition createExternalGrammar() {
+           return new ExternalGrammarDefinition();
         }
+        
+   
+        @Override
+        public void attachTypes(ApplicationDescription egd) {
+            
+        }        
 
     }
 

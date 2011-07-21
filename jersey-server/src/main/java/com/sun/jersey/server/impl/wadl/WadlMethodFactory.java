@@ -112,23 +112,4 @@ import java.util.Map;
         }
     }
 
-    private static Application generateApplication(UriInfo info,
-                                                   AbstractResource resource, String path, WadlGenerator wadlGenerator) {
-        Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(resource) :
-                new WadlBuilder( wadlGenerator ).generate(resource, path);
-
-        for(Resources resources : a.getResources())
-            resources.setBase(info.getBaseUri().toString());
-
-        for(Resources resources : a.getResources()) {
-            final Resource r = resources.getResource().get(0);
-            r.setPath(info.getBaseUri().relativize(
-                    info.getAbsolutePath()).toString());
-
-            // remove path params since path is fixed at this point
-            r.getParam().clear();
-        }
-
-        return a;
-    }
 }

@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
+import javax.xml.namespace.QName;
 
 /**
  * This class is designed to combine the Application instance with any other
@@ -57,14 +58,13 @@ import javax.ws.rs.core.MediaType;
 public class ApplicationDescription {
 
     private Application _application;
-    private Map<String, ExternalGrammar> _externalGrammar;
+    private WadlGenerator.ExternalGrammarDefinition _externalGrammarDefiniton;
 
-    ApplicationDescription( Application _application,
-                            Map<String, ExternalGrammar> _externalGrammar ) {
+    ApplicationDescription( Application application,
+                            WadlGenerator.ExternalGrammarDefinition externalGrammarDefiniton ) {
         super();
-        this._application = _application;
-        this._externalGrammar = 
-            Collections.unmodifiableMap( _externalGrammar );
+        this._application = application;
+        this._externalGrammarDefiniton = externalGrammarDefiniton;
     }
 
     /**
@@ -73,13 +73,20 @@ public class ApplicationDescription {
     public Application getApplication() {
         return _application;
     }
+    
+    /**
+     * @return the QName for the given Class in the grammar
+     */
+    public QName resolve(Class type) {
+        return _externalGrammarDefiniton.resolve(type);
+    }
 
     /**
      * @return the external metadata for a give URL, generally provided as a sub resource
      *   or the root application.wadl
      */
     public ExternalGrammar getExternalGrammar(String path) {
-        return _externalGrammar.get( path );
+        return _externalGrammarDefiniton.map.get( path );
     }
 
     
@@ -87,7 +94,7 @@ public class ApplicationDescription {
      * @return A set of all the external metadata keys
      */
     public Set<String> getExternalMetadataKeys() {
-        return _externalGrammar.keySet();
+        return _externalGrammarDefiniton.map.keySet();
     }
     
 

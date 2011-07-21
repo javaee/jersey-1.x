@@ -61,6 +61,7 @@ import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.generators.resourcedoc.ResourceDocAccessor;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.MethodDocType;
@@ -195,8 +196,13 @@ public class ExampleWadlGenerator implements WadlGenerator {
      * @return 
      */
     @Override
-    public Map<String, ExternalGrammar> createExternalGrammar() {
+    public ExternalGrammarDefinition createExternalGrammar() {
         return _delegate.createExternalGrammar();
     }
 
+    @Override
+    public void attachTypes(ApplicationDescription egd) {
+        _delegate.attachTypes(egd);
+    }
+    
 }

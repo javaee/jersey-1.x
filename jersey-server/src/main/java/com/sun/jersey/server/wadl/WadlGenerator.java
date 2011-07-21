@@ -57,9 +57,13 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRegistry;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -137,9 +141,65 @@ public interface WadlGenerator {
     // ================ methods for post build actions =======================
     
     /**
+     * Call back interface that the create external grammar can use
+     * to allow other parts of the code to attach the correct grammar information
+     */
+    public interface Resolver
+    {
+        /**
+         * @param type The type of the class
+         * @return The schema type of the class if defined, null if not.
+         */
+        public QName resolve(Class type);
+    }
+    
+    /**
+     * And internal storage object to store the grammar definitions and 
+     * any type resolvers that are created along the way.
+     */
+    public class ExternalGrammarDefinition {
+        
+        // final public field to make a property was thinking about encapsulation
+        // but decided code much simpler without
+        public final Map<String, ApplicationDescription.ExternalGrammar>
+                map = new HashMap<String, ApplicationDescription.ExternalGrammar>();
+        
+        private List<Resolver> typeResolvers = new ArrayList<Resolver>();
+        
+        public void addResolver(Resolver resolver) {
+            assert !typeResolvers.contains(resolver) : "Already in list";
+            typeResolvers.add(resolver);
+        }
+        
+        /**
+         * @param type the class to map
+         * @return The resolved qualified name if one is defined.
+         */
+        public QName resolve(Class type) {
+            QName name = null;
+            found : for (Resolver resolver : typeResolvers) {
+                name = resolver.resolve(type);
+                if (name!=null) break found;
+            }
+            return name;
+        }
+    }
+    
+    
+    /**
      * Perform any post create functions such as generating grammars.
      * @return A map of extra files to the content of those file encoded in UTF-8
      * @throws Exception
      */
-    public Map<String, ApplicationDescription.ExternalGrammar> createExternalGrammar();
+    public ExternalGrammarDefinition createExternalGrammar();
+    
+    
+    /**
+     * Process the elements in the WADL definition to attach schema types
+     * as required.
+     * @param description The root description used to resolve these entries
+     */
+    public void attachTypes(ApplicationDescription description);
+    
+    
 }

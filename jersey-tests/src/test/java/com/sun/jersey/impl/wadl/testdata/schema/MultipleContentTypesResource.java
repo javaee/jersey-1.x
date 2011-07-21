@@ -42,40 +42,25 @@ package com.sun.jersey.impl.wadl.testdata.schema;
 
 import com.sun.jersey.impl.wadl.testdata.schema.RequestMessage;
 import com.sun.jersey.impl.wadl.testdata.schema.ResponseMessage;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
- * A simple test case for direct references.
+ * A simple test case form  multiple content types
  * @author Gerard Davison
  */
 @Path(value = "/root")
-public class SimpleSchemaResource {
-
-    private static class SubResource {
-
-        @POST
-        public ResponseMessage hello(RequestMessage message) {
-            return null;
-        }
-    }
-
-    @GET
-    public ResponseMessage hello() {
-        return null;
-    }
+public class MultipleContentTypesResource {
 
     @PUT
+    @Produces({"application/xml", "application/json"})
+    @Consumes({"application/json", "application/xml"})
     public ResponseMessage hello(RequestMessage message) {
         return null;
-    }
-    
-    @Path("sub")
-    public SubResource subResource() {
-        return new SubResource();
     }
     
     

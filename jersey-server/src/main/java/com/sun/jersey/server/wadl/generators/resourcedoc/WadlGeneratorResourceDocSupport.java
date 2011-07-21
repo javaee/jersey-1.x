@@ -339,8 +339,14 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
 
     // ================ methods for post build actions =======================
     
-    public Map<String, ApplicationDescription.ExternalGrammar> createExternalGrammar() {
+    @Override 
+    public ExternalGrammarDefinition createExternalGrammar() {
         return _delegate.createExternalGrammar();
+    }
+
+    @Override 
+    public void attachTypes(ApplicationDescription egd) {
+        _delegate.attachTypes(egd);
     }
 
 }

@@ -214,8 +214,16 @@ public class WadlGeneratorImpl implements WadlGenerator {
     
     // ================ methods for post build actions =======================
     
-    public Map<String, ApplicationDescription.ExternalGrammar> createExternalGrammar() {
+    @Override
+    public ExternalGrammarDefinition createExternalGrammar() {
         // Return an empty list to add to
-        return new HashMap<String, ApplicationDescription.ExternalGrammar>();
+        return new ExternalGrammarDefinition();
     }    
+    
+    @Override
+    public void attachTypes(ApplicationDescription egd) {
+        
+    }
+    
+    
 }

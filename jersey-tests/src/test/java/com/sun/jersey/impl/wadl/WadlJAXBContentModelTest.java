@@ -43,6 +43,7 @@ import com.sun.jersey.impl.wadl.testdata.schema.SimpleSchemaResource;
 import com.sun.jersey.impl.wadl.testdata.schema.RequestMessage;
 import com.sun.jersey.impl.wadl.testdata.schema.ResponseMessage;
 import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
+import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Resource;
 
 import java.util.Collections;
@@ -56,6 +57,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.wadl.testdata.schema.JResponseSchemaResource;
+import com.sun.jersey.impl.wadl.testdata.schema.MultipleContentTypesResource;
 import com.sun.jersey.impl.wadl.testdata.schema.different.ResponseMessageDifferentNamespace;
 import com.sun.jersey.impl.wadl.testdata.schema.SeeAlsoSchemaResource;
 import com.sun.jersey.impl.wadl.testdata.schema.TwoNamespacesSchemaResource;
@@ -194,6 +196,59 @@ public class WadlJAXBContentModelTest extends AbstractResourceTester {
         assertEquals("Should have an element for each type", "2", val);
     }
 
+    /**
+     * Just a simple case with directly referenced types
+     */
+    public void testMultipleContentTypesSchema() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(MultipleContentTypesResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, new SchemaWadlGeneratorConfig());
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/application.wadl", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+        
+        // Right let check that we have a reference to the XSD, so lets cheat
+        // and instantiate the Application object.
+        
+        Application a = (Application)JAXBContext.newInstance(Application.class)
+                .createUnmarshaller()
+                .unmarshal(cr.getEntityInputStream());
+        
+        Grammars g = a.getGrammars();
+        assertNotNull("Should have a grammar defined", g);
+        
+        List<Include> includes = g.getInclude();
+        assertEquals(1,includes.size());
+        
+        String href = includes.get(0).getHref();
+        assertEquals("application.wadl/xsd0.xsd", href);
+        
+        // Okay lets see if we can find the right references
+        //
+        
+        Resource resource = a.getResources().get(0).getResource().get(0);
+        
+        Method post = (Method)resource.getMethodOrResource().get(0);
+
+        List<Representation> requestRepresentation = post.getRequest().getRepresentation();
+        assertEquals(2, requestRepresentation.size());
+        for (int counter = 0; counter < requestRepresentation.size(); counter++) {
+            QName requestType  = requestRepresentation.get(counter).getElement();
+            assertEquals("Reprensentation doesn't match" + counter,RequestMessage.name, requestType);
+        }
+        
+        
+        List<Representation> responseRepresentation = post.getResponse().get(0).getRepresentation();
+        for (int counter = 0; counter < responseRepresentation.size(); counter++) {
+            QName responseType  = responseRepresentation.get(counter).getElement();
+            assertEquals("Reprensentation doesn't match" + counter,ResponseMessage.name, responseType);
+        }
+        
+        
+    }
+    
     
     /**
      * Just a simple case with directly referenced types
@@ -224,6 +279,18 @@ public class WadlJAXBContentModelTest extends AbstractResourceTester {
         String href = includes.get(0).getHref();
         assertEquals("test:/base/application.wadl/xsd0.xsd", href);
 //        assertEquals("../../application.wadl/xsd0.xsd", href);
+        
+        // Check to see that the types have been attached
+        //
+        
+        Resource resource = a.getResources().get(0).getResource().get(0);
+        
+        Method post = (Method)resource.getMethodOrResource().get(0);
+        QName requestType  = post.getRequest().getRepresentation().get(0).getElement(); 
+        QName responseType  = post.getResponse().get(0).getRepresentation().get(0).getElement();
+        assertEquals(ResponseMessage.name, responseType);
+        assertEquals(RequestMessage.name, requestType);
+        
         
     }
     

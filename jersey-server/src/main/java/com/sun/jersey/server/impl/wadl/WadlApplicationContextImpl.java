@@ -114,18 +114,24 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
     public Application getApplication(UriInfo info,
                                       AbstractResource resource, 
                                       String path) {
+
+        // Get the root application description
+        //
+        
+        ApplicationDescription description = getApplication(info);
+
+        //
         
         WadlGenerator wadlGenerator = wadlGeneratorConfig.createWadlGenerator();
-        Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(resource) :
-                new WadlBuilder( wadlGenerator ).generate(resource, path);
+        Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(description,resource) :
+                new WadlBuilder( wadlGenerator ).generate(description, resource, path);
 
         for(Resources resources : a.getResources())
             resources.setBase(info.getBaseUri().toString());
 
         // Attach any grammar we may have
         
-        attachExternalGrammar(a, 
-                getApplication(info),
+        attachExternalGrammar(a, description,
                 info.getRequestUri());
         
         //

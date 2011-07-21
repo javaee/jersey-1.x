@@ -58,6 +58,7 @@ import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
 import com.sun.research.ws.wadl.Application;
@@ -174,9 +175,14 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
 
         
         @Override
-        public Map<String, ExternalGrammar> createExternalGrammar() {
+        public ExternalGrammarDefinition createExternalGrammar() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
+
+        @Override
+        public void attachTypes(ApplicationDescription egd) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }        
         
     }
 

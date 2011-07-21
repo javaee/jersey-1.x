@@ -111,20 +111,32 @@ public class WadlBuilder {
         
         // Build any external grammars
         
-        Map<String, ApplicationDescription.ExternalGrammar> external =
+        WadlGenerator.ExternalGrammarDefinition external =
             _wadlGenerator.createExternalGrammar();
+
+        //
         
+        ApplicationDescription description = new ApplicationDescription(wadlApplication, external);
+        
+        // Attach the data to the parts of the model
+        
+        _wadlGenerator.attachTypes(description);
+         
         // Return the description of the application
         
-        return new ApplicationDescription(wadlApplication, external);
+        
+        return description;
     }
 
     /**
      * Generate WADL for a resource.
      * @param resource the resource
+     * @param description the overall application description so we can
      * @return the JAXB WADL application bean
      */
-    public Application generate(AbstractResource resource) {
+    public Application generate(
+            ApplicationDescription description,
+            AbstractResource resource) {
         Application wadlApplication = _wadlGenerator.createApplication();
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateResource(resource, null);
@@ -132,17 +144,27 @@ public class WadlBuilder {
         wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
+        
+        // Attach the data to the parts of the model
+        
+        _wadlGenerator.attachTypes(description);
+        
+        // Return the WADL
+        
         return wadlApplication;
     }
 
     /**
      * Generate WADL for a virtual subresource resulting from sub resource
      * methods.
+     * @param description the overall application description so we can
      * @param resource the parent resource
      * @param path the value of the methods path annotations
      * @return the JAXB WADL application bean
      */
-    public Application generate(AbstractResource resource, String path) {
+    public Application generate(
+            ApplicationDescription description,
+            AbstractResource resource, String path) {
         Application wadlApplication = _wadlGenerator.createApplication();
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateSubResource(resource, path);
@@ -150,6 +172,13 @@ public class WadlBuilder {
         wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
+        
+        // Attach the data to the parts of the model
+        
+        _wadlGenerator.attachTypes(description);
+        
+        // Return the WADL
+        
         return wadlApplication;
     }
 
