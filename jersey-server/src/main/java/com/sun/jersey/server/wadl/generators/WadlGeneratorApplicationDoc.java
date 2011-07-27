@@ -39,15 +39,6 @@
  */
 package com.sun.jersey.server.wadl.generators;
 
-import java.io.File;
-import java.io.InputStream;
-
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;

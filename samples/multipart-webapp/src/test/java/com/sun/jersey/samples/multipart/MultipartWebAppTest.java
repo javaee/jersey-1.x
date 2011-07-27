@@ -40,16 +40,26 @@
 package com.sun.jersey.samples.multipart;
 
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataBodyPart;
 import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.samples.multipart.resources.Bean;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import javax.ws.rs.core.MediaType;
 import org.junit.Assert;
 import org.junit.Test;
+import org.w3c.dom.Document;
+
+import javax.ws.rs.core.MediaType;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathFactory;
+import java.io.File;
+import java.util.Iterator;
 
 /**
  *
@@ -61,6 +71,24 @@ public class MultipartWebAppTest extends JerseyTest {
     public MultipartWebAppTest() throws Exception {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.multipart.resources")
                 .contextPath("multipart-webapp").build());
+    }
+
+    @Test public void testApplicationWadl() throws Exception {
+        WebResource webResource = resource().path("application.wadl");
+
+        File tmpFile = webResource.get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        // check base URI
+        String val = (String)xp.evaluate("//wadl:resource[@path='part']/wadl:method/wadl:request/wadl:representation/@mediaType", d, XPathConstants.STRING);
+        Assert.assertEquals(val, "multipart/form-data");
     }
 
     @Test
@@ -102,4 +130,37 @@ public class MultipartWebAppTest extends JerseyTest {
         Assert.assertEquals("STRING:string,BEAN:bean", s);
     }
 
+
+    class NSResolver implements NamespaceContext {
+        private String prefix;
+        private String nsURI;
+
+        public NSResolver(String prefix, String nsURI) {
+            this.prefix = prefix;
+            this.nsURI = nsURI;
+        }
+
+        @Override
+        public String getNamespaceURI(String prefix) {
+            if (prefix.equals(this.prefix)) {
+                return this.nsURI;
+            } else {
+                return XMLConstants.NULL_NS_URI;
+            }
+        }
+
+        @Override
+        public String getPrefix(String namespaceURI) {
+            if (namespaceURI.equals(this.nsURI)) {
+                return this.prefix;
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public Iterator getPrefixes(String namespaceURI) {
+            return null;
+        }
+    }
 }

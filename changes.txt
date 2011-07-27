@@ -1,4 +1,7 @@
 release 1.9
+- Fixed issue 745
+  http://java.net/jira/browse/JERSEY-745
+  @FormDataParam parameters were ignored in generated wadl
 - Suport for Generating XML Schema from JAX-B classes
   Added wadl decorator WadlGeneratorJAXBGrammarGenerator that looks at attached JAX-B classes and automatically
   generates schemas for them.

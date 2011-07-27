@@ -235,6 +235,23 @@ public class WadlBuilder {
                         }
                     }
                 }
+            } else if (p.getAnnotation().annotationType().getName().equals("com.sun.jersey.multipart.FormDataParam")) { // jersey-multipart support
+                // Use multipart/form-data if no @Consumes
+                List<MediaType> supportedInputTypes = m.getSupportedInputTypes();
+                if (supportedInputTypes.isEmpty()
+                        || (supportedInputTypes.size() == 1 && supportedInputTypes.get(0).isWildcardType())) {
+                    supportedInputTypes = Collections.singletonList(MediaType.MULTIPART_FORM_DATA_TYPE);
+                }
+
+                for (MediaType mediaType : supportedInputTypes) {
+                    final Representation wadlRepresentation = setRepresentationForMediaType(r, m, mediaType, wadlRequest);
+                    if (getParamByName(wadlRepresentation.getParam(), p.getSourceName()) == null) {
+                        final Param wadlParam = generateParam(r, m, p);
+                        if (wadlParam != null) {
+                            wadlRepresentation.getParam().add(wadlParam);
+                        }
+                    }
+                }
             } else {
                 Param wadlParam = generateParam(r, m, p);
                 if (wadlParam == null) {

@@ -61,7 +61,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.InputStream;
-import java.util.Map;
 import java.util.logging.Logger;
 
 /**

@@ -41,14 +41,6 @@
 package com.sun.jersey.server.wadl;
 
 import com.sun.jersey.api.model.AbstractMethod;
-
-import java.util.Map;
-
-import javax.ws.rs.FormParam;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
-
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -61,7 +53,8 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
-import java.util.HashMap;
+import javax.ws.rs.core.MediaType;
+import javax.xml.namespace.QName;
 
 /**
  * This WadlGenerator creates the basic wadl artifacts.<br>
@@ -121,9 +114,10 @@ public class WadlGeneratorImpl implements WadlGenerator {
 
     @Override
     public Param createParam( AbstractResource r, AbstractMethod m, final Parameter p ) {
+
         if (p.getSource() == Parameter.Source.UNKNOWN)
             return null;
-        
+
         Param wadlParam = new Param();
         wadlParam.setName(p.getSourceName());
 
@@ -143,12 +137,12 @@ public class WadlGeneratorImpl implements WadlGenerator {
             case HEADER:
                 wadlParam.setStyle(ParamStyle.HEADER);
                 break;
-	    case COOKIE:
-		// Generates name="Cookie" path="<name>"
-		wadlParam.setStyle(ParamStyle.HEADER);
-		wadlParam.setName("Cookie");
-		wadlParam.setPath(p.getSourceName());
-		break;
+            case COOKIE:
+                // Generates name="Cookie" path="<name>"
+                wadlParam.setStyle(ParamStyle.HEADER);
+                wadlParam.setName("Cookie");
+                wadlParam.setPath(p.getSourceName());
+                break;
             default:
                 break;
         }

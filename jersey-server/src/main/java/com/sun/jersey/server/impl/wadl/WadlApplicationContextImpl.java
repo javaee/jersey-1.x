@@ -54,15 +54,14 @@ import com.sun.research.ws.wadl.Grammars;
 import com.sun.research.ws.wadl.Include;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
-import java.net.URI;
-import java.util.Map;
 
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
+import java.net.URI;
 import java.util.Set;
 import java.util.logging.Logger;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  *
