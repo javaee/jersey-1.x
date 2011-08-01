@@ -493,7 +493,7 @@
 
     <properties>
         <assembly.directory>${project.build.directory}/assembly</assembly.directory>
-        <jackson.version>1.7.1</jackson.version>
+        <jackson.version>1.8.3</jackson.version>
     </properties>
 
 </project>
