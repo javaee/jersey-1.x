@@ -126,7 +126,7 @@ public class WebAppDescriptor extends AppDescriptor {
         /**
          * Create a builder with initialization parameters.
          *
-         * @param initParams a map of intialization parameters. The parameters
+         * @param initParams a map of initialization parameters. The parameters
          *        will be copied.
          * @throws IllegalArgumentException if <code>initParams</code> is null.
          */
@@ -287,7 +287,7 @@ public class WebAppDescriptor extends AppDescriptor {
         /**
          * Set the context path.
          * 
-         * @param contextPath the context path to the application.
+         * @param contextPath the context path to the application. (See Servlet specification for definition of contextPath)
          * @return this builder.
          * @throws IllegalArgumentException if <code>contextPath</code> is null.
          */
@@ -302,7 +302,7 @@ public class WebAppDescriptor extends AppDescriptor {
         /**
          * Set the servlet path.
          *
-         * @param servletPath the context path to the application.
+         * @param servletPath the servlet path to the application. (See Servlet specification for definition of servletPath)
          * @return this builder.
          * @throws IllegalArgumentException if <code>servletPath</code> is null.
          */
