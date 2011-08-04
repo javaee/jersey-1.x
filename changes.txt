@@ -1,7 +1,4 @@
 release 1.9
-- Fixed issue 686
-  http://java.net/jira/browse/JERSEY-686
-  Clarified WebAppDescriptor's contextPath and servletPath
 - Jackson dependency upgrade: 1.7.1 -> 1.8.3
 - Fixed issue 745
   http://java.net/jira/browse/JERSEY-745
