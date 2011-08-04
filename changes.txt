@@ -1,0 +1,2586 @@
+release 1.9
+- Jackson dependency upgrade: 1.7.1 -> 1.8.3
+- Fixed issue 745
+  http://java.net/jira/browse/JERSEY-745
+  @FormDataParam parameters were ignored in generated wadl
+- Suport for Generating XML Schema from JAX-B classes
+  Added wadl decorator WadlGeneratorJAXBGrammarGenerator that looks at attached JAX-B classes and automatically
+  generates schemas for them.
+- Fixed issue 737
+  http://java.net/jira/browse/JERSEY-737
+  javadoc typo
+- *Breaking change*
+   Updating wadl namespace from "http://research.sun.com/wadl/2006/10" to
+    "http://wadl.dev.java.net/2009/02". WADL format changed slightly too, see
+    http://wadl.java.net/wadl20090202.xsd
+    
+
+release 1.8 (06-2011)
+- Fixed GlassFish issue 16199
+  http://java.net/jira/browse/GLASSFISH-16199
+  IllegalArgumentException: object is not an instance of declaring class - on a REST / EJB Service
+- Breaking change in client API - removed RequestWriter.headerValueToString().
+  Also changed constructors of AsyncWebResource and AsyncViewResource to
+  protected (from package private and private).
+- Fixed issue 726
+  JSON POJO mapping feature does not allow to register custom object mappers for different types
+- jersey-grizzly2: Grizzly update 2.1 -> 2.1.1, Servlet 3.0 -> 3.1
+- Fixed issue 724
+  http://java.net/jira/browse/JERSEY-724
+  Sample code in Guice documentation does not compile.
+
+release 1.7 (05-2011)
+- Added methods to WadlApplicationContext which can control WADL generation in runtime.
+  See WadlResourceTest.testEnableDisableRuntime() for further details.
+- Fixed bug related to init param propagation when Application class name is specified in
+  servlet-name element and servlet-class is not used at all (see sample 2.11 from user guide).
+- Fixed issue 697
+  http://java.net/jira/browse/JERSEY-697
+  Scope of the dependency on Jersey Grizzly2 module in Jersey Guice module updated to "test".
+- Fixed issue 722
+  http://java.net/jira/browse/JERSEY-722
+  PostConstruct and PreDestroy are now invoked in superclasses as well. PostConstruct in a top-down fashion (base class first), PreDestroy bottom up (subclass first).
+- Fixed issue 699
+  http://java.net/jira/browse/JERSEY-699
+  Cleaner implementation of BindingScopingVisitor using ComponentScope as the underlying generic type.
+- Fixed issue 700
+  http://java.net/jira/browse/JERSEY-700
+  Guice-specific annotations replaced with their JSR330 standard counterparts.
+- Introduced new property ClientConfig.PROPERTY_THREADPOOL_SIZE for limiting
+  thread pool size used for handling asynchronous requests.
+- Apache HTTP Client 4.x integration
+  Refer to the module:
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-apache-client4</artifactId>
+- Fixed issue 707
+  http://java.net/jira/browse/JERSEY-707
+  Added human readable http status to URLConnectionResponse.toString()
+- Fixed issue 690
+  http://java.net/jira/browse/JERSEY-690
+  Added javadoc to DefaultClientConfig constructors
+- Fixed issue 647
+  http://java.net/jira/browse/JERSEY-647
+  NullPointerException in AbstractImplicitViewMethod.toString now fixed.
+- Fixed issue 695
+  http://java.net/jira/browse/JERSEY-695
+  For query parameters of a primitive type blank value is now taken as if the value is not present at all - i.e. default value will be used.
+- Fixed issue 703
+  http://java.net/jira/browse/JERSEY-703
+  Fixed a typo in UriTemplate javadoc.
+- Fixed issue 717
+  http://java.net/jira/browse/JERSEY-717
+  Fixed UriInfo.getMatchedURIs() and getMatchedURIs(boolean)
+- Fixed issue 715
+  http://java.net/jira/browse/JERSEY-715
+  NullPointerException instead of IllegalArgumentException when passing null name to UriBuilder.replaceMatrixParam()
+- Fixed issue 716
+  http://java.net/jira/browse/JERSEY-716
+  NullPointerException when passing null to values argument of UriBuilder.replaceMatrixParam()
+- *Breaking change*: Added support for 2-legged OAuth in oauth-server module.
+  As a result, 2 new methods were added to the OAuthConsumer interface: getPrincipal()
+  and isInRole() - these are used by the security context in case of 2-legged oauth
+  (i.e. no token in the oauth header). Existing users of the previous versions of
+  the oauth-server module should add a simple implementation of getPrincipal() always
+  returning null to their impl. of the OAuthConsumer interface, and an implementation
+  of isInRole() method always returning false.
+- Fixed issue 721
+  http://java.net/jira/browse/JERSEY-721
+  NullPointerException during WADL generation with @Autowired Spring beans
+- Fixed issue 709
+  http://java.net/jira/browse/JERSEY-709
+  Avoid throwing RuntimeException eagerly when oauth-server.jar on the classpath but no OAuthProvider is registered.  
+- Fixed issue 713
+  http://java.net/jira/browse/JERSEY-713
+  UserGuide docs typo.
+- Fixed issue 712
+  http://java.net/jira/browse/JERSEY-712
+  Document cobertura profile usage in samples
+- Fixed issue 704
+  http://java.net/jira/browse/JERSEY-704
+  Typo.
+- Fixed issue 696
+  http://java.net/jira/browse/JERSEY-696
+  add missing dependency to pom.xml when sun-web.xml <class-loader delegate="false"/>
+- Fixed issue 694
+  http://java.net/jira/browse/JERSEY-694
+  Typo.
+- Fixed issue 693
+  http://java.net/jira/browse/JERSEY-693
+  Javadoc typos.
+- Fixed issue 668
+  http://java.net/jira/browse/JERSEY-668
+  Removed duplicate copy of form.html in simple-console Jersey example
+
+release 1.6 (03-2011)
+- Added support for lists and arrays of JAXBElement<?> objects.
+- Fixed issue 681
+  http://java.net/jira/browse/JERSEY-681
+  Missing repository declaration in quickstart-grizzly archetype
+- Grizzly 2.0 integration
+  Introduced GrizzlyWebContainerFactory in jersey-grizzly2
+  Introduced jersey-tests-framework-grizzly2 and made it default
+  option in test framework.
+  Changed (almost) all samples to use jersey-grizzly2 for test/run.
+- Added support for specifying XML header in XML responses by attaching XmlHeader annotation to the resource method.
+- Fixed issue 649
+  http://java.net/jira/browse/JERSEY-649
+  @Path("{id}") not matched for paths containing %2F
+  Introduced a new ResourceConfig feature, "com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature".
+  The feature allows to configure Grizzly to enable encoded slashes in URIs
+- Fixed issue 576
+  http://java.net/jira/browse/JERSEY-576
+  Grizzly upgraded to 1.9.31
+- JacksonJsonProvider example: added ObjectMapper resolver
+  to show how to use Jackon specific configuration options
+- Fixed issue 625
+  http://java.net/jira/browse/JERSEY-625
+  IllegalAccessException when using jersey-server-linking with
+  java.* and javax.* field types (unannotated). Excluding these
+  from recurive discovery algorithm.
+- Adding support for Cobertura based code coverage measurement.
+  Use following maven targets to compile, instrument, test and
+  generate reports:
+    mvn clean install -Dcobertura -Dmaven.test.skip=true
+    mvn cobertura:cobertura -Dcobertura
+- Fixed issue 643
+  http://java.net/jira/browse/JERSEY-643
+  Allowing users to use different client implementation in Jersey test
+  framework. It might be done by providing ClientFactory and overriding
+  method getClientFactory in JerseyTest, which respects priority of
+  container provided client OR override getClient() method to gain
+  absolute control.
+- Provided a workaround for issue 639
+  http://java.net/jira/browse/JERSEY-639
+  Jersey allows to hack HttpURLConnection class and injects (via reflection)
+  HTTP method which will be used to "method" field. This approach disables
+  method name control which is used in setMethod method. Users have to set
+  URLConnectionClientHandler.PROPERTY_HTTP_URL_CONNECTION_SET_METHOD_WORKAROUND
+  property to true to activate this workaround. There is also one know
+  limitation - request can't contain entity when this code is executed.
+- Jackson dependency upgrade: 1.5.5 -> 1.7.1
+- Fixed issue 626
+  http://java.net/jira/browse/JERSEY-626
+  Skipping the leading CRLF for the first boundary delimiter in multipart
+  messages.
+- Fixed issue 637
+  http://java.net/jira/browse/JERSEY-637
+  Jersey now adds a whitespace after the semicolon separating the content
+  type parameters.
+- Grizzly 2 http-server support moved from the experimental
+  area to the new jersey-grizzly2 module in the com.sun.jersey space
+- *Breaking change*: Grizzly 1 support in a separate module
+  Grizzly 1 support used to be part of the jersey-server module
+  This is no longer the case. If you rely on Grizzly 1 you will
+  need to use the jersey-grizzly dependency instead of just jersey-server 
+- Re-fixed issue 320
+  http://java.net/jira/browse/JERSEY-320
+  Interning document parser needs to be used because of JAXB.
+- *Breaking change*: Fixed issue 607
+  http://java.net/jira/browse/JERSEY-607
+  OAuthProvider is no longer registered using the init param property.
+  It needs to be added as any other provider (e.g. by binding it).
+
+release 1.5 (01-2011)
+- Fixed issue 624
+  http://java.net/jira/browse/JERSEY-624
+  Async client API incorrectly handled TypeListener<ClientResponse>
+- Fixed issue 620
+  http://java.net/jira/browse/JERSEY-620
+  Exceptions thrown by a nullary constructor of a resource were incorrectly
+  handled.
+- Fixed issue 615
+  http://java.net/jira/browse/JERSEY-615
+  Removed unnecessary unused method
+- Fixed issue (applied patch) 614
+  http://java.net/jira/browse/JERSEY-614
+  Code cleaning - clearing List by clear(), not by removeAll() 
+- Fixed issue (applied patch) 613
+  http://java.net/jira/browse/JERSEY-613
+  Removed unnecessary allocation
+- Fixed issue (applied patch) 612
+  http://java.net/jira/browse/JERSEY-612
+  Correcting charset check in AbstractListElementProvider
+- Fixed issue (applied patch) 611
+  http://java.net/jira/browse/JERSEY-611
+  Code attempts to substring off a trailing / but doesn't assign
+  the substring so the operation was lost.
+- Fixed issue 610
+  http://java.net/jira/browse/JERSEY-610
+  Fixed adding headers (not just auth related) to requests without
+  entity
+- Fixed issue 606
+  http://java.net/jira/browse/JERSEY-606
+  Added null check for return value of OAuthProvider.newAccessToken(...)
+- Fixed issue 132
+  http://java.net/jira/browse/JERSEY-132
+  Ability to have WebResource related properties
+- OSGi headers added to Jersey OAuth modules
+- Fixed issue 557
+  http://java.net/jira/browse/JERSEY-557
+  Spring integration: injection of Spring's ApplicationContext 
+  should be possible using the @javax.ws.rs.core.Context annotation
+- Fixed issue 596
+  http://java.net/jira/browse/JERSEY-596
+  When serializing parameters of the content-disposition header include a
+  ' ' after the '; ' as this improves interoperability with services or clients
+  that do not correctly parse content-disposition headers.
+- Fixed issue 598
+  http://java.net/jira/browse/JERSEY-598
+  The Vary header is set if a call to Request.selectVariant is called.
+- Fixed issue 600
+  http://java.net/jira/browse/JERSEY-600
+  Report errors if CDI-based Jersey injection targets for cannot be obtained.
+- Fixed issue 597
+  http://java.net/jira/browse/JERSEY-597
+  The Errors class correctly cleans up the thread local state to stop
+  class loader leaking when deploying Web applications.
+- Fixed issue 522
+  http://java.net/jira/browse/JERSEY-522
+  The Request.selectVariant supports the quality of source "qs" parameter on
+  media type variant.
+- Fixed issue 206
+  http://java.net/jira/browse/JERSEY-206
+  WADL resource params must also be supported 
+  for resource class fields or resource class bean properties
+- Fixed issue 289
+  http://java.net/jira/browse/JERSEY-289
+  The filter init param "com.sun.jersey.config.feature.FilterContextPath" can
+  be used to declare a filter context path.
+  For example if the URL pattern of the Jersey configured filter is
+  "/filterContext/*" and the param value is "/filterContext" then the base URI
+  of the application is defined to be
+  "http(s)://host:port/contextPath/filterContextPath/".
+  Note that an init param is required because the Servlet 2.x API does not
+  provide access to the URI pattern defined in the web.xml.
+- Fixed issue 452
+  http://java.net/jira/browse/JERSEY-452
+  It is an error if a resource class is annotated with more than one
+  Jersey-based scope annotation e.g. @Singleton and @PerRequest.
+- Fixed issue 595
+  http://java.net/jira/browse/JERSEY-595
+  When mapping exceptions to responses if the Log level is FINE when the
+  exception will be logged. This changes the current behaviour where the
+  exception was logged when tracing was enabled. Thus when Jersey is used
+  as a filter with tracing enabled 404 mapped exceptions will not be logged.
+- Fixed issue 587
+  http://java.net/jira/browse/JERSEY-587
+  Upgrade to tag lib version 1.2 for Jersey's JSP support.
+- Fixed issue 487
+  http://java.net/jira/browse/JERSEY-487
+  Client side LoggingFilter - headers were printed out according to internal
+  structure declaration, not as their real representation in final http
+  request.
+- Fixed issue 593
+  http://java.net/jira/browse/JERSEY-593
+  Changed internal matching request to utilize an empty InputStream rather
+  than a null value.
+- Fixed issue 592
+  http://java.net/jira/browse/JERSEY-592
+  Documented the GlassFish servlet initialization parameter
+    org.glassfish.web.isDefaultErrorPageEnabled
+  that can be used to disable GlassFish default error page support.
+- Fixed issue 590
+  http://java.net/jira/browse/JERSEY-590
+  Added check before adding container notifier for existing ones and add them
+  to new set and move this from ServletCointaner.initiate to configure
+  Moved reload functionality to scanning resource config, cache last scanning
+  results and use them to compute added/removed classes and reflect this change
+  in newly scanned set.
+- Fixed issue 589
+  http://java.net/jira/browse/JERSEY-589
+  Related to https://glassfish.dev.java.net/issues/show_bug.cgi?id=13649
+  Checking "assignability" before actually creating instance of class
+  found using ServiceFinder to prevent classloading issues.
+- Fixed issue 478
+  http://java.net/jira/browse/JERSEY-478
+  Applies when marshalling a collection to JSON and MAPPED or NATURAL JSON notations
+  are used. A JSON array is generated if root unwrapping is set to true.
+  Otherwise, if root unwrapping is set to false, a JSON object is returned.
+
+release 1.4 (11-09-2010)
+- Fixed issue 431
+  http://java.net/jira/browse/JERSEY-431
+  The use of @PerSession no longer results in a NotSerializableException when 
+  session state is persisted for internal state, associated with resource
+  instances, that is stored as a session attribute.
+- Fixed issue 554
+  http://java.net/jira/browse/JERSEY-554
+  Tracing is enabled for the JSP template processor. The JSP name and reference
+  to the it variable is output.
+- Fixed issue 571
+  http://java.net/jira/browse/JERSEY-571
+  User defined providers (MessageBodyReaders and Writers) must have higher
+  priority than Jersey provided ones (client & server side).
+- When ServletContainer.FEATURE_FILTER_FORWARD_ON_404 is enabled
+  and the status code is 404 call HttpServletResponse.setStatus otherwise
+  call HttpServletResponse.sendError.
+- Fixed issue 578
+  http://java.net/jira/browse/JERSEY-578
+  The async client, when no HTTP async implementation is utilized, uses
+  ExecutorService to execute the request/response task.
+  The default implementation is Executors.newCachedThreadPool() and the
+  implementation can be set on the Client.
+- Fixed issue 577
+  http://java.net/jira/browse/JERSEY-577
+  When a client sends an empty request to a resource method that consumes
+  JAXB/JSON the natural and mapped conventions produce inconsistent results and
+  should return a 400 error.
+- Fixed issue 546
+  http://java.net/jira/browse/JERSEY-546
+  Validating default values with @DefaultValue of an @*Param at initialization
+  time to produce on errors on deployment can be avoided if the StringReader
+  is annotated with @StringReader.@ValidateDefaultValue(false). In such cases
+  if the default value is incorrect it will result in a runtime error.
+- Fixed issue 552
+  http://java.net/jira/browse/JERSEY-552
+  Support null key values (as documented) for KeyComparatorHashMap.
+- Fixed issue 550
+  http://java.net/jira/browse/JERSEY-550
+  When a WebApplicationException is thrown because a message body reader/writer
+  cannot be found a message is included with the exception (in addition to that
+  message being logged).
+- Fixed issue 575
+  http://java.net/jira/browse/JERSEY-575
+  Fixed regression in jersey-multipart where @FormDataParam annotated parameters
+  were not being recognized resulting in deployment errors or incorrect
+  information being passed as the entity parameter.
+- Fixed issue 573
+  http://java.net/jira/browse/JERSEY-573
+  Entities that are defined to be parameterized types with type variable as
+  arguments will be resolved, recursively to concrete types where possible.
+  For, example List<T> T[], Map<T, T> and Map<T, List<T>> will be resolved,
+  when T is a String, to List<String> String[], Map<String, String> and
+  Map<String, List<String>>
+- Fixed issue 572
+  http://java.net/jira/browse/JERSEY-572
+  Propagate security context when making internal invocations to match URIs.
+- Fixed issue 564
+  http://java.net/jira/browse/JERSEY-564
+  Modified field injection so that injection will occur independent of the
+  field value. Previously injection would only occur if the field value
+  was null.
+- Support @InjectParam, which has the same semantics as Jersey's @Inject
+  but does not conflict with the JSR 330 version. Jersey's @Inject is now
+  deprecated.
+- Support for @ParentRef to injecting a parent into a sub-resource.
+- Fixed issue 563
+  http://java.net/jira/browse/JERSEY-563
+  When using the low-level Grizzly container injection of GrizzlyRequest
+  and GrizzlyResponse are now supported as follows:
+    @Context ThreadLocal<GrizzlyRequest> request
+    @Context ThreadLocal<GrizzlyResponse> response
+  The thread local is required because GrizzlyRequest/Response are classes,
+  not interfaces, and therefore cannot be proxied using the Java proxy API.
+- Fixed issue 562
+  http://java.net/jira/browse/JERSEY-562
+  When ServletContainer.FEATURE_FILTER_FORWARD_ON_404 feature is set to true
+  and Jersey forwards to the next filter in the chain then the response
+  status code will be set to 200 before forwarding.
+- JSONConfiguration.FEATURE_POJO_MAPPING ResourceConfig feature introduced
+  to simplify Jackson POJO entity provider utilization
+  Users no longer need to register the Jackson provider explicitly
+- Jackson dependency upgraded to version 1.5.5 
+- *Breaking change*: in order to prevent OSGi bundle reload issues
+  we need to bundle JSR-311 API classes with the jersey-core module
+- Fixed issue 486
+  http://java.net/jira/browse/JERSEY-486
+  Added JRebel support.
+- Fixed issue 542
+  http://java.net/jira/browse/JERSEY-542
+  Added client HTTPDigestAuthFilter from external contributor + tests
+- Fixed issue 549
+  http://java.net/jira/browse/JERSEY-549
+  Implicit HEAD method support was not re-using any resource method-specific
+  filters on the GET method from which the HEAD method was derived from.
+- Fixed issue 547
+  http://java.net/jira/browse/JERSEY-547
+  The GZIPContentEncodingFilter works correctly with the Client API and
+  HttpURLConnection when a request entity is sent for which the size is known
+  in advance, for example a File or byte[].
+- Fixed issue 506
+  http://java.net/jira/browse/JERSEY-506
+  Fixed regression. Servlet url patterns of the form
+        <url-pattern>*.xxx</url-pattern>
+  now function as was the case for Jersey 1.0.3.1.
+
+release 1.3 (17-06-2010)
+- Fixed issue 540
+  http://java.net/jira/browse/JERSEY-540
+  Parameterized types of List/Set/SortedSet are supported for parameters,
+  for example @QueryParam("d") List<List<String>>, if there is a
+  StringReaderProvider registered that supports the type List<String>.
+- Remove the restriction that a GET method cannot receive entities. Warnings
+  will be presented instead of errors. Although this is highly uncommon The HTTP
+  spec does not rule this out thus Jersey was being unduly restrictive.
+- Fixed issue 543
+  http://java.net/jira/browse/JERSEY-543
+  unable to build extended-wadl-webapp sample
+- Fixed issue 293
+  http://java.net/jira/browse/JERSEY-293
+  The response building will retain the StatusType (if explictly set) or those
+  defined on javax.ws.rs.core.Response.Status. The container may access the
+  StatusType via ContainerResponse.getStatusType and from that the reason
+  phrase can be obtained.
+  The servlet container will use the reason phrase for the message parameter
+  of the call to HttpServletResponse.sendError for the case when the
+  status code >= 400 and the servlet container is deployed as a servlet
+  (sendError does not work on some web containers when the servlet container is
+  deployed as a filter).
+- Fixed issue 472
+  http://java.net/jira/browse/JERSEY-472
+  Ensure that preconditions with GET then a PUT with If-Unmodified-Since works
+  correctly at the granularity of seconds.
+  The last modified date is rounded down to the nearest second when comparing
+  against If-Modified-Since or If-Unmodified-Since values.
+  (HTTP formatted dates are rounded down to the nearest second.)
+  This can result in lost updates if two or more PUTs occur within an interval
+  of a second. The application should use etags in such cases.
+- ServiceFinder will defer to the defining class loader of the current class
+  if a provider class cannot be loaded from the thread context class loader.
+- Changed the declaration of components defined by jersey-multipart to use
+  the META-INF/services service interface name to avoid the components being
+  output in the logs.
+- Fixed issue 488
+  http://java.net/jira/browse/JERSEY-488
+  When using Apache HTTP client, chunked encoding and jersey-multipart
+  it is necessary for the client to explicitly declare the boundary string for 
+  the content type. See com.sun.jersey.multipart.Boundary and
+  com.sun.jersey.multipart.MultiPartMediaTypes.
+  This is due to architectural restrictions with the Apache HTTP client as
+  the headers have to be declared before the entity is written.
+- Removed support for resource methods utilizing @FormParam and consuming
+  "multipart/form-data". This functionality has been replaced by @FormDataParam
+  in the jersey-multipart module.
+- Fixed issue 531
+  http://java.net/jira/browse/JERSEY-531
+  WADL generation should not modify the abstract model when @FormParam is
+  declared in a resource method parameter and the @Consumes is absent.
+- Fixed issue 538
+  http://java.net/jira/browse/JERSEY-538
+  The reference to the registered application may be injected as follows:
+    @Context Application app;
+- Upgrade the version of Abdera used in the contribs/jersey-atom-abdera to 1.0.
+- Guice integration supports the @Inject binding of common
+  JAX-RS and Jersey dependencies such as UriInfo and ExtendedUriInfo.
+  Extend from com.sun.jersey.guice.JerseyServletModule, instead of
+  com.google.inject.servlet.ServletModule, to register these bindings.
+- GlassFish v3 integration
+  Instead of one big uber JAR, jersey-gf-bundle.jar, individual Jersey modules 
+  are integrated to GlassFish to allow better modularization
+  and alignment with non GlassFish environment
+- Fixed issue 436
+  http://java.net/jira/browse/JERSEY-436
+  Resources may be looked up using a URI via methods on 
+  com.sun.jersey.api.core.ResourceContext.
+- Fixed issue 489
+  http://java.net/jira/browse/JERSEY-489
+  Support configurable namespace separators for JAXB/JSON.
+  See com.sun.jersey.api.json.JSONConfiguration#nsSeparator
+- Fixed Jersey versioning issue for GlassFish when a version of
+  Jersey is deployed in the war that is different to the version of Jersey
+  version distributed with GlassFish.
+  META-INF/sevices files will be ignored if the corresponding
+  META-INF/MANIFEST.MF of the same jar contains a Bundle-SymbolicName
+  beginning with "com.sun.jersey" and a Bundle-Version that is not equal
+  to the Bundle-Version declared in the META-INF/MANIFEST.MF for the same jar
+  that contains the com.sun.jersey.spi.service.ServiceFinder.class.
+- Fixed issue 66
+  http://java.net/jira/browse/JERSEY-66
+  *Breaking changes*
+  Errors will result if dependencies cannot be injected rather than a null
+  value being injected.
+  Non-static inner classes as root resource and provider classes are no longer
+  supported.
+- Fixed issue for WadlGeneratorConfig and building of properties, which now
+  correctly works for any property value type.
+- Fixed issue 527
+  http://java.net/jira/browse/JERSEY-527
+  Package name scanning now works in an OSGi environment
+- Jersey Test Framework
+  Adding support for setting servlet and concurrent filter(s) with possibility
+  to set up filter name and init params per filter
+- Fixed issue 526
+  http://java.net/jira/browse/JERSEY-526
+  Provide access to the matching AbstractResourceMethod that was invoked
+  on a resource class, see ExtendedUriInfo.getMatchedMethod().
+- Fixed issue 529
+  http://java.net/jira/browse/JERSEY-529
+  Close input stream when reading properties file to obtain the Build ID.
+- Fixed issue 509
+  http://java.net/jira/browse/JERSEY-509
+  The stack trace is no longer included as the response entity for an
+  unmapped WebApplicationException with a status code of 500 and no response
+  entity.
+- Fixed issue 521
+  http://java.net/jira/browse/JERSEY-520
+  Support matching when quality of source, qs, values are less than 1.
+- Fixed issue 520
+  http://java.net/jira/browse/JERSEY-520
+  When Guice support is configured enable Guice injection of resource
+  or provider classes that have fields or methods annotated with @Inject
+  but have no constructor annotated with @Inject. In this case Jersey
+  instiaties and manages and lets Guice inject.
+- Fixed issue 449
+  http://java.net/jira/browse/JERSEY-449
+  When a message body reader or writer cannot be found for a media type
+  and Java type log all readers/writers that are compatible with that
+  media type.
+
+release 1.2 (10-05-2010)
+- Fixed issue 457
+  http://java.net/jira/browse/JERSEY-457
+  Jersey WAR project cannot be deployed on OSGI platform
+- Fixed issue 275
+  http://java.net/jira/browse/JERSEY-275
+  Jersey-core, jersey-server, jersey-client and jersey-json modules 
+  now (from 1.2 verison on) contain OSGi headers and use ServiceMix based
+  implementation to work in OSGi environment.
+  2 examples were added to show how to build a Jersey based OSGi web application
+  using OSGi Http-Service and OSGi WAR deployment. 
+  Known limitation: the package name resource configuration can not be used in the OSGi runtime
+  and needs to be replaced by the class name based mechanism.
+  This will be addressed in future development. Also other Jersey modules 
+  are to be OSGified in the future releases.
+- Fixed issue 516
+  http://java.net/jira/browse/JERSEY-516
+  Changed resolving algorithm for finding a CDI Bean from a Class such
+  that inheritence hierarchies are supported.
+  BeanManager.resolve does not resolve a set of Bean to one Bean if all
+  members extend from a common concrete case class.
+- Fixed issue 507
+  http://java.net/jira/browse/JERSEY-507
+  Support DELETE with request entities for the Apache HTTP client.
+- Fixed issue 505
+  http://java.net/jira/browse/JERSEY-505
+  Fixed error in the multipart message body writer when the
+  Content-Type header value is explicitly set and the value is a string.
+- Fixed issue 504
+  http://java.net/jira/browse/JERSEY-504
+  Upgrade Simple HTTP server to 4.1.20.
+- Fixed issue 484
+  http://java.net/jira/browse/JERSEY-484
+  Change the Guice dependency to depend on Guice from the maven central
+  repository rather than GuiceyFruit.
+- Added com.sun.jersey.api.JResponse, which is a type safe alternative to
+  javax.ws.rs.core.Response that preserves the type information of response
+  entity thus it is not necessary to utilize javax.ws.rs.core.GenericEntity.
+  It provides equivalent functonality to Response.
+  JResponse may be extended in combination with JResponse.AJResponseBuilder
+  specialization when building responses.
+- Fixed issue 485, 519
+  http://java.net/jira/browse/JERSEY-485
+  http://java.net/jira/browse/JERSEY-519
+  When a ServletContainer is used as a servlet filter and the feature
+  ServletContainer.FEATURE_FILTER_FORWARD_ON_404 is set to true then enable the
+  next filter in the chain to be invoked if Jersey or the application returns a
+  404 with no entity body.
+  *Breaking changes* in order to support Servlet 2.4 and Servlet 3.0 it was
+  necessary to change the return type of ServletContainer#service(
+    URI baseUri, URI requestUri,
+    final HttpServletRequest request, HttpServletResponse response)
+  from "void" to "int" such that it returns the state code of the response.
+  HttpServletResponse.getStatusCode only exists for Servlet 3.0.
+- Fixed issue 361
+  http://java.net/jira/browse/JERSEY-361
+  Introduced new feature (FeaturesAndProperties.FEATURE_XMLROOTELEMENT_PROCESSING)
+  which enables getting XmlRootElement annotations and deriving name for list
+  from its name property. First letter "decapitalization" is not done
+  when this feature is enabled.
+- Fixed issue 480
+  http://java.net/jira/browse/JERSEY-480
+  An error in the decoding of "application/x-www-form-urlencoded" information
+  will result in a 400 (Client error) response.
+- Fixed issue 471
+  http://java.net/jira/browse/JERSEY-471
+  LoggingFilter should not have side-effects on the response and retain
+  content length information.
+- Allow injection of the Client instance onto client-managed provider
+  classes.
+- Fixed issue 475
+  http://java.net/jira/browse/JERSEY-475
+  A registered application can return null for getClasses and getSingletons
+  which has the same meaning as returning an empty set.
+- Fixed issue 479
+  http://java.net/jira/browse/JERSEY-479
+  Fixed package scanning for applications deployed to the WebLogic application
+  server.
+- Fixed issue 477
+  http://java.net/jira/browse/JERSEY-477
+  Added null check for value returned from ServletContext.getResourcePaths.
+- Jersey Test Framework modularization
+  You can choose which container would be used for testing by depending on that
+  module. For example if you want to use InMemory container, specify dependency
+  like:
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-inmemory</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+  and it will be used. When you define multiple dependencies and grizzly module
+  (default) is present, tests will run on grizzly; otherwise (grizzly module is
+  not present) warning will be produced and tests will run on first discovered
+  module. This can be altered by specifying jersey.test.containerFactory property
+  and setting its value to TestContainer descendant (fully qualified java class
+  name).
+- Upgrade from Grizzly 1.9.8 to Grizzly 1.9.18-i
+- Fixed issue 465
+  http://java.net/jira/browse/JERSEY-465
+  Refactored ResourceConfig; now its possible to use delimiters ';', ',' and ' '
+  (space) to separate class names in various init parameters like filters and
+  filter factories declaration, classpath, class and package names specification.
+  Intended consequence is that FilterFactory now uses ResourceConfig to get list
+  of filters/filter factories so its possible to programatically add filters
+  to ones defined in web.xml.
+- Modified the resolving of "flat-file" templates so the location is
+    '/' + resourceClass.getName().replace('.', '/').replace('$', '.') + '.' + path
+  Thus if there is a resource class named com.Foo and there is an index.html
+  template then the path to the template can be:
+    com/Foo.index.html
+  in addition to:
+    com/Foo/index.html
+  Thus templates can be co-located with Java class files rather than in
+  sub-directories.
+- Fixed issue 461
+  http://java.net/jira/browse/JERSEY-461
+  An exception thrown from a resource method that is mapped to a response
+  will have the appropriate Content-Type set, if an entity is present and if not
+  already set from the mapped response, as declared by the @Produces annotation
+  and what the client accepts.
+- Fixed issue 433
+  http://java.net/jira/browse/JERSEY-433
+  OAuth signature calculation correctly encodes request parameters according
+  to the unreserved character set defined in the URI specifications.
+  RSA_SHA1 support correctly URL encodes the base64 encoding of the signature.
+- Fixed issue 468
+  http://java.net/jira/browse/JERSEY-468
+  If URI canonicalization, and optionally URI normalization is set to true, but
+  redirection is set to false (the default) then the request URI is modified to
+  be the canonicalized, and optionally normalized, URI.
+- Fixed issue 464
+  http://java.net/jira/browse/JERSEY-464
+  Change the context related methods from private to protected.
+- Fixed issue 466
+  http://java.net/jira/browse/JERSEY-466
+  Avoid generation of empty params in WADL.
+- Fixed issue 459
+  http://java.net/jira/browse/JERSEY-459
+  A 307 (Temporary redirect) response for a resource which has a path
+  ending in '/' has a correct full request URI, including query parameters (if present),
+  for the Location header.
+- Fixed issue 467
+  http://java.net/jira/browse/JERSEY-467
+  @Inject can be utilized on provider-based classes.
+
+release 1.1.5 (20-01-2010)
+- Fixed issue 437
+  http://java.net/jira/browse/JERSEY-437
+  Support the parsing of the Cache-Control header.
+- Fixed issue 454
+  http://java.net/jira/browse/JERSEY-454
+  Scanning of classes WEB-INF/classes in a war in ear now works for JBoss 5.x
+  deployments.
+- Fixed issue 456
+  http://java.net/jira/browse/JERSEY-456
+  UriBuilder can be built from URIs whose authority component is a
+  registry based naming authority.
+- When tracing is enabled exceptions that are mapped to responses will be
+  logged.
+- Added formatted support when JSON with natural notation is used
+- Fixed issue 362
+  http://java.net/jira/browse/JERSEY-362
+  Deprecated HttpHelper.getAcceptLangauge and added new method
+  HttpHelper.getAcceptLanguage.
+- Fixed issue 448
+  http://java.net/jira/browse/JERSEY-448
+  Ensure that spring 2.5.x dependency version does not depend on Spring 3.0.
+- Fixed issue 450
+  http://java.net/jira/browse/JERSEY-450
+  Equals method of AsyncWebResource was incorrect.
+- Fixed issue 202
+  http://java.net/jira/browse/JERSEY-202
+  Support the quality source parameter, "qs", on media types declared with
+  @Produces or @ImplicitProduces.
+  The media type, M say, with the highest quality source parameter for a request
+  will be selected as the most acceptable media type if X is an acceptable
+  media type.
+  For example, given the following resource class:
+  public class Foo {
+    @Produces("application/xml")
+    String get() { ... }
+
+    @Produces("text/html;qs=2")
+    String get() { ... }
+  }
+  and given an Accept header of "*/*" or "application/xml, text/*;q=0.8"
+  then "text/html" will be produced because the application prefers "text/html"
+  over "application/xml" even though the client does not.
+  Given an Accept header of "application/xml" then "application/xml" will be
+  produced.
+- Fixed issue 382
+  http://java.net/jira/browse/JERSEY-382
+  Quality source parameters, "qs", on media types declared with @Produces or
+  @ImplicitProduces on resource classes will work correctly for an
+  Accept header of "*/*"
+- Fixed issue 446
+  http://java.net/jira/browse/JERSEY-447
+  Deprecated TemplateProcessor, instead use ViewProcessor, which provides
+  better support when resolving a template name and writing out a template.
+  Note that existing implementations of TemplateProcessor are still supported.
+  When writing out an view with an absolute template name, or a view with a
+  resolving class then it is not required that an HTTP request be in scope
+  (unless the ViewProcessor implementation requires it).
+  *BREAKING CHANGES* for com.sun.jersey.spi.template.TemplateContext and
+  com.sun.jersey.spi.template.ResolvedViewable.
+  TemplateContext no longer has a method to obtain the set of TemplateProcessor.
+  The constructors of ResolvedViewable were modified to be compatible with
+  ViewProcessor.
+- Fixed issues when a Response is returned with a Viewable and a status code
+  >= 400.
+- Fixed issue 447
+  http://java.net/jira/browse/JERSEY-447
+  JAX-RS annotated methods on interfaces or abstract methods on abstract classes
+  that have parameters that are instances of java.lang.reflect.TypeVariable are
+  correctly detected as the annotated methods to process.
+- Fixed issue 439
+  http://java.net/jira/browse/JERSEY-432
+  Servlet RequestDispatcher.forward works when forwarding to Jersey managed
+  URIs. For example a JSP view may utilize <c:import url="/some/jaxrs/path" />
+  to include another view.
+- Added formatted feature, see FeaturesAndProperties.FEATURE_FORMATTED
+  When enabled, XML returned from resources will be formatted (line breaks and
+  indentation).
+- Fixed issue 439
+  http://java.net/jira/browse/JERSEY-439
+  Proxied objects, using java.lang.reflect.Proxy, that invoke the Java method
+  of the proxy will correctly re-throw any target exception caught from a
+  InvocationTargetException, rather than the proxying throwing a
+  java.lang.reflect.UndeclaredThrowableException.
+- Upgraded jersey-simple-server to version 4.1.15.
+- If an exception is mapped to a Response then that exception is now available
+  from the HttpResponseContext.getMappedThrowable() method.
+- Fixed issue 379
+  http://java.net/jira/browse/JERSEY-379
+  Jersey applications can now be deployed on Google App Engine.
+- Added tracing feature.
+  Tracing provides useful information that describes how a request
+  is processed and dispatched to JAX-RS/Jersey components. This can aid
+  debugging when the application is not behaving as expected either
+  because of a bug in the application code or in the Jersey code.
+  Trace messages will be output as response headers with a header name of the
+  form "X-Jersey-Trace-XXX", where XXX is a decimal value corresponding to the
+  trace message number, and a header value that is the trace message.
+  See ResourceConfig.FEATURE_TRACE and ResourceConfig.FEATURE_TRACE_PER_REQUEST.
+  Tracing can be abled for a web application by adding the following init-param:
+    <init-param>
+        <param-name>com.sun.jersey.config.feature.Trace</param-name>
+        <param-value>true</param-value>
+    </init-param>
+- Added new feature - now its possible to set language mappings via
+  ResourceConfig property (ResourceConfig.PROPERTY_LANGUAGE_MAPPINGS);
+  this can be set as a parameter in web.xml file.
+  Allowed types are String and String[], format: "segment:language-tag".
+  Language tag is defined in RFC 2616 (http://www.ietf.org/rfc/rfc2616.txt).
+    language-tag  = primary-tag *( "-" subtag )
+    primary-tag   = 1*8ALPHA
+    subtag        = 1*8ALPHA
+- Added new feature - now its possible to set media type mappings via
+  ResourceConfig property (ResourceConfig.PROPERTY_MEDIA_TYPE_MAPPINGS);
+  this can be set as a parameter in web.xml file.
+  Allowed types are String and String[], format: "segment:media/type".
+  Multiple definitions are comma separated. This was implemented mainly
+  to match similar RESTEasy feature.
+- Fixed issue 430
+  http://java.net/jira/browse/JERSEY-430
+  Fixed injection of per-request resources on to per-request (non-299)
+  managed beans.
+- Fixed issue 429
+  http://java.net/jira/browse/JERSEY-429
+  Package scanning deployment on JBoss 5.x app servers now works correctly.
+- Fixed issue 32
+  http://java.net/jira/browse/JERSEY-32
+  The servlet container supports portable scannnig of WEB-INF/lib and
+  WEB-INF/classes directories when the default servlet configuration is
+  utilized.
+  Default configuration deployments will now work on WebLogic-based
+  application servers.
+- Fixed issue 421
+  http://java.net/jira/browse/JERSEY-421
+  ContainerResponse.write() now consistently sets the isCommitted state.
+- Fixed issue 420
+  http://java.net/jira/browse/JERSEY-420
+  Some servlet containers do not support the addition of headers after
+  a HttpServletResponse.sendError is invoked.
+  Jersey will invoke sendError for a response status code >=400 when there
+  is no response entity. The headers are now written before sendError is
+  invoked.
+- Fixed issue 419
+  http://java.net/jira/browse/JERSEY-419
+  Upgraded simple server to version 4.1.14.
+- Fixed issue 422
+  http://java.net/jira/browse/JERSEY-422
+  The container response filter of the server-side LoggingFilter now ensures
+  that when the ServletContainer is utilized response headers are written when
+  there is no response entity present.
+  This was a regression as the ContainerResponseAdapter of the LoggingFilter
+  was not correctly adapting the finish method.
+- Fixed issue 423
+  http://java.net/jira/browse/JERSEY-423
+  Injection on to 299 managed beans in the dependent scope (scope is managed
+  by Jersey) is correctly supported for Jersey-based injection artifacts
+  such as @Context ResourceContext and @Inject T.
+- Fixed issue 125
+  http://java.net/jira/browse/JERSEY-125
+  @FormParam injection is supported for the same targets as other @*Param
+  annotations. Injection will only occur if there is a request entity
+  of the type "application/x-www-form-urlencoded", otherwise an
+  IllegalStateException will be thrown.
+  Form parameter beans are now supported, and the 
+  @com.sun.jersey.spi.inject.Inject annotation may now be utilized to obtain
+  such beans, for example:
+    class MyFormBean {
+       @FormParam("a") String a;
+       @FormParam("b") String b;
+    }
+
+    @Path("foo")
+    class MyResource {
+      @POST
+      public ... post(@Inject MyFormBean b) { ... }
+    }
+- Fixed issue 424
+  http://java.net/jira/browse/JERSEY-424
+  The @com.sun.jersey.spi.inject.Inject annotation may now be utilized to inject
+  a resource class.
+  This is the recommend over the approach of using ResourceContext.
+  If a per-request managed resource is required to be injected into a
+  singleton managed resource then the resource class can be declared as the
+  parameterized type of Injectable, for example:
+    @Inject Injectable<MyPerRequestResource>
+- Fixed issue 418
+  http://java.net/jira/browse/JERSEY-418
+  Reloading of the servlet container no longer retains previous references to
+  root reosurce and provider classes declared in an extension of Application
+  or ResourceConfig.
+  The root cause: the WebApplication implementation was not cloning the
+  ResourceConfig instance passed to it on initiation if additional
+  root resource and provider classes needed to be added.
+- Added examples from Bill Burke's book "RESTful Java with JAX-RS"
+  modified to be runnable with Jersey and with additional tests.
+- Apache HTTP Client now supports custom HTTP methods.
+
+release 1.1.4 (2009-11)
+- Fixed issue 412
+  http://java.net/jira/browse/JERSEY-412
+  Ensure that ResourceConfig and extensions of retain the order of
+  classes and singletons that are added.
+- Fixed issue 411
+  http://java.net/jira/browse/JERSEY-411
+  Fixed regression in MethodList class caused by fixing issue 229.
+- Fixed issue 229
+  http://java.net/jira/browse/JERSEY-229
+  @PostConstruct and @PreDestroy method can have any visibility.
+- Fixed issue 406
+  http://java.net/jira/browse/JERSEY-406
+  FormDataBodyPart.getValue will honor the charset parameter of the media
+  type associated with the body part.
+- Fixed issue 232
+  http://java.net/jira/browse/JERSEY-232
+  The characters '{' and '}' are percent encoded if a URI is built using
+  UriBuilder.build and no template parameter values are given as input.
+- Fixed issue 357
+  http://java.net/jira/browse/JERSEY-357
+  The Apache HTTP client handler for the Client API will automatically
+  release the connection if no response entity is present. Thus it is not
+  necessary to call ClientResponse.close if the response has no entity.
+  This avoids the client blocking when all the threads of the connection
+  manager are utilized.
+- Fixed issue 384
+  http://java.net/jira/browse/JERSEY-384
+  Work around issue in the LW HTTP server:
+    http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6886436
+  for responses that return a 204 status code. This issue can manifest
+  itself if, for example, a client invokes a POST method that returns 204
+  then invokes a GET method. This may cause some clients to hang, specifically
+  HttpURLConnection (browsers and the Apache HTTP client do not hang).
+- Fixed issue 397
+  http://java.net/jira/browse/JERSEY-397
+  Fixed issue for JSON/JAXB mapped marshalling that results in a stack
+  overflow if the client aborts the connection when marshalling is in
+  operation.
+- Fixed issue 393
+  http://java.net/jira/browse/JERSEY-393
+  Headers may be added to the multi-valued map returned from 
+  Response.getMetadata().
+- Fixed issue 391
+  http://java.net/jira/browse/JERSEY-390
+  The Jersey servlet-layer catches a MappableContainerException and will
+  rethrow the cause wrapped in a ServletException. This ensures that such
+  mappable exceptions can be mapped by the Web application.
+- Fixed issue 390
+  http://java.net/jira/browse/JERSEY-390
+  A com.sun.jersey.api.container.MappableContainerException may be thrown
+  from an ExceptionMapper and as such that expception will be re-thrown to
+  the underlying HTTP container.
+  The EJBException mapper was modified to throw a MappableContainerException
+  with the cause of an EJBException. This ensures that such runtime exceptions
+  can be mapped by the Web application.
+- Fixed issue 389
+  http://java.net/jira/browse/JERSEY-389
+  For Web applications HttpServletResponse.sendError will be called instead
+  of HttpServletResponse.setStatus under the following conditions:
+  1) no bytes have been written to the response output stream; and
+  2) the status code is an error code, namely a value >= 400.
+  Such behaviour ensures that error pages mapped to error codes declared in the
+  web.xml will work if Jersey or the applicaton returns an error code with no
+  entity.
+- Fixed issue 387
+  http://java.net/jira/browse/JERSEY-387
+  Enabling Jersey response logging with views no longer results in an
+  illegal state exception.
+- Fixed issue 388
+  http://java.net/jira/browse/JERSEY-388
+  Maven web-based archetypes use version 2.5 of web.xml.
+- Fixed issue 392
+  http://java.net/jira/browse/JERSEY-392
+  Issue 336 (fixed in 1.1.3-ea) caused a regression such that it was no longer 
+  possible to register provider classes in an Application, a ResourceConfig or
+  a ResourceConfigurator.
+- Fixed issue 95
+  http://java.net/jira/browse/JERSEY-95
+  The recursive cycle detection has been modified to be local to root
+  resource classes such the same sub-resource in two or more root resource
+  classes can be declared in the WADL.
+- Fixed issue 371
+  http://java.net/jira/browse/JERSEY-371
+  Logging of stack trace of mapped exceptions is not performed.
+- Fixed issue 385
+  http://java.net/jira/browse/JERSEY-385
+  Enable non-JAX-RS annotations on interface or abstract methods and
+  parameters to be merged with the annotations on the concrete method and 
+  parameters (if such annotations are not already declared).
+- Fixed issue 383
+  http://java.net/jira/browse/JERSEY-383
+  Singleton instances added to the set of singletons of the Application/
+  ResourceConfig are not longer errornousaly instantiated by the runtime.
+  The singleton reference is also available from the
+  ResourceContent.getResource.
+- Fixed issue 381
+  http://java.net/jira/browse/JERSEY-381
+  Multiple child spring configuration fails may be declared as a value
+  of the property SpringServlet.CONTEXT_CONFIG_LOCATION.
+- Modified the Jersey test framework such that it is possible to override
+  JerseyTest. The external test container supports the system property
+  JERSEY_HOST_NAME to declare the host name for the base URI.
+
+release 1.1.3-ea (2009-10-06)
+- Support configuration of ResourceConfig using the provider interface
+  com.sun.jersey.api.core.ResourceConfigurator.
+  One or more ResourceConfigurator providers may be registered and the
+  configure method will be called which may update the state of the
+  ResourceConfig instance passed as a parameter.
+- Support programmatic modification of the declaration of filters. See the
+  following methods on ResourceConfig: getContainerRequestFilters,
+  getContainerResponseFilters and getResourceFilterFactories.
+- Support the resolving of a type variable, T say, to a concrete type for
+  all parameters (field, method parameters, method setters) and
+  return types of resource methods.
+  Log warnings if T cannot be resolved to a concreate type, or if a
+  parameterized type, Collection<T> say, cannot be resolved because such
+  a type cannot be created dynamically.
+- Added support for Servlet 3.0 deployment with JAX-RS 1.1-ea.
+- Fixed issue 363
+  http://java.net/jira/browse/JERSEY-363
+  Fixed for parameters when a String-based constructor is utlized with a
+  @DefaultValue("").
+- Fixed issue 359
+  http://java.net/jira/browse/JERSEY-359
+  The client API should use the default media type "application/octet-stream"
+  if a default media type cannot be obtained for a request entity of Java type.
+- Fixed issue 336
+  http://java.net/jira/browse/JERSEY-336
+  A class that extends of Application or ResourceConfig referenced in the web.xml
+  is now instantated as a component.
+  If the class has a constructor that takes a single parameter of the
+  type Map then the class is instantiated with that constructor and an instance
+  of Map that contains all the initialization parameters is passed as the
+  parameter. Otherwise, the class is instantiated as a singleton component
+  managed by the runtime, and injection may be performed (the artifacts that
+  may be injected are limited to injectable providers registered when
+  the servlet or filter is configured).
+- OAuth signature library now correctly percent encodes characters when
+  generating a secret.
+- Fixed issue 356
+  http://java.net/jira/browse/JERSEY-356
+  Clarified JavaDoc for com.sun.jersey.core.header.MatchingEntityTag to
+  state that instance of this type or the super type cannot be used to
+  produce headers of the form "If-Match: *" or "If-None-Match: *".
+- Fixed issue 357
+  http://java.net/jira/browse/JERSEY-357
+  Clarifed JavaDoc for client API the response must be closed to ensure that
+  underlying resources are correctly released.
+
+release 1.1.2-ea (2009-08-25)
+- Fixed issue 355
+  http://java.net/jira/browse/JERSEY-355
+  URI conneg works for the case of when a suffix say "nt" is present
+  in the path and is not preceded by a '.', for example "/ontology.nl
+  URI conneg is now a container request filter, see:
+  com.sun.jersey.api.container.filter.UriConnegFilter
+  Developers may extend this filters and register it rather than utilizing the
+  ResourceConfig.getMediaTypeMappings and ResourceConfig.getLanguageMappings.
+- Fixed issue 354
+  http://java.net/jira/browse/JERSEY-354
+  Runtime exceptions thrown from Singleton or Stateless Session Beans,
+  such as WebApplicationException, will be mapped appropraitely.
+- Fixed issue 353
+  http://java.net/jira/browse/JERSEY-353
+  Form reading/writing will use the charset declared in the charset parameter
+  of the media type if present, otherwise the UTF-8 charset will be utilized,
+  to decode/encode characters.
+- Fixed issue 250
+  http://java.net/jira/browse/JERSEY-250
+  Updated the JavaDoc of HttpContext.getProperties and
+  ContainerResponse.getProperties to state:
+     * Care should be taken not to clear the properties or remove properties
+     * that are unkown otherwise unspecified behaviour may result.
+- Fixed issue 343
+  http://java.net/jira/browse/JERSEY-343
+  The ResourceConfig property
+    PROPERTY_DEFAULT_RESOURCE_COMPONENT_PROVIDER_FACTORY_CLASS
+  additional supports a Java type that is a String whose value is a Class name.
+- Fixed issue 332
+  http://java.net/jira/browse/JERSEY-332
+  If an Content-Type header is recieved with an empty value a 400 
+  response is returned.
+- Fixed issue 350
+  http://java.net/jira/browse/JERSEY-350
+  Errors when processing a parameter, annotated with an @*Param annotation,
+  will result in an instance of ParamException (that extends WebApplicaton)
+  being thrown concrete instance of which reflect the particular parameter
+  involved.
+  See com.sun.jersey.api.ParamException and inheriting classes for
+  more details.
+- Fixed issue 338
+  http://java.net/jira/browse/JERSEY-338
+  Ensure correct array element separator (',') is used also
+  in case an array is recognized based on configuration option.
+- Fixed issue 242
+  http://java.net/jira/browse/JERSEY-242
+  Client and server logging now uses a JDK logger to log requests and
+  responses.
+- Code to copy a from an input stream or reader to an output stream or writer
+  has been consolidated. In addition functions that require the use of byte
+  or character arrays will use a default size for the array but this can
+  be overridden if required (for performance reasons). See:
+    com.sun.jersey.core.util.ReaderWriter
+- Cleaned up the throwing of exceptions by message body readers and writers.
+  If a known checked, or documented runtime, exception is thrown when
+  reading then a WebApplcationException is thrown with the cause. If the
+  exception is related to reading then a 400 (Client error) status code is
+  set, otherwise a 500 (Internal server error) status code is set.
+  If a known checked, or documented runtime, exception is thrown when
+  writing then a WebApplcationException is thrown with the cause and a 
+  500 (Internal server error) status code is set.
+- Fixed issue when a Content-Type request header is absent and resource methods
+  consume (explicitly or by default) "*/*".
+  When a Content-Type request header is absent resource methods that consume
+  "*/*" take priority over other reosurce methods that consume other media
+  types. Thus "*/*" means consuming any media type or no media type.
+  See also com.sun.jersey.core.provider.EntityHolder to safely consume a
+  request entity if present, otherwise declare that such an entity is not
+  present.
+- Support for explcitly adding a root resource class or root resource singleton
+  by programatically declaring the root path, rather than using the @Path
+  annotation. See ResourceConfig.getExplicitRootResources for more details.
+- Support the throwing of WebApplicationException from within a singleton
+  or stateless session bean method. This will only work with GF v3 build 58
+  or greater.
+- Fixed issue 302
+  http://java.net/jira/browse/JERSEY-302
+  Allow a relative template name to be resolved to an absolute template name
+  that is a flat name if the template cannot be resolved the path-based
+  rule.
+  The flat name is fully qualified class name plus a "." plus the template name.
+  For example, given the resolving class com.foo.MyResource and the template
+  name index the absolute name will be "com.foo.MyResource.index.jsp".
+- Fixed issue 161
+  http://java.net/jira/browse/JERSEY-161
+  The Jersey client can now be used completely independently of the Jersey
+  server side when errors are produces by certain message body readers and
+  writers.
+  Response and Response.ResponseBuilder are now implemented such that they
+  can be used on the client side (without having to include jersey server
+  dependencies). This is important for some message body readers and writers
+  that may throw WebApplicationException, which in turn defers to Response
+  for building a response.
+- Fixed issue 337
+  http://java.net/jira/browse/JERSEY-337
+  The LW HTTP container logs an IOException (passed from Jersey) and attempts
+  to set the status code to 500. If the statuss and headers are already
+  committed it is not possible to set the status code and the response will be
+  terminated prematurely.
+- Fixed issue 276
+  http://java.net/jira/browse/JERSEY-276
+  Ensure that localized messages are correctly resolved in Web containers.
+- Ensure that ContainerResponseWriter.finish is called consistently, for example
+  when no response entity is present.
+- Cleaned up declaration of checked exceptions from the abstract message body
+  reader/writer classes for JAXB and removed the declaration of IOException.
+- Fixed issue 334
+  http://java.net/jira/browse/JERSEY-334
+  UriBuilder.segment and UriBuilder.matrixParam should percent encode ';'
+  characters.
+- Adding logging when Jersey cannot map an exception to a Response using
+  registered ExceptionMapper and the exception gets re-thrown to the HTTP
+  container.
+- Fixed issue 280
+  http://java.net/jira/browse/JERSEY-280
+  For the "natural" JSON convention, the humanReadableFormatting option
+  now could be set, so that the output JSON contains new-line characters
+  and indentation, which makes is easy to read for humans
+- Upgraded Jackson library to the version 1.1.1, so that people
+  relying on Jackson JAX-RS entity provider does not need to depend on two versions
+  of the very same library at their applications 
+- Fixed issue, working around a JDK bug in the method URL.toURI() when package
+  scanning classes that are present in a directory path location containing
+  space characters, for example "Documents and Services".
+- Fixed issue 331
+  http://java.net/jira/browse/JERSEY-331
+  Add support for de/serializing instances of org.w3c.dom.Document.
+- Fixed issue 326
+  http://java.net/jira/browse/JERSEY-326
+  Work around bug 5087240 in the JDK:
+  http://bugs.sun.com/view_bug.do?bug_id=5087240
+- Fixed issue 330
+  http://java.net/jira/browse/JERSEY-330
+  ContainerRequest and ContainerResponse by may now be adapted from within
+  filters by extending AdaptingContainerRequest and AdaptingContainerResponse
+  respectively. The adapter CachedEntityContainerRequest is available for when
+  a request entity instance consumed by a filter needs to be cached.
+- The oauth modules at the java.net maven repository have moved from
+  jersey/oauth to jersey/contribs/jersey-oauth/.
+
+release 1.1.1-ea (2009-07-13)
+- Fixed issue 322
+  http://java.net/jira/browse/JERSEY-323
+  A proxied IoC provider should not be invoked if the component to be proxied
+  cannot be instantiated.
+- Fixed issue 323
+  http://java.net/jira/browse/JERSEY-323
+  By default entity processing is disabled when XML parsing, on the client and
+  server side, for JAXB types, SAXSource and DOMSource.
+  This prevents Xml eXternal Entity (XXE) attacks. Security defaults for XML
+  processing may be disabled by setting the feature 
+  FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY to true.
+- Fixed issue 310
+  http://java.net/jira/browse/JERSEY-310
+  Single element array in mapped JSON notation is incorrect
+- Fixed issue 305
+  http://java.net/jira/browse/JERSEY-305
+  JSON Natural Notation can not correctly marshall unbounded "any" wildcard
+- Fixed issue 294
+  http://java.net/jira/browse/JERSEY-294
+  Empty JSON elements break deserialization
+- Fixed issue 272
+  http://java.net/jira/browse/JERSEY-272
+  JSONUnmarshaller cannot unmarshal nested array element
+- Fixed issue 113
+  http://java.net/jira/browse/JERSEY-113
+  Namespace support for mapped and natural JSON notations
+    For the MAPPED convention, you would need to explicitly configure mapping
+    of any possible namespaces URIs to JSON prefixes, using the xml2JsonNs method
+    on the JSONConfiguration builder. No such configuration is needed for the
+    NATURAL convention, as it leverages information provided by JAXB implementation.
+    JAXB version 2.1.12 and better is needed.
+- Fixed issue 299
+  http://java.net/jira/browse/JERSEY-299
+  Suppport disabling of WADL. Set the following feature on ResourceConfig to
+  true:
+    ResourceConfig.FEATURE_DISABLE_WADL
+  or add the following initialiation parameter to the Jersey servlet or filter:
+    <init-param>
+        <param-name>com.sun.jersey.config.feature.DisableWADL</param-name>
+        <param-value>true</param-value>
+    </init-param>
+- Fixed issue 319
+  http://java.net/jira/browse/JERSEY-319
+  Ensure that no double encoding of query or matrix components when building
+  from a URI that contains a query or matrix component some parameters of
+  which are replaced, for example:
+    String uri = "http://localhost/query?limit=10&sql=select+*+from+users";
+    URI u = UriBuilder.fromUri(uri).replaceQueryParam("limit", 100).build();
+- Fixed issue 288
+  http://java.net/jira/browse/JERSEY-288
+  ContextResolver instances injected or obtained from 
+  Providers.getContextResolver now correctly aggregate registered
+  ContextResolver implementations according to the specivity of the media type.
+  If you have, say, three ContextResolver implementations:
+
+    @Provider @Produces("application/foo")
+    public class TypeResolver implements ContextResolver<MyContext> { ...}
+
+    @Provider @Produces("application/*")
+    public class SubTypeResolver implements ContextResolver<MyContext> { ...}
+
+    @Provider @Produces("*/*")
+    public class WildCardResolver implements ContextResolver<MyContext> { ...}
+
+  The a call Providers.getContextResolver(...), such as follows:
+
+    MediaType m = MediaType.valueOf("application/foo");
+    Object someType = ...
+    Providers p = ...
+    ContextResolver<MyContext> cr = p.getContextResolver(
+       MyContext.class, m);
+    if (cr != null) {
+      MyContext c = cr.get(someType);
+    }
+
+  will result in a ContextResolver<MyContext> implementation that is an
+  aggregate of TypeResolver, SubTypeResolver, WildCardResolver, where each is
+  checked in order according to the specificity of the produces media types.
+- Fixed issue 282
+  http://java.net/jira/browse/JERSEY-282
+  The file META-INF/services/jersey-server-components may be present and
+  contain root resource and provider class names for classes that
+  should be loaded and deployed. If a class cannot be loaded then a deployment
+  error will occur.
+  The file META-INF/services/jersey-client-components may be present and contain
+  provider clases for classes that should be loaded and work with the client API.
+  If a class cannot be loaded then an error will occur.
+- Fixed issue 279
+  http://java.net/jira/browse/JERSEY-279
+  Updated the dependencies document to include the dependencies required
+  when list List<T> or Collection<T> where T is a JAXB bean. A StaX
+  implementation is required, such as Woodstox.
+- Fixed issue 314
+  http://java.net/jira/browse/JERSEY-314
+  Support MessageBodyReader/Writer implementations have declarations as follows:
+    @Provider
+    public class MyWriter<T> implements MessageBodyWriter<T> { ... }
+  namely the type variable T is never resolved and will be resolved to Object
+  when instantiated.
+- Fixed issue 297
+  http://java.net/jira/browse/JERSEY-297
+  If a servlet URL mapping is something like "/foo/*" and the request URL
+  path is "/foo" then Jersey will consume the request as if the path was "/foo/",
+  unless the redirect feature is enabled (see features of ResourceConfig),
+  which if the case, then Jersey will return a temporary redirect response to
+  the URL with the path "/foo/".
+- Fixed issue 295
+  http://java.net/jira/browse/JERSEY-295
+  Inheritence of Spring annotated classes, using @Component, that are also
+  resource classes is now supported, for example:
+    @Path("a") @Component
+    public static class A {
+        @GET public String get() {
+            return "a";
+        }
+    }
+
+    @Path("b") @Component
+    public static class B extends A {
+        @GET @Override public String get() {
+            return "b";
+        }
+    }
+- Fixed issue 285
+  http://java.net/jira/browse/JERSEY-285
+  A spring configuration file may be declared as a child context in the
+  servlet initialization parameters for the case where multiple Spring-based
+  servlets are deployed, with different spring-based resource classes, from
+  within the same Web application.
+- Fixed issue 306
+  http://java.net/jira/browse/JERSEY-306
+  The support JSONObject and JSONArray should only work for JSON related
+  media types, namely "application/json" and "application/<something>+json".
+- Fixed issue 154
+  http://java.net/jira/browse/JERSEY-154
+  The com.sun.jersey.core.provider.EntityHolder type may be utilized as a 
+  "meta-entity" to determine whether a request consumed by the server, or a 
+  response consumed by the client, contains the entity or contains no entity, 
+  for example:
+     @POST
+     @Consumes("text/plain")
+     public void post(EntityHolder<MyJAXBObject> s) {
+         if (s.hasEntity()) {
+             MyJAXBObject entity = s.getEntity();
+         } else {
+           ...
+         }
+     }
+- Fixed issue 298
+  http://java.net/jira/browse/JERSEY-298
+  A race condition was resolved when return List<T> where T is a JAXB object.
+- Fixed issue 286
+  http://java.net/jira/browse/JERSEY-286
+  Classes that extend ContextResolver may declare a type variable declaration
+  that is resolved to a class or parameterized type by an extending class.
+- Fixed issue 291
+  http://java.net/jira/browse/JERSEY-291
+  If the @DefaultValue annotation is not present and no parameter is present
+  an empty collection will be returned for the types List, Set or SortedSet.
+- Added Jersey EJB sample
+- Fixed issue 292
+  http://java.net/jira/browse/JERSEY-292
+  The file based configuration of custom WadlGenerator implementations via
+  the WadlGeneratorConfig is now deprecated and will be removed in future
+  versions. As alternative the InputStream based configuration shall be used.
+
+release 1.1.0-ea (2009-05-04)
+- Fixed issue 283
+  http://java.net/jira/browse/JERSEY-283
+  Removed race condition that may occur when concurrently creating the 
+  meta-data for a resource class.
+- Added security sample - https service with http basic authentication on
+  GlassFish 2.x
+- Fixed issue 278
+  http://java.net/jira/browse/JERSEY-278
+  com.sun.jersey.api.client.filter.HTTPBasicAuthFilter was not correctly
+  using "=" for padding characters when base 64 encoding the basic string
+  derived from the user name and password.
+- Fixed issue 151
+  http://java.net/jira/browse/JERSEY-151
+  Added the following to ClientResponse:
+  - enum Status, containing all known HTTP status codes
+  - ClientResponse.getClientResponseStatus() that returns an instance of Status
+- When using the Apache HTTP client the request output stream was not closed.
+  This causes issues with using say the GZIP content encoding filter that
+  requires the closing (or finishing) of the GZIP output stream
+- Support a base path from which root resource classes are matchd when
+  using the Grizzly adapter. The base path may be set as follows:
+
+    ResourceConfig rc = ...
+    Adapter a = ContainerFactory.createContainer(Adapter.class, rc);
+    (GrizzlyAdapter)adapter).setResourcesContextPath("/basePath");
+
+  By default the base path is "/".
+- Integrated JSR 311 API 1.1
+  - Require support for static fromString method in addition to existing valueOf
+    method for types used as parameters in resource methods. For backwards
+    compatibility, where both methods exist, valueOf will take precedence except
+    for Enums where the precedence is reversed since every enum defines an
+    implicit valueOf method that cannot be overridden.
+  - Support Request.evaluatePreconditions() which is to be called when a
+    resource does not exist. If the "If-Match" header is present with
+    one or more entities, or is "*" then a 412 response will be returned
+    otherwise null will be returned.
+    This is primarily of use for implementations of PUT.
+  - Unify the value of @Consumes and @Produces as follows:
+
+        /**
+         * A list of media types. Each entry may specify a single type or consist
+         * of a comma separated list of types. E.g. {"image/jpeg,image/gif",
+         * "image/png"}. Use of the comma-separated form allows definition of a
+         * common string constant for use on multiple targets.
+         */
+        String[] value() default "*/*";
+  - Add a secondary key to the sort order used when looking for compatible
+    MessageBodyWriters such that writers whose declared generic type is closer
+    in terms of inheritance are sorted earlier than those whose declared generic
+    type is further.
+
+release 1.0.3 (2009-04-15)
+- Fixed issue 163
+  http://java.net/jira/browse/JERSEY-163
+  Guice integration is supported with the jersey-guice module.
+- Fixed issue 245
+  http://java.net/jira/browse/JERSEY-245
+  When the Apache Adbera Java types are utilized with the jersey-atom-abdera 
+  module and the client API it is ensured that parsing of the types is completed
+  before the type is returned to the user (because the input stream
+  is closed before the type is returned to the user it is necessary to
+  the complete parsing before the input stream is closed).
+- Fixed issues 257 & 259
+  http://java.net/jira/browse/JERSEY-257
+  http://java.net/jira/browse/JERSEY-259
+  added null value checks to UriBuilder.replaceQueryParam and
+  UriTemplate.createURIComponent (used when building uri from a map)
+- Resource filters can be utilized with implicit views. Annotations
+  on the class will be utilized as annotations of the AbtractMethod, specifically
+  the concrete class com.sun.jersey.api.model.AbstractImplicitViewMethod.
+- Ensure that when @ImplicitProduces is utilized that the most acceptable
+  media type is set as the content type when an implicit view is returned.
+- Fixed issue 254
+  http://java.net/jira/browse/JERSEY-254
+  Some implementations of javax.naming.InitialContext return null while
+  others throw a NamingException, if threre is no Object associated with
+  a name when looking up an object.
+- Fixed issue 251
+  http://java.net/jira/browse/JERSEY-251
+  The set of methods on the Allow header is accessible using
+  ClientResponse.getAllow.
+- Fixed issue 230
+  http://java.net/jira/browse/JERSEY-230
+  No-interface view session beans deployed in the war may also be resource
+  and provided classes. Injection of Jersey/JAX-RS artifacts on to fields and
+  setters will work correctly.
+- Fixed issue 239
+  http://java.net/jira/browse/JERSEY-239
+  @Path("/") annotated resource methods are equivalent to if the @Path is not
+  present.
+- Support for EJB 3.1 no-interface view beans as resource or provider class
+  instances deployed into the war.
+  This requires Glassfish V3 build 43, from the 30th of March, or greater.
+- Fixed issue 246
+  http://java.net/jira/browse/JERSEY-246
+  Imran M Yousuf contributed support for file attachments for the jersey-multipart
+  module.
+  See the class
+    com.sun.jersey.multipart.file.FileDataBodyPart
+- Fixed issue 225
+  http://java.net/jira/browse/JERSEY-225
+  Niall Gallagher contributed support for the Simple HTTP server
+  integration with Jersey. See the JavaDoc for the following in the
+  jersey-simple-server module:
+    com.sun.jersey.simple.container.SimpleServerFactory
+- Fixed issue 122
+  http://java.net/jira/browse/JERSEY-122
+  When the ServletContainer is used as a filter then the init-param
+  property "com.sun.jersey.config.property.WebPageContentRegex" may
+  used to declare a regex to match against the request path. If the
+  path matches then the requets is forwarded to the next filter (if any)
+  in the filter chain and Jersey will not process the request.
+  For example if you set the value to "/(image|css)/.*" then you can serve up
+  images and CSS files for your Implicit or Explicit Views while still
+  processing your JAX-RS resources.
+- Added the annotation com.sun.jersey.multipart.FormDataParam for
+  processing parameters that are named body parts of "multipart/form-data"
+  messages. This functionality replaces the overloaded use of @FormParam,
+  and such functionaity for processing "multipart/form-data" will be
+  deprecated.
+- Fixed issue 236
+  http://java.net/jira/browse/JERSEY-236
+  Multiple named body parts of a "multipart/form-data" message can be accessed
+  as follows:
+    @Path("form-data")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @POST
+    public void uploadUrlFormData(
+            @FormDataParam("file") List<FormDataBodyPart> parts) {
+        for (FormDataBodyPart part : parts) {
+            FormDataContentDisposition disp = part.
+                    getFormDataContentDisposition();
+            InputStream in = part.getValueAs(InputStream.class);
+            ...
+        }
+    }
+- Fixed issue 238
+  http://java.net/jira/browse/JERSEY-238
+  The MIME multipart processing performed by the jersey-multipart module
+  now utilizes the MIMEPull API, instance of the JavaMail API. MIMEPull
+  enables streaming and caching, to disk, of body parts and does not
+  require that a MIME multipart message be loaded completely into memory.
+- Fixed issue 86
+  http://java.net/jira/browse/JERSEY-86
+  The use of @FormParam with "multipart/form-data" will be deprecated
+  and instead @FormDataParam, from the jersey-multipart module must be used.
+  The behaviour of @FormDataParam is documented in the JavaDoc.
+- Fixed issue 241
+  http://java.net/jira/browse/JERSEY-241
+  IntrospectionModeller contains logic that should be in the validator
+- Fixed issue 243
+  http://java.net/jira/browse/JERSEY-243
+  Return null from a sub-resource locator results in a 404 response.
+- Fixed issue 222
+  http://java.net/jira/browse/JERSEY-222
+  The Spring integration now correctly supports configurations with
+  hierarchical application contexts.
+- Fixed issue 39
+  http://java.net/jira/browse/JERSEY-39
+  Listening to and getting feedback from the client making requests and
+  receiving responses is now possible using the filter:
+    com.sun.jersey.api.client.filter.ConnectionListenerFilter
+  Such a filter can be utilized to obtain progress for the sending
+  and recieving of large documents.
+- Fixed issue 181
+  http://java.net/jira/browse/JERSEY-181
+  NotFoundException construction now includes an optional URI that was not
+  found. Jersey will pass in the URI if it throws NotFoundException because
+  the request URI could not be matched to a resource class.
+- Fixed issue 198
+  http://java.net/jira/browse/JERSEY-198
+  UriBuilder.uri works correctly replacing scheme specific parts.
+- Fixed issue 240
+  http://java.net/jira/browse/JERSEY-240
+  Fixed issue with LW HTTP server container not using the correct host and
+  port for the base and request URIs. It is necessary to use the host and
+  port declared in the Host HTTP header.
+- Support for IoC integration where by the IoC framework manages components
+  and supports third-party injection onto components by listening on
+  post construction of a component.
+  See:
+    com.sun.jersey.core.spi.component.ioc.{
+        IoCFullyManagedComponentProvider,
+        IoCComponentProcessorFactory,
+        IoCComponentProcessorFactoryInitializer
+    }
+- Fixed issue where charset of the media type was not being used when
+  unmarshalling a list of JAXB objects serialized as a JSON document.
+- Fixed issue 233
+  http://java.net/jira/browse/JERSEY-233
+  The Jersey JSON parser now correctly supports lowercase unicode escape
+  sequences.
+- Fixed issue 221
+  http://java.net/jira/browse/JERSEY-226
+  When resolving an absolute template name to a fully qualified template name
+  that has a template processor associated with it, then the class hiararchy is
+  trasversed such that if the absolute template name cannot be resolved from
+  a declared resolving class, then resolution is attempted with the super class
+  etc. until the Object class is reached, which if so means that resolution
+  failed. This means views work correctly with cglib proxied resource classes.
+- Fixed issue 226
+  http://java.net/jira/browse/JERSEY-226
+  Viewable instances with absolute template names may be set as the response
+  entity no matching resource available. Thus filters and exception mappers
+  can use the model/view/control mechanism.
+  In addition it is possible to declare the resolving class explicitly on
+  a Viewable if required.
+- Fixed issue 228
+  http://java.net/jira/browse/JERSEY-228
+  Precondition support is now working correctly for If-None-Match and
+  in combination with If-Unmodified-Since for GET, HEAD and other HTTP
+  methods.
+  In addition entity tag matching works correctly if there is more than one 
+  entity tag to be matched in a If-Match and If-None-Match header, and entity
+  tag matching works correctly using the weak and strong comparison functions
+  as required.
+- Fixed issue 224
+  http://java.net/jira/browse/JERSEY-224
+  When a UniformInterfaceException is thrown by Async/WebResource then
+  the response entity is buffered by default and resources are cleaned up.
+  This ensures that the developer does not have to managed the cleaning up
+  of resources. This behaviour may be overridden by setting the property
+  ClientConfig.PROPERTY_BUFFER_RESPONSE_ENTITY_ON_EXCEPTION to false. If
+  no buffering is configured then the devloper must explicitly close
+  the ClientResponse instance obtained from the UniformInterfaceException.
+- Added plugable Java type support for @*Param annotations.
+  The provider interface, com.sun.jersey.spi.StringReaderProvider, may be
+  implemented and registered as a provider. Parameter processing will defer
+  to such providers for obtaining a StringReader capable of converting a String
+  to an instance of the parameter annotated Java type.
+  JAXB annotated classes and java.util.Date (using the standard HTTP date
+  formats are supported.
+- Fixed issue 213 and 214
+  http://java.net/jira/browse/JERSEY-213
+  http://java.net/jira/browse/JERSEY-214
+  UriBuilder values check - hostname, port and queryParam values
+- Fixed issue with servlet or filter initialization parameters not being
+  copied to the ResourceConfig for Web applications that define and declare
+  their own ResourceConfig implementation.
+- Fixed two issues with the Apache HTTP client integration:
+  1) Requests are repeatable by default and requests are buffered. Setting the
+     property ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE to a value > 0 will
+     turn off buffering.
+  2) Connections are correctly released when a response entity is present
+     but the client does not consume the entity. It is important if
+     ClientResponse is used without reading an entity (when one is present) or
+     entities are processed that are instances of Closeable that the response
+     or stream is closed respectively after processing the response.
+- The project version and build number are now correctly included in the
+  jersey-bundle.jar and thus those values now appear correctly in generated
+  WADL documents.
+- Fixed issue 219
+  http://java.net/jira/browse/JERSEY-219
+  Refactored com.sun.jersey.spi.container.servlet.ServletContainer to
+  inherit from HttpServlet.
+- Fixed issue 217
+  http://java.net/jira/browse/JERSEY-217
+  SpringServlet was failing when used as a filter.
+- Fixed issue 209
+  http://java.net/jira/browse/JERSEY-209
+  UriBuilder.buildFromEncoded(Object...) throws IllegalArgumentException if a
+  template does not have an associated value declared in the object array.
+- Fixed issue 216
+  http://java.net/jira/browse/JERSEY-216
+  If a URI template contains two or more declarations of a template variable
+  then encoded value for the template variable is used for all declarations.
+  Previously the encoded value was only used for the first declaration and
+  the non-encoded value for subsequent declarations.
+  Previously the
+- Fixed issue 208
+  http://java.net/jira/browse/JERSEY-208
+  When ServletContainer is used as a servlet filter the initialization
+  property "com.sun.jersey.config.property.WebPageContentRegex" can be used
+  to declare a regular expression. If that expression matches the servlet path
+  then the request is forwarded to the next filter in the filter chain otherwise
+  the ServletContainer processes the request.
+  See:
+    com.sun.jersey.spi.container.servlet.ServletContainer#PROPERTY_WEB_PAGE_CONTENT_REGEX
+  The bookstore sample has been modified to use this feature.
+- Fixed problems with constructor injection for InjectableProvider providers.
+  Application-defined injectable providers may now use the constructor for injection
+  system-defined providers.
+- Fixed issue where field injection occurs after a @PostConstruct method
+  is invoked.
+  Field injection is now performed after a component is instantiated and before
+  the @PostConstruct method (if present) is invoked.
+- Fixed issue 207
+  http://java.net/jira/browse/JERSEY-207
+  The loading of resources uses the Thread.currentThread().getContextClassLoader()
+  and loads resources using loader.getResourceAsStream().
+
+release 1.0.2 (2009-02-11)
+- JSON specific configuration options moved to a new JSONConfiguration class
+  See JavaDoc for:
+    com.sun.jersey.api.json.JSONConfiguration
+- Added new NATURAL JSON notation
+  Requires JAXB-RI impl 2.1.10
+  When the new notation is used, users do not need any more 
+  to take care about configurating proper serialization of arrays, numbers and booleans in JSON
+- Fixed issue 180
+  http://java.net/jira/browse/JERSEY-180
+  Support JSON with Padding.
+  See JavaDoc for:
+    com.sun.jersey.api.json.JSONWithPadding
+- Support the setting of a javax.ws.rs.core.SecurityContext implementation
+  on com.sun.jersey.spi.container.ContainerRequest. This allows implementations,
+  such as a request filter, to override the supply authorization logic in
+  combination with the @RolesAllowed annotation and the
+  com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory.
+- Fixed issue 160
+  http://java.net/jira/browse/JERSEY-160
+  Added support for setting HTTPS properties (HostnameVerifier and SSLContext)
+  when the Jersey Client with HttpsURLConnection. See JavaDoc of:
+    com.sun.jersey.client.urlconnection.HTTPSProperties
+- Added support when using the Jersey client for a factory to create
+  HttpURLConnection or HttpsURLConnection. See JavaDoc of:
+    com.sun.jersey.client.urlconnection.URLConnectionClientHandler
+    com.sun.jersey.client.urlconnection.HttpURLConnectionFactory
+- Fixed issue 80
+  http://java.net/jira/browse/JERSEY-80
+  The class and package registration mechanisms for root resource classes
+  and providers works correctly on the JBoss 5.x app server.
+- The ResourceDoclet (generating a resourcedoc file for extended WADL) moved
+  from the maven-wadl-plugin to the wadl-resourcedoc-doclet module. If you're
+  using extended wadl you need to change the docletArtifact/artifactId of the
+  maven-javadoc-plugin configuration from maven-wadl-plugin to 
+  wadl-resourcedoc-doclet.
+- Include Jersey Client API with Apache HTTP client.
+  Refer to the module:
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-apache-client</artifactId>
+- Fixed issue 177
+  http://java.net/jira/browse/JERSEY-177
+  The method Client.getProviders() can be used to get the Providers instance
+  utilized by the client.
+- Fixed issue 183
+  http://java.net/jira/browse/JERSEY-183
+  Query parameters may be built for a WebResource as follows:
+    r.queryParam("a", "foo").queryParam("b", "bar").get(String.class)
+- Fixed issue 196
+  http://java.net/jira/browse/JERSEY-196
+  Removal of filters, using Filterable.removeFilter, no longer causes an
+  exception.
+- Fixed issue 196
+  http://java.net/jira/browse/JERSEY-196
+  Conversion of an Object that is a header value will use the Object.toString()
+  method if a header delegate cannot be found. For example,
+     return Response.noContent().
+                    header("X-INTEGER", 1).
+                    build();
+  will build a 204 response with a header "X-INTEGER: 1".
+- jersey-archive module added to provide archive files that include the
+  set of Jersey jars and JavaDoc. See:
+  http://download.java.net/maven/2/com/sun/jersey/jersey-archive/
+- Fixed issue 191
+  http://java.net/jira/browse/JERSEY-191
+  ResourceConfig.isProviderClass and ResourceConfig.isRootResourceClass return
+  false if the class parameter is null.
+  This fixes an issue with the SpringComponentProviderFactory throwing an NPE
+  for abstract Spring beans.
+- Added support for a RenderedImage provider for consuming and producing images.
+  For producing images the Java type must be assignable to RenderedImage. Any
+  media type that is compatible with "image/*" is supported, but the actual
+  image formats supported is restricted to the image readers registered with
+  the Java imaging API.
+  When consuming images the Java type RenderedImage or BufferedImage may be used.
+  The media types supported for consuming are "image/*" and 
+  "application/octet-stream". For the former the actual image formats supported
+  is restricted to the image writers registered with the Java imaging API.
+  For the latter the Java image API will determine the appropriate
+  image format (if supported) from the contents of the entity body.
+- Fixed issue 188
+  http://java.net/jira/browse/JERSEY-188
+  Servlet consumes the request of the type "application/x-www-form-urlencoded"
+  when HttpServletRequest.getParamter(...) and related methods are called.
+  Jersey constructs a Form instance from the request parameters such that
+  resource methods that utilize @FormParam will work as expected.
+- Fixed issue 164
+  http://java.net/jira/browse/JERSEY-164
+  Added ClientResponse.getResponseDate() to obtain the value of "Date" header.
+- Fixed issue 184
+  http://java.net/jira/browse/JERSEY-184
+  Implemented URLConnectionClientHandler.URLConnectionResponse.toString() to
+  return the HTTP method, request URL and status code.
+- Fixed issue 134
+  http://java.net/jira/browse/JERSEY-134
+  Added support for resource specific filters and support for @RolesAllowed
+  See JavaDoc for the package:
+    com.sun.jersey.api.container.filter
+- Fixed issue when building a URI with templates and fragment: the fragment
+  component was being ignored and the path component was used instead as
+  the fragment component.
+- Fixed issue 182
+  http://java.net/jira/browse/JERSEY-182
+  The message of UniformInterfaceException is set to ClientResponse.toString()
+  if no message is explicitly given. ClientResponse.toString() returns a String
+  with the status code of the response.
+- Fixed issue 150
+  http://java.net/jira/browse/JERSEY-150
+  If no media type is declared with a client request of the Client API
+  then an appropriate media type is derived from the Java type and the
+  message body writers that support that Java type.
+- Refactored Client API implementations for HttpURLConnection and the in-memory
+  to leverage inherited classes for writing and reading HTTP requests and 
+  responses. This makes it easier for other HTTP protocol implementations to 
+  plugin and use the client API.
+- Fixed issue 167
+  http://java.net/jira/browse/JERSEY-167
+  A UniformInterfaceException will be thrown if the client requests an
+  entity and the response status is 204.
+- Fixed issue 170
+  http://java.net/jira/browse/JERSEY-170
+  Encoding of ' ' in query parameters now round trips correctly.
+     String encoded = UriComponent.encode(" ", Type.QUERY);
+     assert(encoded.equals("%20"));
+     String decoded = UriComponent.decode(encoded, Type.QUERY);
+     assert(decoded.equals(" "));
+  The encoding of ' ' to '+' now only occurs for Type.QUERY_PARAM.
+     String encoded = UriComponent.encode(" ", Type.QUERY_PARAM);
+     assert(encoded.equals("+"));
+- Fixed issue 168
+  http://java.net/jira/browse/JERSEY-168
+  Deprecated WebResource.getBuilder and renamed to WebResource.getUriBuilder().
+  Added method WebResource.getRequestBuilder.  
+- Fixed issue 165
+  http://java.net/jira/browse/JERSEY-165
+  Clarified JavaDoc for ClientResponse.getProperties and
+  ClientResponse.getMetadata()
+- Fixed issues 153, 178
+  http://java.net/jira/browse/JERSEY-153
+  http://java.net/jira/browse/JERSEY-178
+  Use consistent class loading strategy conforming to best practice for
+  EE and OSGi friendly.
+- Fixed issue 176
+  http://java.net/jira/browse/JERSEY-176
+  @MatrixParam not carried over for inherited annotations.
+- Fixed issue 148
+  http://java.net/jira/browse/JERSEY-148
+  Inccorect @Path matching for sub-resource methods sharing common path 
+  structures.
+- Support arrays of JAXB XML element and XML type for request and response
+  entities on the client and server.
+- Update to Grizzly 1.8.6.4
+- Fixed issue with runtime exceptions not being mapped when thrown from
+  a request filter.
+
+release 1.0.1 (2008-11/12)
+- The group id for the contribution modules, jersey-multipart, jersey-spring
+  and maven-wadl-plugin Maven Mojo (maven-plugin) has changed to:
+    com.sun.jersey.contribs
+- Support the building a WebResource with query parameters, for example:
+    WebResource r = Client.create().resource(...);
+    MultivaluedMap<String, String> qps = new MultivaluedMapImpl();
+    qps.add("a", "foo");
+    qps.add("b", "bar");
+    String s = r.queryParams(qps).get(String.class);
+- For JAXB-related types the set of supported media types are "application/xml"
+  "text/xml", "*/*+xml", "application/json", "*/*+json".
+  Previously for JAXB-related types the set of media types for XML was
+  unrestricted which limited the set of possible user-declared media types for
+  JSON to just "application/json".
+- Fixed issue 146
+  http://java.net/jira/browse/JERSEY-146
+  UriBuilder.build was implemented as specified for UriBuilder.buildFromEncoded
+  and vice versa, this has been corrected. The '&' character for the template 
+  value of a template parameter that is part of a query parameter is now
+  percent-encoded.
+- Fixed issue 127
+  http://java.net/jira/browse/JERSEY-147
+  WADL generation using incorrect class loader that fails when in an OSGi
+  environment.
+- Fixed issue for null Pathsegment that occurred for a sub-resource locator as
+  follows:
+  @Path("{id}")
+  public SubResource(@PathParam("id") PathSegment id)
+- Fixed issue for a resource method that has the following annotations
+  @POST
+  @Consumes({"multipart/form-data", MediaType.APPLICATION_FORM_URLENCODED})
+  and uses @FormParam and receives content of the latter declared consuming
+  media type for which some @FormParam parameters do not exist in the request.
+- Fixed issue 147
+  http://java.net/jira/browse/JERSEY-147
+  The base path in the Web Pages for JSP templates associated with viewables
+  of resource classes is configurable. The base path may be declared as the
+  value of the servlet init-param:
+    "com.sun.jersey.config.property.JSPTemplatesBasePath"
+- Refactored WADL generation classes to be placed in base package:
+  com.sun.jersey.server.wadl. Previously WADL generation classes
+  were in the base package com.sun.jersey.impl.wadl.
+- Fixed issue 144
+  http://java.net/jira/browse/JERSEY-144
+  Async/WebResource.toString returns a String instance of the URI of
+  the Web resource.
+- Fixed issue 123
+  http://java.net/jira/browse/JERSEY-123
+  Reduce the dependencies of the spring module to those which are
+  required.
+- Fixed issue 133
+  http://java.net/jira/browse/JERSEY-133
+  Replaced e.printStackTrace() with logging.
+- Fixed issue 131
+  http://java.net/jira/browse/JERSEY-131
+  The use of javax.activation.DataSource no longer depends on the JavaMail jar.
+- Fixed issue 143
+  http://java.net/jira/browse/JERSEY-143
+  Improve error message when @Path value syntax is incorrect and is most likely
+  because a path parameter is not terminated with a '}'.
+- Enable the injection of of FormDataContentDispostion when using @FormParam
+  in conjuction with "multipart/form-data". This enables access to parameters
+  on the "form-data" content disposition header such as the value of the
+  "filename" parameter.
+- The following classes have been modified to include the creation of
+  a container with an instance of an IoCContainerProviderFactory:
+  - com.sun.jersey.api.container.ContainerFactory
+  - com.sun.jersey.api.container.httpserver.HttpServerFactory
+  - com.sun.jersey.api.container.grizzly.GrizzlyServerFactory
+  A com.sun.jersey.spi.container.ContainerProvider implementaton should not
+  initiate the web application, otherwise the IoCContainerProviderFactory
+  instance cannot be set.
+- The following classes in jersey-core have moved:
+  - The following classes in package "com.sun.jersey.api" have moved to
+    the package "com.sun.jersey.core.header": InBoundHeaders, MediaTypes and
+    OutBoundHeaders.
+  - The following classe in package "com.sun.jersey.api" have moved to
+    the package "com.sun.jersey.core.util": MultivaluedMapImpl.
+- The Spring servlet automatically registers Spring-based classes (declared
+  via the XML configuration or autowiring) and no configuration via the web.xml
+  servlet initialization parameters is required unless non-Spring managed
+  classes also need to be registered.
+- Fixed issue 141
+  http://java.net/jira/browse/JERSEY-141
+  A request filter can modify the request URI.
+- Fixed issue 88
+  http://java.net/jira/browse/JERSEY-88
+  @PostConstruct and @PreDestroy are supported on resource and provider
+  classes.
+- Fixed issue 136
+  http://java.net/jira/browse/JERSEY-136
+  Improved error messages when building a URI from classes/methods that are not
+  annotated with @Path.
+- Fixed issue 140
+  http://java.net/jira/browse/JERSEY-140
+  The full functionality of the client API can be used independently of the
+  server side and requires no dependency on server-based artificats.
+- Fixed and improved support for the selection of the most acceptable media type
+  used for the content type when the application declares @Produces on a class
+  or a resource method.
+- Fix for issue 138
+  http://java.net/jira/browse/JERSEY-138
+  When the application does not declare a media type as the content type of
+  a response then the type is selected from the acceptable headers given
+  the list of message body writers, what they produce and an acceptable
+  media type is writable.
+- Fix for issue 139
+  http://java.net/jira/browse/JERSEY-139
+  The media types in the accept header are ordered using the quality 
+  parameter as the primiary key and the media specifity (x/y < x/* < */*)
+  as the secondary key).
+- When using JSP-based views the response status and meta-data is now committed
+  to the HttpServletResponse before the JSP is processed.
+- Fix for issue 137
+  http://java.net/jira/browse/JERSEY-137
+  MessageBodyFactory should pass the full MediaType
+- Improved valdation error when a sub-resource locator has a unannotated
+  parameter this is likely, instead, to be associated with an request entity of 
+  a resource method.
+- Fixed issue 130
+  http://java.net/jira/browse/JERSEY-130
+  Building from an @Path value that contains a template with a regex now
+  build the URI without error.
+- Fixed reloading of servlet container. The configuration of the web application
+  occurs only at servlet initiation and not when a reload occurs.
+- Included simple Groovy example.
+- Fixed issue 128
+  http://java.net/jira/browse/JERSEY-128
+  An method parameter that is a request entity is a parameter that is:
+  1) not annotated with any annotations; or
+  2) annotated with one or more annotations all of which are recognized by
+     the Jersey runtime.
+- Fixed issue 117
+  http://java.net/jira/browse/JERSEY-117
+  A JAXB unmarshalling error from the JAXB related providers will result in
+  a 400 response.
+- Fixed issue 126
+  http://java.net/jira/browse/JERSEY-126
+  Registered ExceptionMapper's will only map exceptions thrown by the
+  application and not by the Jersey runtime (which is an error, either in
+  the runtime itself or in the configuration of the application).
+- Fixed issue 124
+  http://java.net/jira/browse/JERSEY-124
+  The method HttpRequestContext.getFormParameters can be used by a filter to
+  obtain the form parameters.
+  
+release 1.0 (2008-10-13)
+- The response filter chain will now get invoked if an exception is thrown
+  from a request filter or a resource class and is mapped to a response.
+  If an exception is thrown from a response filter then the response filter
+  chain is terminated and the exception is mapped to a response.
+- Fixed issue 119
+  http://java.net/jira/browse/JERSEY-119
+  Locale instances not correctly created from HTTP language-based headers.
+- Fixed issue with bridge methods being included in the analysis
+  of resource classes.
+- When implicit views are enabled allow deferral to implicit GET when
+  non of the explicit GETs match. Previously if there were any explicit
+  GETs non-matching or otherwise no deferral occurred.
+- Fixed issue 115.
+  http://java.net/jira/browse/JERSEY-115
+  UriBulder.buildFromEncoded does not work correctly for query parameters
+  that contain '+' characters.
+- Fixed issue 114.
+  http://java.net/jira/browse/JERSEY-114
+  When URI building with template parameters and no explicit port is declared
+  then -1 occurs as the port component in the built URI.
+- Support for EJB stateless session beans as resource classes.
+  A local or remote interface may be annotated with JAX-RS annotations, for
+  example the interface may be annotated with @Path to make the session bean
+  a root resource class.
+  When an application is deployed Jersey will attempt to look up any registeted
+  root resource classes that are interfaces using JNDI where the fully qualified
+  class name is the JNDI name. If an instance is found then the class is removed
+  from registered set of classes and the instance is added to the registered set
+  of singletons.
+- Fixed issue 112
+  http://java.net/jira/browse/JERSEY-112
+  JSON now works with JAXB annotated @XmlRootElement beans where
+  the XML element name is declared by the annotation value.
+- Improved JavaDoc of Jersey API.
+- Support for JAXB with FastInfoset using the media type
+  "application/fastinfoset".
+- Content-Encoding using GZIP filters, see:
+    com.sun.jersey.api.client.filter.GZIPContentEncodingFilter
+    com.sun.jersey.api.container.filter.GZIPContentEncodingFilter
+- Fixed issue 33
+  http://java.net/jira/browse/JERSEY-33
+  Improve the scope of resource class validation and warnings.
+- Fixed issue 109
+  http://java.net/jira/browse/JERSEY-109
+  The LW HTTP server uses the Executors.newCachedThreadPool() as the
+  default executor.
+- Fixed issue 18
+  http://java.net/jira/browse/JERSEY-18
+  Collections of JAXB beans are supported. See the jaxb sample.
+- Fixed issue 6
+  http://java.net/jira/browse/JERSEY-6
+  Client and server-side logging filters of requests and responses, see:
+    com.sun.jersey.api.client.filter.LogggingFilter
+    com.sun.jersey.api.container.filter.LoggingFilter
+- Client API supports the sending and recieving of Java types that contain
+  generic information, see:
+    javax.ws.rs.core.GenericEntity
+    com.sun.jersey.api.client.GenericType
+- Added new samples: sparklines and jaxb.
+- Fixed issue 111
+  http://java.net/jira/browse/JERSEY-111
+  com.sun.jersey.api.json.JSONJAXBContext cannot be created specifying a
+  ClassLoader.
+- Fixed issue 110
+  http://java.net/jira/browse/JERSEY-110
+  "If none of the entity tags match, then the server MAY perform the requested
+   method as if the If-None-Match header field did not exist, but MUST also
+   ignore any If-Modified-Since header field(s) in the request. That is, if no
+   entity tags match, then the server MUST NOT return a 304 (Not Modified)
+   response."
+- Fixed issue 103
+  http://java.net/jira/browse/JERSEY-103
+  Use of Class.getPackage is unsafe.
+- Fixed issue 21
+  http://java.net/jira/browse/JERSEY-21
+  WADL can now include JavaDoc from source.
+  See the samples: generate-wadl and extended-wadl-webapp
+- Fixed issue 106
+  http://java.net/jira/browse/JERSEY-93
+  Improved error message when an invalid media type is declared for the content
+  type of an HTTP request when using the client API. The exception produced 
+  occurs closer to the source of the error.
+- Catch a java.lang.ClassFormatError when loading providers. This can occur
+  if a 'stubbed' jar is in the class path that contains classes with no
+  implementation.
+- Integrated JSR 311 API 0.11
+  - Query/Matrix parameter names used as keys in returned
+    MultivaluedMap<String, String> from UriInfo method calls are always in
+    decoded form.
+  - MessageBodyWriter.isWriterable/getSize and MessageBodyWriter.isReadable
+    method signatures now have additional parameters contain the type, generic
+    type, annotations and media type.
+
+release 0.10-SNAPSHOT
+- Per-session life-cycle is supported for Servlet-based Web applications.
+  See com.sun.jersey.spi.container.servlet.PerSession
+- Access to query parameters, path segments and matrix parameters is now
+  possible from com.sun.jersey.api.core.HttpRequestContext
+- Fixed issue with resource methods utilizing @FormParam that could only
+  contain @FormParam annotated method parameters. Now @FormParam annotated
+  parameters may be intermixed with other annotated parameters.
+- Integrated JSR 311 API 0.10
+  - java.ws.rs.core.ApplicationConfig renamed to java.ws.rs.core.Application
+  - ApplicationConfig.getResourceClasses() and
+    ApplicationConfig.getProviderClasses() merged into one method
+    Application.getClasses()
+  - Application.getSingletons() can be used to add singleton provider
+    instances or root resource class instances.
+  - URI templates declared in @Path now support general regular expressions.
+    A regular expression may be declared by declaring the template variable
+    followed by a ':' followed by the regular expression. For example, the
+    URI template "{n: .+}" declares there to be one template variable 'n' whose
+    regular expression is ".+". In the absense of a declared regular expression
+    the default expression "[^/]+?" applies. White space may occur between the
+    '{' and the template variable name, between the template variable name
+    and the ':', between the ':' and the regular expression, and finally
+    between the regular expression and the '}'. Non-compliant characters for
+    a URI path must be percent-encoded.
+  - @Path "limited" and "encode" properties have been removed.
+    The @Path(value="{a}", limited=false) is equivalent to
+    @Path("{a: .*}") or @Path("{a: .+}")
+  - javax.ws.rs.core.UriBuilder.encode has been removed. Instead contextual
+    encoding is performed automatically. Any non-compliant character is
+    percent-encoded but existing percent-encoded character (namely a '%' followed
+    by two hexadecimal characters) is left unmodified (thus the '%' character
+    is not percent-encoded itself).
+
+release 0.9 (2008-08-22)
+- Fixed issue 93
+  http://java.net/jira/browse/JERSEY-93
+  always write JSON using a JSON library for examples
+- Fixed issue 50
+  http://java.net/jira/browse/JERSEY-50
+  Jersey version is included in the WADL as the first doc element.
+- Fixed issue 97
+  http://java.net/jira/browse/JERSEY-96
+  Methods on JAX-RS conforming annotated interfaces (if present) are used 
+  for invocation as opposed to the concrete methods on the concrete class.
+  This allows for the possibility to proxy an instance using the interface.
+- SpringServlet no longer overrides Servlet.service, which previously 
+  caught all RuntimeException and did not re-throw them.
+- Fixed issue 96
+  http://java.net/jira/browse/JERSEY-96
+  @PathParam annotated parameters on sub-resource locators are correctly
+  represented as template parameters in WADL
+- Fixed issue 87
+  http://java.net/jira/browse/JERSEY-87
+  A message body writer may modify the http headers before any bytes
+  are written to the output stream.
+- JAXB un/marshalling will use any ContextResolver<Un/Marshaller>
+  instances, if present, otherwise, if not present un/marshalling will use
+  ContextResolver<JAXBContext>, if present. The @Produces scope will be
+  taken into account.
+- Set the Content-Length, if known, in automatic response to a HEAD request 
+  that defers to the @GET annotated resource method.
+- Fixed issue where a message body reader is not correctly selected for 
+  a media type that contains parameters.
+- Server-side request filter for HTTP POST method replacing for proxies and
+  servers that block methods other than GET/POST.
+  See JavaDoc of:
+  com.sun.jersey.api.container.filter.PostReplaceFilter
+- Support server side request/response filters
+  See JavaDoc of:
+  com.sun.jersey.spi.container.ContainerRequestFilter
+  com.sun.jersey.spi.container.ContainerResponseFilter
+  ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS
+  ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS
+- Select the constructor for a resource classe that has the most parameters
+  that has the most instances are available for those parameters.
+- Support constructors with parameters on singleton resource classes.
+- Fixed issue 79
+  http://java.net/jira/browse/JERSEY-79
+  ';' separated package names and classpaths specified in the web.xml are
+  trimmed.
+- Integrated JSR 311 API 0.9
+  - Information in a returned Response is not modified and the media type
+    (if set) will override that declared in @Produces.
+  - Path parameters match 1 or more characters that are not '/' 
+    (previously it was zero or more of any character), unless the final 
+     parameter is unlimited, in which case it is the same as before.
+  - Path parameter names are matching with the following regex:
+      "\{([\w[-\w\.]*)\}"
+  - com.sun.jersey.api.representation.FormParam has been deleted. Use
+    javax.ws.rs.FormParam instead.
+  - javax.ws.rs.ConsumeMime and javax.ws.rs.ProduceMime have been renamed
+    to javax.ws.rs.Consumes and javax.ws.rs.Produces respectively.
+  - Resource methods may return generic types, such as List<String>, and
+    an appropriate MessageBodyWriter, for that generic type may be selected.
+    - When using Response.Builder an instance of javax.ws.rs.core.GenericEntity
+      may be set as the entity to preserve the generic type.
+  - ContextResolver can be scoped per @Produces annotated on a
+    implementation.
+    - Scope ContextResolver instances are accessible via the 
+      javax.ws.rs.ext.Providers interface.
+
+release 0.8 (2008-06-20)
+- UriBuilder supports opaque URIs such as "mailto:p@c".
+- Support the reading of an entity delcared as the type Object using JAXB
+  unmarshalling. It is required that there be a ContextResolver<JAXBContext>
+  that supports a JAXBContext for the Object type.
+- The following properties can be set on the client:
+    Read timeout, connection timeout, chunked encoding length and 
+    following redirections.
+  See setter methods on com.sun.jersey.api.client.ClientConfig and
+  properties on com.sun.jersey.api.client.config.ClientConfig.
+- Simplified web.xml configuration when using package scanning for root
+  resource classes. For package scanning the web.xml need only contain the 
+  following:
+
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>*list of ';' separated package names*</param-value>
+        </init-param>
+
+  previously it was necessary to declare another <init-param> referencing the
+  the PackageResourceConfig class.  
+- The container SPI is improved and simplified, see JavaDoc of:
+    com.sun.jersey.spi.container.ContainerRequest
+    com.sun.jersey.spi.container.InBoundHeaders
+    com.sun.jersey.spi.container.ContainerResponse
+    com.sun.jersey.spi.container.ContainerWriter
+- Removed Client.addInjectable, use the following instead:
+    ClientConfig.getProviderInstances().add()
+- Removed WebApplication.addInjectable, use the following instead:
+    ResourceConfig.getProviderInstances().add()
+- Instances of provider classes can be declared by the application by adding
+  provider instances to the Set returned by the method:
+    ResourceConfig.getProviderInstances()
+- Modified com.sun.jersey.spi.container.{AbstractContainerRequest, 
+  AbstractContainerResponse} to take WebApplication as an input parameter
+  as opposed to previously taking MessageBodyContext.
+- Removed com.sun.jersey.spi.container.MessageBodyContext, this is replaced
+  by javax.ws.rs.ext.MessageBodyWorkers.
+- com.sun.jersey.api.uri.ExtendedUriInfo can be injected.
+- The annotation com.sun.jersey.api.representation.FormParam can be used
+  to access form-based parameters using the same rules as other parameter-based
+  annotatons.
+  Form-based resource methods MUST contain only annotated method parameters
+  and at least one parameter MUST be annotated with FormParam.
+  This works for the two media types "application/x-www-form-urlencoded" and
+  "multipart/form-data". For the latter this will only work if the a resource 
+  declares that it consumes "multipart/form-data" using @ConsumeMime. In this
+  case message body readers will be used to obtain the instances of the
+  @FormParam annotated parameters, as opposed to applying the rules for other
+  @*Param annotated parameters.
+- Renamed com.sun.jersey.spi.service.Component.Scope enums from->to:
+  WebApplication -> Singleton; and ApplicationDefined -> PerRequest
+- Unified injection interfaces so that they are independent of where 
+  injection occurs. See the package com.sun.jersey.spi.inject.
+  - com.sun.jersey.spi.resource.Inject moved to com.sun.jersey.spi.inject.Inject
+  - the com.sun.jersey.spi.inject.InjectableProvider behaves as a provider 
+    class and may be annotated with @Provider.   
+- Simple asynchronous client API returning Future<T>. Current implementation
+  utilizes one thread per-request.
+- Moved com.sun.ws.rest.impl.json.JSONJAXBContext to
+  com.sun.jersey.api.json.JSONJAXBContext.
+- Removed JAX-WS container.
+- Set<T> and SortedSet<T> can be used in addition to List<T> for the type of
+  @*Param annotation parameters.
+- Packages "com.sun.ws.rest.api.*" renamed to "com.sun.jersey.api.*"
+- Packages "com.sun.ws.rest.spi.*" renamed to "com.sun.jersey.spi.*"
+- The property/feature name space "com.sun.ws.rest.config" renamed to 
+  "com.sun.jersey.config".
+- The type javax.xml.bind.JAXBElement<T> can be used for XML and JSON
+  serialization.
+- Partially Integrated JSR 311 API 0.8
+  - MediaType.parse renamed to MediaType.valueOf
+  - NewCookie.parse renamed to NewCookie.valueOf
+  - Cookie.parse renamed to Cookie.valueOf
+  - CacheControl.parse renamed to CacheControl.valueOf
+  - EntityTag.parse renamed to EntityTag.valueOf
+  - UriInfo.getTemplateParameters renamed to UriInfo.getPathParameters
+  - ApplicationConfig.getExtensibleMapping renamed to 
+    ApplicationConfig.getMediaTypeMappings
+  - Method parameter order of MessageBodyReader.readFrom has changed to be
+    consistent with the method parameter order of MessageBodyWriter.writerTo.
+  - javax.ws.rs.ext.ExceptionMapper<T> may be used to map a runtime or 
+    checked exception to a javax.ws.rs.core.Response instance.
+
+release 0.7 (2008-04-18)
+- The type javax.xml.bind.JAXBElement<T> can be used for reading and writing
+  JAXB types that a not XML root elements from and to XML. TODO:JSON
+  serialization.
+- Renamed FormURLEncodedProperties to Form and changed the class to implement 
+  javax.ws.rs.core.MultivaluedMap.
+- Containers can be informed when they are required to reload, for example
+  if new root resource classes have been added to removed, or class file
+  definitions have changed while a VM is running.
+  A com.sun.ws.rest.spi.container.ContainerNotifier instance may be 
+  registered by adding a property to the ResourceConfig with the property name
+  "com.sun.ws.rest.spi.container.ContainerNotifier" and a property value
+  that is the instance of the ContainerNotifier.
+  The ContainerNotifier instance may then notifier registered listeners
+  when reloading is required.
+- The com.sun.ws.rest.spi.container.servlet.ServletContainer class has
+  a public load() method that can be invoked to dynamically reload the web
+  web application if, for example, resource classes have been modified,
+  added or removed.
+- The class com.sun.ws.rest.api.core.ApplicationConfigAdapter can be
+  used to adapt an instance of javax.ws.rs.core.ApplicationConfig to an
+  instance of com.sun.ws.rest.api.core.ResourceConfig.
+- Client API request building supports the addition of cookies that are 
+  instances of javax.ws.rs.core.Cookie. Client API response supports obtaining
+  the list of cookies returned by the server as instances of 
+  javax.ws.rs.NewCookie.
+- Renamed HttpContextAccess to HttpContext. Changed getHttpRequestContext
+  and getHttpResponseContext methods to getRequest and getResponse respectively.
+- UriRuleContext extends HttpContext. Removed UriRuleContext.getHttpContext()
+  method.
+- UriInfo interface is removed from HttpRequestContext. UriInfo is now
+  accessible from HttpContext.getUriInfo()
+- Fixed issue 44: Support dependency injection of proxied resources
+  http://java.net/jira/browse/JERSEY-44
+  Added method ComponentProvider.getInjectableInstance
+- The AbstractContainerResponse.writeEntity methods are reduced to one
+  method that takes no arguments. This is responsible for committing the
+  status, headers and writing out the entity (if any), and returning a 406
+  (Not Acceptable) if a message body reader could not be found to serialize
+  the entity for the required media type.
+- The AbstractContainerResponse.commitStatusAndHeaders was modified to take
+  a parameter that is the known length in bytes of the entity to be written
+  as the representation of a response.
+- Partially Integrated JSR 311 API 0.7
+  - Use @Context to inject HttpServletRequest, HttpServletResponse, 
+    ServletConfig and ServletContext instances on JAX-RS/Jersey-based 
+    components deployed in Servlet container.
+  - UriBuilder.build(String... values) changed to 
+    UriBuilder.build(Object... values). 
+    UriBuilder.build(Map<String, String> values) changed to 
+    UriBuilder.build(Map<String, Object> values).
+    The Object instances must support the toString method.
+  - Message body writer for javax.ws.rs.core.StreamingOutput.
+  - Message body reader/writer for java.io.Reader.
+  - Message body reader/writer for javax.xml.transform.Source
+    Only the following Java types are supported for reading:
+      - javax.xml.transform.stream.StreamSource
+      - javax.xml.transform.sax.SAXSource
+      - javax.xml.transform.dom.DOMSource
+  - Message body reader/writer MultivaluedMap<String, String>
+    with the media type "application/x-www-form-urlencoded".
+  - Injection of javax.ws.rs.ext.MessageBodyWorkers to get message body
+    readers and writers. Note this is very similar to
+    com.sun.ws.rest.spi.container.MessageBodyContext, which will be removed
+    if/when MessageBodyWorkers supports the same functionality.
+  - javax.ws.rs.ext.ContextResolver replaces
+    com.sun.ws.rest.spi.service.ContextResolver (which has been removed).
+  - javax.ws.rs.core.ApplicationConfig is the abstract base class of
+    com.sun.ws.rest.api.core.ResourceConfig.
+    ResourceConfig has changed from an interface to an abstract class.
+  - Media type charset parameter is recognized for reading/writing
+    Java types for text-based content. Default charset is UTF-8 if charset 
+    parameter is absent.
+  - If a message body reader cannot be found return 415 (Unsupported Media Type)
+  - if a message body writer cannot be found return 406 (Not Acceptable)
+  - The list of ancestor resource classes and URI paths are available
+    via UriInfo.getAncestorResources() and UriInfo.getAncestorResourceURIs()
+    respectively. Such information can be used for "breadcrumb" support or
+    aiding construction of URIs that are hyperlinks in representations.
+  - Parameters can be annotated with @CookieParam for the type 
+    javax.ws.rs.core.Cookie and types conforming to the standard rules.
+  - RuntimeDelegate.getInstance().createEndpoint() can be used to create
+    a container artifact. This is an alternative to the Jersey specific 
+    ContainerFactory.createContainer().
+  - The web.xml may specify the javax.ws.rs.core.ApplicationConfig class using 
+    the init-param name "javax.ws.rs.ApplicationConfig" with a value that is 
+    the class name of a class that extends (directly or indirectly) 
+    ApplicationConfig.
+    Note that the existing Jersey mechanism using ResourceConfig will take
+    precendence if both ApplicationConfig and ResourceConfig classes names are
+    declared as init-params.
+  - Concrete methods implementing methods on interfaces or overriding methods on
+    super classes (abstract or otherwise) may inherit JAX-RS annotations on such
+    inheriting methods if and only if there are no JAX-RS annotations on the 
+    concrete method or it's parameters.
+  - Generic types, such as List<String>, can be processed by MessageBodyReaders.
+  - javax.ws.rs.core.PathSegment may be used with @Path. The last most path
+    segment containing the declared path parameter will be obtiained. 
+
+release 0.6.2 (2008-03-27)
+- Fixed issue 52: xml attrs in JSON representation deserialization
+  http://java.net/jira/browse/JERSEY-52
+
+release 0.6.1 (2008-03-18)
+- Support for xml attributes serialization/deserialization in JSON added
+  (as a fix for 43)
+  http://java.net/jira/browse/JERSEY-43
+- Fixed issue 45: Jersey leaves stream open; locks JAR file on Windows
+  http://java.net/jira/browse/JERSEY-45
+
+release 0.6 (2008-03-07)
+- Support for a Model View Controller abstraction and plugging in templates
+  processors that process models that produce views. See classes in the package:
+    com.sun.ws.rest.spi.template
+- Consumable and configuration JSON support with JAXB
+- Grizzly support is upgraded to 1.7.2.
+- A sub-resource locator can now return a Class instance, that will be
+  instantiated using a ComponentProvider, using the life-cycle rules for
+  resource classes.
+- Removed support for using the GET to return WADL of resources, only the
+  OPTIONS method is supported. The application.wadl is still obtained using GET.
+- Fixed issue 41: WebApplicationException(500) returning response code 2
+  http://java.net/jira/browse/JERSEY-41
+- The default values for the following resource configuration features are
+  now false: URI normalization, URI path canonicalization and URI redirection.
+  This means by default no automatic redirection will be performed.
+- The resource configuration feature FEATURE_IGNORE_MATRIX_PARAMS is
+  renamed to FEATURE_MATCH_MATRIX_PARAMS and the default value is now false.
+- Fixed issue 35: Cryptic error message for invalid media type of response
+  http://java.net/jira/browse/JERSEY-35
+- When utilizing the ClasspathResourceConfig include files ending
+  in .zip and treat them as jar files.
+- Fixed NPE for PackagesResourceConfig when scanning directories that
+  contain characters such as space (that are percent-encoded in URLs).
+- Unified component instantation and injection. 
+  Included an SPI for plugging in IoC frameworks.
+  Life-cycle of resource classes is now independent of the IoC framework.
+  Many Jersey components may now particpate in an IoC 'session'.
+- MessageBodyReader and MessageBodyWriter implementations are searched for
+  dynamically using the same class scanning techniques as for resource classes.
+- User-defined JAXB contexts may be specified using an implementation of
+  ContextResolver<JAXBContext> that is annotated with @Provider.
+- Included Client API that focuses on the uniform interface, see classes in 
+  package:
+    com.sun.ws.rest.api.client  
+- Integrated JSR 311 API 0.6
+  - java.ws.rs.ext.ProviderFactory replaced with java.ws.rs.ext.RuntimeDelegate.
+  - java.ws.rs.ext.HeaderProvider is removed. This is replaced with
+    java.ws.rs.ext.RuntimeDelegate.HeaderDelegate.
+  - java.ws.rs.UriParam renamed to java.ws.rs.PathParam
+  - java.ws.rs.core.HttpContext renamed to java.ws.rs.Context
+  - javax.ws.rs.core.Response.Builder renamed to 
+    javax.ws.rs.core.Response.ResponseBuilder
+  - The charset parameter is removed from javax.ws.rs.core.Variant
+    constructor and getters. The method to add one or more charsets has been
+    removed from javax.ws.rs.core.Variant.VariantListBuilder. The charset
+    parameter must be included as a "charset" parameter of the media type.
+  - Response.ResponseBuilder.tag(String ) now assumes the String parameter
+    value is the contents of a strong entity tag rather than the entity tag
+    itself.
+  - javax.ws.rs.core.Response.ResponseBuilder.cookie now takes an array of 
+    javax.ws.rs.core.NewCookie.
+  - javax.ws.rs.core.HttpHeaders.getCookies now returns a type of 
+    Map<String, Cookie>, instead of a type List<Cookie>, where the key
+    is the name of the cookie.
+  - The return type of the javax.ws.rs.core.Request.evaluatePreconditions 
+    methods has changed from javax.ws.rs.core.Response to 
+    javax.ws.rs.core.Response.ResponseBuilder.
+
+release 0.5 (2008-01-18)
+- WADL ant task for generating a WADL document of the root resources present
+  in a given classpath. See the class:
+    com.sun.ws.rest.api.wadl.WadlGeneratorTask
+- WADL is now generated at runtime (rather then compile time). WADL is generated
+  as before for the application but in addition it is not possible to get WADL 
+  for a resource by the client sending a GET request that accepts 
+  "application/vnd.sun.wadl+xml", if the application does not override 
+  support for this media type or supports a more general type, or using the 
+  OPTIONS method.
+- Support injection of the ServletContext on a resource class when
+  using the servlet container.
+- Updated Mandel example to use Scala 2.6.1.
+- Updated NetBeans project files of Jersey and the examples to version 6.0
+- Fixed bug for HTTP methods on a super class that have an entity parameter 
+  that is a (generic) type variable.
+- Fixed bug for injecting onto fields of a super class
+- Fixed issue 25: UriBuilder uri() not concatinating properly
+  http://java.net/jira/browse/JERSEY-25
+- Grizzly support is upgraded to 1.7.0.
+- Grizzly and the LW HTTP server now have easy ways to start a server
+  deployed with root resource classes, see: 
+  - com.sun.ws.rest.api.container.grizzly.GrizzlyServerFactory
+  - com.sun.ws.rest.api.container.httpserver.HttpServerFactory
+- Fixed issue 1: Matching errors for sub-resource methods with equivalent URI 
+  template regexs but different template variables
+  http://java.net/jira/browse/JERSEY-1
+  Different sub-resource locator and HTTP methods may have different
+  URI templates that differ only by template variable name.
+- Removed the com.sun.ws.rest.api.core.WebResource interface and resource class
+  support for this interface.
+- Root resource classes, by default, are now found at runtime (rather than
+  compile time) by efficiently scanning the Java class files of the 
+  java.class.path for SE-based deployments or the WEB-INF/lib and 
+  WEB-INF/classes for Servlet-based deployments. Alternatively it is optionally
+  possibly to scan the Java classes files using a list of package names.
+  See the JavaDoc of the following classes for more details:
+    - com.sun.ws.rest.api.container.ContainerFactory
+    - com.sun.ws.rest.spi.container.servlet.ServletContainer
+    - com.sun.ws.rest.api.core.ClasspathResourceConfig
+    - com.sun.ws.rest.api.core.PackagesResourceConfig
+- JAXB XML and JSON support now split into separate implementations,
+  and the former no longer requires the jars of the latter in the classpath.
+- Integrated JSR 311 API 0.5
+  - EntityProvider is split into two separate interfaces
+    MessageBodyReader and MessageBodyWriter
+  - java.ws.rs.UriTemplate renamed to java.ws.rs.Path
+  - javax.ws.rs.core.UriInfo has the following changes:
+    - renamed method getBase to getBaseUri
+    - renamed method getBaseBuilder to getBaseUriBuilder
+    - renamed method getAbsolute to getAbsolutePath
+    - renamed method getBuilder to getAbsolutePathBuilder
+    - add methods getRequestUri and getRequestUriBuilder
+  - Refactored @HttpMethod:
+    - @HttpMethod is now a meta-annotation
+    - Specific annotations @HEAD, @GET, @PUT, @DELETE and @POST replace 
+      @HttpMethod("<method") and @HttpMethod with the HTTP method derived 
+      from the Java method name.
+  - javax.ws.rs.core.Response has the following changes:
+    - Changed from interface to abstract class
+    - Static methods on Response.Builder moved to Response 
+      (and in some cases renamed).
+    - Changed method "addMetaData(MultivaluedMap)" to 
+      "MultivaluedMap getMetaData()"
+  - HTTP header related classes have the following changes:
+    - Where appropriate such classes have a static parse method
+      to create an instance from a String representation, for example
+      MediaType m = MediaType.parse("text/plain") instead of a constructor.
+    - All classes override toString for serialization
+    - javax.ws.rs.core.Cookie is changed to an immutable class
+    - javax.ws.rs.core.NewCookie is changed to an immutable class
+
+release 0.4 (2007-11-02)
+- Fixed issue 17: Matrix Parameter With URL Value Ends Up With 404
+  http://java.net/jira/browse/JERSEY-17
+  A specific JVM option parameter is required to be set when using
+  Glassfish (see issue for details).
+- Added matrix and header param support to WADL
+- Fixed issue 19: java.lang.StringIndexOutOfBoundsException for 
+  LW HTTP container
+  http://java.net/jira/browse/JERSEY-19
+- Integrated JSR 311 API 0.4.
+- The runtime no longer logs the stack trace for a caught 
+  WebApplicationException with a status code < 500. 
+- Fixed bug in File entity provider, the FileInput/OutputStream is
+  wrapped around a BufferedInput/OutputStream.
+- Fixed bug in InputStream and DataStource entity providers, after the bytes 
+  read from the InputStream have been written the InputStream is closed.
+- Added new example, Mandel, for accessing Mandelbrots as a web service.
+  The example is written in Scala and uses Scala actors.
+- Support the @Encoded on class, constructors, method and method parameters.
+  https://jsr311.dev.java.net/nonav/javadoc/javax/ws/rs/Encoded.html
+  Advanced developers may work in the encoded space of URI parameters,
+  query parameters and matrix parameters by declaring this annotation on
+  a class, method or method parameter.
+- Updated URI template ordering to conform to latest changes in JAX-RS:
+  "Sort the set of matching resource classes using the number of 
+   characters in the regular expression not resulting from template 
+   variables as the primary key and the number of matching groups 
+   as a secondary key"
+  This means that a URI template such as "/edit" will take precedence over 
+  a URI template such as /{id}, where as previously this was not the case.
+- Fixed issue 13: Create AbstractServletAdapter class that allows modification 
+  of its WebApplication
+  http://java.net/jira/browse/JERSEY-13
+  The servlet implementation has been split into two. The servlet,
+  com.sun.ws.rest.spi.container.servlet.ServletContainer may be used
+  directly or extended for additional configuration requirements.
+
+release 0.3 (2007-09-21)
+- ResourceConfig interface is modified to support a feature bag and property
+  bag with documented standard features.
+  DefaultResourceConfig is mutable implementation of ResourceConfig.
+  The APT tool generates ResourceConfig classes that inherit from 
+  DefaultResourceConfig.
+- Created SPI container helper classes AbstractContainerRequest and
+  AbstractContainerResponse.
+  This makes it easier for developers to write and maintain their own
+  containers. Previously it was necessary to implement the interfaces
+  ContainerRequest and ContainerResponse or depend on the implementation 
+  specific classes HttpRequestContextImpl and HttpResponseContextImpl.
+- Fixed issue 8: apt tool silently overwrites existing web.xml by default
+  The "noservlet" option used with the WebResourcesProcessorTask ant task
+  has been removed so that by default Servlet is not assumed no overriding 
+  of a web.xml occurs. A new option "servlet" replaces the old option and is 
+  required to be set for the ant task (and apt tool) to generate a web.xml.
+- Fixed issue 2: URI path matching should operate on the encoded path
+  http://java.net/jira/browse/JERSEY-2
+- Integrated JSR 311 API 0.3.
+  The class javax.ws.rs.core.UriBuilder is implemented. This is the preferred
+  way to create URIs.
+  Method names on javax.ws.rs.core.UriInfo were modified, the string "URI"
+  or "Uri" was removed.
+  The methods javax.ws.rs.ext.EntityProvider#readFrom/writeTo take
+  a MediaType as a paramater, which corresponds to the "Content-Type"
+  HTTP header field.
+- Correctly support the writing of responses for the method signature:
+    void <method>(HttpRequestContext, HttpResponseContext)
+  this includes the method signature for resources that implement the interface
+  com.sun.ws.rest.api.core.WebResource.
+  An entity may be directly written by the application by obtaining an 
+  OutputStream from the HttpResponseContext.getOutputStream() method.
+- New SPI com.sun.ws.rest.spi.resource.* replaces com.sun.ws.rest.spi.resolver.*
+  Supports addition of new resource providers that are responsible for creating 
+  resource class instances and managing their lifecycle. The provider for a 
+  particular resource class is set via the ResourceFactory meta-annotation, 
+  see com.sun.ws.rest.spi.resource.Singleton for an example of its usage. 
+  Default lifecycle for resource class instances is per-request, the prior 
+  behaviour can be obtained by annotating a resource class with 
+  com.sun.ws.rest.spi.resource.Singleton. Resource class constructors with a 
+  per-request lifecycle can now have the same parameters as methods annotated 
+  with HttpMethod.
+
+release 0.2.1 (2007-09-04)
+- Fixed issue 4: Unsed jars required to be included in the class path for use 
+  of certain entity providers
+  http://java.net/jira/browse/JERSEY-4
+- JsonFromJaxb example added to demonstrate using JSON representation 
+  of JAXB based resources
+- 'jersey-on-glassfish.xml' ant script added to distribution
+  so that users can install jersey jars, docs and examples on GlassFish
+- Simpler getting started document included.
+- Fixed bug that caused matrix parameters to be decoded twice.
+- JAXB beans can be serialized as JSON or XML using one HTTP method with
+  a @ProduceMime({"application/xml", "application/json"}).
+- For an HTTP method that produces more than one media type automatically
+  select the appropriate media type according to what is acceptable. This
+  enables a developer to implement one method for the returning of a JAXB 
+  bean that can be serialized as XML or JSON.
+- Rename the zip of the Jersey respository from 'jersey-src' to 
+  'jersey-snapshot'.
+- Include zip of 311 src and Jersey src in the lib directory of the 
+  distribution to faciliate easier debugging.
+- Fixed bug in light weight HTTP server container that caused query parameters
+  to be decoded twice and incorrectly extracted from the URI query string.
+- JSON entity providers added to support JSONArray and JSONObject 
+  entities from Jettison.
+
+release 0.2 (2007-07-19)
+- include Allow header in a 405 (Method Not Allowed) response.
+- support by default OPTIONS request if OPTIONS is not implemented.
+- support by default HEAD request if HEAD is not implemented by calling GET 
+  and removing the entity.
+- fixed WADL generation mixing up produce/consume information when generating
+  responses.
+- fixed WADL generation not correctly determining the HTTP method from 
+  @HttpMethod Java method name.
+- WebApplication.initiate can only be called once. Throw exception on subsequent
+  calls.
+- Removed implementation of @SubResources, equivalent functionality supported 
+  by sub-resource locator methods.
+- Removed implementation of @UnmatchedPath, equivalent functionality supported 
+  by greedy parameter on @UriTemplate.
+- JSON support added to JAXB entity provider for use with "application/json",
+  media type. BadgerFish convention is used. Runtime dependency on jettison jar.
+- Views refactored to work correctly in combination with HTTP methods
+- removed the @SubResource annotation from the examples
+- removed Entity class, equivalent functionality is supported by the 
+  javax.ws.rs.core.HttpHeaders class
+- Bookmark example added
+- include 311 API distribution, src and javadoc
+- fixed the formatting of java.util.Date for HTTP-date to conform to RFC 1123
+- refactored API/SPI messages
+- include jersey API/SPI javadoc
+- URIs and URI templates with escaped space character throw exception for 
+  URI.create, found by Julian Reschke:
+  https://jersey.dev.java.net/servlets/ReadMsg?list=dev&msgNo=1 
+- include version information in manifest of jersey.jar
+
+release 0.1 (2007-06-19)
+- initial stable snapshot
