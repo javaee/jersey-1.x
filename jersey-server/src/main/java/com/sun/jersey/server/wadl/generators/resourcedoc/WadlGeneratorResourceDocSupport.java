@@ -91,8 +91,6 @@ import java.util.List;
  */
 public class WadlGeneratorResourceDocSupport implements WadlGenerator {
 
-    public static final String RESOURCE_DOC_FILE = "resourcedoc.xml";
-
     private WadlGenerator _delegate;
     private File _resourceDocFile;
     private InputStream _resourceDocStream;
@@ -314,7 +312,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
     public Param createParam( AbstractResource r,
             AbstractMethod m, Parameter p ) {
         final Param result = _delegate.createParam( r, m, p );
-        final ParamDocType paramDoc = _resourceDoc.getParamDoc( r.getResourceClass(), m.getMethod(), p );
+        final ParamDocType paramDoc = _resourceDoc.getParamDoc( r.getResourceClass(), (m == null ? null : m.getMethod()), p );
         if ( paramDoc != null && !isEmpty( paramDoc.getCommentText() ) ) {
             final Doc doc = new Doc();
             doc.getContent().add( paramDoc.getCommentText() );
