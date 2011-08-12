@@ -62,6 +62,7 @@ public class HMAC_SHA1 implements OAuthSignatureMethod {
     public HMAC_SHA1() {
     }
 
+    @Override
     public String name() {
         return NAME;
     }
@@ -73,6 +74,7 @@ public class HMAC_SHA1 implements OAuthSignatureMethod {
      * @param secrets the shared secrets used to sign the request.
      * @return the OAuth signature, in base64-encoded form.
      */
+    @Override
     public String sign(String elements, OAuthSecrets secrets) {
 
         Mac mac;
@@ -84,7 +86,7 @@ public class HMAC_SHA1 implements OAuthSignatureMethod {
             throw new IllegalStateException(nsae);
         }
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         // null secrets are interpreted as blank per OAuth specification
         String secret = secrets.getConsumerSecret();
@@ -127,6 +129,7 @@ public class HMAC_SHA1 implements OAuthSignatureMethod {
      * @param secrets the shared secrets for verifying the signature.
      * @param signature base64-encoded OAuth signature to be verified.
      */
+    @Override
     public boolean verify(String elements, OAuthSecrets secrets, String signature) {
         // with symmetric cryptography, simply sign again and compare
         return sign(elements, secrets).equals(signature);
