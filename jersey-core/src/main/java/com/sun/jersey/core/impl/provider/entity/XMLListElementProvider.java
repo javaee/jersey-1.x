@@ -47,6 +47,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -131,10 +133,19 @@ public class XMLListElementProvider extends AbstractListElementProvider {
         String property = "com.sun.xml.bind.xmlHeaders";
         String header;
         try {
+            // standalone jaxb ri?
             header = (String) m.getProperty(property);
         } catch (PropertyException e) {
+            // jaxb ri from jdk?
             property = "com.sun.xml.internal.bind.xmlHeaders";
-            header = (String) m.getProperty(property);
+            try {
+                header = (String) m.getProperty(property);
+            } catch (PropertyException ex) {
+                // other jaxb implementation
+                header = null;
+                Logger.getLogger(XMLListElementProvider.class.getName()).log(
+                        Level.WARNING, "@XmlHeader annotation is not supported with this JAXB implementation. Please use JAXB RI if you need this feature.");
+            }
         }
         if (header != null) {
             m.setProperty(property, "");

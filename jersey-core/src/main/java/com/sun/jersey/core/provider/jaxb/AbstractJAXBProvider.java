@@ -58,6 +58,8 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.xml.sax.InputSource;
 
 /**
@@ -216,9 +218,17 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         for (Annotation a : annotations) {
             if (a instanceof XmlHeader) {
                 try {
+                    // standalone jaxb ri
                     m.setProperty("com.sun.xml.bind.xmlHeaders", ((XmlHeader) a).value());
                 } catch (PropertyException e) {
-                    m.setProperty("com.sun.xml.internal.bind.xmlHeaders", ((XmlHeader) a).value());
+                    try {
+                        // jaxb ri from jdk
+                        m.setProperty("com.sun.xml.internal.bind.xmlHeaders", ((XmlHeader) a).value());
+                    } catch (PropertyException ex) {
+                        // other jaxb implementation
+                        Logger.getLogger(AbstractJAXBProvider.class.getName()).log(
+                                Level.WARNING, "@XmlHeader annotation is not supported with this JAXB implementation. Please use JAXB RI if you need this feature.");
+                    }
                 }
                 break;
             }
