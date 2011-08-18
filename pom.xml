@@ -54,39 +54,35 @@
         production quality Reference Implementation for building
         RESTful Web services.
     </description>
-    <url>https://jersey.dev.java.net/</url>
+    <url>https://jersey.java.net/</url>
     <organization>
         <name>Oracle Corporation</name>
         <url>http://www.oracle.com/</url>
     </organization>
     <issueManagement>
         <system>java.net</system>
-        <url>https://jersey.dev.java.net/servlets/ProjectIssues</url>
+        <url>http://java.net/jira/browse/JERSEY/</url>
     </issueManagement>
     <ciManagement>
         <system>Hudson</system>
         <url>http://hudson.glassfish.org/job/Jersey/</url>
     </ciManagement>
     <scm>
-        <connection>scm:svn:https://jersey.dev.java.net/svn/jersey/trunk/jersey/</connection>
-        <developerConnection>scm:svn:https://jersey.dev.java.net/svn/jersey/trunk/jersey/</developerConnection>
+        <connection>scm:svn:https://svn.java.net/svn/jersey~svn/trunk/jersey/</connection>
+        <developerConnection>scm:svn:https://svn.java.net/svn/jersey~svn/trunk/jersey/</developerConnection>
         <tag>HEAD</tag>
-        <url>https://jersey.dev.java.net/source/browse/jersey/trunk/jersey/</url>
+        <url>http://java.net/projects/jersey/sources/svn/show/trunk</url>                
     </scm>
     <mailingLists>
         <mailingList>
             <name>Jersey Users List</name>
-            <archive>http://markmail.org/search/?q=list%3Anet.java.dev.jersey.users</archive>
-            <post>users@jersey.dev.java.net</post>
-            <otherArchives>
-                <otherArchive>http://n2.nabble.com/Jersey-f576304.html</otherArchive>
-                <otherArchive>https://jersey.dev.java.net/servlets/SummarizeList?listName=users</otherArchive>
-            </otherArchives>
+            <archive>http://java.net/projects/jersey/lists/users/archive</archive>
+            <post>users@jersey.java.net</post>            
         </mailingList>
         <mailingList>
             <name>Jersey Dev List</name>
-            <archive>https://jersey.dev.java.net/servlets/SummarizeList?listName=dev</archive>
-            <post>dev@jersey.dev.java.net</post>
+            <archive>http://java.net/projects/jersey/lists/dev/archive</archive>
+            <post>dev@jersey.java.net</post>
         </mailingList>
     </mailingLists>
     <licenses>
@@ -364,24 +360,26 @@
 
     <pluginRepositories>
         <pluginRepository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-            <layout>default</layout>
+            <id>m2.java.net</id>
+            <name>Java.net Maven 2 Repository</name>
+            <url>http://download.java.net/maven/2</url>
+            <layout>default</layout>            
         </pluginRepository>
     </pluginRepositories>
 
     <repositories>
         <repository>
-            <id>m2.dev.java.net</id>
+            <id>m2.java.net</id>
+            <name>Java.net Maven 2 Repository</name>
             <url>http://download.java.net/maven/2</url>
             <layout>default</layout>
-        </repository>
+        </repository>    
         <repository>
-            <id>glassfish.dev.java.net</id>
+            <id>glassfish.java.net</id>
+            <name>GlassFish Maven Repository</name>
             <url>http://download.java.net/maven/glassfish</url>
             <layout>default</layout>
-        </repository>
+        </repository>           
     </repositories>
 
     <dependencyManagement>
