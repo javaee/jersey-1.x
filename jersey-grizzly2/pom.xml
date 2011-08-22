@@ -139,13 +139,4 @@
             <version>3.1</version>
         </dependency>
     </dependencies>
-    <!--
-    <repositories>
-        <repository>
-            <id>glassfish-repository</id>
-            <name>Repository for Glassfish</name>
-            <url>http://maven.glassfish.org/content/groups/glassfish</url>
-        </repository>
-    </repositories>
-    -->
 </project>

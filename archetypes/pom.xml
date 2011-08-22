@@ -58,20 +58,5 @@
         <module>jersey-quickstart-ejb</module>
     </modules>
     <build>
-        <extensions>
-            <extension>
-                <groupId>org.jvnet.wagon-svn</groupId>
-                <artifactId>wagon-svn</artifactId>
-                <version>1.9</version>
-            </extension>
-        </extensions>
      </build>
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-dist-repository</id>
-            <name>java.net-m2-repository</name>
-            <url>java-net:/maven2-repository/trunk/repository/</url>
-        </repository>
-    </distributionManagement>
  </project>

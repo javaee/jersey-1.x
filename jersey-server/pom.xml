@@ -60,7 +60,7 @@
         <dependency>
             <groupId>javax.persistence</groupId>
             <artifactId>persistence-api</artifactId>
-            <version>1.0.2</version>
+            <version>1.0</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -76,9 +76,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>3.0</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -90,7 +90,7 @@
         <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>javax.ejb</artifactId>
-            <version>3.0</version>
+            <version>3.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -271,11 +271,4 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>glassfish-repository</id>
-            <name>Repository for Glassfish</name>
-            <url>http://maven.glassfish.org/content/groups/glassfish</url>
-        </repository>
-    </repositories>
 </project>

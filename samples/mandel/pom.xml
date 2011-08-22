@@ -171,32 +171,6 @@
             </plugin>
         </plugins>
     </build>
-    <repositories>
-        <repository>
-            <id>scala-tools.org</id>
-            <name>Scala-Tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </repository>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>java.net/maven/2 repository</name>
-            <url>http://download.java.net/maven/2/</url>
-            <layout>default</layout>
-        </repository>
-         <repository>
-            <id>glassfish-repository.dev.java.net</id>
-            <name>java.net/maven/glassfish repository</name>
-            <url>http://download.java.net/maven/glassfish/</url>
-            <layout>default</layout>
-        </repository>
-     </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>scala-tools.org</id>
-            <name>Scala-Tools Maven2 Repository</name>
-            <url>http://scala-tools.org/repo-releases</url>
-        </pluginRepository>
-    </pluginRepositories>
     <reporting>
         <plugins>
             <plugin>

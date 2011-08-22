@@ -61,26 +61,6 @@
     <scala.version>2.7.5</scala.version>
   </properties>
 
-  <repositories>
-    <!-- TODO replace with the release repo when we can use a lift release -->
-    <repository>
-      <id>scala-tools.snapshots</id>
-      <url>http://scala-tools.org/repo-snapshots/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <id>scala-tools.org</id>
-      <name>Scala-Tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
-    </repository>
-  </repositories>
-
-
   <modules>
     <module>jersey-lift</module>
     <module>jersey-lift-test</module>

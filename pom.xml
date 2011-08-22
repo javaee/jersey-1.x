@@ -44,6 +44,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <!--
+    <parent>
+      <groupId>net.java</groupId>
+      <artifactId>jvnet-parent</artifactId>
+      <version>1</version>
+    </parent>-->
     <groupId>com.sun.jersey</groupId>
     <artifactId>jersey-project</artifactId>
     <version>1.9-SNAPSHOT</version>
@@ -60,24 +66,24 @@
         <url>http://www.oracle.com/</url>
     </organization>
     <issueManagement>
-        <system>java.net</system>
+        <system>JIRA</system>
         <url>http://java.net/jira/browse/JERSEY/</url>
     </issueManagement>
     <ciManagement>
         <system>Hudson</system>
-        <url>http://hudson.glassfish.org/job/Jersey/</url>
+        <url>http://hudson.glassfish.org/job/Jersey-trunk-multiplatform/</url>
     </ciManagement>
     <scm>
         <connection>scm:svn:https://svn.java.net/svn/jersey~svn/trunk/jersey/</connection>
         <developerConnection>scm:svn:https://svn.java.net/svn/jersey~svn/trunk/jersey/</developerConnection>
         <tag>HEAD</tag>
-        <url>http://java.net/projects/jersey/sources/svn/show/trunk</url>                
+        <url>http://java.net/projects/jersey/sources/svn/show/trunk/jersey</url>
     </scm>
     <mailingLists>
         <mailingList>
             <name>Jersey Users List</name>
             <archive>http://java.net/projects/jersey/lists/users/archive</archive>
-            <post>users@jersey.java.net</post>            
+            <post>users@jersey.java.net</post>
         </mailingList>
         <mailingList>
             <name>Jersey Dev List</name>
@@ -347,25 +353,7 @@
                 <artifactId>cobertura-maven-plugin</artifactId>
             </plugin>
         </plugins>
-
-
-        <extensions>
-            <extension>
-                <groupId>org.jvnet.wagon-svn</groupId>
-                <artifactId>wagon-svn</artifactId>
-                <version>1.9</version>
-            </extension>
-        </extensions>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>m2.java.net</id>
-            <name>Java.net Maven 2 Repository</name>
-            <url>http://download.java.net/maven/2</url>
-            <layout>default</layout>            
-        </pluginRepository>
-    </pluginRepositories>
 
     <repositories>
         <repository>
@@ -373,15 +361,20 @@
             <name>Java.net Maven 2 Repository</name>
             <url>http://download.java.net/maven/2</url>
             <layout>default</layout>
-        </repository>    
+        </repository>      
         <repository>
-            <id>glassfish.java.net</id>
-            <name>GlassFish Maven Repository</name>
-            <url>http://download.java.net/maven/glassfish</url>
+            <id>repository.jboss.org</id>
+            <name>jboss Maven Repository</name>
+            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
             <layout>default</layout>
-        </repository>           
+        </repository>
+        <repository>
+            <id>glassfish-repository</id>
+            <name>Repository for Glassfish</name>
+            <url>http://maven.glassfish.org/content/groups/glassfish</url>
+        </repository>       
     </repositories>
-
+ 
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -420,15 +413,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jackson.version>1.8.3</jackson.version>
-    </properties>
-
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-dist-repository</id>
-            <name>java.net-m2-repository</name>
-            <url>java-net:/maven2-repository/trunk/repository/</url>
-        </repository>
-    </distributionManagement>
+    </properties>        
 
 </project>

@@ -44,6 +44,11 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-project</artifactId>
+        <version>1.9-SNAPSHOT</version>
+    </parent>
     <groupId>com.sun.jersey.test</groupId>
     <artifactId>functional-tests</artifactId>
     <version>1.9-SNAPSHOT</version>
@@ -86,13 +91,4 @@
         </dependencies>
     </dependencyManagement>
 
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-dist-repository</id>
-            <name>java.net-m2-repository</name>
-            <url>java-net:/maven2-repository/trunk/repository/</url>
-        </repository>
-    </distributionManagement>
-   
 </project>

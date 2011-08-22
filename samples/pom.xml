@@ -41,6 +41,11 @@
 
 --><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-project</artifactId>
+        <version>1.9-SNAPSHOT</version>
+    </parent>    
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>jersey-samples</artifactId>
     <version>1.9-SNAPSHOT</version>
@@ -216,14 +221,6 @@
             </plugins>
         </pluginManagement>
     </build>
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-dist-repository</id>
-            <name>java.net-m2-repository</name>
-            <url>java-net:/maven2-repository/trunk/repository/</url>
-        </repository>
-    </distributionManagement>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

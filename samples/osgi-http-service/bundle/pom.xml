@@ -139,21 +139,5 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>m2-djn</id>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>java.net-m2-dist-repository</id>
-            <name>java.net-m2-repository</name>
-            <url>java-net:/maven2-repository/trunk/repository/</url>
-        </repository>
-    </distributionManagement>
-
 </project>
 

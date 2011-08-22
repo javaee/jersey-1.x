@@ -108,14 +108,6 @@
     <properties>
         <jersey-version>1.9-SNAPSHOT</jersey-version>
     </properties>
-    <repositories>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/2/</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
     <version>1.9-SNAPSHOT</version>
     <description>Sample that shows the use of hypermedia annotations like @Action
     available in Jersey.</description>
