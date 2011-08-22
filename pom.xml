@@ -361,7 +361,7 @@
             <name>Java.net Maven 2 Repository</name>
             <url>http://download.java.net/maven/2</url>
             <layout>default</layout>
-        </repository>      
+        </repository>
         <repository>
             <id>repository.jboss.org</id>
             <name>jboss Maven Repository</name>
@@ -372,7 +372,7 @@
             <id>glassfish-repository</id>
             <name>Repository for Glassfish</name>
             <url>http://maven.glassfish.org/content/groups/glassfish</url>
-        </repository>       
+        </repository>
     </repositories>
  
     <dependencyManagement>
