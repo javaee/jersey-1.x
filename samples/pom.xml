@@ -45,7 +45,7 @@
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
         <version>1.9-SNAPSHOT</version>
-    </parent>    
+    </parent>
     <groupId>com.sun.jersey.samples</groupId>
     <artifactId>jersey-samples</artifactId>
     <version>1.9-SNAPSHOT</version>
@@ -111,7 +111,7 @@
   </modules>
 
     <profiles>
-        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" --> 
+        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" -->
         <profile>
             <id>cobertura</id>
             <activation>

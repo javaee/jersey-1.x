@@ -63,72 +63,84 @@
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>bookmark</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>bookmark-em</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>bookstore</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>jersey-ejb</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>helloworld-webapp</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>jmaki-backend</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>scala-helloworld-webapp</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>simple-servlet</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>spring-annotations</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>extended-wadl-webapp</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>managed-beans-webapp</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.samples</groupId>
             <artifactId>jersey-cdi</artifactId>
             <version>${project.version}</version>
+            <type>war</type>
             <scope>provided</scope>
         </dependency>
     </dependencies>
