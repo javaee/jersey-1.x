@@ -53,7 +53,7 @@ import javax.ws.rs.core.CacheControl;
 /**
  *
  * @author Paul.Sandoz@Sun.Com
- * @author hubick@dev.java.net
+ * @author hubick@java.net
  */
 public final class CacheControlProvider implements HeaderDelegateProvider<CacheControl> {
     private static final Pattern WHITESPACE = Pattern.compile("\\s");

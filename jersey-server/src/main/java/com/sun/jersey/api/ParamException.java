@@ -58,7 +58,7 @@ import javax.ws.rs.ext.ExceptionMapper;
  * encounters an error obtaining a parameter value, from a request, for a
  * Java type that is annotated with a parameter-based annotation, such as
  * {@link QueryParam}. For more details see
- * <a href="https://jsr311.dev.java.net/nonav/releases/1.0/spec/index.html">section 3.2</a> 
+ * <a href="http://jsr311.java.net/nonav/releases/1.0/spec/index.html">section 3.2</a> 
  * of the JAX-RS specfication.
  * <p>
  * An {@link ExceptionMapper} may be configured to map this class or a sub-class

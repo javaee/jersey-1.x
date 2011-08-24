@@ -52,7 +52,7 @@ import com.sun.jersey.spring.AbstractResourceTest;
  * Check, that exceptions thrown by resource methods are propagated to the container.
  * This is the test case for issue 81: SpringServlet failing to propagate unchecked exceptions.
  * 
- * @see <a href="https://jersey.dev.java.net/issues/show_bug.cgi?id=81">Issue 81</a>
+ * @see <a href="http://java.net/jira/browse/JERSEY-81">Issue 81</a>
  * 
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$

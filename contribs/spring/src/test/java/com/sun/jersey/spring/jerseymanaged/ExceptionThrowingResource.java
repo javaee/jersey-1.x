@@ -50,7 +50,7 @@ import com.sun.jersey.spi.resource.Singleton;
  * A singleton resource class that throws an exception in it's single resource method,
  * to test issue 81: SpringServlet failing to propagate unchecked exceptions.
  * 
- * @see <a href="https://jersey.dev.java.net/issues/show_bug.cgi?id=81">Issue 81</a>
+ * @see <a href="http://java.net/jira/browse/JERSEY-81">Issue 81</a>
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */

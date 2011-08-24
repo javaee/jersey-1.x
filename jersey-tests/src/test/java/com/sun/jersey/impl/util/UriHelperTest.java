@@ -92,8 +92,8 @@ public class UriHelperTest extends TestCase {
         result = UriHelper.removeDotSegments(path, true);
         assertEquals(expResult, result);
         
-        path = "/uri/http://jersey.dev.java.net";
-        expResult = "/uri/http://jersey.dev.java.net";
+        path = "/uri/http://jersey.java.net";
+        expResult = "/uri/http://jersey.java.net";
         result = UriHelper.removeDotSegments(path, true);
         assertEquals(expResult, result);
     }

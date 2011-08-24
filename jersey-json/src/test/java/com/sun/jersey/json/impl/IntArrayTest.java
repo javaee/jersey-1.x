@@ -50,7 +50,7 @@ import junit.framework.TestCase;
  *
  * test case for issue#497
  *
- * @author lapoluchini@dev.java.net
+ * @author lapoluchini@java.net
  */
 public class IntArrayTest extends TestCase {
 

@@ -50,8 +50,8 @@
  * <p>
  * The {@link java.io.File} reference is appropriate when generating wadl offline,
  * e.g. with the help of the
- * <a href="https://jersey.dev.java.net/source/browse/jersey/trunk/jersey/contribs/maven-wadl-plugin/">maven-wadl-plugin</a>
- * (see the <a href="https://jersey.dev.java.net/source/browse/jersey/trunk/jersey/samples/generate-wadl/">generate-wadl sample</a>).
+ * <a href="http://java.net/projects/jersey/sources/svn/show/trunk/jersey/contribs/maven-wadl-plugin/">maven-wadl-plugin</a>
+ * (see the <a href="http://java.net/projects/jersey/sources/svn/show/trunk/jersey/samples/generate-wadl/">generate-wadl sample</a>).
  * <br/>
  * The {@link java.io.InputStream} is appropriate, when the wadl is generated from a jersey
  * application running in some servlet container or application server.

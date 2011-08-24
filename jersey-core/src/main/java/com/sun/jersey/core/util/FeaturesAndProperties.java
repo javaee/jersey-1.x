@@ -85,7 +85,7 @@ public interface FeaturesAndProperties {
     /**
      * If true, provider precedence will work as it did prior Jersey version 1.4.
      * That behaviour was not according to the spec regarding priority of user
-     * defined providers. See (@link https://jersey.dev.java.net/issues/show_bug.cgi?id=571}. 
+     * defined providers. See (@link http://java.net/jira/browse/JERSEY-571}. 
      * <p>
      * The default value is false.
      */
