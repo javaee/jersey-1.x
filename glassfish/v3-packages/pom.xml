@@ -62,6 +62,17 @@
         <module>osgi-modules</module>
     </modules>
     <build>
+
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <version>2.0.1</version>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+
         <plugins>
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
