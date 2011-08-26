@@ -1,6 +1,6 @@
 pkg = {
     "name"          : "jersey",
-    "version"       : "1.9,0-0.11",
+    "version"       : "1.9,0-0.13",
     "attributes"    : { "pkg.summary" : "Jersey Core, RESTful Web services for GlassFish",
                         "pkg.description" : 
 "Jersey core runtime libraries including some 3rd party dependencies. \
