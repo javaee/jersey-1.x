@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -40,51 +39,22 @@
     holder.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-      <groupId>net.java</groupId>
-      <artifactId>jvnet-parent</artifactId>
-      <version>1</version>
-    </parent>
-    <groupId>com.sun.jersey.archetypes</groupId>
-    <version>1.9-SNAPSHOT</version>
-    <artifactId>jersey-archetypes</artifactId>
-    <packaging>pom</packaging>
-    <name>All Jersey Archetypes</name>
-    <description>
-        A module containing archetypes for generating Jersey based applications.
-    </description>
-    <modules>
-        <module>jersey-quickstart-grizzly</module>
-        <module>jersey-quickstart-grizzly2</module>
-        <module>jersey-quickstart-webapp</module>
-        <module>jersey-quickstart-ejb</module>
-    </modules>
-    <build>
-     </build>
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.1</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifact</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
- </project>
+
+<assembly>
+    <id>javadoc</id>
+    <formats>
+        <format>jar</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>.</directory>
+            <outputDirectory></outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <excludes>
+                <exclude>**/src/**</exclude>
+                <exclude>**/target/**</exclude>
+                <exclude>pom.xml</exclude>
+            </excludes>
+        </fileSet>
+    </fileSets>
+</assembly>
