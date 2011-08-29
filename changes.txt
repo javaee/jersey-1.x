@@ -1,4 +1,8 @@
 release 1.9
+- Fixed issue 756
+  http://java.net/jira/browse/JERSEY-756
+  Applied patch from a contributor - schemas generated during wadl creation weren't included in ouput
+  of maven-wadl-plugin
 - Jersey non blocking client moved from experimental to contribs
 - Fixed issue 753
   http://java.net/jira/browse/JERSEY-753

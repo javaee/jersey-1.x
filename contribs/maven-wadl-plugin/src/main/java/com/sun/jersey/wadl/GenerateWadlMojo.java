@@ -43,10 +43,14 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.server.wadl.ApplicationDescription;
+import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
 import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Grammars;
+import com.sun.research.ws.wadl.Include;
 import com.sun.research.ws.wadl.Resources;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.xml.serialize.OutputFormat;
@@ -58,9 +62,11 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -82,44 +88,44 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
 
     /**
      * Location of the wadl file to create.
-     * 
+     *
      * @parameter property="wadlFile" expression="${project.build.directory}/application.wadl"
      * @required
      */
     private File _wadlFile;
-    
+
     /**
      * Specifies, if the generated wadl file shall contain formatted xml or not.
      * The default value is <code>true</code>.
-     * 
+     *
      * @parameter property="formatWadlFile"
      */
     private boolean _formatWadlFile = true;
 
     /**
      * The base-uri to use.
-     * 
+     *
      * @parameter property="baseUri"
      * @required
      */
     private String _baseUri;
-    
+
     /**
      * An array of packages that is searched for resource classes.
-     * 
+     *
      * @parameter property="packagesResourceConfig"
      * @required
      */
     private String[] _packagesResourceConfig;
-    
+
     /**
      * An array of packages that is searched for resource classes.
-     * 
+     *
      * @parameter property="wadlGenerators"
      * @required
      */
     private List<WadlGeneratorDescription> _wadlGenerators;
-    
+
     public void executeWithClasspath( List<String> classpathElements ) throws MojoExecutionException {
         if ( _packagesResourceConfig == null || _packagesResourceConfig.length == 0 ) {
             throw new MojoExecutionException( "The packagesResourceConfig attribute is required but not defined." );
@@ -131,9 +137,9 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
         if (_baseUri == null || _baseUri.length() == 0) {
             throw new MojoExecutionException( "The baseUri attribute is required but not defined." );
         }
-        
+
         try {
-            
+
             com.sun.jersey.server.wadl.WadlGenerator wadlGenerator = new WadlGeneratorImpl();
             if ( _wadlGenerators != null ) {
                 for ( WadlGeneratorDescription wadlGeneratorDescription : _wadlGenerators ) {
@@ -141,35 +147,62 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
                 }
             }
             wadlGenerator.init();
-            
-            final Application a = createApplication( _packagesResourceConfig, wadlGenerator );
+
+            final ApplicationDescription ad = this.createApplicationDescription(this._packagesResourceConfig, wadlGenerator);
+            final Application a = ad.getApplication();
             for(Resources resources : a.getResources())
                 resources.setBase(_baseUri);
 
-            final JAXBContext c = JAXBContext.newInstance( wadlGenerator.getRequiredJaxbContextPath(), 
+            this.writeExternalGrammars(ad);
+
+            final JAXBContext c = JAXBContext.newInstance( wadlGenerator.getRequiredJaxbContextPath(),
                     Thread.currentThread().getContextClassLoader() );
             final Marshaller m = c.createMarshaller();
             m.setProperty( Marshaller.JAXB_FORMATTED_OUTPUT, _formatWadlFile );
             // m.setProperty( "com.sun.xml.bind.namespacePrefixMapper", new NamespacePrefixMapperImpl() );
             // m.setProperty( "com.sun.xml.bind.characterEscapeHandler", new CustomCharacterEscapeHandler() );
             final OutputStream out = new BufferedOutputStream(new FileOutputStream(_wadlFile));
-            
+
             // get an Apache XMLSerializer configured to generate CDATA
             final XMLSerializer serializer = getXMLSerializer( out );
-            
+
             m.marshal( a, serializer );
             out.close();
-            
+
             getLog().info( "Wrote " + _wadlFile );
-            
+
         } catch( MojoExecutionException e ) {
             throw e;
         } catch (Exception e) {
             getLog().error( e );
-            throw new MojoExecutionException( "Could not write wadl file", e );            
+            throw new MojoExecutionException( "Could not write wadl file", e );
         }
     }
-    
+
+    private void writeExternalGrammars(final ApplicationDescription ad) throws FileNotFoundException, IOException {
+        File wadlParent = this._wadlFile.getParentFile();
+        Set<String> externalMetadataKeys = ad.getExternalMetadataKeys();
+
+        List<String> hrefs = new ArrayList<String>();
+        for (String key : externalMetadataKeys) {
+            ExternalGrammar externalGrammar = ad.getExternalGrammar(key);
+
+            File externalFile = new File(wadlParent, key);
+            OutputStream externalGrammarOutputStream = new BufferedOutputStream(new FileOutputStream(externalFile));
+            try {
+                externalGrammarOutputStream.write(externalGrammar.getContent());
+                this.getLog().info("Wrote " + externalFile);
+            } finally {
+                externalGrammarOutputStream.close();
+            }
+            hrefs.add(key);
+        }
+
+        JAXBGrammars grammars = new JAXBGrammars(hrefs);
+        Application application = ad.getApplication();
+        application.setGrammars(grammars);
+    }
+
     private XMLSerializer getXMLSerializer(OutputStream out) throws FileNotFoundException {
         // configure an OutputFormat to handle CDATA
         OutputFormat of = new OutputFormat();
@@ -195,7 +228,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
 
         // create the serializer
         XMLSerializer serializer = new XMLSerializer(of);
-        
+
         serializer.setOutputByteStream( out );
 
         return serializer;
@@ -273,7 +306,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
         throw new RuntimeException( "Method '" + methodName + "' not found for class " + clazz.getName() );
     }
 
-    private Application createApplication( String[] paths, WadlGenerator wadlGenerator ) throws MojoExecutionException {
+    private ApplicationDescription createApplicationDescription( String[] paths, WadlGenerator wadlGenerator ) throws MojoExecutionException {
         final Map<String, Object> map = new HashMap<String, Object>();
         map.put( PackagesResourceConfig.PROPERTY_PACKAGES, paths );
         final ResourceConfig rc = new PackagesResourceConfig( map );
@@ -282,7 +315,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
             getLog().debug( "Adding class " + c.getName() );
             s.add( IntrospectionModeller.createResource(c) );
         }
-        return new WadlBuilder( wadlGenerator ).generate( s ).getApplication();   
+        return new WadlBuilder( wadlGenerator ).generate( s );
     }
 
     /**
@@ -324,5 +357,20 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
     public void setWadlGenerators( List<WadlGeneratorDescription> wadlGenerators ) {
         _wadlGenerators = wadlGenerators;
     }
-    
+
+    private static class JAXBGrammars extends Grammars {
+
+        public JAXBGrammars(List<String> hrefs) {
+            List<Include> includes = new ArrayList<Include>();
+
+            for (String href : hrefs) {
+                Include include = new Include();
+                include.setHref(href);
+
+                includes.add(include);
+            }
+
+            this.include = includes;
+        }
+    }
 }
