@@ -1,4 +1,5 @@
 release 1.9
+- Added support for Freemarker templates, see contribs/jersey-freemarker and samples/freemarker
 - Fixed issue 755
   http://java.net/jira/browse/JERSEY-755
   Wadl javadoc tag - response doc wasn't processed correctly in all cases

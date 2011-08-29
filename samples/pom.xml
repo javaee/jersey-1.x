@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -78,6 +78,7 @@
         <module>entity-provider</module>
         <module>exceptions</module>
         <module>extended-wadl-webapp</module>
+        <module>freemarker</module>
         <module>generate-wadl</module>
         <module>groovy</module>
         <module>helloworld</module>
