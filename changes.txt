@@ -1,4 +1,5 @@
 release 1.9
+- Jersey non blocking client moved from experimental to contribs
 - Fixed issue 753
   http://java.net/jira/browse/JERSEY-753
   Removed a hard dependency on JAXB RI introduced when implementing support for XmlHeader annotation in Jersey 1.6.
