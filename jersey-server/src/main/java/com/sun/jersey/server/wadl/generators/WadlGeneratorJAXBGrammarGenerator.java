@@ -47,6 +47,7 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
 import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
@@ -160,6 +161,7 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
     private List<Pair> _hasTypeWantsName;
     
     public WadlGeneratorJAXBGrammarGenerator() {
+        _delegate = new WadlGeneratorImpl();
     }
 
     // =============== House keeping methods ================================
@@ -175,6 +177,7 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
     
     
     public void init() throws Exception {
+        _delegate.init();
         //
         _seeAlso = new HashSet<Class>();
 

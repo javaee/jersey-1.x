@@ -47,7 +47,7 @@ import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
 import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
-import com.sun.jersey.server.wadl.WadlGeneratorImpl;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Grammars;
 import com.sun.research.ws.wadl.Include;
@@ -140,7 +140,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
 
         try {
 
-            com.sun.jersey.server.wadl.WadlGenerator wadlGenerator = new WadlGeneratorImpl();
+            com.sun.jersey.server.wadl.WadlGenerator wadlGenerator = new WadlGeneratorJAXBGrammarGenerator();
             if ( _wadlGenerators != null ) {
                 for ( WadlGeneratorDescription wadlGeneratorDescription : _wadlGenerators ) {
                     wadlGenerator = loadWadlGenerator( wadlGeneratorDescription, wadlGenerator );
@@ -253,7 +253,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
     private void setProperty( final Object object, final String propertyName, final Object propertyValue )
             throws Exception {
         final String methodName = "set" + propertyName.substring( 0, 1 ).toUpperCase() + propertyName.substring( 1 );
-        final Method method = getMethodByName( methodName, object.getClass() );
+        final Method method = getMethodByName(methodName, object.getClass());
         if ( method.getParameterTypes().length != 1 ) {
             throw new RuntimeException( "Method " + methodName + " is no setter, it does not expect exactly one parameter, but " + method.getParameterTypes().length );
         }

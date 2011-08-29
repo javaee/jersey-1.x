@@ -39,6 +39,9 @@
  */
 package com.sun.jersey.api.wadl.config;
 
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,9 +54,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.sun.jersey.server.wadl.WadlGenerator;
-import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 
 /**
  * Loads {@link WadlGenerator}s from a provided list of {@link WadlGeneratorDescription}s.<br/>
@@ -88,7 +88,7 @@ class WadlGeneratorLoader {
 
     static WadlGenerator loadWadlGenerators(
             List<WadlGenerator> wadlGenerators) throws Exception {
-        WadlGenerator wadlGenerator = new WadlGeneratorImpl();
+        WadlGenerator wadlGenerator = new WadlGeneratorJAXBGrammarGenerator();
         if (wadlGenerators != null && !wadlGenerators.isEmpty()) {
             for (WadlGenerator generator : wadlGenerators) {
                 generator.setWadlGeneratorDelegate(wadlGenerator);
@@ -105,7 +105,7 @@ class WadlGeneratorLoader {
     }
 
     static WadlGenerator loadWadlGeneratorDescriptions(List<WadlGeneratorDescription> wadlGeneratorDescriptions) throws Exception {
-        WadlGenerator wadlGenerator = new WadlGeneratorImpl();
+        WadlGenerator wadlGenerator = new WadlGeneratorJAXBGrammarGenerator();
 
         final CallbackList callbacks = new CallbackList();
         try {

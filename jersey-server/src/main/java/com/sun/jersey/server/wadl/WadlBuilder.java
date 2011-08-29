@@ -48,6 +48,7 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.model.Parameterized;
 import com.sun.jersey.server.impl.BuildId;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Doc;
 import com.sun.research.ws.wadl.Param;
@@ -84,7 +85,7 @@ public class WadlBuilder {
     private WadlGenerator _wadlGenerator;
 
     public WadlBuilder() {
-        this(new WadlGeneratorImpl());
+        this(new WadlGeneratorJAXBGrammarGenerator());
     }
 
     public WadlBuilder(WadlGenerator wadlGenerator) {

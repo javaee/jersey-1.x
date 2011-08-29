@@ -42,7 +42,6 @@ package com.sun.jersey.api.wadl.config;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.wadl.WadlGenerator;
-import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 import java.util.Collections;
 import java.util.List;
 
@@ -64,7 +63,7 @@ public class WadlGeneratorConfigLoader {
      * <p>
      * The type of this property must be a subclass or an instance of a subclass of
      * {@link WadlGeneratorConfig}.<br/>
-     * If it's not set, the default {@link WadlGeneratorImpl} will be used.
+     * If it's not set, the default {@link com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator} will be used.
      * </p>
      * 
      * @param resourceConfig

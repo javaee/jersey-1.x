@@ -1,4 +1,5 @@
 release 1.9
+- Wadl generator capable of generating XML schemas for params is used by default from now.
 - Added support for Freemarker templates, see contribs/jersey-freemarker and samples/freemarker
 - Fixed issue 755
   http://java.net/jira/browse/JERSEY-755
