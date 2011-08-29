@@ -106,7 +106,6 @@
                                 <link>https://jsr311.java.net/nonav/releases/1.1</link>
                                 <link>https://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
                             </links>
-                            <excludePackageNames>com.sun.jersey.freemarker</excludePackageNames>
                             <notimestamp>true</notimestamp>
                         </configuration>
                     </plugin>
