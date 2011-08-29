@@ -1,4 +1,7 @@
 release 1.9
+- Fixed issue 755
+  http://java.net/jira/browse/JERSEY-755
+  Wadl javadoc tag - response doc wasn't processed correctly in all cases
 - Fixed issue 756
   http://java.net/jira/browse/JERSEY-756
   Applied patch from a contributor - schemas generated during wadl creation weren't included in ouput

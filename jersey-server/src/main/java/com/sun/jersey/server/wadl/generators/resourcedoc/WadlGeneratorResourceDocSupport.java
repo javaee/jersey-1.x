@@ -254,10 +254,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
                 response.getStatus().add(representationDoc.getStatus());
                 response.getRepresentation().add(wadlRepresentation);
             }
-            
-            return response;
-        }
-        else {
+        } else {
             response = _delegate.createResponse( r, m );
         }
         

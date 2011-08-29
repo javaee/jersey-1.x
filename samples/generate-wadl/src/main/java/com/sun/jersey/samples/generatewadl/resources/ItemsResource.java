@@ -39,9 +39,10 @@
  */
 package com.sun.jersey.samples.generatewadl.resources;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.samples.generatewadl.model.Item;
+import com.sun.jersey.samples.generatewadl.util.Examples;
+import com.sun.jersey.spi.resource.Singleton;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -50,11 +51,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
-import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.samples.generatewadl.model.Item;
-import com.sun.jersey.samples.generatewadl.util.Examples;
-import com.sun.jersey.spi.resource.Singleton;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This is the root resource for managing items.<br />
@@ -103,7 +102,7 @@ public class ItemsResource {
      *                  {@style header}
      *                  {@type {http://www.w3.org/2001/XMLSchema}anyURI}
      *                  {@doc The URI where the created item is accessable.}
-     * 
+     *
      * @return The response with the status code and the location header.
      * 
      */
