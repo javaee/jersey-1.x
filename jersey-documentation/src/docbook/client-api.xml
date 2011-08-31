@@ -392,7 +392,7 @@ JAXBBean bean = r.
                 <programlisting language="java">    File f = ...
     String response = r.post(String.class, f);</programlisting>
                 Refer to the
-                    <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jaxb/&version;/jaxb-&version;-project.zip">JAXB sample</ulink> to see how JAXB with XML and JSON can be utilized with the client API (more specifically, see the unit tests).
+                    <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=jaxb&amp;v=&version;&amp;c=project&amp;e=zip">JAXB sample</ulink> to see how JAXB with XML and JSON can be utilized with the client API (more specifically, see the unit tests).
                 </para>
             </section>
         </section>
@@ -404,10 +404,10 @@ JAXBBean bean = r.
                 <ulink url="http://jsr311.java.net/nonav/javadoc/javax/ws/rs/ext/MessageBodyReader.html">MessageBodyReader</ulink> and
                 <ulink url="http://jsr311.java.net/nonav/javadoc/javax/ws/rs/ext/MessageBodyWriter.html">MessageBodyWriter</ulink>,
                 respectively, for request and response entities (or inbound and outbound representations). Refer to the
-                <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/entity-provider/&version;/entity-provider-&version;-project.zip">entity provider</ulink>
+                <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=entity-provider&amp;v=&version;&amp;c=project&amp;e=zip">entity provider</ulink>
                 sample for such implementations utilized on the server side.
             </para>
-            <para>Classes or implementations of the provider-based interfaces need to be registered with a 
+            <para>Classes or implementations of the provider-based interfaces need to be registered with a
             <literal>ClientConfig</literal> and passed to the <literal>Client</literal> for creation. The following
             registers a provider class <literal>MyReader</literal> which will be instantiated by Jersey:
             <programlisting language="java">    ClientConfig cc = new DefaultClientConfig();
@@ -508,7 +508,7 @@ JAXBBean bean = r.
                 </orderedlist>
                 <para>The filters above are good examples that show how to modify or read
                 request and response entities. Refer to the
-                    <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-client/&version;/jersey-client-&version;-sources.jar">source code</ulink>
+                    <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-client&amp;v=&version;&amp;e=jar">source code</ulink>
                     of the Jersey client for more details.
                 </para>
             </section>
@@ -523,9 +523,9 @@ JAXBBean bean = r.
             test-based services. Many of the Jersey samples contain tests that utilize the client API to
             server both for testing and examples of how to use the API. The samples utilize Grizzly or
             embedded Glassfish to deploy the services.</para>
-            <para>The following code snippets are presented from the single unit test 
+            <para>The following code snippets are presented from the single unit test
             <literal>HelloWorldWebAppTest</literal> of the
-                <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-webapp/&version;/helloworld-webapp-&version;-project.zip">helloworld-webapp</ulink>
+                <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=helloworld-webapp&amp;v=&version;&amp;c=project&amp;e=zip">helloworld-webapp</ulink>
                 sample.
             The <literal>setUp</literal> method, called before a test is executed, creates an instance of
             the Glassfish server, deploys the application, and a <literal>WebResource</literal> instance

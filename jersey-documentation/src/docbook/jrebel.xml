@@ -96,8 +96,7 @@
             be output if JRebel is enabled).</para>
 
         <para>
-            Download the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/&version;/helloworld-&version;-project.zip">hello world sample</ulink>
+            Download the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=helloworld&amp;v=&version;&amp;c=project&amp;e=zip">hello world sample</ulink>
       and modify the pom file in accordance with the prevous chapter.</para>
 
         <para>

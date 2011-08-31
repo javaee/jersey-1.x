@@ -67,8 +67,7 @@
     <para>The following code example is a very simple example of a root
     resource class using JAX-RS annotations. The example code shown here is
     from one of the samples that ships with Jersey, the zip file of which can
-    be found in the maven repository <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/&version;/helloworld-&version;-project.zip">here</ulink>.</para>
-
+    be found in the maven repository <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=helloworld&amp;v=&version;&amp;c=project&amp;e=zip">here</ulink>.</para>
     <para><example>
 <title>Simple hello world root resource class</title>
 <programlisting language="java" linenumbering="numbered">package com.sun.ws.rest.samples.helloworld.resources;

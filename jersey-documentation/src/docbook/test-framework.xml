@@ -265,13 +265,13 @@ else
             needed present on classpath and by everything is meant following list:</para>
 
         <itemizedlist>
-            <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.jar">jersey-server</ulink></listitem>
-            <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/&version;/jersey-core-&version;.jar">jersey-core</ulink></listitem>
+            <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=jar">jersey-server</ulink></listitem>
+            <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-core&amp;v=&version;&amp;e=jar">jersey-core</ulink></listitem>
             <listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/&jsr311.version;/jsr311-api-&jsr311.version;.jar">jsr311-api</ulink></listitem>
             <listitem><ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm</ulink></listitem>
-            <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly/&version;/jersey-test-framework-grizzly-&version;.jar">jersey-test-framework-grizzly</ulink></listitem>
-            <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/jersey-test-framework-core/&version;/jersey-test-framework-core-&version;.jar">jersey-test-framework-core</ulink></listitem>
-            <listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-client/&version;/jersey-client-&version;.jar">jersey-client</ulink></listitem>
+            <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.jersey-test-framework&amp;a=jersey-test-framework-grizzly&amp;v=&version;&amp;e=jar">jersey-test-framework-grizzly</ulink></listitem>
+            <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.jersey-test-framework&amp;a=jersey-test-framework-core&amp;v=&version;&amp;e=jar">jersey-test-framework-core</ulink></listitem>
+            <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-client&amp;v=&version;&amp;e=jar">jersey-client</ulink></listitem>
             <listitem><ulink url="http://download.java.net/maven/glassfish/org/glassfish/javax.servlet/3.0-b66/javax.servlet-3.0-b66.jar">javax.servlet</ulink></listitem>
             <listitem><ulink url="http://repo1.maven.org/maven2/junit/junit/4.5/junit-4.5.jar">junit</ulink></listitem>
             <listitem><ulink url="http://download.java.net/maven/2/com/sun/xml/bind/jaxb-impl/2.1/jaxb-impl-2.1.jar">jaxb-impl</ulink></listitem>

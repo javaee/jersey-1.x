@@ -194,10 +194,8 @@ URI offers;</programlisting>
   &lt;param-value&gt;com.sun.jersey.server.linking.LinkFilter&lt;/param-value&gt;
 &lt;/init-param&gt;
 </programlisting>
-<para>See the <ulink
-            url="http://download.java.net/maven/2/com/sun/jersey/samples/jersey-server-linking-sample/"
-            >jersey-server-linking-sample</ulink> for more details.</para>
+<para>See the <ulink url="https://maven.java.net/content/repositories/&repository;/com/sun/jersey/samples/jersey-server-linking-sample">jersey-server-linking-sample</ulink> for more details.</para>
     </section>
-    
-    
+
+
 </chapter>

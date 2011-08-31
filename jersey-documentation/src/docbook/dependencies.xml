@@ -189,13 +189,13 @@
     url="http://maven.apache.org/ant-tasks.html">Ant Tasks for Maven</ulink>
     may be used to add the following to the ant document such that the
     dependencies do not need to be downloaded explicitly: <programlisting language="xml">&lt;artifact:dependencies pathId="dependency.classpath"&gt;
-  &lt;dependency groupId="com.sun.jersey" 
+  &lt;dependency groupId="com.sun.jersey"
               artifactId="jersey-server"
               version="&version;"/&gt;
-  &lt;artifact:remoteRepository id="maven2-repository.java.net"
-                             url="http://download.java.net/maven/2/" /&gt;
   &lt;artifact:remoteRepository id="maven-repository.java.net"
-                             url="http://download.java.net/maven/1" 
+                             url="http://maven.java.net/" /&gt;
+  &lt;artifact:remoteRepository id="maven1-repository.java.net"
+                             url="http://download.java.net/maven/1"
                              layout="legacy" /&gt;
 &lt;/artifact:dependencies&gt;</programlisting> The path id
     “dependency.classpath” may then be referenced as the classpath to be used
@@ -294,8 +294,7 @@
       <title>Simple HTTP Web server</title>
 
       <para>Maven developers, deploying an application using the Simple HTTP
-      Web server, require a dependency on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-simple-server/&version;/jersey-simple-server-&version;.pom">jersey-simple-server</ulink>
+      Web server, require a dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.contribs&amp;a=jersey-simple-server&amp;v=&version;&amp;e=pom">jersey-simple-server</ulink>
       module.</para>
     </section>
     <section>
@@ -345,8 +344,7 @@
 
       <para>Maven developers, using JSON serialization support of JAXB beans
       when using the MIME media type <code>application/json</code> require a
-      dependency on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/&version;/jersey-json-&version;.pom">jersey-json</ulink>
+      dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-json&amp;v=&version;&amp;e=pom">jersey-json</ulink>
       module (no explicit dependency on jaxb-impl is required). This module
       depends on the JAXB reference implementation version 2.1.12 or greater,
       and such a version is required when enabling support for the JAXB
@@ -412,15 +410,11 @@
             <ulink
             url="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</ulink>
           </listitem>
-        </itemizedlist> and additionally, if not depending on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/&version;/jersey-bundle-&version;.jar">jersey-bundle.jar</ulink>,
-      non-maven developers require: <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/&version;/jersey-json-&version;.jar">jersey-json.jar</ulink></para>
-
+        </itemizedlist> and additionally, if not depending on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-bundle&amp;v=&version;&amp;e=jar">jersey-bundle.jar</ulink>,
+      non-maven developers require: <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-json&amp;v=&version;&amp;e=jar">jersey-json.jar</ulink></para>
       <para>Maven developers, using Fast Infoset serialization support of JAXB
       beans with using the MIME media type
-      <code>application/fastinfoset</code> require a dependency on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/&version;/jersey-fastinfoset-&version;.pom">jersey-fastinfoset</ulink>
+      <code>application/fastinfoset</code> require a dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-fastinfoset&amp;v=&version;&amp;e=pom">jersey-fastinfoset</ulink>
       module (no dependency on jaxb-impl is required). The following
       dependency needs to be added to the pom: <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
@@ -461,10 +455,8 @@
             <ulink
             url="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</ulink>
           </listitem>
-        </itemizedlist> and additionally, if not depending on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/&version;/jersey-bundle-&version;.jar">jersey-bundle.jar</ulink>,
-      non-maven developers require: <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-fastinfoset/&version;/jersey-fastinfoset-&version;.jar">jersey-fastinfoset.jar</ulink></para>
+        </itemizedlist> and additionally, if not depending on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-bundle&amp;v=&version;&amp;e=jar">jersey-bundle.jar</ulink>,
+      non-maven developers require: <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-fastinfoset&amp;v=&version;&amp;e=jar">jersey-fastinfoset.jar</ulink></para>
     </section>
 
     <section>
@@ -474,8 +466,7 @@
       <code>org.apache.abdera.model.{Categories, Entry, Feed, Service}</code>
       requires a dependency on Apache Abdera.</para>
 
-      <para>Maven developers require a dependency on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-atom-abdera/&version;/jersey-atom-abdera-&version;.pom">jersey-atom-abdera</ulink>
+      <para>Maven developers require a dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.contribs&amp;a=jersey-atom-abdera&amp;v=&version;&amp;e=pom">jersey-atom-abdera</ulink>
       module. The following dependency needs to be added to the pom:
       <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
@@ -488,8 +479,7 @@
       <code>com.sun.syndication.feed.atom.Feed</code> requires a dependency on
       ROME version 0.9 or higher.</para>
 
-      <para>Maven developers require a dependency on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/&version;/jersey-atom-&version;.pom">jersey-atom</ulink>
+      <para>Maven developers require a dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-atom&amp;v=&version;&amp;e=pom">jersey-atom</ulink>
       module. The following dependency needs to be added to the pom:
       <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
@@ -509,10 +499,8 @@
             <ulink
             url="http://repo1.maven.org/maven2/jdom/jdom/1.0/jdom-1.0.jar">jdom.jar</ulink>
           </listitem>
-        </itemizedlist> and additionally, if not depending on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/&version;/jersey-bundle-&version;.jar">jersey-bundle.jar</ulink>,
-      non-maven developers require: <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-atom/&version;/jersey-atom-&version;.jar">jersey-atom.jar</ulink></para>
+        </itemizedlist> and additionally, if not depending on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-bundle&amp;v=&version;&amp;e=jar">jersey-bundle.jar</ulink>,
+      non-maven developers require: <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-atom&amp;v=&version;&amp;e=jar">jersey-atom.jar</ulink></para>
     </section>
 
     <section>
@@ -523,8 +511,7 @@
       <code>org.codehaus.jettison.json.JSONArray</code> requires Jettison
       version 1.1 or higher.</para>
 
-      <para>Maven developers require a dependency on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/&version;/jersey-json-&version;.pom">jersey-json</ulink>
+      <para>Maven developers require a dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-json&amp;v=&version;&amp;e=pom">jersey-json</ulink>
       module. The following dependency needs to be added to the pom:
       <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
@@ -534,10 +521,8 @@
 
       <para>Non-maven developers require: <ulink
       url="http://repo1.maven.org/maven2/org/codehaus/jettison/jettison/1.1/jettison-1.1.jar">jettison.jar</ulink>
-      and additionally, if not depending on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-bundle/&version;/jersey-bundle-&version;.jar">jersey-bundle.jar</ulink>,
-      non-maven developers require: <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/jersey-json/&version;/jersey-json-&version;.jar">jersey-json.jar</ulink></para>
+      and additionally, if not depending on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-bundle&amp;v=&version;&amp;e=jar">jersey-bundle.jar</ulink>
+      non-maven developers require: <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-json&amp;v=&version;&amp;e=jar">jersey-json.jar</ulink></para>
     </section>
 
     <section>
@@ -566,8 +551,7 @@
         </itemizedlist></para>
 
       <para>Jersey ships with a high-level MIME multipart API. Maven
-      developers requires a dependency on the <ulink
-      url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/&version;/jersey-multipart-&version;.pom">jersey-multipart</ulink>
+      developers requires a dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.contribs&amp;a=jersey-multipart&amp;v=&version;&amp;e=pom">jersey-multipart</ulink>
       module. The following dependency needs to be added to the pom:
       <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
@@ -577,15 +561,13 @@
 
       <para>Non-maven developers require: <itemizedlist>
           <listitem>
-            <ulink
-            url="http://download.java.net/maven/2/org/jvnet/mimepull/1.3/mimepull-1.3.jar">mimepull.jar</ulink>
+            <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=org.jvnet&amp;a=mimepull&amp;v=1.3&amp;e=jar">mimepull.jar</ulink>
 
             ,
           </listitem>
 
           <listitem>
-            <ulink
-            url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-multipart/&version;/jersey-multipart-&version;.jar">jersey-multipart.jar</ulink>
+              <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.contribs&amp;a=jersey-multipart&amp;v=&version;&amp;e=jar">jersey-multipart.jar</ulink>
           </listitem>
         </itemizedlist></para>
     </section>
@@ -614,8 +596,7 @@
     <title>Spring</title>
 
     <para>Maven developers, using Spring 2.0.x or Spring 2.5.x, require a
-    dependency on the <ulink
-    url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-spring/&version;/jersey-spring-&version;.pom">jersey-spring</ulink>
+    dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.contribs&amp;a=jersey-spring&amp;v=&version;&amp;e=pom">jersey-spring</ulink>
     module. The following dependency needs to be added to the pom:
     <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
@@ -632,8 +613,7 @@
     <title>Guice</title>
 
     <para>Maven developers, using Guice 2.0, require a dependency on the
-    <ulink
-    url="http://download.java.net/maven/2/com/sun/jersey/contribs/jersey-guice/&version;/jersey-guice-&version;.pom">jersey-guice</ulink>
+    <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.contribs&amp;a=jersey-guice&amp;v=&version;&amp;e=pom">jersey-guice</ulink>
     module. The following dependency needs to be added to the pom:
     <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.contribs&lt;/groupId&gt;
@@ -684,8 +664,7 @@
     url="http://jersey.java.net/nonav/apidocs/&version;/jersey-test-framework/com/sun/jersey/test/framework/JerseyTest.html">JerseyTest</ulink>
     class.</para>
 
-    <para>Maven developers require a dependency on the <ulink
-    url="http://download.java.net/maven/2/com/sun/jersey/jersey-test-framework/jersey-test-framework-grizzly/&version;/jersey-test-framework-grizzly-&version;.pom">jersey-test-framework-grizzly</ulink>
+    <para>Maven developers require a dependency on the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.jersey-test-framework&amp;a=jersey-test-framework-grizzly&amp;v=&version;&amp;e=pom">jersey-test-framework-grizzly</ulink>
     module. The following dependency needs to be added to the pom:
     <programlisting language="xml">&lt;dependency&gt;
     &lt;groupId&gt;com.sun.jersey.jersey-test-framework&lt;/groupId&gt;

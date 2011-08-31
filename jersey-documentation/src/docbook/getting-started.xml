@@ -56,10 +56,10 @@ with a Web application.</para>
 <para>First, it is necessary to depend on the correct Jersey artifacts
 as described in <xref linkend="chapter_deps"/>
 </para>
-<para>Maven developers require a dependency on 
+<para>Maven developers require a dependency on
 
 <itemizedlist>
-  <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.pom">jersey-server</ulink> module, </listitem>
+   <listitem>the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=pom">jersey-server</ulink> module, </listitem>
    <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.pom">grizzly-servlet-webserver</ulink> module </listitem>
    <listitem>and optionally for WADL support if using Java SE 5 the <ulink url="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.12.pom">jaxb-impl</ulink> module</listitem>
  </itemizedlist>
@@ -81,9 +81,9 @@ And the following repositories need to be added to the pom:
 <programlisting language="xml">&lt;repository&gt;
     &lt;id&gt;maven2-repository.java.net&lt;/id&gt;
     &lt;name&gt;Java.net Repository for Maven&lt;/name&gt;
-    &lt;url&gt;http://download.java.net/maven/2/&lt;/url&gt;
+    &lt;url&gt;http://maven.java.net/&lt;/url&gt;
     &lt;layout&gt;default&lt;/layout&gt;
-&lt;/repository&gt; 
+&lt;/repository&gt;
 &lt;repository&gt;
     &lt;id&gt;maven-repository.java.net&lt;/id&gt;
     &lt;name&gt;Java.net Maven 1 Repository (legacy)&lt;/name&gt;
@@ -94,8 +94,8 @@ And the following repositories need to be added to the pom:
 Non-maven developers require:
 <itemizedlist>
 <listitem><ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.jar">grizzly-servlet-webserver.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-server/&version;/jersey-server-&version;.jar">jersey-server.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/2/com/sun/jersey/jersey-core/&version;/jersey-core-&version;.jar">jersey-core.jar</ulink>,</listitem>
+<listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=jar">jersey-server.jar</ulink>,</listitem>
+<listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-core&amp;v=&version;&amp;e=jar">jersey-core.jar</ulink>,</listitem>
 <listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/&jsr311.version;/jsr311-api-&jsr311.version;.jar">jsr311-api.jar</ulink>,</listitem>
 <listitem><ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</ulink></listitem>
 </itemizedlist></para>
@@ -113,16 +113,16 @@ Tasks for Maven</ulink> may be used to add the following to the ant
 document such that the dependencies do not need to be downloaded
 explicitly:</para>
 <programlisting language="xml">&lt;artifact:dependencies pathId=&quot;dependency.classpath&quot;&gt;
-  &lt;dependency groupId=&quot;com.sun.jersey&quot; 
+  &lt;dependency groupId=&quot;com.sun.jersey&quot;
               artifactId=&quot;jersey-server&quot;
               version=&quot;&version;&quot;/&gt;
-  &lt;dependency groupId=&quot;com.sun.grizzly&quot; 
+  &lt;dependency groupId=&quot;com.sun.grizzly&quot;
               artifactId=&quot;grizzly-servlet-webserver&quot;
               version=&quot;1.8.6.4&quot;/&gt;
-  &lt;artifact:remoteRepository id=&quot;maven2-repository.java.net&quot;
-                             url=&quot;http://download.java.net/maven/2/&quot; /&gt;
   &lt;artifact:remoteRepository id=&quot;maven-repository.java.net&quot;
-                             url=&quot;http://download.java.net/maven/1&quot; 
+                             url=&quot;http://maven.java.net/&quot; /&gt;
+  &lt;artifact:remoteRepository id=&quot;maven1-repository.java.net&quot;
+                             url=&quot;http://download.java.net/maven/1&quot;
                              layout=&quot;legacy&quot; /&gt;
 &lt;/artifact:dependencies&gt;</programlisting>
 
@@ -213,12 +213,12 @@ in your favourite browser.</para>
 
 <section id="getting.started.created">
 <title>Here's one Paul created earlier</title>
-<para>The example code presented above is shipped as the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld/&version;/helloworld-&version;-project.zip">HelloWorld</ulink>
+<para>The example code presented above is shipped as the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=helloworld&amp;v=&version;&amp;c=project&amp;e=zip">HelloWorld</ulink>
 sample in the Java.Net maven repository.</para>
 <para>For developers wishing to get started by deploying a Web
 application an equivalent sample, as a Web application, is shipped as
-the <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/helloworld-webapp/&version;/helloworld-webapp-&version;-project.zip">HelloWorld-WebApp</ulink>
+the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=helloworld-webapp&amp;v=&version;&amp;c=project&amp;e=zip">HelloWorld-WebApp</ulink>
 sample.</para>
 </section>
-  
+
 </chapter>

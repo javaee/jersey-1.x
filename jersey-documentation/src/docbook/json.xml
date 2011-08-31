@@ -99,24 +99,24 @@ The following snippet shows how to use the POJO mapping feature on the client si
 </para>
 
 <para>
-Jackson JSON processor could be futher controlled via providing custom Jackson <ulink url="http://jackson.codehaus.org/&jackson.javadoc.version;/javadoc/org/codehaus/jackson/map/ObjectMapper.html">ObjectMapper</ulink> instance. 
+Jackson JSON processor could be futher controlled via providing custom Jackson <ulink url="http://jackson.codehaus.org/&jackson.javadoc.version;/javadoc/org/codehaus/jackson/map/ObjectMapper.html">ObjectMapper</ulink> instance.
 This could be handy if you need to redefine the default Jackson behaviour and to fine-tune how your JSON data structures look like.
-Detailed description of all Jackson features is out of scope of this guide. The example bellow gives you a hint on how to wire 
-your ObjectMapper instance into your Jersey application. 
+Detailed description of all Jackson features is out of scope of this guide. The example bellow gives you a hint on how to wire
+your ObjectMapper instance into your Jersey application.
 </para>
 
-<para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jacksonjsonprovider/&version;/jacksonjsonprovider-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/jacksonjsonprovider/&version;/jacksonjsonprovider-&version;-project.zip</ulink>
+<para>Download <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=jacksonjsonprovider&amp;v=&version;&amp;c=project&amp;e=zip">https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=jacksonjsonprovider&amp;v=&version;&amp;c=project&amp;e=zip</ulink>
    to get a complete example using POJO based JSON support.
     </para>
-    
-  </section>  
-    
+
+  </section>
+
   <section>
     <title id="json.jaxb.approach.title">JAXB Based JSON support</title>
-    
+
     <para>
      Taking this approach will save you a lot of time, if you want to easily produce/consume both JSON and XML data format.
-     Because even then you will still be able to use a unified Java model. 
+     Because even then you will still be able to use a unified Java model.
      Another advantage is simplicity of working with such a model, as JAXB leverages annotated POJOs and these could be handled
      as simple Java beans
     </para>
@@ -523,29 +523,29 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
        </example>
        </para>
       </section>
-      
+
     </section>
 <section><title>Examples</title>
-   <para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/json-from-jaxb/&version;/json-from-jaxb-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/json-from-jaxb/&version;/json-from-jaxb-&version;-project.zip</ulink>
+   <para>Download <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=json-from-jaxb&amp;v=&version;&amp;c=project&amp;e=zip">https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=json-from-jaxb&amp;v=&version;&amp;c=project&amp;e=zip</ulink>
    or
-   <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/jmaki-backend/&version;/jmaki-backend-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/jmaki-backend/&version;/jmaki-backend-&version;-project.zip</ulink>
+   <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=jmaki-backend&amp;v=&version;&amp;c=project&amp;c=project&amp;e=zip">https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=jmaki-backend&amp;v=&version;&amp;c=project&amp;e=zip</ulink>
    to get a more complex example using JAXB based JSON support.
    </para>
    </section>
-  
-   </section>
-  
 
-  
-   
+   </section>
+
+
+
+
    <section>
     <title id="json.low.level.approach.title">Low-Level JSON support</title>
 
     <para>Using this approach means you will be using JSONObject and/or JSONArray classes for your data representations.
-    These classes are actually taken from Jettison project, but conform to the description 
+    These classes are actually taken from Jettison project, but conform to the description
     provided at <ulink url="http://www.json.org/java/index.html"> http://www.json.org/java/index.html</ulink>.
     </para>
-    
+
     <para>
     The biggest advantage here is, that you will gain full control over the JSON format produced and consumed.
     On the other hand, dealing with your data model objects will probably be a bit more complex, than when taking the JAXB based approach.
@@ -578,10 +578,10 @@ try {
 
     <section><title>Examples</title>
 
-   <para>Download <ulink url="http://download.java.net/maven/2/com/sun/jersey/samples/bookmark/&version;/bookmark-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/samples/bookmark/&version;/bookmark-&version;-project.zip</ulink> 
+   <para>Download  <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=bookmark&amp;v=&version;&amp;c=project&amp;e=zip">https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.samples&amp;a=bookmark&amp;v=&version;&amp;c=project&amp;e=zip</ulink>
    to get a more complex example using low-level JSON support.
    </para>
-   
+
   </section>
 </section>
 </chapter>

@@ -69,7 +69,7 @@
             environments support Maven and Maven archetypes, but to avoid narrowing this discussion
             to any specific development envinroment, we shall use command-line tools instead. To
             create the basic Web application execute the following command:
-            <programlisting>mvn archetype:generate -DarchetypeCatalog=http://download.java.net/maven/2</programlisting>
+            <programlisting>mvn archetype:generate -DarchetypeCatalog=http://maven.java.net/</programlisting>
             and select the <literal>jersey-quickstart-webapp</literal> option. When prompted choose
                 <literal>example.jersey.spring</literal> for the <literal>groupId</literal> and
             choose <literal>example-spring-jersey</literal> for the <literal>artifactId</literal>.

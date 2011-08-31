@@ -105,11 +105,9 @@ Stop all running server instances. Then remove the following files from the Glas
 
 Download the new Jersey version archive from
 
-                <ulink
-  url="http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-core/&version;/jersey-gfv3-core-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-core/&version;/jersey-gfv3-core-&version;-project.zip
-                </ulink>
-  
-and unzip it's 
+                <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.glassfish.v3&amp;a=jersey-gfv3-core&amp;v=&version;&amp;c=project&amp;e=zip">https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.glassfish.v3&amp;a=jersey-gfv3-core&amp;v=&version;&amp;c=project&amp;e=zip</ulink>
+
+and unzip it's
                 <literal>glassfish/modules</literal> content into the GlassFish installation directory (to the
                 <literal>glassfish/modules</literal> subdirectory there).
             </para>
@@ -117,11 +115,7 @@ and unzip it's
             <para>
 To install also Jersey examples in addition, download
 
-                <ulink
-  url="
-http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-docs-and-samples/&version;/jersey-gfv3-docs-and-samples-&version;-project.zip">
-http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-docs-and-samples/&version;/jersey-gfv3-docs-and-samples-&version;-project.zip
-                </ulink>
+                <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.glassfish.v3&amp;a=jersey-gfv3-docs-and-samples&amp;v=&version;&amp;c=project&amp;e=zip">https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.glassfish.v3&amp;a=jersey-gfv3-docs-and-samples&amp;v=&version;&amp;c=project&amp;e=zip</ulink>
 
 and unzip it's content into the GlassFish installation directory.
             </para>
@@ -154,16 +148,14 @@ Stop all running server instances. Then remove the following files from the Glas
                     <listitem>glassfish/modules/jackson-core-asl.jar</listitem>
                     <listitem>glassfish/modules/jackson-mapper-asl.jar</listitem>
                     <listitem>glassfish/modules/jackson-jaxrs.jar</listitem>
-                    <listitem>glassfish/modules/jettison.jar</listitem>                    
+                    <listitem>glassfish/modules/jettison.jar</listitem>
                 </itemizedlist>
 
 Download the new Jersey version archive from
 
-                <ulink
-  url="http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-core/&version;/jersey-gfv3-core-&version;-project.zip">http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-core/&version;/jersey-gfv3-core-&version;-project.zip
-                </ulink>
-  
-and unzip it's 
+                <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.glassfish.v3&amp;a=jersey-gfv3-core&amp;v=&version;&amp;c=project&amp;e=zip">https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.glassfish.v3&amp;a=jersey-gfv3-core&amp;v=&version;&amp;c=project&amp;e=zip</ulink>
+
+and unzip it's
                 <literal>glassfish/modules</literal> content into the GlassFish installation directory (to the
                 <literal>glassfish/modules</literal> subdirectory there).
             </para>
@@ -171,18 +163,14 @@ and unzip it's
             <para>
 To install also Jersey examples in addition, download (you can change the version in the link to get another non-snapshot version of Jersey)
 
-                <ulink
-  url="
-http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-docs-and-samples/&version;/jersey-gfv3-docs-and-samples-&version;-project.zip">
-http://download.java.net/maven/2/com/sun/jersey/glassfish/v3/jersey-gfv3-docs-and-samples/&version;/jersey-gfv3-docs-and-samples-&version;-project.zip
-                </ulink>
+                <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.glassfish.v3&amp;a=jersey-gfv3-docs-and-samples&amp;v=&version;&amp;c=project&amp;e=zip">https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.glassfish.v3&amp;a=jersey-gfv3-docs-and-samples&amp;v=&version;&amp;c=project&amp;e=zip</ulink>
 
 and unzip it's content into the GlassFish installation directory.
             </para>
             <para>
 To be 100 % sure the changes take effect, you might also want to remove the felix cache, which is located in
                 <literal>glassfish/domains/domain1/osgi-cache</literal> directory.
-This directory gets created upon the first start of the GlassFish instance.  
+This directory gets created upon the first start of the GlassFish instance.
             </para>
         </section>
     </section>
