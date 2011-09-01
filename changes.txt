@@ -1,4 +1,7 @@
 release 1.9
+- Fixed issue 761
+  http://java.net/jira/browse/JERSEY-761
+  Fix typo in com.sun.jersey.api.core.ResourceConfig
 - Cross-Site Request Forgery protection filters were added to jersey-server and jersey-client. On the server side, the filter checks for the custom header X-Requested-By for any potentially state changing methods (i.e. methods other than GET, HEAD and OPTIONS). If the header is not present, bad request error is returned to the client. The client side filter ensures the X-Requested-By header is added to the requests.
 - Wadl generator capable of generating XML schemas for params is used by default from now.
 - Added support for Freemarker templates, see contribs/jersey-freemarker and samples/freemarker

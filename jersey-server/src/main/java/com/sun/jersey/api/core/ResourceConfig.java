@@ -293,7 +293,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * each class is instantiated as a singleton. Thus, if there is more than one
      * class registered for this property or the same class is also registered for
      * the {@link #PROPERTY_CONTAINER_RESPONSE_FILTERS} property then only
-     * one instance will be instatiated.
+     * one instance will be instantiated.
      * 
      * @see com.sun.jersey.api.container.filter
      */
@@ -317,7 +317,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * each class is instantiated as a singleton. Thus, if there is more than one
      * class registered for this property or the same class is also registered for
      * the {@link #PROPERTY_CONTAINER_REQUEST_FILTERS} property then only
-     * one instance will be instatiated.
+     * one instance will be instantiated.
      *
      * @see com.sun.jersey.api.container.filter
      */
@@ -339,7 +339,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
      * <p>
      * If a String[] or String of fully qualified class names or a Class then
      * each class is instantiated as a singleton. Thus, if there is more than one
-     * class registered for this property one instance will be instatiated.
+     * class registered for this property one instance will be instantiated.
      * 
      * @see com.sun.jersey.api.container.filter
      */
