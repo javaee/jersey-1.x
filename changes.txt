@@ -1,4 +1,6 @@
-release 1.9
+release 1.10
+
+release 1.9 (09-2011)
 - Fixed issue 761
   http://java.net/jira/browse/JERSEY-761
   Fix typo in com.sun.jersey.api.core.ResourceConfig

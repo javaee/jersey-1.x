@@ -117,7 +117,7 @@
     </dependencies>
 
     <properties>
-        <jersey.version>1.9-SNAPSHOT</jersey.version>
+        <jersey.version>1.10-SNAPSHOT</jersey.version>
         <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
     </properties>
 </project>
