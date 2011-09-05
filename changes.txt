@@ -1,6 +1,10 @@
 release 1.10
 
 release 1.9 (09-2011)
+- Fixed issues 506 and 760
+  http://java.net/jira/browse/JERSEY-506
+  http://java.net/jira/browse/JERSEY-760
+  Improved heuristics to determine if servlet extension or path mapping was used. Passing the full servlet path to the resources if extension mapping is used.
 - Fixed issue 761
   http://java.net/jira/browse/JERSEY-761
   Fix typo in com.sun.jersey.api.core.ResourceConfig

@@ -65,6 +65,49 @@ public class PreliminaryAppTest extends JerseyTest {
     }
 
     @Test
+    public void testDotTxt() {
+        WebResource webResource = resource();
+        String response = webResource.path("preliminaryapp").path("txt").path("test.txt").get(String.class);
+        assertEquals("test.txt", response);
+    }
+
+    @Test
+    public void testDotSlashTxt() {
+        WebResource webResource = resource();
+        String response = webResource.path("preliminaryapp").path("txt").path("folder").path("test.txt").get(String.class);
+        assertEquals("folder/test.txt", response);
+    }
+
+    @Test
+    public void testDotTxtSlash() {
+        WebResource webResource = resource();
+        ClientResponse response = webResource.path("preliminaryapp").path("txt").path("test.txt")
+                .path("/").get(ClientResponse.class);
+        assertEquals("Expected response not seen.", 404, response.getStatus());
+    }
+
+    @Test
+    public void testNoAppMatch() {
+        WebResource webResource = resource();
+        ClientResponse response = webResource.path("preliminaryapp").path("txt").path("test").get(ClientResponse.class);
+        assertEquals("Expected response not seen.", 404, response.getStatus());
+    }
+
+    @Test
+    public void testRoot() {
+        WebResource webResource = resource();
+        String response = webResource.path("preliminaryapp").path("oneandtwo").path("/").get(String.class);
+        assertEquals("Expected response not seen.", "ROOT", response);
+    }
+
+    @Test
+    public void testRootWithoutSlash() {
+        WebResource webResource = resource();
+        String response = webResource.path("preliminaryapp").path("oneandtwo").get(String.class);
+        assertEquals("Expected response not seen.", "ROOT", response);
+    }
+
+    @Test
     public void testOneApplication() {
         WebResource webResource = resource();
         String response = webResource.path("preliminaryapp").path("oneonly").path("one").get(String.class);

@@ -98,9 +98,9 @@ import java.util.regex.PatternSyntaxException;
  * "javax.ws.rs.Application" and whose value is a
  * fully qualified name of a class that implements {@link ResourceConfig} or
  * {@link Application}.
- * If the concrete class has a constructor that takes a single parameter of the 
- * type Map then the class is instantiated with that constructor and an instance 
- * of Map that contains all the initialization parameters is passed as the 
+ * If the concrete class has a constructor that takes a single parameter of the
+ * type Map then the class is instantiated with that constructor and an instance
+ * of Map that contains all the initialization parameters is passed as the
  * parameter. Otherwise, the class is instantiated as a singleton component
  * managed by the runtime, and injection may be performed (the artifacts that
  * may be injected are limited to injectable providers registered when
@@ -109,30 +109,30 @@ import java.util.regex.PatternSyntaxException;
  * If the initialization parameter
  * "com.sun.jersey.config.property.resourceConfigClass" or
  * "javax.ws.rs.Application" is not present and a
- * initialization parameter "com.sun.jersey.config.property.packages" is present 
+ * initialization parameter "com.sun.jersey.config.property.packages" is present
  * (see {@link PackagesResourceConfig#PROPERTY_PACKAGES}) a new instance of
- * {@link PackagesResourceConfig} is created. The initialization parameter 
+ * {@link PackagesResourceConfig} is created. The initialization parameter
  * "com.sun.jersey.config.property.packages" MUST be set to provide one or
  * more package names. Each package name MUST be separated by ';'.
- * 
- * The package names are added as a property value to a Map instance using 
+ *
+ * The package names are added as a property value to a Map instance using
  * the property name (@link PackagesResourceConfig#PROPERTY_PACKAGES}. Any
- * additional initialization parameters are then added to the Map instance. 
- * Then that Map instance is passed to the constructor of 
+ * additional initialization parameters are then added to the Map instance.
+ * Then that Map instance is passed to the constructor of
  * {@link PackagesResourceConfig}.
- * 
+ *
  * <p>
  * If none of the above resource configuration related initialization parameters
  * are present a new instance of {@link WebAppResourceConfig} is created. The
  * initialization parameter "com.sun.jersey.config.property.classpath" MAY be
  * set to provide one or more resource paths. Each path MUST be separated by ';'.
- * 
+ *
  * The resource paths are added as a property value to a Map instance using
- * the property name (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any 
- * additional initialization parameters are then added to the Map instance. 
- * Then that Map instance is passed to the constructor of 
+ * the property name (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any
+ * additional initialization parameters are then added to the Map instance.
+ * Then that Map instance is passed to the constructor of
  * {@link WebAppResourceConfig}.
- * 
+ *
  * If the initialization parameter is not present then the following resource
  * paths are utilized:
  * "/WEB-INF/lib" and "/WEB-INF/classes".
@@ -145,7 +145,7 @@ import java.util.regex.PatternSyntaxException;
  * and {@link Application} classes using {@link javax.ws.rs.core.Context}:
  * {@link HttpServletRequest}, {@link HttpServletResponse},
  * {@link ServletContext}, {@link ServletConfig} and {@link WebConfig}.
- * If this class is used as a Servlet then the {@link ServletConfig} class may 
+ * If this class is used as a Servlet then the {@link ServletConfig} class may
  * be injected. If this class is used as a Filter then the {@link FilterConfig}
  * class may be injected. {@link WebConfig} may be injected to abstract
  * servlet or filter deployment.
@@ -154,7 +154,7 @@ import java.util.regex.PatternSyntaxException;
  * and overriding the method {@link #initiate(ResourceConfig, WebApplication)}
  * to initiate the {@link WebApplication} with the {@link IoCComponentProviderFactory}
  * instance.
- * 
+ *
  */
 public class ServletContainer extends HttpServlet implements Filter {
     /**
@@ -169,7 +169,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @since 1.5
      */
     public static final String GLASSFISH_DEFAULT_ERROR_PAGE_RESPONSE = "org.glassfish.web.isDefaultErrorPageEnabled";
-    
+
     /**
      * The servlet initialization property whose value is a fully qualified
      * class name of a class that implements {@link ResourceConfig} or
@@ -215,7 +215,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * <p>
      * For example if you set the value to
      * <code>/(image|css)/.*</code>
-     * then you can serve up images and CSS files for your Implicit or Explicit 
+     * then you can serve up images and CSS files for your Implicit or Explicit
      * Views while still processing your JAX-RS resources.
      */
     public static final String PROPERTY_WEB_PAGE_CONTENT_REGEX
@@ -235,7 +235,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * Application code, such as methods corresponding to sub-resource locators
      * may be invoked when this feature is enabled.
      * <p>
-     * This feature is an alternative to setting 
+     * This feature is an alternative to setting
      * {@link #PROPERTY_WEB_PAGE_CONTENT_REGEX} and requires less configuration.
      * However, application code, such as methods corresponding to sub-resource
      * locators, may be invoked when this feature is enabled.
@@ -300,7 +300,7 @@ public class ServletContainer extends HttpServlet implements Filter {
         InternalWebComponent(Application app) {
             super(app);
         }
-        
+
         @Override
         protected WebApplication create() {
             return ServletContainer.this.create();
@@ -358,7 +358,7 @@ public class ServletContainer extends HttpServlet implements Filter {
 
         return super.getServletContext();
     }
-    
+
     /**
      * Initiate the Web component.
      *
@@ -390,7 +390,7 @@ public class ServletContainer extends HttpServlet implements Filter {
     protected WebApplication create() {
         return WebApplicationFactory.createWebApplication();
     }
-    
+
     /**
      * Get the default resource configuration if one is not declared in the
      * web.xml.
@@ -471,7 +471,7 @@ public class ServletContainer extends HttpServlet implements Filter {
             rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_NOTIFIER, notifiers);
         }
     }
-    
+
     /**
      * Initiate the {@link WebApplication}.
      * <p>
@@ -539,7 +539,7 @@ public class ServletContainer extends HttpServlet implements Filter {
 
     /**
      * Destroy this Servlet or Filter.
-     * 
+     *
      */
     @Override
     public void destroy() {
@@ -548,9 +548,9 @@ public class ServletContainer extends HttpServlet implements Filter {
         }
     }
 
-    
+
     // Servlet
-    
+
     @Override
     public void init() throws ServletException {
         init(new WebServletConfig(this));
@@ -638,20 +638,29 @@ public class ServletContainer extends HttpServlet implements Filter {
         StringBuffer requestURL = request.getRequestURL();
         String requestURI = request.getRequestURI();
         final boolean checkPathInfo = pathInfo == null || pathInfo.isEmpty() || pathInfo.equals("/");
-        final boolean checkServletPath = servletPath == null || servletPath.isEmpty();
-        if (checkPathInfo && checkServletPath && !request.getRequestURI().endsWith("/")) {
-            if (webComponent.getResourceConfig().getFeature(ResourceConfig.FEATURE_REDIRECT)) {
-                URI l = UriBuilder.fromUri(request.getRequestURL().toString()).
-                        path("/").
-                        replaceQuery(request.getQueryString()).build();
+        if (checkPathInfo && !request.getRequestURI().endsWith("/")) {
+            // Only do this if the last segment of the servlet path does not contain '.'
+            // This handles the case when the extension mapping is used with the servlet
+            // see issue 506
+            // This solution does not require parsing the deployment descriptor,
+            // however still leaves it broken for the very rare case if a standard path
+            // servlet mapping would include dot in the last segment (e.g. /.webresources/*)
+            // and somebody would want to hit the root resource without the trailing slash
+            int i = servletPath.lastIndexOf("/");
+            if (servletPath.substring(i + 1).indexOf('.') < 0) {
+                if (webComponent.getResourceConfig().getFeature(ResourceConfig.FEATURE_REDIRECT)) {
+                    URI l = UriBuilder.fromUri(request.getRequestURL().toString()).
+                            path("/").
+                            replaceQuery(request.getQueryString()).build();
 
-                response.setStatus(307);
-                response.setHeader("Location", l.toASCIIString());
-                return;
-            } else {
-                pathInfo = "/";
-                requestURL.append("/");
-                requestURI += "/";
+                    response.setStatus(307);
+                    response.setHeader("Location", l.toASCIIString());
+                    return;
+                } else {
+                    pathInfo = "/";
+                    requestURL.append("/");
+                    requestURI += "/";
+                }
             }
         }
 
@@ -775,7 +784,7 @@ public class ServletContainer extends HttpServlet implements Filter {
             }
         }
     }
-    
+
     /**
      * Dispatches client requests to the {@link #doFilter(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, javax.servlet.FilterChain) }
      * method.
@@ -807,7 +816,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * is forwarded to the next filter in the filter chain so that the
      * underlying servlet engine can process the request otherwise Jersey
      * will process the request.
-     * 
+     *
      * @param request the {@link HttpServletRequest} object that
      *        contains the request the client made to
      *	      the servlet.
@@ -839,7 +848,7 @@ public class ServletContainer extends HttpServlet implements Filter {
 
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
             String requestURI, String servletPath, String queryString) throws IOException, ServletException {
-        // if we match the static content regular expression lets delegate to 
+        // if we match the static content regular expression lets delegate to
         // the filter chain to use the default container servlets & handlers
         final Pattern p = getStaticContentPattern();
         if (p != null && p.matcher(servletPath).matches()) {
@@ -890,9 +899,9 @@ public class ServletContainer extends HttpServlet implements Filter {
         if (forwardOn404 && status == 404 && !response.isCommitted()) {
             // lets clear the response to OK before we forward to the next in the chain
             // as OK is the default set by servlet containers before filters/servlets do any wor
-            // so lets hide our footsteps and pretend we were never in the chain at all and let the 
+            // so lets hide our footsteps and pretend we were never in the chain at all and let the
             // next filter or servlet return the 404 if they can't find anything to return
-            // 
+            //
             // We could add an optional flag to disable this step if anyone can ever find a case where
             // this causes a problem, though I suspect any problems will really be with downstream
             // servlets not correctly setting an error status if they cannot find something to return
