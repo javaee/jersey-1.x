@@ -44,66 +44,173 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.filter.PostReplaceFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.impl.AbstractResourceTester;
 import java.util.Arrays;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
+ * @author Martin Matula
  */
 public class PostToPutDeleteTest extends AbstractResourceTester {
-    
+
     @Path("/")
     public static class Resource {
+        @GET
+        public String get(@QueryParam("a") String a) { return "GET: " + a; }
+
         @PUT
         public String put() { return "PUT"; }
-        
+
         @DELETE
         public String delete() { return "DELETE"; }
-        
+
         @POST
         public String post() { return "POST"; }
     }
-    
+
     public PostToPutDeleteTest(String testName) {
         super(testName);
     }
-        
-    
-    public void testWithInstance() {
+
+    public void initWithInstance(PostReplaceFilter.ConfigFlag... flags) {
         ResourceConfig rc = new DefaultResourceConfig(Resource.class);
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
-                Arrays.asList(new PostReplaceFilter()));
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+                Arrays.asList(new PostReplaceFilter(flags)));
         initiateWebApplication(rc);
-        _test();
     }
-    
-    public void testWithString() {
+
+    public void initWithString(PostReplaceFilter.ConfigFlag... flags) {
+        StringBuilder flagsSB = null;
+        if (flags != null) {
+            flagsSB = new StringBuilder();
+            for (PostReplaceFilter.ConfigFlag f : flags) {
+                flagsSB.append(f.name()).append(",");
+            }
+        }
         ResourceConfig rc = new DefaultResourceConfig(Resource.class);
-        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 PostReplaceFilter.class.getName());
+        if (flagsSB != null) {
+            rc.getProperties().put(PostReplaceFilter.PROPERTY_POST_REPLACE_FILTER_CONFIG, flagsSB.toString());
+        }
         initiateWebApplication(rc);
-        _test();
     }
-    
-    public void _test() {
-        WebResource r = resource("/", false);
-        
-        String s = r.header("X-HTTP-Method-Override", "PUT").post(String.class);
-        assertEquals("PUT", s);
-        
-        s = r.header("X-HTTP-Method-Override", "DELETE").post(String.class);
-        assertEquals("DELETE", s);
-        
-        ClientResponse cr = r.header("X-HTTP-Method-Override", "PATCH").
-                post(ClientResponse.class);
-        assertEquals(405, cr.getStatus());
-        
-        s = r.post(String.class);
-        assertEquals("POST", s);
+
+
+    public ClientResponse[] _testWithInstance(String uri, String method, PostReplaceFilter.ConfigFlag... flags) {
+        initWithInstance(flags);
+        return _test(uri, method);
+    }
+
+    public ClientResponse[] _testWithString(String uri, String method, PostReplaceFilter.ConfigFlag... flags) {
+        initWithString(flags);
+        return _test(uri, method);
+    }
+
+    public void testPutWithInstance() {
+        assertResponseEquals("PUT,PUT,PUT,", _testWithInstance("/", "PUT"));
+    }
+
+    public void testDeleteWithString() {
+        assertResponseEquals("DELETE,DELETE,DELETE,", _testWithString("/", "DELETE"));
+    }
+
+    public void testGetWithString() {
+        assertResponseEquals("GET: null,GET: null,GET: null,", _testWithString("/", "GET"));
+    }
+
+    public void testGetWithParamsWithInstance() {
+        assertResponseEquals("GET: test,GET: test,GET: test,", _testWithInstance(UriBuilder.fromPath("/").queryParam("a", "test").build().toString(), "GET"));
+    }
+
+    public void testPutHeaderOnlyWithInstance() {
+        assertResponseEquals("PUT,POST,PUT,", _testWithInstance("/", "PUT", PostReplaceFilter.ConfigFlag.HEADER));
+    }
+
+    public void testPutHeaderAndQueryWithInstance() {
+        assertResponseEquals("PUT,PUT,PUT,", _testWithInstance("/", "PUT", PostReplaceFilter.ConfigFlag.HEADER, PostReplaceFilter.ConfigFlag.QUERY));
+    }
+
+    public void testDeleteQueryOnlyWithString() {
+        assertResponseEquals("POST,DELETE,DELETE,", _testWithString("/", "DELETE", PostReplaceFilter.ConfigFlag.QUERY));
+    }
+
+    public void testDeleteHeaderAndQueryWithString() {
+        assertResponseEquals("DELETE,DELETE,DELETE,", _testWithString("/", "DELETE", PostReplaceFilter.ConfigFlag.QUERY, PostReplaceFilter.ConfigFlag.HEADER));
+    }
+
+    public void testConflictingMethodsWithInstance() {
+        initWithInstance();
+        ClientResponse cr = resource("/", false).queryParam("_method", "PUT").header("X-HTTP-Method-Override", "DELETE").post(ClientResponse.class);
+        assertEquals(ClientResponse.Status.BAD_REQUEST.getStatusCode(), cr.getStatus());
+    }
+
+    public void testUnsupportedMethodWithInstance() {
+        assertResponseEquals("405,405,405,", _testWithInstance("/", "PATCH"));
+    }
+
+    public void testUnsupportedMethodWithString() {
+        assertResponseEquals("405,405,405,", _testWithString("/", "PATCH"));
+    }
+
+    public void testGetWithFormParamsWithString() {
+        initWithString();
+        Form f = new Form();
+        f.add("a", "test");
+        String result = resource("/", false).queryParam("_method", "GET").type(MediaType.APPLICATION_FORM_URLENCODED_TYPE).entity(f).post(String.class);
+        assertEquals("GET: test", result);
+    }
+
+    public void testGetWithOtherEntityWithInstance() {
+        initWithInstance();
+        String result = resource("/", false).queryParam("_method", "GET").type(MediaType.TEXT_PLAIN).entity("a=test").post(String.class);
+        assertEquals("GET: null", result);
+    }
+
+    public void testPostWithInstance() {
+        initWithInstance();
+        String result = resource("/", false).post(String.class);
+        assertEquals("POST", result);
+    }
+
+    public void testPostWithString() {
+        initWithString();
+        String result = resource("/", false).post(String.class);
+        assertEquals("POST", result);
+    }
+
+    public ClientResponse[] _test(String uri, String method) {
+        ClientResponse[] result = new ClientResponse[3];
+        WebResource r = resource(uri.toString(), false);
+
+        result[0] = r.header("X-HTTP-Method-Override", method).post(ClientResponse.class);
+        result[1] = r.queryParam("_method", method).post(ClientResponse.class);
+        result[2] = r.queryParam("_method", method).header("X-HTTP-Method-Override", method).post(ClientResponse.class);
+        return result;
+    }
+
+    public void assertResponseEquals(String expected, ClientResponse[] responses) {
+        StringBuilder result = new StringBuilder();
+
+        for (ClientResponse r : responses) {
+            if (r.getStatus() == ClientResponse.Status.OK.getStatusCode()) {
+                result.append(r.getEntity(String.class));
+            } else {
+                result.append(r.getStatus());
+            }
+            result.append(",");
+        }
+
+        assertEquals(expected, result.toString());
     }
 }

@@ -1,10 +1,18 @@
 release 1.10
-
-release 1.9 (09-2011)
+- Fixed issues 65, 166, 220
+  http://java.net/jira/browse/JERSEY-65
+  http://java.net/jira/browse/JERSEY-166
+  http://java.net/jira/browse/JERSEY-220
+  Extended the functionality of PostReplaceFilter to add support for:
+    - specifying the overriding method in the query parameter (besides the existing header support)
+    - configuration property, so that user can choose if both the header as well as the query param should be supported
+    - converting form parameters to query parameters in case of overriding to GET
 - Fixed issues 506 and 760
   http://java.net/jira/browse/JERSEY-506
   http://java.net/jira/browse/JERSEY-760
   Improved heuristics to determine if servlet extension or path mapping was used. Passing the full servlet path to the resources if extension mapping is used.
+
+release 1.9 (09-2011)
 - Fixed issue 761
   http://java.net/jira/browse/JERSEY-761
   Fix typo in com.sun.jersey.api.core.ResourceConfig
