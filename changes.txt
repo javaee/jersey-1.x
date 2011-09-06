@@ -1,4 +1,7 @@
 release 1.10
+
+release 1.9.1
+- Fixed an issue in OAuthClientFilter causing it to ask for a new request token instead of resuming the authentication after the authentication flow gets suspended to retrieve the verifier code.
 - Fixed issues 65, 166, 220
   http://java.net/jira/browse/JERSEY-65
   http://java.net/jira/browse/JERSEY-166
