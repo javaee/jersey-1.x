@@ -41,6 +41,8 @@
 package com.sun.jersey.core.provider.jaxb;
 
 import com.sun.jersey.core.impl.provider.entity.Inflector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -61,13 +63,18 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
+import java.util.TreeSet;
 import javax.xml.bind.JAXBElement;
 
 /**
@@ -76,7 +83,16 @@ import javax.xml.bind.JAXBElement;
  */
 /**
  * An abstract provider for <code>T[]</code>, <code>Collection&lt;T&gt;</code>,
- * or <code>List&lt;T&gt;</code> where <code>T</code> is a JAXB types annotated with
+ * and its subtypes as long as they have the public default constructor or
+ * are interfaces implemented by one the following classes:
+ * <ul>
+ * <li>{@link ArrayList}</li>
+ * <li>{@link LinkedList}</li>
+ * <li>{@link HashSet}</li>
+ * <li>{@link TreeSet}</li>
+ * <li>{@link Stack}</li>
+ * </ul>
+ * <code>T</code> must be a JAXB type annotated with
  * {@link XmlRootElement}.
  * <p>
  * Implementing classes may extend this class to provide specific marshalling
@@ -93,8 +109,16 @@ import javax.xml.bind.JAXBElement;
  * (Internal Server error).
  *
  * @author Paul.Sandoz@Sun.Com
+ * @author Martin Matula
  */
 public abstract class AbstractListElementProvider extends AbstractJAXBProvider<Object> {
+    private static final Class[] DEFAULT_IMPLS = new Class[] {
+        ArrayList.class,
+        LinkedList.class,
+        HashSet.class,
+        TreeSet.class,
+        Stack.class
+    };
 
     public AbstractListElementProvider(Providers ps) {
         super(ps);
@@ -106,7 +130,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        if (type == List.class || type == Collection.class) {
+        if (verifyCollectionSubclass(type)) {
             return verifyGenericType(genericType) && isSupported(mediaType);
         } else if (type.isArray()) {
             return verifyArrayType(type) && isSupported(mediaType);
@@ -116,12 +140,30 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
-        if (List.class.isAssignableFrom(type)) {
+        if (Collection.class.isAssignableFrom(type)) {
             return verifyGenericType(genericType) && isSupported(mediaType);
         } else if (type.isArray()) {
             return verifyArrayType(type) && isSupported(mediaType);
         } else
             return false;
+    }
+
+    private boolean verifyCollectionSubclass(Class<?> type) {
+        try {
+            if (Collection.class.isAssignableFrom(type)) {
+                for (Class c : DEFAULT_IMPLS) {
+                    if (type.isAssignableFrom(c)) {
+                        return true;
+                    }
+                }
+                return !Modifier.isAbstract(type.getModifiers()) && Modifier.isPublic(type.getConstructor().getModifiers());
+            }
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(AbstractListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(AbstractListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 
     private boolean verifyArrayType(Class type) {
@@ -213,8 +255,29 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             final Class elementType = getElementClass(type, genericType);                
             final Unmarshaller u = getUnmarshaller(elementType, mediaType);            
             final XMLStreamReader r = getXMLStreamReader(elementType, mediaType, u, entityStream);
-            final List l = new ArrayList();
             boolean jaxbElement = false;
+
+            Collection l = null;
+            if (type.isArray()) {
+                l = new ArrayList();
+            } else {
+                try {
+                    l = (Collection) type.newInstance();
+                } catch (Exception e) {
+                    for (Class c : DEFAULT_IMPLS) {
+                        if (type.isAssignableFrom(c)) {
+                            try {
+                                l = (Collection) c.newInstance();
+                                break;
+                            } catch (InstantiationException ex) {
+                                Logger.getLogger(AbstractListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IllegalAccessException ex) {
+                                Logger.getLogger(AbstractListElementProvider.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                }
+            }
 
             // Move to root element
             int event = r.next();
@@ -245,7 +308,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             }
 
             return (type.isArray())
-                    ? createArray(l, jaxbElement ? JAXBElement.class : elementType)
+                    ? createArray((List) l, jaxbElement ? JAXBElement.class : elementType)
                     : l;
         } catch (UnmarshalException ex) {
             throw new WebApplicationException(ex, Status.BAD_REQUEST);

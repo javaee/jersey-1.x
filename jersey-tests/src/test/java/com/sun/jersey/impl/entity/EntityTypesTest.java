@@ -91,7 +91,14 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeSet;
 
 /**
  * @author Paul.Sandoz@Sun.Com
@@ -799,6 +806,30 @@ public class EntityTypesTest extends AbstractTypeTester {
             return l;
         }
 
+        @POST
+        @Path("set")
+        public Set<JAXBBean> postSet(Set<JAXBBean> l) {
+            return l;
+        }
+
+        @POST
+        @Path("queue")
+        public Queue<JAXBBean> postQueue(Queue<JAXBBean> l) {
+            return l;
+        }
+
+        @POST
+        @Path("stack")
+        public Stack<JAXBBean> postStack(Stack<JAXBBean> l) {
+            return l;
+        }
+
+        @POST
+        @Path("custom")
+        public MyArrayList<JAXBBean> postCustom(MyArrayList<JAXBBean> l) {
+            return l;
+        }
+
         @GET
         public Collection<JAXBBean> get() {
             ArrayList<JAXBBean> l = new ArrayList<JAXBBean>();
@@ -889,6 +920,44 @@ public class EntityTypesTest extends AbstractTypeTester {
                 new GenericEntity<Collection<JAXBBean>>(a) {
                 });
         assertEquals(a, b);
+
+        a = new LinkedList(a);
+        b = r.path("queue").type("application/foo+xml").post(new GenericType<Queue<JAXBBean>>() {
+        },
+                new GenericEntity<Queue<JAXBBean>>((Queue) a) {
+                });
+        assertEquals(a, b);
+
+        a = new HashSet(a);
+        b = r.path("set").type("application/foo+xml").post(new GenericType<Set<JAXBBean>>() {
+        },
+                new GenericEntity<Set<JAXBBean>>((Set) a) {
+                });
+        Comparator<JAXBBean> c = new Comparator<JAXBBean>() {
+            @Override
+            public int compare(JAXBBean t, JAXBBean t1) {
+                return t.value.compareTo(t1.value);
+            }
+        };
+        TreeSet t1 = new TreeSet(c), t2 = new TreeSet(c);
+        t1.addAll(a);
+        t2.addAll(b);
+        assertEquals(t1 , t2);
+
+        Stack s = new Stack();
+        s.addAll(a);
+        b = r.path("stack").type("application/foo+xml").post(new GenericType<Stack<JAXBBean>>() {
+        },
+                new GenericEntity<Stack<JAXBBean>>(s) {
+                });
+        assertEquals(s, b);
+
+        a = new MyArrayList(a);
+        b = r.path("custom").type("application/foo+xml").post(new GenericType<MyArrayList<JAXBBean>>() {
+        },
+                new GenericEntity<MyArrayList<JAXBBean>>((MyArrayList) a) {
+                });
+        assertEquals(a, b);
     }
 
 
@@ -931,6 +1000,44 @@ public class EntityTypesTest extends AbstractTypeTester {
                 new GenericEntity<Collection<JAXBBean>>(a) {
                 });
         assertEquals(a, b);
+
+        a = new LinkedList(a);
+        b = r.path("queue").type("application/fastinfoset").post(new GenericType<Queue<JAXBBean>>() {
+        },
+                new GenericEntity<Queue<JAXBBean>>((Queue) a) {
+                });
+        assertEquals(a, b);
+
+        a = new HashSet(a);
+        b = r.path("set").type("application/fastinfoset").post(new GenericType<Set<JAXBBean>>() {
+        },
+                new GenericEntity<Set<JAXBBean>>((Set) a) {
+                });
+        Comparator<JAXBBean> c = new Comparator<JAXBBean>() {
+            @Override
+            public int compare(JAXBBean t, JAXBBean t1) {
+                return t.value.compareTo(t1.value);
+            }
+        };
+        TreeSet t1 = new TreeSet(c), t2 = new TreeSet(c);
+        t1.addAll(a);
+        t2.addAll(b);
+        assertEquals(t1 , t2);
+
+        Stack s = new Stack();
+        s.addAll(a);
+        b = r.path("stack").type("application/fastinfoset").post(new GenericType<Stack<JAXBBean>>() {
+        },
+                new GenericEntity<Stack<JAXBBean>>(s) {
+                });
+        assertEquals(s, b);
+
+        a = new MyArrayList(a);
+        b = r.path("custom").type("application/fastinfoset").post(new GenericType<MyArrayList<JAXBBean>>() {
+        },
+                new GenericEntity<MyArrayList<JAXBBean>>((MyArrayList) a) {
+                });
+        assertEquals(a, b);
     }
 
     @Path("/")
@@ -957,6 +1064,44 @@ public class EntityTypesTest extends AbstractTypeTester {
         b = r.path("type").type("application/json").post(new GenericType<Collection<JAXBBean>>() {
         },
                 new GenericEntity<Collection<JAXBBean>>(a) {
+                });
+        assertEquals(a, b);
+
+        a = new LinkedList(a);
+        b = r.path("queue").type("application/json").post(new GenericType<Queue<JAXBBean>>() {
+        },
+                new GenericEntity<Queue<JAXBBean>>((Queue) a) {
+                });
+        assertEquals(a, b);
+
+        a = new HashSet(a);
+        b = r.path("set").type("application/json").post(new GenericType<Set<JAXBBean>>() {
+        },
+                new GenericEntity<Set<JAXBBean>>((Set) a) {
+                });
+        Comparator<JAXBBean> c = new Comparator<JAXBBean>() {
+            @Override
+            public int compare(JAXBBean t, JAXBBean t1) {
+                return t.value.compareTo(t1.value);
+            }
+        };
+        TreeSet t1 = new TreeSet(c), t2 = new TreeSet(c);
+        t1.addAll(a);
+        t2.addAll(b);
+        assertEquals(t1 , t2);
+
+        Stack s = new Stack();
+        s.addAll(a);
+        b = r.path("stack").type("application/json").post(new GenericType<Stack<JAXBBean>>() {
+        },
+                new GenericEntity<Stack<JAXBBean>>(s) {
+                });
+        assertEquals(s, b);
+
+        a = new MyArrayList(a);
+        b = r.path("custom").type("application/json").post(new GenericType<MyArrayList<JAXBBean>>() {
+        },
+                new GenericEntity<MyArrayList<JAXBBean>>((MyArrayList) a) {
                 });
         assertEquals(a, b);
 

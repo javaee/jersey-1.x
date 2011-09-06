@@ -121,6 +121,7 @@ public class XMLListElementProvider extends AbstractListElementProvider {
         return xif.getValue().createXMLStreamReader(entityStream);
     }
     
+    @Override
     public final void writeList(Class<?> elementType, Collection<?> t,
             MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
