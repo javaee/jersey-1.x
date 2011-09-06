@@ -44,7 +44,7 @@ import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.core.WebAppResourceConfig;
+import com.sun.jersey.api.core.servlet.WebAppResourceConfig;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.server.impl.application.DeferredResourceConfig;
