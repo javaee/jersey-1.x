@@ -47,7 +47,7 @@ import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.TraceInformation;
-import com.sun.jersey.api.core.WebAppResourceConfig;
+import com.sun.jersey.api.core.servlet.WebAppResourceConfig;
 import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.header.MediaTypes;

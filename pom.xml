@@ -239,6 +239,7 @@
         <module>jersey-json</module>
         <module>jersey-server-linking</module>
         <module>jersey-server</module>
+        <module>jersey-servlet</module>
         <module>jersey-test-framework</module>
         <module>jersey-tests</module>
         <module>samples</module>

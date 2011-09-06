@@ -1,4 +1,7 @@
 release 1.10
+- *Breaking change*
+  Servlet, EJB and CDI integration separated out from the jersey-server module
+  When using Jersey in a Servlet container, jersey-server dependency need to be replaced with jersey-servlet
 
 release 1.9.1
 - Fixed an issue in OAuthClientFilter causing it to ask for a new request token instead of resuming the authentication after the authentication flow gets suspended to retrieve the verifier code.

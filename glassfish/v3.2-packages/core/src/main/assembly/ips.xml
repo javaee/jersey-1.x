@@ -13,6 +13,7 @@
       <directory>target/assembly</directory>
       <includes>
         <include>jersey-core.jar</include>
+        <include>jersey-servlet.jar</include>
         <include>jersey-gf-server.jar</include>
         <include>jersey-client.jar</include>
         <include>jersey-json.jar</include>

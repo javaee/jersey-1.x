@@ -62,7 +62,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
+                    <artifactId>jersey-servlet</artifactId>
                     <version>${project.version}</version>
                     <!--<scope>provided</scope>-->
                     <classifier>cobertura</classifier>
@@ -99,7 +99,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
+                    <artifactId>jersey-servlet</artifactId>
                     <version>${project.version}</version>
                     <!--<scope>provided</scope>-->
                 </dependency>
@@ -150,7 +150,7 @@
                 <dependencies>
                     <dependency>
                         <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-server</artifactId>
+                        <artifactId>jersey-servlet</artifactId>
                         <version>${project.version}</version>
                     </dependency>
                     <dependency>

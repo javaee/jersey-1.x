@@ -37,7 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.spi.scanning;
+package com.sun.jersey.spi.scanning.servlet;
 
 import com.sun.jersey.core.spi.scanning.JarFileScanner;
 import com.sun.jersey.core.spi.scanning.Scanner;

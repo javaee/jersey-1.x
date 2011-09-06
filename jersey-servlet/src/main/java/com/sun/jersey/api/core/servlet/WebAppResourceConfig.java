@@ -38,9 +38,11 @@
  * holder.
  */
 
-package com.sun.jersey.api.core;
+package com.sun.jersey.api.core.servlet;
 
-import com.sun.jersey.spi.scanning.WebAppResourcesScanner;
+import com.sun.jersey.api.core.ClasspathResourceConfig;
+import com.sun.jersey.api.core.ScanningResourceConfig;
+import com.sun.jersey.spi.scanning.servlet.WebAppResourcesScanner;
 
 import javax.servlet.ServletContext;
 import java.util.Map;

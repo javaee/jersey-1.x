@@ -181,7 +181,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
+                    <artifactId>jersey-servlet</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -254,7 +254,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
+                    <artifactId>jersey-servlet</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -340,7 +340,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
+                    <artifactId>jersey-servlet</artifactId>
                     <version>${project.version}</version>
                 </dependency>
                 <dependency>
@@ -411,7 +411,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
+                    <artifactId>jersey-servlet</artifactId>
                     <version>${project.version}</version>
                     <classifier>cobertura</classifier>
                 </dependency>
