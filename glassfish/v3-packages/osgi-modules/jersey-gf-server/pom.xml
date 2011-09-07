@@ -89,19 +89,14 @@
                         <Import-Package>
                             com.sun.grizzly.*;resolution:="optional",
                             com.sun.net.httpserver;resolution:="optional",
-                            javax.ejb;version="3.1";resolution:="optional",
-                            javax.interceptor;version="3.1";resolution:="optional",
                             javax.mail.*;resolution:="optional",
                             javax.persistence;resolution:="optional",
-                            javax.servlet.*;resolution:="optional",
                             javax.xml.bind.*;resolution:="optional",
                             javax.xml.namespace;resolution:="optional",
                             javax.xml.transform.*;resolution:="optional",
-                            org.apache.tools.ant.*;resolution:="optional",
                             org.objectweb.asm.*;password=GlassFish;version="3.1",
                             javax.mail.*;resolution:=optional,
                             javax.annotation.*;resolution:=optional,
-                            javax.enterprise.*;resolution:=optional,
                             com.sun.jersey.core.osgi;resolution:=optional,
                             *
                         </Import-Package>

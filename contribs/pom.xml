@@ -59,6 +59,7 @@
         with other projects/frameworks.
     </description>
     <modules>
+	<module>ant-wadl-task</module>
         <module>spring</module>
         <module>maven-wadl-plugin</module>
         <module>wadl-resourcedoc-doclet</module>

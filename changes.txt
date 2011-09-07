@@ -1,5 +1,7 @@
 release 1.10
 - *Breaking change*
+  Ant task for generating WADL moved from jersey-server to a newly created contribs/ant-wadl-task module
+- *Breaking change*
   Servlet, EJB and CDI integration separated out from the jersey-server module
   When using Jersey in a Servlet container, jersey-server dependency need to be replaced with jersey-servlet
 
