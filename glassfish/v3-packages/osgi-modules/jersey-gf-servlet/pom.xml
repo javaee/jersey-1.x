@@ -41,146 +41,30 @@
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.sun.jersey</groupId>
-        <artifactId>jersey-project</artifactId>
-        <version>1.10-SNAPSHOT</version>
+      <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+      <artifactId>osgi-modules</artifactId>
+      <version>1.10-SNAPSHOT</version>
     </parent>
-    <artifactId>jersey-servlet</artifactId>
-    <packaging>bundle</packaging>
-    <name>jersey-servlet</name>
-    <dependencies>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.ejb</artifactId>
-            <version>3.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.weld</groupId>
-            <artifactId>weld-osgi-bundle</artifactId>
-            <version>1.1.0.Final</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.persistence</groupId>
-            <artifactId>persistence-api</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>ant</groupId>
-            <artifactId>ant</artifactId>
-            <version>1.6.5</version>
-            <scope>provided</scope>
-        </dependency>
-       <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi_R4_core</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>1.3.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <links>
-                                <link>http://jsr311.java.net/nonav/releases/1.1</link>
-                            </links>
-                            <excludePackageNames>com.sun.jersey.server.impl:com.sun.research.ws.wadl</excludePackageNames>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>cobertura</id>
-            <activation>
-                <property>
-                    <name>cobertura</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
-                    <version>${project.version}</version>
-                    <classifier>cobertura</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>default</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-server</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+    <artifactId>jersey-gf-servlet</artifactId>
+    <packaging>jar</packaging> 
+    <name>Jersey servlet library repackaged as OSGi bundle for GlassFish</name>
+    <description>Module repackaging of the Jersey servlet library</description>
 
     <build>
         <resources>
-            <resource>
-                <directory>${basedir}/src/main/java</directory>
-                <includes>
-                    <include>META-INF/**/*</include>
-                </includes>
-            </resource>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
                 <filtering>true</filtering>
             </resource>
         </resources>
-
         <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Private-Package>
@@ -196,7 +80,7 @@
                             <!-- the following is being used internally in GF REST API code! :-( -->
 			    com.sun.jersey.server.impl.container.servlet
                         </Export-Package>
-                        <Import-Package>
+                       <Import-Package>
                             com.sun.net.httpserver;resolution:="optional",
                             javax.ejb;version="3.1";resolution:="optional",
                             javax.interceptor;version="3.1";resolution:="optional",
@@ -206,7 +90,7 @@
                             javax.xml.bind.*;resolution:="optional",
                             javax.xml.namespace;resolution:="optional",
                             javax.xml.transform.*;resolution:="optional",
-                            org.objectweb.asm.*;resolution:="optional",
+                            org.objectweb.asm.*;password=GlassFish;version="3.1",
                             javax.mail.*;resolution:=optional,
                             javax.annotation.*;resolution:=optional,
                             javax.enterprise.*;resolution:=optional,
@@ -215,19 +99,16 @@
                             *
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
+                        <Embed-Dependency>jersey-servlet;inline=META-INF/services/**|META-INF/taglib.tld|META-INF/jersey-module-version</Embed-Dependency>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>attach-sources</id>
+                        <id>osgi-bundle</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>bundle</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -235,4 +116,81 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin> <!-- want to unpack sources from individual modules -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>com.sun.jersey</groupId>
+                                            <artifactId>jersey-servlet</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>jar</type>
+                                            <classifier>sources</classifier>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${gen-src-dir}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin> <!-- generate javadoc from sources unpacked above -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>https://jsr311.dev.java.net/nonav/releases/1.1</link>
+                            </links>
+                            <sourcepath>${gen-src-dir}</sourcepath>
+                            <!-- excludePackageNames HAS TO be defined as single line -->
+                            <excludePackageNames>com.sun.jersey.core.impl com.sun.jersey.client.impl com.sun.jersey.server.impl com.sun.jersey.impl com.sun.research.ws.wadl com.sun.jersey.atom.rome.impl com.sun.jersey.fastinfoset.impl com.sun.jersey.json.impl</excludePackageNames>
+                            <notimestamp>true</notimestamp>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/sources.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                                <phase>package</phase> <!-- append to the packaging phase. -->
+                                <goals>
+                                    <goal>attached</goal> <!-- goals == mojos -->
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <dependencies>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-servlet</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <gen-src-dir>${basedir}/target/imported-sources</gen-src-dir>
+    </properties>
 </project>

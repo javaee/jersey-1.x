@@ -216,7 +216,6 @@
                             javax.xml.bind.*;resolution:="optional",
                             javax.xml.namespace;resolution:="optional",
                             javax.xml.transform.*;resolution:="optional",
-                            org.apache.tools.ant.*;resolution:="optional",
                             org.objectweb.asm.*;resolution:="optional",
                             javax.mail.*;resolution:=optional,
                             javax.annotation.*;resolution:=optional,
