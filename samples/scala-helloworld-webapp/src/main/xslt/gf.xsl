@@ -59,6 +59,32 @@
         </xsl:copy>
     </xsl:template>
 
+    <xsl:template match="pom:profile[pom:id='default']/pom:dependencies/pom:dependency[pom:artifactId='jersey-scala']">
+        <xsl:copy>
+            <xsl:apply-templates/>
+                    <exclusions>
+                      <exclusion>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>jersey-server</artifactId>
+                      </exclusion>
+                     </exclusions>
+        </xsl:copy>
+    </xsl:template>
+
+    <xsl:template match="pom:profile[pom:id='default']/pom:dependencies">
+        <xsl:copy>
+            <xsl:if test="count(pom:dependency[pom:artifactId='jersey-server'])=0">
+	    <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-server</artifactId>
+                    <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            </xsl:if>
+            <xsl:apply-templates/>
+        </xsl:copy>
+    </xsl:template>
+
     <xsl:template match="comment()">
         <xsl:comment><xsl:value-of select="."/></xsl:comment>
     </xsl:template>

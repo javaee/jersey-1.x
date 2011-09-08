@@ -23,7 +23,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-servlet</artifactId>
+                    <artifactId>jersey-server</artifactId>
                     <version>${project.version}</version>
                     <classifier>cobertura</classifier>
                 </dependency>
@@ -37,7 +37,7 @@
             <dependencies>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-servlet</artifactId>
+                    <artifactId>jersey-server</artifactId>
                     <version>${project.version}</version>
                 </dependency>
             </dependencies>
