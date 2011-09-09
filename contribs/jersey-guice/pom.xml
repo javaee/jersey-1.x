@@ -127,7 +127,7 @@
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-grizzly2</artifactId>
+                    <artifactId>jersey-grizzly2-servlet</artifactId>
                     <version>${project.version}</version>
                     <classifier>cobertura</classifier>
                     <scope>test</scope>
@@ -153,7 +153,7 @@
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-grizzly2</artifactId>
+                    <artifactId>jersey-grizzly2-servlet</artifactId>
                     <version>${project.version}</version>
                     <scope>test</scope>
                 </dependency>

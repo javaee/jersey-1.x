@@ -39,12 +39,12 @@
  */
 package com.sun.jersey.samples.sparklines;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -55,13 +55,11 @@ public class Main {
     public static void main(String[] args) throws IOException {
         
         final String baseUri = "http://localhost:9998/sparklines/";
-        final Map<String, String> initParams = new HashMap<String, String>();
 
-        initParams.put("com.sun.jersey.config.property.packages",
-                "com.sun.jersey.samples.sparklines");
+        ResourceConfig rc = new PackagesResourceConfig("com.sun.jersey.samples.sparklines");
 
         System.out.println("Starting grizzly...");
-        HttpServer httpServer = GrizzlyWebContainerFactory.create(baseUri, initParams);
+        HttpServer httpServer = GrizzlyServerFactory.createHttpServer(baseUri, rc);
         System.out.println(String.format("Jersey app started with WADL available at %sapplication.wadl\n" +
                 "Try out %sdiscrete?d=88,84,82,92,82,86,66,82,44,64,66,88,96,80,24,26,14,0,0,26,8,6,6,24,52,66,36,6,10,14,30\n" +
                 "Hit enter to stop it...", baseUri, baseUri));

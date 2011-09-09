@@ -41,8 +41,10 @@
 package com.sun.jersey.samples.contacts.server;
 
 import com.sun.jersey.api.container.filter.RolesAllowedResourceFilterFactory;
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.samples.contacts.server.auth.AuthenticationExceptionMapper;
 import com.sun.jersey.samples.contacts.server.auth.SecurityFilter;
 import org.glassfish.grizzly.http.server.HttpServer;
 
@@ -75,20 +77,17 @@ public class Server {
     public static final URI BASE_URI = getBaseURI();
 
     public static HttpServer startServer() throws IOException {
-        final Map<String, String> initParams = new HashMap<String, String>();
-
-        initParams.put("com.sun.jersey.config.property.packages",
-                "com.sun.jersey.samples.contacts.server;" +
-                "com.sun.jersey.samples.contacts.server.auth");
-//        initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-//                "com.sun.jersey.samples.contacts.server.auth.AuthFilter");
-        initParams.put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
-                SecurityFilter.class.getName());
-        initParams.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES,
-                RolesAllowedResourceFilterFactory.class.getName());
+        
+        final PackagesResourceConfig rc = 
+                new PackagesResourceConfig(new String[]{
+                        BaseResource.class.getPackage().getName(),
+                        AuthenticationExceptionMapper.class.getPackage().getName()});
+        
+        rc.getContainerRequestFilters().add(SecurityFilter.class.getName());
+        rc.getResourceFilterFactories().add(RolesAllowedResourceFilterFactory.class.getName());
 
 //        System.out.println("Starting grizzly...");
-        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
     }
 
     public static void main(String[] args) throws IOException {

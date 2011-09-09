@@ -44,7 +44,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.atom.abdera.ContentHelper;
 import junit.framework.TestCase;
 import org.apache.abdera.i18n.iri.IRI;
@@ -63,9 +65,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Providers;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>Unit tests for the <code>jersey-atom2</code> module.</p>
@@ -79,13 +79,9 @@ public class ProvidersTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        Map<String,String> initParams = new HashMap<String,String>();
-        initParams.put("com.sun.jersey.config.property.resourceConfigClass",
-                       "com.sun.jersey.api.core.PackagesResourceConfig");
-        initParams.put("com.sun.jersey.config.property.packages",
-                       "com.sun.jersey.atom.abdera.impl.provider.entity");
+        ResourceConfig rc = new PackagesResourceConfig("com.sun.jersey.atom.abdera.impl.provider.entity");
         System.out.println("Starting grizzly ...");
-        httpServer = GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        httpServer = GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
         ClientConfig config = new DefaultClientConfig();
         config.getClasses().add(ContentBeanProvider.class);
         client = Client.create(config);

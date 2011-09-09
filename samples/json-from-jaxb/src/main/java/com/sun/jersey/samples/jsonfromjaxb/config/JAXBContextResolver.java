@@ -70,6 +70,7 @@ public final class JAXBContextResolver implements ContextResolver<JAXBContext> {
         this.context = new JSONJAXBContext(JSONConfiguration.natural().build(), cTypes);
     }
     
+    @Override
     public JAXBContext getContext(Class<?> objectType) {
         return (types.contains(objectType)) ? context : null;
     }

@@ -40,14 +40,14 @@
 
 package com.sun.jersey.samples.console;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
 
@@ -70,13 +70,11 @@ public class Main {
     public static final int defaultPort = 9998;
 
     protected static HttpServer startServer() throws IOException {
-        final Map<String, String> initParams = new HashMap<String, String>();
 
-        initParams.put("com.sun.jersey.config.property.packages",
-                "com.sun.jersey.samples.console");
+        ResourceConfig rc = new PackagesResourceConfig("com.sun.jersey.samples.console");
 
         System.out.println("Starting grizzly...");
-        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
     }
 
     /**

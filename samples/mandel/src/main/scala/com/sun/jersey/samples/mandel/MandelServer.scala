@@ -1,10 +1,11 @@
 package com.sun.jersey.samples.mandel
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import java.net.URI;
-import java.util.HashMap;
 import javax.ws.rs.core.UriBuilder;
 
 
@@ -30,12 +31,10 @@ object MandelServer {
     val BASE_URI = getBaseURI();
 
     def startServer() = {
-        val initParams = new HashMap[String, String]();
-        initParams.put("com.sun.jersey.config.property.packages",
-                "com.sun.jersey.samples.mandel");
+        val rc = new PackagesResourceConfig("com.sun.jersey.samples.mandel");
 
         System.out.println("Starting grizzly...");
-        GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
     }
 
     def main(args: Array[String]) {

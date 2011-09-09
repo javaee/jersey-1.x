@@ -46,10 +46,8 @@ import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
 import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Resource;
 
-import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.Path;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -67,20 +65,14 @@ import com.sun.research.ws.wadl.Grammars;
 import com.sun.research.ws.wadl.Include;
 import com.sun.research.ws.wadl.Method;
 import java.io.InputStream;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
 
 /**
  * Verify the generation of JAXB content model from java beans

@@ -40,14 +40,14 @@
 
 package com.sun.jersey.samples.jsonfromjaxb;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
     
@@ -69,12 +69,9 @@ public class Main {
     public static final URI BASE_URI = getBaseURI();
    
     public static HttpServer startServer() throws IOException{
-        final Map<String, String> initParams = new HashMap<String, String>();
 
-        initParams.put("com.sun.jersey.config.property.packages",
-                "com.sun.jersey.samples.jsonfromjaxb");
-
-        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        ResourceConfig rc = new PackagesResourceConfig("com.sun.jersey.samples.jsonfromjaxb");
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
     }
     
     public static void main(String[] args) throws IOException {

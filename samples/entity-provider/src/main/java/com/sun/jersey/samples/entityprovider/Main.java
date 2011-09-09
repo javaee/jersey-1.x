@@ -40,14 +40,14 @@
 
 package com.sun.jersey.samples.entityprovider;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
 
@@ -69,18 +69,13 @@ public class Main {
     public static final URI BASE_URI = getBaseURI();
 
     protected static HttpServer startServer() throws IOException {
-        final Map<String, String> initParams = new HashMap<String, String>();
 
-        initParams.put("com.sun.jersey.config.property.resourceConfigClass",
-                "com.sun.jersey.api.core.PackagesResourceConfig");
-        initParams.put("com.sun.jersey.config.property.packages",
-                "com.sun.jersey.samples.entityprovider");
+        ResourceConfig rc = new PackagesResourceConfig(PropertiesProvider.class.getPackage().getName());
 
         System.out.println("Starting grizzly...");
-        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
     }
 
-    
     public static void main(String[] args) throws IOException {
         HttpServer httpServer = startServer();
         System.out.println(String.format("Jersey app started with WADL available at %sapplication.wadl\nHit enter to stop it...", BASE_URI));

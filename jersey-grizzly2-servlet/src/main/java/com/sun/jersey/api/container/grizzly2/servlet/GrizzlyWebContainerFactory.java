@@ -37,9 +37,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-package com.sun.jersey.api.container.grizzly2;
+package com.sun.jersey.api.container.grizzly2.servlet;
 
 import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import org.glassfish.grizzly.http.server.HttpServer;
