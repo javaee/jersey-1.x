@@ -235,6 +235,7 @@
         <module>jersey-fastinfoset</module>
         <module>jersey-grizzly</module>
         <module>jersey-grizzly2</module>
+        <module>jersey-grizzly2-servlet</module>
         <module>jersey-jrebel</module>
         <module>jersey-json</module>
         <module>jersey-server-linking</module>
