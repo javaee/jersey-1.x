@@ -2,34 +2,34 @@ package com.sun.jersey.samples.hypermedia;
 
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+
+import com.sun.jersey.server.hypermedia.filter.HypermediaFilterFactory;
 import com.sun.jersey.samples.hypermedia.client.model.Address;
+
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
 
     public static final URI BASE_URI = UriBuilder.fromUri("http://localhost/").port(9998).build();
 
     public static HttpServer startServer() throws IOException {
-        final Map<String, String> initParams = new HashMap<String, String>();
-
-        initParams.put("com.sun.jersey.config.property.packages",
+        ResourceConfig rc = new PackagesResourceConfig(
                 "com.sun.jersey.samples.hypermedia.server.controller");
-        initParams.put("com.sun.jersey.config.feature.Formatted", "true");
 
-        // Register HypermediaFilterFactory
-        initParams.put(ResourceConfig.PROPERTY_RESOURCE_FILTER_FACTORIES,
-                "com.sun.jersey.server.hypermedia.filter.HypermediaFilterFactory");
+        rc.getFeatures().put(ResourceConfig.FEATURE_FORMATTED, Boolean.TRUE);
+
+        // Register HypermediaFilterFactory 
+        rc.getResourceFilterFactories().add(HypermediaFilterFactory.class);
 
         System.out.println("Starting grizzly...");
-        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
     }
 
     public static void main(String[] args) throws Exception {

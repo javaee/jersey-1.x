@@ -44,7 +44,9 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.api.container.grizzly2.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.client.view.exception.FailedUserAssumptionException;
 import com.sun.jersey.samples.viewclient.atompubsimple.provider.AtomEntryProvider;
 import com.sun.jersey.samples.viewclient.atompubsimple.provider.AtomFeedProvider;
@@ -60,8 +62,6 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Main class.
@@ -76,14 +76,13 @@ public class Main2 {
 			port(9998).build();
 
 	public static HttpServer startServer() throws IOException {
-		final Map<String, String> initParams = new HashMap<String, String>();
 
-		initParams.put("com.sun.jersey.config.property.packages",
-				"com.sun.jersey.samples.viewclient.atompubsimple.server,com.sun.jersey.samples.viewclient.atompubsimple.provider");
+		ResourceConfig rc = new PackagesResourceConfig(
+                        "com.sun.jersey.samples.viewclient.atompubsimple.server",
+                        "com.sun.jersey.samples.viewclient.atompubsimple.provider");
 
 		System.out.println("Starting grizzly...");
-		return GrizzlyWebContainerFactory.create(
-				BASE_URI, initParams);
+		return GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
 	}
 
 	public static void main(String[] args) throws Exception {
