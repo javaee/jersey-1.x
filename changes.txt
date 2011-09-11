@@ -8,6 +8,7 @@ release 1.10
   When using Jersey in a Servlet container, jersey-server dependency need to be replaced with jersey-servlet
 
 release 1.9.1
+- improved error checking on OAuthClientFilter - if the internal requests for tokens fail, it now propagates the failure (the response from the server) to the client rather than ignoring it and failing later on getAuthorizationUri() method.
 - Fixed issue 765
   http://java.net/jira/browse/JERSEY-765
   Jersey can now marshall/unmarshall all the standard collection types (Set, Queue, LinkedList, etc.) and any custom ones with the default constructor.

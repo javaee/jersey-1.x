@@ -244,6 +244,10 @@ public final class OAuthClientFilter extends ClientFilter {
                         state = State.UNMANAGED;
                         try {
                             ClientResponse cr = handle(ClientRequest.create().build(requestTokenUri, HttpMethod.POST));
+                            // requestToken request failed
+                            if (cr.getStatus() >= 400) {
+                                return cr;
+                            }
                             Form response = cr.getEntity(Form.class);
                             String token = response.getFirst(OAuthParameters.TOKEN);
                             parameters.token(token);
@@ -253,8 +257,8 @@ public final class OAuthClientFilter extends ClientFilter {
                             return handle(request);
                         } finally {
                             if (state == State.UNMANAGED) {
-                                parameters.setToken(null);
-                                secrets.setTokenSecret(null);
+                                parameters.token(null);
+                                secrets.tokenSecret(null);
                             }
                             if (state != State.REQUEST_TOKEN) {
                                 state = State.MANAGED;
@@ -269,6 +273,10 @@ public final class OAuthClientFilter extends ClientFilter {
                     state = State.UNMANAGED;
                     try {
                         ClientResponse cr = handle(ClientRequest.create().build(accessTokenUri, HttpMethod.POST));
+                        // accessToken request failed
+                        if (cr.getStatus() >= 400) {
+                            return cr;
+                        }
                         Form response = cr.getEntity(Form.class);
                         String token = response.getFirst(OAuthParameters.TOKEN);
                         String secret = response.getFirst(OAuthParameters.TOKEN_SECRET);
@@ -282,7 +290,7 @@ public final class OAuthClientFilter extends ClientFilter {
                     } finally {
                         parameters.remove(OAuthParameters.VERIFIER);
                         if (state == State.UNMANAGED) {
-                            parameters.remove(OAuthParameters.TOKEN);
+                            parameters.token(null);
                             secrets.tokenSecret(null);
                             state = State.MANAGED;
                         }
@@ -319,7 +327,7 @@ public final class OAuthClientFilter extends ClientFilter {
 
         if (state == State.MANAGED && response.getClientResponseStatus() == ClientResponse.Status.UNAUTHORIZED) {
             request.getHeaders().remove("Authorization");
-            parameters.remove(OAuthParameters.TOKEN);
+            parameters.token(null);
             secrets.tokenSecret(null);
             uie = null;
             return handle(request);

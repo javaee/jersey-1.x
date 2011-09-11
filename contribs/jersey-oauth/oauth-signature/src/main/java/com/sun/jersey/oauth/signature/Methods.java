@@ -73,6 +73,6 @@ class Methods {
             map.put(method.name(), method);
         }
         return map;
-    } 
+    }
 }
 

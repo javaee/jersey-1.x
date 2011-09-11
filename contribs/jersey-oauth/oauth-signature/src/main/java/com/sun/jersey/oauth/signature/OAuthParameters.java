@@ -59,7 +59,7 @@ public class OAuthParameters extends HashMap<String, String> {
 
     /** OAuth scheme in Authorization header. */
     public static final String SCHEME = "OAuth";
-    
+
     /** Name of parameter containing the protection realm. */
     public static final String REALM = "realm";
 
@@ -136,7 +136,7 @@ public class OAuthParameters extends HashMap<String, String> {
     public String getConsumerKey() {
         return get(CONSUMER_KEY);
     }
-    
+
     /**
      * Sets the consumer key.
      */
@@ -160,6 +160,11 @@ public class OAuthParameters extends HashMap<String, String> {
      */
     public String getToken() {
         return get(TOKEN);
+    }
+
+    @Override
+    public String put(String key, String value) {
+        return value == null ? remove(key) : super.put(key, value);
     }
 
     /**
@@ -288,14 +293,14 @@ public class OAuthParameters extends HashMap<String, String> {
     public String getNonce() {
         return get(NONCE);
     }
-    
+
     /**
      * Sets the nonce, a value that should be unique for a given timestamp.
      */
     public void setNonce(String nonce) {
         put(NONCE, nonce);
     }
-    
+
     /**
      * Builder pattern method to return {@link OAuthParameters} after setting
      * nonce.
@@ -430,7 +435,7 @@ public class OAuthParameters extends HashMap<String, String> {
         int length = value.length();
         return ((length >= 2 && value.charAt(0) == '"' && value.charAt(length - 1) == '"') ?
          value.substring(1, length - 1) : value);
-    } 
+    }
 
     /**
      * Reads a request for OAuth parameters, and populates this object.
@@ -484,7 +489,7 @@ public class OAuthParameters extends HashMap<String, String> {
      * @return this parameters object.
      */
     public OAuthParameters writeRequest(OAuthRequest request) {
-        StringBuffer buf = new StringBuffer(SCHEME);
+        StringBuilder buf = new StringBuilder(SCHEME);
         boolean comma = false;
         for (String key : keySet()) {
             String value = get(key);
