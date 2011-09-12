@@ -1,4 +1,7 @@
 release 1.10
+- Fixed issue 763
+  http://java.net/jira/browse/JERSEY-763
+  VfsSchemeScanner cannot be run in Jboss-7 environment
 - *Breaking change*
   Grizzly 2 ServletHandler support separated out to a new, jersey-grizlly2-servlet, module
 - *Breaking change*

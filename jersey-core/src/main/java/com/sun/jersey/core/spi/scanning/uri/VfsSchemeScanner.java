@@ -53,20 +53,20 @@ import java.util.Set;
 import javax.ws.rs.core.UriBuilder;
 
 /**
- * A JBoss-based "vfsfile" and "vfszip" scheme URI scanner.
+ * A JBoss-based "vfsfile", "vfs" and "vfszip" scheme URI scanner.
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class VfsSchemeScanner implements UriSchemeScanner {
 
     public Set<String> getSchemes() {
-        return new HashSet<String>(Arrays.asList("vfsfile", "vfszip"));
+        return new HashSet<String>(Arrays.asList("vfsfile", "vfszip", "vfs"));
     }
 
     // UriSchemeScanner
     
     public void scan(final URI u, final ScannerListener sl) {
-        if (u.getScheme().equalsIgnoreCase("vfsfile")) {
+        if (!u.getScheme().equalsIgnoreCase("vfszip")) {
             new FileSchemeScanner().scan(
                     UriBuilder.fromUri(u).scheme("file").build(),
                     sl);
