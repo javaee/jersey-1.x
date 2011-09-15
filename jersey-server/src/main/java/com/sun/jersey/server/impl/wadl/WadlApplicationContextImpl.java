@@ -70,8 +70,8 @@ import java.util.logging.Logger;
 public class WadlApplicationContextImpl implements WadlApplicationContext {
 
     private static final Logger LOG = Logger.getLogger( WadlApplicationContextImpl.class.getName() );
-    
-    
+
+
     private boolean wadlGenerationEnabled = true;
 
     private final Set<AbstractResource> rootResources;
@@ -88,7 +88,7 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
             // TODO perhaps this should be done another way for the moment
             // create a temporary generator just to do this one task
             //
-            
+
             this.jaxbContext = JAXBContext.newInstance(
                     this.wadlGeneratorConfig.createWadlGenerator().getRequiredJaxbContextPath());
         } catch (JAXBException ex) {
@@ -100,27 +100,31 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 //        return getWadlBuilder().generate(rootResources);
 //    }
 
-    public ApplicationDescription getApplication(UriInfo ui) {
+    @Override
+    public ApplicationDescription getApplication(UriInfo uriInfo) {
         ApplicationDescription a = getWadlBuilder().generate(rootResources);
         final Application application = a.getApplication();
-        for(Resources resources : application.getResources())
-            resources.setBase(ui.getBaseUri().toString());
-        attachExternalGrammar(application,a, ui.getRequestUri());
+        for(Resources resources : application.getResources()) {
+            if (resources.getBase() == null) {
+                resources.setBase(uriInfo.getBaseUri().toString());
+            }
+        }
+        attachExternalGrammar(application,a, uriInfo.getRequestUri());
         return a;
     }
 
-    
+    @Override
     public Application getApplication(UriInfo info,
-                                      AbstractResource resource, 
+                                      AbstractResource resource,
                                       String path) {
 
         // Get the root application description
         //
-        
+
         ApplicationDescription description = getApplication(info);
 
         //
-        
+
         WadlGenerator wadlGenerator = wadlGeneratorConfig.createWadlGenerator();
         Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(description,resource) :
                 new WadlBuilder( wadlGenerator ).generate(description, resource, path);
@@ -129,10 +133,10 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
             resources.setBase(info.getBaseUri().toString());
 
         // Attach any grammar we may have
-        
+
         attachExternalGrammar(a, description,
                 info.getRequestUri());
-        
+
         //
 
         for(Resources resources : a.getResources()) {
@@ -145,12 +149,13 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 
         return a;
     }
-    
-    
+
+
     /**
      * @TODO probably no longer required
-     * @return 
+     * @return
      */
+    @Override
     public JAXBContext getJAXBContext() {
         return jaxbContext;
     }
@@ -169,11 +174,12 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
         this.wadlGenerationEnabled = wadlGenerationEnabled;
     }
 
+    @Override
     public boolean isWadlGenerationEnabled() {
         return wadlGenerationEnabled;
     }
-    
-    
+
+
 
     /**
      * Update the application object to include the generated grammar objects
@@ -185,9 +191,9 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 
         // Massage the application.wadl URI slightly to get the right effect
         //
-        
+
         final String requestURIPath = requestURI.getPath();
-        
+
         if (requestURIPath.endsWith("application.wadl")) {
             requestURI = UriBuilder.fromUri(requestURI)
                     .replacePath(
@@ -195,7 +201,7 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
                         .substring(0, requestURIPath.lastIndexOf('/')+1))
                     .build();
         }
-        
+
 
         String root = application.getResources().get(0).getBase();
         UriBuilder extendedPath = root!=null ?
@@ -215,7 +221,7 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
         } else {
             grammars = new Grammars();
             application.setGrammars( grammars );
-        }        
+        }
 
         // Create a reference back to the root WADL
         //
@@ -224,24 +230,24 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
         {
             URI schemaURI =
                 extendedPath.clone().path( path ).build();
-            
+
             String schemaURIS = schemaURI.toString();
             String requestURIs = requestURI.toString();
-            
+
             String schemaPath = rootURI!=null ?
                     requestURI.relativize(schemaURI).toString()
-                    : schemaURI.toString();     
-            
+                    : schemaURI.toString();
+
             Include include = new Include();
             include.setHref( schemaPath );
             Doc doc = new Doc();
             doc.setLang( "en" );
             doc.setTitle( "Generated" );
             include.getDoc().add( doc );
-            
+
             // Finally add to list
             grammars.getInclude().add(include);
         }
     }
-    
+
 }

@@ -40,19 +40,13 @@
 
 package com.sun.jersey.impl.wadl;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.LoggingFilter;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.impl.entity.JAXBBean;
-import com.sun.jersey.server.wadl.WadlApplicationContext;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -67,8 +61,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -82,13 +75,26 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
+import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.impl.entity.JAXBBean;
+import com.sun.jersey.server.wadl.WadlApplicationContext;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.WadlGeneratorImpl;
+import com.sun.research.ws.wadl.Resources;
 
 /**
  *
@@ -172,9 +178,11 @@ public class WadlResourceTest extends AbstractResourceTester {
     }
 
     /**
-     * Test WADL generation
+     * Test WADL generation.
+     *
+     * @throws Exception in case of unexpected test failure.
      */
-    public void testGetWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
+    public void testGetWadl() throws Exception {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
         WebResource r = resource("/application.wadl");
 
@@ -655,5 +663,59 @@ public class WadlResourceTest extends AbstractResourceTester {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static class MyWadlGeneratorConfig extends WadlGeneratorConfig {
+
+        @Override
+        public List<WadlGeneratorDescription> configure() {
+            return generator(MyWadlGenerator.class).descriptions();
+        }
+
+        public static class MyWadlGenerator extends WadlGeneratorImpl {
+            public static final String CUSTOM_RESOURCES_BASE_URI = "http://myBaseUri";
+
+
+
+            @Override
+            public Resources createResources() {
+                Resources resources = super.createResources();
+                resources.setBase(CUSTOM_RESOURCES_BASE_URI);
+
+                return resources;
+            }
+
+            @Override
+            public void setWadlGeneratorDelegate(WadlGenerator delegate) {
+                // nothing
+            }
+        }
+    }
+
+    /**
+     * Test overriding WADL's /application/resources/@base attribute.
+     *
+     * @throws Exception in case of unexpected test failure.
+     */
+    public void testCustomWadlResourcesBaseUri() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(WidgetsResource.class, ExtraResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, "com.sun.jersey.impl.wadl.WadlResourceTest$MyWadlGeneratorConfig");
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/application.wadl");
+
+        File tmpFile = r.get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        bf.setXIncludeAware(false);
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+        // check base URI
+        String val = (String) xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
+        assertEquals(val, MyWadlGeneratorConfig.MyWadlGenerator.CUSTOM_RESOURCES_BASE_URI);
     }
 }

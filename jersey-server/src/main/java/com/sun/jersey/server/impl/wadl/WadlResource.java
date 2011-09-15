@@ -40,25 +40,25 @@
 
 package com.sun.jersey.server.impl.wadl;
 
-import com.sun.jersey.server.wadl.ApplicationDescription;
-import com.sun.jersey.server.wadl.WadlApplicationContext;
-import com.sun.jersey.spi.resource.Singleton;
-import com.sun.research.ws.wadl.Application;
-import com.sun.research.ws.wadl.Resources;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.Marshaller;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
+import javax.xml.bind.Marshaller;
+
+import com.sun.jersey.server.wadl.ApplicationDescription;
+import com.sun.jersey.server.wadl.WadlApplicationContext;
+import com.sun.jersey.spi.resource.Singleton;
+import com.sun.research.ws.wadl.Application;
 
 
 /**
@@ -71,8 +71,6 @@ public final class WadlResource {
     private static final Logger LOGGER = Logger.getLogger(WadlResource.class.getName());
 
     private WadlApplicationContext wadlContext;
-
-
     private byte[] wadlXmlRepresentation;
 
     public WadlResource(@Context WadlApplicationContext wadlContext) {
@@ -85,16 +83,12 @@ public final class WadlResource {
         if(!wadlContext.isWadlGenerationEnabled()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        
+
         ApplicationDescription applicationDescription =
                 wadlContext.getApplication(uriInfo);
         Application application = applicationDescription.getApplication();
 
         if (wadlXmlRepresentation == null) {
-            for(Resources resources : application.getResources())
-                if (resources.getBase() == null) {
-                    resources.setBase(uriInfo.getBaseUri().toString());
-                }
             try {
                 final Marshaller marshaller = wadlContext.getJAXBContext().createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -110,7 +104,7 @@ public final class WadlResource {
 
         return Response.ok(new ByteArrayInputStream(wadlXmlRepresentation)).build();
     }
-    
+
     @Produces({"application/xml"})
     @GET
     @Path("{path}")
@@ -132,7 +126,7 @@ public final class WadlResource {
         if( externalMetadata==null ) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        
+
         // Return the data
 
         return Response.ok().type( externalMetadata.getType() )
