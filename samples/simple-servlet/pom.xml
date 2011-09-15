@@ -53,7 +53,7 @@
     <name>Simple Servlet - Jersey sample</name>
     <packaging>war</packaging>
     <profiles>
-        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" --> 
+        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" -->
         <profile>
             <id>cobertura</id>
             <activation>
@@ -124,7 +124,7 @@
         <finalName>simple-servlet</finalName>
         <resources>
             <resource>
-                <directory>src/main/java</directory>            
+                <directory>src/main/java</directory>
             </resource>
         </resources>
         <plugins>
@@ -136,7 +136,7 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <!-- 
+            <!--
                skip the tests, since they fail because of insufficent support by the
                GrizzlyWeb and HTTPServer containers. If you want to run the tests using
                EmbeddedGF or External container, that can be achieved by -
@@ -166,58 +166,21 @@
              <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.1</version>
                 <configuration>
-                    <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>${basedir}/target/simple-servlet.war</app>
-                    <autoDelete>true</autoDelete>
-                    <port>8080</port>
                     <installRoot>./target/gfembeddedtmp</installRoot>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-servlet</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.glassfish</groupId>
-                        <artifactId>javax.ejb</artifactId>
-                        <version>3.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>javax.servlet-api</artifactId>
-                        <version>3.0.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>update-gf-deps</id>
-                        <phase>package</phase> <!-- append to the packaging phase. -->
-                        <goals>
-                            <goal>transform</goal> <!-- goals == mojos -->
-                        </goals>
-                        <configuration>
-                            <xslFile>src/main/xslt/gf.xsl</xslFile>
-                            <srcDir>.</srcDir>
-                            <srcIncludes>pom.xml</srcIncludes>
-                            <destDir>target/gf-pom-file</destDir>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.1.1</version>  
+                <version>2.1.1</version>
                 <configuration>
-                    <packagingExcludes>WEB-INF/glassfish-web.xml</packagingExcludes>                     
+                    <packagingExcludes>WEB-INF/glassfish-web.xml</packagingExcludes>
                 </configuration>
             </plugin>
              <plugin>

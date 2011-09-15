@@ -45,8 +45,8 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>jersey-samples</artifactId>
         <groupId>com.sun.jersey.samples</groupId>
+        <artifactId>jersey-samples</artifactId>
         <version>1.10-SNAPSHOT</version>
     </parent>
     <artifactId>moxy</artifactId>
@@ -66,21 +66,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>update-gf-deps</id>
-                        <phase>package</phase> <!-- append to the packaging phase. -->
-                        <goals>
-                            <goal>transform</goal> <!-- goals == mojos -->
-                        </goals>
-                        <configuration>
-                            <xslFile>src/main/xslt/gf.xsl</xslFile>
-                            <srcDir>.</srcDir>
-                            <srcIncludes>pom.xml</srcIncludes>
-                            <destDir>target/gf-pom-file</destDir>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -104,30 +89,6 @@
              <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>${basedir}/target/moxy.war</app>
-                    <autoDelete>true</autoDelete>
-                    <port>8080</port>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-servlet</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>javax.servlet-api</artifactId>
-                        <version>3.0.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.glassfish</groupId>
-                        <artifactId>javax.ejb</artifactId>
-                        <version>3.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
               <groupId>org.mortbay.jetty</groupId>
@@ -209,6 +170,14 @@
             <version>${moxy-version}</version>
         </dependency>
     </dependencies>
+    <repositories>
+        <repository>
+            <id>eclipselink.repository</id>
+            <name>Eclipse Maven Repository</name>
+            <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
     <properties>
         <jersey-version>1.10-SNAPSHOT</jersey-version>
         <moxy-version>2.2.0-M6</moxy-version>

@@ -51,7 +51,7 @@
     <name>Scala Helloworld WebApp - Jersey sample</name>
     <packaging>war</packaging>
     <profiles>
-        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" -->            
+        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" -->
         <profile>
             <id>cobertura</id>
             <activation>
@@ -118,15 +118,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.glassfish.distributions</groupId>
-            <artifactId>web-all</artifactId>
-            <version>10.0-build-20080430</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.embedded</groupId>
-            <artifactId>gf-embedded-api</artifactId>
-            <version>1.0-alpha-4</version>
+            <groupId>org.glassfish.extras</groupId>
+            <artifactId>glassfish-embedded-web</artifactId>
+            <version>3.1.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -155,25 +149,6 @@
              <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>${basedir}/target/scala-helloworld-webapp.war</app>
-                    <autoDelete>true</autoDelete>
-                    <port>8080</port>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-servlet</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>javax.servlet-api</artifactId>
-                        <version>3.0.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
 
             <plugin>
@@ -188,21 +163,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
-                <executions>
-                	<execution>
-                		<id>update-gf-deps</id>
-                        <phase>package</phase> <!-- append to the packaging phase. -->
-                        <goals>
-                            <goal>transform</goal> <!-- goals == mojos -->
-                        </goals>
-                 		<configuration>
-                			<xslFile>src/main/xslt/gf.xsl</xslFile>
-                			<srcDir>.</srcDir>
-                			<srcIncludes>pom.xml</srcIncludes>
-                			<destDir>target/gf-pom-file</destDir>
-                		</configuration>
-                	</execution>
-                </executions>
             </plugin>
              <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>

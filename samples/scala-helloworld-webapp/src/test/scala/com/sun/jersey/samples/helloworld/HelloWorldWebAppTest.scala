@@ -45,7 +45,8 @@ import java.net.URI;
 import java.util.Collections;
 import javax.ws.rs.core.UriBuilder;
 import junit.framework.{Assert, TestCase};
-import org.glassfish.embed.{ScatteredWar, GlassFish};
+import org.glassfish.embeddable.{Deployer, GlassFish, GlassFishProperties, GlassFishRuntime};
+import org.glassfish.embeddable.archive.ScatteredArchive;
 
 
 object HelloWorldWebAppTest {
@@ -74,17 +75,26 @@ class HelloWorldWebAppTest extends TestCase {
 
     var r : WebResource = _
 
+    var deployer : Deployer = _
+
     override def setUp() : Unit = {
         super.setUp();
 
         // Start Glassfish
-        glassfish = new GlassFish(HelloWorldWebAppTest.baseUri.getPort())
+        val props = new GlassFishProperties();
+        props.setPort("http-listener", HelloWorldWebAppTest.baseUri.getPort());
+
+        glassfish = GlassFishRuntime.bootstrap().newGlassFish(props);
+        glassfish.start();
+
+        val war = new ScatteredArchive(HelloWorldWebAppTest.baseUri.getRawPath(), ScatteredArchive.Type.WAR);
+        war.addMetadata(new File("src/main/webapp/WEB-INF/web.xml"));
+        war.addMetadata(new File("src/main/webapp/WEB-INF/sun-web.xml"));
+        war.addClassPath(new File("target/classes"));
+
         // Deploy Glassfish referencing the web.xml
-        val war = new ScatteredWar(HelloWorldWebAppTest.baseUri.getRawPath(),
-                new File("src/main/webapp"),
-                new File("src/main/webapp/WEB-INF/web.xml"),
-                Collections.singleton(new File("target/classes").toURI().toURL()))
-        glassfish.deploy(war)
+        deployer = glassfish.getDeployer();
+        deployer.deploy(war.toURI());
 
         val c = Client.create();
         r = c.resource(HelloWorldWebAppTest.baseUri)

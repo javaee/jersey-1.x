@@ -52,7 +52,7 @@
     <packaging>war</packaging>
     <profiles>
         <profile>
-            <id>test</id>            
+            <id>test</id>
         </profile>
         <profile>
             <id>skip-test</id>
@@ -116,35 +116,6 @@
             <plugin>
                 <groupId>org.glassfish</groupId>
                 <artifactId>maven-embedded-glassfish-plugin</artifactId>
-                <version>3.1</version>
-                <configuration>
-                    <goalPrefix>embedded-glassfish</goalPrefix>
-                    <app>${basedir}/target/jersey-cdi.war</app>
-                    <autoDelete>true</autoDelete>                   
-                    <port>8080</port>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.sun.jersey</groupId>
-                        <artifactId>jersey-servlet</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>  
-                    <dependency>
-                        <groupId>javax.servlet</groupId>
-                        <artifactId>javax.servlet-api</artifactId>
-                        <version>3.0.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.glassfish</groupId>
-                        <artifactId>javax.ejb</artifactId>
-                        <version>3.1</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.enterprise</groupId>
-                        <artifactId>cdi-api</artifactId>
-                        <version>1.0</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -163,7 +134,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>      
+            </plugin>
         </plugins>
     </build>
     <properties>
