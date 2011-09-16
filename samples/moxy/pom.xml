@@ -99,10 +99,6 @@
                 <contextPath>moxy</contextPath>
               </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.glassfish</groupId>
-                <artifactId>maven-glassfish-plugin</artifactId>
-            </plugin>
         </plugins>
     </build>
     <profiles>

@@ -48,7 +48,7 @@
    <parent>
         <groupId>com.sun.jersey.test.functional</groupId>
         <artifactId>end-to-end-tests</artifactId>
-        <version>${jersey.version}</version>
+        <version>1.10-SNAPSHOT</version>
     </parent>
 
    <artifactId>exceptions</artifactId>
@@ -67,12 +67,11 @@
                 <dependency> <!-- depend on JAXB to enable WADL support -->
                     <groupId>com.sun.xml.bind</groupId>
                     <artifactId>jaxb-impl</artifactId>
-                    <version>2.1.12</version>
                 </dependency>
             </dependencies>
         </profile>
     </profiles>
-    
+
     <build>
         <finalName>exceptions</finalName>
         <plugins>
@@ -85,9 +84,29 @@
                     <target>1.5</target>
                 </configuration>
             </plugin>
+            <!-- Run the application using "mvn embedded-glassfish:run" -->
             <plugin>
                 <groupId>org.glassfish</groupId>
-                <artifactId>maven-glassfish-plugin</artifactId>
+                <artifactId>maven-embedded-glassfish-plugin</artifactId>
+                <version>${glassfish.version}</version>
+                <configuration>
+                    <goalPrefix>embedded-glassfish</goalPrefix>
+                    <app>${basedir}/target/${project.build.finalName}.war</app>
+                    <autoDelete>true</autoDelete>
+                    <port>8080</port>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.sun.jersey</groupId>
+                        <artifactId>jersey-servlet</artifactId>
+                        <version>${jersey.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>javax.servlet-api</artifactId>
+                        <version>3.0.1</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -96,17 +115,17 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-servlet</artifactId>
-            <version>${jersey.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
-            <version>${jersey.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-multipart</artifactId>
-            <version>${jersey.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.jersey-test-framework</groupId>
@@ -117,7 +136,7 @@
     </dependencies>
 
     <properties>
-        <jersey.version>1.10-SNAPSHOT</jersey.version>
+        <glassfish.version>3.1.1</glassfish.version>
         <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
     </properties>
 </project>

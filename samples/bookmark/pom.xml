@@ -112,10 +112,10 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
-            <!-- Run the application using "mvn glassfish:run" -->
+            <!-- Run the application using "mvn embedded-glassfish:run" -->
             <plugin>
                 <groupId>org.glassfish</groupId>
-                <artifactId>maven-glassfish-plugin</artifactId>
+                <artifactId>maven-embedded-glassfish-plugin</artifactId>
             </plugin>
            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
