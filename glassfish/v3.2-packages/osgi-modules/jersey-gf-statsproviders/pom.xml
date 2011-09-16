@@ -124,7 +124,7 @@
         <dependency>
             <groupId>com.sun.enterprise</groupId>
             <artifactId>hk2</artifactId>
-	    <version>0.3.9</version>
+	        <version>1.6.9</version>
 	    <scope>provided</scope>
         </dependency>
         <dependency>
