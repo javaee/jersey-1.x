@@ -212,12 +212,4 @@ To run the tests, use "mvn -P test clean install".
         </profile>
     </profiles>
 
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net Repository for Maven</name>
-            <url>http://download.java.net/maven/glassfish/</url>
-        </pluginRepository>
-    </pluginRepositories>
 </project>

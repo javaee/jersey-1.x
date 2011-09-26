@@ -169,7 +169,7 @@ Jersey resource at <ulink url="http://localhost:8080/helloworld/webresources/hel
 
   <para>
     OSGi Http Service support currently does not come out of the box with GlassFish, but is provided with a separate OSGi bundle,
-    <ulink url="http://download.java.net/maven/glassfish/org/glassfish/osgi-http/3.1-SNAPSHOT/osgi-http-3.1-SNAPSHOT.jar">http://download.java.net/maven/glassfish/org/glassfish/osgi-http/3.1-SNAPSHOT/osgi-http-3.1-SNAPSHOT.jar</ulink>.
+    <ulink url="http://search.maven.org/remotecontent?filepath=org/glassfish/osgi-http/3.2-b03/osgi-http-3.2-b03.jar">http://search.maven.org/remotecontent?filepath=org/glassfish/osgi-http/3.2-b03/osgi-http-3.2-b03.jar</ulink>.
     You will need to enable the feature first, by installing that bundle. After that, you can install and activate the Jersey application bundle.
     Following is the listing showing how both bundles could be installed and activated (Be sure to replace &lt;version&gt; with the current Jersey version and &lt;repository&gt; with either snapshots or releases based on whether you depend
 on a snapshot or stable release version of Jersey respectively):
@@ -177,7 +177,7 @@ on a snapshot or stable release version of Jersey respectively):
 
     <para>
 <programlisting>
-g! install http://download.java.net/maven/glassfish/org/glassfish/osgi-http/3.1-SNAPSHOT/osgi-http-3.1-SNAPSHOT.jar
+g! install http://search.maven.org/remotecontent?filepath=org/glassfish/osgi-http/3.2-b03/osgi-http-3.2-b03.jar
 Bundle ID: 247
 g! install https://maven.java.net/service/local/artifact/maven/redirect?r=&lt;repository&gt;&amp;g=com.sun.jersey.samples.osgi-http-service&amp;a=bundle&amp;v=&lt;version&gt;&amp;e=jar
 Bundle ID: 248

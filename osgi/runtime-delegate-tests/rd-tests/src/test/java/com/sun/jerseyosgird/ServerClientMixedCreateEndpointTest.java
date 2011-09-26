@@ -117,19 +117,17 @@ public class ServerClientMixedCreateEndpointTest {
     public static Option[] configuration() {
 
         Option[] options = options(
-        		
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
-                
                 systemPackage("sun.misc"),
 
                 // define maven repository
                 repositories(
-                        "http://repo1.maven.org/maven2", 
+                        "http://repo1.maven.org/maven2",
                         "http://repository.apache.org/content/groups/snapshots-group",
                         "http://repository.ops4j.org/maven2",
                         "http://svn.apache.org/repos/asf/servicemix/m2-repo",
-                        "http://download.java.net/maven/2",
+                        "http://maven.java.net/",
                         "http://repository.springsource.com/maven/bundles/release",
                         "http://repository.springsource.com/maven/bundles/external"
                    ),

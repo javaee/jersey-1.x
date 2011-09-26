@@ -509,7 +509,7 @@ public class ControllerInvocationHandler<T> implements InvocationHandler {
 
         // Attempt to fetch meta-data from server
         if (result == null) {
-            Wadl2Java wm = new Wadl2Java(null, null, false);
+            Wadl2Java wm = new Wadl2Java(null, null, null, false);
             try {
                 WebResource r = client.resource(h.getUri());
                 InputStream is = r.options(InputStream.class);

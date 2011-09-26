@@ -61,37 +61,6 @@
         <osgi-version>4.2.0</osgi-version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>ops4j.releases</id>
-            <url>http://repository.ops4j.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>ops4j.snapshots</id>
-            <url>http://repository.ops4j.org/mvn-snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>m2-djn</id>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>ops4j.releases</id>
-            <url>http://repository.ops4j.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
-
     <build>
         <plugins>
             <plugin>
@@ -238,7 +207,7 @@
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.31</version>
+            <version>1.9.36</version>
             <scope>test</scope>
         </dependency>
         <dependency>

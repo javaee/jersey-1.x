@@ -60,8 +60,7 @@ as described in <xref linkend="chapter_deps"/>
 
 <itemizedlist>
    <listitem>the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=pom">jersey-server</ulink> module, </listitem>
-   <listitem>the <ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.pom">grizzly-servlet-webserver</ulink> module </listitem>
-   <listitem>and optionally for WADL support if using Java SE 5 the <ulink url="http://download.java.net/maven/1/com.sun.xml.bind/poms/jaxb-impl-2.1.12.pom">jaxb-impl</ulink> module</listitem>
+   <listitem>the <ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-servlet-webserver/1.9.36/grizzly-servlet-webserver-1.9.36.pom">grizzly-servlet-webserver</ulink> module </listitem>
  </itemizedlist>
  </para>
  <para>
@@ -74,22 +73,8 @@ as described in <xref linkend="chapter_deps"/>
 &lt;dependency&gt;
     &lt;groupId&gt;com.sun.grizzly&lt;/groupId&gt;
     &lt;artifactId&gt;grizzly-servlet-webserver&lt;/artifactId&gt;
-    &lt;version&gt;1.9.18-i&lt;/version&gt;
+    &lt;version&gt;1.9.36&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
-<para>
-And the following repositories need to be added to the pom:
-<programlisting language="xml">&lt;repository&gt;
-    &lt;id&gt;maven2-repository.java.net&lt;/id&gt;
-    &lt;name&gt;Java.net Repository for Maven&lt;/name&gt;
-    &lt;url&gt;http://download.java.net/maven/2/&lt;/url&gt;
-    &lt;layout&gt;default&lt;/layout&gt;
-&lt;/repository&gt;
-&lt;repository&gt;
-    &lt;id&gt;maven-repository.java.net&lt;/id&gt;
-    &lt;name&gt;Java.net Maven 1 Repository (legacy)&lt;/name&gt;
-    &lt;url&gt;http://download.java.net/maven/1&lt;/url&gt;
-    &lt;layout&gt;legacy&lt;/layout&gt;
-&lt;/repository&gt;</programlisting></para>
 
     <para>If you want to depend on Jersey snapshot versions the following repository needs to be added to the pom:
     <programlisting language="xml">&lt;repository&gt;
@@ -97,25 +82,17 @@ And the following repositories need to be added to the pom:
     &lt;name&gt;Java.net Snapshot Repository for Maven&lt;/name&gt;
     &lt;url&gt;https://maven.java.net/content/repositories/snapshots/&lt;/url&gt;
     &lt;layout&gt;default&lt;/layout&gt;
-&lt;/repository&gt;</programlisting></para> 
+&lt;/repository&gt;</programlisting></para>
 
 <para>
 Non-maven developers require:
 <itemizedlist>
-<listitem><ulink url="http://download.java.net/maven/2/com/sun/grizzly/grizzly-servlet-webserver/1.9.18-i/grizzly-servlet-webserver-1.9.18-i.jar">grizzly-servlet-webserver.jar</ulink>,</listitem>
+<listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-servlet-webserver/1.9.36/grizzly-servlet-webserver-1.9.36.jar">grizzly-servlet-webserver.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=jar">jersey-server.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-core&amp;v=&version;&amp;e=jar">jersey-core.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/2/javax/ws/rs/jsr311-api/&jsr311.version;/jsr311-api-&jsr311.version;.jar">jsr311-api.jar</ulink>,</listitem>
-<listitem><ulink url="http://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar">asm.jar</ulink></listitem>
+<listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/ws/rs/jsr311-api/&jsr311.version;/jsr311-api-&jsr311.version;.jar">jsr311-api.jar</ulink>,</listitem>
+<listitem><ulink url="http://search.maven.org/remotecontent?filepath=asm/asm/3.3.1/asm-3.3.1.jar">asm.jar</ulink></listitem>
 </itemizedlist></para>
-<para>and optionally for WADL support if using Java SE 5:
-<itemizedlist>
-<listitem><ulink url="http://download.java.net/maven/1/com.sun.xml.bind/jars/jaxb-impl-2.1.12.jar">jaxb-impl.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/1/javax.xml.bind/jars/jaxb-api-2.1.jar">jaxb-api.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/1/javax.activation/jars/activation-1.1.jar">activation.jar</ulink>,</listitem>
-<listitem><ulink url="http://download.java.net/maven/1/javax.xml.stream/jars/stax-api-1.0-2.jar">stax-api.jar</ulink></listitem>
-</itemizedlist>
-</para>
 <para>For Ant
 developers the <ulink url="http://maven.apache.org/ant-tasks.html">Ant
 Tasks for Maven</ulink> may be used to add the following to the ant
