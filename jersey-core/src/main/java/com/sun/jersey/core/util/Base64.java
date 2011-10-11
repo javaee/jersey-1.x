@@ -69,12 +69,11 @@ package com.sun.jersey.core.util;
  */
 public final class  Base64
 {
-    static private final int  BASELENGTH         = 255;
+    static private final int  BASELENGTH         = 256;
     static private final int  LOOKUPLENGTH       = 64;
     static private final int  TWENTYFOURBITGROUP = 24;
     static private final int  EIGHTBIT           = 8;
     static private final int  SIXTEENBIT         = 16;
-    static private final int  SIXBIT             = 6;
     static private final int  FOURBYTE           = 4;
     static private final int  SIGN               = -128;
     static private final byte PAD                = (byte) '=';
@@ -83,7 +82,7 @@ public final class  Base64
 
     static
     {
-        for (int i = 0; i < BASELENGTH; i++ )
+        for (int i = 0; i < BASELENGTH; i++)
         {
             base64Alphabet[i] = -1;
         }
@@ -116,18 +115,18 @@ public final class  Base64
         lookUpBase64Alphabet[63] = (byte) '/';
     }
 
-    public static boolean isBase64( String isValidString )
+    public static boolean isBase64(String isValidString)
     {
         return isArrayByteBase64(isValidString.getBytes());
     }
 
-    public static boolean isBase64( byte octect )
+    public static boolean isBase64( byte octet )
     {
         //shall we ignore white space? JEFF??
-        return (octect == PAD || base64Alphabet[octect] != -1);
+        return (octet == PAD || base64Alphabet[(octet & 0x0F) + (octet & 0xF0)] != -1);
     }
 
-    public static boolean isArrayByteBase64( byte[] arrayOctect )
+    public static boolean isArrayByteBase64(byte[] arrayOctect)
     {
         int length = arrayOctect.length;
         if (length == 0)
@@ -155,7 +154,7 @@ public final class  Base64
         int      lengthDataBits    = binaryData.length*EIGHTBIT;
         int      fewerThan24bits   = lengthDataBits%TWENTYFOURBITGROUP;
         int      numberTriplets    = lengthDataBits/TWENTYFOURBITGROUP;
-        byte     encodedData[]     = null;
+        byte     encodedData[];
 
 
         if (fewerThan24bits != 0)
@@ -169,11 +168,11 @@ public final class  Base64
             encodedData = new byte[ numberTriplets * 4 ];
         }
 
-        byte k = 0, l = 0, b1 = 0, b2 = 0, b3 = 0;
+        byte k, l, b1, b2, b3;
 
-        int encodedIndex = 0;
-        int dataIndex   = 0;
-        int i           = 0;
+        int encodedIndex;
+        int dataIndex;
+        int i;
         for ( i = 0; i<numberTriplets; i++ )
         {
             dataIndex = i*3;
@@ -191,9 +190,9 @@ public final class  Base64
 
             encodedData[encodedIndex]   = lookUpBase64Alphabet[ val1 ];
             encodedData[encodedIndex+1] =
-                lookUpBase64Alphabet[ val2 | ( k<<4 )];
+                    lookUpBase64Alphabet[ val2 | ( k<<4 )];
             encodedData[encodedIndex+2] =
-                lookUpBase64Alphabet[ (l <<2 ) | val3 ];
+                    lookUpBase64Alphabet[ (l <<2 ) | val3 ];
             encodedData[encodedIndex+3] = lookUpBase64Alphabet[ b3 & 0x3f ];
         }
 
@@ -223,7 +222,7 @@ public final class  Base64
 
             encodedData[encodedIndex]     = lookUpBase64Alphabet[ val1 ];
             encodedData[encodedIndex + 1] =
-                lookUpBase64Alphabet[ val2 | ( k<<4 )];
+                    lookUpBase64Alphabet[ val2 | ( k<<4 )];
             encodedData[encodedIndex + 2] = lookUpBase64Alphabet[ l<<2 ];
             encodedData[encodedIndex + 3] = PAD;
         }
@@ -234,7 +233,7 @@ public final class  Base64
     /**
      * Decodes Base64 data into octects
      *
-     * @param binaryData Byte array containing Base64 data
+     * @param base64Data Byte array containing Base64 data
      * @return Array containing decoded data.
      */
     public static byte[] decode( byte[] base64Data )
@@ -243,13 +242,13 @@ public final class  Base64
         if(base64Data.length == 0) { return new byte[0]; }
 
         int      numberQuadruple    = base64Data.length/FOURBYTE;
-        byte     decodedData[]      = null;
-        byte     b1=0,b2=0,b3=0, b4=0, marker0=0, marker1=0;
+        byte     decodedData[];
+        byte     b1, b2, b3, b4, marker0, marker1;
 
         // Throw away anything not in base64Data
 
         int encodedIndex = 0;
-        int dataIndex    = 0;
+        int dataIndex;
         {
             // this sizes the output array properly - rlw
             int lastData = base64Data.length;
@@ -281,7 +280,7 @@ public final class  Base64
 
                 decodedData[encodedIndex]   = (byte)(  b1 <<2 | b2>>4 ) ;
                 decodedData[encodedIndex + 1] =
-                    (byte)(((b2 & 0xf)<<4 ) |( (b3>>2) & 0xf) );
+                        (byte)(((b2 & 0xf)<<4 ) |( (b3>>2) & 0xf) );
                 decodedData[encodedIndex + 2] = (byte)( b3<<6 | b4 );
             }
             else if (marker0 == PAD)
@@ -296,13 +295,13 @@ public final class  Base64
 
                 decodedData[encodedIndex]   = (byte)(  b1 <<2 | b2>>4 );
                 decodedData[encodedIndex + 1] =
-                    (byte)(((b2 & 0xf)<<4 ) |( (b3>>2) & 0xf) );
+                        (byte)(((b2 & 0xf)<<4 ) |( (b3>>2) & 0xf) );
             }
             encodedIndex += 3;
         }
         return decodedData;
     }
-     
+
     /**
      * Encodes hex octets of a UTF-8 encoded String into Base64
      *
@@ -322,35 +321,34 @@ public final class  Base64
     public static byte[] decode(String data) {
         return decode(data.getBytes());
     }
-          
+
     static final int base64[] = {
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
-        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 64, 64, 64, 64, 64,
-        64, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
-        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 64,
-        64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-        64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
+            52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 64, 64, 64, 64, 64,
+            64, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,
+            15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 64,
+            64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+            41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
+            64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64
     };
 
     public static String base64Decode(String orig) {
         char chars[] = orig.toCharArray();
         StringBuilder sb = new StringBuilder();
-        int i = 0;
 
         int shift = 0;   // # of excess bits stored in accum
         int acc = 0;
 
-        for (i = 0; i < chars.length; i++) {
+        for (int i = 0; i < chars.length; i++) {
             int v = base64[chars[i] & 0xFF];
 
             if (v >= 64) {

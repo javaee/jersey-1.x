@@ -41,7 +41,7 @@
 package com.sun.jersey.core.util;
 
 import junit.framework.TestCase;
-import static junit.framework.Assert.assertTrue;
+
 import java.util.Arrays;
 
 /**
@@ -97,5 +97,9 @@ public class Base64Test extends TestCase {
         for (int i = 0; i < 256; ++i) {
             assertEquals("incorrect value", result[i], (byte)i);
         }
+    }
+
+    public void testIssue784() {
+        Base64.isBase64((byte) 0xFF);
     }
 }

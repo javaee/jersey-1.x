@@ -1,4 +1,7 @@
 release 1.10
+- Fixed issue 784
+  http://java.net/jira/browse/JERSEY-784
+  Base64.isBase64 fix (was not applicable to all values from byte value range) 
 - Fixed issue 773
   http://java.net/jira/browse/JERSEY-773
   Regression: WADL resurces base URI customization stopped working in Jersey 1.9
