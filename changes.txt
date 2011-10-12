@@ -9,7 +9,7 @@ release 1.10
   http://java.net/jira/browse/JERSEY-763
   VfsSchemeScanner cannot be run in Jboss-7 environment
 - *Breaking change*
-  Grizzly 2 ServletHandler support separated out to a new, jersey-grizlly2-servlet, module
+  Grizzly 2 ServletHandler support separated out to a new, jersey-grizzly2-servlet, module
 - *Breaking change*
   Ant task for generating WADL moved from jersey-server to a newly created contribs/ant-wadl-task module
 - *Breaking change*
