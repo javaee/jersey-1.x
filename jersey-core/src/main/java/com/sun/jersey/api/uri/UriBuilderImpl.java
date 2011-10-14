@@ -37,7 +37,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.api.uri;
 
 import java.lang.reflect.AnnotatedElement;
@@ -53,35 +52,24 @@ import javax.ws.rs.core.UriBuilderException;
 
 /**
  * An implementaton of {@link UriBuilder}.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class UriBuilderImpl extends UriBuilder {
 
     // All fields should be in the percent-encoded form
-    
     private String scheme;
-    
     private String ssp;
-
     private String authority;
-    
     private String userInfo;
-    
     private String host;
-    
     private int port = -1;
-    
     private final StringBuilder path;
-
     private MultivaluedMap<String, String> matrixParams;
-            
     private final StringBuilder query;
-    
     private MultivaluedMap<String, String> queryParams;
-
     private String fragment;
-    
+
     public UriBuilderImpl() {
         path = new StringBuilder();
         query = new StringBuilder();
@@ -97,18 +85,21 @@ public class UriBuilderImpl extends UriBuilder {
         this.query = new StringBuilder(that.query);
         this.fragment = that.fragment;
     }
-    
+
     @Override
     public UriBuilder clone() {
         return new UriBuilderImpl(this);
     }
-    
+
     @Override
     public UriBuilder uri(URI uri) {
-        if (uri == null) 
+        if (uri == null) {
             throw new IllegalArgumentException("URI parameter is null");
-        
-        if (uri.getRawFragment() != null) fragment = uri.getRawFragment();
+        }
+
+        if (uri.getRawFragment() != null) {
+            fragment = uri.getRawFragment();
+        }
 
         if (uri.isOpaque()) {
             scheme = uri.getScheme();
@@ -136,9 +127,15 @@ public class UriBuilderImpl extends UriBuilder {
                 port = -1;
             } else {
                 authority = null;
-                if (uri.getRawUserInfo() != null) userInfo = uri.getRawUserInfo();
-                if (uri.getHost() != null) host = uri.getHost();
-                if (uri.getPort() != -1) port = uri.getPort();
+                if (uri.getRawUserInfo() != null) {
+                    userInfo = uri.getRawUserInfo();
+                }
+                if (uri.getHost() != null) {
+                    host = uri.getHost();
+                }
+                if (uri.getPort() != -1) {
+                    port = uri.getPort();
+                }
             }
         }
 
@@ -168,23 +165,29 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder schemeSpecificPart(String ssp) {
-        if (ssp == null)
+        if (ssp == null) {
             throw new IllegalArgumentException("Scheme specific part parameter is null");
-        
+        }
+
         // TODO encode or validate scheme specific part
         // This will not work for template variables present in the spp
-        StringBuilder sb = new StringBuilder();        
-        if (scheme != null) sb.append(scheme).append(':');
-        if (ssp != null)
+        StringBuilder sb = new StringBuilder();
+        if (scheme != null) {
+            sb.append(scheme).append(':');
+        }
+        if (ssp != null) {
             sb.append(ssp);
-        if (fragment != null && fragment.length() > 0) sb.append('#').append(fragment);
+        }
+        if (fragment != null && fragment.length() > 0) {
+            sb.append('#').append(fragment);
+        }
         URI uri = createURI(sb.toString());
-        
+
         if (uri.getRawSchemeSpecificPart() != null && uri.getRawPath() == null) {
             this.ssp = uri.getRawSchemeSpecificPart();
         } else {
             this.ssp = null;
-            
+
             if (uri.getRawAuthority() != null) {
                 if (uri.getRawUserInfo() == null && uri.getHost() == null && uri.getPort() == -1) {
                     authority = uri.getRawAuthority();
@@ -198,7 +201,7 @@ public class UriBuilderImpl extends UriBuilder {
                     port = uri.getPort();
                 }
             }
-            
+
             path.setLength(0);
             path.append(replaceNull(uri.getRawPath()));
 
@@ -211,17 +214,19 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder userInfo(String ui) {
         checkSsp();
-        this.userInfo = (ui != null) ?
-            encode(ui, UriComponent.Type.USER_INFO) : null;
+        this.userInfo = (ui != null)
+                ? encode(ui, UriComponent.Type.USER_INFO) : null;
         return this;
     }
 
     @Override
     public UriBuilder host(String host) {
         checkSsp();
-        if(host != null) {
-            if(host.length() == 0) // null is used to reset host setting
+        if (host != null) {
+            if (host.length() == 0) // null is used to reset host setting
+            {
                 throw new IllegalArgumentException("Invalid host name");
+            }
             this.host = encode(host, UriComponent.Type.HOST);
         } else {
             this.host = null;
@@ -232,9 +237,11 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder port(int port) {
         checkSsp();
-        if(port < -1) // -1 is used to reset port setting and since URI allows
-                      // as port any positive integer, so do we.
+        if (port < -1) // -1 is used to reset port setting and since URI allows
+        // as port any positive integer, so do we.
+        {
             throw new IllegalArgumentException("Invalid port value");
+        }
         this.port = port;
         return this;
     }
@@ -243,28 +250,31 @@ public class UriBuilderImpl extends UriBuilder {
     public UriBuilder replacePath(String path) {
         checkSsp();
         this.path.setLength(0);
-        if(path != null)
+        if (path != null) {
             appendPath(path);
+        }
         return this;
     }
 
     @Override
-    public UriBuilder path(String path) {        
+    public UriBuilder path(String path) {
         checkSsp();
-        appendPath(path);        
+        appendPath(path);
         return this;
     }
 
     @Override
     public UriBuilder path(Class resource) {
         checkSsp();
-        if (resource == null) 
+        if (resource == null) {
             throw new IllegalArgumentException("Resource parameter is null");
+        }
 
         Class<?> c = resource;
         Path p = c.getAnnotation(Path.class);
-        if (p == null)
+        if (p == null) {
             throw new IllegalArgumentException("The class, " + resource + " is not annotated with @Path");
+        }
         appendPath(p);
         return this;
     }
@@ -272,105 +282,122 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder path(Class resource, String methodName) {
         checkSsp();
-        if (resource == null) 
+        if (resource == null) {
             throw new IllegalArgumentException("Resource parameter is null");
-        if (methodName == null) 
+        }
+        if (methodName == null) {
             throw new IllegalArgumentException("MethodName parameter is null");
-        
+        }
+
         Method[] methods = resource.getMethods();
         Method found = null;
         for (Method m : methods) {
             if (methodName.equals(m.getName())) {
-                if (found == null) found = m;
-                else 
+                if (found == null) {
+                    found = m;
+                } else {
                     throw new IllegalArgumentException();
+                }
             }
         }
 
-        if (found == null)
-            throw new IllegalArgumentException("The method named, " + methodName +
-                    ", is not specified by " + resource);
+        if (found == null) {
+            throw new IllegalArgumentException("The method named, " + methodName
+                    + ", is not specified by " + resource);
+        }
 
         appendPath(getPath(found));
-        
+
         return this;
     }
 
     @Override
     public UriBuilder path(Method method) {
         checkSsp();
-        if (method == null)
+        if (method == null) {
             throw new IllegalArgumentException("Method is null");
+        }
         appendPath(getPath(method));
         return this;
     }
-    
+
     private Path getPath(AnnotatedElement ae) {
         Path p = ae.getAnnotation(Path.class);
-        if (p == null)
-            throw new IllegalArgumentException("The annotated element, " +
-                    ae + " is not annotated with @Path");
+        if (p == null) {
+            throw new IllegalArgumentException("The annotated element, "
+                    + ae + " is not annotated with @Path");
+        }
         return p;
     }
-
 
     @Override
     public UriBuilder segment(String... segments) throws IllegalArgumentException {
         checkSsp();
-        if (segments == null) 
+        if (segments == null) {
             throw new IllegalArgumentException("Segments parameter is null");
+        }
 
-        for (String segment: segments)
-            appendPath(segment, true);        
+        for (String segment : segments) {
+            appendPath(segment, true);
+        }
         return this;
     }
-    
+
     @Override
     public UriBuilder replaceMatrix(String matrix) {
         checkSsp();
         int i = path.lastIndexOf("/");
-        if (i != -1) i = 0;
+        if (i != -1) {
+            i = 0;
+        }
         i = path.indexOf(";", i);
         if (i != -1) {
             path.setLength(i + 1);
         } else {
             path.append(';');
         }
-        
-        if (matrix != null)
+
+        if (matrix != null) {
             path.append(encode(matrix, UriComponent.Type.PATH));
+        }
         return this;
     }
 
     @Override
     public UriBuilder matrixParam(String name, Object... values) {
         checkSsp();
-        if (name == null)
+        if (name == null) {
             throw new IllegalArgumentException("Name parameter is null");
-        if (values == null)
+        }
+        if (values == null) {
             throw new IllegalArgumentException("Value parameter is null");
-        if (values.length == 0)
+        }
+        if (values.length == 0) {
             return this;
-        
+        }
+
         name = encode(name, UriComponent.Type.MATRIX_PARAM);
         if (matrixParams == null) {
             for (Object value : values) {
                 path.append(';').append(name);
 
-                if (value == null)
+                if (value == null) {
                     throw new IllegalArgumentException("One or more of matrix value parameters are null");
+                }
 
                 final String stringValue = value.toString();
-                if (stringValue.length() > 0)
+                if (stringValue.length() > 0) {
                     path.append('=').append(encode(stringValue, UriComponent.Type.MATRIX_PARAM));
+                }
             }
         } else {
             for (Object value : values) {
-                if (value == null)
+                if (value == null) {
                     throw new IllegalArgumentException("One or more of matrix value parameters are null");
-                
+                }
+
                 matrixParams.add(name, encode(value.toString(), UriComponent.Type.MATRIX_PARAM));
-            }            
+            }
         }
         return this;
     }
@@ -378,68 +405,82 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public UriBuilder replaceMatrixParam(String name, Object... values) {
         checkSsp();
-        
+
         if (name == null) {
             throw new IllegalArgumentException("Name parameter is null");
         }
 
         if (matrixParams == null) {
             int i = path.lastIndexOf("/");
-            if (i != -1) i = 0;
+            if (i != -1) {
+                i = 0;
+            }
             matrixParams = UriComponent.decodeMatrix((i != -1) ? path.substring(i) : "", false);
             i = path.indexOf(";", i);
-            if (i != -1) path.setLength(i);
+            if (i != -1) {
+                path.setLength(i);
+            }
         }
-        
+
         name = encode(name, UriComponent.Type.MATRIX_PARAM);
         matrixParams.remove(name);
         if (values != null) {
             for (Object value : values) {
-                if (value == null)
+                if (value == null) {
                     throw new IllegalArgumentException("One or more of matrix value parameters are null");
+                }
 
                 matrixParams.add(name, encode(value.toString(), UriComponent.Type.MATRIX_PARAM));
             }
         }
         return this;
     }
-    
+
     @Override
     public UriBuilder replaceQuery(String query) {
         checkSsp();
         this.query.setLength(0);
-        if (query != null)
+        if (query != null) {
             this.query.append(encode(query, UriComponent.Type.QUERY));
+        }
         return this;
     }
 
     @Override
     public UriBuilder queryParam(String name, Object... values) {
         checkSsp();
-        if (name == null)
+        if (name == null) {
             throw new IllegalArgumentException("Name parameter is null");
-        if (values == null)
+        }
+        if (values == null) {
             throw new IllegalArgumentException("Value parameter is null");
-        if (values.length == 0)
+        }
+        if (values.length == 0) {
             return this;
+        }
 
         name = encode(name, UriComponent.Type.QUERY_PARAM);
         if (queryParams == null) {
             for (Object value : values) {
-                if (query.length() > 0) query.append('&');
+                if (query.length() > 0) {
+                    query.append('&');
+                }
                 query.append(name);
 
-                if (value == null)
+                if (value == null) {
                     throw new IllegalArgumentException("One or more of query value parameters are null");
+                }
 
                 final String stringValue = value.toString();
-                if (stringValue.length() > 0)
+                if (stringValue.length() > 0) {
                     query.append('=').append(encode(stringValue, UriComponent.Type.QUERY_PARAM));
+                }
             }
         } else {
             for (Object value : values) {
-                if (value == null)
+                if (value == null) {
                     throw new IllegalArgumentException("One or more of query value parameters are null");
+                }
 
                 queryParams.add(name, encode(value.toString(), UriComponent.Type.QUERY_PARAM));
             }
@@ -459,96 +500,110 @@ public class UriBuilderImpl extends UriBuilder {
         name = encode(name, UriComponent.Type.QUERY_PARAM);
         queryParams.remove(name);
 
-        if (values == null) return this;
+        if (values == null) {
+            return this;
+        }
 
         for (Object value : values) {
-            if (value == null)
+            if (value == null) {
                 throw new IllegalArgumentException("One or more of query value parameters are null");
+            }
 
             queryParams.add(name, encode(value.toString(), UriComponent.Type.QUERY_PARAM));
         }
         return this;
     }
-    
+
     @Override
     public UriBuilder fragment(String fragment) {
-        this.fragment = (fragment != null) ? 
-            encode(fragment, UriComponent.Type.FRAGMENT) :
-            null;
+        this.fragment = (fragment != null)
+                ? encode(fragment, UriComponent.Type.FRAGMENT)
+                : null;
         return this;
     }
 
     private void checkSsp() {
-        if (ssp != null) 
-            throw new IllegalArgumentException("Schema specific part is opaque");                
+        if (ssp != null) {
+            throw new IllegalArgumentException("Schema specific part is opaque");
+        }
     }
-    
+
     private void appendPath(Path t) {
-        if (t == null)
+        if (t == null) {
             throw new IllegalArgumentException("Path is null");
-        
+        }
+
         appendPath(t.value());
     }
-    
+
     private void appendPath(String path) {
         appendPath(path, false);
     }
-    
+
     private void appendPath(String segments, boolean isSegment) {
-        if (segments == null)
+        if (segments == null) {
             throw new IllegalArgumentException("Path segment is null");
-        if (segments.length() == 0)
+        }
+        if (segments.length() == 0) {
             return;
+        }
 
         // Encode matrix parameters on current path segment
         encodeMatrix();
 
-        segments = encode(segments, 
+        segments = encode(segments,
                 (isSegment) ? UriComponent.Type.PATH_SEGMENT : UriComponent.Type.PATH);
-        
+
         final boolean pathEndsInSlash = path.length() > 0 && path.charAt(path.length() - 1) == '/';
         final boolean segmentStartsWithSlash = segments.charAt(0) == '/';
-        
+
         if (path.length() > 0 && !pathEndsInSlash && !segmentStartsWithSlash) {
             path.append('/');
         } else if (pathEndsInSlash && segmentStartsWithSlash) {
             segments = segments.substring(1);
-            if (segments.length() == 0)
+            if (segments.length() == 0) {
                 return;
+            }
         }
-        
+
         path.append(segments);
     }
 
     private void encodeMatrix() {
-        if (matrixParams == null || matrixParams.isEmpty())
+        if (matrixParams == null || matrixParams.isEmpty()) {
             return;
+        }
 
         for (Map.Entry<String, List<String>> e : matrixParams.entrySet()) {
             String name = e.getKey();
-            
+
             for (String value : e.getValue()) {
                 path.append(';').append(name);
-                if (value.length() > 0)
+                if (value.length() > 0) {
                     path.append('=').append(value);
+                }
             }
         }
         matrixParams = null;
     }
 
     private void encodeQuery() {
-        if (queryParams == null || queryParams.isEmpty())
+        if (queryParams == null || queryParams.isEmpty()) {
             return;
+        }
 
         for (Map.Entry<String, List<String>> e : queryParams.entrySet()) {
             String name = e.getKey();
 
             for (String value : e.getValue()) {
-                if (query.length() > 0) query.append('&');
+                if (query.length() > 0) {
+                    query.append('&');
+                }
                 query.append(name);
 
-                if (value.length() > 0)
+                if (value.length() > 0) {
                     query.append('=').append(value);
+                }
             }
         }
         queryParams = null;
@@ -557,7 +612,8 @@ public class UriBuilderImpl extends UriBuilder {
     private String encode(String s, UriComponent.Type type) {
         return UriComponent.contextualEncode(s, type, true);
     }
-    
+
+    @Override
     public URI buildFromMap(Map<String, ? extends Object> values) {
         return _buildFromMap(true, values);
     }
@@ -568,35 +624,38 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     private URI _buildFromMap(boolean encode, Map<String, ? extends Object> values) {
-        if (ssp != null) 
+        if (ssp != null) {
             throw new IllegalArgumentException("Schema specific part is opaque");
-        
+        }
+
         encodeMatrix();
         encodeQuery();
-        
+
         String uri = UriTemplate.createURI(
                 scheme, authority,
                 userInfo, host, (port != -1) ? String.valueOf(port) : null,
                 path.toString(), query.toString(), fragment, values, encode);
-        return createURI(uri);        
+        return createURI(uri);
     }
-    
+
     @Override
     public URI build(Object... values) {
         return _build(true, values);
     }
-    
+
     @Override
     public URI buildFromEncoded(Object... values) {
         return _build(false, values);
     }
-    
-    private URI _build(boolean encode, Object... values) {
-        if (values == null || values.length == 0) 
-            return createURI(create());
 
-        if (ssp != null)
+    private URI _build(boolean encode, Object... values) {
+        if (values == null || values.length == 0) {
+            return createURI(create());
+        }
+
+        if (ssp != null) {
             throw new IllegalArgumentException("Schema specific part is opaque");
+        }
 
         encodeMatrix();
         encodeQuery();
@@ -611,43 +670,54 @@ public class UriBuilderImpl extends UriBuilder {
     private String create() {
         encodeMatrix();
         encodeQuery();
-        
+
         StringBuilder sb = new StringBuilder();
-        
-        if (scheme != null) sb.append(scheme).append(':');
+
+        if (scheme != null) {
+            sb.append(scheme).append(':');
+        }
 
         if (ssp != null) {
             sb.append(ssp);
-        } else {        
+        } else {
             if (userInfo != null || host != null || port != -1) {
                 sb.append("//");
 
-                if (userInfo != null && userInfo.length() > 0) 
+                if (userInfo != null && userInfo.length() > 0) {
                     sb.append(userInfo).append('@');
+                }
 
                 if (host != null) {
                     // TODO check IPv6 address
                     sb.append(host);
                 }
 
-                if (port != -1) sb.append(':').append(port);
+                if (port != -1) {
+                    sb.append(':').append(port);
+                }
             } else if (authority != null) {
                 sb.append("//").append(authority);
             }
 
             if (path.length() > 0) {
-                if (sb.length() > 0 && path.charAt(0) != '/') sb.append("/");
+                if (sb.length() > 0 && path.charAt(0) != '/') {
+                    sb.append("/");
+                }
                 sb.append(path);
             }
 
-            if (query.length() > 0) sb.append('?').append(query);
+            if (query.length() > 0) {
+                sb.append('?').append(query);
+            }
         }
-        
-        if (fragment != null && fragment.length() > 0) sb.append('#').append(fragment);
-        
+
+        if (fragment != null && fragment.length() > 0) {
+            sb.append('#').append(fragment);
+        }
+
         return UriComponent.encodeTemplateNames(sb.toString());
     }
-    
+
     private URI createURI(String uri) {
         try {
             return new URI(uri);
@@ -655,7 +725,7 @@ public class UriBuilderImpl extends UriBuilder {
             throw new UriBuilderException(ex);
         }
     }
-    
+
     private String replaceNull(String s) {
         return (s != null) ? s : "";
     }
