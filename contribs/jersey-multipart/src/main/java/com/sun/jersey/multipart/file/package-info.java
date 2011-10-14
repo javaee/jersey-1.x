@@ -39,7 +39,17 @@
  */
 
 /**
+ * <p>
  * Provides support for body parts that are file attachments.
+ * </p>
+ * 
+ * <p>
+ * The file attachment can be represented i.e. by the {@link java.io.File} 
+ * ({@link com.sun.jersey.multipart.file.FileDataBodyPart}) or 
+ * by the {@link java.io.InputStream} 
+ * ({@link com.sun.jersey.multipart.file.StreamDataBodyPart}).
+ * </p>
  *
  */
 package com.sun.jersey.multipart.file;
+

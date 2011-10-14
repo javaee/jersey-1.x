@@ -1,5 +1,8 @@
 release 1.10
-- Fixed issue 784
+- Fixed issue 777
+  http://java.net/jira/browse/JERSEY-777
+  Provide support for byte[] in FormDataBodyPart
+-- Fixed issue 784
   http://java.net/jira/browse/JERSEY-784
   Base64.isBase64 fix (was not applicable to all values from byte value range) 
 - Fixed issue 773
