@@ -224,7 +224,7 @@ public class OAuthServerFilter implements ContainerRequestFilter {
             }
 
             OAuthConsumer atConsumer = accessToken.getConsumer();
-            if (atConsumer == null || !atConsumer.getSecret().equals(consumer.getSecret())) {
+            if (atConsumer == null || !consumerKey.equals(atConsumer.getKey())) {
                 throw newUnauthorizedException();
             }
 

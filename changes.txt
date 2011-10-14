@@ -1,4 +1,7 @@
 release 1.10
+- Fixed issue 789
+  http://java.net/jira/browse/JERSEY-789
+  OAuthServerFilter now compares consumer keys instead of consumer secrets
 - Fixed issue 777
   http://java.net/jira/browse/JERSEY-777
   Provide support for byte[] in FormDataBodyPart
