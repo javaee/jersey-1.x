@@ -91,7 +91,7 @@ public abstract class AbstractHttpServiceTest {
                                 "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                                 "http://repository.springsource.com/maven/bundles/release",
                                 "http://repository.springsource.com/maven/bundles/external",
-                                "http://download.java.net/maven/2"),
+                                "http://maven.java.net/content/repositories/snapshots/"),
                 mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
                 mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
