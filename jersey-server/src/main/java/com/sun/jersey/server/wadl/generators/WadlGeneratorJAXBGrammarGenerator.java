@@ -95,18 +95,18 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
     // Wrapper interfaces so I can treat dispirate types the same
     // when processing them later
     //
-    
+
     private static interface HasType
     {
         public Class getPrimaryClass();
         public Type getType();
     }
-        
+
     private static interface WantsName
     {
         public void setName( QName name );
     }
-    
+
     /**
      * @return An adapter for Parameter
      */
@@ -121,51 +121,49 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
             }
         };
     }
-    
-    
+
+
     private class Pair {
-        
+
         public Pair(HasType hasType, WantsName wantsName) {
             this.hasType = hasType;
             this.wantsName = wantsName;
         }
-        
+
         HasType hasType;
         WantsName wantsName;
     }
-    
+
     // Static final fields
-    
+
     private static final Logger LOG = Logger.getLogger( WadlGeneratorJAXBGrammarGenerator.class.getName() );
 
     private static final java.util.Set<Class> SPECIAL_GENERIC_TYPES =
             new HashSet<Class>()
             {{
-                add(JResponse.class);
-                add(List.class);
-            }};
-    
-    
+                    add(JResponse.class);
+                    add(List.class);
+                }};
+
+
     // Instance fields
-    //
-    
-    
+
     // The generator we are decorating
     private WadlGenerator _delegate;
 
     // Any SeeAlso references
     private Set<Class> _seeAlso;
-    
+
     // A matched list of Parm, Parameter to list the relavent
     // entity objects that we might like to transform.
     private List<Pair> _hasTypeWantsName;
-    
+
     public WadlGeneratorJAXBGrammarGenerator() {
         _delegate = new WadlGeneratorImpl();
     }
 
     // =============== House keeping methods ================================
-    
+
     public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
         _delegate = delegate;
     }
@@ -173,9 +171,9 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
     public String getRequiredJaxbContextPath() {
         return _delegate.getRequiredJaxbContextPath();
     }
-    
-    
-    
+
+
+
     public void init() throws Exception {
         _delegate.init();
         //
@@ -185,10 +183,10 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
         // entity objects that we might like to transform.
         _hasTypeWantsName = new ArrayList<Pair>();
     }
-    
+
     // =============== Application Creation ================================
 
-    
+
     /**
      * @return application
      * @see com.sun.jersey.server.wadl.WadlGenerator#createApplication()
@@ -204,7 +202,7 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
      * @see com.sun.jersey.server.wadl.WadlGenerator#createMethod(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Method createMethod( AbstractResource ar,
-            AbstractResourceMethod arm ) {
+                                AbstractResourceMethod arm ) {
         return _delegate.createMethod( ar, arm );
     }
 
@@ -215,7 +213,7 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
      * @see com.sun.jersey.server.wadl.WadlGenerator#createRequest(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Request createRequest( AbstractResource ar,
-            AbstractResourceMethod arm ) {
+                                  AbstractResourceMethod arm ) {
 
         return _delegate.createRequest( ar, arm );
     }
@@ -228,9 +226,9 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
      * @see com.sun.jersey.server.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
     public Param createParam( AbstractResource ar,
-            AbstractMethod am, Parameter p ) {
+                              AbstractMethod am, Parameter p ) {
         final Param param = _delegate.createParam( ar, am, p );
-        
+
         // If the paramter is an entity we probably want to convert this to XML
         //
         if (p.getSource() == Parameter.Source.ENTITY) {
@@ -242,7 +240,7 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                         }
                     }));
         }
-        
+
         return param;
     }
 
@@ -270,7 +268,7 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                         }));
             }
         }
-        
+
         return rt;
     }
 
@@ -306,7 +304,7 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
      * @see com.sun.jersey.server.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Response createResponse( AbstractResource ar,
-            final AbstractResourceMethod arm ) {
+                                    final AbstractResourceMethod arm ) {
         final Response response = _delegate.createResponse( ar, arm );
         if (response!=null) {
             HasType hasType = new HasType()  {
@@ -314,76 +312,67 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                 public Class getPrimaryClass() {
                     return arm.getReturnType();
                 }
-                
+
                 public Type getType() {
                     return arm.getGenericReturnType();
                 }
             };
-            
+
             for (final Representation representation : response.getRepresentation()) {
-                
+
                 // Process each representation
                 _hasTypeWantsName.add(new Pair(
-                    hasType,
-                    new WantsName() {
-                        @Override
-                        public void setName(QName name) {
-                            representation.setElement(name);
-                        }
-                    }));
+                        hasType,
+                        new WantsName() {
+                            @Override
+                            public void setName(QName name) {
+                                representation.setElement(name);
+                            }
+                        }));
             }
         }
         return response;
     }
 
     // ================ methods for post build actions =======================
-    
+
     public ExternalGrammarDefinition createExternalGrammar() {
 
-        
         // Right now lets generate some external metadata
-        //
-        
+
         Map<String, ApplicationDescription.ExternalGrammar> extraFiles =
                 new HashMap<String, ApplicationDescription.ExternalGrammar>();
-        
-        // Build the model as required
-        //
-        Resolver resolver = buildModelAndSchemas(extraFiles);
-        
-        
-        // Pass onto the next delegate
 
+        // Build the model as required
+        Resolver resolver = buildModelAndSchemas(extraFiles);
+
+        // Pass onto the next delegate
         ExternalGrammarDefinition previous = _delegate.createExternalGrammar();
         previous.map.putAll(extraFiles);
         if (resolver!=null) {
             previous.addResolver(resolver);
         }
 
-        
         return previous;
     }
 
-
-
-    
     /**
      * Build the JAXB model and generate the schemas based on tha data
-     * @param extraFiles 
+     * @param extraFiles
      */
     private Resolver buildModelAndSchemas(Map<String, ExternalGrammar> extraFiles) {
 
         // Lets get all candidate classes so we can create the JAX-B context
         // include any @XmlSeeAlso references.
-        
+
         Set<Class> classSet = new HashSet<Class>(_seeAlso);
-        
+
         for ( Pair pair : _hasTypeWantsName ) {
             HasType hasType = pair.hasType;
             Class clazz = hasType.getPrimaryClass();
-            
+
             // Is this class itself interesting?
-            
+
             if ( clazz.getAnnotation( XmlRootElement.class ) !=null ) {
                 classSet.add( clazz );
             }
@@ -398,48 +387,45 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                         classSet.add( (Class) parameterType );
                     }
                 }
-                
             }
         }
-        
+
         // Create a JAX-B context, and use this to generate us a bunch of
         // schema objects
-        //
-        
+
         JAXBIntrospector introspector = null;
-        
+
         try {
             JAXBContext context = JAXBContext.newInstance( classSet.toArray( new Class[classSet.size()] ) );
-            
+
             final List<StreamResult> results = new ArrayList<StreamResult>();
-            
+
             context.generateSchema( new SchemaOutputResolver() {
-                
-                    int counter = 0;
-                
-                    @Override
-                    public Result createOutput( String namespaceUri, String suggestedFileName ) {
-                        StreamResult result = new StreamResult( new CharArrayWriter() );
-                        result.setSystemId( "xsd" + (counter++)  + ".xsd");
-                        results.add(result);
-                        return result;
-                    }
-                });
-            
+
+                int counter = 0;
+
+                @Override
+                public Result createOutput( String namespaceUri, String suggestedFileName ) {
+                    StreamResult result = new StreamResult( new CharArrayWriter() );
+                    result.setSystemId( "xsd" + (counter++)  + ".xsd");
+                    results.add(result);
+                    return result;
+                }
+            });
+
             // Store the new files for later use
             //
-            
+
             for (StreamResult result : results) {
                 CharArrayWriter writer = ( CharArrayWriter )result.getWriter();
                 byte[] contents = writer.toString().getBytes( "UTF8" );
-                extraFiles.put( 
-                    result.getSystemId() , 
-                    new ApplicationDescription.ExternalGrammar(
-                        MediaType.APPLICATION_XML_TYPE, // I don't think there is a specific media type for XML Schema
-                        contents));
+                extraFiles.put(
+                        result.getSystemId() ,
+                        new ApplicationDescription.ExternalGrammar(
+                                MediaType.APPLICATION_XML_TYPE, // I don't think there is a specific media type for XML Schema
+                                contents));
             }
-            
-            
+
             // Create an introspector
             //
 
@@ -454,7 +440,7 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
         }
 
         // Create introspector
-        
+
         if (introspector!=null) {
             final JAXBIntrospector copy = introspector;
 
@@ -466,17 +452,16 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                     try {
                         parameterClassInstance = type.newInstance();
                     } catch (InstantiationException ex) {
-                        LOG.log(Level.SEVERE, null, ex);
+                        LOG.log(Level.FINE, null, ex);
                     } catch (IllegalAccessException ex) {
-                        LOG.log(Level.SEVERE, null, ex);
+                        LOG.log(Level.FINE, null, ex);
                     }
 
                     if (parameterClassInstance==null) {
                         return null;
                     }
 
-                    return copy.getElementName( 
-                        parameterClassInstance);
+                    return copy.getElementName(parameterClassInstance);
 
                 }
             };
@@ -485,19 +470,17 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
             return null; // No resolver created
         }
     }
-        
-    
-    @Override 
-    public void attachTypes(ApplicationDescription introspector) {    
-        
+
+    @Override
+    public void attachTypes(ApplicationDescription introspector) {
+
         // If we managed to get an introspector then lets go back an update the parameters
-        //
-        
+
         if (introspector!=null) {
 
             int i = _hasTypeWantsName.size();
             nextItem : for ( int j = 0; j < i; j++ ) {
-            
+
                 Pair pair = _hasTypeWantsName.get( j );
                 WantsName nextToProcess = pair.wantsName;
                 HasType nextType = pair.hasType;
@@ -507,24 +490,22 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                 // as it leads to cleaner code
 
                 Class<?> parameterClass = nextType.getPrimaryClass();
-                
+
                 // Fix those specific generic types
                 if (SPECIAL_GENERIC_TYPES.contains(parameterClass)) {
                     parameterClass = (Class)
                             ((ParameterizedType)nextType.getType())
-                               .getActualTypeArguments()[0];
+                                    .getActualTypeArguments()[0];
                 }
 
                 QName name = introspector.resolve(parameterClass);
-                
+
                 if ( name !=null ) {
                     nextToProcess.setName(name);
-                } 
-                else  {
+                } else  {
                     LOG.info("Couldn't find JAX-B element for class " + parameterClass.getName());
                 }
             }
         }
     }
-
 }

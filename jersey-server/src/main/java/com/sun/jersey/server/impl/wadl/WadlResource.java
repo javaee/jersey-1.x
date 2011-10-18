@@ -60,7 +60,6 @@ import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.spi.resource.Singleton;
 import com.sun.research.ws.wadl.Application;
 
-
 /**
  *
  * @author Paul.Sandoz@Sun.Com
