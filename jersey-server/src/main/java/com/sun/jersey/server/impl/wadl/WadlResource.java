@@ -40,10 +40,10 @@
 
 package com.sun.jersey.server.impl.wadl;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.sun.jersey.server.wadl.ApplicationDescription;
+import com.sun.jersey.server.wadl.WadlApplicationContext;
+import com.sun.jersey.spi.resource.Singleton;
+import com.sun.research.ws.wadl.Application;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -52,13 +52,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-
 import javax.xml.bind.Marshaller;
-
-import com.sun.jersey.server.wadl.ApplicationDescription;
-import com.sun.jersey.server.wadl.WadlApplicationContext;
-import com.sun.jersey.spi.resource.Singleton;
-import com.sun.research.ws.wadl.Application;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -67,13 +67,16 @@ import com.sun.research.ws.wadl.Application;
 @Singleton
 public final class WadlResource {
 
+    public static final String HTTPDATEFORMAT = "EEE, dd MMM yyyy HH:mm:ss zzz";
     private static final Logger LOGGER = Logger.getLogger(WadlResource.class.getName());
 
     private WadlApplicationContext wadlContext;
     private byte[] wadlXmlRepresentation;
+    private final String lastModified;
 
     public WadlResource(@Context WadlApplicationContext wadlContext) {
         this.wadlContext = wadlContext;
+        this.lastModified = new SimpleDateFormat(HTTPDATEFORMAT).format(new Date());
     }
 
     @Produces({"application/vnd.sun.wadl+xml", "application/xml"})
@@ -101,15 +104,15 @@ public final class WadlResource {
             }
         }
 
-        return Response.ok(new ByteArrayInputStream(wadlXmlRepresentation)).build();
+        return Response.ok(new ByteArrayInputStream(wadlXmlRepresentation)).header("Last-modified", lastModified).build();
     }
 
     @Produces({"application/xml"})
     @GET
     @Path("{path}")
     public synchronized Response geExternalGramar(
-        @Context UriInfo uriInfo,
-        @PathParam("path") String path) {
+            @Context UriInfo uriInfo,
+            @PathParam("path") String path) {
 
         // Fail if wadl generation is disabled
         if(!wadlContext.isWadlGenerationEnabled()) {
@@ -117,7 +120,7 @@ public final class WadlResource {
         }
 
         ApplicationDescription applicationDescription =
-            wadlContext.getApplication(uriInfo);
+                wadlContext.getApplication(uriInfo);
 
         // Fail is we don't have any metadata for this path
         ApplicationDescription.ExternalGrammar externalMetadata = applicationDescription.getExternalGrammar( path );
@@ -129,7 +132,7 @@ public final class WadlResource {
         // Return the data
 
         return Response.ok().type( externalMetadata.getType() )
-            .entity( externalMetadata.getContent() )
-            .build();
+                .entity( externalMetadata.getContent() )
+                .build();
     }
 }

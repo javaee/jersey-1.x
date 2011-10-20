@@ -40,45 +40,6 @@
 
 package com.sun.jersey.impl.wadl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.LoggingFilter;
@@ -95,6 +56,42 @@ import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 import com.sun.research.ws.wadl.Resources;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 /**
  *
@@ -230,6 +227,23 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("//wadl:resource[@path='{id}/verbose']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
         assertEquals(val,"xs:int");
     }
+
+    public void testLastModifiedGET() {
+        initiateWebApplication(WidgetsResource.class, ExtraResource.class);
+        WebResource r = resource("/application.wadl");
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertTrue(cr.getHeaders().containsKey("Last-modified"));
+    }
+
+    public void testLastModifiedOPTIONS() {
+        initiateWebApplication(WidgetsResource.class, ExtraResource.class);
+        WebResource r = resource("/widgets/3/verbose");
+
+        ClientResponse cr = r.options(ClientResponse.class);
+        assertTrue(cr.getHeaders().containsKey("Last-modified"));
+    }
+
 
     public void testOptionsResourceWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
         initiateWebApplication(WidgetsResource.class, ExtraResource.class);
@@ -674,8 +688,6 @@ public class WadlResourceTest extends AbstractResourceTester {
 
         public static class MyWadlGenerator extends WadlGeneratorImpl {
             public static final String CUSTOM_RESOURCES_BASE_URI = "http://myBaseUri";
-
-
 
             @Override
             public Resources createResources() {

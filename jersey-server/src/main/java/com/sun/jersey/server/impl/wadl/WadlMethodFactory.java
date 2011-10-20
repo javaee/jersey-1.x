@@ -50,6 +50,8 @@ import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.research.ws.wadl.Application;
 
 import javax.ws.rs.core.Response;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -82,14 +84,16 @@ import java.util.Map;
         private final AbstractResource resource;
         private final String path;
         private final WadlApplicationContext wadlApplicationContext;
+        private final String lastModified;
 
         WadlOptionsMethodDispatcher(Map<String, List<ResourceMethod>> methods,
-                                    AbstractResource resource, String path, 
+                                    AbstractResource resource, String path,
                                     WadlApplicationContext wadlApplicationContext) {
             super(methods);
             this.resource = resource;
             this.path = path;
             this.wadlApplicationContext = wadlApplicationContext;
+            this.lastModified = new SimpleDateFormat(WadlResource.HTTPDATEFORMAT).format(new Date());
         }
 
         @Override
@@ -100,7 +104,7 @@ import java.util.Map;
                         resource, path);
 
                 context.getResponse().setResponse(
-                        Response.ok(a, MediaTypes.WADL).header("Allow", allow).build());
+                        Response.ok(a, MediaTypes.WADL).header("Allow", allow).header("Last-modified", lastModified).build());
             } else {
                 context.getResponse().setResponse(Response.status(Response.Status.NO_CONTENT).header("Allow", allow).build());
             }

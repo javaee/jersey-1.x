@@ -123,8 +123,6 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 
         ApplicationDescription description = getApplication(info);
 
-        //
-
         WadlGenerator wadlGenerator = wadlGeneratorConfig.createWadlGenerator();
         Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(description,resource) :
                 new WadlBuilder( wadlGenerator ).generate(description, resource, path);
@@ -136,8 +134,6 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 
         attachExternalGrammar(a, description,
                 info.getRequestUri());
-
-        //
 
         for(Resources resources : a.getResources()) {
             final Resource r = resources.getResource().get(0);
@@ -160,11 +156,6 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
         return jaxbContext;
     }
 
-// This method was not longer used
-//    public String getJAXBContextPath() {
-//        return wadlGenerator.getRequiredJaxbContextPath();
-//    }
-
     private WadlBuilder getWadlBuilder() {
         return (this.wadlGenerationEnabled ? new WadlBuilder(wadlGeneratorConfig.createWadlGenerator()) : null);
     }
@@ -178,8 +169,6 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
     public boolean isWadlGenerationEnabled() {
         return wadlGenerationEnabled;
     }
-
-
 
     /**
      * Update the application object to include the generated grammar objects
