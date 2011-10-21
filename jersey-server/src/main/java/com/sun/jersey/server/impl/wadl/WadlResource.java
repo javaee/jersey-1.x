@@ -55,6 +55,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.Marshaller;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
@@ -71,8 +72,9 @@ public final class WadlResource {
     private static final Logger LOGGER = Logger.getLogger(WadlResource.class.getName());
 
     private WadlApplicationContext wadlContext;
+    private URI lastBaseUri;
     private byte[] wadlXmlRepresentation;
-    private final String lastModified;
+    private String lastModified;
 
     public WadlResource(@Context WadlApplicationContext wadlContext) {
         this.wadlContext = wadlContext;
@@ -86,11 +88,14 @@ public final class WadlResource {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        ApplicationDescription applicationDescription =
-                wadlContext.getApplication(uriInfo);
-        Application application = applicationDescription.getApplication();
+        if ((wadlXmlRepresentation == null) || ((lastBaseUri != null) && !lastBaseUri.equals(uriInfo.getBaseUri())) ) {
+            this.lastBaseUri = uriInfo.getBaseUri();
+            this.lastModified = new SimpleDateFormat(HTTPDATEFORMAT).format(new Date());
 
-        if (wadlXmlRepresentation == null) {
+            ApplicationDescription applicationDescription =
+                    wadlContext.getApplication(uriInfo);
+            Application application = applicationDescription.getApplication();
+
             try {
                 final Marshaller marshaller = wadlContext.getJAXBContext().createMarshaller();
                 marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
@@ -111,8 +116,8 @@ public final class WadlResource {
     @GET
     @Path("{path}")
     public synchronized Response geExternalGramar(
-            @Context UriInfo uriInfo,
-            @PathParam("path") String path) {
+        @Context UriInfo uriInfo,
+        @PathParam("path") String path) {
 
         // Fail if wadl generation is disabled
         if(!wadlContext.isWadlGenerationEnabled()) {
@@ -120,7 +125,7 @@ public final class WadlResource {
         }
 
         ApplicationDescription applicationDescription =
-                wadlContext.getApplication(uriInfo);
+            wadlContext.getApplication(uriInfo);
 
         // Fail is we don't have any metadata for this path
         ApplicationDescription.ExternalGrammar externalMetadata = applicationDescription.getExternalGrammar( path );
@@ -130,9 +135,8 @@ public final class WadlResource {
         }
 
         // Return the data
-
         return Response.ok().type( externalMetadata.getType() )
-                .entity( externalMetadata.getContent() )
-                .build();
+            .entity(externalMetadata.getContent())
+            .build();
     }
 }

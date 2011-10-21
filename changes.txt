@@ -1,4 +1,8 @@
 release 1.10
+- Fixed issue 794
+  http://java.net/jira/browse/JERSEY-794
+  Resources base in generated wadl does not reflect only first request anymore,
+  redesigned cache to invalidate when request comes form different base URI.
 - Fixed issue 29
   http://java.net/jira/browse/JERSEY-29
   Response to GET /application.wadl and OPTIONS /url now contains Last-modified
