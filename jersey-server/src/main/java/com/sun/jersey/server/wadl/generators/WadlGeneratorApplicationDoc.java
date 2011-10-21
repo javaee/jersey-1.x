@@ -60,6 +60,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * This {@link WadlGenerator} adds all doc elements provided by {@link ApplicationDocs#getDocs()}
@@ -209,8 +210,8 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return response
      * @see com.sun.jersey.server.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Response createResponse(AbstractResource r, AbstractResourceMethod m) {
-        return _delegate.createResponse(r, m);
+    public List<Response> createResponses(AbstractResource r, AbstractResourceMethod m) {
+        return _delegate.createResponses(r, m);
     }
 
     /**

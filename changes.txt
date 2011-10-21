@@ -1,4 +1,12 @@
 release 1.10
+- Fixed issue 778
+  http://java.net/jira/browse/JERSEY-778
+  * Breaking change *
+  Modified WadlGenerator interface to be able to generate more than one response
+  for one declared method; this is particularly useful when you are producing
+  different element (entity types) with different status codes. See WADL spec
+  (http://www.w3.org/Submission/wadl/#x3-40001.3) and/or Extended WADL
+  webapp sample for more details.
 - Fixed issue 794
   http://java.net/jira/browse/JERSEY-794
   Resources base in generated wadl does not reflect only first request anymore,

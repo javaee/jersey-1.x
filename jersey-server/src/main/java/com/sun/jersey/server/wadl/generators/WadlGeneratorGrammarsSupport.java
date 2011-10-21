@@ -61,6 +61,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.InputStream;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -229,9 +230,9 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      * @return response
      * @see com.sun.jersey.server.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Response createResponse( AbstractResource ar,
-            AbstractResourceMethod arm ) {
-        return _delegate.createResponse( ar, arm );
+    public List<Response> createResponses(AbstractResource ar,
+                                          AbstractResourceMethod arm ) {
+        return _delegate.createResponses( ar, arm );
     }
 
     // ================ methods for post build actions =======================

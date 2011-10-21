@@ -55,6 +55,8 @@ import com.sun.research.ws.wadl.Response;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This WadlGenerator creates the basic wadl artifacts.<br>
@@ -184,7 +186,7 @@ public class WadlGeneratorImpl implements WadlGenerator {
     }
 
     @Override
-    public Response createResponse( AbstractResource r, AbstractResourceMethod m ) {
+    public List<Response> createResponses( AbstractResource r, AbstractResourceMethod m ) {
         final Response response = new Response();
 
         for (MediaType mediaType: m.getSupportedOutputTypes()) {
@@ -195,8 +197,10 @@ public class WadlGeneratorImpl implements WadlGenerator {
 //                    wadlRepresentation);
             response.getRepresentation().add(wadlRepresentation);
         }
-        
-        return response;
+
+        List<Response> responses = new ArrayList<Response>();
+        responses.add(response);
+        return responses;
     }
 
     public Representation createResponseRepresentation( AbstractResource r, AbstractResourceMethod m, MediaType mediaType ) {
@@ -216,8 +220,5 @@ public class WadlGeneratorImpl implements WadlGenerator {
     
     @Override
     public void attachTypes(ApplicationDescription egd) {
-        
     }
-    
-    
 }

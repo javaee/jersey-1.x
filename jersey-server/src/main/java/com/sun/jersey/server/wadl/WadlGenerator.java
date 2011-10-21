@@ -41,12 +41,6 @@
 package com.sun.jersey.server.wadl;
 
 import com.sun.jersey.api.model.AbstractMethod;
-
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlRegistry;
-
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -57,13 +51,14 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -71,26 +66,26 @@ import javax.xml.namespace.QName;
  * so that several implementations can decorate existing ones. One decorator could e.g. add
  * references to definitions within some xsd for existing representations.<br>
  * Created on: Jun 16, 2008<br>
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
 public interface WadlGenerator {
-    
+
     /**
      * Sets the delegate that is decorated by this wadl generator. Is invoked directly after
      * this generator is instantiated before {@link #init()} or any setter method is invoked.
      * @param delegate the wadl generator to decorate
      */
     void setWadlGeneratorDelegate( WadlGenerator delegate );
-    
+
     /**
      * Invoked before all methods related to wadl-building are invoked. This method is used in a
      * decorator like manner, and therefore has to invoke <code>this.delegate.init()</code>.
      * @throws Exception
      */
     void init() throws Exception;
-    
+
     /**
      * The jaxb context path that is used when the generated wadl application is marshalled
      * to a file.<br/>
@@ -102,44 +97,44 @@ public interface WadlGenerator {
      * otherwise return the delegate's {@link #getRequiredJaxbContextPath()} together with
      * your required context path (separated by a colon):<br/>
      * <pre><code>_delegate.getRequiredJaxbContextPath() == null
-            ? ${yourContextPath}
-            : _delegate.getRequiredJaxbContextPath() + ":" + ${yourContextPath};</code></pre>
-     * 
+     ? ${yourContextPath}
+     : _delegate.getRequiredJaxbContextPath() + ":" + ${yourContextPath};</code></pre>
+     *
      * If you add the path for your custom jaxb beans, don't forget to add an
      * ObjectFactory (annotated with {@link XmlRegistry}) to this package.
      * @return simply the {@link #getRequiredJaxbContextPath()} of the delegate or the
      *  {@link #getRequiredJaxbContextPath()} + ":" + ${yourContextPath}.
      */
     String getRequiredJaxbContextPath();
-    
+
     // ================  methods for building the wadl application =============
 
     public Application createApplication();
 
     public Resources createResources();
-    
+
     public Resource createResource(AbstractResource r,
-            String path);
+                                   String path);
 
-    public com.sun.research.ws.wadl.Method createMethod(AbstractResource r, 
-            AbstractResourceMethod m);
+    public com.sun.research.ws.wadl.Method createMethod(AbstractResource r,
+                                                        AbstractResourceMethod m);
 
-    public Request createRequest(AbstractResource r, 
-            AbstractResourceMethod m);
+    public Request createRequest(AbstractResource r,
+                                 AbstractResourceMethod m);
 
-    public Representation createRequestRepresentation(AbstractResource r, 
-            AbstractResourceMethod m, 
-            MediaType mediaType);
+    public Representation createRequestRepresentation(AbstractResource r,
+                                                      AbstractResourceMethod m,
+                                                      MediaType mediaType);
 
-    public Response createResponse(AbstractResource r,
-            AbstractResourceMethod m);    
-    
-    public Param createParam(AbstractResource r, 
-            AbstractMethod m,
-            Parameter p);
+    public List<Response> createResponses(AbstractResource r,
+                                          AbstractResourceMethod m);
+
+    public Param createParam(AbstractResource r,
+                             AbstractMethod m,
+                             Parameter p);
 
     // ================ methods for post build actions =======================
-    
+
     /**
      * Call back interface that the create external grammar can use
      * to allow other parts of the code to attach the correct grammar information
@@ -152,25 +147,25 @@ public interface WadlGenerator {
          */
         public QName resolve(Class type);
     }
-    
+
     /**
      * And internal storage object to store the grammar definitions and 
      * any type resolvers that are created along the way.
      */
     public class ExternalGrammarDefinition {
-        
+
         // final public field to make a property was thinking about encapsulation
         // but decided code much simpler without
         public final Map<String, ApplicationDescription.ExternalGrammar>
                 map = new HashMap<String, ApplicationDescription.ExternalGrammar>();
-        
+
         private List<Resolver> typeResolvers = new ArrayList<Resolver>();
-        
+
         public void addResolver(Resolver resolver) {
             assert !typeResolvers.contains(resolver) : "Already in list";
             typeResolvers.add(resolver);
         }
-        
+
         /**
          * @param type the class to map
          * @return The resolved qualified name if one is defined.
@@ -184,22 +179,19 @@ public interface WadlGenerator {
             return name;
         }
     }
-    
-    
+
     /**
      * Perform any post create functions such as generating grammars.
      * @return A map of extra files to the content of those file encoded in UTF-8
      * @throws Exception
      */
     public ExternalGrammarDefinition createExternalGrammar();
-    
-    
+
     /**
      * Process the elements in the WADL definition to attach schema types
      * as required.
      * @param description The root description used to resolve these entries
      */
     public void attachTypes(ApplicationDescription description);
-    
-    
+
 }

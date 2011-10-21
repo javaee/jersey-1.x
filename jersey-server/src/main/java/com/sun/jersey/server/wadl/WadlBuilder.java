@@ -199,9 +199,9 @@ public class WadlBuilder {
             wadlMethod.setRequest(wadlRequest);
         }
         // generate the response part
-        Response wadlResponse = generateResponse(r, m);
-        if (wadlResponse != null) {
-            wadlMethod.getResponse().add(wadlResponse);
+        final List<Response> responses = generateResponses(r, m);
+        if(responses != null) {
+            wadlMethod.getResponse().addAll(responses);
         }
         return wadlMethod;
     }
@@ -443,11 +443,10 @@ public class WadlBuilder {
         return wadlResource;
     }
 
-    private Response generateResponse(AbstractResource r, final AbstractResourceMethod m) {
+    private List<Response> generateResponses(AbstractResource r, final AbstractResourceMethod m) {
         if (m.getMethod().getReturnType() == void.class) {
             return null;
         }
-        Response wadlResponse = _wadlGenerator.createResponse(r, m);
-        return wadlResponse;
+        return _wadlGenerator.createResponses(r, m);
     }
 }

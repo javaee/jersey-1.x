@@ -44,14 +44,6 @@
 package com.sun.jersey.api.wadl.config;
 
 import com.sun.jersey.api.model.AbstractMethod;
-import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-
-import junit.framework.TestCase;
-
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
@@ -65,7 +57,7 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
-import java.util.HashMap;
+import junit.framework.TestCase;
 
 import javax.ws.rs.core.MediaType;
 import java.util.List;
@@ -182,7 +174,7 @@ public class WadlGeneratorConfigTest extends TestCase {
             return null;
         }
 
-        public Response createResponse(AbstractResource r,
+        public List<Response> createResponses(AbstractResource r,
                 AbstractResourceMethod m) {
             return null;
         }

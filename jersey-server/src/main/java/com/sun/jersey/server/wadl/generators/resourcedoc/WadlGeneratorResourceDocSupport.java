@@ -70,6 +70,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -237,14 +238,13 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
      * @return the enhanced {@link Response}
      * @see com.sun.jersey.server.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Response createResponse( AbstractResource r, AbstractResourceMethod m ) {
+    public List<Response> createResponses( AbstractResource r, AbstractResourceMethod m ) {
         final ResponseDocType responseDoc = _resourceDoc.getResponse( r.getResourceClass(), m.getMethod() );
-        final Response response;
+        List<Response> responses = new ArrayList<Response>();
         if ( responseDoc != null && responseDoc.hasRepresentations() ) {
-            response = new Response();
-            
             for ( RepresentationDocType representationDoc : responseDoc.getRepresentations() ) {
-                
+                Response response = new Response();
+
                 final Representation wadlRepresentation = new Representation();
                 wadlRepresentation.setElement( representationDoc.getElement() );
                 wadlRepresentation.setMediaType( representationDoc.getMediaType() );
@@ -253,29 +253,34 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
 
                 response.getStatus().add(representationDoc.getStatus());
                 response.getRepresentation().add(wadlRepresentation);
+
+                responses.add(response);
             }
+
+            if (!responseDoc.getWadlParams().isEmpty() ) {
+                for ( WadlParamType wadlParamType : responseDoc.getWadlParams() ) {
+                    final Param param = new Param();
+                    param.setName( wadlParamType.getName() );
+                    param.setStyle( ParamStyle.fromValue( wadlParamType.getStyle() ) );
+                    param.setType( wadlParamType.getType() );
+                    addDoc( param.getDoc(), wadlParamType.getDoc() );
+                    for(Response response : responses) {
+                        response.getParam().add(param);
+                    }
+                }
+            }
+
+            if (!isEmpty( responseDoc.getReturnDoc() ) ) {
+                for(Response response : responses) {
+                    addDoc( response.getDoc(), responseDoc.getReturnDoc() );
+                }
+            }
+
         } else {
-            response = _delegate.createResponse( r, m );
+            responses = _delegate.createResponses(r, m);
         }
-        
-        /* add response params from resourcedoc
-         */
-        if ( responseDoc != null && !responseDoc.getWadlParams().isEmpty() ) {
-            for ( WadlParamType wadlParamType : responseDoc.getWadlParams() ) {
-                final Param param = new Param();
-                param.setName( wadlParamType.getName() );
-                param.setStyle( ParamStyle.fromValue( wadlParamType.getStyle() ) );
-                param.setType( wadlParamType.getType() );
-                addDoc( param.getDoc(), wadlParamType.getDoc() );
-                response.getParam().add( param );
-            }
-        }
-        
-        if ( responseDoc != null && !isEmpty( responseDoc.getReturnDoc() ) ) {
-            addDoc( response.getDoc(), responseDoc.getReturnDoc() );
-        }
-        
-        return response;
+
+        return responses;
     }
 
     private void addDocForExample( final List<Doc> docs, final String example ) {

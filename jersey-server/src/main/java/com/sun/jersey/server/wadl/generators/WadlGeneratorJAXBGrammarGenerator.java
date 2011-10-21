@@ -303,10 +303,10 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
      * @return response
      * @see com.sun.jersey.server.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
-    public Response createResponse( AbstractResource ar,
-                                    final AbstractResourceMethod arm ) {
-        final Response response = _delegate.createResponse( ar, arm );
-        if (response!=null) {
+    public List<Response> createResponses(AbstractResource ar,
+                                    final AbstractResourceMethod arm) {
+        final List<Response> responses = _delegate.createResponses(ar, arm );
+        if (responses!=null) {
             HasType hasType = new HasType()  {
                 @Override
                 public Class getPrimaryClass() {
@@ -318,20 +318,22 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                 }
             };
 
-            for (final Representation representation : response.getRepresentation()) {
+            for(Response response : responses) {
+                for (final Representation representation : response.getRepresentation()) {
 
-                // Process each representation
-                _hasTypeWantsName.add(new Pair(
-                        hasType,
-                        new WantsName() {
-                            @Override
-                            public void setName(QName name) {
-                                representation.setElement(name);
-                            }
-                        }));
+                    // Process each representation
+                    _hasTypeWantsName.add(new Pair(
+                            hasType,
+                            new WantsName() {
+                                @Override
+                                public void setName(QName name) {
+                                    representation.setElement(name);
+                                }
+                            }));
+                }
             }
         }
-        return response;
+        return responses;
     }
 
     // ================ methods for post build actions =======================

@@ -44,13 +44,6 @@
 
 package com.sun.jersey.api.wadl.config;
 
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractMethod;
@@ -60,7 +53,6 @@ import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlGenerator;
-import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Param;
@@ -69,6 +61,10 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+
+import javax.ws.rs.core.MediaType;
+import java.net.URISyntaxException;
+import java.util.List;
 
 
 
@@ -157,7 +153,7 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
             return null;
         }
 
-        public Response createResponse( AbstractResource r,
+        public List<Response> createResponses( AbstractResource r,
                 AbstractResourceMethod m ) {
             return null;
         }
