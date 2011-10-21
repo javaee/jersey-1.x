@@ -39,24 +39,6 @@
  */
 package com.sun.jersey.samples.generatewadl.util;
 
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
-import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
-import java.io.File;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -80,6 +62,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import java.io.File;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -185,9 +168,9 @@ public class ExampleWadlGenerator implements WadlGenerator {
         return _delegate.createResources();
     }
 
-    public Response createResponse( AbstractResource arg0,
+    public List<Response> createResponses( AbstractResource arg0,
             AbstractResourceMethod arg1 ) {
-        return _delegate.createResponse( arg0, arg1 );
+        return _delegate.createResponses( arg0, arg1 );
     }
 
     
