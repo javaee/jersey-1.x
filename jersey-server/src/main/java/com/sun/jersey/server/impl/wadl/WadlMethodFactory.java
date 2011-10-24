@@ -50,10 +50,14 @@ import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.research.ws.wadl.Application;
 
 import javax.ws.rs.core.Response;
+import javax.xml.bind.Marshaller;
+import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -86,6 +90,8 @@ import java.util.Map;
         private final WadlApplicationContext wadlApplicationContext;
         private final String lastModified;
 
+        private static final Logger LOGGER = Logger.getLogger(WadlOptionsMethodDispatcher.class.getName());
+
         WadlOptionsMethodDispatcher(Map<String, List<ResourceMethod>> methods,
                                     AbstractResource resource, String path,
                                     WadlApplicationContext wadlApplicationContext) {
@@ -103,10 +109,25 @@ import java.util.Map;
                         context.getUriInfo(),
                         resource, path);
 
-                context.getResponse().setResponse(
-                        Response.ok(a, MediaTypes.WADL).header("Allow", allow).header("Last-modified", lastModified).build());
+                try {
+                    final Marshaller marshaller = wadlApplicationContext.getJAXBContext().createMarshaller();
+                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                    final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                    marshaller.marshal(a, os);
+                    os.close();
+
+                    context.getResponse().setResponse(
+                            Response.ok(os.toByteArray(), MediaTypes.WADL).
+                                    header("Allow", allow).header("Last-modified", lastModified).build());
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Could not marshal wadl Application.", e);
+
+                    context.getResponse().setResponse(
+                            Response.noContent().header("Allow", allow).build());
+                }
             } else {
-                context.getResponse().setResponse(Response.status(Response.Status.NO_CONTENT).header("Allow", allow).build());
+                context.getResponse().setResponse(
+                        Response.noContent().header("Allow", allow).build());
             }
         }
     }

@@ -77,4 +77,13 @@ public class ExtendedWadlWebappTest extends JerseyTest {
                 wadl.contains("This is a paragraph"));
     }
 
+    @Test
+    public void testWadlOptionsMethod() throws Exception {
+
+        WebResource webResource = resource();
+        String wadl = webResource.path("items").accept(MediaTypes.WADL).options(String.class);
+        Assert.assertTrue("Generated wadl is of null length", wadl.length() > 0);
+        Assert.assertTrue("Generated wadl doesn't contain the expected text",
+                wadl.contains("This is a paragraph"));
+    }
 }

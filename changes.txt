@@ -1,4 +1,8 @@
 release 1.10
+- Fixed issue 796
+  http://java.net/jira/browse/JERSEY-796
+  Wadl generated in response to OPTIONS request wasn't generated correctly;
+  fixed by using JAXBContext from WadlApplicationContext.
 - Fixed issue 778
   http://java.net/jira/browse/JERSEY-778
   * Breaking change *
