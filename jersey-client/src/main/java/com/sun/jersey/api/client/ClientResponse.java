@@ -510,7 +510,8 @@ public class ClientResponse {
      * Get the entity of the response.
      * <p>
      * If the entity is not an instance of Closeable then this response
-     * is closed.
+     * is closed (you cannot read it more than once, any subsequent
+     * call will produce {@link ClientHandlerException}).
      *
      * @param <T> the type of the response.
      * @param gt the generic type of the entity.
