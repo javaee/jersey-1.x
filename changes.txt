@@ -1,4 +1,7 @@
 release 1.10
+- Fixed issue 791
+  http://java.net/jira/browse/JERSEY-796
+  jersey-archive was incorrectly updated when jersey-servlet module was introduced
 - Fixed issue 796
   http://java.net/jira/browse/JERSEY-796
   Wadl generated in response to OPTIONS request wasn't generated correctly;

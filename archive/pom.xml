@@ -291,6 +291,14 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>com.sun.jersey</groupId>
+                                            <artifactId>jersey-server</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${assembly.directory}</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>com.sun.jersey</groupId>
                                             <artifactId>jersey-client</artifactId>
                                             <version>${project.version}</version>
                                             <type>jar</type>
@@ -489,6 +497,14 @@
                                         <artifactItem>
                                             <groupId>com.sun.jersey</groupId>
                                             <artifactId>jersey-servlet</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>jar</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${assembly.directory}</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>com.sun.jersey</groupId>
+                                            <artifactId>jersey-server</artifactId>
                                             <version>${project.version}</version>
                                             <type>jar</type>
                                             <overWrite>false</overWrite>
