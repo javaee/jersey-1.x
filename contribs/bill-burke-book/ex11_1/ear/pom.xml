@@ -96,6 +96,26 @@
                 </dependency>
             </dependencies>
         </profile>
+
+<!--
+Hack to avoid having to run the tests which require a running
+JavaDB instance (not having one would break the Hudson build).
+Running "mvn clean install" will not run the tests.
+To run the tests, use "mvn -P test clean install".
+-->
+        <profile>
+            <id>test</id>
+        </profile>
+
+        <profile>
+            <id>skip-test</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </profile>
     </profiles>
     <dependencies>
         <dependency>
@@ -189,27 +209,5 @@
 
         </plugins>
     </build>
-
-<!--
-Hack to avoid having to run the tests which require a running
-JavaDB instance (not having one would break the Hudson build).
-Running "mvn clean install" will not run the tests.
-To run the tests, use "mvn -P test clean install".
--->
-    <profiles>
-        <profile>
-            <id>test</id>
-        </profile>
-
-        <profile>
-            <id>skip-test</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <maven.test.skip>true</maven.test.skip>
-            </properties>
-        </profile>
-    </profiles>
 
 </project>
