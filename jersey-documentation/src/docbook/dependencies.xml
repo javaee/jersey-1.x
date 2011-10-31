@@ -312,13 +312,14 @@
 
       <para>Using servlet:
       <code>com.sun.jersey.spi.container.servlet.ServletContainer</code>
-      requires no additional dependences.</para>
+      requires a dependency on the <ulink
+      url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-servlet&amp;v=&version;&amp;e=pom">jersey-servlet</ulink> module.</para>
 
       <para>Maven developers using servlet:
       <code>com.sun.jersey.server.impl.container.servlet.ServletAdaptor</code>
       in a non-EE 5 servlet require a dependency on the <ulink
       url="http://search.maven.org/remotecontent?filepath=javax/persistence/persistence-api/1.0.2/persistence-api-1.0.2.pom">persistence-api</ulink>
-      module.</para>
+      module in addition.</para>
 
       <para>Non-Maven developers require: <ulink
       url="http://search.maven.org/remotecontent?filepath=javax/persistence/persistence-api/1.0.2/persistence-api-1.0.2.jar">persistence-api.jar</ulink></para>
