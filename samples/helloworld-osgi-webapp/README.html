@@ -121,8 +121,10 @@ g! install https://maven.java.net/service/local/artifact/maven/redirect?r=<b>&lt
 Bundle ID: 9
 g! install https://maven.java.net/service/local/artifact/maven/redirect?r=<b>&lt;repository&gt;</b>&g=com.sun.jersey&a=jersey-server&v=<b>&lt;version&gt;</b>&e=jar
 Bundle ID: 10
-g! install file:war-bundle-1.9.war
+g! install https://maven.java.net/service/local/artifact/maven/redirect?r=<b>&lt;repository&gt;</b>&g=com.sun.jersey&a=jersey-servlet&v=<b>&lt;version&gt;</b>&e=jar
 Bundle ID: 11
+g! install file:war-bundle-1.9.war
+Bundle ID: 12
 g! lb
 START LEVEL 1
    ID|State      |Level|Name
@@ -137,8 +139,9 @@ START LEVEL 1
     8|Installed  |    1|OPS4J Pax Web - Extender - WAR (0.7.1)
     9|Installed  |    1|jersey-core (1.9.0)
    10|Installed  |    1|jersey-server (1.9.0)
-   11|Installed  |    1|Helloworld OSGi WebApp - Jersey Sample WAR (1.9.0)
-g! start 5 6 7 8 9 10 11
+   11|Installed  |    1|jersey-servlet (1.9.0)
+   12|Installed  |    1|Helloworld OSGi WebApp - Jersey Sample WAR (1.9.0)
+g! start 5 6 7 8 9 10 11 12
 Mar 22, 2011 10:25:20 PM com.sun.jersey.server.impl.application.WebApplicationImpl _initiate
 INFO: Initiating Jersey application, version 'Jersey: 1.9 09/02/2011 12:46 AM'
 </pre>
