@@ -48,7 +48,7 @@
   <parent>
     <groupId>com.sun.jersey.contribs</groupId>
     <artifactId>jersey-contribs</artifactId>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.11-SNAPSHOT</version>
   </parent>
 
   <artifactId>scala</artifactId>

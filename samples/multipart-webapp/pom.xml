@@ -45,7 +45,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.11-SNAPSHOT</version>
     </parent>
     <artifactId>multipart-webapp</artifactId>
     <name>Multipart WebApp - Jersey Sample</name>

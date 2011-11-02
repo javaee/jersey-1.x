@@ -46,7 +46,7 @@
     <parent>
         <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
         <artifactId>osgi-modules</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.11-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-gf-statsproviders</artifactId>
     <packaging>bundle</packaging>

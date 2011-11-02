@@ -47,7 +47,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.10-SNAPSHOT</version>
+        <version>1.11-SNAPSHOT</version>
     </parent>
     <artifactId>moxy</artifactId>
     <packaging>war</packaging>
@@ -175,7 +175,7 @@
         </repository>
     </repositories>
     <properties>
-        <jersey-version>1.10-SNAPSHOT</jersey-version>
+        <jersey-version>1.11-SNAPSHOT</jersey-version>
         <moxy-version>2.2.0-M6</moxy-version>
     </properties>
 </project>
