@@ -1,4 +1,6 @@
-release 1.10
+release 1.11
+
+release 1.10 (11-2011)
 - Fixed issue 791
   http://java.net/jira/browse/JERSEY-796
   jersey-archive was incorrectly updated when jersey-servlet module was introduced
