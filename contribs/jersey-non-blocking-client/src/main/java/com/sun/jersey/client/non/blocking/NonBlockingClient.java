@@ -44,10 +44,12 @@ import com.ning.http.client.Response;
 import com.sun.jersey.api.client.AsyncViewResource;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -208,6 +210,81 @@ public class NonBlockingClient extends Client {
 //                    ") property MUST be an instance of String or URI");
 //        }
 //    }
+
+    /**
+     * {@inheritDoc}
+     * <p />
+     * ClientFilters are not supported (and won't be executed) during async requests. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternatives.
+     *
+     * @param f the filter to add.
+     */
+    @Override
+    public void addFilter(ClientFilter f) {
+        super.addFilter(f);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p />
+     * ClientFilters are not supported (and won't be executed) during async requests. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternatives.
+     *
+     * @param f the filter to remove.
+     */
+    @Override
+    public void removeFilter(ClientFilter f) {
+        super.removeFilter(f);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p />
+     * ClientFilters are not supported (and won't be executed) during async requests. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternatives.
+     *
+     * @param f the filter to remove.
+     * @return
+     */
+    @Override
+    public boolean isFilterPreset(ClientFilter f) {
+        return super.isFilterPreset(f);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p />
+     * ClientFilters are not supported (and won't be executed) during async requests. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternatives.
+     *
+     */
+    @Override
+    public void removeAllFilters() {
+        super.removeAllFilters();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p />
+     * ClientFilters are not supported (and won't be executed) during async requests. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternatives.
+     *
+     * @return
+     */
+    @Override
+    public ClientHandler getHeadHandler() {
+        return super.getHeadHandler();
+    }
 
     public Request getRequest(ClientRequest request) {
         return getClientHandlerNing().getRequest(request);

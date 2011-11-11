@@ -48,6 +48,8 @@ import com.ning.http.client.Realm;
 import com.ning.http.client.Request;
 import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
+import com.ning.http.client.filter.RequestFilter;
+import com.ning.http.client.filter.ResponseFilter;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
@@ -69,6 +71,7 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -115,14 +118,13 @@ public final class NonBlockingClientHandler extends TerminatingClientHandler {
     };
 
     public NonBlockingClientHandler(final ClientConfig cc) {
-
         AsyncHttpClientConfig.Builder builder = new AsyncHttpClientConfig.Builder();
 
         if(cc != null) {
-            Object o = cc.getProperty(NonBlockingClientConfig.PROPERTY_EXECUTOR_SERVICE);
-            if(o != null && (o instanceof ExecutorService)) {
-                builder = builder.setExecutorService((ExecutorService)o);
-                this.executorService = (ExecutorService)o;
+            Object executorService = cc.getProperty(NonBlockingClientConfig.PROPERTY_EXECUTOR_SERVICE);
+            if(executorService != null && (executorService instanceof ExecutorService)) {
+                builder = builder.setExecutorService((ExecutorService)executorService);
+                this.executorService = (ExecutorService)executorService;
             } else {
                 final Object threadpoolSize = cc.getProperties().get(ClientConfig.PROPERTY_THREADPOOL_SIZE);
 
@@ -168,12 +170,43 @@ public final class NonBlockingClientHandler extends TerminatingClientHandler {
 
                 builder = builder.setRealm(realm);
             }
+
+            Object requestFilters = cc.getProperties().get(NonBlockingClientConfig.PROPERTY_REQUEST_FILTERS);
+            if(requestFilters != null) {
+                if(requestFilters instanceof RequestFilter) {
+                    builder.addRequestFilter((RequestFilter) requestFilters);
+                } else if(requestFilters instanceof List) {
+                    List<?> requestFilterList = (List)requestFilters;
+                    for (ListIterator iterator = requestFilterList.listIterator(requestFilterList.size()); iterator.hasPrevious();) {
+                        final Object listElement = iterator.previous();
+                        if(listElement instanceof RequestFilter) {
+                            builder.addRequestFilter((RequestFilter)listElement);
+                        }
+                    }
+                }
+            }
+
+            Object responseFilters = cc.getProperties().get(NonBlockingClientConfig.PROPERTY_RESPONSE_FILTERS);
+            if(responseFilters != null) {
+                if(responseFilters instanceof ResponseFilter) {
+                    builder.addResponseFilter((ResponseFilter) responseFilters);
+                } else if(responseFilters instanceof List) {
+                    List<?> responseFiltersList = (List)responseFilters;
+                    for (ListIterator iterator = responseFiltersList.listIterator(responseFiltersList.size()); iterator.hasPrevious();) {
+                        final Object listElement = iterator.previous();
+                        if(listElement instanceof ResponseFilter) {
+                            builder.addResponseFilter((ResponseFilter) listElement);
+                        }
+                    }
+                }
+            }
+
         } else {
             this.executorService = Executors.newCachedThreadPool();
             builder.setExecutorService(this.executorService);
         }
 
-        this.client =new AsyncHttpClient(builder.build());
+        this.client = new AsyncHttpClient(builder.build());
         this.clientConfig = cc;
     }
 
@@ -328,7 +361,7 @@ public final class NonBlockingClientHandler extends TerminatingClientHandler {
         };
     }
 
-    protected final static void writeOutBoundHeaders(final MultivaluedMap<String, Object> headers, final Request request) {
+    protected static void writeOutBoundHeaders(final MultivaluedMap<String, Object> headers, final Request request) {
         for (Map.Entry<String, List<Object>> e : headers.entrySet()) {
             List<Object> vs = e.getValue();
             if (vs.size() == 1) {
@@ -390,7 +423,7 @@ public final class NonBlockingClientHandler extends TerminatingClientHandler {
 
         public ProxyServerBuilder(String host) {
             this.host = host;
-        };
+        }
 
         public ProxyServerBuilder setPort(int port) {
             this.port = port;

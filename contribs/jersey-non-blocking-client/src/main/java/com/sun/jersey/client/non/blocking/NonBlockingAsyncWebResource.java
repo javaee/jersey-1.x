@@ -44,10 +44,12 @@ import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.ClientHandler;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.async.FutureListener;
+import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.client.impl.CopyOnWriteHashMap;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -79,6 +81,80 @@ public class NonBlockingAsyncWebResource extends AsyncWebResource {
     private NonBlockingAsyncWebResource(NonBlockingAsyncWebResource that, UriBuilder ub) {
         super(that, ub);
         this.client = that.client;
+    }
+
+    /**
+     * Unsupported.
+     * <p />
+     * Any invocation will result in {@link UnsupportedOperationException}. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternative to ClientFilter.
+     *
+     * @param f the filter to add.
+     */
+    @Override
+    public void addFilter(ClientFilter f) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Unsupported.
+     * <p />
+     * Any invocation will result in {@link UnsupportedOperationException}. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternative to ClientFilter.
+
+     * @param f the filter to remove.
+     */
+    @Override
+    public void removeFilter(ClientFilter f) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Unsupported.
+     * <p />
+     * Any invocation will result in {@link UnsupportedOperationException}. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternative to ClientFilter.
+     *
+     * @param f the filter to remove.
+     * @return
+     */
+    @Override
+    public boolean isFilterPreset(ClientFilter f) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Unsupported.
+     * <p />
+     * Any invocation will result in {@link UnsupportedOperationException}. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternative to ClientFilter.
+     */
+    @Override
+    public void removeAllFilters() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * Unsupported.
+     * <p />
+     * Any invocation will result in {@link UnsupportedOperationException}. See
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_REQUEST_FILTERS} and
+     * {@link com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig#PROPERTY_RESPONSE_FILTERS} for
+     * alternative to ClientFilter.
+
+     * @return nothing
+     */
+    @Override
+    public ClientHandler getHeadHandler() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -184,4 +260,6 @@ public class NonBlockingAsyncWebResource extends AsyncWebResource {
             throw new ClientHandlerException(e);
         }
     }
+
+
 }

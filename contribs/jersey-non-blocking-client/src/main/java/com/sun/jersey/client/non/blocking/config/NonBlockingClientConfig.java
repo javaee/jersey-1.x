@@ -145,8 +145,25 @@ public interface NonBlockingClientConfig extends ClientConfig {
     public static final String PROPERTY_PROXY_PROTOCOL =
             "com.sun.jersey.impl.client.non.blocking.proxy.protocol";
 
+    /**
+     * Request filter(s) which will be applied to modify request prior dispatching.
+     * <p>
+     * The instance may be a {@link com.ning.http.client.filter.RequestFilter} instance or
+     * List of {@link com.ning.http.client.filter.RequestFilter} instances.
+     *
+     * @see com.ning.http.client.filter.RequestFilter
+     */
+    public static final String PROPERTY_REQUEST_FILTERS =
+            "com.sun.jersey.impl.client.non.blocking.requestFilter";
 
-
-
-
+    /**
+     * Response filter(s) which will be applied after recieving the response.
+     * <p>
+     * The instance may be a {@link com.ning.http.client.filter.ResponseFilter} instance or
+     * List of {@link com.ning.http.client.filter.ResponseFilter} instances.
+     *
+     * @see com.ning.http.client.filter.ResponseFilter
+     */
+    public static final String PROPERTY_RESPONSE_FILTERS =
+            "com.sun.jersey.impl.client.non.blocking.responseFilter";
 }

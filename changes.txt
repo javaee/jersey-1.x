@@ -1,4 +1,9 @@
 release 1.11
+- Workarounded issue 802
+  http://java.net/jira/browse/JERSEY-802
+  Client filters are not executed when using NonBlockingClient and making
+  async web requests. Introduced a way how to set Ning request/response filters,
+  Jersey client filters can't be used.
 
 release 1.10 (11-2011)
 - Fixed issue 791
