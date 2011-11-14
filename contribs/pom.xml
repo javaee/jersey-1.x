@@ -68,6 +68,7 @@
         <module>jersey-apache-client</module>
         <module>jersey-apache-client4</module>
         <module>jersey-freemarker</module>
+        <module>jersey-moxy</module>
         <module>jersey-non-blocking-client</module>
         <module>jersey-simple-server</module>
         <module>jersey-guice</module>

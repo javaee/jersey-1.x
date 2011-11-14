@@ -48,7 +48,7 @@ import org.eclipse.persistence.oxm.annotations.XmlPath;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak
  */
 @XmlRootElement
 @XmlType(propOrder={"name", "address", "phoneNumbers"})

@@ -98,6 +98,7 @@
         <module>managed-beans-webapp</module>
         <module>mandel</module>
         <module>moxy</module>
+        <module>moxy-oxm-mapping</module>
         <module>multipart-webapp</module>
         <module>optimistic-concurrency</module>
         <module>osgi-http-service</module>

@@ -62,11 +62,11 @@ import java.util.List;
  * @author japod
  */
 public class MainTest {
-    
+
     private HttpServer httpServer;
-    
+
     private WebResource r;
-   
+
     @Before
     public void setUp() throws Exception {
         httpServer = Main.startServer();

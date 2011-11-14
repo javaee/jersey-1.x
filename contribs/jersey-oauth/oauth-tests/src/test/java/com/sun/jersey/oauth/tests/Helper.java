@@ -42,7 +42,7 @@ package com.sun.jersey.oauth.tests;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak
  */
 public class Helper {
     

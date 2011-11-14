@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!--
+
+    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+
+    The contents of this file are subject to the terms of either the GNU
+    General Public License Version 2 only ("GPL") or the Common Development
+    and Distribution License("CDDL") (collectively, the "License").  You
+    may not use this file except in compliance with the License.  You can
+    obtain a copy of the License at
+    http://glassfish.java.net/public/CDDL+GPL_1_1.html
+    or packager/legal/LICENSE.txt.  See the License for the specific
+    language governing permissions and limitations under the License.
+
+    When distributing the software, include this License Header Notice in each
+    file and include the License file at packager/legal/LICENSE.txt.
+
+    GPL Classpath Exception:
+    Oracle designates this particular file as subject to the "Classpath"
+    exception as provided by Oracle in the GPL Version 2 section of the License
+    file that accompanied this code.
+
+    Modifications:
+    If applicable, add the following below the License Header, with the fields
+    enclosed by brackets [] replaced by your own identifying information:
+    "Portions Copyright [year] [name of copyright owner]"
+
+    Contributor(s):
+    If you wish your version of this file to be governed by only the CDDL or
+    only the GPL Version 2, indicate your decision by adding "[Contributor]
+    elects to include this software in this distribution under the [CDDL or GPL
+    Version 2] license."  If you don't indicate a single choice of license, a
+    recipient has the option to distribute your version of this file under
+    either the CDDL, the GPL Version 2 or to extend the choice of license to
+    its licensees as provided above.  However, if you add GPL Version 2 code
+    and therefore, elected the GPL Version 2 license, then the option applies
+    only if the new code is made subject to such option by the copyright
+    holder.
+
+-->
+<html><head><title>MOXy OXM External Mapping Example</title></head>
+
+
+  <body>
+      <h1>MOXy OXM External Mapping Example</h1>
+
+      <p>This example demonstrates utilizing MOXy OXM External Mapping extension when dealing with XML representation when developing a Jersey based RESTful Web application</p>
+
+      <h2>What is MOXy OXM External Mapping Extension</h2>
+      
+      <p>MOXy is EclipseLink's Object to XML Mapping services. MOXy allows for a POJO object model to be mapped to an XML schema. The Java Architecture for XML Binding (JAXB) provides a Java standard for object XML mapping (OXM). MOXy supports JAXB, as well as providing its' own native API and integration with Web Services. 
+      </p>
+      <p>In addition to using Java annotations, EclipseLink provides an XML mapping configuration file called eclipselink-oxm.xml. This mapping file can be used in place of or to override JAXB annotations in source. In addition to allowing all of the standard JAXB mapping capabilities it also includes advanced mapping types and options.</p>
+
+      <p>The MOXy extension shown in this example is described on the Eclipse Wiki site
+          at <a href="http://wiki.eclipse.org/EclipseLink/Examples/MOXy/EclipseLink-OXM.XML">http://wiki.eclipse.org/EclipseLink/Examples/MOXy/EclipseLink-OXM.XML</a>.
+          The extension allows you to process Java beans which do not use JAXB annotations to produce and/or consume XML. To emphasise you do not need access to source code of such beans, the XML Java model classes for this example are placed in a separate module called beans.
+          The other module, webapp, then only contains a JAX-RS web resource, CustomerResource, which uses MOXy to serialize customer XML representation.
+      </p>
+
+      <p>Please check out the source code and the wiki page linked above for the detailed information on the OXM external mapping feature.
+  </p>
+  
+<h2>Replacing Implicit JAXB Runtime With MOXy</h2>
+<p>Since MOXy is a JAXB implementation, the example still utilizes the standard Jersey JAXB message body reader/writer providers.
+To make Jersey use MOXy runtime, you just need to put a <code>jaxb.properties</code> file into the Java package
+containing your JAXB beans. The file should have the following content:
+<pre>
+javax.xml.bind.context.factory=org.eclipse.persistence.jaxb.JAXBContextFactory
+</pre>
+Concrete file used in this example is placed under <code>src/main/resources/com/sun/jersey/samples/moxy/beans/jaxb.properties</code>
+</p>
+<p>So far the configuration was the same as in the other MOXy example in Jersey.
+Now to enable MOXy JAXB provider also for the types, which do not use JAXB annotations,
+you need to name respective Java packages in Jersey ResourceConfig property called <code>com.sun.jersey.moxy.config.property.packages</code>.
+</p>
+      <h2>REST Resources</h2>
+      <p>The example consists of a single REST Resource represented by the following Java class:</p>
+      <dl>
+          <dt><code>com.sun.jersey.samples.moxy.CustomerResource</code></dt>
+          <dd>A resource class that maintains a single customer data.</dd>
+      </dl>
+    <p>The mapping of the URI path space is presented in the following table:</p>
+	<table border="1">
+	<tr>
+	<th>URI path</th>
+	<th>Resource class</th>
+	<th>HTTP methods</th>
+	</tr>
+	<tr>
+	<td>/customer</td>
+	<td>CustomerResource</td>
+	<td>GET</td>
+	</tr>
+	<tr>
+	<td>/customer</td>
+	<td>CustomerResource</td>
+	<td>PUT</td>
+	</tr>
+	</table>
+
+      <h2>Running the Example</h2>
+
+      <p>
+      You will need to manually deploy the example web application archive to your web container.
+      Concrete steps for GlassFish v3.1.2 container are coming soon.
+      </p>
+ </body></html>

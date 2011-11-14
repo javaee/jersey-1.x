@@ -114,6 +114,11 @@
             <artifactId>jersey-multipart</artifactId>
             <version>${project.version}</version>
         </dependency>
+         <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-moxy</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -189,6 +194,14 @@
                                 <artifactItem>
                                     <groupId>com.sun.jersey.contribs</groupId>
                                     <artifactId>jersey-multipart</artifactId>
+                                    <version>${project.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}</outputDirectory>
+                                </artifactItem>
+                                 <artifactItem>
+                                    <groupId>com.sun.jersey.contribs</groupId>
+                                    <artifactId>jersey-moxy</artifactId>
                                     <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>

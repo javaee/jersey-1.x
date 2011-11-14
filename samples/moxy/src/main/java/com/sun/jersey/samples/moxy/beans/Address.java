@@ -43,7 +43,7 @@ package com.sun.jersey.samples.moxy.beans;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak
  */
 public class Address {
 

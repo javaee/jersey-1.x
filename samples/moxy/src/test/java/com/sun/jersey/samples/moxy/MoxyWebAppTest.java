@@ -51,7 +51,7 @@ import org.junit.Test;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak
  */
 public class MoxyWebAppTest extends JerseyTest {
 

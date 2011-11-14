@@ -42,7 +42,7 @@ package com.sun.jersey.spring.tests.util;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak
  */
 public class JerseyTestHelper {
     

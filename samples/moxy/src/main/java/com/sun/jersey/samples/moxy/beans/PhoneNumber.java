@@ -45,7 +45,7 @@ import javax.xml.bind.annotation.XmlValue;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak
  */
 public class PhoneNumber {
 

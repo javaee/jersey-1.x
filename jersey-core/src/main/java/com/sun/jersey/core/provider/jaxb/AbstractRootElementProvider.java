@@ -75,38 +75,38 @@ import javax.xml.transform.stream.StreamSource;
  * When marshalling a {@link JAXBException} will result in a
  * {@link WebApplicationException} being thrown with a status of 500
  * (Internal Server error).
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
-public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<Object> {    
+public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<Object> {
     public AbstractRootElementProvider(Providers ps) {
         super(ps);
     }
-    
+
     public AbstractRootElementProvider(Providers ps, MediaType mt) {
-        super(ps, mt);        
+        super(ps, mt);
     }
-    
+
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return (type.getAnnotation(XmlRootElement.class) != null ||
                 type.getAnnotation(XmlType.class) != null) && isSupported(mediaType);
     }
-    
+
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return type.getAnnotation(XmlRootElement.class) != null && isSupported(mediaType);
     }
-    
+
     @Override
     public final Object readFrom(
-            Class<Object> type, 
-            Type genericType, 
+            Class<Object> type,
+            Type genericType,
             Annotation annotations[],
-            MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, 
-            InputStream entityStream) throws IOException { 
-        
+            MediaType mediaType,
+            MultivaluedMap<String, String> httpHeaders,
+            InputStream entityStream) throws IOException {
+
         try {
             return readFrom(type, mediaType, getUnmarshaller(type, mediaType), entityStream);
         } catch (UnmarshalException ex) {
@@ -140,11 +140,11 @@ public abstract class AbstractRootElementProvider extends AbstractJAXBProvider<O
 
     @Override
     public final void writeTo(
-            Object t, 
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
-            MediaType mediaType, 
+            Object t,
+            Class<?> type,
+            Type genericType,
+            Annotation annotations[],
+            MediaType mediaType,
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {

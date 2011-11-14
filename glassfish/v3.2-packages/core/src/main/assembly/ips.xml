@@ -19,6 +19,7 @@
         <include>jersey-json.jar</include>
         <include>jersey-gf-statsproviders.jar</include>
         <include>jersey-multipart.jar</include>
+        <include>jersey-moxy.jar</include>
         <include>jersey-grizzly2.jar</include>
         <include>asm-all.jar</include>
         <include>jackson-core-asl.jar</include>

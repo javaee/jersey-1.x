@@ -1,4 +1,7 @@
 release 1.11
+- Added EclipseLink MOXy support (http://wiki.eclipse.org/EclipseLink/Examples/MOXy)
+  The main added value is the external JAXB binding feature, 
+  see moxy-oxm-mapping example for details 
 - Workarounded issue 802
   http://java.net/jira/browse/JERSEY-802
   Client filters are not executed when using NonBlockingClient and making

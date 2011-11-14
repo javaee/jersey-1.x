@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xml-bindings
+        xmlns="http://www.eclipse.org/eclipselink/xsds/persistence/oxm"
+        version="2.1">
+    <java-types>
+        <java-type name="com.sun.jersey.samples.moxy.beans.Customer">
+            <xml-root-element/>
+            <xml-type prop-order="name address phoneNumbers"/>
+            <java-attributes>
+                <xml-element java-attribute="name" xml-path="personal-info/name/text()"/>
+                <xml-element java-attribute="address" xml-path="contact-info/address"/>
+                <xml-element java-attribute="phoneNumbers" xml-path="contact-info/phone-number"/>
+            </java-attributes>
+        </java-type>
+        <java-type name="com.sun.jersey.samples.moxy.beans.PhoneNumber">
+            <xml-root-element/>
+            <java-attributes>
+                <xml-attribute java-attribute="type"/>
+                <xml-value java-attribute="number"/>
+            </java-attributes>
+        </java-type>
+    </java-types>
+</xml-bindings>
