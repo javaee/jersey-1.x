@@ -52,7 +52,7 @@
 <!-- Jackson version -->
 <!ENTITY jackson.version "$jackson.version">
 <!-- TODO: need to get rid of this: -->
-<!ENTITY jackson.javadoc.version "1.7.0">
+<!ENTITY jackson.javadoc.version "1.9.0">
 
 <!-- Maven maven-war-plugin failOnMissingWebXml Links -->
 <!ENTITY maven-war-plugin.path "http://maven.apache.org/plugins/maven-war-plugin/war-mojo.html">

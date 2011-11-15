@@ -1,4 +1,5 @@
 release 1.11
+- Jackson dependency upgrade: 1.8.3 -> 1.9.0
 - Added EclipseLink MOXy support (http://wiki.eclipse.org/EclipseLink/Examples/MOXy)
   The main added value is the external JAXB binding feature, 
   see moxy-oxm-mapping example for details 
