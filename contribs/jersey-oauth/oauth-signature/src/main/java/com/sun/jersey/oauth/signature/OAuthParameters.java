@@ -171,7 +171,11 @@ public class OAuthParameters extends HashMap<String, String> {
      * Sets the request or access token.
      */
     public void setToken(String token) {
-        put(TOKEN, token);
+        if (token == null) {
+            remove(TOKEN);
+        } else {
+            put(TOKEN, token);
+        }
     }
 
     /**
