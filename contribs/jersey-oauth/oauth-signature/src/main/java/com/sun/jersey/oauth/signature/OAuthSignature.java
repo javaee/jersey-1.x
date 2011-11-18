@@ -44,10 +44,11 @@ import com.sun.jersey.api.uri.UriComponent;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Class used for processing an OAuth signature (signing or verifying).
@@ -122,7 +123,7 @@ public class OAuthSignature {
     OAuthParameters params, OAuthSecrets secrets) throws OAuthSignatureException {
         return getSignatureMethod(params).verify(elements(request, params), secrets, params.getSignature());
     }
-
+    
     /**
      * Collects, sorts and concetenates the request parameters into a
      * normalized string, per section 9.1.1. of the OAuth 1.0 specification.
@@ -131,9 +132,9 @@ public class OAuthSignature {
      * @param params the OAuth authorization parameters to retrieve parameters from.
      * @return the normalized parameters string.
      */
-    private static String normalizeParameters(OAuthRequest request, OAuthParameters params) {
+    static String normalizeParameters(OAuthRequest request, OAuthParameters params) {
 
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String[]> list = new ArrayList<String[]>();
 
         // parameters in the OAuth HTTP authorization header
         for (String key : params.keySet()) {
@@ -147,9 +148,7 @@ public class OAuthSignature {
 
             // Encode key and values as per section 3.6 http://tools.ietf.org/html/draft-hammer-oauth-10#section-3.6
             if (value != null) {
-                list.add(UriComponent.encode(key, UriComponent.Type.UNRESERVED) + 
-                        '=' +
-                        UriComponent.encode(value, UriComponent.Type.UNRESERVED));
+                addParam(key, value, list);
             }
         }
 
@@ -167,29 +166,34 @@ public class OAuthSignature {
             // Encode key and values as per section 3.6 http://tools.ietf.org/html/draft-hammer-oauth-10#section-3.6
             if (values != null) {
                 for (String value : values) {
-                    list.add(UriComponent.encode(key, UriComponent.Type.UNRESERVED) + 
-                            '=' +
-                            UriComponent.encode(value, UriComponent.Type.UNRESERVED));
+                    addParam(key, value, list);
                 }
             }
         }
 
-        // sort name-value pairs in natural (binary) sort order
-        Collections.sort(list);
+        // sort name-value pairs by name
+        Collections.sort(list, new Comparator<String[]>() {
+            @Override
+            public int compare(String[] t, String[] t1) {
+                int c = t[0].compareTo(t1[0]);
+                return c == 0 ? t[1].compareTo(t1[1]) : c;
+            }
+        });
 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         // append each name-value pair, delimited with ampersand
-        for (Iterator<String> i = list.iterator(); i.hasNext(); ) {
-            buf.append(i.next());
+        for (Iterator<String[]> i = list.iterator(); i.hasNext(); ) {
+            String[] param = i.next();
+            buf.append(param[0]).append("=").append(param[1]);
             if (i.hasNext()) {
                 buf.append('&');
             }
         }
-
+        
         return buf.toString();
     }
-
+    
     /**
      * Constructs the request URI, per section 9.1.2 of the OAuth 1.0
      * specification.
@@ -221,12 +225,12 @@ public class OAuthSignature {
      *
      * @param request the request from which to assemble elements.
      * @param params the OAuth authorization parameters from which to assemble elements.
-     * @return the concetenated elements, ready to sign/verify
+     * @return the concatenated elements, ready to sign/verify
      */
     private static String elements(OAuthRequest request,
     OAuthParameters params) throws OAuthSignatureException {
         // HTTP request method
-        StringBuffer buf = new StringBuffer(request.getRequestMethod().toUpperCase());
+        StringBuilder buf = new StringBuilder(request.getRequestMethod().toUpperCase());
 
         // request URL, see section 3.4.1.2 http://tools.ietf.org/html/draft-hammer-oauth-10#section-3.4.1.2
         buf.append('&').append(UriComponent.encode(constructRequestURL(request).toASCIIString(),
@@ -253,6 +257,13 @@ public class OAuthSignature {
             throw new UnsupportedSignatureMethodException(params.getSignatureMethod());
         }
         return method;
+    }
+
+    private static void addParam(String key, String value, List<String[]> list) {
+        list.add(new String[] {
+                UriComponent.encode(key, UriComponent.Type.UNRESERVED),
+                UriComponent.encode(value, UriComponent.Type.UNRESERVED)
+            });
     }
 }
 

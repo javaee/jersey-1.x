@@ -54,7 +54,8 @@ public class OsgiIntegrationTest {
                 "http://repository.ops4j.org/maven2",
                 "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                 "http://repository.springsource.com/maven/bundles/release",
-                "http://repository.springsource.com/maven/bundles/external"),
+                "http://repository.springsource.com/maven/bundles/external",
+                "http://maven.java.net/content/repositories/snapshots"),
                 // load grizzly bundle
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http").versionAsInProject(),

@@ -1,4 +1,7 @@
 release 1.11
+- Fixed issue 833
+  http://java.net/jira/browse/JERSEY-833
+  Normalization of the request parameters now correctly orders request parameters.
 - Jackson dependency upgrade: 1.8.3 -> 1.9.0
 - Added EclipseLink MOXy support (http://wiki.eclipse.org/EclipseLink/Examples/MOXy)
   The main added value is the external JAXB binding feature, 
