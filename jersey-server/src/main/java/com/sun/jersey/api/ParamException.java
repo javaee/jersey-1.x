@@ -58,7 +58,7 @@ import javax.ws.rs.ext.ExceptionMapper;
  * encounters an error obtaining a parameter value, from a request, for a
  * Java type that is annotated with a parameter-based annotation, such as
  * {@link QueryParam}. For more details see
- * <a href="http://jsr311.java.net/nonav/releases/1.0/spec/index.html">section 3.2</a> 
+ * <a href="http://jsr311.java.net/nonav/releases/1.0/spec/index.html">section 3.2</a>
  * of the JAX-RS specfication.
  * <p>
  * An {@link ExceptionMapper} may be configured to map this class or a sub-class
@@ -66,7 +66,7 @@ import javax.ws.rs.ext.ExceptionMapper;
  * <p>
  * Unless otherwise stated all such exceptions of this type will contain a
  * response with a 400 (Client error) status code.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ParamException extends WebApplicationException {
@@ -79,7 +79,7 @@ public abstract class ParamException extends WebApplicationException {
      * (Not Found) status code.
      */
     public static abstract class URIParamException extends ParamException {
-        protected URIParamException(Throwable cause, 
+        protected URIParamException(Throwable cause,
                 Class<? extends Annotation> parameterType, String name, String defaultStringValue) {
             super(cause, Responses.NOT_FOUND, parameterType, name, defaultStringValue);
         }
@@ -104,11 +104,11 @@ public abstract class ParamException extends WebApplicationException {
     }
 
     /**
-     * A URI-parameter-based exception for errors with {@link QueryParam}.
+     * A parameter exception for errors with {@link QueryParam}.
      */
-    public static class QueryParamException extends URIParamException {
+    public static class QueryParamException extends ParamException {
         public QueryParamException(Throwable cause, String name, String defaultStringValue) {
-            super(cause, QueryParam.class, name, defaultStringValue);
+            super(cause, Responses.CLIENT_ERROR, QueryParam.class, name, defaultStringValue);
         }
     }
 
@@ -145,7 +145,7 @@ public abstract class ParamException extends WebApplicationException {
 
     private final String defaultStringValue;
 
-    protected ParamException(Throwable cause, int status, 
+    protected ParamException(Throwable cause, int status,
             Class<? extends Annotation> parameterType, String name, String defaultStringValue) {
         super(cause, status);
         this.parameterType = parameterType;
