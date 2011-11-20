@@ -59,7 +59,7 @@ import javax.ws.rs.ext.ExceptionMapper;
  * Java type that is annotated with a parameter-based annotation, such as
  * {@link QueryParam}. For more details see
  * <a href="http://jsr311.java.net/nonav/releases/1.0/spec/index.html">section 3.2</a>
- * of the JAX-RS specfication.
+ * of the JAX-RS specification.
  * <p>
  * An {@link ExceptionMapper} may be configured to map this class or a sub-class
  * of to customize responses for parameter-based errors.
@@ -104,11 +104,11 @@ public abstract class ParamException extends WebApplicationException {
     }
 
     /**
-     * A parameter exception for errors with {@link QueryParam}.
+     * A URI-parameter-based exception for errors with {@link QueryParam}.
      */
-    public static class QueryParamException extends ParamException {
+    public static class QueryParamException extends URIParamException {
         public QueryParamException(Throwable cause, String name, String defaultStringValue) {
-            super(cause, Responses.CLIENT_ERROR, QueryParam.class, name, defaultStringValue);
+            super(cause, QueryParam.class, name, defaultStringValue);
         }
     }
 
