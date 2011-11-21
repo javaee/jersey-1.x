@@ -131,10 +131,10 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
 
     /**
      * Creates a new HTTP Digest Authentication filter using provided username
-     * and password credentials
+     * and password credentials.
      *
-     * @param user
-     * @param pass
+     * @param user username
+     * @param pass password
      */
     public HTTPDigestAuthFilter (
             final String user,
@@ -169,7 +169,9 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
     }
 
     /**
-     * Converts array of bytes in hexadecimal format
+     * Converts array of bytes in hexadecimal format.
+     *
+     * @param data data to be converted to hex
      */
     private static String convertToHex(byte[] data) {
         StringBuffer buf = new StringBuffer();
@@ -188,7 +190,10 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
     }
 
     /**
-     * Compute md5 hash of a string and returns the hexadecimal representation of it
+     * Compute md5 hash of a string and returns the hexadecimal representation of it.
+     *
+     * @param text data from which would be returned hash value computed.
+     * @return computed hash.
      */
     static String MD5(String text) {
         try {
@@ -196,8 +201,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             md = MessageDigest.getInstance("MD5");
             md.update(text.getBytes("iso-8859-1"), 0, text.length());
             byte[] md5hash = md.digest();
-            String result = convertToHex(md5hash);
-            return result;
+            return convertToHex(md5hash);
         } catch (Exception e) {
             throw new Error(e);
         }
@@ -205,11 +209,14 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
 
     /**
      * Concatenate the strings with ':' and then pass it to md5
+     *
+     * @param vals values to be concatenated.
+     * @return concatenated string.
      */
     static String concatMD5(String... vals) {
 
         // Loop on vals : populate a buffer
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         for (String val : vals) {
             buff.append(val);
             buff.append(':');
@@ -223,7 +230,10 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
 
 
     /**
-     * Generate a random sequence of bytes and return it hexadecimal representation
+     * Generate a random sequence of bytes and return it hexadecimal representation.
+     *
+     * @param nbBytes number of random bytes.
+     * @return random data.
      */
     String randHexBytes(int nbBytes) {
 
@@ -245,6 +255,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
      * If no www-authenticate field is found with the "Digest" scheme, null is returned
      *
      * @param lines All www-authenticate lines of the header.
+     * @return parsed headers, null when "Digest" scheme not present.
      */
     static HashMap<String, String> parseHeaders(Collection<String> lines) {
 
@@ -396,7 +407,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             buff.deleteCharAt(buff.length() - 1);
             String authLine = buff.toString();
 
-            // Add the whole Authoriation line to the header
+            // Add the whole Authorization line to the header
             request.getHeaders().add(
                     HttpHeaders.AUTHORIZATION,
                     authLine);
