@@ -51,7 +51,7 @@ import javax.ws.rs.core.MediaType;
  * @author Marc.Hadley@Sun.Com
  */
 public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
-    
+
     @Override
     public boolean supports(Class<?> type) {
         return MediaType.class.isAssignableFrom(type);
@@ -63,7 +63,7 @@ public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
         b.append(header.getType()).append('/').append(header.getSubtype());
         for (Map.Entry<String, String> e : header.getParameters().entrySet()) {
             b.append("; ").append(e.getKey()).append('=');
-            WriterUtil.appendQuotedIfWhiteSpaceOrQuote(b, e.getValue());
+            WriterUtil.appendQuotedIfNonToken(b, e.getValue());
         }
         return b.toString();
     }
@@ -72,7 +72,7 @@ public class MediaTypeProvider implements HeaderDelegateProvider<MediaType> {
     public MediaType fromString(String header) {
         if (header == null)
             throw new IllegalArgumentException("Media type is null");
-        
+
         try {
             return valueOf(HttpHeaderReader.newInstance(header));
         } catch (ParseException ex) {

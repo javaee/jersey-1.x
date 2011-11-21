@@ -40,49 +40,42 @@
 
 package com.sun.jersey.core.impl.provider.header;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import com.sun.jersey.core.header.GrammarUtil;
 
 /**
  *
  * @author Marc.Hadley@Sun.Com
  */
 public class WriterUtil {
-    
-    private static Pattern whitespace = Pattern.compile("\\s");
 
-    private static Pattern whitespaceOrQuote = Pattern.compile("[\\s\"]");
-    
-    public static void appendQuotedIfWhiteSpaceOrQuote(StringBuilder b, String value) {
+    public static void appendQuotedIfNonToken(StringBuilder b, String value) {
         if (value==null)
             return;
-        Matcher m = whitespaceOrQuote.matcher(value);
-        boolean quote = m.find();
+        boolean quote = !GrammarUtil.isTokenString(value);
         if (quote)
             b.append('"');
         appendEscapingQuotes(b, value);
         if (quote)
-            b.append('"');        
+            b.append('"');
     }
-    
+
     public static void appendQuotedIfWhitespace(StringBuilder b, String value) {
         if (value==null)
             return;
-        Matcher m = whitespace.matcher(value);
-        boolean quote = m.find();
+        boolean quote = GrammarUtil.containsWhiteSpace(value);
         if (quote)
             b.append('"');
         appendEscapingQuotes(b, value);
         if (quote)
             b.append('"');
     }
-    
+
     public static void appendQuoted(StringBuilder b, String value) {
         b.append('"');
         appendEscapingQuotes(b, value);
         b.append('"');
     }
-    
+
     public static void appendEscapingQuotes(StringBuilder b, String value) {
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
@@ -91,5 +84,5 @@ public class WriterUtil {
             b.append(c);
         }
     }
-    
+
 }

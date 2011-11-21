@@ -1,4 +1,7 @@
 release 1.11
+- Fixed issue 627
+  http://java.net/jira/browse/JERSEY-627
+  Parameters of media type are not quoted correctly if containing separators.
 - Fixed issue 833
   http://java.net/jira/browse/JERSEY-833
   Normalization of the request parameters now correctly orders request parameters.

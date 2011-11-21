@@ -40,6 +40,7 @@
 package com.sun.jersey.core.header.reader;
 
 import java.text.ParseException;
+import static com.sun.jersey.core.header.GrammarUtil.*;
 
 /**
  *
@@ -47,72 +48,6 @@ import java.text.ParseException;
  */
 /* package */ final class HttpHeaderReaderImpl extends HttpHeaderReader {
 
-    private static final int TOKEN = 0;
-    private static final int QUOTED_STRING = 1;
-    private static final int COMMENT = 2;
-    private static final int SEPARATOR = 3;
-    private static final int CONTROL = 4;
-    private static final char[] WHITE_SPACE = {'\t', '\r', '\n', ' '};
-    private static final char[] SEPARATORS = {'(', ')', '<', '>', '@', ',', ';', ':', '\\', '"', '/', '[', ']', '?', '=', '{', '}', ' ', '\t'};
-    private static final int[] EVENT_TABLE = createEventTable();
-
-    private static int[] createEventTable() {
-        int[] table = new int[128];
-
-        // Token
-        for (int i = 0; i < 127; i++) {
-            table[i] = TOKEN;
-        }
-
-        // Separator
-        for (char c : SEPARATORS) {
-            table[c] = SEPARATOR;
-        }
-
-        // Comment
-        table['('] = COMMENT;
-
-        // QuotedString
-        table['"'] = QUOTED_STRING;
-
-        // Control
-        for (int i = 0; i < 32; i++) {
-            table[i] = CONTROL;
-        }
-        table[127] = CONTROL;
-
-        // White space
-        for (char c : WHITE_SPACE) {
-            table[c] = -1;
-        }
-
-        return table;
-    }
-
-    private static final boolean[] IS_WHITE_SPACE = createWhiteSpaceTable();
-
-    private static boolean[] createWhiteSpaceTable() {
-        boolean[] table = new boolean[128];
-
-        for (char c : WHITE_SPACE) {
-            table[c] = true;
-        }
-
-        return table;
-    }
-
-    private static final boolean[] IS_TOKEN = createTokenTable();
-
-    private static boolean[] createTokenTable() {
-        boolean[] table = new boolean[128];
-
-        for (int i = 0; i < 128; i++) {
-            table[i] = (EVENT_TABLE[i] == TOKEN);
-        }
-
-        return table;
-    }
-    
     private String header;
 
     private boolean processComments;
@@ -136,10 +71,12 @@ import java.text.ParseException;
         this(header, false);
     }
 
+    @Override
     public boolean hasNext() {
         return skipWhiteSpace();
     }
 
+    @Override
     public boolean hasNextSeparator(char separator, boolean skipWhiteSpace) {
         if (skipWhiteSpace) {
             skipWhiteSpace();
@@ -150,10 +87,11 @@ import java.text.ParseException;
         }
 
         char c = header.charAt(index);
-        return (EVENT_TABLE[c] == SEPARATOR)
+        return (TYPE_TABLE[c] == SEPARATOR)
                 ? c == separator : false;
     }
 
+    @Override
     public String nextSeparatedString(char startSeparator, char endSeparator) throws ParseException {
         nextSeparator(startSeparator);
         final int start = index;
@@ -176,26 +114,32 @@ import java.text.ParseException;
         return value = header.substring(start, index++);
     }
 
+    @Override
     public Event next() throws ParseException {
         return event = process(getNextCharacter(true));
     }
 
+    @Override
     public Event next(boolean skipWhiteSpace) throws ParseException {
         return event = process(getNextCharacter(skipWhiteSpace));
     }
 
+    @Override
     public Event getEvent() {
         return event;
     }
 
+    @Override
     public String getEventValue() {
         return value;
     }
 
+    @Override
     public String getRemainder() {
         return (index < length) ? header.substring(index) : null;
     }
 
+    @Override
     public int getIndex() {
         return index;
     }
@@ -228,7 +172,7 @@ import java.text.ParseException;
             return Event.Control;
         }
 
-        switch (EVENT_TABLE[c]) {
+        switch (TYPE_TABLE[c]) {
             case TOKEN: {
                 final int start = index;
                 for (index++; index < length; index++) {
@@ -311,49 +255,5 @@ import java.text.ParseException;
         }
 
         throw new ParseException("Unbalanced quoted string", index);
-    }
-
-    private boolean isWhiteSpace(char c) {
-        return (c < 128 && IS_WHITE_SPACE[c]);
-    }
-
-    private boolean isToken(char c) {
-        return (c < 128 && IS_TOKEN[c]);
-    }
-
-    private static String filterToken(String s, int start, int end) {
-        StringBuffer sb = new StringBuffer();
-        char c;
-        boolean gotEscape = false;
-        boolean gotCR = false;
-
-        for (int i = start; i < end; i++) {
-            c = s.charAt(i);
-            if (c == '\n' && gotCR) {
-                // This LF is part of an unescaped
-                // CRLF sequence (i.e, LWSP). Skip it.
-                gotCR = false;
-                continue;
-            }
-
-            gotCR = false;
-            if (!gotEscape) {
-                // Previous character was NOT '\'
-                if (c == '\\') { // skip this character
-                    gotEscape = true;
-                } else if (c == '\r') { // skip this character
-                    gotCR = true;
-                } else { // append this character
-                    sb.append(c);
-                }
-            } else {
-                // Previous character was '\'. So no need to
-                // bother with any special processing, just
-                // append this character
-                sb.append(c);
-                gotEscape = false;
-            }
-        }
-        return sb.toString();
     }
 }
