@@ -49,7 +49,7 @@ import java.util.Map;
  * <p>
  * The header consists of a value and zero or more parameters. A value consists
  * of zero or more tokens and separators up to but not including a ';' separator
- * if present. The tokens and seaprators of a value may be separated by zero or
+ * if present. The tokens and separators of a value may be separated by zero or
  * more white space, which is ignored and is not considered part of the value.
  * The value is separated from the parameters with a ';'. Each parameter is
  * separated with a ';'.

@@ -54,7 +54,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Common media types and functonality.
+ * Common media types and functionality.
  * 
  * @author Paul.Sandoz@Sun.Com
  */
