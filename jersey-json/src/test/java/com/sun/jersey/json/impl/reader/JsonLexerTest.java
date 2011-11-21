@@ -40,6 +40,7 @@
 
 package com.sun.jersey.json.impl.reader;
 
+import java.io.IOException;
 import java.io.StringReader;
 import junit.framework.TestCase;
 
@@ -48,10 +49,10 @@ import junit.framework.TestCase;
  * @author japod
  */
 public class JsonLexerTest extends TestCase {
-    
+
     public JsonLexerTest(String testName) {
         super(testName);
-    }            
+    }
 
     public void testNumbers() throws Exception {
         String testInput = "1 -45 12.355 0.123 -0.14 10e91 0e-12 0.12E14 -123.88E+34";
@@ -85,7 +86,7 @@ public class JsonLexerTest extends TestCase {
         assertEquals(JsonToken.NUMBER, token.tokenType);
         assertEquals("-123.88E+34", token.tokenText);
     }
-    
+
     public void testBooleans() throws Exception {
         String testInput = "true false";
         JsonLexer lexer = new JsonLexer(new StringReader(testInput));
@@ -117,7 +118,7 @@ public class JsonLexerTest extends TestCase {
         token = lexer.yylex();
         assertEquals(JsonToken.END_OBJECT, token.tokenType);
     }
-    
+
     public void testStrings() throws Exception {
         String testInput = "\"one\" \"one big\" \"one big \\n tower\" \"\\/ is slash\" \"other \\\" \\u0065 \\\\ symbols \\b\\f\\n\\r\\t\"";
         JsonLexer lexer = new JsonLexer(new StringReader(testInput));
@@ -138,7 +139,7 @@ public class JsonLexerTest extends TestCase {
         assertEquals(JsonToken.STRING, token.tokenType);
         assertEquals("other \" \u0065 \\ symbols \b\f\n\r\t", token.tokenText);
     }
-    
+
 
     public void testJsonExprWithoutWhitespace() throws Exception {
         String testInput = "[{\"name\":\"jakub\",\"age\":12}]";
@@ -167,7 +168,7 @@ public class JsonLexerTest extends TestCase {
         token = lexer.yylex();
         assertEquals(JsonToken.END_ARRAY, token.tokenType);
     }
-    
+
     public void testJsonExprWithWhitespace() throws Exception {
         String testInput = "[{ \"name\" : \"jakub\" ,\n\"age\" : 12}]";
         JsonLexer lexer = new JsonLexer(new StringReader(testInput));
@@ -195,6 +196,27 @@ public class JsonLexerTest extends TestCase {
         token = lexer.yylex();
         assertEquals(JsonToken.END_ARRAY, token.tokenType);
     }
-    
 
+    public void testUnfinishedString() throws Exception {
+        try {
+            JsonLexer lexer = new JsonLexer(new StringReader("\"unfinished string"));
+            lexer.yylex();
+        } catch (JsonFormatException e) {
+            assertEquals("Unexpected end of file.", e.getMessage());
+            return;
+        }
+        assertTrue(false);
+    }
+
+    public void testInvalidChar() throws Exception {
+        try {
+            JsonLexer lexer = new JsonLexer(new StringReader("\n 12 test"));
+            lexer.yylex();
+            lexer.yylex();
+        } catch (JsonFormatException e) {
+            assertEquals("Unexpected character: t (line: 2, column: 5)", e.getMessage());
+            return;
+        }
+        assertTrue(false);
+    }
 }

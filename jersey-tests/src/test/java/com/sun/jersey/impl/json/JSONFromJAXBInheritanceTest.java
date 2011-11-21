@@ -40,6 +40,7 @@
 
 package com.sun.jersey.impl.json;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -57,6 +58,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBContext;
@@ -84,13 +86,13 @@ public class JSONFromJAXBInheritanceTest extends AbstractResourceTester {
                 throw new RuntimeException(ex);
             }
         }
-        
+
         @Override
         public JAXBContext getContext(Class<?> c) {
             return types.contains(c) ? context : null;
         }
     }
-    
+
     @Path("/")
     public static class AnimalResource {
         @POST @Consumes("application/json") @Produces("application/json")
@@ -98,7 +100,7 @@ public class JSONFromJAXBInheritanceTest extends AbstractResourceTester {
             return b;
         }
     }
-    
+
     public void testAnimalResource() throws Exception {
         JAXBContextResolver cr = new JAXBContextResolver();
         ResourceConfig rc = new DefaultResourceConfig(AnimalResource.class);
@@ -114,5 +116,16 @@ public class JSONFromJAXBInheritanceTest extends AbstractResourceTester {
         assertEquals("bobik animal", r.type("application/json").post(Animal.class, new Animal("bobik animal")).name);
         assertEquals(Cat.class, r.type(MediaType.APPLICATION_JSON).post(Animal.class, new Cat("bobik cat", 9)).getClass());
         assertEquals(Dog.class, r.type(MediaType.APPLICATION_JSON).post(Animal.class, new Dog("bobik dog", 12)).getClass());
-    }        
+    }
+
+    public void testMalformedContent() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(AnimalResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, LoggingFilter.class.getName());
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, LoggingFilter.class.getName());
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/", false);
+        ClientResponse response = r.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, "\"");
+        assertEquals(400, response.getStatus());
+    }
 }

@@ -152,7 +152,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     void colon() throws IOException {
         JsonToken token = nextToken();
         if (token.tokenType != JsonToken.COLON) {
-            throw new IOException("Colon expected instead of \"" + token.tokenText + "\"");
+            throw new JsonFormatException(token.tokenText, token.line, token.column, "Colon expected instead of \"" + token.tokenText + "\"");
         }
     }
 
@@ -235,7 +235,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                 lastToken = nextToken();
                                 // TODO process attr value
                                 if (!valueTokenTypes.contains(lastToken.tokenType)) {
-                                    throw new IOException("Attribute value expected instead of \"" + lastToken.tokenText + "\"");
+                                    throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Attribute value expected instead of \"" + lastToken.tokenText + "\"");
                                 }
                                 if (null != processingStack.get(depth - 1).eventToReadAttributesFor) {
                                     processingStack.get(depth - 1).eventToReadAttributesFor.addAttribute(
@@ -252,7 +252,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                     case JsonToken.COMMA:
                                         break;
                                     default:
-                                        throw new IOException("\'\"\', or \'}\' expected instead of \"" + lastToken.tokenText + "\"");
+                                        throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "\'\"\', or \'}\' expected instead of \"" + lastToken.tokenText + "\"");
                                 }
                             } else { // non attribute
                                 StartElementEvent event =

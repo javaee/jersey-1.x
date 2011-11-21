@@ -43,6 +43,7 @@ package com.sun.jersey.json.impl.reader;
 %unicode
 %line
 %char
+%column
 %type JsonToken
 %{
    StringBuffer string = new StringBuffer();
@@ -55,23 +56,24 @@ WHITE_SPACE_CHAR=[\n\r\ \t\b\012]
 NUMBER_TEXT=-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?
 %%
 <YYINITIAL> {
-  "," { return (new JsonToken(JsonToken.COMMA, yytext(), yyline, yychar, yychar+1)); }
-  ":" { return (new JsonToken(JsonToken.COLON, yytext(), yyline, yychar, yychar+1)); }
-  "[" { return (new JsonToken(JsonToken.START_ARRAY, yytext(), yyline, yychar, yychar+1)); }
-  "]" { return (new JsonToken(JsonToken.END_ARRAY, yytext(), yyline, yychar, yychar+1)); }
-  "{" { return (new JsonToken(JsonToken.START_OBJECT, yytext(), yyline, yychar, yychar+1)); }
-  "}" { return (new JsonToken(JsonToken.END_OBJECT, yytext(), yyline, yychar, yychar+1)); }
-  "true" { return (new JsonToken(JsonToken.TRUE, yytext(), yyline, yychar, yychar+yylength()));}
-  "false" { return (new JsonToken(JsonToken.FALSE, yytext(), yyline, yychar, yychar+yylength()));}
-  "null" { return (new JsonToken(JsonToken.NULL, yytext(), yyline, yychar, yychar+yylength()));}
+  "," { return (new JsonToken(JsonToken.COMMA, yytext(), yyline, yychar, yychar+1, yycolumn)); }
+  ":" { return (new JsonToken(JsonToken.COLON, yytext(), yyline, yychar, yychar+1, yycolumn)); }
+  "[" { return (new JsonToken(JsonToken.START_ARRAY, yytext(), yyline, yychar, yychar+1, yycolumn)); }
+  "]" { return (new JsonToken(JsonToken.END_ARRAY, yytext(), yyline, yychar, yychar+1, yycolumn)); }
+  "{" { return (new JsonToken(JsonToken.START_OBJECT, yytext(), yyline, yychar, yychar+1, yycolumn)); }
+  "}" { return (new JsonToken(JsonToken.END_OBJECT, yytext(), yyline, yychar, yychar+1, yycolumn)); }
+  "true" { return (new JsonToken(JsonToken.TRUE, yytext(), yyline, yychar, yychar+yylength(), yycolumn));}
+  "false" { return (new JsonToken(JsonToken.FALSE, yytext(), yyline, yychar, yychar+yylength(), yycolumn));}
+  "null" { return (new JsonToken(JsonToken.NULL, yytext(), yyline, yychar, yychar+yylength(), yycolumn));}
   \"  { string.setLength(0); yybegin(STRING); }
-  {NUMBER_TEXT} { return (new JsonToken(JsonToken.NUMBER, yytext(), yyline, yychar, yychar+yylength()));} 
+  {NUMBER_TEXT} { return (new JsonToken(JsonToken.NUMBER, yytext(), yyline, yychar, yychar+yylength(), yycolumn));}
   {WHITE_SPACE_CHAR} {}
+  . { throw new JsonFormatException(yytext(), yyline, yycolumn, "Unexpected character: " + yytext() + " (line: " + (yyline + 1) + ", column: " + (yycolumn + 1) + ")"); }
 }
 
 <STRING> {
- \"  { yybegin(YYINITIAL); 
-       return (new JsonToken(JsonToken.STRING, string.toString(), yyline, yychar, yychar+string.length()));}
+ \"  { yybegin(YYINITIAL);
+       return (new JsonToken(JsonToken.STRING, string.toString(), yyline, yychar, yychar+string.length(), yycolumn));}
  [^\n\r\"\\]+   { string.append(yytext()); }
   \\\"          { string.append('\"'); }
   \\\\          { string.append('\\'); }
@@ -82,6 +84,7 @@ NUMBER_TEXT=-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][+-]?[0-9]+)?
   \\r           { string.append('\r'); }
   \\t          { string.append('\t'); }
   \\u[0-9A-Fa-f]{4}    { string.append(Character.toChars(Integer.parseInt(yytext().substring(2),16))); }
+  <<EOF>>       { throw new JsonFormatException(null, yyline, yycolumn, "Unexpected end of file."); }
 }
 
 

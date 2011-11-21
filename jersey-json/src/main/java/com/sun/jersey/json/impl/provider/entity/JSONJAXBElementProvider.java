@@ -46,6 +46,7 @@ import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.core.provider.jaxb.AbstractJAXBElementProvider;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 
+import com.sun.jersey.json.impl.reader.JsonFormatException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -62,13 +63,15 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
 /**
  *
  * @author japod
  */
 public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
-    
+
     boolean jacksonEntityProviderTakesPrecedence = false;
 
     JSONJAXBElementProvider(Providers ps) {
@@ -118,10 +121,14 @@ public class JSONJAXBElementProvider extends AbstractJAXBElementProvider {
             throws JAXBException {
         final Charset c = getCharset(mediaType);
 
-        return JSONJAXBContext.getJSONUnmarshaller(u).
-                unmarshalJAXBElementFromJSON(new InputStreamReader(entityStream, c), type);
+        try {
+            return JSONJAXBContext.getJSONUnmarshaller(u).
+                    unmarshalJAXBElementFromJSON(new InputStreamReader(entityStream, c), type);
+        } catch (JsonFormatException e) {
+            throw new WebApplicationException(e, Status.BAD_REQUEST);
+        }
     }
-    
+
     @Override
     protected final void writeTo(JAXBElement<?> t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)

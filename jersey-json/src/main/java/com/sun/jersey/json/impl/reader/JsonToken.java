@@ -63,13 +63,15 @@ class JsonToken {
     public int line;
     public int charBegin;
     public int charEnd;
+    public int column;
 
-    JsonToken(int tokenType, String text, int line, int charBegin, int charEnd) {
+    JsonToken(int tokenType, String text, int line, int charBegin, int charEnd, int column) {
         this.tokenType = tokenType;
         this.tokenText = text;
         this.line = line;
         this.charBegin = charBegin;
         this.charEnd = charEnd;
+        this.column = column;
     }
 
     @Override

@@ -44,6 +44,7 @@ import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.json.impl.reader.JsonFormatException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
@@ -60,13 +61,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com, Jakub.Podlesak@Sun.COM
  */
 public class JSONRootElementProvider extends AbstractRootElementProvider {
-    
+
     boolean jacksonEntityProviderTakesPrecedence = false;
 
     JSONRootElementProvider(Providers ps) {
@@ -122,8 +125,12 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
             throws JAXBException {
         final Charset c = getCharset(mediaType);
 
-        return JSONJAXBContext.getJSONUnmarshaller(u).
-                unmarshalFromJSON(new InputStreamReader(entityStream, c), type);
+        try {
+            return JSONJAXBContext.getJSONUnmarshaller(u).
+                    unmarshalFromJSON(new InputStreamReader(entityStream, c), type);
+        } catch (JsonFormatException e) {
+            throw new WebApplicationException(e, Status.BAD_REQUEST);
+        }
     }
 
     @Override
