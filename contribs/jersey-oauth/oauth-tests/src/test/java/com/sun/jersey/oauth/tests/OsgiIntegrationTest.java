@@ -21,6 +21,7 @@ import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.felix;
 import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemPackage;
+import static org.ops4j.pax.exam.MavenUtils.getArtifactVersion;
 
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 import org.osgi.framework.BundleContext;
@@ -42,6 +43,7 @@ public class OsgiIntegrationTest {
 
     @Configuration
     public static Option[] configuration() {
+        String jerseyVersion = getArtifactVersion("com.sun.jersey", "jersey-core").replaceFirst("[0-9]{8}\\.[0-9]{6}-[0-9]+", "SNAPSHOT");
 
         Option[] options = options(
                 //                systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
@@ -69,14 +71,14 @@ public class OsgiIntegrationTest {
                 // asm bundle
                 mavenBundle().groupId("asm").artifactId("asm-all").versionAsInProject(),
                 // load Jersey bundles
-                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
-                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
-                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-servlet").versionAsInProject(),
-                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-grizzly").versionAsInProject(),
-                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
-                mavenBundle().groupId("com.sun.jersey.contribs.jersey-oauth").artifactId("oauth-signature").versionAsInProject(),
-                mavenBundle().groupId("com.sun.jersey.contribs.jersey-oauth").artifactId("oauth-server").versionAsInProject(),
-                mavenBundle().groupId("com.sun.jersey.contribs.jersey-oauth").artifactId("oauth-client").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").version(jerseyVersion),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").version(jerseyVersion),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-servlet").version(jerseyVersion),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-grizzly").version(jerseyVersion),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").version(jerseyVersion),
+                mavenBundle().groupId("com.sun.jersey.contribs.jersey-oauth").artifactId("oauth-signature").version(jerseyVersion),
+                mavenBundle().groupId("com.sun.jersey.contribs.jersey-oauth").artifactId("oauth-server").version(jerseyVersion),
+                mavenBundle().groupId("com.sun.jersey.contribs.jersey-oauth").artifactId("oauth-client").version(jerseyVersion),
 
                 // customize the export header
 
