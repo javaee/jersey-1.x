@@ -96,7 +96,7 @@
             proxies is simply more natural for developers and less error prone as fewer URIs need to
             be constructed.</para>
         <para>Rather than presenting all these extensions abstractly, we shall illustrate their use
-            via an example. The complete example can found in <ulink url="https://maven.java.net/content/repositories/&repository;/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample">hypermedia-action-sample</ulink>. The <emphasis>Purchase Ordering System</emphasis>
+            via an example. The complete example can found in <ulink url="https://maven.java.net/content/repositories/&experimentalrepository;/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample">hypermedia-action-sample</ulink>. The <emphasis>Purchase Ordering System</emphasis>
             exemplifies a system in which customers can submit orders and where orders are guided by
             a workflow that includes states like <literal>REVIEWED</literal>,
             <literal>PAYED</literal> and <literal>SHIPPED</literal>. The system's model is comprised
@@ -120,7 +120,7 @@
             form of <emphasis>serialization by reference</emphasis> is supported in Jersey using
             JAXB beans and the <literal>@XmlJavaTypeAdapter</literal> annotation. An
                 <literal>XmlAdapter</literal> is capable of mapping an object reference in the model
-            to a URI. Refer to <ulink url="https://maven.java.net/content/repositories/&repository;/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample">hypermedia-action-sample</ulink> for more information on how this mapping is
+            to a URI. Refer to <ulink url="https://maven.java.net/content/repositories/&experimentalrepository;/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample">hypermedia-action-sample</ulink> for more information on how this mapping is
         implemented.</para>
     </section>
     <section>
@@ -366,7 +366,7 @@
     </section>
     <section>
         <title>Configuring Hypermedia in Jersey</title>
-        <para>There are a few configuration options in <ulink url="https://maven.java.net/content/repositories/&repository;/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample">hypermedia-action-sample</ulink> that are worth highlighting. First, a
+        <para>There are a few configuration options in <ulink url="https://maven.java.net/content/repositories/&experimentalrepository;/com/sun/jersey/experimental/hypermedia-action/hypermedia-action-sample">hypermedia-action-sample</ulink> that are worth highlighting. First, a
             special filter factory <literal>HypermediaFilterFactory</literal> must
             be enabled. This can be done programmatically by adding
             <programlisting>com.sun.jersey.server.hypermedia.filter.HypermediaFilterFactory</programlisting> to the list defined by
