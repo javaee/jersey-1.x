@@ -1,4 +1,7 @@
 release 1.11
+- Fixed issue 844
+  http://java.net/jira/browse/JERSEY-844
+  Links pointing to "hypermedia-action-sample" broken in user guide
 - Fixed issue 835
   http://java.net/jira/browse/JERSEY-835
   JsonLexer used to throw java.lang.Error in case of syntactical errors with the JSON stream. Fixed to throw JsonFormatException which gets subsequently wrapped (by the message processing chain) an a WebApplicationException with the status code 400.
