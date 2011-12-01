@@ -57,7 +57,7 @@
         <pax-exam-version>1.2.3</pax-exam-version>
         <pax-swissbox-version>1.2.0</pax-swissbox-version>
         <jetty-version>6.1.22</jetty-version>
-        <jackson.version>1.8.3</jackson.version>
+        <jackson.version>1.9.2</jackson.version>
         <osgi-version>4.2.0</osgi-version>
     </properties>
 
