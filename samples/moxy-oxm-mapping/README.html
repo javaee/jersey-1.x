@@ -65,7 +65,7 @@
   
 <h2>Replacing Implicit JAXB Runtime With MOXy</h2>
 <p>Since MOXy is a JAXB implementation, the example still utilizes the standard Jersey JAXB message body reader/writer providers.
-To make Jersey use MOXy runtime, you just need to put a <code>jaxb.properties</code> file into the Java package
+To make Jersey uses MOXy runtime, you just need to put a <code>jaxb.properties</code> file into the Java package
 containing your JAXB beans. The file should have the following content:
 <pre>
 javax.xml.bind.context.factory=org.eclipse.persistence.jaxb.JAXBContextFactory
@@ -75,6 +75,11 @@ Concrete file used in this example is placed under <code>src/main/resources/com/
 <p>So far the configuration was the same as in the other MOXy example in Jersey.
 Now to enable MOXy JAXB provider also for the types, which do not use JAXB annotations,
 you need to name respective Java packages in Jersey ResourceConfig property called <code>com.sun.jersey.moxy.config.property.packages</code>.
+And finally to make Jersey use properly configured JAXB context resolver, you need
+to add
+<code>com.sun.jersey.moxy.MoxyContextResolver</code> to your provider classes.
+In this example we do so via <code>META-INF/services/jersey-server-components</code>
+and <code>META-INF/services/jersey-files-components</code> placed in the web application WAR file.
 </p>
       <h2>REST Resources</h2>
       <p>The example consists of a single REST Resource represented by the following Java class:</p>

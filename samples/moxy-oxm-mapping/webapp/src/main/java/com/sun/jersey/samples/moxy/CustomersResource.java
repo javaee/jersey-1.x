@@ -37,43 +37,50 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.samples.moxy;
 
 import com.sun.jersey.samples.moxy.beans.Address;
 import com.sun.jersey.samples.moxy.beans.Customer;
 import com.sun.jersey.samples.moxy.beans.PhoneNumber;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import java.util.Arrays;
+import java.util.List;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-@Path("/customer")
-public class CustomerResource {
+@Path("/customers")
+public class CustomersResource {
 
-    private static Customer customer = createInitialCustomer();
+    private static List<Customer> customers = Arrays.asList(
+            new Customer[]{
+                createCustomer("Jane Doe", "123 Any Street", "My Town", 
+                                      new PhoneNumber("work", "613-555-1111"), new PhoneNumber("cell", "613-555-2222")), 
+                createCustomer("John White", "567 Another Street", "His Town", new PhoneNumber("work", "613-666-1111"))});
 
     @GET
     @Produces(MediaType.APPLICATION_XML)
-    public Customer getCustomer() {
-        return customer;
+    public List<Customer> getCustomers() {
+        return customers;
     }
 
-    @PUT
+    @GET @Path("{index: \\d+}")
+    @Produces(MediaType.APPLICATION_XML)
+    public Customer getCustomer(@PathParam("index") int index) {
+        return customers.get(index);
+    }
+
+    @PUT @Path("{index: \\d+}")
     @Consumes(MediaType.APPLICATION_XML)
-    public void setCustomer(Customer c) {
-        customer = c;
+    public void setCustomer(@PathParam("index") int index, Customer customer) {
+        CustomersResource.customers.set(index, customer);
     }
 
-    private static Customer createInitialCustomer() {
+    private static Customer createCustomer(String name, String street, String town, PhoneNumber... phoneNumbers) {
         Customer result = new Customer();
 
-        result.setName("Jane Doe");
-        result.setAddress(new Address("123 Any Street", "My Town"));
-        result.getPhoneNumbers().add(new PhoneNumber("work", "613-555-1111"));
-        result.getPhoneNumbers().add(new PhoneNumber("cell", "613-555-2222"));
+        result.setName(name);
+        result.setAddress(new Address(street, town));
+
+        result.getPhoneNumbers().addAll(Arrays.asList(phoneNumbers));
 
         return result;
     }

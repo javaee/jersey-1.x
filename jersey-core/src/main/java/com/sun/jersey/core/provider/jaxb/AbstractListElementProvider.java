@@ -119,6 +119,19 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         TreeSet.class,
         Stack.class
     };
+    
+    public static interface JaxbTypeChecker {
+        boolean isJaxbType(Class type);
+    }
+  
+    private static final JaxbTypeChecker DefaultJaxbTypeCHECKER = new JaxbTypeChecker() {
+
+        @Override
+        public boolean isJaxbType(Class type) {
+            return type.isAnnotationPresent(XmlRootElement.class) ||
+                type.isAnnotationPresent(XmlType.class);
+        }
+    };
 
     public AbstractListElementProvider(Providers ps) {
         super(ps);
@@ -148,7 +161,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             return false;
     }
 
-    private boolean verifyCollectionSubclass(Class<?> type) {
+    public static boolean verifyCollectionSubclass(Class<?> type) {
         try {
             if (Collection.class.isAssignableFrom(type)) {
                 for (Class c : DEFAULT_IMPLS) {
@@ -165,16 +178,24 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         }
         return false;
     }
+    
 
-    private boolean verifyArrayType(Class type) {
+    private static boolean verifyArrayType(Class type) {
+        return verifyArrayType(type, DefaultJaxbTypeCHECKER);
+    }
+    
+    public static boolean verifyArrayType(Class type, JaxbTypeChecker checker) {
         type = type.getComponentType();
 
-        return type.isAnnotationPresent(XmlRootElement.class) ||
-                type.isAnnotationPresent(XmlType.class) ||
+        return checker.isJaxbType(type) ||
                 JAXBElement.class.isAssignableFrom(type);
     }
 
-    private boolean verifyGenericType(Type genericType) {
+    private static boolean verifyGenericType(Type genericType) {
+        return verifyGenericType(genericType, DefaultJaxbTypeCHECKER);
+    }
+    
+    public static boolean verifyGenericType(Type genericType, JaxbTypeChecker checker) {
         if (!(genericType instanceof ParameterizedType)) return false;
 
         final ParameterizedType pt = (ParameterizedType)genericType;
@@ -193,8 +214,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
 
         final Class listClass = (Class)pt.getActualTypeArguments()[0];
 
-        return listClass.isAnnotationPresent(XmlRootElement.class) ||
-                listClass.isAnnotationPresent(XmlType.class);        
+        return checker.isJaxbType(listClass);        
     }
 
     @Override

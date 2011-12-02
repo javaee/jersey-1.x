@@ -41,19 +41,19 @@
  */
 package com.sun.jersey.moxy;
 
+import com.sun.jersey.core.provider.jaxb.AbstractListElementProvider;
 import com.sun.jersey.core.util.FeaturesAndProperties;
-
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -68,36 +68,37 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Jakub Podlesak
  */
 @Provider
-public class MoxyMessageBodyWorker implements MessageBodyWriter, MessageBodyReader {
+public class MoxyListMessageBodyWorker implements MessageBodyWriter, MessageBodyReader {
 
     @XmlRootElement
     public static class JaxbDollType {};
 
     final MessageBodyWorkers msgBodyWorkers;
     final Set<String> moxyPackageNames = new HashSet<String>();
-    final static JaxbDollType JaxbDoll = new JaxbDollType();
+    final static JaxbDollType[] JaxbDoll = new JaxbDollType[]{};
 
-    public MoxyMessageBodyWorker(@Context MessageBodyWorkers mbw, @Context FeaturesAndProperties fap) {
-        this.msgBodyWorkers = mbw;
-        moxyPackageNames.addAll(getPackageNames(fap.getProperty(MoxyContextResolver.PROPERTY_MOXY_OXM_PACKAGE_NAMES)));
-    }
-
-    static List<String> getPackageNames(Object p) {
-        if (p == null) {
-            return Collections.EMPTY_LIST;
-        } else if (p instanceof String) {
-            return Arrays.asList(Helper.getElements(new String[]{(String)p}));
-        } else if (p instanceof String[]) {
-            return Arrays.asList(Helper.getElements((String[])p));
-        } else {
-            throw new IllegalArgumentException(MoxyContextResolver.PROPERTY_MOXY_OXM_PACKAGE_NAMES + " must " +
-                    "have a property value of type String or String[]");
+    private final AbstractListElementProvider.JaxbTypeChecker oxmJaxbTypeChecker 
+                                = new AbstractListElementProvider.JaxbTypeChecker() {
+        @Override
+        public boolean isJaxbType(Class type) {
+            return typeIsKnown(type);
         }
+    };
+    
+    public MoxyListMessageBodyWorker(@Context MessageBodyWorkers mbw, @Context FeaturesAndProperties fap) {
+        this.msgBodyWorkers = mbw;
+        moxyPackageNames.addAll(
+                MoxyMessageBodyWorker.getPackageNames(fap.getProperty(MoxyContextResolver.PROPERTY_MOXY_OXM_PACKAGE_NAMES)));
     }
 
     @Override
     public boolean isWriteable(Class type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return typeIsKnown(type) && mediaTypeIsXml(mediaType);
+        if (Collection.class.isAssignableFrom(type)) {
+            return AbstractListElementProvider.verifyGenericType(genericType, oxmJaxbTypeChecker) && mediaTypeIsXml(mediaType);
+        } else if (type.isArray()) {
+            return AbstractListElementProvider.verifyArrayType(type, oxmJaxbTypeChecker) && mediaTypeIsXml(mediaType);
+        } else
+            return false;
     }
 
     private boolean typeIsKnown(Class type) {
@@ -124,9 +125,15 @@ public class MoxyMessageBodyWorker implements MessageBodyWriter, MessageBodyRead
 
     @Override
     public boolean isReadable(Class type, Type genericType, Annotation[] annotations, MediaType mediaType) {
-        return typeIsKnown(type) && mediaTypeIsXml(mediaType);
+        if (AbstractListElementProvider.verifyCollectionSubclass(type)) {
+            return AbstractListElementProvider.verifyGenericType(genericType, oxmJaxbTypeChecker) && mediaTypeIsXml(mediaType);
+        } else if (type.isArray()) {
+            return AbstractListElementProvider.verifyArrayType(type, oxmJaxbTypeChecker) && mediaTypeIsXml(mediaType);
+        } else
+            return false;
     }
 
+    
     @Override
     public Object readFrom(Class type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
         return lookupXmlReader(msgBodyWorkers, mediaType).readFrom(type, genericType, annotations, mediaType, httpHeaders, entityStream);
@@ -134,7 +141,7 @@ public class MoxyMessageBodyWorker implements MessageBodyWriter, MessageBodyRead
 
     private MessageBodyWriter lookupXmlWriter(MessageBodyWorkers mbw, MediaType mt) {
         for (MessageBodyWriter writer : mbw.getWriters(mt).get(mt)) {
-            if (writer instanceof MoxyMessageBodyWorker) {
+            if (writer instanceof MoxyListMessageBodyWorker) {
                 continue;
             } else if (!writer.isWriteable(JaxbDoll.getClass(), JaxbDoll.getClass(), null, mt)){
                 continue;
@@ -148,7 +155,7 @@ public class MoxyMessageBodyWorker implements MessageBodyWriter, MessageBodyRead
 
     private MessageBodyReader lookupXmlReader(MessageBodyWorkers mbw, MediaType mt) {
         for (MessageBodyReader reader : mbw.getReaders(mt).get(mt)) {
-            if (reader instanceof MoxyMessageBodyWorker) {
+            if (reader instanceof MoxyListMessageBodyWorker) {
                 continue;
             } else if (!reader.isReadable(JaxbDoll.getClass(), JaxbDoll.getClass(), null, mt)){
                 continue;

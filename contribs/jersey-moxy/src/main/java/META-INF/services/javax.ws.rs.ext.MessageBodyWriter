@@ -1,1 +1,2 @@
 com.sun.jersey.moxy.MoxyMessageBodyWorker
+com.sun.jersey.moxy.MoxyListMessageBodyWorker
