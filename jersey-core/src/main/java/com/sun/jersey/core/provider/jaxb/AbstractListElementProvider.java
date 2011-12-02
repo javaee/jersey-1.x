@@ -119,11 +119,15 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         TreeSet.class,
         Stack.class
     };
-    
+
+    /**
+     * This is to allow customized JAXB collections checking.
+     * @see verifyArrayType and verifyGenericype methods
+     */
     public static interface JaxbTypeChecker {
         boolean isJaxbType(Class type);
     }
-  
+
     private static final JaxbTypeChecker DefaultJaxbTypeCHECKER = new JaxbTypeChecker() {
 
         @Override
@@ -136,11 +140,11 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     public AbstractListElementProvider(Providers ps) {
         super(ps);
     }
-    
+
     public AbstractListElementProvider(Providers ps, MediaType mt) {
-        super(ps, mt);        
+        super(ps, mt);
     }
-    
+
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         if (verifyCollectionSubclass(type)) {
@@ -150,7 +154,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         } else
             return false;
     }
-    
+
     @Override
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         if (Collection.class.isAssignableFrom(type)) {
@@ -178,12 +182,21 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         }
         return false;
     }
-    
+
 
     private static boolean verifyArrayType(Class type) {
         return verifyArrayType(type, DefaultJaxbTypeCHECKER);
     }
-    
+
+
+    /**
+     * The method could be used to check if given type is an array of JAXB beans.
+     * It allows customizing the "is this a JAXB bean?" part.
+     *
+     * @param type the array to be checked
+     * @param checker allows JAXB bean check customization
+     * @return true if given type is an array of JAXB beans
+     */
     public static boolean verifyArrayType(Class type, JaxbTypeChecker checker) {
         type = type.getComponentType();
 
@@ -194,14 +207,22 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     private static boolean verifyGenericType(Type genericType) {
         return verifyGenericType(genericType, DefaultJaxbTypeCHECKER);
     }
-    
+
+    /**
+     * The method could be used to check if given type is a collection of JAXB beans.
+     * It allows customizing the "is this a JAXB bean?" part.
+     *
+     * @param genericType the type to be checked
+     * @param checker allows JAXB bean check customization
+     * @return true if given type is a collection of JAXB beans
+     */
     public static boolean verifyGenericType(Type genericType, JaxbTypeChecker checker) {
         if (!(genericType instanceof ParameterizedType)) return false;
 
         final ParameterizedType pt = (ParameterizedType)genericType;
 
         if (pt.getActualTypeArguments().length > 1) return false;
-        
+
         final Type ta = pt.getActualTypeArguments()[0];
 
         if (ta instanceof ParameterizedType) {
@@ -214,20 +235,20 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
 
         final Class listClass = (Class)pt.getActualTypeArguments()[0];
 
-        return checker.isJaxbType(listClass);        
+        return checker.isJaxbType(listClass);
     }
 
     @Override
     public final void writeTo(
             Object t,
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
-            MediaType mediaType, 
+            Class<?> type,
+            Type genericType,
+            Annotation annotations[],
+            MediaType mediaType,
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            final Collection c = (type.isArray()) 
+            final Collection c = (type.isArray())
                     ? Arrays.asList((Object[])t)
                     : (Collection)t;
             final Class elementType = getElementClass(type, genericType);
@@ -248,7 +269,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
 
     /**
      * Write a collection of JAXB objects as child elements of the root element.
-     * 
+     *
      * @param elementType the element type in the collection.
      * @param t the collecton to marshall
      * @param mediaType the media type
@@ -256,7 +277,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
      * @param m the marshaller
      * @param entityStream the output stream to marshall the collection
      * @throws javax.xml.bind.JAXBException
-     * @throws IOException 
+     * @throws IOException
      */
     public abstract void writeList(Class<?> elementType, Collection<?> t,
             MediaType mediaType, Charset c,
@@ -266,14 +287,14 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
     @Override
     public final Object readFrom(
             Class<Object> type,
-            Type genericType, 
+            Type genericType,
             Annotation annotations[],
-            MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, 
+            MediaType mediaType,
+            MultivaluedMap<String, String> httpHeaders,
             InputStream entityStream) throws IOException {
         try {
-            final Class elementType = getElementClass(type, genericType);                
-            final Unmarshaller u = getUnmarshaller(elementType, mediaType);            
+            final Class elementType = getElementClass(type, genericType);
+            final Unmarshaller u = getUnmarshaller(elementType, mediaType);
             final XMLStreamReader r = getXMLStreamReader(elementType, mediaType, u, entityStream);
             boolean jaxbElement = false;
 
@@ -345,7 +366,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
             Array.set(array, i, l.get(i));
         return array;
     }
-    
+
     /**
      * Get the XMLStreamReader for unmarshalling.
      *
@@ -378,7 +399,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         }
         return (Class) ta;
     }
-    
+
     private final Inflector inflector = Inflector.getInstance();
 
     private String convertToXmlName(final String name) {
@@ -391,7 +412,7 @@ public abstract class AbstractListElementProvider extends AbstractJAXBProvider<O
         } else {
             return convertToXmlName(inflector.decapitalize(inflector.pluralize(inflector.demodulize(elementType.getName()))));
         }
-    }    
+    }
 
     protected final String getElementName(Class<?> elementType) {
         String name = elementType.getName();
