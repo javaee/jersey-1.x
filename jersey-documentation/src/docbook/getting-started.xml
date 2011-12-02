@@ -60,8 +60,8 @@ as described in <xref linkend="chapter_deps"/>
 
 <itemizedlist>
    <listitem>the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=pom">jersey-server</ulink> module, </listitem>
-   <listitem>the <ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-servlet-webserver/1.9.36/grizzly-servlet-webserver-1.9.36.pom">grizzly-servlet-webserver</ulink> module </listitem>
- </itemizedlist>
+   <listitem>the <ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-grizzly2&amp;v=&version;&amp;e=pom">jersey-grizzly2</ulink> module, </listitem>
+  </itemizedlist>
  </para>
  <para>
    The following dependencies need to be added to the pom:
@@ -71,9 +71,9 @@ as described in <xref linkend="chapter_deps"/>
     &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;
 &lt;dependency&gt;
-    &lt;groupId&gt;com.sun.grizzly&lt;/groupId&gt;
-    &lt;artifactId&gt;grizzly-servlet-webserver&lt;/artifactId&gt;
-    &lt;version&gt;1.9.36&lt;/version&gt;
+    &lt;groupId&gt;com.sun.jersey&lt;/groupId&gt;
+    &lt;artifactId&gt;jersey-grizzly2&lt;/artifactId&gt;
+    &lt;version&gt;&version;&lt;/version&gt;
 &lt;/dependency&gt;</programlisting></para>
 
     <para>If you want to depend on Jersey snapshot versions the following repository needs to be added to the pom:
@@ -87,8 +87,10 @@ as described in <xref linkend="chapter_deps"/>
 <para>
 Non-maven developers require:
 <itemizedlist>
-<listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-servlet-webserver/1.9.36/grizzly-servlet-webserver-1.9.36.jar">grizzly-servlet-webserver.jar</ulink>,</listitem>
+<listitem><ulink url="http://search.maven.org/remotecontent?filepath=org/glassfish/grizzly/grizzly-http-server/&grizzly2.version;/grizzly-http-server-&grizzly2.version;.jar">grizzly-http-server.jar</ulink>,</listitem>
+<listitem><ulink url="http://search.maven.org/remotecontent?filepath=org/glassfish/grizzly/grizzly-http/&grizzly2.version;/grizzly-http-&grizzly2.version;.jar">grizzly-http.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=jar">jersey-server.jar</ulink>,</listitem>
+<listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-grizzly2&amp;v=&version;&amp;e=jar">jersey-grizzly2.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-core&amp;v=&version;&amp;e=jar">jersey-core.jar</ulink>,</listitem>
 <listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/ws/rs/jsr311-api/&jsr311.version;/jsr311-api-&jsr311.version;.jar">jsr311-api.jar</ulink>,</listitem>
 <listitem><ulink url="http://search.maven.org/remotecontent?filepath=asm/asm/3.3.1/asm-3.3.1.jar">asm.jar</ulink></listitem>
@@ -102,9 +104,15 @@ explicitly:</para>
   &lt;dependency groupId=&quot;com.sun.jersey&quot;
               artifactId=&quot;jersey-server&quot;
               version=&quot;&version;&quot;/&gt;
-  &lt;dependency groupId=&quot;com.sun.grizzly&quot;
-              artifactId=&quot;grizzly-servlet-webserver&quot;
-              version=&quot;1.8.6.4&quot;/&gt;
+  &lt;dependency groupId=&quot;com.sun.jersey&quot;
+              artifactId=&quot;jersey-grizzly2&quot;
+              version=&quot;&version;&quot;/&gt;             
+  &lt;dependency groupId=&quot;org.glassfish.grizzly&quot;
+              artifactId=&quot;grizzly-http-server&quot;
+              version=&quot;&grizzly2.version;&quot;/&gt;
+  &lt;dependency groupId=&quot;org.glassfish.grizzly&quot;
+              artifactId=&quot;grizzly-http&quot;
+              version=&quot;&grizzly2.version;&quot;/&gt;
   &lt;artifact:remoteRepository id=&quot;maven-repository.java.net&quot;
                              url=&quot;http://maven.java.net/&quot; /&gt;
   &lt;artifact:remoteRepository id=&quot;maven1-repository.java.net&quot;
@@ -151,38 +159,63 @@ HTTP method and the media type. This is a key feature of JSR 311.</para>
 <para>The root resource will be deployed using the Grizzly Web
 container.</para>
 <para>Create the following Java class in your project:</para>
-<programlisting language="java" linenumbering="numbered">public class Main {
-          
-     public static void main(String[] args) throws IOException {
-             
-         final String baseUri = &quot;http://localhost:9998/&quot;;
-         final Map&lt;String, String&gt; initParams = 
-	                       new HashMap&lt;String, String&gt;();
- 
-         initParams.put(&quot;com.sun.jersey.config.property.packages&quot;, 
-                 &quot;com.sun.jersey.samples.helloworld.resources&quot;);
+<programlisting language="java" linenumbering="numbered">import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import org.glassfish.grizzly.http.server.HttpServer;
 
+import javax.ws.rs.core.UriBuilder;
+import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+public class Main {
+
+    private static int getPort(int defaultPort) {
+        String port = System.getProperty(&quot;jersey.test.port&quot;);
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultPort;        
+    } 
+    
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri(&quot;http://localhost/&quot;).port(getPort(9998)).build();
+    }
+
+    public static final URI BASE_URI = getBaseURI();
+
+    protected static HttpServer startServer() throws IOException {
         System.out.println(&quot;Starting grizzly...&quot;);
-        SelectorThread threadSelector = 
-	          GrizzlyWebContainerFactory.create(baseUri, initParams);
-        System.out.println(String.format(
-          &quot;Jersey app started with WADL available at %sapplication.wadl\n” + 
-          “Try out %shelloworld\nHit enter to stop it...&quot;, baseUri, baseUri));
+        ResourceConfig rc = new PackagesResourceConfig(&quot;com.sun.jersey.samples.helloworld.resources&quot;);
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
+    }
+    
+    public static void main(String[] args) throws IOException {
+        HttpServer httpServer = startServer();
+        System.out.println(String.format(&quot;Jersey app started with WADL available at &quot;
+                + &quot;%sapplication.wadl\nTry out %shelloworld\nHit enter to stop it...&quot;,
+                BASE_URI, BASE_URI));
         System.in.read();
-        threadSelector.stopEndpoint();
-        System.exit(0);
+        httpServer.stop();
     }    
 }</programlisting><para>
 The <literal>Main</literal> class deploys the <literal>HelloWorldResource</literal>
 using the Grizzly Web container.</para>
-<para>Lines 9 to 10 creates an initialization parameter that informs the
+<para>Line 35 creates an initialization parameter that informs the
 Jersey runtime where to search for root resource classes to be
 deployed. In this case it assumes the root resource class in the
 package <literal>com.sun.jersey.samples.helloworld.resources</literal>
 (or in a sub-package of).</para>
-<para>Lines 13 to 14 deploys the root resource to the base URI
+<para>Line 36 deploys the root resource to the base URI
 &quot;<ulink url="http://localhost:9998/">http://localhost:9998/</ulink>&quot;
-and returns a Grizzly SelectorThread. The complete URI of the Hello
+and returns a Grizzly HttpServer. The complete URI of the Hello
 World root resource is &quot;<ulink url="http://localhost:9998/helloworld">http://localhost:9998/helloworld</ulink>&quot;.</para>
 <para>Notice that no deployment descriptors were needed and the root
 resource was setup in a few statements of Java code.</para>
