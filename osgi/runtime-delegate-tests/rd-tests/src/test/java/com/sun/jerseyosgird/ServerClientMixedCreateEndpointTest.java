@@ -129,8 +129,8 @@ public class ServerClientMixedCreateEndpointTest {
                         "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                         "http://maven.java.net/",
                         "http://repository.springsource.com/maven/bundles/release",
-                        "http://repository.springsource.com/maven/bundles/external"
-                   ),
+                        "http://repository.springsource.com/maven/bundles/external",
+                        "http://maven.java.net/content/repositories/snapshots"),
 
                 // log
                 mavenBundle("org.ops4j.pax.logging", "pax-logging-api", "1.4"),
@@ -154,11 +154,11 @@ public class ServerClientMixedCreateEndpointTest {
                 
                 // HTTP SPEC
                 mavenBundle("org.apache.geronimo.specs","geronimo-servlet_2.5_spec","1.1.2"),
-                 
-                
+
+
                 // load PAX url war
                 mavenBundle("org.ops4j.pax.url","pax-url-war","1.1.2"),
-                
+
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
         	mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-servlet").versionAsInProject(),

@@ -104,7 +104,8 @@ public abstract class AbstractJettyWebContainerTester {
                 "http://repository.ops4j.org/maven2",
                 "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                 "http://repository.springsource.com/maven/bundles/release",
-                "http://repository.springsource.com/maven/bundles/external"),
+                "http://repository.springsource.com/maven/bundles/external",
+                "http://maven.java.net/content/repositories/snapshots"),
 
                 // load jsr250-api jar
                 wrappedBundle(mavenBundle().groupId("javax.annotation").artifactId("jsr250-api").versionAsInProject()),

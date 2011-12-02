@@ -100,21 +100,21 @@ public class ClientOnlyTest {
     public static Option[] configuration() {
 
         Option[] options = options(
-        		
+
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"INFO"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
-                
+
                 systemPackage("sun.misc"),
 
                 // define maven repository
                 repositories(
-                        "http://repo1.maven.org/maven2", 
+                        "http://repo1.maven.org/maven2",
                         "http://repository.apache.org/content/groups/snapshots-group",
                         "http://repository.ops4j.org/maven2",
                         "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                         "http://repository.springsource.com/maven/bundles/release",
-                        "http://repository.springsource.com/maven/bundles/external"
-                   ),
+                        "http://repository.springsource.com/maven/bundles/external",
+                        "http://maven.java.net/content/repositories/snapshots"),
 
                 // log
                 mavenBundle("org.ops4j.pax.logging", "pax-logging-api", "1.4"),
@@ -138,11 +138,11 @@ public class ClientOnlyTest {
                 
                 // HTTP SPEC
                 mavenBundle("org.apache.geronimo.specs","geronimo-servlet_2.5_spec","1.1.2"),
-                 
-                
+
+
                 // load PAX url war
                 mavenBundle("org.ops4j.pax.url","pax-url-war","1.1.2"),
-                
+
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
         	mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
 

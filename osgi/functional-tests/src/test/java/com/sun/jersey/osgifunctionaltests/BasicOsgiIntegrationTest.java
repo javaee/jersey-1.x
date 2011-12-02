@@ -64,7 +64,8 @@ public class BasicOsgiIntegrationTest {
                 "http://repository.ops4j.org/maven2",
                 "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                 "http://repository.springsource.com/maven/bundles/release",
-                "http://repository.springsource.com/maven/bundles/external"),
+                "http://repository.springsource.com/maven/bundles/external",
+                "http://maven.java.net/content/repositories/snapshots"),
 
                 // log
 //                mavenBundle("org.ops4j.pax.logging", "pax-logging-api", "1.4"),

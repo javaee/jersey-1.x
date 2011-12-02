@@ -42,7 +42,7 @@ public class JsonTest {
     private static final int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 8080);
     private static final String CONTEXT = "/jersey";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
-    
+
     @Configuration
     public static Option[] configuration() {
 
@@ -57,7 +57,8 @@ public class JsonTest {
                 "http://repository.ops4j.org/maven2",
                 "http://svn.apache.org/repos/asf/servicemix/m2-repo",
                 "http://repository.springsource.com/maven/bundles/release",
-                "http://repository.springsource.com/maven/bundles/external"),
+                "http://repository.springsource.com/maven/bundles/external",
+                "http://maven.java.net/content/repositories/snapshots"),
                 // felix config admin
                 //mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4"),
                 // felix event admin

@@ -13,8 +13,8 @@
     <!-- we can use full maven properties incl. inheritance ! -->
     <properties>
         <junit-version>4.5</junit-version>
-        <pax-exam-version>1.2.3</pax-exam-version>
-        <pax-swissbox-version>1.2.0</pax-swissbox-version>
+        <pax-exam-version>1.2.4</pax-exam-version>
+        <pax-swissbox-version>1.3.1</pax-swissbox-version>
         <osgi-version>4.2.0</osgi-version>
     </properties>
 
