@@ -58,7 +58,7 @@
     <!-- we can use full maven properties incl. inheritance ! -->
     <properties>
         <junit-version>4.5</junit-version>
-        <pax-exam-version>1.2.4</pax-exam-version>
+        <pax-exam-version>1.2.3</pax-exam-version>
         <osgi-version>4.2.0</osgi-version>
         <jetty-version>0.7.1</jetty-version>
         <slf4j-log4j-binding-impl-version>1.6.4</slf4j-log4j-binding-impl-version>
@@ -138,8 +138,8 @@
             <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
             <artifactId>war-bundle</artifactId>
             <type>war</type>
-            <scope>test</scope>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -157,53 +157,55 @@
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-junit</artifactId>
             <version>${pax-exam-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-default</artifactId>
             <version>${pax-exam-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
             <version>${junit-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.core</artifactId>
-            <scope>test</scope>
             <version>${osgi-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>org.osgi.compendium</artifactId>
-            <scope>test</scope>
             <version>${osgi-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.eventadmin</artifactId>
-            <scope>test</scope>
             <version>1.2.2</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.eclipse.equinox</groupId>
             <artifactId>event</artifactId>
-            <scope>test</scope>
             <version>1.0.100-v20070516</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-jetty-bundle</artifactId>
-            <scope>test</scope>
             <version>${jetty-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-extender-war</artifactId>
-            <scope>test</scope>
             <version>${jetty-version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
