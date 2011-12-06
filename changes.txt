@@ -1,4 +1,7 @@
 release 1.11
+- Fixed issue 849
+  http://java.net/jira/browse/JERSEY-849
+  "Registering with Twitter" section updated to match current Twitter UI in samples/oauth-client-twitter/README.html 
 - Fixed issue 844
   http://java.net/jira/browse/JERSEY-844
   Links pointing to "hypermedia-action-sample" broken in user guide
