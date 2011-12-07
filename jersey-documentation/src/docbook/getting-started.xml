@@ -174,19 +174,8 @@ import java.util.Map.Entry;
 
 public class Main {
 
-    private static int getPort(int defaultPort) {
-        String port = System.getProperty(&quot;jersey.test.port&quot;);
-        if (null != port) {
-            try {
-                return Integer.parseInt(port);
-            } catch (NumberFormatException e) {
-            }
-        }
-        return defaultPort;        
-    } 
-    
     private static URI getBaseURI() {
-        return UriBuilder.fromUri(&quot;http://localhost/&quot;).port(getPort(9998)).build();
+        return UriBuilder.fromUri(&quot;http://localhost/&quot;).port(9998).build();
     }
 
     public static final URI BASE_URI = getBaseURI();
@@ -208,12 +197,12 @@ public class Main {
 }</programlisting><para>
 The <literal>Main</literal> class deploys the <literal>HelloWorldResource</literal>
 using the Grizzly Web container.</para>
-<para>Line 35 creates an initialization parameter that informs the
+<para>Line 24 creates an initialization parameter that informs the
 Jersey runtime where to search for root resource classes to be
 deployed. In this case it assumes the root resource class in the
 package <literal>com.sun.jersey.samples.helloworld.resources</literal>
 (or in a sub-package of).</para>
-<para>Line 36 deploys the root resource to the base URI
+<para>Line 25 deploys the root resource to the base URI
 &quot;<ulink url="http://localhost:9998/">http://localhost:9998/</ulink>&quot;
 and returns a Grizzly HttpServer. The complete URI of the Hello
 World root resource is &quot;<ulink url="http://localhost:9998/helloworld">http://localhost:9998/helloworld</ulink>&quot;.</para>
