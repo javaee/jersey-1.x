@@ -1,4 +1,7 @@
 release 1.11
+- Fixed issue 875
+  http://java.net/jira/browse/JERSEY-875
+  Fixed broken jersey-quickstart-ejb archetype, removed jaxb dependency from pom, it's not required.
 - Fixed issue 838
   http://java.net/jira/browse/JERSEY-838
   Fixed broken jersey-quickstart-grizzly2 archetype, added missing dependency to pom and corrected package import.
