@@ -47,7 +47,7 @@
     <parent>
       <artifactId>glassfish-packages</artifactId>
       <groupId>com.sun.jersey.glassfish.v32</groupId>
-      <version>1.11-SNAPSHOT</version>
+      <version>1.12-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-gfv3-docs-and-samples</artifactId>
     <name>Jersey GFv3.2 UC Docs And Examples Package Image</name>

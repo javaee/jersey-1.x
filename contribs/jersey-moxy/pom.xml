@@ -46,7 +46,7 @@
     <parent>
         <artifactId>jersey-contribs</artifactId>
         <groupId>com.sun.jersey.contribs</groupId>
-        <version>1.11-SNAPSHOT</version>
+        <version>1.12-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-moxy</artifactId>
     <packaging>jar</packaging>

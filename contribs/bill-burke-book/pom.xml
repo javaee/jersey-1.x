@@ -18,12 +18,12 @@
     <parent>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-contribs</artifactId>
-        <version>1.11-SNAPSHOT</version>
+        <version>1.12-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
     <artifactId>bill-burke-book-examples</artifactId>
-    <version>1.11-SNAPSHOT</version>
+    <version>1.12-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>

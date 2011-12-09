@@ -47,7 +47,7 @@
     <parent>
         <groupId>com.sun.jersey.ri</groupId>
         <artifactId>ri-archives</artifactId>
-        <version>1.11-SNAPSHOT</version>
+        <version>1.12-SNAPSHOT</version>
     </parent>
     <artifactId>jax-rs-ri</artifactId>
     <name>JAX-RS RI binaries archive</name>

@@ -5,7 +5,7 @@
 
     <groupId>com.sun.jersey.test.osgi.runtime-delegate-tests</groupId>
     <artifactId>runtime-delegate-test-bundle</artifactId>
-    <version>1.11-SNAPSHOT</version>
+    <version>1.12-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>jersey runtime delegate test - osgi bundle</name>
 
