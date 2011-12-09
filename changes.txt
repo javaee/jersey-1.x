@@ -1,4 +1,6 @@
-release 1.11
+release 1.12
+
+release 1.11 (12-2011)
 - Fixed issue 875
   http://java.net/jira/browse/JERSEY-875
   Fixed broken jersey-quickstart-ejb archetype, removed jaxb dependency from pom, it's not required.
