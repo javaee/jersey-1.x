@@ -47,11 +47,12 @@ import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
 
 /**
  * Factory for creating and starting Grizzly {@link SelectorThread} instances.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class GrizzlyServerFactory {
@@ -64,7 +65,7 @@ public final class GrizzlyServerFactory {
     public final static String FEATURE_ALLOW_ENCODED_SLASH = "com.sun.jersey.api.container.grizzly.AllowEncodedSlashFeature";
 
     private GrizzlyServerFactory() {}
-    
+
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
      * in turn manages all root resource and provder classes found by searching the classes
@@ -83,13 +84,13 @@ public final class GrizzlyServerFactory {
      * @throws IllegalArgumentException if <code>u</code> is null
      */
     public static SelectorThread create(String u)
-            throws IOException, IllegalArgumentException {            
+            throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
         return create(URI.create(u));
     }
-    
+
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
      * in turn manages all root resource and provder classes found by searching 
@@ -108,10 +109,10 @@ public final class GrizzlyServerFactory {
      * @throws IllegalArgumentException if <code>u</code> is null
      */
     public static SelectorThread create(URI u)
-            throws IOException, IllegalArgumentException {            
+            throws IOException, IllegalArgumentException {
         return create(u, ContainerFactory.createContainer(Adapter.class));
     }
-        
+
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that
      * in turn manages all root resource and provder classes declared by the
@@ -184,7 +185,7 @@ public final class GrizzlyServerFactory {
      * @throws IllegalArgumentException if <code>u</code> is null
      */
     public static SelectorThread create(String u, ResourceConfig rc,
-            IoCComponentProviderFactory factory)
+                                        IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
@@ -215,7 +216,7 @@ public final class GrizzlyServerFactory {
      * @throws IllegalArgumentException if <code>u</code> is null
      */
     public static SelectorThread create(URI u, ResourceConfig rc,
-            IoCComponentProviderFactory factory)
+                                        IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException {
         return create(u, ContainerFactory.createContainer(Adapter.class, rc, factory));
     }
@@ -241,7 +242,7 @@ public final class GrizzlyServerFactory {
 
         return create(URI.create(u), adapter);
     }
-    
+
     /**
      * Create a {@link SelectorThread} that registers an {@link Adapter} that 
      * in turn manages all root resource and provder classes found by searching the classes
@@ -259,31 +260,32 @@ public final class GrizzlyServerFactory {
      * @throws IllegalArgumentException if <code>u</code> is null or the URI
      *         path does not begin with a "/".
      */
-    public static SelectorThread create(URI u, Adapter adapter) 
+    public static SelectorThread create(URI u, Adapter adapter)
             throws IOException, IllegalArgumentException {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
-            
+
         // TODO support https
         final String scheme = u.getScheme();
         if (!scheme.equalsIgnoreCase("http"))
-            throw new IllegalArgumentException("The URI scheme, of the URI " + u + 
-                    ", must be equal (ignoring case) to 'http'");            
+            throw new IllegalArgumentException("The URI scheme, of the URI " + u +
+                    ", must be equal (ignoring case) to 'http'");
 
         if (adapter instanceof GrizzlyAdapter) {
             GrizzlyAdapter ga = (GrizzlyAdapter)adapter;
             ga.setResourcesContextPath(u.getRawPath());
         }
-        
+
         final SelectorThread selectorThread = new SelectorThread();
 
         selectorThread.setAlgorithmClassName(StaticStreamAlgorithm.class.getName());
-        
-        final int port = (u.getPort() == -1) ? 80 : u.getPort();            
+
+        final int port = (u.getPort() == -1) ? 80 : u.getPort();
         selectorThread.setPort(port);
+        selectorThread.setAddress(InetAddress.getByName(u.getHost()));
 
         selectorThread.setAdapter(adapter);
-        
+
         try {
             selectorThread.listen();
         } catch (InstantiationException e) {
@@ -292,5 +294,5 @@ public final class GrizzlyServerFactory {
             throw _e;
         }
         return selectorThread;
-    }    
+    }
 }

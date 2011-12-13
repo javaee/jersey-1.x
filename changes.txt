@@ -1,4 +1,7 @@
 release 1.12
+- Fixed issue 876
+  http://java.net/jira/browse/JERSEY-876
+  Adapted to recent change in Grizzly 1.x API.
 
 release 1.11 (12-2011)
 - Fixed issue 875
