@@ -246,7 +246,7 @@
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.36</version>
+            <version>1.9.42</version>
             <type>jar</type>
             <scope>test</scope>
         </dependency>

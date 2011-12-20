@@ -175,7 +175,7 @@
             <groupId>com.sun.grizzly.osgi</groupId>
             <artifactId>grizzly-httpservice-bundle</artifactId>
             <scope>test</scope>
-            <version>1.9.36</version>
+            <version>1.9.42</version>
         </dependency>
         <dependency>
             <groupId>org.ops4j.pax.web</groupId>
