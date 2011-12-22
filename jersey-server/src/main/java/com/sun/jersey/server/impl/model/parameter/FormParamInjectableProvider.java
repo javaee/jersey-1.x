@@ -37,8 +37,10 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.server.impl.model.parameter;
+
+import javax.ws.rs.FormParam;
+import javax.ws.rs.core.MediaType;
 
 import com.sun.jersey.api.ParamException;
 import com.sun.jersey.api.core.HttpContext;
@@ -53,34 +55,29 @@ import com.sun.jersey.server.impl.model.parameter.multivalued.ExtractorContainer
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractor;
 import com.sun.jersey.server.impl.model.parameter.multivalued.MultivaluedParameterExtractorProvider;
 import com.sun.jersey.spi.inject.Injectable;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.core.MediaType;
-
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class FormParamInjectableProvider extends BaseParamInjectableProvider<FormParam> {
-    
+
     private static final class FormParamInjectable extends AbstractHttpContextInjectable<Object> {
+
         private final MultivaluedParameterExtractor extractor;
-        private final boolean decode;
-        
+
         FormParamInjectable(MultivaluedParameterExtractor extractor, boolean decode) {
             this.extractor = extractor;
-            this.decode = decode;
         }
-        
+
+        @Override
         public Object getValue(HttpContext context) {
-            Form form = (Form)
-                    context.getProperties().get(FormDispatchProvider.FORM_PROPERTY);
+
+            Form form = getCachedForm(context);
+
             if (form == null) {
                 form = getForm(context);
-                if (form == null)
-                    throw new IllegalStateException(
-                            "The @FormParam is utilized when the content type of the request entity " +
-                            "is not application/x-www-form-urlencoded");
+                cacheForm(context, form);
             }
 
             try {
@@ -91,35 +88,51 @@ public final class FormParamInjectableProvider extends BaseParamInjectableProvid
             }
         }
 
-        private Form getForm(HttpContext context) {
-            final HttpRequestContext r = context.getRequest();
-            if (r.getMethod().equals("GET"))
-                return null;
-
-            if (!MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, r.getMediaType()))
-                return null;
-
-            final Form form = r.getFormParameters();
+        private void cacheForm(final HttpContext context, final Form form) {
             context.getProperties().put(FormDispatchProvider.FORM_PROPERTY, form);
-            return form;
+        }
+
+        private Form getCachedForm(final HttpContext context) {
+            return (Form) context.getProperties().get(FormDispatchProvider.FORM_PROPERTY);
+        }
+
+        private HttpRequestContext ensureValidRequest(final HttpRequestContext r) throws IllegalStateException {
+            if (r.getMethod().equals("GET")) {
+                throw new IllegalStateException(
+                        "The @FormParam is utilized when the request method is GET");
+            }
+
+            if (!MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, r.getMediaType())) {
+                throw new IllegalStateException(
+                        "The @FormParam is utilized when the content type of the request entity "
+                        + "is not application/x-www-form-urlencoded");
+            }
+            return r;
+        }
+
+        private Form getForm(HttpContext context) {
+            final HttpRequestContext r = ensureValidRequest(context.getRequest());
+            return r.getFormParameters();
         }
     }
 
     public FormParamInjectableProvider(MultivaluedParameterExtractorProvider w) {
         super(w);
     }
-    
+
+    @Override
     public Injectable getInjectable(ComponentContext ic, FormParam a, Parameter c) {
         String parameterName = c.getSourceName();
         if (parameterName == null || parameterName.length() == 0) {
             // Invalid query parameter name
             return null;
         }
-        
+
         MultivaluedParameterExtractor e = get(c);
-        if (e == null)
+        if (e == null) {
             return null;
-        
+        }
+
         return new FormParamInjectable(e, !c.isEncoded());
     }
 }

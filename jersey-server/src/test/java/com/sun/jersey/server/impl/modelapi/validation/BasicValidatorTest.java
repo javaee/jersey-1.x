@@ -39,14 +39,10 @@
  */
 package com.sun.jersey.server.impl.modelapi.validation;
 
-import com.sun.jersey.server.impl.modelapi.validation.BasicValidator;
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.api.model.ResourceModelIssue;
-import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
-import com.sun.jersey.spi.resource.Singleton;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -58,13 +54,19 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import junit.framework.TestCase;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.ResourceModelIssue;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.spi.resource.Singleton;
+import javax.ws.rs.FormParam;
+
 /**
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public class BasicValidatorTest {
 
@@ -224,6 +226,25 @@ public class BasicValidatorTest {
         assertTrue(!validator.getIssueList().get(0).isFatal());
     }
 
+    public static class TestGetRMConsumingFormParam {
+
+        @GET
+        public String getMethod(@FormParam("f") Object o, @FormParam("g") Object p) {
+            return "it";
+        }
+    }
+
+    @Test
+    public void testGetRMConsumingFormParam() throws Exception {
+        System.out.println("---\nAn issue should be reported if a get method consumes a form param:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestGetRMConsumingFormParam.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(validator.getIssueList().size() == 1);
+        assertTrue(validator.getIssueList().get(0).isFatal());
+    }
+
     public static class TestSRLReturningVoid {
 
         @Path("srl")
@@ -278,6 +299,25 @@ public class BasicValidatorTest {
         printIssueList(validator);
         assertTrue(!validator.getIssueList().isEmpty());
         assertTrue(!validator.getIssueList().get(0).isFatal());
+    }
+
+    public static class TestGetSRMConsumingFormParam {
+
+        @GET @Path("p")
+        public String getMethod(@FormParam("f") Object o) {
+            return "it";
+        }
+    }
+
+    @Test
+    public void testGetSRMConsumingFormParam() throws Exception {
+        System.out.println("---\nAn issue should be reported if a get method consumes a form param:");
+        AbstractResource ar = IntrospectionModeller.createResource(TestGetSRMConsumingFormParam.class);
+        BasicValidator validator = new BasicValidator();
+        validator.validate(ar);
+        printIssueList(validator);
+        assertTrue(!validator.getIssueList().isEmpty());
+        assertTrue(validator.getIssueList().get(0).isFatal());
     }
 
     @Path("rootMultipleHttpMethodDesignatorsRM")

@@ -39,6 +39,31 @@
  */
 package com.sun.jersey.server.impl.modelapi.validation;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+
 import com.sun.jersey.api.core.HttpRequestContext;
 import com.sun.jersey.api.core.HttpResponseContext;
 import com.sun.jersey.api.model.AbstractField;
@@ -55,28 +80,6 @@ import com.sun.jersey.core.reflection.AnnotatedMethod;
 import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 
 /**
  * <p>Performs a basic check on abstract resources. Validity check populates a list of potential issues
@@ -92,7 +95,7 @@ import javax.ws.rs.core.Context;
  * so that you can build the issue list for more than one resource. To clear the list, you may want to call
  * {@link AbstractModelValidator#cleanIssueList()} method.
  *
- * @author jakub.podlesak@oracle.com
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public class BasicValidator extends AbstractModelValidator {
 
@@ -146,6 +149,16 @@ public class BasicValidator extends AbstractModelValidator {
                             method,
                             ImplMessages.ERROR_GET_CONSUMES_ENTITY(method.getMethod()),
                             false));
+                }
+                // ensure GET does not consume any @FormParam annotated parameter
+                for (Parameter p : method.getParameters()) {
+                    if (p.isAnnotationPresent(FormParam.class)) {
+                        issueList.add(new ResourceModelIssue(
+                                method,
+                                ImplMessages.ERROR_GET_CONSUMES_FORM_PARAM(method.getMethod()),
+                                true));
+                        break;
+                    }
                 }
             }
         }
@@ -322,7 +335,7 @@ public class BasicValidator extends AbstractModelValidator {
 
     // TODO: the method could probably have more then 2 params...
     private boolean isRequestResponseMethod(AbstractResourceMethod method) {
-        return (method.getMethod().getParameterTypes().length == 2) && 
+        return (method.getMethod().getParameterTypes().length == 2) &&
                 (HttpRequestContext.class == method.getMethod().getParameterTypes()[0]) &&
                 (HttpResponseContext.class == method.getMethod().getParameterTypes()[1]);
     }
