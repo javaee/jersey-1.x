@@ -78,8 +78,8 @@ public class MyObjectMapperProvider implements ContextResolver<ObjectMapper> {
         Pair combinedIntrospector = createJaxbJacksonAnnotationIntrospector();
         ObjectMapper result = new ObjectMapper();
         result.configure(Feature.WRAP_ROOT_VALUE, true);
-        result.getDeserializationConfig().setAnnotationIntrospector(combinedIntrospector);
-        result.getSerializationConfig().setAnnotationIntrospector(combinedIntrospector);
+        result.setDeserializationConfig(result.getDeserializationConfig().withAnnotationIntrospector(combinedIntrospector));
+        result.setSerializationConfig(result.getSerializationConfig().withAnnotationIntrospector(combinedIntrospector));
 
         return result;
     }
