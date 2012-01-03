@@ -693,6 +693,10 @@ public class ContainerRequest implements HttpRequestContext {
 
     @Override
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
+        if(eTag == null) {
+            throw new IllegalArgumentException("Parameter 'eTag' cannot be null.");
+        }
+
         ResponseBuilder r = evaluateIfMatch(eTag);
         if (r != null)
             return r;
@@ -702,6 +706,10 @@ public class ContainerRequest implements HttpRequestContext {
 
     @Override
     public ResponseBuilder evaluatePreconditions(Date lastModified) {
+        if(lastModified == null) {
+            throw new IllegalArgumentException("Parameter 'lastModified' cannot be null.");
+        }
+
         final long lastModifiedTime = lastModified.getTime();
         ResponseBuilder r = evaluateIfUnmodifiedSince(lastModifiedTime);
         if (r != null)
@@ -712,6 +720,10 @@ public class ContainerRequest implements HttpRequestContext {
 
     @Override
     public ResponseBuilder evaluatePreconditions(Date lastModified, EntityTag eTag) {
+        if(lastModified == null || eTag == null) {
+            throw new IllegalArgumentException("Parameters 'lastModified' and 'eTag' cannot be null.");
+        }
+
         ResponseBuilder r = evaluateIfMatch(eTag);
         if (r != null)
             return r;
