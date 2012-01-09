@@ -92,7 +92,7 @@ Non-maven developers require:
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=jar">jersey-server.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-grizzly2&amp;v=&version;&amp;e=jar">jersey-grizzly2.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-core&amp;v=&version;&amp;e=jar">jersey-core.jar</ulink>,</listitem>
-<listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/ws/rs/jsr311-api/&jsr311.version;/jsr311-api-&jsr311.version;.jar">jsr311-api.jar</ulink>,</listitem>
+<listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/ws/rs/jsr311-api/&jsr311-api-jar.version;/jsr311-api-&jsr311-api-jar.version;.jar">jsr311-api.jar</ulink>,</listitem>
 <listitem><ulink url="http://search.maven.org/remotecontent?filepath=asm/asm/3.3.1/asm-3.3.1.jar">asm.jar</ulink></listitem>
 </itemizedlist></para>
 <para>For Ant

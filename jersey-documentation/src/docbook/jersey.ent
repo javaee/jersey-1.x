@@ -48,6 +48,7 @@
 
 <!-- JSR311 (JAX-RS) Entities -->
 <!ENTITY jsr311.version "$jsr311-version">
+<!ENTITY jsr311-api-jar.version "$jsr311-api-jar-version">
 <!ENTITY jsr311.release.path "http://jsr311.java.net/nonav/releases/&jsr311.version;">
 <!ENTITY jsr311.javadoc.path "&jsr311.release.path;/javax/ws/rs">
 
