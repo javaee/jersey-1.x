@@ -268,7 +268,7 @@ else
             <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=jar">jersey-server</ulink></listitem>
             <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-core&amp;v=&version;&amp;e=jar">jersey-core</ulink></listitem>
             <listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/ws/rs/jsr311-api/&jsr311-api-jar.version;/jsr311-api-&jsr311-api-jar.version;.jar">jsr311-api</ulink></listitem>
-            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=asm/asm/3.3.1/asm-3.3.1.jar">asm</ulink></listitem>
+            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm</ulink></listitem>
             <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.jersey-test-framework&amp;a=jersey-test-framework-grizzly&amp;v=&version;&amp;e=jar">jersey-test-framework-grizzly</ulink></listitem>
             <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey.jersey-test-framework&amp;a=jersey-test-framework-core&amp;v=&version;&amp;e=jar">jersey-test-framework-core</ulink></listitem>
             <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-client&amp;v=&version;&amp;e=jar">jersey-client</ulink></listitem>

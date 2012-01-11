@@ -63,6 +63,9 @@
 <!-- Grizzly2 version -->
 <!ENTITY javax.servlet.version "3.1">
 
+<!-- asm version -->
+<!ENTITY asm.version "$asm-version">
+
 <!-- Maven maven-war-plugin failOnMissingWebXml Links -->
 <!ENTITY maven-war-plugin.path "http://maven.apache.org/plugins/maven-war-plugin/war-mojo.html">
 <!ENTITY failOnMissingWebXml.path "&maven-war-plugin.path;#failOnMissingWebXml">

@@ -76,6 +76,7 @@
                                 <replace file="${src.dir}/jersey.ent" token="$jsr311-version" value="1.1"/>
                                 <replace file="${src.dir}/jersey.ent" token="$jsr311-api-jar-version" value="1.1.1"/>
                                 <replace file="${src.dir}/jersey.ent" token="$jackson.version" value="${jackson.version}"/>
+                                <replace file="${src.dir}/jersey.ent" token="$asm-version" value="3.3.1"/>
                             </tasks>
                         </configuration>
                         <id>process-entities</id>

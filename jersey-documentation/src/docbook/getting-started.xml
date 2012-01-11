@@ -89,11 +89,12 @@ Non-maven developers require:
 <itemizedlist>
 <listitem><ulink url="http://search.maven.org/remotecontent?filepath=org/glassfish/grizzly/grizzly-http-server/&grizzly2.version;/grizzly-http-server-&grizzly2.version;.jar">grizzly-http-server.jar</ulink>,</listitem>
 <listitem><ulink url="http://search.maven.org/remotecontent?filepath=org/glassfish/grizzly/grizzly-http/&grizzly2.version;/grizzly-http-&grizzly2.version;.jar">grizzly-http.jar</ulink>,</listitem>
+<listitem><ulink url="http://search.maven.org/remotecontent?filepath=org/glassfish/grizzly/grizzly-framework/&grizzly2.version;/grizzly-framework-&grizzly2.version;.jar">grizzly-framework.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-server&amp;v=&version;&amp;e=jar">jersey-server.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-grizzly2&amp;v=&version;&amp;e=jar">jersey-grizzly2.jar</ulink>,</listitem>
 <listitem><ulink url="https://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-core&amp;v=&version;&amp;e=jar">jersey-core.jar</ulink>,</listitem>
 <listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/ws/rs/jsr311-api/&jsr311-api-jar.version;/jsr311-api-&jsr311-api-jar.version;.jar">jsr311-api.jar</ulink>,</listitem>
-<listitem><ulink url="http://search.maven.org/remotecontent?filepath=asm/asm/3.3.1/asm-3.3.1.jar">asm.jar</ulink></listitem>
+<listitem><ulink url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink></listitem>
 </itemizedlist></para>
 <para>For Ant
 developers the <ulink url="http://maven.apache.org/ant-tasks.html">Ant
@@ -105,14 +106,26 @@ explicitly:</para>
               artifactId=&quot;jersey-server&quot;
               version=&quot;&version;&quot;/&gt;
   &lt;dependency groupId=&quot;com.sun.jersey&quot;
+              artifactId=&quot;jersey-core&quot;
+              version=&quot;&version;&quot;/&gt;
+  &lt;dependency groupId=&quot;com.sun.jersey&quot;
               artifactId=&quot;jersey-grizzly2&quot;
-              version=&quot;&version;&quot;/&gt;             
+              version=&quot;&version;&quot;/&gt;
   &lt;dependency groupId=&quot;org.glassfish.grizzly&quot;
               artifactId=&quot;grizzly-http-server&quot;
               version=&quot;&grizzly2.version;&quot;/&gt;
   &lt;dependency groupId=&quot;org.glassfish.grizzly&quot;
               artifactId=&quot;grizzly-http&quot;
               version=&quot;&grizzly2.version;&quot;/&gt;
+  &lt;dependency groupId=&quot;org.glassfish.grizzly&quot;
+              artifactId=&quot;grizzly-framework&quot;
+              version=&quot;&grizzly2.version;&quot;/&gt;
+  &lt;dependency groupId=&quot;javax/ws/rs&quot;
+              artifactId=&quot;jsr311-api&quot;
+              version=&quot;&jsr311-api-jar.version;&quot;/&gt;
+  &lt;dependency groupId=&quot;asm&quot;
+              artifactId=&quot;asm&quot;
+              version=&quot;&asm.version;&quot;/&gt;
   &lt;artifact:remoteRepository id=&quot;maven-repository.java.net&quot;
                              url=&quot;http://maven.java.net/&quot; /&gt;
   &lt;artifact:remoteRepository id=&quot;maven1-repository.java.net&quot;

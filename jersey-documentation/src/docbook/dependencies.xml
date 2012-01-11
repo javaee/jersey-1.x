@@ -171,7 +171,7 @@
 
         <listitem>
           <ulink
-          url="http://search.maven.org/remotecontent?filepath=asm/asm/3.3.1/asm-3.3.1.jar">asm.jar</ulink>
+          url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink>
         </listitem>
       </itemizedlist> or, if using the jersey-bundle: <itemizedlist>
         <listitem>
@@ -183,7 +183,7 @@
 
         <listitem>
           <ulink
-          url="http://search.maven.org/remotecontent?filepath=asm/asm/3.3.1/asm-3.3.1.jar">asm.jar</ulink>
+          url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink>
         </listitem>
       </itemizedlist> For Ant developers the <ulink
     url="http://maven.apache.org/ant-tasks.html">Ant Tasks for Maven</ulink>
@@ -200,7 +200,7 @@
 &lt;/artifact:dependencies&gt;</programlisting> The path id
     “dependency.classpath” may then be referenced as the classpath to be used
     for compiling or executing. Specifically the <ulink
-    url="http://search.maven.org/remotecontent?filepath=asm/asm/3.3.1/asm-3.3.1.jar">asm.jar</ulink>
+    url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink>
     dependency is required when either of the following <ulink
     url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ResourceConfig.html">com.sun.jersey.api.core.ResourceConfig</ulink>
     implementations are utilized: <itemizedlist>
