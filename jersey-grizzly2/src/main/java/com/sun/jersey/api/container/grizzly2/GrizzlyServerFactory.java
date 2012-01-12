@@ -320,7 +320,9 @@ public final class GrizzlyServerFactory {
 
         // Map the path to the processor.
         final ServerConfiguration config = server.getServerConfiguration();
-        config.addHttpHandler(handler, u.getPath());
+        if (handler != null) {
+            config.addHttpHandler(handler, u.getPath());
+        }
 
         // Start the server.
         server.start();

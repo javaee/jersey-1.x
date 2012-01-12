@@ -39,12 +39,12 @@
  */
 package com.sun.jersey.api.container.grizzly2.servlet;
 
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
 
 import javax.servlet.Servlet;
 import java.io.File;
@@ -219,18 +219,6 @@ public final class GrizzlyWebContainerFactory {
         if (u == null)
             throw new IllegalArgumentException("The URI must not be null");
 
-        final ServletHandler handler = new ServletHandler();
-        if (initParams == null) {
-            handler.addInitParameter(ClasspathResourceConfig.PROPERTY_CLASSPATH,
-                     System.getProperty("java.class.path").replace(File.pathSeparatorChar, ';'));
-        } else {
-            for (Map.Entry<String, String> e : initParams.entrySet()) {
-                handler.addInitParameter(e.getKey(), e.getValue());
-            }
-        }
-
-        handler.setServletInstance(getInstance(c));
-
         String path = u.getPath();
         if (path == null)
             throw new IllegalArgumentException("The URI path, of the URI " + u +
@@ -245,17 +233,21 @@ public final class GrizzlyWebContainerFactory {
         if (path.length() > 1) {
             if (path.endsWith("/"))
                 path = path.substring(0, path.length() - 1);
-            handler.setContextPath(path);
         }
 
-        return GrizzlyServerFactory.createHttpServer(u, handler);
+        WebappContext context = new WebappContext("", path);
+        ServletRegistration registration = context.addServlet(c.getName(), c);
+        registration.addMapping("");
+        if (initParams == null) {
+            registration.setInitParameter(ClasspathResourceConfig.PROPERTY_CLASSPATH,
+                    System.getProperty("java.class.path").replace(File.pathSeparatorChar, ';'));
+        } else {
+            registration.setInitParameters(initParams);
+        }
+
+        HttpServer server = GrizzlyServerFactory.createHttpServer(u);
+        context.deploy(server);
+        return server;
     }
 
-     private static Servlet getInstance(Class<? extends Servlet> c){
-         try{
-             return c.newInstance();
-         } catch (Exception e) {
-             throw new ContainerException(e);
-         }
-     }
 }

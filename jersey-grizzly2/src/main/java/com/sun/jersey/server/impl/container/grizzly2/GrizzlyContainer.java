@@ -54,7 +54,6 @@ import javax.ws.rs.core.UriBuilder;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.grizzly.http.server.Response;
 import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.util.Charsets;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 
@@ -64,6 +63,7 @@ import com.sun.jersey.server.impl.ThreadLocalInvoker;
 
 import com.sun.jersey.spi.container.*;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import org.glassfish.grizzly.http.util.Constants;
 
 /**
  * Grizzly 2.0 Jersey container.
@@ -197,7 +197,7 @@ public final class GrizzlyContainer extends HttpHandler implements
         // TODO: this is terrible, there must be a way to obtain the original request URI!
         String originalURI = UriBuilder.fromPath(
                 request.getRequest().getRequestURIRef()
-                .getOriginalRequestURIBC().toString(Charsets.DEFAULT_CHARSET))
+                .getOriginalRequestURIBC().toString(Constants.DEFAULT_HTTP_CHARSET))
                 .build().toString();
 
         String queryString = request.getQueryString();
@@ -210,7 +210,7 @@ public final class GrizzlyContainer extends HttpHandler implements
         try {
             final ContainerRequest cRequest = new ContainerRequest(_application,
                     request.getMethod().getMethodString(), baseUri, requestUri,
-                    getHeaders(request), request.getInputStream(true));
+                    getHeaders(request), request.getInputStream());
 
             _application.handleRequest(cRequest, new Writer(response));
         } catch (final IOException ex) {

@@ -46,9 +46,16 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import junit.framework.TestCase;
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.grizzly.servlet.FilterRegistration;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
@@ -90,18 +97,22 @@ public abstract class AbstractGuiceGrizzlyTest extends TestCase {
     public <T extends GuiceServletContextListener> void startServer(Class<T> c) {
         LOGGER.info("Starting grizzly...");
 
-
-        ServletHandler sa = new ServletHandler();
-
-        sa.addServletListener(c.getName());
-
+        WebappContext context = new WebappContext("TestContext", baseUri.getRawPath());
+        context.addListener(c.getName());
         f = new GuiceFilter();
-        sa.addFilter(f, "guiceFilter", null);
-
-        sa.setContextPath(baseUri.getRawPath());
+        FilterRegistration reg = context.addFilter("guiceFilter", f);
+        reg.addMappingForUrlPatterns(null, "/*");
+        ServletRegistration sreg = context.addServlet("TestServlet", new HttpServlet() {
+            @Override
+            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            }
+        });
+        sreg.addMapping("/test/*");
+        
 
         try {
-            httpServer = GrizzlyServerFactory.createHttpServer(baseUri, sa);
+            httpServer = GrizzlyServerFactory.createHttpServer(baseUri, (HttpHandler) null);
+            context.deploy(httpServer);
             httpServer.start();
         } catch (IOException ex) {
             throw new RuntimeException(ex);

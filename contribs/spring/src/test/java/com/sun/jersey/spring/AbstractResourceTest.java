@@ -46,8 +46,10 @@ import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.spring.tests.util.JerseyTestHelper;
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 
@@ -105,18 +107,22 @@ public class AbstractResourceTest {
     */
     private void startGrizzly(int port, String servletPath) throws Exception {
         LOGGER.info("Starting grizzly...");
-        ServletHandler sa = new ServletHandler();
-        sa.setServletInstance(SpringServlet.class.newInstance());
-        sa.addServletListener("org.springframework.web.context.ContextLoaderListener");
-        sa.addContextParameter("contextConfigLocation","classpath:"+_springConfig);
+        System.out.println("SERVLET PATH: " + servletPath);
+        WebappContext context = new WebappContext("TestContext");
+        context.addListener("org.springframework.web.context.ContextLoaderListener");
+        context.addContextInitParameter("contextConfigLocation","classpath:"+_springConfig);
+        ServletRegistration registration =
+                context.addServlet("SpringServlet", SpringServlet.class);
         if (!springManaged) {
-            sa.addInitParameter( "com.sun.jersey.config.property.resourceConfigClass",
-                     PackagesResourceConfig.class.getName() );
-            sa.addInitParameter( PackagesResourceConfig.PROPERTY_PACKAGES,
-                     "com.sun.jersey.spring.jerseymanaged" );
+            registration.setInitParameter("com.sun.jersey.config.property.resourceConfigClass",
+                    PackagesResourceConfig.class.getName());
+            registration.setInitParameter(PackagesResourceConfig.PROPERTY_PACKAGES,
+                    "com.sun.jersey.spring.jerseymanaged");
         }
-        sa.setServletPath(servletPath);
-        httpServer = GrizzlyServerFactory.createHttpServer(new URI("http://localhost:" + port + "/" + servletPath), sa);
+        registration.addMapping(servletPath + "/*");
+
+        httpServer = GrizzlyServerFactory.createHttpServer(new URI("http://localhost:" + port + "/" + servletPath), (HttpHandler) null);
+        context.deploy(httpServer);
         httpServer.start();
     }
 

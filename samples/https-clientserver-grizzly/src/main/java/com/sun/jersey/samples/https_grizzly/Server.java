@@ -45,7 +45,8 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.samples.https_grizzly.auth.SecurityFilter;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 
@@ -82,20 +83,17 @@ public class Server {
     protected static void startServer() {
 
         // add Jersey resource servlet
-
-        ServletHandler jerseyAdapter = new ServletHandler();
-        jerseyAdapter.addInitParameter("com.sun.jersey.config.property.packages",
+        WebappContext context = new WebappContext("context");
+        ServletRegistration registration = 
+                context.addServlet("ServletContainer", ServletContainer.class);
+        registration.setInitParameter("com.sun.jersey.config.property.packages",
                 "com.sun.jersey.samples.https_grizzly.resource;com.sun.jersey.samples.https_grizzly.auth");
-        jerseyAdapter.setContextPath("/");
-        jerseyAdapter.setServletInstance(new ServletContainer());
 
         // add security filter (which handles http basic authentication)
-
-        jerseyAdapter.addInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
+        registration.setInitParameter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS,
                 SecurityFilter.class.getName());
 
         // Grizzly ssl configuration
-
         SSLContextConfigurator sslContext = new SSLContextConfigurator();
         
         // set up security context
@@ -108,13 +106,14 @@ public class Server {
 
             webServer = GrizzlyServerFactory.createHttpServer(
                     getBaseURI(),
-                    jerseyAdapter,
+                    null,
                     true,
                     new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(true)
             );
 
             // start Grizzly embedded server //
             System.out.println("Jersey app started. Try out " + BASE_URI + "\nHit CTRL + C to stop it...");
+            context.deploy(webServer);
             webServer.start();
 
         } catch (Exception ex) {

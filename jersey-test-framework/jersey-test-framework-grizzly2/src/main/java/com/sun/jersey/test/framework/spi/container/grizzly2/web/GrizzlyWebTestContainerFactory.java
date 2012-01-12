@@ -46,11 +46,16 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.grizzly.servlet.FilterRegistration;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
 
 import javax.servlet.Servlet;
 import javax.ws.rs.core.UriBuilder;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.EventListener;
@@ -94,7 +99,7 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         final String servletPath;
 
-        final Class servletClass;
+        final Class<? extends Servlet> servletClass;
 
         List<WebAppDescriptor.FilterDescriptor> filters = null;
 
@@ -160,63 +165,74 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
          */
         private void instantiateGrizzlyWebServer() {
 
-            final ServletHandler handler = new ServletHandler();
-
-            Servlet servletInstance;
-            if( servletClass != null) {
-                try {
-                    servletInstance = (Servlet) servletClass.newInstance();
-                } catch (InstantiationException ex) {
-                    throw new TestContainerException(ex);
-                } catch (IllegalAccessException ex) {
-                    throw new TestContainerException(ex);
+            String contextPathLocal;
+            if (contextPath != null && contextPath.length() > 0) {
+                if (!contextPath.startsWith("/")) {
+                    contextPathLocal = "/" + contextPath;
+                } else {
+                    contextPathLocal = contextPath;
                 }
-                handler.setServletInstance(servletInstance);
+            } else {
+                contextPathLocal = "";
+            }
+            String servletPathLocal;
+            if(servletPath != null && servletPath.length() > 0) {
+                if( !servletPath.startsWith("/") ) {
+                    servletPathLocal = "/" + servletPath;
+                } else {
+                    servletPathLocal = servletPath;
+                }
+                if (servletPathLocal.endsWith("/")) {
+                    servletPathLocal += "*";
+                } else {
+                    servletPathLocal +="/*";
+                }
+            } else {
+               servletPathLocal = "/*";
+            }
+
+            WebappContext context = 
+                    new WebappContext("TestContext", contextPathLocal);
+
+            if (servletClass != null) {
+                ServletRegistration registration =
+                    context.addServlet(servletClass.getName(), servletClass);
+                for(String initParamName : initParams.keySet()) {
+                    registration.setInitParameter(initParamName, initParams.get(initParamName));
+                }
+
+            
+                registration.addMapping(servletPathLocal);
+            } else {
+                ServletRegistration registration = 
+                   context.addServlet("default", new HttpServlet() {
+                       public void service() throws ServletException {
+                       }
+                   });
+                registration.addMapping("");
             }
 
             for(Class<? extends EventListener> eventListener : eventListeners) {
-                handler.addServletListener(eventListener.getName());
+                context.addListener(eventListener);
             }
 
             for(String contextParamName : contextParams.keySet()) {
-                handler.addContextParameter(contextParamName, contextParams.get(contextParamName));
+                context.addContextInitParameter(contextParamName, contextParams.get(contextParamName));
             }
 
-            for(String initParamName : initParams.keySet()) {
-                handler.addInitParameter(initParamName, initParams.get(initParamName));
-            }
-
-            if(contextPath != null && contextPath.length() > 0) {
-                if( !contextPath.startsWith("/") ) {
-                    handler.setContextPath("/" + contextPath);
-                } else {
-                    handler.setContextPath(contextPath);
-                }
-            }
-
-            if(servletPath != null && servletPath.length() > 0) {
-                if( !servletPath.startsWith("/") ) {
-                    handler.setServletPath("/" + servletPath);
-                } else {
-                    handler.setServletPath(servletPath);
-                }
-            }
 
             // Filter support
             if ( filters!=null ) {
-                try {
-                    for(WebAppDescriptor.FilterDescriptor d : this.filters) {
-                        handler.addFilter(d.getFilterClass().newInstance(), d.getFilterName(), d.getInitParams());
-                    }
-                } catch (InstantiationException ex) {
-                    throw new TestContainerException(ex);
-                } catch (IllegalAccessException ex) {
-                    throw new TestContainerException(ex);
+                for (WebAppDescriptor.FilterDescriptor d : this.filters) {
+                    FilterRegistration freg = context.addFilter(d.getFilterName(), d.getFilterClass());
+                    freg.setInitParameters(d.getInitParams());
+                    freg.addMappingForUrlPatterns(null, servletPathLocal);
                 }
             }
 
             try {
-                httpServer = GrizzlyServerFactory.createHttpServer(baseUri, handler);
+                httpServer = GrizzlyServerFactory.createHttpServer(baseUri, (HttpHandler) null);
+                context.deploy(httpServer);
             } catch(IOException ioe) {
                 throw new TestContainerException(ioe);
             }

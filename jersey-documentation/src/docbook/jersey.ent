@@ -58,7 +58,7 @@
 <!ENTITY jackson.javadoc.version "1.9.2">
 
 <!-- Grizzly2 version -->
-<!ENTITY grizzly2.version "2.1.2">
+<!ENTITY grizzly2.version "2.2.1">
 
 <!-- Grizzly2 version -->
 <!ENTITY javax.servlet.version "3.1">

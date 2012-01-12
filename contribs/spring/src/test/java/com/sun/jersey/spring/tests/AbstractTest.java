@@ -44,8 +44,10 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.spring.tests.util.JerseyTestHelper;
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.servlet.ServletHandler;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
 import org.testng.annotations.AfterClass;
 
 import javax.ws.rs.core.UriBuilder;
@@ -84,24 +86,19 @@ public class AbstractTest {
     public void start(Map<String, String> initParams) {        
         String appConfig =  this.getClass().getName();
         appConfig = appConfig.replace(".", "/") + "-config.xml";
-
         try {
             stop();
-
-            ServletHandler sa = new ServletHandler();
-            sa.setServletInstance(SpringServlet.class.newInstance());
-            sa.setServletPath("/spring");
-
+            WebappContext context = new WebappContext("TestContext");
+            ServletRegistration registration =
+                    context.addServlet("SpringServlet", SpringServlet.class);
+            registration.addMapping("/spring/*");
             if (initParams != null) {
-                for (Map.Entry<String, String> e : initParams.entrySet()) {
-                    sa.addInitParameter(e.getKey(), e.getValue());
-                }
+                registration.setInitParameters(initParams);
             }
-
-            sa.addServletListener("org.springframework.web.context.ContextLoaderListener");
-            sa.addContextParameter("contextConfigLocation", "classpath:" + appConfig);
-
-            httpServer = GrizzlyServerFactory.createHttpServer(BASE_URI, sa);
+            context.addListener("org.springframework.web.context.ContextLoaderListener");
+            context.addContextInitParameter("contextConfigLocation", "classpath:" + appConfig);
+            httpServer = GrizzlyServerFactory.createHttpServer(BASE_URI, (HttpHandler) null);
+            context.deploy(httpServer);
             httpServer.start();
         } catch (Exception e) {
             throw new RuntimeException(e);
