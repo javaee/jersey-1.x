@@ -41,10 +41,11 @@
 package com.sun.jersey.spi.container.servlet;
 
 import com.sun.jersey.api.core.ResourceConfig;
-import java.util.Enumeration;
-import java.util.Map;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * The Web configuration for accessing initialization parameters of a Web
@@ -66,8 +67,8 @@ public interface WebConfig {
          * A configuration type of filter configuration.
          */
         FilterConfig
-    };
-    
+    }
+
     /**
      * Get the configuration type of this config.
      * 

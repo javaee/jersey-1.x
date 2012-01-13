@@ -50,6 +50,7 @@ import com.ning.http.client.RequestBuilder;
 import com.ning.http.client.Response;
 import com.ning.http.client.filter.RequestFilter;
 import com.ning.http.client.filter.ResponseFilter;
+import com.ning.http.client.providers.grizzly.GrizzlyAsyncHttpProvider;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
@@ -205,8 +206,8 @@ public final class NonBlockingClientHandler extends TerminatingClientHandler {
             this.executorService = Executors.newCachedThreadPool();
             builder.setExecutorService(this.executorService);
         }
-
-        this.client = new AsyncHttpClient(builder.build());
+        final AsyncHttpClientConfig config = builder.build();
+        this.client = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config), config);
         this.clientConfig = cc;
     }
 

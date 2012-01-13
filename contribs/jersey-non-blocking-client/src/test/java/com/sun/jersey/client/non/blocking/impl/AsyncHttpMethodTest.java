@@ -110,7 +110,7 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         private void sleep() {
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException ex) {
+            } catch (InterruptedException ignored) {
             }
         }
     }
@@ -164,16 +164,16 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
 
     public void testGet() throws Exception {
         startServer(HttpMethodResource.class);
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class).get());
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testGetNotFound() throws Exception {
         startServer(HttpMethodResource.class);
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("404").build());
 
         boolean caught = false;
@@ -183,14 +183,13 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
             caught = ex.getCause() instanceof UniformInterfaceException;
         }
         assertTrue(caught);
-
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testGetListener() throws Exception {
         startServer(HttpMethodResource.class);
 
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
 
         StringListener l = new StringListener();
@@ -199,13 +198,13 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("GET", f.get());
         l.check("GET");
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testGetClientResponseListener() throws Exception {
         startServer(HttpMethodResource.class);
 
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
 
         ClientResponseListener l = new ClientResponseListener();
@@ -214,13 +213,13 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertTrue(ClientResponse.class.isAssignableFrom(f.get().getClass()));
         l.check("GET");
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testGetListenerNotFound() throws Exception {
         startServer(HttpMethodResource.class);
 
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("404").build());
 
         final CountDownLatch cdl = new CountDownLatch(1);
@@ -252,13 +251,13 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals(1, l.size());
         assertEquals("404", l.get(0));
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testGetClientResponseListenerNotFound() throws Exception {
         startServer(HttpMethodResource.class);
 
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("404").build());
 
         final CountDownLatch cdl = new CountDownLatch(1);
@@ -287,22 +286,22 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals(1, l.size());
         assertEquals("404", l.get(0));
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testPost() throws Exception {
         startServer(HttpMethodResource.class);
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
         assertEquals("POST", r.post(String.class, "POST").get());
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testPostListener() throws Exception {
         startServer(HttpMethodResource.class);
 
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
 
         StringListener l = new StringListener();
@@ -311,23 +310,23 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("POST", f.get());
         l.check("POST");
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
 
     public void testPut() throws Exception {
         startServer(HttpMethodResource.class);
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
         assertEquals("PUT", r.put(String.class, "PUT").get());
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testPutListener() throws Exception {
         startServer(HttpMethodResource.class);
 
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
 
         StringListener l = new StringListener();
@@ -336,22 +335,22 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("PUT", f.get());
         l.check("PUT");
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testDelete() throws Exception {
         startServer(HttpMethodResource.class);
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class).get());
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testDeleteListener() throws Exception {
         startServer(HttpMethodResource.class);
 
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
 
         StringListener l = new StringListener();
@@ -360,12 +359,12 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("DELETE", f.get());
         l.check("DELETE");
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testAllSequential() throws Exception {
         startServer(HttpMethodResource.class);
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
         assertEquals("GET", r.get(String.class).get());
 
@@ -378,12 +377,12 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         r = Client.create().asyncResource(getUri().path("test").build());
         assertEquals("DELETE", r.delete(String.class).get());
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testAllParallel() throws Exception {
         startServer(HttpMethodResource.class);
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
 
         Future<String> get = r.get(String.class);
@@ -396,12 +395,12 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("PUT", put.get());
         assertEquals("DELETE", delete.get());
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     public void testAllParallelListener() throws Exception {
         startServer(HttpMethodResource.class);
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("test").build());
 
         final CountDownLatch cdl = new CountDownLatch(4);
@@ -439,14 +438,14 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals("PUT", lf.get(2).get());
         assertEquals("DELETE", lf.get(3).get());
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     // TODO
     public void _testCancelListener() throws Exception {
         startServer(HttpMethodResource.class);
 
-        Client c = NonBlockingClient.create();
+        NonBlockingClient c = NonBlockingClient.create();
         AsyncWebResource r = c.asyncResource(getUri().path("wait").build());
 
         final CountDownLatch cdl = new CountDownLatch(1);
@@ -473,7 +472,7 @@ public class AsyncHttpMethodTest extends AbstractGrizzlyServerTester {
         assertEquals(1, l.size());
         assertTrue(l.get(0));
 
-        terminate(c.getExecutorService());
+        c.close();
     }
 
     private void terminate(ExecutorService es) throws Exception {
