@@ -235,7 +235,7 @@ public final class GrizzlyWebContainerFactory {
                 path = path.substring(0, path.length() - 1);
         }
 
-        WebappContext context = new WebappContext("", path);
+        WebappContext context = new WebappContext("GrizzlyContext", path);
         ServletRegistration registration = context.addServlet(c.getName(), c);
         registration.addMapping("");
         if (initParams == null) {

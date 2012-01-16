@@ -136,6 +136,7 @@ public class CopyOnWriteHashMap<K,V> implements Map<K,V> {
     @Override
     public void clear() {
         core = new HashMap<K, V>();
+        view = null;
         copy();
     }
 

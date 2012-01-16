@@ -72,8 +72,6 @@ import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import com.sun.jersey.spi.monitoring.RequestListener;
-import com.sun.jersey.spi.monitoring.ResponseListener;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
