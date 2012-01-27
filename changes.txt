@@ -1,4 +1,13 @@
 release 1.12
+- Fixed issue 906
+  http://java.net/jira/browse/JERSEY-906
+  Added missing grizzly-framework-2.1.2.jar file to the list of jars 'Non-maven developers require:' in getting-started guide
+- Fixed issue 902
+  http://java.net/jira/browse/JERSEY-902
+  Fix broken links to JSR311 Javadocs in Overview of JAX-RS 1.1.1 chapter of Jersey User Guide.
+- Fixed issue 840
+  http://java.net/jira/browse/JERSEY-840
+  Added jersey-grizzly2.jar to list required for non-maven developers to fix broken Getting Started section in the Jersey User Guide.
 - Grizzly 2 version update (to 2.2.1)
 - Fixed issue 898
   http://java.net/jira/browse/JERSEY-898
