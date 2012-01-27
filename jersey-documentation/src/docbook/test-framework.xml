@@ -278,13 +278,13 @@ else
             <listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/xml/bind/jaxb-api/2.2.4/jaxb-api-2.2.4.jar">jaxb-api</ulink></listitem>
             <listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/xml/stream/stax-api/1.0-2/stax-api-1.0-2.jar">stax-api</ulink></listitem>
             <listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/activation/activation/1.1.1/activation-1.1.1.jar">activation</ulink></listitem>
-            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-servlet-webserver/1.9.42/grizzly-servlet-webserver-1.9.42.jar">grizzly-servlet-webserver</ulink></listitem>
-            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-http/1.9.42/grizzly-http-1.9.42.jar">grizzly-http</ulink></listitem>
-            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-framework/1.9.42/grizzly-framework-1.9.42.jar">grizzly-framework</ulink></listitem>
-            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-utils/1.9.42/grizzly-utils-1.9.42.jar">grizzly-utils</ulink></listitem>
-            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-rcm/1.9.42/grizzly-rcm-1.9.42.jar">grizzly-rcm</ulink></listitem>
-            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-portunif/1.9.42/grizzly-portunif-1.9.42.jar">grizzly-portunif</ulink></listitem>
-            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-http-servlet/1.9.42/grizzly-http-servlet-1.9.42.jar">grizzly-http-servlet</ulink></listitem>
+            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-servlet-webserver/1.9.45/grizzly-servlet-webserver-1.9.45.jar">grizzly-servlet-webserver</ulink></listitem>
+            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-http/1.9.45/grizzly-http-1.9.45.jar">grizzly-http</ulink></listitem>
+            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-framework/1.9.45/grizzly-framework-1.9.45.jar">grizzly-framework</ulink></listitem>
+            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-utils/1.9.45/grizzly-utils-1.9.45.jar">grizzly-utils</ulink></listitem>
+            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-rcm/1.9.45/grizzly-rcm-1.9.45.jar">grizzly-rcm</ulink></listitem>
+            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-portunif/1.9.45/grizzly-portunif-1.9.45.jar">grizzly-portunif</ulink></listitem>
+            <listitem><ulink url="http://search.maven.org/remotecontent?filepath=com/sun/grizzly/grizzly-http-servlet/1.9.45/grizzly-http-servlet-1.9.45.jar">grizzly-http-servlet</ulink></listitem>
             <listitem><ulink url="http://search.maven.org/remotecontent?filepath=javax/servlet/servlet-api/2.5/servlet-api-2.5.jar">servlet-api</ulink></listitem>
         </itemizedlist>
 

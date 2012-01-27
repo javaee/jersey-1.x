@@ -43,7 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A listener for recieving events on resources from a {@link Scanner}.
+ * A listener for receiving events on resources from a {@link Scanner}.
  * 
  * @author Paul.Sandoz@Sun.Com
  */

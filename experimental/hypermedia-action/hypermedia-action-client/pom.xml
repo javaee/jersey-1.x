@@ -120,7 +120,7 @@
         <dependency>
             <groupId>com.sun.grizzly</groupId>
             <artifactId>grizzly-servlet-webserver</artifactId>
-            <version>1.9.42</version>
+            <version>1.9.45</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
