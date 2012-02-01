@@ -54,24 +54,24 @@
 
   <itemizedlist>
     <listitem>
-      <para><link linkend="json.pojo.approach.title">POJO support</link></para>
+      <para><link linkend="json.pojo.approach.section">POJO support</link></para>
     </listitem>
     <listitem>
-      <para><link linkend="json.jaxb.approach.title">JAXB based JSON support</link></para>
+      <para><link linkend="json.jaxb.approach.section">JAXB based JSON support</link></para>
     </listitem>
     <listitem>
-      <para><link linkend="json.low.level.approach.title">Low-level, JSONObject/JSONArray based JSON support</link></para>
+      <para><link linkend="json.low.level.approach.section">Low-level, JSONObject/JSONArray based JSON support</link></para>
     </listitem>
   </itemizedlist>
-  
-  The first method is pretty generic and allows you to map any Java Object to JSON and vice versa. 
+ 
+  The first method is pretty generic and allows you to map any Java Object to JSON and vice versa.
   The other two approaches limit you in Java types your resource methods could produce and/or consume.
   JAXB based approach could be taken if you want to utilize certain JAXB features.
   The last, low-level, approach gives you the best fine-grained control over the outcoming JSON data format.
   </para>
 
-  <section>
-    <title id="json.pojo.approach.title">POJO support</title>
+  <section xml:id="json.pojo.approach.section">
+    <title xml:id="json.pojo.approach.section.title">POJO support</title>
     <para>
     POJO suppport represents the easiest way to convert your Java Objects to JSON and back.
     It is based on the <ulink url="http://jackson.codehaus.org/">Jackson library</ulink>.
@@ -111,8 +111,8 @@ your ObjectMapper instance into your Jersey application.
 
   </section>
 
-  <section>
-    <title id="json.jaxb.approach.title">JAXB Based JSON support</title>
+  <section xml:id="json.jaxb.approach.section">
+    <title xml:id="json.jaxb.approach.section.title">JAXB Based JSON support</title>
 
     <para>
      Taking this approach will save you a lot of time, if you want to easily produce/consume both JSON and XML data format.
@@ -538,8 +538,8 @@ a single address (<code>street="Long Street 1"</code>, <code>town="Short Village
 
 
 
-   <section>
-    <title id="json.low.level.approach.title">Low-Level JSON support</title>
+   <section xml:id="json.low.level.approach.section">
+    <title xml:id="json.low.level.approach.section.title">Low-Level JSON support</title>
 
     <para>Using this approach means you will be using JSONObject and/or JSONArray classes for your data representations.
     These classes are actually taken from Jettison project, but conform to the description

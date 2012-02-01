@@ -79,7 +79,7 @@
     </listitem>
   </itemizedlist>
   Both examples are multi-module maven projects and both consist of an application OSGi bundle module and a test module. The tests are based
-  on <ulink url="http://wiki.ops4j.org/display/paxexam/Pax+Exam">Pax Exam</ulink> framework.
+  on <ulink url="http://team.ops4j.org/wiki/display/paxexam/Pax+Exam">Pax Exam</ulink> framework.
   Both examples also include a readme file containing instructions how to manually run the application using <ulink url="http://felix.apache.org/site/index.html">Apache Felix</ulink> framework.
   </para>
 

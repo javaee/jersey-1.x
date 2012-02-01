@@ -567,8 +567,8 @@ public void post(MultivaluedMap&lt;String, String&gt; formParams) {
     <literal>java.io.InputStream</literal>, <literal>java.io.Reader</literal>
     and <literal>java.io.File</literal> are supported. In addition JAXB beans
     are supported. Such beans are <literal>JAXBElement</literal> or classes
-    annotated with <ulink url="http://java.sun.com/javase/6/docs/api/javax/xml/bind/annotation/XmlRootElement.html">@XmlRootElement</ulink>
-    or <ulink url="http://java.sun.com/javase/6/docs/api/javax/xml/bind/annotation/XmlType.html">@XmlType</ulink>.
+    annotated with <ulink url="http://docs.oracle.com/javase/6/docs/api/javax/xml/bind/annotation/XmlRootElement.html">@XmlRootElement</ulink>
+    or <ulink url="http://docs.oracle.com/javase/6/docs/api/javax/xml/bind/annotation/XmlType.html">@XmlType</ulink>.
     The samples jaxb and json-from-jaxb show the use of JAXB beans. </para>
 
     <para>Unlike method parameters that are associated with the extraction of
@@ -766,7 +766,7 @@ public class ItemContentResource {
     practice.</para>
 
     <para>Building URIs and building them safely is not easy with <ulink
-    url="http://java.sun.com/j2se/1.5.0/docs/api/java/net/URI.html">java.net.URI</ulink>,
+    url="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/URI.html">java.net.URI</ulink>,
     which is why JAX-RS has the &jaxrs.core.UriBuilder; class that makes it simple and easy to build URIs safely.</para>
 
     <para>&jaxrs.core.UriBuilder; can be used to build new URIs or build from existing URIs. For resource
@@ -875,7 +875,7 @@ public Item getItem(@PathParam("itemid") String itemid) {
     <para>In other cases it may not be appropriate to throw instances of &jaxrs.WebApplicationException;,
     or classes that extend &jaxrs.WebApplicationException;, and instead it may be preferable to map an existing exception to a
     response. For such cases it is possible to use the &jaxrs.ext.ExceptionMapper; interface. For example, the following
-    maps the <ulink url="http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
+    maps the <ulink url="http://docs.oracle.com/javaee/5/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
     to a HTTP 404 (Not Found) response:</para>
 
     <para><example>
@@ -892,7 +892,7 @@ public class EntityNotFoundMapper implements
 
     <para>The above class is annotated with &jaxrs.ext.Provider;, this declares that the class is of interest to the JAX-RS runtime. Such a
     class may be added to the set of classes of the &jaxrs.core.Application; instance that is configured. When an application throws an
-    <ulink url="http://java.sun.com/javaee/5/docs/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
+    <ulink url="http://docs.oracle.com/javaee/5/api/javax/persistence/EntityNotFoundException.html">EntityNotFoundException</ulink>
     the <literal>toResponse</literal> method of the <literal>EntityNotFoundMapper</literal> instance will be invoked.</para>
   </section>
 
@@ -978,7 +978,7 @@ public class EntityNotFoundMapper implements
     <title>Security</title>
 
     <para>Security information is available by obtaining the &jaxrs.core.SecurityContext; using &jaxrs.core.Context;,
-    which is essentially the equivalent functionality available on the <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletRequest.html">HttpServletRequest</ulink>.</para>
+    which is essentially the equivalent functionality available on the <ulink url="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletRequest.html">HttpServletRequest</ulink>.</para>
 
     <para>&jaxrs.core.SecurityContext; can be used in conjunction with sub-resource locators to return different
     resources if the user principle is included in a certain role. For example, a sub-resource locator could return
@@ -1053,17 +1053,17 @@ public class InjectedResource {
     <para>Previous sections have introduced the use of &jaxrs.core.Context;. <ulink url="&jsr311.release.path;/spec/spec3.html#x3-520005">Chapter 5</ulink>
     of the JAX-RS specification presents all the standard JAX-RS Java types that may be used with &jaxrs.core.Context;.</para>
 
-    <para>When deploying a JAX-RS application using servlet then <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/ServletConfig.html">ServletConfig</ulink>,
-    <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/ServletContext.html">ServletContext</ulink>,
-    <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletRequest.html">HttpServletRequest</ulink>
-    and <ulink url="http://java.sun.com/javaee/5/docs/api/javax/servlet/http/HttpServletResponse.html">HttpServletResponse</ulink>
+    <para>When deploying a JAX-RS application using servlet then <ulink url="http://docs.oracle.com/javaee/5/api/javax/servlet/ServletConfig.html">ServletConfig</ulink>,
+    <ulink url="http://docs.oracle.com/javaee/5/api/javax/servlet/ServletContext.html">ServletContext</ulink>,
+    <ulink url="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletRequest.html">HttpServletRequest</ulink>
+    and <ulink url="http://docs.oracle.com/javaee/5/api/javax/servlet/http/HttpServletResponse.html">HttpServletResponse</ulink>
     are available using &jaxrs.core.Context;.</para>
   </section>
 
   <section>
     <title>Annotations Defined By JAX-RS</title>
 
-    <para>For a list of the annotations specified by JAX-RS see <ulink url="&jsr311.release.path;/spec/spec3.html#x3-66000A">Appendix
+    <para>For a list of the annotations specified by JAX-RS see <ulink url="&jsr311.release.path;/spec/spec3.html#x3-67000A">Appendix
     A</ulink> of the specification.</para>
   </section>
 </chapter>

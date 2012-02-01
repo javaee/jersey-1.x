@@ -50,7 +50,7 @@
 
   <para>Jersey is built, assembled and installed using Maven. Jersey is
   deployed to the Java.Net maven repository at the following location: <ulink
-  url="http://maven.java.net/">http://maven.java.net/</ulink>.
+  url="https://maven.java.net/index.html">http://maven.java.net/</ulink>.
   The Jersey modules can be browsed at the following location: <ulink
   url="https://maven.java.net/content/repositories/&repository;/com/sun/jersey">https://maven.java.net/content/repositories/&repository;/com/sun/jersey</ulink>.
   Jars, Jar sources, Jar JavaDoc and samples are all available on the java.net
@@ -76,7 +76,7 @@
   manage dependencies of their applications than developers using ant or other
   build technologies. This document will explain to both maven and non-maven
   developers how to depend on Jersey for their application. Ant developers are
-  likely to find the <ulink url="http://maven.apache.org/ant-tasks.html">Ant
+  likely to find the <ulink url="http://maven.apache.org/ant-tasks/index.html">Ant
   Tasks for Maven</ulink> very useful. For the convenience of non-maven
   developers the following are provided: <itemizedlist>
       <listitem>
@@ -186,7 +186,7 @@
           url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink>
         </listitem>
       </itemizedlist> For Ant developers the <ulink
-    url="http://maven.apache.org/ant-tasks.html">Ant Tasks for Maven</ulink>
+    url="http://maven.apache.org/ant-tasks/index.html">Ant Tasks for Maven</ulink>
     may be used to add the following to the ant document such that the
     dependencies do not need to be downloaded explicitly: <programlisting language="xml">&lt;artifact:dependencies pathId="dependency.classpath"&gt;
   &lt;dependency groupId="com.sun.jersey"
@@ -657,7 +657,7 @@
     &lt;id&gt;guice-maven&lt;/id&gt;
     &lt;name&gt;guice maven&lt;/name&gt;
     &lt;url&gt;<ulink
-          url="http://guiceyfruit.googlecode.com/svn/repo/releases">http://guiceyfruit.googlecode.com/svn/repo/releases</ulink>&lt;/url&gt;
+          url="http://guiceyfruit.googlecode.com/svn/repo/releases/">http://guiceyfruit.googlecode.com/svn/repo/releases/</ulink>&lt;/url&gt;
 &lt;/repository&gt;</programlisting></para>
   </section>
 
@@ -770,7 +770,7 @@
     for an example.</para>
 
     <para>See the blog entry on <ulink
-    url="http://blogs.sun.com/naresh/entry/jersey_test_framework_makes_it">Jersey
+    url="http://blogs.oracle.com/naresh/entry/jersey_test_framework_makes_it">Jersey
     Test Framework</ulink> for detailed instructions on how to use 1.1.1-ea
     version of the framework in your application.</para>
   </section>

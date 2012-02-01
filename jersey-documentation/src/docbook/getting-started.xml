@@ -97,7 +97,7 @@ Non-maven developers require:
 <listitem><ulink url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink></listitem>
 </itemizedlist></para>
 <para>For Ant
-developers the <ulink url="http://maven.apache.org/ant-tasks.html">Ant
+developers the <ulink url="http://maven.apache.org/ant-tasks/index.html">Ant
 Tasks for Maven</ulink> may be used to add the following to the ant
 document such that the dependencies do not need to be downloaded
 explicitly:</para>

@@ -170,7 +170,7 @@
             </listitem>
         </orderedlist>
         <para>Some APIs, like the Apache HTTP client or
-            <ulink url="http://java.sun.com/j2se/1.5.0/docs/api/java/net/HttpURLConnection.html">java.net.HttpURLConnection</ulink>,
+            <ulink url="http://docs.oracle.com/javase/1.5.0/docs/api/java/net/HttpURLConnection.html">java.net.HttpURLConnection</ulink>,
             can be rather hard to use and/or require too much code to do something relatively simple.
         </para>
         <para>This is why the Jersey Client API provides support for wrapping HttpURLConnection and the Apache
@@ -214,8 +214,8 @@ JAXBBean bean = r.
     <section>
         <title>Getting started with the Jersey client</title>
         <para>Refer to the
-            <ulink url="#chapter_deps">dependencies chapter</ulink>,
-            and specifically the <ulink url="#core_client">Core client</ulink> section,
+         <ulink url="http://jersey.java.net/nonav/documentation/&version;/chapter_deps.html#chapter_deps">dependencies chapter</ulink>,
+            and specifically the <ulink url="http://jersey.java.net/nonav/documentation/&version;/chapter_deps.html#core_client">Core client</ulink> section,
             for details on the dependencies when using the Jersey client with Maven and Ant.
         </para>
         <para>Refer to the
@@ -580,11 +580,11 @@ JAXBBean bean = r.
             security settings (which is obviously not sufficient for multiple client configurations).</para>
             <para>For HTTP authentication the <literal>java.net.Authenticator</literal> can
             be extended and statically registered. Refer to the
-                <ulink url="http://java.sun.com/javase/6/docs/technotes/guides/net/http-auth.html">Http authentication</ulink>
+                <ulink url="http://docs.oracle.com/javase/6/docs/technotes/guides/net/http-auth.html">Http authentication</ulink>
                 document for more details.
             For cookie management the <literal>java.net.CookieHandler</literal> can be extended
             and statically registered. Refer to the
-                <ulink url="http://java.sun.com/javase/6/docs/technotes/guides/net/http-cookie.html">Cookie Management</ulink>
+                <ulink url="http://docs.oracle.com/javase/6/docs/technotes/guides/net/http-cookie.html">Cookie Management</ulink>
                 document for more details.
             </para>
             <para>To utilize HTTP with SSL it is necessary to utilize the “https” scheme.
