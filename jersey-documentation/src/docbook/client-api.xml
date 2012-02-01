@@ -148,7 +148,7 @@
         <orderedlist>
             <listitem>
                 <para>URI building using
-                    <ulink url="http://jsr311.java.net/nonav/releases/1.0/javax/ws/rs/core/UriBuilder.html">UriBuilder</ulink> and
+                    <ulink url="&jsr311.javadoc.path;/core/UriBuilder.html">UriBuilder</ulink> and
                     <ulink url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/uri/UriTemplate.html">UriTemplate</ulink>
                     to safely build URIs;
                 </para>
@@ -182,11 +182,11 @@
         <example>
             <title>POST request with form parameters</title>
             <programlisting language="java" linenumbering="numbered">Form f = new Form();
-f.add(“x”, “foo”);
-f.add(“y”, “bar”);
+f.add(&quot;x&quot;, &quot;foo&quot;);
+f.add(&quot;y&quot;, &quot;bar&quot;);
 
 Client c = Client.create();
-WebResource r = c.resource(“http://localhost:8080/form”);
+WebResource r = c.resource(&quot;http://localhost:8080/form&quot;);
 
 JAXBBean bean = r.
     type(MediaType.APPLICATION_FORM_URLENCODED_TYPE)
@@ -256,7 +256,7 @@ JAXBBean bean = r.
                 instance, which will inherit the configuration declared on the client instance.
                 For example, the following creates a reference to a Web resource with the URI
                 “http://localhost:8080/xyz”:
-                <programlisting language="java">    WebResource r = c.resource(“http://localhost:8080/xyz”);</programlisting>
+                <programlisting language="java">    WebResource r = c.resource(&quot;http://localhost:8080/xyz&quot;);</programlisting>
             and redirection will be configured for responses to requests invoked on the Web resource.
             </para>
             <para>
@@ -285,7 +285,7 @@ JAXBBean bean = r.
                 <programlisting language="java">    String response = r.accept(
         MediaType.APPLICATION_JSON_TYPE,
         MediaType.APPLICATION_XML_TYPE).
-        header(“X-FOO”, “BAR”).
+        header(&quot;X-FOO&quot;, &quot;BAR&quot;).
         get(String.class);</programlisting>
             </para>
             <para>The above sends a GET request with an
@@ -302,21 +302,21 @@ JAXBBean bean = r.
                 <literal>POST</literal> and
                 <literal>DELETE</literal> requests.
             For example, the following sends a POST request:
-                <programlisting language="java">    String request = “content”;
+                <programlisting language="java">    String request = &quot;content&quot;;
     String response = r.accept(
         MediaType.APPLICATION_JSON_TYPE,
         MediaType.APPLICATION_XML_TYPE).
-        header(“X-FOO”, “BAR”).
+        header(&quot;X-FOO&quot;, &quot;BAR&quot;).
         post(String.class, request);</programlisting>
-            where the String “content” will be serialized as the request
-            entity (see the section “Java instances and types for representations”
+            where the String &quot;content&quot; will be serialized as the request
+            entity (see the section &quot;Java instances and types for representations&quot;
             section for further details on the supported Java types). The
             <literal>Content-Type</literal> of the request entity may be declared
             using the <literal>type</literal> builder method as follows:
             <programlisting language="java">    String response = r.accept(
          MediaType.APPLICATION_JSON_TYPE,
          MediaType.APPLICATION_XML_TYPE).
-         header(“X-FOO”, “BAR”).
+         header(&quot;X-FOO&quot;, &quot;BAR&quot;).
          type(MediaType.TEXT_PLAIN_TYPE).
          post(String.class, request);</programlisting>
             or alternatively the request entity and type may be declared
@@ -324,7 +324,7 @@ JAXBBean bean = r.
             <programlisting language="java">    String response = r.accept(
          MediaType.APPLICATION_JSON_TYPE,
          MediaType.APPLICATION_XML_TYPE).
-         header(“X-FOO”, “BAR”).
+         header(&quot;X-FOO&quot;, &quot;BAR&quot;).
          entity(request, MediaType.TEXT_PLAIN_TYPE).
          post(String.class);</programlisting>
             </para>
@@ -363,16 +363,16 @@ JAXBBean bean = r.
                     can be created from an existing <literal>WebResource</literal> by building from the latter's URI.
                     Thus it is possible to build the request URI before building the request. For example, the
                     following appends a new path segment and adds some query parameters:
-                <programlisting language="java">    WebResource r = c.resource(“http://localhost:8080/xyz”);
+                <programlisting language="java">    WebResource r = c.resource(&quot;http://localhost:8080/xyz&quot;);
 
     MultivaluedMap&lt;String, String&gt; params = MultivaluedMapImpl();
-    params.add(“foo”, “x”);
-    params.add(“bar”, “y”);
+    params.add(&quot;foo&quot;, &quot;x&quot;);
+    params.add(&quot;bar&quot;, &quot;y&quot;);
     
-    String response = r.path(“abc”).
+    String response = r.path(&quot;abc&quot;).
         queryParams(params).
         get(String.class);</programlisting>
-                that results in a GET request to the URI “http://localhost:8080/xyz/abc?foo=x&amp;bar=y”.</para>
+                that results in a GET request to the URI &quot;http://localhost:8080/xyz/abc?foo=x&amp;bar=y&quot;.</para>
             </section>
             
             <section>

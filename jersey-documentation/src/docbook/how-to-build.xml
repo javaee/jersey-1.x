@@ -53,7 +53,7 @@
 <title>Checking out the source</title>
 <para>
 The Jersey source code is available from the Subversion repository located at
-<ulink url="http://java.net/projects/jersey/sources/svn/show">http://java.net/projects/jersey/sources/svn/show</ulink>.
+<ulink url="http://java.net/projects/jersey/sources/svn/show">http://java.net/projects/jersey/sources/svn/show</ulink>.  You can also read more about how the top level of the `jersey' Subversion repository is structured at that same <ulink url="http://java.net/projects/jersey/sources/svn/show">link</ulink>.
 </para>
 <para>
 To check out the trunk where active development on the next release occurs use
@@ -66,11 +66,8 @@ svn checkout https://svn.java.net/svn/jersey~svn/trunk/jersey jersey --username 
 If you are new to Subversion, you may want to visit the <ulink url="http://subversion.tigris.org/">Subversion Project website</ulink> and read <ulink url="http://svnbook.red-bean.com/">Version Control with Subversion</ulink>.
 </para>
 <para>
-<ulink url="http://jersey.java.net/servlets/ProjectSource">Read more about how to checkout this project's repository...</ulink>
-</para>
-<para>
 Stable releases of Jersey are tagged in the location
-<ulink url="http://jersey.java.net/svn/jersey/tags">http://jersey.java.net/svn/jersey/tags</ulink>.
+<ulink url="http://java.net/projects/jersey/sources/svn/show/tags">http://java.net/projects/jersey/sources/svn/show/tags</ulink>.
 </para>
 <para>
 The source code may be browsed using
