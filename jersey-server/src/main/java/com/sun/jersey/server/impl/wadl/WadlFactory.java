@@ -42,15 +42,11 @@ package com.sun.jersey.server.impl.wadl;
 
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.api.wadl.config.WadlGeneratorConfigLoader;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.server.impl.uri.PathPattern;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
-import com.sun.jersey.server.wadl.WadlGenerator;
-import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 
-import javax.ws.rs.core.Context;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,9 +94,6 @@ public final class WadlFactory {
         if (!isSupported()) return;
 
         wadlApplicationContext = new WadlApplicationContextImpl(rootResources, _resourceConfig);
-
-        ipf.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>(
-                WadlApplicationContext.class, wadlApplicationContext) {});
     }
 
     /**
@@ -135,5 +128,14 @@ public final class WadlFactory {
      */
     private static boolean isWadlEnabled(ResourceConfig resourceConfig) {
         return !resourceConfig.getFeature(ResourceConfig.FEATURE_DISABLE_WADL);
+    }
+
+    /**
+     * Get {@link WadlApplicationContext}.
+     *
+     * @return {@link WadlApplicationContext}.
+     */
+    /* package */ WadlApplicationContext getWadlApplicationContext() {
+        return wadlApplicationContext;
     }
 }

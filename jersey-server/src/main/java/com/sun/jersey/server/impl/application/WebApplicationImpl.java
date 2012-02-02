@@ -95,9 +95,11 @@ import com.sun.jersey.server.impl.monitoring.MonitoringProviderFactory;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.server.impl.template.TemplateFactory;
 import com.sun.jersey.server.impl.uri.rules.RootResourceClassesRule;
+import com.sun.jersey.server.impl.wadl.WadlApplicationContextInjectionProxy;
 import com.sun.jersey.server.impl.wadl.WadlFactory;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
+import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.StringReaderWorkers;
 import com.sun.jersey.spi.container.ContainerRequest;
@@ -1246,6 +1248,14 @@ public final class WebApplicationImpl implements WebApplication {
         // Initiate the WADL factory
         this.wadlFactory = new WadlFactory(resourceConfig);
 
+        WadlApplicationContextInjectionProxy wadlApplicationContextInjectionProxy = null;
+
+        if(!resourceConfig.getFeature(ResourceConfig.FEATURE_DISABLE_WADL)) {
+            wadlApplicationContextInjectionProxy = new WadlApplicationContextInjectionProxy();
+            injectableFactory.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>(
+                    WadlApplicationContext.class, wadlApplicationContextInjectionProxy) {});
+        }
+
         // Initiate filter
         filterFactory.init(resourceConfig);
         if (!resourceConfig.getMediaTypeMappings().isEmpty() ||
@@ -1298,6 +1308,10 @@ public final class WebApplicationImpl implements WebApplication {
         RulesMap<UriRule> rootRules = new RootResourceUriRules(this,
                 resourceConfig, wadlFactory, injectableFactory).getRules();
         this.rootsRule = new RootResourceClassesRule(rootRules);
+
+        if(!resourceConfig.getFeature(ResourceConfig.FEATURE_DISABLE_WADL)) {
+            wadlApplicationContextInjectionProxy.init(wadlFactory);
+        }
 
         requestListener = MonitoringProviderFactory.createRequestListener(providerServices);
         responseListener = MonitoringProviderFactory.createResponseListener(providerServices);

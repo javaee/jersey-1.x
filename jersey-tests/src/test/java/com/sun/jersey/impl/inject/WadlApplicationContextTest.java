@@ -43,6 +43,8 @@ package com.sun.jersey.impl.inject;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResourceModelContext;
 import com.sun.jersey.api.model.AbstractResourceModelListener;
 import com.sun.jersey.impl.AbstractResourceTester;
@@ -141,8 +143,44 @@ public class WadlApplicationContextTest extends AbstractResourceTester {
         resource("randomUniqueDumbResource123456").get(String.class);
     }
 
+    public void testInjectSingleton() {
+        ResourceConfig rc = new DefaultResourceConfig();
+        rc.getClasses().add(A.class);
+        rc.getSingletons().add(new ProviderAdapter());
+
+        initiateWebApplication(rc);
+
+        resource("randomUniqueDumbResource123456").get(String.class);
+    }
+
     public void testEnableDisableRuntime() {
         initiateWebApplication(A.class, ProviderAdapter.class);
+        WebResource r = resource("/", false);
+        r.addFilter(new LoggingFilter());
+
+        ClientResponse response = r.path("application.wadl").get(ClientResponse.class);
+        assertTrue(response.getStatus() == 200);
+
+        response = r.path("randomUniqueDumbResource123456").options(ClientResponse.class);
+        assertTrue(response.getStatus() == 200);
+
+        response = r.path("application.wadl").get(ClientResponse.class);
+        assertTrue(response.getStatus() == 404);
+
+        response = r.path("randomUniqueDumbResource123456").options(ClientResponse.class);
+        assertTrue(response.getStatus() == 204);
+
+        response = r.path("application.wadl").get(ClientResponse.class);
+        assertTrue(response.getStatus() == 200);
+    }
+
+    public void testEnableDisableRuntimeSingleton() {
+        ResourceConfig rc = new DefaultResourceConfig();
+        rc.getClasses().add(A.class);
+        rc.getSingletons().add(new ProviderAdapter());
+
+        initiateWebApplication(rc);
+
         WebResource r = resource("/", false);
         r.addFilter(new LoggingFilter());
 
