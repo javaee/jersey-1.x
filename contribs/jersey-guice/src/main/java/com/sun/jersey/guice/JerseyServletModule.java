@@ -96,7 +96,7 @@ public class JerseyServletModule extends ServletModule {
     }
 
     @Provides
-    public FeaturesAndProperties fearturesAndProperties(WebApplication webApplication) {
+    public FeaturesAndProperties featuresAndProperties(WebApplication webApplication) {
         return webApplication.getFeaturesAndProperties();
     }
 
