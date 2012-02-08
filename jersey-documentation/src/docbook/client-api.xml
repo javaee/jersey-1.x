@@ -434,11 +434,12 @@ JAXBBean bean = r.
             instances. A <literal>WebResource</literal> will inherit filters from its creator, which
             can be a <literal>Client</literal> or another <literal>WebResource</literal>.
             Additional filters can be added to a <literal>WebResource</literal> after it has been
-            created. For requests, filters are applied in order, starting with inherited filters
-            and followed by the filters added to the <literal>WebResource</literal>. All filters
-            are applied in the order in which they were added. For responses, filters are applied
+            created. For requests, filters are applied
             in reverse order, starting with the <literal>WebResource</literal> filters and then
             moving to the inherited filters.
+            For responses, filters are applied in order, starting with inherited filters
+            and followed by the filters added to the <literal>WebResource</literal>. All filters
+            are applied in the order in which they were added.
             For instance, in the following example the <literal>Client</literal> has two filters added,
             <literal>filter1</literal> and <literal>filter2</literal>, in that order, and the
             <literal>WebResource</literal> has one filter added, <literal>filter3</literal>:
@@ -451,10 +452,10 @@ JAXBBean bean = r.
     ClientFilter filter3 = ...
     WebResource r = c.resource(...);
     r.addFilter(filter3);</programlisting>
-            After a request has been built the request is filtered by <literal>filter1</literal>,
-            <literal>filter2</literal> and <literal>filter3</literal> in that order. After the response
-            has been received the response is filtered by <literal>filter3</literal>,
-            <literal>filter2</literal> and <literal>filter1</literal> in that order, before the
+            After a request has been built the request is filtered by <literal>filter3</literal>,
+            <literal>filter2</literal> and <literal>filter1</literal> in that order. After the response
+            has been received the response is filtered by <literal>filter1</literal>,
+            <literal>filter2</literal> and <literal>filter3</literal> in that order, before the
             response is returned.</para>
             <para>Filters are implemented using the “russian doll” stack-based pattern where a
             filter is responsible for calling the next filter in the ordered list of filters

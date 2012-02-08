@@ -1,4 +1,7 @@
 release 1.12
+- Fixed issue 907
+  http://java.net/jira/browse/JERSEY-906
+  Modified documentation (user guide) to reflect current implementation (client filter execution order).
 - Fixed issue 906
   http://java.net/jira/browse/JERSEY-906
   Added missing grizzly-framework-2.1.2.jar file to the list of jars 'Non-maven developers require:' in getting-started guide
