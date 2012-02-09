@@ -49,7 +49,7 @@
         <version>1.12-SNAPSHOT</version>
     </parent>
     <artifactId>oauth-server</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>oauth-server</name>
     <dependencies>
         <dependency>
