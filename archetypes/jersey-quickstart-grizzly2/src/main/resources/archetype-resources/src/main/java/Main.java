@@ -1,13 +1,14 @@
 
 package $package;
 
-import com.sun.jersey.api.container.grizzly2.servlet.GrizzlyWebContainerFactory;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
+
+import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.core.UriBuilder;
 
 
 public class Main {
@@ -31,12 +32,10 @@ public class Main {
     public static final URI BASE_URI = getBaseURI();
     
     protected static HttpServer startServer() throws IOException {
-        final Map<String, String> initParams = new HashMap<String, String>();
-
-        initParams.put("com.sun.jersey.config.property.packages", "$package");
+        ResourceConfig resourceConfig = new PackagesResourceConfig("com.example");
 
         System.out.println("Starting grizzly2...");
-        return GrizzlyWebContainerFactory.create(BASE_URI, initParams);
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, resourceConfig);
     }
     
     public static void main(String[] args) throws IOException {

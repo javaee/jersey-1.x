@@ -41,7 +41,7 @@ public class MainTest extends TestCase {
     /**
      * Test to see that the message "Got it!" is sent in the response.
      */
-    public void _testMyResource() {
+    public void testMyResource() {
         String responseMsg = r.path("myresource").get(String.class);
         assertEquals("Got it!", responseMsg);
     }

@@ -52,7 +52,7 @@ import static org.junit.Assert.*;
  */
 public class MainTest extends JerseyTest {
 
-    public MainTest()throws Exception {
+    public MainTest() throws Exception {
         super("com.sun.jersey.samples.helloworld.resources");
     }
 

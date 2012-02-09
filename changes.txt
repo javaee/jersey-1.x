@@ -1,4 +1,7 @@
 release 1.12
+- Fixed issue 943
+  http://java.net/jira/browse/JERSEY-943
+  Fixed archetype jersey-quickstart-grizzly2.
 - Fixed issue 907
   http://java.net/jira/browse/JERSEY-906
   Modified documentation (user guide) to reflect current implementation (client filter execution order).
