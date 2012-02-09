@@ -1,4 +1,7 @@
 release 1.12
+- Fixed issue 874
+  http://java.net/jira/browse/JERSEY-874
+  Added "throws ClientHandlerException" to all methods declared in UniformInterface, same for its successors.
 - Fixed issue 883 
   http://java.net/jira/browse/JERSEY-883
   Improved support for CDI Bean manager lookup

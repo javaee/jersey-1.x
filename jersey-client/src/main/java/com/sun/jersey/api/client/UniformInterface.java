@@ -94,8 +94,10 @@ public interface UniformInterface {
      * Invoke the HEAD method.
      * 
      * @return the HTTP response.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    ClientResponse head();
+    ClientResponse head() throws ClientHandlerException;
     
     
     /**
@@ -107,8 +109,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T options(Class<T> c) throws UniformInterfaceException;
+    <T> T options(Class<T> c) throws UniformInterfaceException, ClientHandlerException;
     
     
     /**
@@ -120,8 +124,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T options(GenericType<T> gt) throws UniformInterfaceException;
+    <T> T options(GenericType<T> gt) throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the GET method.
@@ -132,8 +138,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T get(Class<T> c) throws UniformInterfaceException;
+    <T> T get(Class<T> c) throws UniformInterfaceException, ClientHandlerException;
             
     /**
      * Invoke the GET method.
@@ -144,8 +152,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T get(GenericType<T> gt) throws UniformInterfaceException;
+    <T> T get(GenericType<T> gt) throws UniformInterfaceException, ClientHandlerException;
 
     
     /**
@@ -156,8 +166,10 @@ public interface UniformInterface {
      * 
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    void put() throws UniformInterfaceException;
+    void put() throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the PUT method with a request entity but no response.
@@ -168,8 +180,10 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    void put(Object requestEntity) throws UniformInterfaceException;
+    void put(Object requestEntity) throws UniformInterfaceException, ClientHandlerException;
 
     /**
      * Invoke the PUT method with no request entity that returns a response.
@@ -180,8 +194,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T put(Class<T> c) throws UniformInterfaceException;
+    <T> T put(Class<T> c) throws UniformInterfaceException, ClientHandlerException;
 
     /**
      * Invoke the PUT method with a request entity that returns a response.
@@ -192,8 +208,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T put(GenericType<T> gt) throws UniformInterfaceException;
+    <T> T put(GenericType<T> gt) throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the PUT method with a request entity that returns a response.
@@ -205,9 +223,11 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     <T> T put(Class<T> c, Object requestEntity) 
-            throws UniformInterfaceException;
+            throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the PUT method with a request entity that returns a response.
@@ -219,9 +239,11 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     <T> T put(GenericType<T> gt, Object requestEntity) 
-            throws UniformInterfaceException;
+            throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the POST method with no request entity or response.
@@ -231,8 +253,10 @@ public interface UniformInterface {
      * 
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    void post() throws UniformInterfaceException;
+    void post() throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the POST method with a request entity but no response.
@@ -243,8 +267,10 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    void post(Object requestEntity) throws UniformInterfaceException;
+    void post(Object requestEntity) throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the POST method with no request entity that returns a response.
@@ -255,8 +281,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T post(Class<T> c) throws UniformInterfaceException;
+    <T> T post(Class<T> c) throws UniformInterfaceException, ClientHandlerException;
 
     /**
      * Invoke the POST method with a request entity that returns a response.
@@ -267,8 +295,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T post(GenericType<T> gt) throws UniformInterfaceException;
+    <T> T post(GenericType<T> gt) throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the POST method with a request entity that returns a response.
@@ -280,9 +310,11 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     <T> T post(Class<T> c, Object requestEntity) 
-            throws UniformInterfaceException;
+            throws UniformInterfaceException, ClientHandlerException;
                 
     /**
      * Invoke the POST method with a request entity that returns a response.
@@ -294,9 +326,11 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     <T> T post(GenericType<T> gt, Object requestEntity)
-            throws UniformInterfaceException;
+            throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the DELETE method with no request entity or response.
@@ -306,8 +340,10 @@ public interface UniformInterface {
      * 
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    void delete() throws UniformInterfaceException;
+    void delete() throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the DELETE method with a request entity but no response.
@@ -318,8 +354,10 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    void delete(Object requestEntity) throws UniformInterfaceException;
+    void delete(Object requestEntity) throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the DELETE method with no request entity that returns a response.
@@ -330,8 +368,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T delete(Class<T> c) throws UniformInterfaceException;
+    <T> T delete(Class<T> c) throws UniformInterfaceException, ClientHandlerException;
 
     /**
      * Invoke the DELETE method with a request entity that returns a response.
@@ -342,8 +382,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T delete(GenericType<T> gt) throws UniformInterfaceException;
+    <T> T delete(GenericType<T> gt) throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke the DELETE method with a request entity that returns a response.
@@ -355,9 +397,11 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     <T> T delete(Class<T> c, Object requestEntity) 
-            throws UniformInterfaceException;
+            throws UniformInterfaceException, ClientHandlerException;
 
     /**
      * Invoke the DELETE method with a request entity that returns a response.
@@ -369,9 +413,11 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     <T> T delete(GenericType<T> gt, Object requestEntity)
-            throws UniformInterfaceException;
+            throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke a HTTP method with no request entity or response.
@@ -382,8 +428,10 @@ public interface UniformInterface {
      * @param method the HTTP method.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    void method(String method) throws UniformInterfaceException;
+    void method(String method) throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke a HTTP method with a request entity but no response.
@@ -395,9 +443,11 @@ public interface UniformInterface {
      * @param requestEntity the request entity.
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     void method(String method, Object requestEntity) 
-            throws UniformInterfaceException;
+            throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke a HTTP method with no request entity that returns a response.
@@ -409,8 +459,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T method(String method, Class<T> c) throws UniformInterfaceException;
+    <T> T method(String method, Class<T> c) throws UniformInterfaceException, ClientHandlerException;
 
     /**
      * Invoke a HTTP method with no request entity that returns a response.
@@ -422,8 +474,10 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
-    <T> T method(String method, GenericType<T> gt) throws UniformInterfaceException;
+    <T> T method(String method, GenericType<T> gt) throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke a HTTP method with a request entity that returns a response.
@@ -436,9 +490,11 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>c</code> is not the type
      *         {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     <T> T method(String method, Class<T> c, Object requestEntity) 
-            throws UniformInterfaceException;    
+            throws UniformInterfaceException, ClientHandlerException;
     
     /**
      * Invoke a HTTP method with a request entity that returns a response.
@@ -451,7 +507,9 @@ public interface UniformInterface {
      * @throws UniformInterfaceException if the status of the HTTP response is 
      *         greater than or equal to 300 and <code>gt</code> does not
      *         represent the type {@link ClientResponse}.
+     * @throws ClientHandlerException if the client handler fails to process
+     *         the request or response.
      */
     <T> T method(String method, GenericType<T> gt, Object requestEntity) 
-            throws UniformInterfaceException;    
+            throws UniformInterfaceException, ClientHandlerException;
 }
