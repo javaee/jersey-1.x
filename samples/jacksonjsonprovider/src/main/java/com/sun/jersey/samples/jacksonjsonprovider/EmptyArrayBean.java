@@ -49,6 +49,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class EmptyArrayBean {
 
-    public String[] emtpyArray = new String[0];
+    public String[] emptyArray = new String[0];
 
 }
