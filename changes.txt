@@ -1,4 +1,7 @@
 release 1.12
+- Fixed issue 883 
+  http://java.net/jira/browse/JERSEY-883
+  Improved support for CDI Bean manager lookup
 - Fixed issue 943
   http://java.net/jira/browse/JERSEY-943
   Fixed archetype jersey-quickstart-grizzly2.

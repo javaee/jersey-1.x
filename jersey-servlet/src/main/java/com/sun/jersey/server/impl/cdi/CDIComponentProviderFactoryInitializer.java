@@ -42,10 +42,13 @@ package com.sun.jersey.server.impl.cdi;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.server.impl.InitialContextHelper;
 import com.sun.jersey.spi.container.WebApplication;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.sun.jersey.spi.container.servlet.WebConfig;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.servlet.ServletContext;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Initializes the factory for IoCComponentProvider(s) for CDI beans.
@@ -55,28 +58,81 @@ import javax.naming.NamingException;
  */
 public class CDIComponentProviderFactoryInitializer {
     
-    private static final Logger LOGGER = Logger.getLogger(
-            CDIComponentProviderFactoryInitializer.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CDIComponentProviderFactoryInitializer.class.getName());
 
-    public static void initialize(ResourceConfig rc, WebApplication wa) {
+    private static final String BEAN_MANAGER_CLASS = "javax.enterprise.inject.spi.BeanManager";
+    private static final String WELD_SERVLET_PACKAGE = "org.jboss.weld.environment.servlet";
+
+    public static void initialize(WebConfig wc, ResourceConfig rc, WebApplication wa) {
+        ServletContext sc = wc.getServletContext();
+
+        Object beanManager = lookup(sc);
+        if (beanManager == null) {
+            LOGGER.config("The CDI BeanManager is not available. JAX-RS CDI support is disabled.");
+            return;
+        }
+
+        rc.getSingletons().add(new CDIComponentProviderFactory(beanManager, rc, wa));
+        LOGGER.info("CDI support is enabled");
+    }
+
+    private static Object lookup(ServletContext sc) {
+        Object beanManager = null;
+
+        beanManager = lookupInJndi("java:comp/BeanManager");
+        if (beanManager != null) {
+            return beanManager;
+        }
+
+        // Standard in CDI 1.1
+        beanManager = lookupInServletContext(sc, BEAN_MANAGER_CLASS);
+        if (beanManager != null) {
+            return beanManager;
+        }
+
+        // For older Weld versions
+        beanManager = lookupInServletContext(sc, WELD_SERVLET_PACKAGE + "." + BEAN_MANAGER_CLASS);
+        if (beanManager != null) {
+            return beanManager;
+        }
+
+        return null;
+    }
+
+    private static Object lookupInJndi(String name) {
         try {
             InitialContext ic = InitialContextHelper.getInitialContext();
-            if (ic == null)
-                return;
-            Object beanManager = ic.lookup("java:comp/BeanManager");
+            if (ic == null) {
+                return null;
+            }
+
+            Object beanManager = ic.lookup(name);
             // Some implementations of InitialContext return null instead of
             // throwing NamingException if there is no Object associated with
             // the name
             if (beanManager == null) {
-                LOGGER.config("The CDI BeanManager is not available. JAX-RS CDI support is disabled.");
-                return;
+                LOGGER.config("The CDI BeanManager is not available at " + name);
+                return null;
             }
 
-            rc.getSingletons().add(new CDIComponentProviderFactory(beanManager, rc, wa));
-            LOGGER.info("CDI support is enabled");
+            LOGGER.config("The CDI BeanManager is at " + name);
+            return beanManager;
             
         } catch (NamingException ex) {
-            LOGGER.log(Level.CONFIG, "The CDI BeanManager is not available. JAX-RS CDI support is disabled.", ex);
+            LOGGER.log(Level.CONFIG, "The CDI BeanManager is not available at " + name, ex);
         }
+
+        return null;
+    }
+
+    private static Object lookupInServletContext(ServletContext sc, String name) {
+        Object beanManager = sc.getAttribute(name);
+        if (beanManager == null) {
+            LOGGER.config("The CDI BeanManager is not available at " + name);
+            return null;
+        }
+
+        LOGGER.config("The CDI BeanManager is at " + name);
+        return beanManager;
     }
 }

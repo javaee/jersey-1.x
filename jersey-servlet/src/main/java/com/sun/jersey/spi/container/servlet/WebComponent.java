@@ -571,7 +571,7 @@ public class WebComponent implements ContainerListener {
         // If CDI is enabled should EJB injection be disabled?
         EJBComponentProviderFactoryInitilizer.initialize(rc);
 
-        CDIComponentProviderFactoryInitializer.initialize(rc, wa);
+        CDIComponentProviderFactoryInitializer.initialize(wc, rc, wa);
 
         // TODO
         // If CDI is enabled then no need to initialize managed beans
