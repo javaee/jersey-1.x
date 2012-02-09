@@ -40,14 +40,12 @@
 package com.sun.jersey.impl.container;
 
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.core.ResourceConfigurator;
 import com.sun.jersey.impl.AbstractResourceTester;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -55,6 +53,10 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 
 /**
  *
@@ -164,4 +166,16 @@ public class ResourceConfiguratorTest extends AbstractResourceTester {
         assertEquals("ONE", r.path("one").get(String.class));
         assertEquals("TWO", r.path("two").get(String.class));
     }
+
+    public void testCommonDelimiterLineBreak() {
+        ResourceConfig rc = new ClassNamesResourceConfig(ConfigOne.class.getName() + "\n" + ConfigTwo.class.getName());
+
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/");
+
+        assertEquals("ONE", r.path("one").get(String.class));
+        assertEquals("TWO", r.path("two").get(String.class));
+    }
+
 }

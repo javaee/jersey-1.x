@@ -362,7 +362,7 @@ public abstract class ResourceConfig extends Application implements FeaturesAndP
     /**
      * Common delimiters used by various properties.
      */
-    public static final String COMMON_DELIMITERS = " ,;";
+    public static final String COMMON_DELIMITERS = " ,;\n";
     
     /**
      * Get the map of features associated with the Web application.

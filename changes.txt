@@ -1,4 +1,7 @@
 release 1.12
+- Fixed issue 934
+  http://java.net/jira/browse/JERSEY-934
+  Added '\n' to ResourceConfig.COMMON_DELIMITERS (to ease params declarations)
 - Fixed issue 830
   http://java.net/jira/browse/JERSEY-830
   Fixed issue with WADL generation when dealing with nested generic types; added check before trying to cast Type to Class

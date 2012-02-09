@@ -108,7 +108,7 @@ public class ClassNamesResourceConfig extends DefaultResourceConfig {
     }
     
     private static Set<Class<?>> getClasses(String[] elements) {
-        return convertToSet(getElements(elements));
+        return convertToSet(getElements(elements, ResourceConfig.COMMON_DELIMITERS));
     }
 
     private static Set<Class<?>> convertToSet(String[] classes) {
