@@ -27,6 +27,7 @@ release 1.12
   http://java.net/jira/browse/JERSEY-840
   Added jersey-grizzly2.jar to list required for non-maven developers to fix broken Getting Started section in the Jersey User Guide.
 - Grizzly 2 version update (to 2.2.1)
+- Switched implementation used in async http client from jetty to grizzly
 - Fixed issue 898
   http://java.net/jira/browse/JERSEY-898
   Added missing null checks to ContainerRequest.evaluatePreconditions(Date | EntityTag)
