@@ -1,4 +1,7 @@
 release 1.12
+- Fixed issue 830
+  http://java.net/jira/browse/JERSEY-830
+  Fixed issue with WADL generation when dealing with nested generic types; added check before trying to cast Type to Class
 - Fixed issue 874
   http://java.net/jira/browse/JERSEY-874
   Added "throws ClientHandlerException" to all methods declared in UniformInterface, same for its successors.

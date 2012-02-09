@@ -40,6 +40,7 @@
 
 package com.sun.jersey.impl.wadl;
 
+import com.sun.jersey.api.JResponse;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.filter.LoggingFilter;
@@ -87,6 +88,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -729,5 +731,28 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check base URI
         String val = (String) xp.evaluate("/wadl:application/wadl:resources/@base", d, XPathConstants.STRING);
         assertEquals(val, MyWadlGeneratorConfig.MyWadlGenerator.CUSTOM_RESOURCES_BASE_URI);
+    }
+
+    @Path("jresponse")
+    public static class JResponseTestResource {
+        @GET
+        @Produces("text/plain")
+        public JResponse<List<String>> getClichedMessage() {
+            // Return some cliched textual content
+            return JResponse.<List<String>>status(200).entity(new ArrayList() {
+                {
+                    add("Hello world!");
+                }
+            }).build();
+        }
+    }
+
+    public void testJresponse() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(JResponseTestResource.class);
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/application.wadl");
+
+        assertTrue(r.get(String.class).length() > 0);
     }
 }

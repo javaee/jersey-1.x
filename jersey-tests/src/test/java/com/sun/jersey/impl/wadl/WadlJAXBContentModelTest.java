@@ -39,40 +39,39 @@
  */
 package com.sun.jersey.impl.wadl;
 
-import com.sun.jersey.impl.wadl.testdata.schema.SimpleSchemaResource;
-import com.sun.jersey.impl.wadl.testdata.schema.RequestMessage;
-import com.sun.jersey.impl.wadl.testdata.schema.ResponseMessage;
-import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
-import com.sun.research.ws.wadl.Representation;
-import com.sun.research.ws.wadl.Resource;
-
-import java.util.List;
-
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
+import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.wadl.testdata.schema.JResponseSchemaResource;
 import com.sun.jersey.impl.wadl.testdata.schema.MultipleContentTypesResource;
-import com.sun.jersey.impl.wadl.testdata.schema.different.ResponseMessageDifferentNamespace;
+import com.sun.jersey.impl.wadl.testdata.schema.RequestMessage;
+import com.sun.jersey.impl.wadl.testdata.schema.ResponseMessage;
 import com.sun.jersey.impl.wadl.testdata.schema.SeeAlsoSchemaResource;
+import com.sun.jersey.impl.wadl.testdata.schema.SimpleSchemaResource;
 import com.sun.jersey.impl.wadl.testdata.schema.TwoNamespacesSchemaResource;
+import com.sun.jersey.impl.wadl.testdata.schema.different.ResponseMessageDifferentNamespace;
 import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Grammars;
 import com.sun.research.ws.wadl.Include;
 import com.sun.research.ws.wadl.Method;
-import java.io.InputStream;
+import com.sun.research.ws.wadl.Representation;
+import com.sun.research.ws.wadl.Resource;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * Verify the generation of JAXB content model from java beans
@@ -461,7 +460,6 @@ public class WadlJAXBContentModelTest extends AbstractResourceTester {
         
         // Right let check that we have a reference to the XSD, so lets cheat
         // and instantiate the Application object.
-        
         Application a = (Application)JAXBContext.newInstance(Application.class)
                 .createUnmarshaller()
                 .unmarshal(cr.getEntityInputStream());
@@ -514,6 +512,4 @@ public class WadlJAXBContentModelTest extends AbstractResourceTester {
         String val = (String)xp.evaluate("count(/xs:schema/xs:element)", dom, XPathConstants.STRING);
         assertEquals("Should just have the single directly reference element", "1", val);
     }
-    
-
 }
