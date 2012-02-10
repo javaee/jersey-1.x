@@ -90,5 +90,12 @@ public class ObjectFactory {
     public Flights createFlights() {
         return new Flights();
     }
-
+    
+    /**
+    * Create an instance of {@link AircraftType }
+    *
+    */
+    public AircraftType createAircraftType() { 
+        return new AircraftType(); 
+    }
 }
