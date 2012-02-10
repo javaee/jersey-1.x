@@ -110,6 +110,11 @@ and <code>META-INF/services/jersey-client-components</code> placed in the web ap
 
       <p>
       You will need to manually deploy the example web application archive to your web container.
-      Concrete steps for GlassFish v3.1.2 container are coming soon.
+      The simplest way to try this out from the command line could be:
+      <pre>
+      cd webapp && mvn clean package org.mortbay.jetty:maven-jetty-plugin:run 
+      </pre>
+      Then you may want to open <a href="http://localhost:8080/moxy-oxm-mapping-webapp/customers">http://localhost:8080/moxy-oxm-mapping-webapp/customers</a> in your favourite web browser.
+      If you will, go ahead and check the source code to see, that the Java beans in the beans module do not contain any JAXB annotations, and the web application is still able to generate XML out of it.
       </p>
  </body></html>
