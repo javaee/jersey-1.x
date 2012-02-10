@@ -153,6 +153,7 @@
                         </Export-Package>
                         <Import-Package>
                             com.sun.grizzly.*;resolution:="optional",
+		            javax.servlet.*;version="[2.5,4)",
                             *
                         </Import-Package>
                     </instructions>
