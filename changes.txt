@@ -1,4 +1,7 @@
 release 1.12
+- Fixed issue 671
+  http://java.net/jira/browse/JERSEY-671
+  Added missing createAircraftType() method to json-from-jaxb sample in JAXB ObjectFactory
 - Fixed issue 934
   http://java.net/jira/browse/JERSEY-934
   Added '\n' to ResourceConfig.COMMON_DELIMITERS (to ease params declarations)
