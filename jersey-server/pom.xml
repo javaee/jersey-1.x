@@ -191,7 +191,6 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Bundle-SymbolicName>com.sun.jersey.jersey-server</Bundle-SymbolicName>
                         <Bundle-Activator>com.sun.jersey.server.osgi.Activator</Bundle-Activator>
                         <Private-Package>com.sun.jersey.server.osgi</Private-Package>
                         <Export-Package>

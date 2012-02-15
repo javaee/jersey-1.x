@@ -52,7 +52,7 @@
     </parent>
 
     <artifactId>jersey-multipart</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>jersey-multipart</name>
 
     <dependencies>

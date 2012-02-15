@@ -222,16 +222,6 @@
     </dependencies>
     <build>
         <plugins>
-            <!--plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <executions>
-                  <execution>
-                    <id>disable-execution</id>
-                    <phase>none</phase>
-		  </execution>
-		</executions>
-	    </plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

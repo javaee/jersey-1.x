@@ -1,7 +1,4 @@
 release 1.12
-- Fixed issue 752
-  http://java.net/jira/browse/JERSEY-752
-  Exported packages in OSGi manifest don't have versions
 - Fixed issue 671
   http://java.net/jira/browse/JERSEY-671
   Added missing createAircraftType() method to json-from-jaxb sample in JAXB ObjectFactory

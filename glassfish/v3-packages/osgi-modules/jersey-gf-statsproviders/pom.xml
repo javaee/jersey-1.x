@@ -61,7 +61,7 @@
                 <configuration>
                     <instructions>
                         <Export-Package>com.sun.jersey.server.spi.monitoring.glassfish</Export-Package>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
                     </instructions>
                 </configuration>
             </plugin>
@@ -130,7 +130,6 @@
             <groupId>org.glassfish.common</groupId>
             <artifactId>internal-api</artifactId>
             <version>3.0</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
