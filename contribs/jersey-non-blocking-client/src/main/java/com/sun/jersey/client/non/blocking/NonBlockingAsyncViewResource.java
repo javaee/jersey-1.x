@@ -67,7 +67,6 @@ import java.util.concurrent.TimeoutException;
  *
  * @author pavel.bucek@oracle.com
  */
-
 public class NonBlockingAsyncViewResource extends AsyncViewResource {
     private final NonBlockingClient client;
 

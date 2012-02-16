@@ -1,4 +1,9 @@
-release 1.12
+release 1.13
+- Fixed issue 985
+  http://java.net/jira/browse/JERSEY-985
+  Non-blocking client now takes ssl settings (via HTTPSPropertins) into account.
+
+release 1.12 (02-2012)
 - Fixed issue 671
   http://java.net/jira/browse/JERSEY-671
   Added missing createAircraftType() method to json-from-jaxb sample in JAXB ObjectFactory

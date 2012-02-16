@@ -57,9 +57,11 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.client.non.blocking.config.NonBlockingClientConfig;
+import com.sun.jersey.client.urlconnection.HTTPSProperties;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.util.ReaderWriter;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -170,6 +172,16 @@ public final class NonBlockingClientHandler extends TerminatingClientHandler {
                         .setScheme(authScheme).build();
 
                 builder = builder.setRealm(realm);
+            }
+
+            Object httpsPropertiesProperty = cc.getProperties().get(HTTPSProperties.PROPERTY_HTTPS_PROPERTIES);
+            if(httpsPropertiesProperty != null && httpsPropertiesProperty instanceof HTTPSProperties) {
+                HTTPSProperties httpsProperties = (HTTPSProperties)httpsPropertiesProperty;
+                final HostnameVerifier hostnameVerifier = httpsProperties.getHostnameVerifier();
+                if(hostnameVerifier != null) {
+                    builder = builder.setHostnameVerifier(hostnameVerifier);
+                }
+                builder = builder.setSSLContext(httpsProperties.getSSLContext());
             }
 
             Object requestFilters = cc.getProperties().get(NonBlockingClientConfig.PROPERTY_REQUEST_FILTERS);
