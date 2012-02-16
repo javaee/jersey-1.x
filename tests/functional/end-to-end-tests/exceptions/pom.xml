@@ -48,7 +48,7 @@
    <parent>
         <groupId>com.sun.jersey.test.functional</groupId>
         <artifactId>end-to-end-tests</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.13-SNAPSHOT</version>
     </parent>
 
    <artifactId>exceptions</artifactId>
