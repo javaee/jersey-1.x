@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 964
+  http://java.net/jira/browse/JERSEY-964
+  Making *WebResource.Builders not final to make mocking possible.
 - Fixed issue 985
   http://java.net/jira/browse/JERSEY-985
   Non-blocking client now takes ssl settings (via HTTPSPropertins) into account.

@@ -482,7 +482,7 @@ public class AsyncWebResource extends Filterable implements
      * handling the request using the {@link UniformInterface}. The methods
      * of the {@link UniformInterface} are the build methods of the builder.
      */
-    public final class Builder extends PartialRequestBuilder<Builder>
+    public class Builder extends PartialRequestBuilder<Builder>
             implements AsyncUniformInterface {
 
         private Builder() {
