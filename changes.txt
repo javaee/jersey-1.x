@@ -1,4 +1,8 @@
 release 1.13
+- Fixed issue 988
+  http://java.net/jira/browse/JERSEY-988
+  Applied patch which tries to find/access non-public constructor for JAXB beans
+  while generating XML Schema to be included in WADL.
 - Fixed issue 964
   http://java.net/jira/browse/JERSEY-964
   Making *WebResource.Builders not final to make mocking possible.

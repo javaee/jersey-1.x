@@ -69,6 +69,8 @@ import javax.xml.transform.Result;
 import javax.xml.transform.stream.StreamResult;
 import java.io.CharArrayWriter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -453,10 +455,20 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
 
                     Object parameterClassInstance = null;
                     try {
-                        parameterClassInstance = type.newInstance();
+                        Constructor<?> defaultConstructor = type.getDeclaredConstructor();
+                        defaultConstructor.setAccessible(true);
+                        parameterClassInstance = defaultConstructor.newInstance();
                     } catch (InstantiationException ex) {
                         LOGGER.log(Level.FINE, null, ex);
                     } catch (IllegalAccessException ex) {
+                        LOGGER.log(Level.FINE, null, ex);
+                    } catch (IllegalArgumentException ex) {
+                        LOGGER.log(Level.FINE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        LOGGER.log(Level.FINE, null, ex);
+                    } catch (SecurityException ex) {
+                        LOGGER.log(Level.FINE, null, ex);
+                    } catch (NoSuchMethodException ex) {
                         LOGGER.log(Level.FINE, null, ex);
                     }
 

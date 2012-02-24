@@ -40,6 +40,9 @@
 package com.sun.jersey.api.uri;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
+
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.PathSegment;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -50,8 +53,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.PathSegment;
 
 /**
  * Utility class for validating, encoding and decoding components
@@ -125,7 +126,7 @@ public class UriComponent {
      * represents a URI component type.
      *
      * @param s the encoded string.
-     * @param t the URI compontent type identifying the legal characters.
+     * @param t the URI component type identifying the legal characters.
      * @throws IllegalArgumentException if the encoded string contains illegal
      *         characters.
      */
@@ -138,7 +139,7 @@ public class UriComponent {
      * represents a URI component type.
      *
      * @param s the encoded string.
-     * @param t the URI compontent type identifying the legal characters.
+     * @param t the URI component type identifying the legal characters.
      * @param template true if the encoded string contains URI template variables
      * @throws IllegalArgumentException if the encoded string contains illegal
      *         characters.
@@ -158,7 +159,7 @@ public class UriComponent {
      * represents a URI component type.
      *
      * @param s the encoded string.
-     * @param t the URI compontent type identifying the legal characters.
+     * @param t the URI component type identifying the legal characters.
      * @return true if the encoded string is valid, otherwise false.
      */
     public static boolean valid(String s, Type t) {
@@ -170,7 +171,7 @@ public class UriComponent {
      * represents a URI component type.
      *
      * @param s the encoded string.
-     * @param t the URI compontent type identifying the legal characters.
+     * @param t the URI component type identifying the legal characters.
      * @param template true if the encoded string contains URI template variables
      * @return true if the encoded string is valid, otherwise false.
      */
@@ -199,7 +200,7 @@ public class UriComponent {
      * double encoded.
      *
      * @param s the string to be encoded.
-     * @param t the URI compontent type identifying the ASCII characters that 
+     * @param t the URI component type identifying the ASCII characters that
      *          must be percent-encoded.
      * @return the encoded string.
      */
@@ -214,7 +215,7 @@ public class UriComponent {
      * double encoded.
      *
      * @param s the string to be encoded.
-     * @param t the URI compontent type identifying the ASCII characters that 
+     * @param t the URI component type identifying the ASCII characters that
      *          must be percent-encoded.
      * @param template true if the encoded string contains URI template variables
      * @return the encoded string.
@@ -229,7 +230,7 @@ public class UriComponent {
      * UTF-8 encoding.
      *
      * @param s the string to be encoded.
-     * @param t the URI compontent type identifying the ASCII characters that 
+     * @param t the URI component type identifying the ASCII characters that
      *          must be percent-encoded.
      * @return the encoded string.
      */
@@ -243,7 +244,7 @@ public class UriComponent {
      * UTF-8 encoding.
      *
      * @param s the string to be encoded.
-     * @param t the URI compontent type identifying the ASCII characters that 
+     * @param t the URI component type identifying the ASCII characters that
      *          must be percent-encoded.
      * @param template true if the encoded string contains URI template variables
      * @return the encoded string.

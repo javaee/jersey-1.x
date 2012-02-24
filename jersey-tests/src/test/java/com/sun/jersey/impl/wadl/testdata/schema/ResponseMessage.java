@@ -52,6 +52,10 @@ public class ResponseMessage {
     public static final QName name = new QName("urn:message", "responseMessage");
     private String _text;
 
+    protected ResponseMessage() {
+
+    }
+
     public String getText() {
         return _text;
     }
