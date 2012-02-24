@@ -289,6 +289,15 @@ public class ContainerRequest implements HttpRequestContext {
     }
 
     /**
+     * Get the security context.
+     *
+     * @return the security context.
+     */
+    public SecurityContext getSecurityContext() {
+        return securityContext;
+    }
+
+    /**
      * Get the message body workers.
      *
      * @return the message body workers.

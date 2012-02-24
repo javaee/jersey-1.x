@@ -120,7 +120,7 @@ public final class WebApplicationContext implements UriRuleContext, ExtendedUriI
                 HTTP_METHOD_MATCH_RESOURCE,
                 base, u,
                 new InBoundHeaders(), new ByteArrayInputStream(new byte[0]));
-        _request.setSecurityContext(request);
+        _request.setSecurityContext(request.getSecurityContext());
 
         // Propagate security context
         final ContainerResponse _response = new ContainerResponse(app,

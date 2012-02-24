@@ -50,6 +50,7 @@ import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
+import com.sun.jersey.spi.container.SubjectSecurityContext;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.monitoring.DispatchingListener;
 import com.sun.jersey.spi.uri.rules.UriRule;
@@ -58,8 +59,10 @@ import com.sun.jersey.spi.uri.rules.UriRuleContext;
 import javax.ws.rs.WebApplicationException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.PrivilegedAction;
 import java.util.Iterator;
 import java.util.List;
+import javax.ws.rs.core.SecurityContext;
 
 /**
  * The rule for accepting a sub-locator method.
@@ -151,13 +154,14 @@ public final class SubLocatorRule extends BaseRule {
                         subResource));
     }
 
-    private Object invokeSubLocator(Object resource, UriRuleContext context) {
+    private Object invokeSubLocator(final Object resource, final UriRuleContext context) {
         // Push the response filters
         context.pushContainerResponseFilters(responseFilters);
 
+        ContainerRequest containerRequest = context.getContainerRequest();
+
         // Process the request filter
         if (!requestFilters.isEmpty()) {
-            ContainerRequest containerRequest = context.getContainerRequest();
             for (ContainerRequestFilter f : requestFilters) {
                 containerRequest = f.filter(containerRequest);
                 context.setContainerRequest(containerRequest);
@@ -165,9 +169,24 @@ public final class SubLocatorRule extends BaseRule {
         }
 
         // Invoke the sub-locator method
+        dispatchingListener.onSubResourceLocator(Thread.currentThread().getId(), locator);
+
+        SecurityContext sc = containerRequest.getSecurityContext();
+        if (sc instanceof SubjectSecurityContext) {
+            return ((SubjectSecurityContext) sc).doAsSubject(new PrivilegedAction() {
+                @Override
+                public Object run() {
+                    return dispatch(resource, context);
+                }
+            });
+        } else {
+            return dispatch(resource, context);
+        }
+    }
+
+    private Object dispatch(Object resource, UriRuleContext context) {
         try {
             if (is.isEmpty()) {
-                dispatchingListener.onSubResourceLocator(Thread.currentThread().getId(), locator);
                 return m.invoke(resource);
             } else {
                 final Object[] params = new Object[is.size()];
@@ -175,8 +194,6 @@ public final class SubLocatorRule extends BaseRule {
                 for (AbstractHttpContextInjectable i : is) {
                     params[index++] = i.getValue(context);
                 }
-
-                dispatchingListener.onSubResourceLocator(Thread.currentThread().getId(), locator);
                 return m.invoke(resource, params);
             }
         } catch (InvocationTargetException e) {

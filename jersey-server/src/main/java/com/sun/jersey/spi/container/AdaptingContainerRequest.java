@@ -66,11 +66,11 @@ import javax.ws.rs.core.Variant;
 /**
  * An adapting in-bound HTTP request that may override the behaviour of
  * {@link ContainerRequest}.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class AdaptingContainerRequest extends ContainerRequest {
-   
+
     /**
      * The adapted container request.
      */
@@ -122,6 +122,11 @@ public class AdaptingContainerRequest extends ContainerRequest {
     }
 
     @Override
+    public SecurityContext getSecurityContext() {
+        return acr.getSecurityContext();
+    }
+
+    @Override
     public MessageBodyWorkers getMessageBodyWorkers() {
         return acr.getMessageBodyWorkers();
     }
@@ -139,7 +144,7 @@ public class AdaptingContainerRequest extends ContainerRequest {
     }
 
     // HttpRequestContext
-    
+
     @Override
     public URI getBaseUri() {
         return acr.getBaseUri();

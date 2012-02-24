@@ -52,9 +52,11 @@ import com.sun.jersey.server.impl.template.ViewResourceMethod;
 import com.sun.jersey.server.probes.UriRuleProbeProvider;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.sun.jersey.spi.container.SubjectSecurityContext;
 import com.sun.jersey.spi.monitoring.DispatchingListener;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRuleContext;
+import java.security.PrivilegedAction;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -64,6 +66,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.SecurityContext;
 
 /**
  * The rule for accepting an HTTP method.
@@ -178,7 +181,7 @@ public final class HttpMethodRule implements UriRule {
     }
 
     @Override
-    public boolean accept(CharSequence path, Object resource, UriRuleContext context) {
+    public boolean accept(final CharSequence path, final Object resource, final UriRuleContext context) {
         UriRuleProbeProvider.ruleAccept(HttpMethodRule.class.getSimpleName(), path,
                 resource);
 
@@ -270,9 +273,10 @@ public final class HttpMethodRule implements UriRule {
             // Push the response filters
             context.pushContainerResponseFilters(method.getResponseFilters());
 
+            ContainerRequest containerRequest = context.getContainerRequest();
+
             // Process the request filter
             if (!method.getRequestFilters().isEmpty()) {
-                ContainerRequest containerRequest = context.getContainerRequest();
                 for (ContainerRequestFilter f : method.getRequestFilters()) {
                     containerRequest = f.filter(containerRequest);
                     context.setContainerRequest(containerRequest);
@@ -285,7 +289,18 @@ public final class HttpMethodRule implements UriRule {
             try {
                 dispatchingListener.onResourceMethod(Thread.currentThread().getId(), method.getAbstractResourceMethod());
 
-                method.getDispatcher().dispatch(resource, context);
+                SecurityContext sc = containerRequest.getSecurityContext();
+                if (sc instanceof SubjectSecurityContext) {
+                    ((SubjectSecurityContext) sc).doAsSubject(new PrivilegedAction() {
+                        @Override
+                        public Object run() {
+                            method.getDispatcher().dispatch(resource, context);
+                            return null;
+                        }
+                    });
+                } else {
+                    method.getDispatcher().dispatch(resource, context);
+                }
             } catch (RuntimeException e) {
                 if (m.rmSelected.isProducesDeclared() &&
                         !m.mSelected.isWildcardType() &&

@@ -1,4 +1,6 @@
 release 1.13
+- Added SubjectSecurityContext to enable subject-based security
+  *Added getSecurityContext() method to ContainerRequest*
 - Fixed issue 988
   http://java.net/jira/browse/JERSEY-988
   Applied patch which tries to find/access non-public constructor for JAXB beans
