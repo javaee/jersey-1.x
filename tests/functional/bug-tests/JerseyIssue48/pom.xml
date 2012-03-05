@@ -48,7 +48,7 @@
         <version>${jersey.version}</version>
     </parent>
     <artifactId>JerseyIssue48</artifactId>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <name>JerseyIssue48</name>
     
     <dependencies>        

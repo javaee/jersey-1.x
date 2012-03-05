@@ -50,7 +50,7 @@
         <version>1.13-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-json</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>jersey-json</name>
 
     <profiles>
@@ -222,7 +222,7 @@
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
-            </plugin>
+             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

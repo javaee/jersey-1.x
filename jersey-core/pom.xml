@@ -49,7 +49,7 @@
         <version>1.13-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-core</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>jersey-core</name>
     <dependencies>
         <dependency>
@@ -222,7 +222,7 @@
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
-            </plugin>
+             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 752
+  http://java.net/jira/browse/JERSEY-752
+  Exported packages in manifest don't have versions
 - Added SubjectSecurityContext to enable subject-based security
   *Added getSecurityContext() method to ContainerRequest*
 - Fixed issue 988

@@ -49,7 +49,7 @@
         <version>1.13-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-servlet</artifactId>
-    <packaging>bundle</packaging>
+    <packaging>jar</packaging>
     <name>jersey-servlet</name>
     <dependencies>
         <dependency>
@@ -218,7 +218,7 @@
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
-            </plugin>
+             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>

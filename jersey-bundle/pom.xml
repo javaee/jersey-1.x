@@ -463,15 +463,6 @@
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>osgi-bundle</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <plugin> <!-- remove the generated src dir-->
                 <artifactId>maven-clean-plugin</artifactId>
