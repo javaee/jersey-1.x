@@ -69,7 +69,7 @@
 
       <h2>Running the Example</h2>
       <p>Run the example as follows:</p>
-      <p> create war package
+      <p> create war package</p>
       <blockquote><code>mvn clean package</code><p></blockquote>
 
       <p> setup GlassFish 3.1 (installed at <code>AS_HOME=&lt;install_dir&gt;/glassfish</code>):
@@ -85,10 +85,17 @@
                   <tr><th>JAAS context</th><td><code>fileRealm</code></td></tr>
                   <tr><th>Key File</th><td><code>${com.sun.aas.instanceRoot}/config/myRealm-keyfile</code></td></tr>
               </table>
-              <li>Create user and set password for user <code>myRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>New...</code>"); <b>Ensure "<code>User ID:</code>" set to "<code>myRole</code>" and "<code>Group List:</code>" set to "<code>Users</code>"</li>
-              <li>Enter password <code>myRole</code> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</b></li>
-              <li>Add one other user name <code>joeRole</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>New...</code>"); <b>Ensure "<code>User ID:</code>" set to "<code>joeRole</code>" and "<code>Group List:</code>" set to "<code>Users</code>"</li>
-              <li>Enter password <code>joeRole</code> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</b></li>
+              <li>Create user and set password for user <code>myUser</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>New...</code>");
+				  <ul>
+					  <li><strong>Ensure</strong> "<code>User ID:</code>" set to "<code>myUser</code>" <strong>and</strong> "<code>Group List:</code>" set to "<code>Users</code>"</li>
+					  <li>Enter password <strong><code>myPass</code></strong> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</li>
+				  </ul>
+			  </li>
+              <li>Add one other user name <code>joeUser</code> (click on "<code>myRealm</code>", "<code>Manage Users</code>", "<code>New...</code>");
+				  <ul>
+					  <li><strong>Ensure</strong> "<code>User ID:</code>" set to "<code>joeUser</code>" <strong>and</strong> "<code>Group List:</code>" set to "<code>Users</code>"</li>
+					  <li>Enter password <strong><code>joePass</code></strong> in "<code>New Password:</code>" and "<code>Confirm New Password:</code>" text fields</li>
+		  		  </ul>
           </ul>
           <li>Check <code>web.xml</code> and <code>sun-web.xml</code> to understand how role mappings are configured.  This blog is also helpful to clarify role mappings <a href="http://blogs.oracle.com/bobby/entry/simplified_security_role_mapping">http://blogs.oracle.com/bobby/entry/simplified_security_role_mapping</a> </li>
           <li>Deploy <code>httpsBasicAuth-webapp.war</code> as a Web Application</li>
@@ -99,14 +106,47 @@
 
       </ul>
 
-      <p>From a web browser, visit:</p>
-           <ul>
-              <li><blockquote><code><a href="https://localhost:8181/httpsBasicAuth-webapp/helloworld">https://localhost:8181/httpsBasicAuth-webapp/helloworld</a></code> (you have to add security exception for GlassFish server certificate / ignore all warnings about security)</blockquote></li>
-              <li>Enter either Username <code>myRole</code> and Password <code>myRole</code> or, Username <code>joeRole</code> and Password <code>joeRole</code></li>
-              <li> If entered Username <code>myRole</code> and Password <code>myRole</code>, verify that <b>expected output</b>: <code>Sending "Hello World" to user "myRole"</code> was displayed</li>
-              <li> If entered Username <code>joeRole</code> and Password <code>joeRole</code>, verify that <b>expected output</b>: <code>Sending "Hello World" to user "joeRole"</code> was displayed</li>
-          </ul>
-      
+	  <p>From a web browser, visit:</p>
+	  <blockquote><code><a href="https://localhost:8181/httpsBasicAuth-webapp/helloworld">https://localhost:8181/httpsBasicAuth-webapp/helloworld</a></code>
+		  (you have to add security exception for GlassFish server certificate / ignore all warnings about security)
+	  </blockquote>
+	  <ul>
+		  <li>Enter either Username <code>myUser</code> and Password <code>myPass</code> or, Username
+			  <code>joeUser</code> and Password <code>joePass</code></li>
+		  <li> If entered Username <code>myUser</code> and Password <code>myPass</code>, verify that <b>expected
+			  output</b>: <code>Sending "Hello World" to user "myUser"</code> was displayed
+		  </li>
+		  <li> If entered Username <code>joeUser</code> and Password <code>joePass</code>, verify that <b>expected
+			  output</b>: <code>Sending "Hello World" to user "joeUser"</code> was displayed
+		  </li>
+	  </ul>
+
+	  <h2>Running the Negative Example</h2>
+
+	  <p>Run the example as follows:</p>
+	  <p> create war package</p>
+	  <blockquote><code>mvn clean package</code><p></blockquote>
+
+	  <p>setup GlassFish 3.1 (installed at <code>AS_HOME=&lt;install_dir&gt;/glassfish</code>):</p>
+	  <ul>
+		  <li>
+			  Follow the steps described in the "<strong>setup GlassFish 3.1</strong>" section from the previous chapter "<strong>Running the Example</strong>"
+			  but instead of adding the user "<code>joeUser</code>" to the "<code>Group List:</code>" of "<code>Users</code>" set
+			  "<code>Group List:</code>" for this user to "<code>OtherUsers</code>"
+		  </li>
+	  </ul>
+
+	  <p>From a web browser, visit:</p>
+	  <blockquote><code><a href="https://localhost:8181/httpsBasicAuth-webapp/helloworld">https://localhost:8181/httpsBasicAuth-webapp/helloworld</a></code>
+		  (you have to add security exception for GlassFish server certificate / ignore all warnings about security)
+	  </blockquote>
+	  <ul>
+		  <li>Enter Username <code>joeUser</code> and Password <code>joePass</code>, verify that <b>expected
+			  output</b> looks like: <code>HTTP Status 403 - Access to the requested resource has been denied</code>
+		  </li>
+	  </ul>
+
+
 
  </body></html>
 
