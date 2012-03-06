@@ -55,7 +55,7 @@ import javax.ws.rs.core.Response;
  * @author Paul.Sandoz@Sun.Com
  */
 public class AcceptTest extends AbstractResourceTester {
-    
+
     public AcceptTest(String testName) {
         super(testName);
     }
@@ -203,6 +203,11 @@ public class AcceptTest extends AbstractResourceTester {
         response = r.accept("text/plain;q=0.5, text/html").get(ClientResponse.class);
         assertEquals("GET", response.getEntity(String.class));
         assertEquals(MediaType.TEXT_HTML_TYPE, response.getType());
+
+//      FIXME: test for JERSEY-997
+//        response = r.accept("text/plain;q=0.5").get(ClientResponse.class);
+//        assertEquals("GET", response.getEntity(String.class));
+//        assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getType());
     }
 
     @Path("/")
