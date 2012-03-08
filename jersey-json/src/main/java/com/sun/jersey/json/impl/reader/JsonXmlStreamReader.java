@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -50,6 +50,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 import java.util.logging.Level;
@@ -66,7 +67,6 @@ import javax.xml.stream.XMLStreamReader;
  * @author japod
  */
 public class JsonXmlStreamReader implements XMLStreamReader {
-
 
     private enum LaState {
         START,
@@ -118,6 +118,8 @@ public class JsonXmlStreamReader implements XMLStreamReader {
     }
 
     final Queue<JsonReaderXmlEvent> eventQueue = new LinkedList<JsonReaderXmlEvent>();
+
+    boolean endDocumentReached = false;
 
     List<ProcessingState> processingStack;
     int depth;
@@ -220,10 +222,9 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                                 processingStack.get(depth).state = LaState.END;
                                 break;
                             default:
-                            // TODO: handle problem
+                                throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
                         }
                     }
-                    // TODO: if JsonToken.START_OBJECT != lastToken then problem
                     processingStack.get(depth).state = LaState.AFTER_OBJ_START_BRACE;
                     break;
                 case AFTER_OBJ_START_BRACE:
@@ -272,7 +273,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             valueRead();
                             break;
                         default:
-                        // TODO: handle problem
+                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
                     }
                     break;
                 case BEFORE_OBJ_NEXT_KV_PAIR:
@@ -286,7 +287,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             processingStack.get(depth).state = LaState.BEFORE_VALUE_IN_KV_PAIR;
                             break;
                         default:
-                        // TODO: handle problem
+                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
                     }
                     break;
                 case BEFORE_VALUE_IN_KV_PAIR:
@@ -314,7 +315,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
                             break;
                         default:
-                        // TODO: handle problem
+                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
                     }
                     break; // AFTER_ARRAY_ELEM
                 case AFTER_OBJ_KV_PAIR:
@@ -330,7 +331,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             valueRead();
                             break; // END_OBJECT
                         default:
-                        // TODO: handle problem
+                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
                     }
                     break; // AFTER_OBJ_KV_PAIR
                 case AFTER_ARRAY_START_BRACE:
@@ -354,7 +355,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
                             break;
                         default:
-                        // TODO: handle problem
+                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
                     }
                     break; // AFTER_ARRAY_ELEM
                 case BEFORE_NEXT_ARRAY_ELEM:
@@ -375,8 +376,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
                             break;
                         default:
-                        // TODO: handle problem
-                    }
+                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");                   }
                     break; // BEFORE_NEXT_ARRAY_ELEM
                 case AFTER_ARRAY_ELEM:
                     switch (lastToken.tokenType) {
@@ -390,13 +390,14 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                             generateEEEvent(processingStack.get(depth - 1).lastName);
                             break;
                         default:
-                        // TODO: handle problem
+                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
                     }
                     break; // AFTER_ARRAY_ELEM
             }
         } // end while lastEvent null
     }
 
+    @Override
     public int getAttributeCount() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeCount");
         assert !eventQueue.isEmpty();
@@ -404,7 +405,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
             try {
                 readNext(true);
             } catch (IOException e) {
-            // TODO: handle it!!!
+                throw new JsonFormatException("...", -1, -1, "Error counting attributes");
             }
             eventQueue.peek().attributesChecked = true;
         }
@@ -413,6 +414,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public int getEventType() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getEventType");
         assert !eventQueue.isEmpty();
@@ -421,12 +423,14 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public int getNamespaceCount() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getNamespaceCount");
         LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getNamespaceCount", 0);
         return 0;
     }
 
+    @Override
     public int getTextLength() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getTextLength");
         assert !eventQueue.isEmpty();
@@ -435,6 +439,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public int getTextStart() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getTextStart");
         assert !eventQueue.isEmpty();
@@ -443,17 +448,25 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public int next() throws XMLStreamException {
+        endDocumentCheck();
         try {
             readNext();
-            return eventQueue.peek().getEventType();
+            final int nextEventType = eventQueue.peek().getEventType();
+            if (nextEventType == XMLStreamConstants.END_DOCUMENT) {
+                endDocumentReached = true;
+            }
+            return nextEventType;
         } catch (IOException ex) {
             Logger.getLogger(JsonXmlStreamReader.class.getName()).log(Level.SEVERE, null, ex);
             throw new XMLStreamException(ex);
         }
     }
 
+    @Override
     public int nextTag() throws XMLStreamException {
+        endDocumentCheck();
         int eventType = next();
         while ((eventType == XMLStreamConstants.CHARACTERS && isWhiteSpace()) // skip whitespace
                 || (eventType == XMLStreamConstants.CDATA && isWhiteSpace()) // skip whitespace
@@ -466,22 +479,27 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return eventType;
     }
 
+    @Override
     public void close() throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean hasName() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean hasNext() throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return !endDocumentReached;
     }
 
+    @Override
     public boolean hasText() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean isCharacters() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "isCharacters");
         assert !eventQueue.isEmpty();
@@ -490,6 +508,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public boolean isEndElement() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "isEndElement");
         assert !eventQueue.isEmpty();
@@ -498,10 +517,12 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public boolean isStandalone() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public boolean isStartElement() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "isStartElement");
         assert !eventQueue.isEmpty();
@@ -510,6 +531,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public boolean isWhiteSpace() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "isWhiteSpace");
         boolean result = false; // white space processed by lexer
@@ -517,10 +539,12 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public boolean standaloneSet() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public char[] getTextCharacters() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getTextCharacters");
         assert !eventQueue.isEmpty();
@@ -529,6 +553,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public boolean isAttributeSpecified(int attribute) {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "isAttributeSpecified");
         assert !eventQueue.isEmpty();
@@ -537,6 +562,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length) throws XMLStreamException {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getTextCharacters");
         assert !eventQueue.isEmpty();
@@ -545,18 +571,22 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getCharacterEncodingScheme() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getElementText() throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getEncoding() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getLocalName() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getLocalName");
         assert !eventQueue.isEmpty();
@@ -565,6 +595,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getNamespaceURI() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getNamespaceURI");
         assert !eventQueue.isEmpty();
@@ -573,14 +604,17 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getPIData() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getPITarget() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getPrefix() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getPrefix");
         assert !eventQueue.isEmpty();
@@ -589,6 +623,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getText() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getText");
         assert !eventQueue.isEmpty();
@@ -597,10 +632,12 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getVersion() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getAttributeLocalName(int index) {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeLocalName");
         assert !eventQueue.isEmpty();
@@ -609,6 +646,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public QName getAttributeName(int index) {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeName");
         assert !eventQueue.isEmpty();
@@ -617,6 +655,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getAttributeNamespace(int index) {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeNamespace");
         assert !eventQueue.isEmpty();
@@ -625,6 +664,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getAttributePrefix(int index) {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributePrefix");
         assert !eventQueue.isEmpty();
@@ -633,6 +673,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getAttributeType(int index) {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeType");
         assert !eventQueue.isEmpty();
@@ -641,6 +682,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getAttributeValue(int index) {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeValue");
         assert !eventQueue.isEmpty();
@@ -649,6 +691,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getAttributeValue(String namespaceURI, String localName) {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeValue");
         assert !eventQueue.isEmpty();
@@ -657,14 +700,17 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public String getNamespacePrefix(int arg0) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getNamespaceURI(int arg0) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public NamespaceContext getNamespaceContext() {
         // TODO: put/take it to/from processing stack
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getNamespaceContext");
@@ -673,6 +719,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public QName getName() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getName");
         assert !eventQueue.isEmpty();
@@ -681,6 +728,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public Location getLocation() {
         LOGGER.entering(JsonXmlStreamReader.class.getName(), "getLocation");
         assert !eventQueue.isEmpty();
@@ -689,14 +737,17 @@ public class JsonXmlStreamReader implements XMLStreamReader {
         return result;
     }
 
+    @Override
     public Object getProperty(String arg0) throws IllegalArgumentException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public void require(int arg0, String arg1, String arg2) throws XMLStreamException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public String getNamespaceURI(String arg0) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
@@ -724,6 +775,12 @@ public class JsonXmlStreamReader implements XMLStreamReader {
             String prefix = name.substring(0, dotIndex);
             String suffix = name.substring(dotIndex + 1);
             return revertedXml2JsonNs.containsKey(prefix) ? new QName(revertedXml2JsonNs.get(prefix), suffix) : new QName(name);
+        }
+    }
+
+    private void endDocumentCheck() throws NoSuchElementException {
+        if (endDocumentReached) {
+            throw new NoSuchElementException();
         }
     }
 }
