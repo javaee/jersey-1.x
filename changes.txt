@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1003
+  http://java.net/jira/browse/JERSEY-1003
+  Adjusted log level in FieldDescriptor class
 - Fixed issue 752
   http://java.net/jira/browse/JERSEY-752
   Exported packages in manifest don't have versions

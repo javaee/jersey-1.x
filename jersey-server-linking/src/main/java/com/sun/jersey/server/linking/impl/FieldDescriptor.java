@@ -65,9 +65,9 @@ public class FieldDescriptor {
         try {
             value = field.get(instance);
         } catch (IllegalArgumentException ex) {
-            Logger.getLogger(FieldDescriptor.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FieldDescriptor.class.getName()).log(Level.FINE, null, ex);
         } catch (IllegalAccessException ex) {
-            Logger.getLogger(FieldDescriptor.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(FieldDescriptor.class.getName()).log(Level.FINE, null, ex);
         }
         return value;
     }
