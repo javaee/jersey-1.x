@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1014
+  http://java.net/jira/browse/JERSEY-1014
+  Null Pointer Exception when resources are not found
 - Fixed issue 1003
   http://java.net/jira/browse/JERSEY-1003
   Adjusted log level in FieldDescriptor class
