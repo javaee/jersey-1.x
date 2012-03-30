@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -69,6 +69,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -116,8 +117,8 @@ import java.util.regex.PatternSyntaxException;
  * more package names. Each package name MUST be separated by ';'.
  *
  * The package names are added as a property value to a Map instance using
- * the property name (@link PackagesResourceConfig#PROPERTY_PACKAGES}. Any
- * additional initialization parameters are then added to the Map instance.
+ * the property name {@value com.sun.jersey.api.core.PackagesResourceConfig#PROPERTY_PACKAGES}.
+ * Any additional initialization parameters are then added to the Map instance.
  * Then that Map instance is passed to the constructor of
  * {@link PackagesResourceConfig}.
  *
@@ -128,8 +129,8 @@ import java.util.regex.PatternSyntaxException;
  * set to provide one or more resource paths. Each path MUST be separated by ';'.
  *
  * The resource paths are added as a property value to a Map instance using
- * the property name (@link ClasspathResourceConfig.PROPERTY_CLASSPATH}. Any
- * additional initialization parameters are then added to the Map instance.
+ * the property name {@value com.sun.jersey.api.core.ClasspathResourceConfig#PROPERTY_CLASSPATH}.
+ * Any additional initialization parameters are then added to the Map instance.
  * Then that Map instance is passed to the constructor of
  * {@link WebAppResourceConfig}.
  *
@@ -638,6 +639,20 @@ public class ServletContainer extends HttpServlet implements Filter {
         StringBuffer requestURL = request.getRequestURL();
         String requestURI = request.getRequestURI();
         final boolean checkPathInfo = pathInfo == null || pathInfo.isEmpty() || pathInfo.equals("/");
+
+        /**
+         * The HttpServletRequest.getRequestURL() contains the complete URI
+         * minus the query and fragment components.
+         */
+        UriBuilder absoluteUriBuilder = null;
+        try {
+            absoluteUriBuilder = UriBuilder.fromUri(requestURL.toString());
+        } catch (IllegalArgumentException iae) {
+            final Response.Status badRequest = Response.Status.BAD_REQUEST;
+            response.sendError(badRequest.getStatusCode(), badRequest.getReasonPhrase());
+            return;
+        }
+
         if (checkPathInfo && !request.getRequestURI().endsWith("/")) {
             // Only do this if the last segment of the servlet path does not contain '.'
             // This handles the case when the extension mapping is used with the servlet
@@ -649,7 +664,7 @@ public class ServletContainer extends HttpServlet implements Filter {
             int i = servletPath.lastIndexOf("/");
             if (servletPath.substring(i + 1).indexOf('.') < 0) {
                 if (webComponent.getResourceConfig().getFeature(ResourceConfig.FEATURE_REDIRECT)) {
-                    URI l = UriBuilder.fromUri(request.getRequestURL().toString()).
+                    URI l = absoluteUriBuilder.
                             path("/").
                             replaceQuery(request.getQueryString()).build();
 
@@ -663,13 +678,6 @@ public class ServletContainer extends HttpServlet implements Filter {
                 }
             }
         }
-
-        /**
-         * The HttpServletRequest.getRequestURL() contains the complete URI
-         * minus the query and fragment components.
-         */
-        UriBuilder absoluteUriBuilder = UriBuilder.fromUri(
-                requestURL.toString());
 
         /**
          * The HttpServletRequest.getPathInfo() and
