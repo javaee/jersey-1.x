@@ -586,6 +586,10 @@ public void post(MultivaluedMap&lt;String, String&gt; formParams) {
 @Path("/images/{image}")
 @Produces("image/*")
 public Response getImage(@PathParam("image") String image) {
+    if (!isSafeToOpenFile(image)) {
+        throw new IllegalArgumentException("Cannot open the image file.");
+    }
+
     File f = new File(image);
 
     if (!f.exists()) {
