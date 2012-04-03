@@ -190,7 +190,8 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
      * Select the first media type, from a list of media types, that is most
      * acceptable according to the requested acceptable media types.
      *
-     * @deprecated
+     * @deprecated will stay in Jersey 1.x, use {@link Request#selectVariant(java.util.List)}
+     *             as an alternative.
      * @param mediaTypes the list of media types
      * @return the most acceptable media type, or null if no media type
      *         was found to be acceptable.
@@ -201,7 +202,8 @@ public interface HttpRequestContext extends HttpHeaders, Request, SecurityContex
     /**
      * Get a list of media types that are acceptable for the response.
      *
-     * @deprecated
+     * @deprecated will stay in Jersey 1.x, use {@link Request#selectVariant(java.util.List)}
+     *             as an alternative.
      * @param priorityMediaTypes the list of media types that take priority,
      *        ordered according to the quality source parameter, "qs" as the
      *        primary key.
