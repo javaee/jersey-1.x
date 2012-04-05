@@ -1,4 +1,5 @@
 release 1.13
+- Grizzly 2 version update (to 2.2.4)
 - Fixed issue 880
   http://java.net/jira/browse/JERSEY-880
   com.sun.jersey.config.property.WebPageContentRegex parameter fails on a Websphere Application Server.
