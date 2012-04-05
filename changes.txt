@@ -1,4 +1,25 @@
 release 1.13
+- Fixed issue 880
+  http://java.net/jira/browse/JERSEY-880
+  com.sun.jersey.config.property.WebPageContentRegex parameter fails on a Websphere Application Server.
+- Fixed issue 1055
+  http://java.net/jira/browse/JERSEY-1055
+  Fix vulnerable sample of code in documentation
+- Fixed issue 797
+  http://java.net/jira/browse/JERSEY-797
+  HttpRequestContext.getAcceptableMediaType() Javadoc should specify alternatives
+- Fixed issue 780
+  http://java.net/jira/browse/JERSEY-780
+  Malformed URL returns a 500 instead of a 400
+- Fixed issue 843
+  http://java.net/jira/browse/JERSEY-843
+  Some javadoc links are broken
+- Fixed issue 1000
+  http://java.net/jira/browse/JERSEY-1000
+  Improvement suggestions for https-server-glassfish sample
+- Fixed issue 670
+  http://java.net/jira/browse/JERSEY-670
+  jacksonjsonprovider sample improvement requests
 - Fixed issue 1014
   http://java.net/jira/browse/JERSEY-1014
   Null Pointer Exception when resources are not found
