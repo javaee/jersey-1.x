@@ -123,7 +123,7 @@ public class OAuthSignature {
     OAuthParameters params, OAuthSecrets secrets) throws OAuthSignatureException {
         return getSignatureMethod(params).verify(elements(request, params), secrets, params.getSignature());
     }
-    
+
     /**
      * Collects, sorts and concetenates the request parameters into a
      * normalized string, per section 9.1.1. of the OAuth 1.0 specification.
@@ -190,10 +190,10 @@ public class OAuthSignature {
                 buf.append('&');
             }
         }
-        
+
         return buf.toString();
     }
-    
+
     /**
      * Constructs the request URI, per section 9.1.2 of the OAuth 1.0
      * specification.
@@ -213,7 +213,7 @@ public class OAuthSignature {
             }
             buf.append(url.getPath());
             return new URI(buf.toString());
-            
+
         } catch (URISyntaxException mue) {
             throw new OAuthSignatureException(mue);
         }
@@ -262,7 +262,7 @@ public class OAuthSignature {
     private static void addParam(String key, String value, List<String[]> list) {
         list.add(new String[] {
                 UriComponent.encode(key, UriComponent.Type.UNRESERVED),
-                UriComponent.encode(value, UriComponent.Type.UNRESERVED)
+                value == null ? "" : UriComponent.encode(value, UriComponent.Type.UNRESERVED)
             });
     }
 }

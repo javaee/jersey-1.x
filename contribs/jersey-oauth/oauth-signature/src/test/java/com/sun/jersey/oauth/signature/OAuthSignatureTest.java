@@ -42,6 +42,7 @@ package com.sun.jersey.oauth.signature;
 
 import com.sun.jersey.core.util.MultivaluedMapImpl;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import junit.framework.TestCase;
@@ -94,5 +95,45 @@ public class OAuthSignatureTest extends TestCase {
             }
         }, new OAuthParameters());
         assertEquals("a=b&org=acme&org=dummy&org-country=US", normalizedParams);
+    }
+
+    public void testNullParamValue() {
+        final MultivaluedMapImpl params = new MultivaluedMapImpl();
+        params.add("org-country", "US");
+        params.put("org", Arrays.asList(new String[] {null}));
+        params.add("a", "b");
+
+        String normalizedParams = OAuthSignature.normalizeParameters(new OAuthRequest() {
+            @Override
+            public String getRequestMethod() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public URL getRequestURL() {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public Set<String> getParameterNames() {
+                return params.keySet();
+            }
+
+            @Override
+            public List<String> getParameterValues(String name) {
+                return params.get(name);
+            }
+
+            @Override
+            public List<String> getHeaderValues(String name) {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+
+            @Override
+            public void addHeaderValue(String name, String value) throws IllegalStateException {
+                throw new UnsupportedOperationException("Not supported yet.");
+            }
+        }, new OAuthParameters());
+        assertEquals("a=b&org=&org-country=US", normalizedParams);
     }
 }

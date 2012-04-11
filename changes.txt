@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1064
+  http://java.net/jira/browse/JERSEY-1064
+  Checking for null in OAuthSignature.addParam() to avoid NPE's when query parameters don't have values.
 - Grizzly 2 version update (to 2.2.4)
 - Fixed issue 880
   http://java.net/jira/browse/JERSEY-880
