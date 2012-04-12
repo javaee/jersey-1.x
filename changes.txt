@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1081
+  http://java.net/jira/browse/JERSEY-1081
+  UriBuilderImpl did not clone it's state correctly when calling clone() method.
 - Fixed issue 1064
   http://java.net/jira/browse/JERSEY-1064
   Checking for null in OAuthSignature.addParam() to avoid NPE's when query parameters don't have values.

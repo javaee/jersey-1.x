@@ -40,9 +40,7 @@
 
 package com.sun.jersey.api.uri;
 
-import java.lang.reflect.Method;
 import java.net.URI;
-import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -83,5 +81,19 @@ public class UriBuilderImplTest {
             fail("Expected IllegalArgumentException but got " + e.toString());
         }
         fail("Expected IllegalArgumentException but no exception was thrown.");
+    }
+
+    // regression test for JERSEY-1081
+    @Test
+    public void testReplaceQueryParam() {
+        URI uri = new UriBuilderImpl().path("http://localhost/").replaceQueryParam("foo", "test").build();
+        assertEquals("http://localhost/?foo=test", uri.toString());
+    }
+
+    // regression test for JERSEY-1081
+    @Test
+    public void testReplaceQueryParamAndClone() {
+        URI uri = new UriBuilderImpl().path("http://localhost/").replaceQueryParam("foo", "test").clone().build();
+        assertEquals("http://localhost/?foo=test", uri.toString());
     }
 }
