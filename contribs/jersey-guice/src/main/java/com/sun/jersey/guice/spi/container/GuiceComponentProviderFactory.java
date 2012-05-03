@@ -216,12 +216,12 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
     /**
      * Determine if a class is an implicit Guice component that can be
      * instantiated by Guice and the life-cycle managed by Jersey.
-     * 
+     *
      * @param c the class.
      * @return true if the class is an implicit Guice component.
      */
     public boolean isGuiceConstructorInjected(Class<?> c) {
-        for (Constructor<?> con : c.getConstructors()) {
+        for (Constructor<?> con : c.getDeclaredConstructors()) {
             if (isInjectable(con)) {
                 return true;
             }
@@ -231,9 +231,9 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
     }
 
     /**
-     * Determine if a class uses field or method injection via Guice 
-     * using the {@link Inject} annotation
-     * 
+     * Determine if a class uses field or method injection via Guice
+     * using the {@code Inject} annotation
+     *
      * @param c the class.
      * @return true if the class is an implicit Guice component.
      */
@@ -243,17 +243,17 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
                 return true;
             }
         }
-        
+
         for (Field f : c.getDeclaredFields()) {
             if (isInjectable(f)) {
                 return true;
             }
         }
-        
+
         if (!c.equals(Object.class)) {
             return isGuiceFieldOrMethodInjected(c.getSuperclass());
         }
-        
+
         return false;
     }
 
