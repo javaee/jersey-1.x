@@ -236,7 +236,7 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
      * @param r
      * @param m
      * @return the enhanced {@link Response}
-     * @see com.sun.jersey.server.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createResponses(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public List<Response> createResponses( AbstractResource r, AbstractResourceMethod m ) {
         final ResponseDocType responseDoc = _resourceDoc.getResponse( r.getResourceClass(), m.getMethod() );
@@ -311,14 +311,16 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
      * @return the enhanced {@link Param}
      * @see com.sun.jersey.server.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
-    public Param createParam( AbstractResource r,
-            AbstractMethod m, Parameter p ) {
-        final Param result = _delegate.createParam( r, m, p );
-        final ParamDocType paramDoc = _resourceDoc.getParamDoc( r.getResourceClass(), (m == null ? null : m.getMethod()), p );
-        if ( paramDoc != null && !isEmpty( paramDoc.getCommentText() ) ) {
-            final Doc doc = new Doc();
-            doc.getContent().add( paramDoc.getCommentText() );
-            result.getDoc().add( doc );
+    public Param createParam(AbstractResource r,
+                             AbstractMethod m, Parameter p) {
+        final Param result = _delegate.createParam(r, m, p);
+        if (result != null) {
+            final ParamDocType paramDoc = _resourceDoc.getParamDoc( r.getResourceClass(), (m == null ? null : m.getMethod()), p );
+            if(paramDoc != null && !isEmpty( paramDoc.getCommentText())) {
+                final Doc doc = new Doc();
+                doc.getContent().add( paramDoc.getCommentText() );
+                result.getDoc().add( doc );
+            }
         }
         return result;
     }

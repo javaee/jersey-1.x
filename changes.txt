@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1131
+  http://java.net/jira/browse/JERSEY-1131
+  Missing null check in WadlGeneratorResourceDocSupport
 - Fixed issue 1081
   http://java.net/jira/browse/JERSEY-1081
   UriBuilderImpl did not clone it's state correctly when calling clone() method.
