@@ -105,7 +105,6 @@
         <dependency>
             <groupId>org.eclipse.persistence</groupId>
             <artifactId>org.eclipse.persistence.moxy</artifactId>
-            <version>${moxy-version}</version>
         </dependency>
     </dependencies>
 
@@ -146,15 +145,4 @@
              </plugin>
          </plugins>
     </build>
-    <properties>
-        <moxy-version>2.2.0-M6</moxy-version>
-    </properties>
-    <repositories>
-        <repository>
-            <id>eclipselink.repository</id>
-            <name>Eclipse Maven Repository</name>
-            <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
-            <layout>default</layout>
-        </repository>
-    </repositories>
  </project>

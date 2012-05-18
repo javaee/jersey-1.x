@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,18 @@
 
 package com.sun.jersey.json.impl.reader;
 
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamReader;
+
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.json.impl.AttrAndCharDataBean;
 import com.sun.jersey.json.impl.ComplexBeanWithAttributes;
 import com.sun.jersey.json.impl.ComplexBeanWithAttributes2;
@@ -58,27 +70,22 @@ import com.sun.jersey.json.impl.TwoListsWrapperBean;
 import com.sun.jersey.json.impl.User;
 import com.sun.jersey.json.impl.UserTable;
 import com.sun.jersey.json.impl.writer.Stax2JacksonWriter;
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import junit.framework.TestCase;
+
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonParser;
 
-/**
- *
- * @author japod
- */
-public class Jackson2StaxReaderTest extends TestCase {
+import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
 
-    public Jackson2StaxReaderTest(String testName) {
+import junit.framework.TestCase;
+
+/**
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
+ */
+public class JsonXmlStreamReaderNaturalNotationTest extends TestCase {
+
+    public JsonXmlStreamReaderNaturalNotationTest(String testName) {
         super(testName);
     }
 
@@ -123,23 +130,23 @@ public class Jackson2StaxReaderTest extends TestCase {
     }
 
     public void testSimpleBeanWithAttributes() throws Exception {
-        _testBean(SimpleBeanWithAttributes.class,SimpleBeanWithAttributes.createTestInstance());
+        _testBean(SimpleBeanWithAttributes.class, SimpleBeanWithAttributes.createTestInstance());
     }
 
     public void testSimpleBeanWithJustOneAttribute() throws Exception {
-        _testBean(SimpleBeanWithJustOneAttribute.class,SimpleBeanWithJustOneAttribute.createTestInstance());
+        _testBean(SimpleBeanWithJustOneAttribute.class, SimpleBeanWithJustOneAttribute.createTestInstance());
     }
 
     public void testSimpleBeanWithJustOneAttributeAndValue() throws Exception {
-        _testBean(SimpleBeanWithJustOneAttributeAndValue.class,SimpleBeanWithJustOneAttributeAndValue.createTestInstance());
+        _testBean(SimpleBeanWithJustOneAttributeAndValue.class, SimpleBeanWithJustOneAttributeAndValue.createTestInstance());
     }
 
     public void testTreeModelBean() throws Exception {
-        _testBean(TreeModel.class,TreeModel.createTestInstance());
+        _testBean(TreeModel.class, TreeModel.createTestInstance());
     }
 
     public void testTwoListsWrapperBean() throws Exception {
-        _testBean(TwoListsWrapperBean.class,TwoListsWrapperBean.createTestInstance());
+        _testBean(TwoListsWrapperBean.class, TwoListsWrapperBean.createTestInstance());
     }
 
     public void testUser() throws Exception {
@@ -166,7 +173,7 @@ public class Jackson2StaxReaderTest extends TestCase {
 
         Marshaller marshaller = ctx.createMarshaller();
 //        marshaller.marshal(bean, System.out);
-        marshaller.marshal(bean, new Stax2JacksonWriter(g));
+        marshaller.marshal(bean, new Stax2JacksonWriter(g, clazz, ctx));
 
         g.flush();
 
@@ -176,7 +183,9 @@ public class Jackson2StaxReaderTest extends TestCase {
         JsonParser parser = factory.createJsonParser(new StringReader(jsonExpression));
 
         Unmarshaller unmarshaller = ctx.createUnmarshaller();
-        Object unmarshalledBean = unmarshaller.unmarshal(new Jackson2StaxReader(parser));
+        final XMLStreamReader xmlStreamReader = JsonXmlStreamReader.create(new StringReader(jsonExpression), JSONConfiguration
+                .natural().rootUnwrapping(false).build(), null, clazz, ctx, false);
+        Object unmarshalledBean = unmarshaller.unmarshal(xmlStreamReader);
 
         System.out.println(String.format("Unmarshalled bean = %s", unmarshalledBean));
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,11 +39,14 @@
  */
 package com.sun.jersey.json.impl;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Helper methods for JSON classes.
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public final class JSONHelper {
 
@@ -71,8 +74,32 @@ public final class JSONHelper {
         }
     }
 
-
     private static final String getVariableName(String baseName) {
         return NameUtil.toMixedCaseName(NameUtil.toWordList(baseName), false);
     }
+
+    /**
+     * Creates an {@link JaxbXmlDocumentStructure} for {@link javax.xml.stream.XMLStreamReader} or
+     * {@link javax.xml.stream.XMLStreamWriter} based on a given {@link JAXBContext}.
+     *
+     * @param jaxbContext {@link JAXBContext} to create this {@code JaxbXmlDocumentStructure} for.
+     * @param expectedType expected type that is going to be (un)marshalled.
+     * @param isReader {@code true} if the instance should be created for a reader, {@code false} if the instance is intended
+     * for a writer.
+     * @return an {@link JaxbXmlDocumentStructure} instance for the {@link JAXBContext}
+     * @throws IllegalStateException if the given {@code JAXBContext} is an unsupported implementation.
+     */
+    public static JaxbXmlDocumentStructure getXmlDocumentStructure(final JAXBContext jaxbContext,
+                                                                   final Class<?> expectedType,
+                                                                   final boolean isReader) throws IllegalStateException {
+        if (jaxbContext == null || jaxbContext instanceof com.sun.xml.bind.v2.runtime.JAXBContextImpl) {
+            return new JaxbRiXmlStructure(isReader);
+        } else if (jaxbContext instanceof org.eclipse.persistence.jaxb.JAXBContext) {
+            return new MoxyXmlStructure(jaxbContext, expectedType, isReader);
+        } else {
+            throw new IllegalStateException("Following JAXB context class is not supported for natural JSON notation: "
+                    + jaxbContext.getClass());
+        }
+    }
+
 }

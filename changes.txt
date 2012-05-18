@@ -1,4 +1,13 @@
 release 1.13
+- Fixed issue 1118
+  http://java.net/jira/browse/JERSEY-1118
+  The NPE occurs when a java type of consumes is a primitive type, and not found entity provider
+- Fixed issue 1042
+  http://java.net/jira/browse/JERSEY-1042
+  JsonXmlStreamReader is not working correctly with MOXy
+- Fixed issue 770
+  http://java.net/jira/browse/JERSEY-770
+  JsonXmlStreamWriter writeCData "not supported yet"
 - Fixed issue 1131
   http://java.net/jira/browse/JERSEY-1131
   Missing null check in WadlGeneratorResourceDocSupport

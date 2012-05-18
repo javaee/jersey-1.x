@@ -43,10 +43,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.Method;
+import java.util.Collection;
 
 /**
- *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public class JSONTestHelper {
 
@@ -70,4 +70,9 @@ public class JSONTestHelper {
             return null;
         }
     }
+
+    public static boolean isCollectionEmpty(final Collection<?> collection) {
+        return collection == null || collection.isEmpty();
+    }
+
 }

@@ -40,71 +40,129 @@
 package com.sun.jersey.json.impl;
 
 import java.io.StringReader;
-import junit.framework.TestCase;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import javax.xml.bind.JAXBContext;
+
+import junit.framework.TestCase;
 
 /**
- * Test for JERSEY-954
+ * Test for JERSEY-954.
  *
- * @author Jakub Podlesak
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class JsonXmlStreamReaderInvalidInputTest extends TestCase {
 
-    String[] invalidInputs = new String [] {
-        "{",
-        "[",
-        // only the above input made the reader stuck
-        ",",
-        "",
-        "\"\"",
-        "\"",
-        "\'",
-        "}",
-        "{{",
-        "{}",
-        "}}",
-        "}{",
-        "]",
-        "lojza",
-        "12",
-        "\"12"
-    };
+    private final static List<String> invalidInputs = Arrays.asList(
+            "{",
+            "[",
+            // only the above input made the reader stuck
+            ",",
+            "\"",
+            "\'",
+            "}",
+            "{{",
+            "}}",
+            "}{",
+            "]",
+            "lojza",
+            "\"12"
+    );
 
-    public void testInvalidInput() throws Exception {
+    private final static List<String> terminatingInputs = Arrays.asList(
+            "",
+            "\"\"",
+            "{}",
+            "12"
+    );
 
-        final JAXBContext ctx = JAXBContext.newInstance(TwoListsWrapperBean.class);
+    private final JAXBContext ctx;
+    private final List<String> failedInputs = new LinkedList<String>();
 
-        for (String input : invalidInputs) {
-            assertTrue("input \"" + input + "\" caused an infinite loop",
-                    terminatesBeforeTimeout(ctx,
-                    JSONConfiguration.DEFAULT, input));
+    public JsonXmlStreamReaderInvalidInputTest() throws Exception {
+        this.ctx = JAXBContext.newInstance(TwoListsWrapperBean.class);
+    }
+
+    public void testTerminatingInputMappedNotation() throws Exception {
+        testInvalidInput(terminatingInputs, JSONConfiguration.mapped().build(), false);
+    }
+
+    public void testInvalidInputMappedNotation() throws Exception {
+        testInvalidInput(invalidInputs, JSONConfiguration.mapped().build(), true);
+    }
+
+    public void testTerminatingInputNaturalNotation() throws Exception {
+        testInvalidInput(terminatingInputs, JSONConfiguration.natural().build(), false);
+    }
+
+    public void testInvalidInputNaturalNotation() throws Exception {
+        testInvalidInput(invalidInputs, JSONConfiguration.natural().build(), true);
+    }
+
+    private void testInvalidInput(final Collection<String> terminatingInputs,
+                                  final JSONConfiguration configuration, final boolean failIfUnmarshals) throws Exception {
+        for (String input : terminatingInputs) {
+            terminatesBeforeTimeout(ctx, configuration, input, failIfUnmarshals);
+        }
+
+        if (!failedInputs.isEmpty()) {
+            if (failIfUnmarshals) {
+                fail("Inputs \"" + failedInputs + "\" should not have been parsed.");
+            } else {
+                fail("Inputs \"" + failedInputs + "\" caused an infinite loop.");
+            }
         }
     }
 
-    public boolean terminatesBeforeTimeout(final JAXBContext jaxbContext, final JSONConfiguration config, final String input) throws Exception {
+    public void terminatesBeforeTimeout(final JAXBContext jaxbContext,
+                                        final JSONConfiguration config,
+                                        final String input,
+                                        final boolean failIfUnmarshals) throws Exception {
+
         final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         final ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(new Runnable() {
+
+        final Callable<JAXBElement<TwoListsWrapperBean>> callable = new Callable<JAXBElement<TwoListsWrapperBean>>() {
 
             @Override
-            public void run() {
+            public JAXBElement<TwoListsWrapperBean> call() throws Exception {
+                JAXBElement<TwoListsWrapperBean> unmarshal = null;
+
                 try {
-                    unmarshaller.unmarshal(new JsonXmlStreamReader(new StringReader(input), config), TwoListsWrapperBean.class);
-                } catch (Exception ex) {
-                    System.out.println(ex);
-                    // an exception does not hurt here
+                    unmarshal = unmarshaller.unmarshal(
+                            JsonXmlStreamReader.create(
+                                    new StringReader(input), config, null, TwoListsWrapperBean.class, jaxbContext, false),
+                            TwoListsWrapperBean.class);
+                } catch (Exception e) {
+                    System.out.println(e);
                 }
+
+                return unmarshal;
             }
-        });
+
+        };
+
+        final Future<JAXBElement<TwoListsWrapperBean>> element = executor.submit(callable);
         executor.shutdown();
-        return executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+        final boolean terminatedInTime = executor.awaitTermination(5000, TimeUnit.MILLISECONDS);
+
+        if ((element.get() != null && failIfUnmarshals) || !terminatedInTime) {
+            failedInputs.add(input);
+        }
     }
+
 }

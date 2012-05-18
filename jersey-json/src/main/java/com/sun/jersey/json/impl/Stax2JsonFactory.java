@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,22 +39,26 @@
  */
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.core.util.ReaderWriter;
-import com.sun.jersey.json.impl.writer.*;
-import com.sun.jersey.json.impl.reader.Jackson2StaxReader;
-import com.sun.jersey.json.impl.reader.JacksonRootAddingParser;
-import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+
+import javax.xml.bind.JAXBContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.core.util.ReaderWriter;
+import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
+import com.sun.jersey.json.impl.writer.JacksonArrayWrapperGenerator;
+import com.sun.jersey.json.impl.writer.JacksonRootStrippingGenerator;
+import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
+import com.sun.jersey.json.impl.writer.Stax2JacksonWriter;
+
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParser;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamReader;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLStreamWriter;
 import org.codehaus.jettison.json.JSONObject;
@@ -65,19 +69,26 @@ import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 /**
- *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class Stax2JsonFactory {
 
     private Stax2JsonFactory() {
     }
 
-    public static XMLStreamWriter createWriter(Writer writer, JSONConfiguration config) throws IOException {
-        return createWriter(writer, config, false);
+    public static XMLStreamWriter createWriter(final Writer writer,
+                                               final JSONConfiguration config,
+                                               final Class<?> expectedType,
+                                               final JAXBContext jaxbContext) throws IOException {
+        return createWriter(writer, config, expectedType, jaxbContext, false);
     }
 
-    public static XMLStreamWriter createWriter(Writer writer, JSONConfiguration config, boolean writingList) throws IOException {
+    public static XMLStreamWriter createWriter(final Writer writer,
+                                               final JSONConfiguration config,
+                                               final Class<?> expectedType,
+                                               final JAXBContext jaxbContext,
+                                               final boolean writingList) throws IOException {
         switch (config.getNotation()) {
             case NATURAL:
                 final JsonGenerator rawGenerator = new JsonFactory().createJsonGenerator(writer);
@@ -86,9 +97,9 @@ public class Stax2JsonFactory {
                 }
                 final JsonGenerator bodyGenerator = writingList ? JacksonArrayWrapperGenerator.createArrayWrapperGenerator(rawGenerator, config.isRootUnwrapping() ? 0 : 1) : rawGenerator;
                 if (config.isRootUnwrapping()) {
-                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(bodyGenerator, writingList ? 2 : 1), config);
+                    return new Stax2JacksonWriter(JacksonRootStrippingGenerator.createRootStrippingGenerator(bodyGenerator, writingList ? 2 : 1), config, expectedType, jaxbContext);
                 } else {
-                    return new Stax2JacksonWriter(bodyGenerator, config);
+                    return new Stax2JacksonWriter(bodyGenerator, config, expectedType, jaxbContext);
                     }
             case MAPPED:
                 return JsonXmlStreamWriter.createWriter(writer, config);
@@ -107,34 +118,19 @@ public class Stax2JsonFactory {
         }
     }
 
-    public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName) throws XMLStreamException {
-        return createReader(reader, config, rootName, false);
+    public static XMLStreamReader createReader(final Reader reader, final JSONConfiguration config, final String rootName, final Class<?> expectedType, final JAXBContext jaxbContext) throws XMLStreamException {
+        return createReader(reader, config, rootName, expectedType, jaxbContext, false);
     }
 
 
-    public static XMLStreamReader createReader(Reader reader, JSONConfiguration config, String rootName, boolean readingList) throws XMLStreamException {
+    public static XMLStreamReader createReader(final Reader reader, final JSONConfiguration config, final String rootName, final Class<?> expectedType, final JAXBContext jaxbContext, final boolean readingList) throws XMLStreamException {
 
         Reader nonEmptyReader = ensureNonEmptyReader(reader);
 
         switch (config.getNotation()) {
             case NATURAL:
-                try {
-                    final JsonParser rawParser = new JsonFactory().createJsonParser(nonEmptyReader);
-                    final JsonParser nonListParser = config.isRootUnwrapping() ? JacksonRootAddingParser.createRootAddingParser(rawParser, rootName) : rawParser;
-                    if (!readingList) {
-                        return new Jackson2StaxReader(nonListParser, config);
-                    } else {
-                        return new Jackson2StaxReader(JacksonRootAddingParser.createRootAddingParser(nonListParser, "jsonArrayRootElement"), config);
-                    }
-                } catch (Exception ex) {
-                    throw new XMLStreamException(ex);
-                }
             case MAPPED:
-                try {
-                    return new JsonXmlStreamReader(nonEmptyReader, rootName, config);
-                } catch (IOException ex) {
-                    throw new XMLStreamException(ex);
-                }
+                return JsonXmlStreamReader.create(nonEmptyReader, config, rootName, expectedType, jaxbContext, readingList);
             case MAPPED_JETTISON:
                 try {
                     Configuration jmConfig;

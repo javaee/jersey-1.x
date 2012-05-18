@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,7 +39,6 @@
  */
 package com.sun.jersey.json.impl.writer;
 
-import com.sun.jersey.api.json.JSONConfiguration;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -51,15 +50,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.namespace.NamespaceContext;
+
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import com.sun.jersey.api.json.JSONConfiguration;
+
 /**
+ * Implementation of {@link XMLStreamWriter} for JSON streams in mapped notation.
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
-public class JsonXmlStreamWriter implements XMLStreamWriter {
+public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLStreamWriter {
 
     private static class WriterAdapter {
 
@@ -236,19 +239,8 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         }
     }
 
-    public void writeStartDocument() throws XMLStreamException {
-    }
-
     public void writeCharacters(char[] text, int start, int length) throws XMLStreamException {
         writeCharacters(new String(text, start, length));
-    }
-
-    public void setDefaultNamespace(String uri) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void writeCData(String data) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
@@ -274,55 +266,12 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
         }
     }
 
-    public void writeComment(String data) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void writeDTD(String dtd) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void writeDefaultNamespace(String uri) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     public void writeEmptyElement(String localName) throws XMLStreamException {
         writeEmptyElement(null, localName, null);
     }
 
-    public void writeEntityRef(String name) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void writeProcessingInstruction(String target) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void writeStartDocument(String version) throws XMLStreamException {
-    }
-
     public void writeStartElement(String localName) throws XMLStreamException {
         writeStartElement(null, localName, null);
-    }
-
-    public NamespaceContext getNamespaceContext() {
-        return null;
-    }
-
-    public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public Object getProperty(String name) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public String getPrefix(String uri) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void setPrefix(String prefix, String uri) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void writeAttribute(String localName, String value) throws XMLStreamException {
@@ -331,19 +280,6 @@ public class JsonXmlStreamWriter implements XMLStreamWriter {
 
     public void writeEmptyElement(String namespaceURI, String localName) throws XMLStreamException {
         writeEmptyElement(null, localName, null);
-    }
-
-    public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
-        // we do not want to deal with namespaces
-        // the main goal of this writer is keep the produced json as simple as possible
-    }
-
-    public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    public void writeStartDocument(String encoding, String version) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public void writeStartElement(String namespaceURI, String localName) throws XMLStreamException {

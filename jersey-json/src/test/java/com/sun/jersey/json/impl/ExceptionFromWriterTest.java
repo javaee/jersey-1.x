@@ -49,6 +49,10 @@ import java.io.Writer;
 import javax.xml.bind.MarshalException;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLStreamException;
+
+import org.eclipse.persistence.exceptions.EclipseLinkException;
+import org.eclipse.persistence.exceptions.XMLMarshalException;
+
 import junit.framework.TestCase;
 
 /**
@@ -129,7 +133,11 @@ public class ExceptionFromWriterTest extends TestCase {
             } catch (Exception ex) {
                 caught = true;
                 assertEquals(MarshalException.class, ex.getClass());
-                assertEquals(XMLStreamException.class, ex.getCause().getClass());
+                Throwable cause = ex.getCause();
+                if (cause instanceof EclipseLinkException) {
+                    cause = ((XMLMarshalException)cause).getInternalException();
+                }
+                assertEquals(XMLStreamException.class, cause.getClass());
             }
             assertTrue(caught);
         }

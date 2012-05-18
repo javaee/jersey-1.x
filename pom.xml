@@ -225,6 +225,35 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <!-- To see ignored test for MOXy JAXB provider look for this profile in submodules -->
+            <id>moxy</id>
+            <activation>
+                <property>
+                    <name>moxy</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.moxy</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <inherited>true</inherited>
+                        <configuration>
+                            <systemPropertyVariables>
+                                <javax.xml.bind.JAXBContext>org.eclipse.persistence.jaxb.JAXBContextFactory</javax.xml.bind.JAXBContext>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
     <modules>
         <module>contribs</module>
@@ -407,6 +436,12 @@
             <url>http://repository.jboss.org/nexus/content/groups/public/</url>
             <layout>default</layout>
         </repository>
+        <repository>
+            <id>eclipselink.repository</id>
+            <name>Eclipse Maven Repository</name>
+            <url>http://www.eclipse.org/downloads/download.php?r=1&amp;nf=1&amp;file=/rt/eclipselink/maven.repo</url>
+            <layout>default</layout>
+        </repository>
     </repositories>
 
     <!--pluginRepositories>
@@ -449,6 +484,11 @@
                 <artifactId>jackson-xc</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.persistence</groupId>
+                <artifactId>org.eclipse.persistence.moxy</artifactId>
+                <version>${moxy.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -456,6 +496,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jackson.version>1.9.2</jackson.version>
         <gf.embedded.version>3.1.1</gf.embedded.version>
+        <moxy.version>2.3.2</moxy.version>
     </properties>
 
 </project>

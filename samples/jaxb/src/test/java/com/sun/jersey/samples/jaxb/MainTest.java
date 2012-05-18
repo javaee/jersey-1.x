@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,26 +39,31 @@
  */
 package com.sun.jersey.samples.jaxb;
 
+import java.util.Collection;
+
+import javax.ws.rs.core.GenericEntity;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;
-import java.util.Collection;
-import javax.ws.rs.core.GenericEntity;
-import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public class MainTest extends JerseyTest {
 
     public MainTest() throws Exception {
         super("com.sun.jersey.samples.jaxb");
     }
-    
+
     /**
      * Test checks that the application.wadl is reachable.
      */
@@ -75,7 +80,7 @@ public class MainTest extends JerseyTest {
         WebResource webResource = resource();
         JAXBXmlRootElement e1 = webResource.path("jaxb/XmlRootElement").
                 get(JAXBXmlRootElement.class);
-        
+
         JAXBXmlRootElement e2 = webResource.path("jaxb/XmlRootElement").type("application/xml").
                 post(JAXBXmlRootElement.class, e1);
 
@@ -90,18 +95,19 @@ public class MainTest extends JerseyTest {
 
         String e2 = webResource.path("jaxb/XmlRootElementWithHeader").
                 get(String.class);
-        assertTrue(e2.contains("<?xml-stylesheet type='text/xsl' href='foobar.xsl' ?>") && e2.contains(e1.substring(e1.indexOf("?>") + 2)));
+        assertTrue(e2.contains("<?xml-stylesheet type='text/xsl' href='foobar.xsl' ?>")
+                && e2.contains(e1.substring(e1.indexOf("?>") + 2).trim()));
     }
 
     @Test
     public void testJAXBElement() {
         WebResource webResource = resource();
-        GenericType<JAXBElement<JAXBXmlType>> genericType = 
+        GenericType<JAXBElement<JAXBXmlType>> genericType =
                 new GenericType<JAXBElement<JAXBXmlType>>() {};
-                
+
         JAXBElement<JAXBXmlType> e1 = webResource.path("jaxb/JAXBElement").
                 get(genericType);
-        
+
         JAXBElement<JAXBXmlType> e2 = webResource.path("jaxb/JAXBElement").type("application/xml").
                 post(genericType, e1);
 
@@ -113,29 +119,29 @@ public class MainTest extends JerseyTest {
         WebResource webResource = resource();
         JAXBXmlType t1 = webResource.path("jaxb/JAXBElement").
                 get(JAXBXmlType.class);
-        
+
         JAXBElement<JAXBXmlType> e = new JAXBElement<JAXBXmlType>(
                 new QName("jaxbXmlRootElement"),
                 JAXBXmlType.class,
                 t1);
         JAXBXmlType t2 = webResource.path("jaxb/XmlType").type("application/xml").
                 post(JAXBXmlType.class, e);
-        
+
         assertEquals(t1, t2);
     }
 
     @Test
     public void testRootElementCollection() {
         WebResource webResource = resource();
-        GenericType<Collection<JAXBXmlRootElement>> genericType = 
+        GenericType<Collection<JAXBXmlRootElement>> genericType =
                 new GenericType<Collection<JAXBXmlRootElement>>() {};
-        
+
         Collection<JAXBXmlRootElement> ce1 = webResource.path("jaxb/collection/XmlRootElement").
                 get(genericType);
         Collection<JAXBXmlRootElement> ce2 = webResource.path("jaxb/collection/XmlRootElement").
                 type("application/xml").
                 post(genericType, new GenericEntity<Collection<JAXBXmlRootElement>>(ce1){});
-                
+
         assertEquals(ce1, ce2);
     }
 
@@ -144,19 +150,19 @@ public class MainTest extends JerseyTest {
         WebResource webResource = resource();
         GenericType<Collection<JAXBXmlRootElement>> genericRootElement =
                 new GenericType<Collection<JAXBXmlRootElement>>() {};
-        GenericType<Collection<JAXBXmlType>> genericXmlType = 
+        GenericType<Collection<JAXBXmlType>> genericXmlType =
                 new GenericType<Collection<JAXBXmlType>>() {};
-                
+
         Collection<JAXBXmlRootElement> ce1 = webResource.path("jaxb/collection/XmlRootElement").
                 get(genericRootElement);
-        
+
         Collection<JAXBXmlType> ct1 = webResource.path("jaxb/collection/XmlType").
                 type("application/xml").
                 post(genericXmlType, new GenericEntity<Collection<JAXBXmlRootElement>>(ce1){});
-                
+
         Collection<JAXBXmlType> ct2 = webResource.path("jaxb/collection/XmlRootElement").
                 get(genericXmlType);
-                
+
         assertEquals(ct1, ct2);
     }
 

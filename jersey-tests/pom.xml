@@ -205,6 +205,38 @@
                 </dependency>
             </dependencies>
         </profile>
+        <profile>
+            <id>moxy</id>
+            <activation>
+                <property>
+                    <name>moxy</name>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.eclipse.persistence</groupId>
+                    <artifactId>org.eclipse.persistence.moxy</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <inherited>true</inherited>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/sun/jersey/impl/container/httpserver/*Test.java</exclude>
+                                <!-- MOXy does not support 'com.sun.xml.bind.xmlHeaders' property. -->
+                                <exclude>**/XmlHeaderTest.java</exclude>
+                            </excludes>
+                            <forkMode>always</forkMode>
+                            <enableAssertions>false</enableAssertions>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <dependencies>

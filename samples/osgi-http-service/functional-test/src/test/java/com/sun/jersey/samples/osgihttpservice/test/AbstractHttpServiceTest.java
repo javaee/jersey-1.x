@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,19 +37,22 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.samples.osgihttpservice.test;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+
 import javax.ws.rs.core.UriBuilder;
+
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
+
 import org.ops4j.pax.exam.Inject;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
@@ -57,20 +60,17 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventConstants;
 import org.osgi.service.event.EventHandler;
-
-import static org.ops4j.pax.exam.CoreOptions.felix;
-import static org.ops4j.pax.exam.CoreOptions.equinox;
-import static org.ops4j.pax.exam.CoreOptions.options;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-
-import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
-
 import static org.junit.Assert.assertEquals;
+import static org.ops4j.pax.exam.CoreOptions.equinox;
+import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public abstract class AbstractHttpServiceTest {
 
@@ -82,16 +82,16 @@ public abstract class AbstractHttpServiceTest {
 
         String bundleLocation = mavenBundle().groupId("com.sun.jersey.samples.osgi-http-service").artifactId("bundle").versionAsInProject().getURL().toString();
 
-        return Arrays.asList(options(
+        List<Option> options = Arrays.asList(options(
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
                 systemProperty(BundleLocationProperty).value(bundleLocation),
                 repositories("http://repo1.maven.org/maven2",
-                                "http://repository.apache.org/content/groups/snapshots-group",
-                                "http://repository.ops4j.org/maven2",
-                                "http://svn.apache.org/repos/asf/servicemix/m2-repo",
-                                "http://repository.springsource.com/maven/bundles/release",
-                                "http://repository.springsource.com/maven/bundles/external",
-                                "http://maven.java.net/content/repositories/snapshots/"),
+                        "http://repository.apache.org/content/groups/snapshots-group",
+                        "http://repository.ops4j.org/maven2",
+                        "http://svn.apache.org/repos/asf/servicemix/m2-repo",
+                        "http://repository.springsource.com/maven/bundles/release",
+                        "http://repository.springsource.com/maven/bundles/external",
+                        "http://maven.java.net/content/repositories/snapshots/"),
                 mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
                 mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
@@ -99,6 +99,14 @@ public abstract class AbstractHttpServiceTest {
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-servlet").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-grizzly").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject()));
+
+        final String localRepository = System.getProperty("localRepository");
+        if (localRepository != null) {
+            options = new ArrayList<Option>(options);
+            options.add(systemProperty("org.ops4j.pax.url.mvn.localRepository").value(localRepository));
+        }
+
+        return options;
     }
 
 
@@ -143,7 +151,7 @@ public abstract class AbstractHttpServiceTest {
 
     final Semaphore semaphore = new Semaphore(0);
 
-    private static final int port = getProperty("jersey.test.port", 8080);    
+    private static final int port = getProperty("jersey.test.port", 8080);
     private static final String CONTEXT = "/jersey-http-service";
     private static final URI baseUri = UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT).build();
     private static final String BundleLocationProperty = "jersey.bundle.location";
@@ -178,7 +186,7 @@ public abstract class AbstractHttpServiceTest {
         System.out.println("JERSEY RESULT = " + result);
         assertEquals("active", result);
     }
-      
+
     public static int getProperty(final String varName, int defaultValue) {
         if (null == varName) {
             return defaultValue;

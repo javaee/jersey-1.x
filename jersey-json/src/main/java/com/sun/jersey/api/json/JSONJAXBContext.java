@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -414,15 +414,15 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
 
     /**
      * Get a {@link JSONMarshaller} from a {@link Marshaller}.
-     * 
+     *
      * @param marshaller the JAXB marshaller.
      * @return the JSON marshaller.
      */
-    public static JSONMarshaller getJSONMarshaller(Marshaller marshaller) {
+    public static JSONMarshaller getJSONMarshaller(Marshaller marshaller, JAXBContext jaxbContext) {
         if (marshaller instanceof JSONMarshaller) {
             return (JSONMarshaller) marshaller;
         } else {
-            return new BaseJSONMarshaller(marshaller, JSONConfiguration.DEFAULT);
+            return new BaseJSONMarshaller(marshaller, jaxbContext, JSONConfiguration.DEFAULT);
         }
 
     }
@@ -433,11 +433,11 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * @param unmarshaller the JAXB unmarshaller.
      * @return the JSON unmarshaller.
      */
-    public static JSONUnmarshaller getJSONUnmarshaller(Unmarshaller unmarshaller) {
+    public static JSONUnmarshaller getJSONUnmarshaller(Unmarshaller unmarshaller, JAXBContext jaxbContext) {
         if (unmarshaller instanceof JSONUnmarshaller) {
             return (JSONUnmarshaller) unmarshaller;
         } else {
-            return new BaseJSONUnmarshaller(unmarshaller, JSONConfiguration.DEFAULT);
+            return new BaseJSONUnmarshaller(unmarshaller, jaxbContext, JSONConfiguration.DEFAULT);
         }
 
     }
@@ -506,6 +506,15 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     @Override
     public Validator createValidator() throws JAXBException {
         return jaxbContext.createValidator();
+    }
+
+    /**
+     * Returns the underlying {@link JAXBContext}.
+     *
+     * @return underlying {@link JAXBContext}.
+     */
+    public JAXBContext getOriginalJaxbContext() {
+        return jaxbContext;
     }
 
     static final Map<String, JSONConfiguration.Notation> _notationMap = new HashMap<String, JSONConfiguration.Notation>() {

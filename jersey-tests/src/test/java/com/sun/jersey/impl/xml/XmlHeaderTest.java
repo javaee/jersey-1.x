@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,36 +37,38 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.xml;
 
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.provider.jaxb.XmlHeader;
-import com.sun.jersey.impl.AbstractResourceTester;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.List;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.provider.jaxb.XmlHeader;
+import com.sun.jersey.impl.AbstractResourceTester;
+
 /**
- *
- * @author Martin Matula
+ * @author Martin Matula (martin.matula at oracle.com)
  */
 public class XmlHeaderTest extends AbstractResourceTester {
+
     private static final String XML_STYLESHEET = "<?xml-stylesheet type='text/xsl' href='foobar.xsl' ?>";
+
     public XmlHeaderTest(String testName) {
         super(testName);
     }
 
     @Path("/")
     public static class FooResource {
+
         @Path("root")
         @GET
         @Produces({"application/xml", "application/json"})
@@ -152,4 +154,5 @@ public class XmlHeaderTest extends AbstractResourceTester {
         s = resource(resource).type(MediaType.APPLICATION_XML).get(String.class);
         assertTrue("Wrong message: " + s, s.contains(XML_STYLESHEET));
     }
+
 }

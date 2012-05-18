@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,20 +37,21 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl.reader;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public class JsonNamespaceContext implements NamespaceContext {
-    
+
     static final String PrefixPREFIX = "ns";
 
     private final Map<String, String> ns2pMap = new HashMap<String, String>();
@@ -61,14 +62,34 @@ public class JsonNamespaceContext implements NamespaceContext {
         return nsCount;
     }
 
-    public String getNamespaceURI(String prefix) {
+    public String getNamespaceURI(final String prefix) {
+        // Invalid prefix.
+        if (prefix == null) {
+            throw new IllegalArgumentException();
+        }
+
+        // Default prefix.
+        if (XMLConstants.DEFAULT_NS_PREFIX.equals(prefix)) {
+            return XMLConstants.NULL_NS_URI;
+        }
+
         if (p2nsMap.containsKey(prefix)) {
             return p2nsMap.get(prefix);
         }
         return null;
     }
 
-    public String getPrefix(String namespaceURI) {
+    public String getPrefix(final String namespaceURI) {
+        // Invalid NS.
+        if (namespaceURI == null) {
+            throw new IllegalArgumentException();
+        }
+
+        // Default NS.
+        if (XMLConstants.NULL_NS_URI.equals(namespaceURI)) {
+            return XMLConstants.DEFAULT_NS_PREFIX;
+        }
+
         if (ns2pMap.containsKey(namespaceURI)) {
             return ns2pMap.get(namespaceURI);
         } else {

@@ -37,14 +37,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl.reader;
 
 /**
- *
  * @author Martin Matula
  */
 public class JsonFormatException extends RuntimeException {
+
     private final String text;
     private final int line, column;
 

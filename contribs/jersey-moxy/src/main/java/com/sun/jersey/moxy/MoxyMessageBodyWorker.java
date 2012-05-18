@@ -107,7 +107,8 @@ public class MoxyMessageBodyWorker implements MessageBodyWriter, MessageBodyRead
     }
 
     /* package*/  boolean typeIsKnown(Class type) {
-        return moxyPackageNames.contains(type.getPackage().getName());
+        final Package typePackage = type.getPackage();
+        return typePackage != null && moxyPackageNames.contains(typePackage.getName());
     }
 
     /* package*/ boolean mediaTypeIsXml(MediaType mediaType) {

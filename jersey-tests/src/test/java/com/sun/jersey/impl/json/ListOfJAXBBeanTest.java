@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,24 +37,14 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.json;
 
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.api.container.filter.LoggingFilter;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -63,12 +53,24 @@ import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.container.filter.LoggingFilter;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.impl.AbstractResourceTester;
+
 /**
  *
- * @author Jakub.Podlesak@Sun.Com
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public class ListOfJAXBBeanTest extends AbstractResourceTester {
     public ListOfJAXBBeanTest(String testName) {
@@ -92,14 +94,14 @@ public class ListOfJAXBBeanTest extends AbstractResourceTester {
                 throw new RuntimeException(ex);
             }
         }
-        
+
         @Override
         public JAXBContext getContext(Class<?> c) {
             JAXBContext myContext = unwrappingOn ? unwrappingContext : wrappingContext;
             return types.contains(c) ? myContext : null;
         }
     }
-    
+
     @Path("/")
     public static class DogsResource {
         @POST @Consumes("application/json") @Produces("application/json")
@@ -107,13 +109,13 @@ public class ListOfJAXBBeanTest extends AbstractResourceTester {
             return b;
         }
     }
-    
+
 
     public void testDogsResourceUnwrappingOn() throws Exception {
         unwrappingOn = true;
         rawTestDogsResource();
     }
-    
+
     public void testDogsResourceUnwrappingOff() throws Exception {
         unwrappingOn = false;
         rawTestDogsResource();
@@ -137,7 +139,9 @@ public class ListOfJAXBBeanTest extends AbstractResourceTester {
         GenericType<List<Dog>> genericDogCollection =
                 new GenericType<List<Dog>>() {};
 
-        System.out.println(r.type(MediaType.APPLICATION_JSON).post(genericDogCollection, new GenericEntity<List<Dog>>(dogs){}));
-        assertEquals(dogs, r.type("application/json").post(genericDogCollection, new GenericEntity<List<Dog>>(dogs){}));
-    }        
+        final List<Dog> dogList =
+                r.type(MediaType.APPLICATION_JSON).post(genericDogCollection, new GenericEntity<List<Dog>>(dogs) {});
+        System.out.println(dogList);
+        assertEquals(dogs, dogList);
+    }
 }

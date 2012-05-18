@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,8 +37,15 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl.writer;
+
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
 
 import com.sun.jersey.json.impl.AttrAndCharDataBean;
 import com.sun.jersey.json.impl.ComplexBeanWithAttributes;
@@ -57,24 +64,19 @@ import com.sun.jersey.json.impl.TreeModel;
 import com.sun.jersey.json.impl.TwoListsWrapperBean;
 import com.sun.jersey.json.impl.User;
 import com.sun.jersey.json.impl.UserTable;
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-import junit.framework.TestCase;
+
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 
+import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
+
+import junit.framework.TestCase;
+
 /**
- *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public class Stax2JacksonWriterTest extends TestCase {
 
-  
     public Stax2JacksonWriterTest(String testName) {
         super(testName);
     }
@@ -120,23 +122,23 @@ public class Stax2JacksonWriterTest extends TestCase {
     }
 
     public void testSimpleBeanWithAttributes() throws Exception {
-        _testBean(SimpleBeanWithAttributes.class,SimpleBeanWithAttributes.createTestInstance());
+        _testBean(SimpleBeanWithAttributes.class, SimpleBeanWithAttributes.createTestInstance());
     }
 
     public void testSimpleBeanWithJustOneAttribute() throws Exception {
-        _testBean(SimpleBeanWithJustOneAttribute.class,SimpleBeanWithJustOneAttribute.createTestInstance());
+        _testBean(SimpleBeanWithJustOneAttribute.class, SimpleBeanWithJustOneAttribute.createTestInstance());
     }
 
     public void testSimpleBeanWithJustOneAttributeAndValue() throws Exception {
-        _testBean(SimpleBeanWithJustOneAttributeAndValue.class,SimpleBeanWithJustOneAttributeAndValue.createTestInstance());
+        _testBean(SimpleBeanWithJustOneAttributeAndValue.class, SimpleBeanWithJustOneAttributeAndValue.createTestInstance());
     }
 
     public void testTreeModelBean() throws Exception {
-        _testBean(TreeModel.class,TreeModel.createTestInstance());
+        _testBean(TreeModel.class, TreeModel.createTestInstance());
     }
 
     public void testTwoListsWrapperBean() throws Exception {
-        _testBean(TwoListsWrapperBean.class,TwoListsWrapperBean.createTestInstance());
+        _testBean(TwoListsWrapperBean.class, TwoListsWrapperBean.createTestInstance());
     }
 
     public void testUser() throws Exception {
@@ -147,8 +149,7 @@ public class Stax2JacksonWriterTest extends TestCase {
         _testBean(UserTable.class, UserTable.createTestInstance());
     }
 
-
- private void _testBean(Class clazz, Object bean) throws Exception {
+    private void _testBean(Class clazz, Object bean) throws Exception {
         Map<String, Object> props = new HashMap<String, Object>();
 
         props.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
@@ -163,7 +164,7 @@ public class Stax2JacksonWriterTest extends TestCase {
         g = factory.createJsonGenerator(osWriter);
 
         Marshaller marshaller = ctx.createMarshaller();
-        marshaller.marshal(bean, new Stax2JacksonWriter(g));
+        marshaller.marshal(bean, new Stax2JacksonWriter(g, clazz, ctx));
 
         g.flush();
         System.out.println("");

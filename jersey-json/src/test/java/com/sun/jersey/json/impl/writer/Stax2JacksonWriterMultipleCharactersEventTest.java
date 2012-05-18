@@ -69,7 +69,7 @@ public class Stax2JacksonWriterMultipleCharactersEventTest extends TestCase {
         JsonGenerator g;
 
         g = factory.createJsonGenerator(osWriter);
-        final Stax2JacksonWriter s2jWriter = new Stax2JacksonWriter(g);
+        final Stax2JacksonWriter s2jWriter = new Stax2JacksonWriter(g, null, null);
 
         try {
             s2jWriter.writeStartDocument();

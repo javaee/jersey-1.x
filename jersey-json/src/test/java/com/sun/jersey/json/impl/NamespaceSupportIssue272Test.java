@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,22 +37,22 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl;
+
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
 import com.sun.jersey.api.json.JSONUnmarshaller;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Map;
+
 import junit.framework.TestCase;
 
 /**
- *
- * @author Jakub.Podlesak@Sun.COM
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public class NamespaceSupportIssue272Test extends TestCase {
 
@@ -77,10 +77,11 @@ public class NamespaceSupportIssue272Test extends TestCase {
 
         jm.marshallToJSON(one, sw);
 
-        System.out.println(String.format("%s", sw));
+        final String s = sw.toString();
+        System.out.println(String.format("%s", s));
 
         MyResponse two;
-        two =  ju.unmarshalFromJSON(new StringReader(sw.toString()), MyResponse.class);
+        two =  ju.unmarshalFromJSON(new StringReader(s), MyResponse.class);
 
         assertEquals(one, two);
     }

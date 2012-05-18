@@ -43,7 +43,16 @@ package com.sun.jersey.json.impl;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
+
+import java.io.StringReader;
 import java.io.StringWriter;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+
 import junit.framework.TestCase;
 
 /**
@@ -55,7 +64,7 @@ import junit.framework.TestCase;
 public class AnotherArrayTest extends TestCase {
 
     public void testAnotherSimpleXmlTypeBean() throws Exception {
-        
+
         final JSONJAXBContext ctx = new JSONJAXBContext(JSONConfiguration.mapped().arrays("cats").build(), AnotherArrayTestBean.class);
         final JSONMarshaller jm = ctx.createJSONMarshaller();
         final StringWriter sw = new StringWriter();
@@ -65,13 +74,25 @@ public class AnotherArrayTest extends TestCase {
         one.addCat(c1);
         Cat c2 = new Cat("Bar", "Puss");
         one.addCat(c2);
-        
+
         one.setProp("testProp");
-        
+
+        final StringWriter sw1 = new StringWriter();
+        final JAXBContext jaxbContext = JAXBContext.newInstance(AnotherArrayTestBean.class);
+        final Marshaller marshaller = jaxbContext.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.marshal(one, sw1);
+
+        final Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+        final JAXBElement<AnotherArrayTestBean> unmarshal = unmarshaller.unmarshal(new StreamSource(new StringReader(sw1
+                .toString())), AnotherArrayTestBean.class);
+
+        marshaller.marshal(unmarshal, System.out);
+
         jm.marshallToJSON(one, sw);
         String jsonResult = sw.toString();
         System.out.println(jsonResult);
-        
+
         String excpectedResult = "{\"cats\":[{\"name\":\"Foo\",\"nickName\":\"Kitty\"},{\"name\":\"Bar\",\"nickName\":\"Puss\"}],\"prop\":\"testProp\"}";
         assertEquals(excpectedResult, jsonResult);
     }

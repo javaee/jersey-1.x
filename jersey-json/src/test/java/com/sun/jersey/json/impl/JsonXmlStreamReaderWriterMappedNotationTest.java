@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,10 +39,6 @@
  */
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONConfiguration.MappedBuilder;
-import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
-import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -50,20 +46,29 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import junit.framework.TestCase;
+
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONConfiguration.MappedBuilder;
+import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
+import com.sun.jersey.json.impl.writer.JsonXmlStreamWriter;
 
 import static com.sun.jersey.json.impl.util.JSONNormalizer.normalizeJsonString;
 
+import junit.framework.TestCase;
+
 /**
+ * {@code JsonXmlStreamReader} test for JSON in the mapped notation.
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
-public class JsonXmlStreamReaderWriterTest extends TestCase {
+public class JsonXmlStreamReaderWriterMappedNotationTest extends TestCase {
 
     private static final String PKG_NAME = "com/sun/jersey/json/impl/";
     
@@ -78,11 +83,11 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
         jaxbContext = JAXBContext.newInstance("com.sun.jersey.json.impl");
     }
     
-    public void testSimpleBeanUnwrapped() throws Exception {
+    public void testSimpleBeanWrapped() throws Exception {
         tryBean(john, "userWrapped.json", false);
     }
     
-    public void testSimpleBeanWrapped() throws Exception {    
+    public void testSimpleBeanUnwrapped() throws Exception {
         tryBean(john, "userUnwrapped.json", true);
     }
     
@@ -247,12 +252,23 @@ public class JsonXmlStreamReaderWriterTest extends TestCase {
     public void tryReadingBean(String jsonExprFilename, Object expectedJaxbBean, 
             JSONConfiguration config) throws JAXBException, IOException {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        JAXBElement jaxbElement = unmarshaller.unmarshal(
-                new JsonXmlStreamReader(
-                    new StringReader(JSONTestHelper.getResourceAsString(PKG_NAME, jsonExprFilename)), config),
-                expectedJaxbBean.getClass());
-        System.out.println("unmarshalled: " + jaxbElement.getValue().toString());
-        assertEquals("MISMATCH:\n" + expectedJaxbBean + "\n" + jaxbElement.getValue() + "\n", 
-                expectedJaxbBean, jaxbElement.getValue());
+        JAXBElement jaxbElement = null;
+        try {
+            jaxbElement = unmarshaller.unmarshal(
+                    JsonXmlStreamReader.create(new StringReader(JSONTestHelper.getResourceAsString(PKG_NAME,
+                            jsonExprFilename)), config, null, expectedJaxbBean.getClass(), jaxbContext, false),
+                    expectedJaxbBean.getClass());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (jaxbElement != null) {
+            final Object jaxbElementValue = jaxbElement.getValue();
+            System.out.println("unmarshalled: " + jaxbElementValue.toString());
+            assertEquals("MISMATCH:\n" + expectedJaxbBean + "\n" + jaxbElementValue + "\n",
+                    expectedJaxbBean, jaxbElementValue);
+        } else {
+            fail("JAXBElement is null.");
+        }
     }
 }

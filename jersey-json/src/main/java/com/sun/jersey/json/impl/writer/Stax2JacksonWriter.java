@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,11 +39,6 @@
  */
 package com.sun.jersey.json.impl.writer;
 
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.xml.bind.v2.model.runtime.RuntimePropertyInfo;
-import com.sun.xml.bind.v2.model.runtime.RuntimeReferencePropertyInfo;
-import com.sun.xml.bind.v2.runtime.XMLSerializer;
-import com.sun.xml.bind.v2.runtime.property.Property;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -57,37 +52,47 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.namespace.NamespaceContext;
+
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonGenerator;
 
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.json.impl.JSONHelper;
+import com.sun.jersey.json.impl.JaxbXmlDocumentStructure;
+
 /**
+ * Implementation of {@link XMLStreamWriter} for JSON streams in natural notation.
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
-public class Stax2JacksonWriter implements XMLStreamWriter {
+public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStreamWriter {
 
     private static class ProcessingInfo {
 
-        RuntimePropertyInfo rpi;
         boolean isArray;
         Type t;
         ProcessingInfo lastUnderlyingPI;
         boolean startObjectWritten = false;
         boolean afterFN = false;
-        String elementName;
+        QName elementName;
 
-        public ProcessingInfo(String elementName, RuntimePropertyInfo rpi, boolean isArray, Type t) {
+        public ProcessingInfo(QName elementName, boolean isArray, Type t) {
             this.elementName = elementName;
-            this.rpi = rpi;
+
             this.isArray = isArray;
             this.t = t;
         }
 
         public ProcessingInfo(ProcessingInfo pi) {
-            this(pi.elementName, pi.rpi, pi.isArray, pi.t);
+            this(pi.elementName, pi.isArray, pi.t);
         }
 
         @Override
@@ -99,10 +104,11 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
                 return false;
             }
             final ProcessingInfo other = (ProcessingInfo) obj;
-            if (this.rpi != other.rpi && (this.rpi == null || !this.rpi.equals(other.rpi))) {
+            if (this.isArray != other.isArray) {
                 return false;
             }
-            if (this.isArray != other.isArray) {
+            if (this.elementName != other.elementName
+                    && (this.elementName == null || !this.elementName.equals(other.elementName))) {
                 return false;
             }
             if (this.t != other.t && (this.t == null || !this.t.equals(other.t))) {
@@ -114,8 +120,8 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 47 * hash + (this.rpi != null ? this.rpi.hashCode() : 0);
             hash = 47 * hash + (this.isArray ? 1 : 0);
+            hash = 47 * hash + (this.elementName != null ?this.elementName.hashCode() : 0);
             hash = 47 * hash + (this.t != null ? this.t.hashCode() : 0);
             return hash;
         }
@@ -129,6 +135,11 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
     final List<ProcessingInfo> processingStack = new ArrayList<ProcessingInfo>();
     boolean writingAttr = false;
 
+    /**
+     * Document structure to obtain the expected elements and attributes from.
+     */
+    private JaxbXmlDocumentStructure documentStructure;
+
     static <T> T pop(List<T> stack) {
         return stack.remove(stack.size() - 1);
     }
@@ -141,13 +152,21 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         return (stack.size() > 1) ? stack.get(stack.size() - 2) : null;
     }
 
-    public Stax2JacksonWriter(JsonGenerator generator) {
-        this(generator, JSONConfiguration.DEFAULT);
+    public Stax2JacksonWriter(final JsonGenerator generator, final Class<?> expectedType, final JAXBContext jaxbContext) {
+        this(generator, JSONConfiguration.DEFAULT, expectedType, jaxbContext);
     }
 
-    public Stax2JacksonWriter(JsonGenerator generator, JSONConfiguration config) {
+    public Stax2JacksonWriter(final JsonGenerator generator,
+                              final JSONConfiguration config,
+                              final Class<?> expectedType,
+                              JAXBContext jaxbContext) {
         this.attrsWithPrefix = config.isUsingPrefixesAtNaturalAttributes();
         this.generator = JacksonStringMergingGenerator.createGenerator(generator);
+
+        if (jaxbContext instanceof JSONJAXBContext) {
+            jaxbContext = ((JSONJAXBContext) jaxbContext).getOriginalJaxbContext();
+        }
+        this.documentStructure = JSONHelper.getXmlDocumentStructure(jaxbContext, expectedType, false);
     }
 
     @Override
@@ -171,7 +190,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
     @Override
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         try {
-            pushPropInfo(localName);
+            pushPropInfo(namespaceURI, localName);
             ProcessingInfo currentPI = peek(processingStack);
             ProcessingInfo parentPI = peek2nd(processingStack);
             if (!currentPI.isArray) {
@@ -245,48 +264,38 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         }
     };
 
-    private void pushPropInfo(String elementName) {
+    private void pushPropInfo(String namespaceUri, String localName) {
+        final QName qname = new QName(namespaceUri == null ? XMLConstants.NULL_NS_URI : namespaceUri, localName);
+        documentStructure.startElement(qname);
+
         ProcessingInfo parentPI = peek(processingStack);
         // still the same array, no need to dig out runtime property info
-        if ((elementName != null) && (parentPI != null) && (parentPI.lastUnderlyingPI != null) && (elementName.equals(parentPI.lastUnderlyingPI.elementName))) {
+        if ((localName != null) && (parentPI != null) && (parentPI.lastUnderlyingPI != null) && (localName.equals(parentPI.lastUnderlyingPI.elementName.getLocalPart()))) {
             processingStack.add(new ProcessingInfo(parentPI.lastUnderlyingPI));
             return;
         }
-        final XMLSerializer xs = XMLSerializer.getInstance();
-        final Property cp = (xs == null) ? null : xs.getCurrentProperty();
-        final RuntimePropertyInfo ri = (cp == null) ? null : cp.getInfo();
-        final Type rt = (ri == null) ? null : ri.getRawType();
-        final String dn = (ri == null) ? null : ri.getName();
+
+        final Type rt = documentStructure.getEntityType(qname, writingAttr);
         // rt is null for root elements
         if (null == rt) {
-            if (writingAttr) {
-                // this should not happen:
-                processingStack.add(new ProcessingInfo(elementName, ri, false, null));
-                return;
-            } else {
-                processingStack.add(new ProcessingInfo(elementName, ri, false, null));
-                return;
-            }
-        }
-        if (primitiveTypes.contains(rt)) {
-            processingStack.add(new ProcessingInfo(elementName, ri, false, rt));
+            processingStack.add(new ProcessingInfo(qname, false, null));
             return;
         }
+        if (primitiveTypes.contains(rt)) {
+            processingStack.add(new ProcessingInfo(qname, false, rt));
+            return;
+        }
+
         // TODO: wildcard could still simulate an array by adding several elements of the same name
-        if (ri.isCollection() && !isWildcardElement(ri)) { // another array
-            if (!((parentPI != null) && (parentPI.isArray) && (parentPI.rpi == ri))) {
+        if (documentStructure.isArrayCollection()) { // another array
+            if (!((parentPI != null) && (parentPI.isArray) && (documentStructure.isSameArrayCollection()))) {
                 // another array
-                processingStack.add(new ProcessingInfo(elementName, ri, true, rt));
+                processingStack.add(new ProcessingInfo(qname, true, rt));
                 return;
             }
         }
         // something else
-        processingStack.add(new ProcessingInfo(elementName, ri, false, rt));
-        return;
-    }
-
-    private boolean isWildcardElement(RuntimePropertyInfo ri) {
-        return (ri instanceof RuntimeReferencePropertyInfo) && (((RuntimeReferencePropertyInfo)ri).getWildcard() != null);
+        processingStack.add(new ProcessingInfo(qname, false, rt));
     }
 
     @Override
@@ -327,6 +336,7 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
             if ((removedPI.lastUnderlyingPI != null) && (removedPI.lastUnderlyingPI.isArray)) {
                 generator.writeEndArray();
             }
+            documentStructure.endElement(removedPI.elementName);
             cleanlyEndObject(removedPI);
         } catch (IOException ex) {
             Logger.getLogger(Stax2JacksonWriter.class.getName()).log(Level.SEVERE, null, ex);
@@ -382,47 +392,6 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         // a dirty hack, since jaxb ri is giving us wrong info on the actual attribute type in this case
         writeCharacters(value, "type".equals(localName) && XML_SCHEMA_INSTANCE.equals(namespaceURI));
         writeEndElement();
-    }
-
-    @Override
-    public void writeNamespace(String prefix, String namespaceURI) throws XMLStreamException {
-        // we do not want to deal with namespaces
-        // the main goal of this writer is keep the produced json as simple as possible
-    }
-
-    @Override
-    public void writeDefaultNamespace(String uri) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void writeComment(String data) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void writeProcessingInstruction(String target) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void writeProcessingInstruction(String target, String data) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void writeCData(String data) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void writeDTD(String dtd) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void writeEntityRef(String name) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -487,33 +456,4 @@ public class Stax2JacksonWriter implements XMLStreamWriter {
         writeCharacters(new String(text, start, length));
     }
 
-    @Override
-    public String getPrefix(String uri) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setPrefix(String prefix, String uri) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setDefaultNamespace(String uri) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void setNamespaceContext(NamespaceContext context) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public NamespaceContext getNamespaceContext() {
-        return null;
-    }
-
-    @Override
-    public Object getProperty(String name) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 }

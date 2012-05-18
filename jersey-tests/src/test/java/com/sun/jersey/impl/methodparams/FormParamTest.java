@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,17 +39,10 @@
  */
 package com.sun.jersey.impl.methodparams;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.impl.AbstractResourceTester;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
-import javax.mail.internet.MimeMultipart;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -61,11 +54,21 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
+
+import javax.mail.internet.MimeMultipart;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.InjectParam;
+import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.core.header.FormDataContentDisposition;
+import com.sun.jersey.impl.AbstractResourceTester;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public class FormParamTest extends AbstractResourceTester {
 
@@ -96,7 +99,7 @@ public class FormParamTest extends AbstractResourceTester {
         assertEquals("foo", s);
     }
 
-    @XmlRootElement
+    @XmlRootElement(name = "jaxbBean")
     public static class JAXBBean {
 
         public String value;
@@ -181,7 +184,7 @@ public class FormParamTest extends AbstractResourceTester {
                 @FormParam("int") int i,
                 @FormParam("float") float f,
                 @FormParam("decimal") BigDecimal d
-                ) {
+        ) {
             return "" + i + " " + f + " " + d;
         }
     }
@@ -209,7 +212,7 @@ public class FormParamTest extends AbstractResourceTester {
                 @DefaultValue("1") @FormParam("int") int i,
                 @DefaultValue("3.14") @FormParam("float") float f,
                 @DefaultValue("3.14") @FormParam("decimal") BigDecimal d
-                ) {
+        ) {
             return "" + i + " " + f + " " + d;
         }
     }
@@ -227,16 +230,16 @@ public class FormParamTest extends AbstractResourceTester {
 
 
     public static class TrimmedString {
-       private final String string;
+        private final String string;
 
-       public TrimmedString(String string) {
-          this.string = string.trim();
-       }
+        public TrimmedString(String string) {
+            this.string = string.trim();
+        }
 
-       @Override
-       public String toString() {
-          return string;
-       }
+        @Override
+        public String toString() {
+            return string;
+        }
     }
 
     @Path("/")
@@ -427,13 +430,13 @@ public class FormParamTest extends AbstractResourceTester {
         public String get() {
             return "GET";
         }
-        
+
         @POST
         @Consumes(MediaType.TEXT_PLAIN)
         public String postText(String s) {
             return s;
         }
-        
+
         @POST
         @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
         public String post(String s) {

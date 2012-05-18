@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,27 +37,26 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 @XmlRootElement
 public class TreeModel {
-    
+
     public static class Node {
         @XmlElement  public String label;
-        @XmlElement public boolean expanded;        
+        @XmlElement public boolean expanded;
         @XmlElement public List<Node> children;
-        
+
         public Node() {
             this("dummy node", null);
         }
@@ -65,21 +64,21 @@ public class TreeModel {
         public Node(String label){
             this(label, null);
         }
-        
+
         public Node(String label, Collection<Node> children) {
             this.label = label;
-            if (null != children) {
+            if (!JSONTestHelper.isCollectionEmpty(children)) {
                 this.children = new LinkedList<Node>();
                 this.children.addAll(children);
                 expanded = true;
             }
         }
-        
+
         @Override
         public int hashCode() {
             int result = 13;
             result = 5 + 17 * label.hashCode();
-            if (null != children) {
+            if (!JSONTestHelper.isCollectionEmpty(children)) {
                 for (Node n : children) {
                     result = 5 + 17 * n.hashCode();
                 }
@@ -96,16 +95,17 @@ public class TreeModel {
             if (this.label != other.label && (this.label == null || !this.label.equals(other.label))) {
                 return false;
             }
-            if (this.children != other.children && (this.children == null || !this.children.equals(other.children))) {
+            if ((this.children != other.children && JSONTestHelper.isCollectionEmpty(this.children) != JSONTestHelper.isCollectionEmpty(other.children))
+                    && (this.children == null || !this.children.equals(other.children))) {
                 return false;
             }
             return true;
         }
-        
+
         @Override
         public String toString() {
             String result = "(" + label + ":";
-            if (null != children) {
+            if (!JSONTestHelper.isCollectionEmpty(children)) {
                 for (Node n : children) {
                     result += n.toString();
                 }
@@ -115,21 +115,21 @@ public class TreeModel {
             }
         }
     }
-    
+
     @XmlElement public Node root;
-    
+
     public TreeModel() {}
-    
+
     public TreeModel(Node root) {
         this.root = root;
     }
-    
+
     public static Object createTestInstance() {
         TreeModel instance = new TreeModel();
         instance.root = new Node();
         return instance;
     }
-    
+
     @Override
     public int hashCode() {
         if (null != root) {
@@ -150,7 +150,7 @@ public class TreeModel {
         }
         return true;
     }
-    
+
     @Override
     public String toString() {
         return (null != root) ? root.toString() : "(NULL_ROOT)";

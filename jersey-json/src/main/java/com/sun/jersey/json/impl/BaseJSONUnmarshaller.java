@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,16 +37,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONConfigurated;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONUnmarshaller;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -56,25 +53,31 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import com.sun.jersey.api.json.JSONConfigurated;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONUnmarshaller;
+
 /**
- *
- * @author Jakub.Podlesak@Sun.COM
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class BaseJSONUnmarshaller implements JSONUnmarshaller, JSONConfigurated {
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
     protected final Unmarshaller jaxbUnmarshaller;
+    private final JAXBContext jaxbContext;
 
     protected final JSONConfiguration jsonConfig;
 
 
     public BaseJSONUnmarshaller(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
-        this(jaxbContext.createUnmarshaller(), jsonConfig);
+        this(jaxbContext.createUnmarshaller(), jaxbContext, jsonConfig);
     }
 
-    public BaseJSONUnmarshaller(Unmarshaller jaxbUnmarshaller, JSONConfiguration jsonConfig) {
+    public BaseJSONUnmarshaller(Unmarshaller jaxbUnmarshaller, JAXBContext jaxbContext, JSONConfiguration jsonConfig) {
         this.jaxbUnmarshaller = jaxbUnmarshaller;
+        this.jaxbContext = jaxbContext;
         this.jsonConfig = jsonConfig;
     }
 
@@ -111,7 +114,7 @@ public class BaseJSONUnmarshaller implements JSONUnmarshaller, JSONConfigurated 
     private XMLStreamReader createXmlStreamReader(Reader reader, Class expectedType) throws JAXBException {
         try {
         return Stax2JsonFactory.createReader(reader, jsonConfig,
-                jsonConfig.isRootUnwrapping() ? JSONHelper.getRootElementName(expectedType) : null);
+                jsonConfig.isRootUnwrapping() ? JSONHelper.getRootElementName(expectedType) : null, expectedType, jaxbContext);
         } catch (XMLStreamException ex) {
             throw new UnmarshalException("Error creating JSON-based XMLStreamReader", ex);
         }

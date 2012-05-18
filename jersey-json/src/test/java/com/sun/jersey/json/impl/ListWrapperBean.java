@@ -64,7 +64,8 @@ public class ListWrapperBean {
             return false;
         }
         final ListWrapperBean other = (ListWrapperBean) obj;
-        if (this.property != other.property && (this.property == null || !this.property.equals(other.property))) {
+        if ((this.property != other.property && JSONTestHelper.isCollectionEmpty(this.property) != JSONTestHelper.isCollectionEmpty(other.property))
+                && (this.property == null || !this.property.equals(other.property))) {
             return false;
         }
         return true;

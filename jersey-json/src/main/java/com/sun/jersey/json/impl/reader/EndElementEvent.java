@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,7 +37,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl.reader;
 
 import javax.xml.namespace.QName;
@@ -45,29 +44,21 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamConstants;
 
 /**
+ * End element XML event type.
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
-public class EndElementEvent extends JsonReaderXmlEvent {
-    
-    public EndElementEvent(QName name, Location location) {
-        this.name = name;
-        this.location = location;
-    }
-    
-    @Override
-    public boolean isEndElement() {
-        return true;
+public class EndElementEvent extends JsonXmlEvent {
+
+    public EndElementEvent(final QName name, final Location location) {
+        super(XMLStreamConstants.END_ELEMENT, location);
+        this.setName(name);
     }
 
     @Override
-    public int getEventType() {
-        return XMLStreamConstants.END_ELEMENT;
-    }
-    
-    @Override
     public String toString() {
-        return "EndElementEvent(" + name + ")";
+        return "EndElementEvent(" + getName() + ")";
     }
 
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,39 +39,42 @@
  */
 package com.sun.jersey.json.impl;
 
-import com.sun.jersey.api.json.JSONConfigurated;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONMarshaller;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.stream.XMLStreamWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.stream.XMLStreamWriter;
+
+import com.sun.jersey.api.json.JSONConfigurated;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONMarshaller;
+
 /**
- *
- * @author Jakub.Podlesak@Sun.COM
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class BaseJSONMarshaller implements JSONMarshaller, JSONConfigurated {
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
-    
+
     protected final Marshaller jaxbMarshaller;
-    
+    private final JAXBContext jaxbContext;
+
     protected JSONConfiguration jsonConfig;
 
     public BaseJSONMarshaller(JAXBContext jaxbContext, JSONConfiguration jsonConfig) throws JAXBException {
-        this(jaxbContext.createMarshaller(), jsonConfig);
+        this(jaxbContext.createMarshaller(), jaxbContext, jsonConfig);
     }
 
-    public BaseJSONMarshaller(Marshaller jaxbMarshaller, JSONConfiguration jsonConfig) {
+    public BaseJSONMarshaller(Marshaller jaxbMarshaller, JAXBContext jaxbContext, JSONConfiguration jsonConfig) {
         this.jsonConfig = jsonConfig;
+        this.jaxbContext = jaxbContext;
         this.jaxbMarshaller = jaxbMarshaller;
     }
 
@@ -100,12 +103,12 @@ public class BaseJSONMarshaller implements JSONMarshaller, JSONConfigurated {
             throw new IllegalArgumentException("The writer is null");
         }
 
-        jaxbMarshaller.marshal(o, getXMLStreamWrtier(writer));
+        jaxbMarshaller.marshal(o, getXMLStreamWriter(writer, o.getClass()));
     }
 
-    private XMLStreamWriter getXMLStreamWrtier(Writer writer) throws JAXBException {
+    private XMLStreamWriter getXMLStreamWriter(Writer writer, Class<?> expectedType) throws JAXBException {
         try {
-            return Stax2JsonFactory.createWriter(writer, jsonConfig);
+            return Stax2JsonFactory.createWriter(writer, jsonConfig, expectedType, jaxbContext);
         } catch (IOException ex) {
             throw new JAXBException(ex);
         }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,12 +37,12 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl.reader;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
 import org.codehaus.jackson.Base64Variant;
 import org.codehaus.jackson.JsonLocation;
 import org.codehaus.jackson.JsonNode;
@@ -56,11 +56,11 @@ import org.codehaus.jackson.type.TypeReference;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 public class JacksonRootAddingParser extends JsonParser {
 
-    enum State { START, AFTER_SO, AFTER_FN, INNER, END };
+    enum State { START, AFTER_SO, AFTER_FN, INNER, END }
 
     String rootName;
     JsonParser parser;

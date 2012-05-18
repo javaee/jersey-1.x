@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,24 +37,14 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl.reader;
 
-import com.sun.jersey.api.json.JSONConfiguration;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -62,725 +52,486 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
+
+import org.codehaus.jackson.JsonFactory;
+import org.codehaus.jackson.JsonParser;
+
 /**
+ * Implementation of {@link XMLStreamReader} for JSON streams in natural or mapped notation. This class contains a factory
+ * method for an instance creation.
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class JsonXmlStreamReader implements XMLStreamReader {
 
-    private enum LaState {
-        START,
-        END,
-        AFTER_OBJ_START_BRACE,
-        BEFORE_OBJ_NEXT_KV_PAIR,
-        BEFORE_COLON_IN_KV_PAIR,
-        BEFORE_VALUE_IN_KV_PAIR,
-        AFTER_OBJ_KV_PAIR,
-        AFTER_ARRAY_START_BRACE,
-        BEFORE_NEXT_ARRAY_ELEM,
-        AFTER_ARRAY_ELEM
-    };
+    /**
+     * Provider of Xml events.
+     */
+    private final XmlEventProvider eventProvider;
 
-    private static final Logger LOGGER = Logger.getLogger(JsonXmlStreamReader.class.getName());
+    /**
+     * Default namespace context for this class.
+     */
+    private final JsonNamespaceContext namespaceContext = new JsonNamespaceContext();
 
-    boolean jsonRootUnwrapping;
-    String rootElementName;
-    char nsSeparator;
-    CharSequence nsSeparatorAsSequence;
-    final Map<String, String> revertedXml2JsonNs = new HashMap<String, String>();
-    final Collection<String> attrAsElemNames = new LinkedList<String>();
+    /**
+     * Exception that occurred during processing of the JSON stream. This property is supposed to be used in methods that are not
+     * designed to throw the {@code XMLStreamException} directly (i.e. {@code #getAttributeXXX}).
+     */
+    private XMLStreamException validationException;
 
-    JsonLexer lexer;
-    JsonToken lastToken;
-
-    private static final class ProcessingState {
-        String lastName;
-        LaState state;
-        JsonReaderXmlEvent eventToReadAttributesFor;
-
-        ProcessingState() {
-            this(LaState.START);
-        }
-
-        ProcessingState(LaState state) {
-            this(state, null);
-        }
-
-        ProcessingState(LaState state, String name) {
-            this.state = state;
-            this.lastName = name;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("{lastName:%s,laState:%s}", lastName, state);
-        }
-    }
-
-    final Queue<JsonReaderXmlEvent> eventQueue = new LinkedList<JsonReaderXmlEvent>();
-
-    boolean endDocumentReached = false;
-
-    List<ProcessingState> processingStack;
-    int depth;
-
-    public JsonXmlStreamReader(Reader reader, JSONConfiguration config) throws IOException {
-        this(reader, config.isRootUnwrapping() ? "rootElement" : null, config);
-    }
-
-    public JsonXmlStreamReader(Reader reader, String rootElementName) throws IOException {
-        this(reader, rootElementName, JSONConfiguration.DEFAULT);
-    }
-
-    public JsonXmlStreamReader(Reader reader, String rootElementName, JSONConfiguration config) throws IOException {
-        this.jsonRootUnwrapping = (rootElementName != null);
-        this.rootElementName = rootElementName;
-        if (config.getAttributeAsElements() != null) {
-            this.attrAsElemNames.addAll(config.getAttributeAsElements());
-        }
-        if (config.getXml2JsonNs() != null) {
-            for (String uri : config.getXml2JsonNs().keySet())
-            revertedXml2JsonNs.put(config.getXml2JsonNs().get(uri), uri);
-        }
-        nsSeparator = config.getNsSeparator();
-        nsSeparatorAsSequence = new StringBuffer(1).append(nsSeparator);
-        lexer = new JsonLexer(reader);
-        depth = 0;
-        processingStack = new ArrayList<ProcessingState>();
-        processingStack.add(new ProcessingState());
-        readNext();
-    }
-
-    void colon() throws IOException {
-        JsonToken token = nextToken();
-        if (token.tokenType != JsonToken.COLON) {
-            throw new JsonFormatException(token.tokenText, token.line, token.column, "Colon expected instead of \"" + token.tokenText + "\"");
-        }
-    }
-
-    JsonToken nextToken() throws IOException {
-        JsonToken result = lexer.yylex();
-        return result;
-    }
-
-    private void valueRead() {
-        if (LaState.BEFORE_VALUE_IN_KV_PAIR == processingStack.get(depth).state) {
-            processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
-        } else if (LaState.BEFORE_NEXT_ARRAY_ELEM == processingStack.get(depth).state) {
-            processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
-        } else if (LaState.AFTER_ARRAY_START_BRACE == processingStack.get(depth).state) {
-            processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
-        }
-    }
-
-    private static final Set<Integer> valueTokenTypes = new HashSet<Integer>() {{
-        add(JsonToken.FALSE); add(JsonToken.TRUE); add(JsonToken.NULL); add(JsonToken.NUMBER);add(JsonToken.STRING);}};
-
-    private void readNext() throws IOException {
-        readNext(false);
-    }
-
-    private void readNext(boolean checkAttributesOnly) throws IOException {
-        if (!checkAttributesOnly) {
-            eventQueue.poll();
-        }
-        //boolean attributesStarted = false;
-        while (eventQueue.isEmpty() || checkAttributesOnly) {
-            lastToken = nextToken();
-            if ((null == lastToken) || (LaState.END == processingStack.get(depth).state)){
-                if (jsonRootUnwrapping) {
-                    generateEEEvent(processingStack.get(depth).lastName);
-                }
-                eventQueue.add(new EndDocumentEvent(new StaxLocation(lexer)));
-                break;
-            }
-            switch (processingStack.get(depth).state) {
-                case START:
-                    if (0 == depth) {
-                        eventQueue.add(new StartDocumentEvent(new StaxLocation(lexer)));
-                        processingStack.get(depth).state = LaState.AFTER_OBJ_START_BRACE;
-                        if (jsonRootUnwrapping) {
-                            processingStack.get(depth).lastName = this.rootElementName;
-                            StartElementEvent event = generateSEEvent(processingStack.get(depth).lastName);
-                            processingStack.get(depth).eventToReadAttributesFor = event;
-                        }
-                        switch (lastToken.tokenType) {
-                            case JsonToken.START_OBJECT:
-                                processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
-                                depth++;
-                                break;
-                            case JsonToken.START_ARRAY:
-                                processingStack.add(new ProcessingState(LaState.AFTER_ARRAY_START_BRACE));
-                                depth++;
-                                break;
-                            case JsonToken.STRING:
-                            case JsonToken.NUMBER:
-                            case JsonToken.TRUE:
-                            case JsonToken.FALSE:
-                            case JsonToken.NULL:
-                                eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
-                                processingStack.get(depth).state = LaState.END;
-                                break;
-                            default:
-                                throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
-                        }
-                    }
-                    processingStack.get(depth).state = LaState.AFTER_OBJ_START_BRACE;
-                    break;
-                case AFTER_OBJ_START_BRACE:
-                    switch (lastToken.tokenType) {
-                        case JsonToken.STRING:
-                            if (lastToken.tokenText.startsWith("@") || attrAsElemNames.contains(lastToken.tokenText)) { // eat attribute
-                                String attrName = lastToken.tokenText.startsWith("@") ? lastToken.tokenText : ("@" + lastToken.tokenText);
-                                colon();
-                                lastToken = nextToken();
-                                // TODO process attr value
-                                if (!valueTokenTypes.contains(lastToken.tokenType)) {
-                                    throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Attribute value expected instead of \"" + lastToken.tokenText + "\"");
-                                }
-                                if (null != processingStack.get(depth - 1).eventToReadAttributesFor) {
-                                    processingStack.get(depth - 1).eventToReadAttributesFor.addAttribute(
-                                            createQName(attrName.substring(1)), lastToken.tokenText);
-                                }
-                                lastToken = nextToken();
-                                switch (lastToken.tokenType) {
-                                    case JsonToken.END_OBJECT:
-                                        processingStack.remove(depth);
-                                        depth--;
-                                        valueRead();
-                                        checkAttributesOnly = false;
-                                        break;
-                                    case JsonToken.COMMA:
-                                        break;
-                                    default:
-                                        throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "\'\"\', or \'}\' expected instead of \"" + lastToken.tokenText + "\"");
-                                }
-                            } else { // non attribute
-                                StartElementEvent event =
-                                        generateSEEvent(lastToken.tokenText);
-                                processingStack.get(depth).eventToReadAttributesFor = event;
-                                checkAttributesOnly = false;
-                                processingStack.get(depth).lastName = lastToken.tokenText;
-                                colon();
-                                processingStack.get(depth).state = LaState.BEFORE_VALUE_IN_KV_PAIR;
-                            }
-                            break;
-                        case JsonToken.END_OBJECT: // empty object/element
-                            generateEEEvent(processingStack.get(depth).lastName);
-                            checkAttributesOnly = false;
-                            processingStack.remove(depth);
-                            depth--;
-                            valueRead();
-                            break;
-                        default:
-                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
-                    }
-                    break;
-                case BEFORE_OBJ_NEXT_KV_PAIR:
-                    switch (lastToken.tokenType) {
-                        case JsonToken.STRING:
-                            StartElementEvent event =
-                                    generateSEEvent(lastToken.tokenText);
-                            processingStack.get(depth).eventToReadAttributesFor = event;
-                            processingStack.get(depth).lastName = lastToken.tokenText;
-                            colon();
-                            processingStack.get(depth).state = LaState.BEFORE_VALUE_IN_KV_PAIR;
-                            break;
-                        default:
-                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
-                    }
-                    break;
-                case BEFORE_VALUE_IN_KV_PAIR:
-                    switch (lastToken.tokenType) {
-                        case JsonToken.START_OBJECT:
-                            processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
-                            depth++;
-                            break;
-                        case JsonToken.START_ARRAY:
-                            processingStack.add(new ProcessingState(LaState.AFTER_ARRAY_START_BRACE));
-                            depth++;
-                            break;
-                        case JsonToken.STRING:
-                        case JsonToken.NUMBER:
-                        case JsonToken.TRUE:
-                        case JsonToken.FALSE:
-                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
-                            processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
-                            break;
-                        case JsonToken.NULL:
-                            //TODO: optionally generate a fake xsi:nil attribute
-//                            if (!eventQueue.isEmpty()) {
-//                                 eventQueue.peek().addAttribute(new QName("http://www.w3.org/2001/XMLSchema-instance", "nil"), "true");
-//                            }
-                            processingStack.get(depth).state = LaState.AFTER_OBJ_KV_PAIR;
-                            break;
-                        default:
-                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
-                    }
-                    break; // AFTER_ARRAY_ELEM
-                case AFTER_OBJ_KV_PAIR:
-                    switch (lastToken.tokenType) {
-                        case JsonToken.COMMA:
-                            processingStack.get(depth).state = LaState.BEFORE_OBJ_NEXT_KV_PAIR;
-                            generateEEEvent(processingStack.get(depth).lastName);
-                            break; // STRING
-                        case JsonToken.END_OBJECT: // empty object/element
-                            generateEEEvent(processingStack.get(depth).lastName);
-                            processingStack.remove(depth);
-                            depth--;
-                            valueRead();
-                            break; // END_OBJECT
-                        default:
-                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
-                    }
-                    break; // AFTER_OBJ_KV_PAIR
-                case AFTER_ARRAY_START_BRACE:
-                    switch (lastToken.tokenType) {
-                        case JsonToken.START_OBJECT:
-                            processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
-                            processingStack.get(depth).eventToReadAttributesFor = processingStack.get(depth - 1).eventToReadAttributesFor;
-                            depth++;
-                            break;
-                        case JsonToken.START_ARRAY:
-                            processingStack.add(new ProcessingState(LaState.AFTER_ARRAY_START_BRACE));
-                            depth++;
-                            break;
-                        case JsonToken.END_ARRAY:
-                            processingStack.remove(depth);
-                            depth--;
-                            valueRead();
-                            break;
-                        case JsonToken.STRING:
-                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
-                            processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
-                            break;
-                        default:
-                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
-                    }
-                    break; // AFTER_ARRAY_ELEM
-                case BEFORE_NEXT_ARRAY_ELEM:
-                    StartElementEvent event =
-                            generateSEEvent(processingStack.get(depth - 1).lastName);
-                    switch (lastToken.tokenType) {
-                        case JsonToken.START_OBJECT:
-                            processingStack.add(new ProcessingState(LaState.AFTER_OBJ_START_BRACE));
-                            processingStack.get(depth).eventToReadAttributesFor = event;
-                            depth++;
-                            break;
-                        case JsonToken.START_ARRAY:
-                            processingStack.add(new ProcessingState(LaState.AFTER_ARRAY_START_BRACE));
-                            depth++;
-                            break;
-                        case JsonToken.STRING:
-                            eventQueue.add(new CharactersEvent(lastToken.tokenText, new StaxLocation(lexer)));
-                            processingStack.get(depth).state = LaState.AFTER_ARRAY_ELEM;
-                            break;
-                        default:
-                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");                   }
-                    break; // BEFORE_NEXT_ARRAY_ELEM
-                case AFTER_ARRAY_ELEM:
-                    switch (lastToken.tokenType) {
-                        case JsonToken.END_ARRAY:
-                            processingStack.remove(depth);
-                            depth--;
-                            valueRead();
-                            break;
-                        case JsonToken.COMMA:
-                            processingStack.get(depth).state = LaState.BEFORE_NEXT_ARRAY_ELEM;
-                            generateEEEvent(processingStack.get(depth - 1).lastName);
-                            break;
-                        default:
-                            throw new JsonFormatException(lastToken.tokenText, lastToken.line, lastToken.column, "Unexpected JSON token");
-                    }
-                    break; // AFTER_ARRAY_ELEM
-            }
-        } // end while lastEvent null
-    }
-
-    @Override
-    public int getAttributeCount() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeCount");
-        assert !eventQueue.isEmpty();
-        if (!eventQueue.peek().attributesChecked) {
-            try {
-                readNext(true);
-            } catch (IOException e) {
-                throw new JsonFormatException("...", -1, -1, "Error counting attributes");
-            }
-            eventQueue.peek().attributesChecked = true;
-        }
-        int result = eventQueue.peek().getAttributeCount();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributeCount", result);
-        return result;
-    }
-
-    @Override
-    public int getEventType() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getEventType");
-        assert !eventQueue.isEmpty();
-        int result = eventQueue.peek().getEventType();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getEventType", result);
-        return result;
-    }
-
-    @Override
-    public int getNamespaceCount() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getNamespaceCount");
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getNamespaceCount", 0);
-        return 0;
-    }
-
-    @Override
-    public int getTextLength() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getTextLength");
-        assert !eventQueue.isEmpty();
-        int result = eventQueue.peek().getTextLength();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getTextLength", result);
-        return result;
-    }
-
-    @Override
-    public int getTextStart() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getTextStart");
-        assert !eventQueue.isEmpty();
-        int result = eventQueue.peek().getTextStart();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getTextStart", result);
-        return result;
-    }
-
-    @Override
-    public int next() throws XMLStreamException {
-        endDocumentCheck();
+    /**
+     * Factory method for creating instances of this class.
+     *
+     * @param reader JSON input.
+     * @param configuration JSON configuration.
+     * @param rootName if non-{@code null} then the {@code JsonXmlStreamReader} emulates presence of root element with this
+     * name for JAXB provider.
+     * @param expectedType expected type of JAXB element.
+     * @param jaxbContext JAXB context.
+     * @param readingList flag whether it is expected that root is an JSON array instead of an object.
+     * @return an instance of JSON XML stream reader
+     * @throws XMLStreamException if an {@link IOException} has been thrown during the creation of an {@code JsonParser} instance.
+     */
+    public static XMLStreamReader create(final Reader reader,
+                                         final JSONConfiguration configuration,
+                                         String rootName,
+                                         final Class<?> expectedType,
+                                         JAXBContext jaxbContext,
+                                         final boolean readingList) throws XMLStreamException {
         try {
-            readNext();
-            final int nextEventType = eventQueue.peek().getEventType();
-            if (nextEventType == XMLStreamConstants.END_DOCUMENT) {
-                endDocumentReached = true;
+            if ((rootName == null || "".equals(rootName)) && (configuration.isRootUnwrapping())) {
+                rootName = "rootElement";
             }
-            return nextEventType;
+            
+            final JsonParser rawParser = new JsonFactory().createJsonParser(reader);
+            final JsonParser nonListParser = configuration.isRootUnwrapping() ? JacksonRootAddingParser.createRootAddingParser
+                    (rawParser, rootName) : rawParser;
+
+            XmlEventProvider eventStack = null;
+            switch (configuration.getNotation()) {
+                case MAPPED:
+                    eventStack = new MappedNotationEventProvider(nonListParser, configuration);
+                    break;
+                case NATURAL:
+                    if (jaxbContext instanceof JSONJAXBContext) {
+                        jaxbContext = ((JSONJAXBContext) jaxbContext).getOriginalJaxbContext();
+                    }
+
+                    if (!readingList) {
+                        eventStack = new NaturalNotationEventProvider(nonListParser, configuration, jaxbContext, expectedType);
+                    } else {
+                        eventStack = new NaturalNotationEventProvider(
+                                JacksonRootAddingParser.createRootAddingParser(nonListParser, "jsonArrayRootElement"),
+                                configuration,
+                                jaxbContext,
+                                expectedType);
+                    }
+                    break;
+            }
+
+            return new JsonXmlStreamReader(eventStack);
         } catch (IOException ex) {
-            Logger.getLogger(JsonXmlStreamReader.class.getName()).log(Level.SEVERE, null, ex);
             throw new XMLStreamException(ex);
         }
     }
 
-    @Override
-    public int nextTag() throws XMLStreamException {
-        endDocumentCheck();
-        int eventType = next();
-        while ((eventType == XMLStreamConstants.CHARACTERS && isWhiteSpace()) // skip whitespace
-                || (eventType == XMLStreamConstants.CDATA && isWhiteSpace()) // skip whitespace
-                || eventType == XMLStreamConstants.SPACE || eventType == XMLStreamConstants.PROCESSING_INSTRUCTION || eventType == XMLStreamConstants.COMMENT) {
-            eventType = next();
+    private JsonXmlStreamReader(final XmlEventProvider nodeStack) {
+        this.eventProvider = nodeStack;
+    }
+
+    /**
+     * Returns a list of attribute of the current element. This method also checks if the parser is in the proper state ({@code
+     * XMLStreamConstants.START_ELEMENT} or {@code XMLStreamConstants.ATTRIBUTE}).
+     *
+     * @return list of the current elements attributes.
+     */
+    private List<JsonXmlEvent.Attribute> getAttributes() {
+        if (getEventType() != XMLStreamConstants.START_ELEMENT
+                && getEventType() != XMLStreamConstants.ATTRIBUTE) {
+            throw new IllegalArgumentException("Parser must be on START_ELEMENT or ATTRIBUTE to read next attribute.");
         }
-        if (eventType != XMLStreamConstants.START_ELEMENT && eventType != XMLStreamConstants.END_ELEMENT) {
-            throw new XMLStreamException("expected start or end tag", getLocation());
+
+        final JsonXmlEvent currentNode = eventProvider.getCurrentNode();
+
+        try {
+            if (currentNode.getAttributes() == null) {
+                eventProvider.processAttributesOfCurrentElement();
+            }
+            return currentNode.getAttributes();
+        } catch (XMLStreamException xse) {
+            // Cannot throw an exception from here - #getAttributeXXX methods doesn't support it - throw it when #next() method
+            // is invoked.
+            validationException = xse;
+
+            return Collections.emptyList();
         }
-        return eventType;
+    }
+
+    /**
+     * Returns an attribute of the current element at given index.
+     *
+     * @param index index of an attribute to retrieve.
+     * @return attribute at given index or {@code null} if the index is outside of boundaries of the list of attributes.
+     */
+    private JsonXmlEvent.Attribute getAttribute(int index) {
+        List<JsonXmlEvent.Attribute> attributes = getAttributes();
+        if (index < 0 || index >= attributes.size()) {
+            return null;
+        }
+        return attributes.get(index);
     }
 
     @Override
     public void close() throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        eventProvider.close();
     }
 
     @Override
-    public boolean hasName() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean hasNext() throws XMLStreamException {
-        return !endDocumentReached;
-    }
-
-    @Override
-    public boolean hasText() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isCharacters() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "isCharacters");
-        assert !eventQueue.isEmpty();
-        boolean result = eventQueue.peek().isCharacters();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "isCharacters", result);
-        return result;
-    }
-
-    @Override
-    public boolean isEndElement() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "isEndElement");
-        assert !eventQueue.isEmpty();
-        boolean result = eventQueue.peek().isEndElement();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "isEndElement", result);
-        return result;
-    }
-
-    @Override
-    public boolean isStandalone() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public boolean isStartElement() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "isStartElement");
-        assert !eventQueue.isEmpty();
-        boolean result = eventQueue.peek().isStartElement();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "isStartElement", result);
-        return result;
-    }
-
-    @Override
-    public boolean isWhiteSpace() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "isWhiteSpace");
-        boolean result = false; // white space processed by lexer
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "isWhiteSpace", result);
-        return result;
-    }
-
-    @Override
-    public boolean standaloneSet() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public char[] getTextCharacters() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getTextCharacters");
-        assert !eventQueue.isEmpty();
-        char[] result = eventQueue.peek().getTextCharacters();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getTextCharacters", result);
-        return result;
-    }
-
-    @Override
-    public boolean isAttributeSpecified(int attribute) {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "isAttributeSpecified");
-        assert !eventQueue.isEmpty();
-        boolean result = eventQueue.peek().isAttributeSpecified(attribute);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "isAttributeSpecified", result);
-        return result;
-    }
-
-    @Override
-    public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length) throws XMLStreamException {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getTextCharacters");
-        assert !eventQueue.isEmpty();
-        int result = eventQueue.peek().getTextCharacters(sourceStart, target, targetStart, length);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getTextCharacters", result);
-        return result;
-    }
-
-    @Override
-    public String getCharacterEncodingScheme() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getElementText() throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getEncoding() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getLocalName() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getLocalName");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getLocalName();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getLocalName", result);
-        return result;
-    }
-
-    @Override
-    public String getNamespaceURI() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getNamespaceURI");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getName().getNamespaceURI();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getNamespaceURI", result);
-        return result;
-    }
-
-    @Override
-    public String getPIData() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getPITarget() {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String getPrefix() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getPrefix");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getPrefix();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getPrefix", result);
-        return result;
-    }
-
-    @Override
-    public String getText() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getText");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getText();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getText", result);
-        return result;
-    }
-
-    @Override
-    public String getVersion() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public int getAttributeCount() {
+        return getAttributes().size();
     }
 
     @Override
     public String getAttributeLocalName(int index) {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeLocalName");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getAttributeLocalName(index);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributeLocalName", result);
-        return result;
+        JsonXmlEvent.Attribute attribute = getAttribute(index);
+        return attribute == null ? null : attribute.getName().getLocalPart();
     }
 
     @Override
     public QName getAttributeName(int index) {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeName");
-        assert !eventQueue.isEmpty();
-        QName result = eventQueue.peek().getAttributeName(index);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributeName", result);
-        return result;
+        JsonXmlEvent.Attribute attribute = getAttribute(index);
+        return attribute == null ? null : attribute.getName();
     }
 
     @Override
     public String getAttributeNamespace(int index) {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeNamespace");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getAttributeNamespace(index);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributeNamespace", result);
-        return result;
+        JsonXmlEvent.Attribute attribute = getAttribute(index);
+        return attribute == null ? null : attribute.getName().getNamespaceURI();
     }
 
     @Override
     public String getAttributePrefix(int index) {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributePrefix");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getAttributePrefix(index);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributePrefix", result);
-        return result;
+        JsonXmlEvent.Attribute attribute = getAttribute(index);
+        return attribute == null ? null : attribute.getName().getPrefix();
     }
 
     @Override
     public String getAttributeType(int index) {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeType");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getAttributeType(index);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributeType", result);
-        return result;
-    }
-
-    @Override
-    public String getAttributeValue(int index) {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeValue");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getAttributeValue(index);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributeValue", result);
-        return result;
+        return null;
     }
 
     @Override
     public String getAttributeValue(String namespaceURI, String localName) {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getAttributeValue");
-        assert !eventQueue.isEmpty();
-        String result = eventQueue.peek().getAttributeValue(namespaceURI, localName);
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getAttributeValue", result);
-        return result;
+        if (localName == null || "".equals(localName)) {
+            return null;
+        }
+        
+        for (JsonXmlEvent.Attribute attribute : getAttributes()) {
+            if (localName.equals(attribute.getName().getLocalPart())
+                    && ((namespaceURI == null) || (namespaceURI.equals(attribute.getName().getNamespaceURI())))) {
+                return attribute.getValue();
+            }
+        }
+
+        return null;
     }
 
     @Override
-    public String getNamespacePrefix(int arg0) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public String getAttributeValue(int index) {
+        JsonXmlEvent.Attribute attribute = getAttribute(index);
+        return attribute == null ? null : attribute.getValue();
     }
 
     @Override
-    public String getNamespaceURI(int arg0) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public String getCharacterEncodingScheme() {
+        return "UTF-8";
     }
 
     @Override
-    public NamespaceContext getNamespaceContext() {
-        // TODO: put/take it to/from processing stack
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getNamespaceContext");
-        NamespaceContext result = new JsonNamespaceContext();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getNamespaceContext", result);
-        return result;
+    public String getElementText() throws XMLStreamException {
+        if(getEventType() != XMLStreamConstants.START_ELEMENT) {
+            throw new XMLStreamException(
+                    "Parser must be on START_ELEMENT to read next text.", getLocation());
+        }
+
+        int eventType = next();
+        StringBuilder content = new StringBuilder();
+
+        while (eventType != XMLStreamConstants.END_ELEMENT) {
+            if(eventType == XMLStreamConstants.CHARACTERS
+                    || eventType == XMLStreamConstants.CDATA
+                    || eventType == XMLStreamConstants.SPACE
+                    || eventType == XMLStreamConstants.ENTITY_REFERENCE) {
+                content.append(getText());
+            } else if (eventType == XMLStreamConstants.PROCESSING_INSTRUCTION
+                    || eventType == XMLStreamConstants.COMMENT) {
+                // skipping
+            } else if (eventType == XMLStreamConstants.END_DOCUMENT) {
+                throw new XMLStreamException(
+                        "Unexpected end of document when reading element text content.", getLocation());
+            } else if (eventType == XMLStreamConstants.START_ELEMENT) {
+                throw new XMLStreamException(
+                        "Element text content may not contain START_ELEMENT.", getLocation());
+            } else {
+                throw new XMLStreamException(
+                        "Unexpected event type " + eventType + ".", getLocation());
+            }
+            eventType = next();
+        }
+
+        return content.toString();
     }
 
     @Override
-    public QName getName() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getName");
-        assert !eventQueue.isEmpty();
-        QName result = eventQueue.peek().getName();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getName");
-        return result;
+    public String getEncoding() {
+        return "UTF-8";
+    }
+
+    @Override
+    public int getEventType() {
+        return eventProvider.getCurrentNode().getEventType();
+    }
+
+    @Override
+    public String getLocalName() {
+        final int eventType = getEventType();
+
+        if (eventType != XMLStreamReader.START_ELEMENT
+                && eventType != XMLStreamReader.END_ELEMENT
+                && eventType != XMLStreamReader.ENTITY_REFERENCE) {
+            throw new IllegalArgumentException(
+                    "Parser must be on START_ELEMENT, END_ELEMENT or ENTITY_REFERENCE to read local name.");
+        }
+        
+        return eventProvider.getCurrentNode().getName().getLocalPart();
     }
 
     @Override
     public Location getLocation() {
-        LOGGER.entering(JsonXmlStreamReader.class.getName(), "getLocation");
-        assert !eventQueue.isEmpty();
-        Location result = eventQueue.peek().getLocation();
-        LOGGER.exiting(JsonXmlStreamReader.class.getName(), "getLocation", result);
-        return result;
+        return eventProvider.getCurrentNode().getLocation();
     }
 
     @Override
-    public Object getProperty(String arg0) throws IllegalArgumentException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public QName getName() {
+        final int eventType = getEventType();
+
+        if (eventType != XMLStreamReader.START_ELEMENT
+                && eventType != XMLStreamReader.END_ELEMENT) {
+            throw new IllegalArgumentException("Parser must be on START_ELEMENT or END_ELEMENT to read the name.");
+        }
+        
+        return eventProvider.getCurrentNode().getName();
     }
 
     @Override
-    public void require(int arg0, String arg1, String arg2) throws XMLStreamException {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public NamespaceContext getNamespaceContext() {
+        return namespaceContext;
     }
 
     @Override
-    public String getNamespaceURI(String arg0) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public int getNamespaceCount() {
+        return this.namespaceContext.getNamespaceCount();
     }
 
-    private StartElementEvent generateSEEvent(String name) {
-        StartElementEvent event = null;
-        if (!"$".equals(name)) {
-           event = new StartElementEvent(createQName(name), new StaxLocation(lexer));
-           eventQueue.add(event);
+    @Override
+    public String getNamespacePrefix(int index) {
+        return null;
+    }
+
+    @Override
+    public String getNamespaceURI(String prefix) {
+        return null;
+    }
+
+    @Override
+    public String getNamespaceURI(int index) {
+        return null;
+    }
+
+    @Override
+    public String getNamespaceURI() {
+        final int eventType = getEventType();
+
+        if (eventType != XMLStreamReader.START_ELEMENT
+                && eventType != XMLStreamReader.END_ELEMENT) {
+            throw new IllegalArgumentException("Parser must be on START_ELEMENT or END_ELEMENT to read the namespace URI.");
         }
-        return event;
+
+        return eventProvider.getCurrentNode().getName().getNamespaceURI();
     }
 
-    private void generateEEEvent(String name) {
-       if ((null != name) && !"$".equals(name)) {
-           eventQueue.add(new EndElementEvent(createQName(name), new StaxLocation(lexer)));
-       }
+    @Override
+    public String getPIData() {
+        return null;
     }
 
-    private QName createQName(String name) {
-        if (revertedXml2JsonNs.isEmpty() || !name.contains(nsSeparatorAsSequence)) {
-            return new QName(name);
-        } else {
-            int dotIndex = name.indexOf(nsSeparator);
-            String prefix = name.substring(0, dotIndex);
-            String suffix = name.substring(dotIndex + 1);
-            return revertedXml2JsonNs.containsKey(prefix) ? new QName(revertedXml2JsonNs.get(prefix), suffix) : new QName(name);
+    @Override
+    public String getPITarget() {
+        return null;
+    }
+
+    @Override
+    public String getPrefix() {
+        return eventProvider.getCurrentNode().getPrefix();
+    }
+
+    @Override
+    public Object getProperty(String name) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("Name is null.");
         }
+        return null;
     }
 
-    private void endDocumentCheck() throws NoSuchElementException {
-        if (endDocumentReached) {
-            throw new NoSuchElementException();
+    @Override
+    public String getText() {
+        final int eventType = getEventType();
+        
+        if(eventType == XMLStreamConstants.CHARACTERS
+                || eventType == XMLStreamConstants.CDATA
+                || eventType == XMLStreamConstants.SPACE
+                || eventType == XMLStreamConstants.ENTITY_REFERENCE) {
+
+            return eventProvider.getCurrentNode().getText();
         }
+        
+        throw new IllegalArgumentException(
+                "Parser must be on CHARACTERS, CDATA, SPACE or ENTITY_REFERENCE to read text.");
     }
+
+    @Override
+    public char[] getTextCharacters() {
+        final String text = getText();
+        return text != null ? text.toCharArray() : new char[0];
+    }
+
+    @Override
+    public int getTextCharacters(int sourceStart, char[] target, int targetStart, int length)
+            throws XMLStreamException {
+        getText().getChars(sourceStart, sourceStart + length, target, targetStart);
+        return length;
+    }
+
+    @Override
+    public int getTextLength() {
+        final String text = getText();
+        return text == null ? 0 : text.length();
+    }
+
+    @Override
+    public int getTextStart() {
+        return 0;
+    }
+
+    @Override
+    public String getVersion() {
+        return null;
+    }
+
+    @Override
+    public boolean hasName() {
+        final int eventType = getEventType();
+
+        if (eventType != XMLStreamReader.START_ELEMENT
+                && eventType != XMLStreamReader.END_ELEMENT) {
+            throw new IllegalArgumentException("Parser must be on START_ELEMENT or END_ELEMENT to read the name.");
+        }
+
+        return eventProvider.getCurrentNode().getName() != null;
+    }
+
+    @Override
+    public boolean hasNext() throws XMLStreamException {
+        // Failure in the previous state?
+        if (validationException != null) {
+            throw validationException;
+        }
+
+        return eventProvider.getCurrentNode().getEventType() != XMLStreamConstants.END_DOCUMENT;
+    }
+
+    @Override
+    public boolean hasText() {
+        final int eventType = getEventType();
+
+        return eventType == XMLStreamConstants.CHARACTERS
+                || eventType == XMLStreamConstants.CDATA
+                || eventType == XMLStreamConstants.SPACE
+                || eventType == XMLStreamConstants.ENTITY_REFERENCE
+                || eventType == XMLStreamConstants.COMMENT
+                || eventType == XMLStreamConstants.DTD;
+    }
+
+    @Override
+    public boolean isAttributeSpecified(int index) {
+        return false;
+    }
+
+    @Override
+    public boolean isCharacters() {
+        return eventProvider.getCurrentNode().getEventType() == XMLStreamConstants.CHARACTERS;
+    }
+
+    @Override
+    public boolean isEndElement() {
+        return eventProvider.getCurrentNode().getEventType() == XMLStreamConstants.END_ELEMENT;
+    }
+
+    @Override
+    public boolean isStandalone() {
+        return false;
+    }
+
+    @Override
+    public boolean isStartElement() {
+        return eventProvider.getCurrentNode().getEventType() == XMLStreamConstants.START_ELEMENT;
+    }
+
+    @Override
+    public boolean isWhiteSpace() {
+        return false;   // JsonParser does not return any whitespace element.
+    }
+
+    @Override
+    public int next() throws XMLStreamException {
+        if (!hasNext()) {
+            throw new IllegalArgumentException("No more parsing elements.");
+        }
+
+        return eventProvider.readNext().getEventType();
+    }
+
+    @Override
+    public int nextTag() throws XMLStreamException {
+        int eventType = next();
+
+        while ((eventType == XMLStreamConstants.CHARACTERS && isWhiteSpace()) // skip whitespace
+                || (eventType == XMLStreamConstants.CDATA && isWhiteSpace()) // skip whitespace
+                || eventType == XMLStreamConstants.SPACE
+                || eventType == XMLStreamConstants.PROCESSING_INSTRUCTION
+                || eventType == XMLStreamConstants.COMMENT) {
+            eventType = next();
+        }
+
+        if (eventType != XMLStreamConstants.START_ELEMENT && eventType != XMLStreamConstants.END_ELEMENT) {
+            throw new XMLStreamException("Expected start or end tag.", getLocation());
+        }
+
+        return eventType;
+    }
+
+    @Override
+    public void require(int type, String namespaceURI, String localName) throws XMLStreamException {
+    }
+
+    @Override
+    public boolean standaloneSet() {
+        return false;
+    }
+
+
 }

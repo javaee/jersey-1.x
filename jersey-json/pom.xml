@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -129,6 +129,11 @@
             <artifactId>jackson-xc</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.moxy</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -237,32 +242,8 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>de.jflex</groupId>
-                <artifactId>maven-jflex-plugin</artifactId>
-                <version>1.4.3</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/generated-sources</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jflex</id>
-            <name>JFlex repository</name>
-            <url>http://jflex.sourceforge.net/maven-jflex-plugin/</url>
-        </pluginRepository>
-    </pluginRepositories>
 
     <reporting>
         <plugins>

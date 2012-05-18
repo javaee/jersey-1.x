@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,8 +37,45 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.impl.wadl;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import com.sun.jersey.api.JResponse;
 import com.sun.jersey.api.client.ClientResponse;
@@ -56,48 +93,19 @@ import com.sun.jersey.impl.entity.JAXBBean;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
-import com.sun.research.ws.wadl.Resources;
+
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
+import com.sun.research.ws.wadl.Resources;
 
 /**
+ * Wadl test cases.
  *
  * @author mh124079
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class WadlResourceTest extends AbstractResourceTester {
 
@@ -217,8 +225,10 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"2");
         // check type of {id} is int
+        String prefix = getXmlSchemaNamespacePrefix(
+                (Node) xp.evaluate("//wadl:resource[@path='{id}']/wadl:param[@name='id']", d, XPathConstants.NODE));
         val = (String)xp.evaluate("//wadl:resource[@path='{id}']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
-        assertEquals(val,"xs:int");
+        assertEquals(val, (prefix == null ? "" : prefix + ":") + "int");
         // check number of output representations is two
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method[@name='GET']/wadl:response/wadl:representation)", d, XPathConstants.STRING);
         assertEquals(val,"2");
@@ -226,8 +236,10 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method[@name='POST']/wadl:request/wadl:representation)", d, XPathConstants.STRING);
         assertEquals(val,"1");
         // check type of {id}/verbose is int
+        prefix = getXmlSchemaNamespacePrefix(
+                (Node) xp.evaluate("//wadl:resource[@path='{id}/verbose']/wadl:param[@name='id']", d, XPathConstants.NODE));
         val = (String)xp.evaluate("//wadl:resource[@path='{id}/verbose']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
-        assertEquals(val,"xs:int");
+        assertEquals(val, (prefix == null ? "" : prefix + ":") + "int");
     }
 
     public void testLastModifiedGET() {
@@ -285,8 +297,10 @@ public class WadlResourceTest extends AbstractResourceTester {
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"2");
         // check type of {id} is int
+        String prefix = getXmlSchemaNamespacePrefix(
+                (Node) xp.evaluate("//wadl:resource[@path='{id}']/wadl:param[@name='id']", d, XPathConstants.NODE));
         val = (String)xp.evaluate("//wadl:resource[@path='{id}']/wadl:param[@name='id']/@type", d, XPathConstants.STRING);
-        assertEquals(val,"xs:int");
+        assertEquals(val, (prefix == null ? "" : prefix + ":") + "int");
         // check number of output representations is two
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method[@name='GET']/wadl:response/wadl:representation)", d, XPathConstants.STRING);
         assertEquals(val,"2");
@@ -313,6 +327,19 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check 1 methods for foo
         val = (String)xp.evaluate("count(//wadl:resource[@path='foo']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"1");
+    }
+
+    private String getXmlSchemaNamespacePrefix(final Node elementNode) {
+        final NamedNodeMap attributes = elementNode.getAttributes();
+
+        for (int i = 0; i < attributes.getLength(); i++) {
+            final Node item = attributes.item(i);
+            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(item.getNodeValue())) {
+                return item.getLocalName();
+            }
+        }
+
+        return "xs";
     }
 
     public void testOptionsLocatorWadl() throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {

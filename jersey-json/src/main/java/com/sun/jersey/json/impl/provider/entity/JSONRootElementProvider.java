@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -126,7 +126,7 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
         final Charset c = getCharset(mediaType);
 
         try {
-            return JSONJAXBContext.getJSONUnmarshaller(u).
+            return JSONJAXBContext.getJSONUnmarshaller(u, getStoredJAXBContext(type)).
                     unmarshalFromJSON(new InputStreamReader(entityStream, c), type);
         } catch (JsonFormatException e) {
             throw new WebApplicationException(e, Status.BAD_REQUEST);
@@ -137,7 +137,7 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
     protected void writeTo(Object t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException {
-        JSONMarshaller jsonMarshaller = JSONJAXBContext.getJSONMarshaller(m);
+        JSONMarshaller jsonMarshaller = JSONJAXBContext.getJSONMarshaller(m, getStoredJAXBContext(t.getClass()));
         if(isFormattedOutput())
             jsonMarshaller.setProperty(JSONMarshaller.FORMATTED, true);
         jsonMarshaller.marshallToJSON(t, new OutputStreamWriter(entityStream, c));

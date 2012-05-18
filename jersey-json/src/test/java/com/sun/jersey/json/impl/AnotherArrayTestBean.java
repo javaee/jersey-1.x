@@ -44,6 +44,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement()
 public class AnotherArrayTestBean {
@@ -60,6 +61,7 @@ public class AnotherArrayTestBean {
         this.cats = cats;
     }
 
+    @XmlTransient
     public List<Cat> getTheCats() {
         return this.cats;
     }
