@@ -41,6 +41,8 @@
 package com.sun.jersey.api.uri;
 
 import java.net.URI;
+import java.util.HashMap;
+
 import javax.ws.rs.core.UriBuilder;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -81,6 +83,27 @@ public class UriBuilderImplTest {
             fail("Expected IllegalArgumentException but got " + e.toString());
         }
         fail("Expected IllegalArgumentException but no exception was thrown.");
+    }
+
+    // for completeness (added along with regression tests for JERSEY-1114)
+    @Test
+    public void testBuildNoSlashUri() {
+        UriBuilder builder = new UriBuilderImpl().uri(URI.create("http://localhost:8080")).path("test");
+        assertEquals("http://localhost:8080/test", builder.build().toString());
+    }
+
+    // regression test for JERSEY-1114
+    @Test
+    public void testBuildFromMapNoSlashInUri() {
+        UriBuilder builder = new UriBuilderImpl().uri(URI.create("http://localhost:8080")).path("test");
+        assertEquals("http://localhost:8080/test", builder.buildFromMap(new HashMap<String, Object>()).toString());
+    }
+
+    // regression test for JERSEY-1114
+    @Test
+    public void testBuildFromArrayNoSlashInUri() {
+        UriBuilder builder = new UriBuilderImpl().uri(URI.create("http://localhost:8080")).path("test");
+        assertEquals("http://localhost:8080/test", builder.build("testing").toString());
     }
 
     // regression test for JERSEY-1081

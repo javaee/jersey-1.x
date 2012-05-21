@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1114
+  http://java.net/jira/browse/JERSEY-1114
+  UriTemplate was not concatenating URI with path correctly.
 - Fixed issue 1118
   http://java.net/jira/browse/JERSEY-1118
   The NPE occurs when a java type of consumes is a primitive type, and not found entity provider
