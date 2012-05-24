@@ -83,6 +83,7 @@ public abstract class AbstractWebAppTest {
 
         List<Option> options = Arrays.asList(options(
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
+                systemProperty("jersey.test.port").value(String.valueOf(port)),
                 systemProperty(BundleLocationProperty).value(bundleLocation),
                 repositories("http://repo1.maven.org/maven2",
                         "http://repository.apache.org/content/groups/snapshots-group",
