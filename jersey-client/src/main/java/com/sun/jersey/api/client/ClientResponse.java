@@ -59,6 +59,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PushbackInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.net.URI;
@@ -463,7 +464,17 @@ public class ClientResponse {
                 entity.reset();
                 return i != -1;
             } else {
-                return false;
+                int b = entity.read();
+                if (b == -1) {
+                    return false;
+                }
+
+                if (!(entity instanceof PushbackInputStream)) {
+                    entity = new PushbackInputStream(entity, 1);
+                }
+                ((PushbackInputStream) entity).unread(b);
+
+                return true;
             }
         } catch (IOException ex) {
             throw new ClientHandlerException(ex);

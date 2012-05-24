@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1127
+  http://java.net/jira/browse/JERSEY-1127
+  Receiving responses using the client API failed occassionally when using chunked encoding.
 - Fixed issue 1114
   http://java.net/jira/browse/JERSEY-1114
   UriTemplate was not concatenating URI with path correctly.
