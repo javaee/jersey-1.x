@@ -1,4 +1,8 @@
 release 1.13
+- Fixed issue 1130
+  http://java.net/jira/browse/JERSEY-1130
+  BeanGenerator.generatedClassCounter is now static (there were issues with
+  multiple instances in the same thread/jvm).
 - Fixed issue 1127
   http://java.net/jira/browse/JERSEY-1127
   Receiving responses using the client API failed occassionally when using chunked encoding.

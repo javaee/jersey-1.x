@@ -44,6 +44,7 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.objectweb.asm.ClassWriter;
@@ -63,24 +64,23 @@ public class BeanGenerator {
     private static final Logger LOGGER = Logger.getLogger(CDIExtension.class.getName());
     private String prefix;
     private Method defineClassMethod;
-    private int generatedClassCounter = 0;
+    private static AtomicInteger generatedClassCounter = new AtomicInteger(0);
 
     BeanGenerator(String prefix) {
         this.prefix = prefix;
-        
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
         try {
             defineClassMethod =
-                AccessController.doPrivileged(new PrivilegedExceptionAction<Method>(){
-                    public Method run() throws Exception{
-                        Class classLoaderClass = Class.forName("java.lang.ClassLoader");
-                        Method method = classLoaderClass.getDeclaredMethod(
-                            "defineClass",
-                            new Class[] { String.class, byte[].class, int.class, int.class });
-                        method.setAccessible(true);
-                        return method;
-                    }
-                });
+                    AccessController.doPrivileged(new PrivilegedExceptionAction<Method>(){
+                        public Method run() throws Exception{
+                            Class classLoaderClass = Class.forName("java.lang.ClassLoader");
+                            Method method = classLoaderClass.getDeclaredMethod(
+                                    "defineClass",
+                                    new Class[] { String.class, byte[].class, int.class, int.class });
+                            method.setAccessible(true);
+                            return method;
+                        }
+                    });
         }
         catch (PrivilegedActionException e) {
             LOGGER.log(Level.SEVERE, "failed to access method ClassLoader.defineClass", e);
@@ -88,10 +88,10 @@ public class BeanGenerator {
             throw new RuntimeException(e);
         }
     }
-    
+
     Class<?> createBeanClass() {
-        ClassWriter writer = new ClassWriter(0);
-        String name = prefix + Integer.toString(generatedClassCounter++);
+        ClassWriter writer = new ClassWriter(0);          a
+        String name = prefix + Integer.toString(generatedClassCounter.addAndGet(1));
         writer.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC, name, null, "java/lang/Object", null);
         MethodVisitor methodVisitor = writer.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
         methodVisitor.visitCode();
