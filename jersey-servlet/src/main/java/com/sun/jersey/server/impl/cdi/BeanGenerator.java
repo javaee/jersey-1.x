@@ -90,7 +90,7 @@ public class BeanGenerator {
     }
 
     Class<?> createBeanClass() {
-        ClassWriter writer = new ClassWriter(0);          a
+        ClassWriter writer = new ClassWriter(0);
         String name = prefix + Integer.toString(generatedClassCounter.addAndGet(1));
         writer.visit(Opcodes.V1_6, Opcodes.ACC_PUBLIC, name, null, "java/lang/Object", null);
         MethodVisitor methodVisitor = writer.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
