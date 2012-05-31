@@ -73,7 +73,6 @@ import com.sun.jersey.json.impl.writer.Stax2JacksonWriter;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonParser;
 
 import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
 
@@ -179,8 +178,6 @@ public class JsonXmlStreamReaderNaturalNotationTest extends TestCase {
 
         String jsonExpression = sWriter.toString();
         System.out.println(jsonExpression);
-
-        JsonParser parser = factory.createJsonParser(new StringReader(jsonExpression));
 
         Unmarshaller unmarshaller = ctx.createUnmarshaller();
         final XMLStreamReader xmlStreamReader = JsonXmlStreamReader.create(new StringReader(jsonExpression), JSONConfiguration

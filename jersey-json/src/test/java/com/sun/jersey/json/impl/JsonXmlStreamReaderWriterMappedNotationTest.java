@@ -121,6 +121,10 @@ public class JsonXmlStreamReaderWriterMappedNotationTest extends TestCase {
         treeModel.root.children.add(new TreeModel.Node("child3"));
         tryBean(treeModel, "oneLevelTree.json", true, null, "expanded");
     }
+
+    public void testSimpleBeanEmpty() throws Exception {
+        tryBean(new SimpleBean(), "simpleBeanEmpty.json", true, null, null);
+    }
     
     public void testSimpleBeanWithAttributes() throws Exception {
         SimpleBeanWithAttributes bean = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
@@ -244,7 +248,7 @@ public class JsonXmlStreamReaderWriterMappedNotationTest extends TestCase {
         String expectedJsonExpr = JSONTestHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter resultWriter = new StringWriter();
-        marshaller.marshal(jaxbBean, JsonXmlStreamWriter.createWriter(resultWriter, config));
+        marshaller.marshal(jaxbBean, JsonXmlStreamWriter.createWriter(resultWriter, config, jaxbBean.getClass(), jaxbContext));
         assertEquals("MISMATCH:\n" + expectedJsonExpr + "\n" + resultWriter.toString() + "\n", 
                 normalizeJsonString(expectedJsonExpr), normalizeJsonString(resultWriter.toString()));
     }

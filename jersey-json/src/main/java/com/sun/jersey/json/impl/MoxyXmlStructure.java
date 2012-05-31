@@ -371,4 +371,10 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
         return true;
     }
 
+    @Override
+    public boolean hasSubElements() {
+        final Collection<QName> expectedElements = getExpectedElements();
+        return expectedElements != null && !expectedElements.isEmpty();
+    }
+
 }

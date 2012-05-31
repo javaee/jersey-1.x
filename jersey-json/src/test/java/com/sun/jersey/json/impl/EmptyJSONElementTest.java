@@ -59,7 +59,7 @@ public class EmptyJSONElementTest extends TestCase {
         final JSONUnmarshaller ju = ctx.createJSONUnmarshaller();
 
         EmptyElementBean one = ju.unmarshalFromJSON(new StringReader("{\"emptyElementBean\":{}}"), EmptyElementBean.class);
-        EmptyElementBean two = ju.unmarshalFromJSON(new StringReader("{\"emptyElementBean\":null}"), EmptyElementBean.class);
+        EmptyElementBean two = ju.unmarshalFromJSON(new StringReader("{\"emptyElementBean\":{\"nullOnly\":null}"), EmptyElementBean.class);
 
         assertEquals(one, two);
     }

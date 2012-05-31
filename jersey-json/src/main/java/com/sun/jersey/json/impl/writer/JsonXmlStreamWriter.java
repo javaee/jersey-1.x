@@ -51,10 +51,14 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.json.impl.JSONHelper;
+import com.sun.jersey.json.impl.JaxbXmlDocumentStructure;
 
 /**
  * Implementation of {@link XMLStreamWriter} for JSON streams in mapped notation.
@@ -146,11 +150,16 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
     final Collection<String> nonStringElementNames = new LinkedList<String>();
     final Map<String, String> xml2JsonNs = new HashMap<String, String>();
 
-    private JsonXmlStreamWriter(Writer writer) {
-        this(writer, JSONConfiguration.DEFAULT);
-    }
+    /**
+     * Document structure to obtain the expected elements and attributes from.
+     */
+    private JaxbXmlDocumentStructure documentStructure;
 
-    private JsonXmlStreamWriter(Writer writer, JSONConfiguration config) {
+    private JsonXmlStreamWriter(final Writer writer,
+                                final JSONConfiguration config,
+                                final Class<?> expectedType,
+                                final JAXBContext jaxbContext) {
+
         this.mainWriter = writer;
         this.stripRoot = config.isRootUnwrapping();
         this.nsSeparator = config.getNsSeparator();
@@ -165,15 +174,20 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
         }
         processingStack.add(createProcessingState());
         depth = 0;
+
+        this.documentStructure = JSONHelper.getXmlDocumentStructure(jaxbContext, expectedType, false);
     }
 
-    public static XMLStreamWriter createWriter(Writer writer, JSONConfiguration config) {
+    public static XMLStreamWriter createWriter(final Writer writer,
+                                               final JSONConfiguration config,
+                                               final Class<?> expectedType,
+                                               final JAXBContext jaxbContext) {
         final Collection<String> attrsAsElems = config.getAttributeAsElements();
         if ((attrsAsElems != null) && !attrsAsElems.isEmpty()) {
             return new A2EXmlStreamWriterProxy(
-                    new JsonXmlStreamWriter(writer, config), attrsAsElems);
+                    new JsonXmlStreamWriter(writer, config, expectedType, jaxbContext), attrsAsElems);
         } else {
-            return new JsonXmlStreamWriter(writer, config);
+            return new JsonXmlStreamWriter(writer, config, expectedType, jaxbContext);
         }
     }
 
@@ -226,17 +240,32 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
                 }
             }
             if (processingStack.get(depth).writer.isEmpty) {
-                processingStack.get(depth).writer.write("null");
+                if(documentStructure.isArrayCollection() || documentStructure.hasSubElements()) {
+                    processingStack.get(depth).writer.write("{}");
+                } else {
+                    processingStack.get(depth).writer.write("null");
+                }
             } else if ((null == processingStack.get(depth).lastWasPrimitive) || !processingStack.get(depth).lastWasPrimitive) {
                 processingStack.get(depth).writer.write("}");
             }
             processingStack.get(depth - 1).lastName = processingStack.get(depth - 1).currentName;
             processingStack.get(depth - 1).lastWasPrimitive = false;
             processingStack.get(depth - 1).lastElementWriter = processingStack.get(depth).writer;
+
+            documentStructure.endElement(getQName(processingStack.get(depth - 1).currentName));
             pollStack();
         } catch (IOException ex) {
             throw new XMLStreamException(ex);
         }
+    }
+
+    private QName getQName(String s) {
+        final String[] currentName = s.split(Character.toString(nsSeparator));
+        QName name = new QName(s);
+        if (currentName.length > 1) {
+            name = new QName(currentName[0], currentName[1]);
+        }
+        return name;
     }
 
     public void writeCharacters(char[] text, int start, int length) throws XMLStreamException {
@@ -375,6 +404,7 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
             }
             depth++;
             processingStack.add(depth, createProcessingState());
+            documentStructure.startElement(new QName(namespaceURI, localName));
         } catch (IOException ex) {
             throw new XMLStreamException(ex);
         }

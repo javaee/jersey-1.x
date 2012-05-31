@@ -50,6 +50,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.core.util.ReaderWriter;
 import com.sun.jersey.json.impl.reader.JsonXmlStreamReader;
 import com.sun.jersey.json.impl.writer.JacksonArrayWrapperGenerator;
@@ -87,8 +88,12 @@ public class Stax2JsonFactory {
     public static XMLStreamWriter createWriter(final Writer writer,
                                                final JSONConfiguration config,
                                                final Class<?> expectedType,
-                                               final JAXBContext jaxbContext,
+                                               JAXBContext jaxbContext,
                                                final boolean writingList) throws IOException {
+        if (jaxbContext instanceof JSONJAXBContext) {
+            jaxbContext = ((JSONJAXBContext) jaxbContext).getOriginalJaxbContext();
+        }
+
         switch (config.getNotation()) {
             case NATURAL:
                 final JsonGenerator rawGenerator = new JsonFactory().createJsonGenerator(writer);
@@ -102,7 +107,7 @@ public class Stax2JsonFactory {
                     return new Stax2JacksonWriter(bodyGenerator, config, expectedType, jaxbContext);
                     }
             case MAPPED:
-                return JsonXmlStreamWriter.createWriter(writer, config);
+                return JsonXmlStreamWriter.createWriter(writer, config, expectedType, jaxbContext);
             case BADGERFISH:
                 return new BadgerFishXMLStreamWriter(writer);
             case MAPPED_JETTISON:
@@ -121,7 +126,6 @@ public class Stax2JsonFactory {
     public static XMLStreamReader createReader(final Reader reader, final JSONConfiguration config, final String rootName, final Class<?> expectedType, final JAXBContext jaxbContext) throws XMLStreamException {
         return createReader(reader, config, rootName, expectedType, jaxbContext, false);
     }
-
 
     public static XMLStreamReader createReader(final Reader reader, final JSONConfiguration config, final String rootName, final Class<?> expectedType, final JAXBContext jaxbContext, final boolean readingList) throws XMLStreamException {
 

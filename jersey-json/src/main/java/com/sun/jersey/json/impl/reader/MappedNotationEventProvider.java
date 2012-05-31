@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.json.impl.reader;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +61,7 @@ class MappedNotationEventProvider extends XmlEventProvider {
 
     private final char nsSeparator;
     private final CharSequence nsSeparatorAsSequence;
+    private final Collection<String> arrays;
 
     protected MappedNotationEventProvider(final JsonParser parser, final JSONConfiguration configuration)
             throws XMLStreamException {
@@ -67,6 +69,8 @@ class MappedNotationEventProvider extends XmlEventProvider {
 
         nsSeparator = configuration.getNsSeparator();
         nsSeparatorAsSequence = new StringBuffer(1).append(nsSeparator);
+
+        arrays = configuration.getArrays();
 
         // xmlNs-jsonNs -> jsonNs-xmlNs
         final Map<String, String> xml2JsonNs = configuration.getXml2JsonNs();

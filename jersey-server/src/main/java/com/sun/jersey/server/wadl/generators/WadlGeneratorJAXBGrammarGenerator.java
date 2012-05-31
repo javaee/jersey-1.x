@@ -476,8 +476,13 @@ public class WadlGeneratorJAXBGrammarGenerator implements WadlGenerator {
                         return null;
                     }
 
-                    return copy.getElementName(parameterClassInstance);
-
+                    try {
+                        return copy.getElementName(parameterClassInstance);
+                    } catch (NullPointerException e) {
+                        // EclipseLink throws an NPE if an object annotated with @XmlType and without the @XmlRootElement
+                        // annotation is passed as a parameter of #getElementName method.
+                        return null;
+                    }
                 }
             };
         }

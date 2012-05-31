@@ -45,10 +45,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,13 +57,11 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.codehaus.jackson.JsonGenerationException;
-import org.codehaus.jackson.JsonGenerator;
-
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.JaxbXmlDocumentStructure;
+
+import org.codehaus.jackson.JsonGenerator;
 
 /**
  * Implementation of {@link XMLStreamWriter} for JSON streams in natural notation.
@@ -162,10 +158,6 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
                               JAXBContext jaxbContext) {
         this.attrsWithPrefix = config.isUsingPrefixesAtNaturalAttributes();
         this.generator = JacksonStringMergingGenerator.createGenerator(generator);
-
-        if (jaxbContext instanceof JSONJAXBContext) {
-            jaxbContext = ((JSONJAXBContext) jaxbContext).getOriginalJaxbContext();
-        }
         this.documentStructure = JSONHelper.getXmlDocumentStructure(jaxbContext, expectedType, false);
     }
 
@@ -179,7 +171,7 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
         writeStartElement(null, localName, namespaceURI);
     }
 
-    private void ensureStartObjectBeforeFieldName(ProcessingInfo pi) throws JsonGenerationException, IOException {
+    private void ensureStartObjectBeforeFieldName(ProcessingInfo pi) throws IOException {
         if ((pi != null) && pi.afterFN) {
             generator.writeStartObject();
             peek2nd(processingStack).startObjectWritten = true;
@@ -243,24 +235,10 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
             addAll(Arrays.asList(_pt));
         }
     };
-    static final Set<Type> primitiveTypeArrays = new HashSet<Type>() {
-
-        {
-            addAll(Arrays.asList(_pta));
-        }
-    };
     static final Set<Type> nonStringTypes = new HashSet<Type>() {
 
         {
             addAll(Arrays.asList(_nst));
-        }
-    };
-    static final Map<Type, Type> pta2pMap = new HashMap<Type, Type>() {
-
-        {
-            for (int i = 0; i < _pta.length; i++) {
-                put(_pta[i], _pt[i]);
-            }
         }
     };
 
@@ -319,7 +297,13 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
             generator.writeEndObject();
         } else {
             if (pi.afterFN && pi.lastUnderlyingPI == null) {
-                generator.writeNull();
+                if(documentStructure.isArrayCollection()
+                        || documentStructure.hasSubElements()) {
+                    generator.writeStartObject();
+                    generator.writeEndObject();
+                } else {
+                    generator.writeNull();
+                }
             }
         }
     }
@@ -336,8 +320,8 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
             if ((removedPI.lastUnderlyingPI != null) && (removedPI.lastUnderlyingPI.isArray)) {
                 generator.writeEndArray();
             }
-            documentStructure.endElement(removedPI.elementName);
             cleanlyEndObject(removedPI);
+            documentStructure.endElement(removedPI.elementName);
         } catch (IOException ex) {
             Logger.getLogger(Stax2JacksonWriter.class.getName()).log(Level.SEVERE, null, ex);
             throw new XMLStreamException(ex);

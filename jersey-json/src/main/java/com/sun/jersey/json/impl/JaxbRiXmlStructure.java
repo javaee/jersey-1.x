@@ -153,20 +153,28 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
     }
 
     @Override
-    public void startElement(QName name) {
+    public void startElement(final QName name) {
         if (!isReader) {
-            final XMLSerializer xs = XMLSerializer.getInstance();
-            final Property cp = (xs == null) ? null : xs.getCurrentProperty();
-            final RuntimePropertyInfo ri = (cp == null) ? null : cp.getInfo();
-
-            processedNodes.add(new NodeWrapper(ri));
+            processedNodes.add(new NodeWrapper(getCurrentElementRuntimePropertyInfo()));
         }
+    }
+
+    private RuntimePropertyInfo getCurrentElementRuntimePropertyInfo() {
+        final XMLSerializer xs = XMLSerializer.getInstance();
+        final Property cp = (xs == null) ? null : xs.getCurrentProperty();
+        return (cp == null) ? null : cp.getInfo();
     }
 
     @Override
     public boolean isArrayCollection() {
-        final NodeWrapper peek = processedNodes.get(processedNodes.size() - 1);
-        return peek.runtimePropertyInfo != null && peek.runtimePropertyInfo.isCollection() && !isWildcardElement(peek.runtimePropertyInfo);
+        RuntimePropertyInfo runtimePropertyInfo = isReader ? null : getCurrentElementRuntimePropertyInfo();
+
+        if (runtimePropertyInfo == null && !processedNodes.isEmpty()) {
+            final NodeWrapper peek = processedNodes.get(processedNodes.size() - 1);
+            runtimePropertyInfo = peek.runtimePropertyInfo;
+        }
+
+        return runtimePropertyInfo != null && runtimePropertyInfo.isCollection() && !isWildcardElement(runtimePropertyInfo);
     }
 
     @Override
@@ -178,6 +186,16 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean hasSubElements() {
+        if (isReader) {
+            return !getExpectedElements().isEmpty();
+        } else {
+            return !processedNodes.isEmpty()
+                    && processedNodes.get(processedNodes.size() - 1) != getCurrentElementRuntimePropertyInfo();
+        }
     }
 
     @Override

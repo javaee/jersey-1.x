@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,7 +37,6 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.json.impl;
 
 import java.util.Formatter;
@@ -47,17 +46,26 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
  * @author mchenryc
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 @XmlRootElement(name = "listEmptyBean")
 public class ListEmptyBean {
-    public List<String> empty = new LinkedList<String>();
+
+    private List<String> empty;
     
     public static Object createTestInstance() {
         ListEmptyBean instance = new ListEmptyBean();
         instance.empty = new LinkedList<String>();
         return instance;
+    }
+
+    public List<String> getEmpty() {
+        return empty;
+    }
+
+    public void setEmpty(List<String> empty) {
+        this.empty = empty;
     }
 
     @Override
@@ -69,10 +77,9 @@ public class ListEmptyBean {
             return false;
         }
         final ListEmptyBean other = (ListEmptyBean) obj;
-        if (this.empty != other.empty && (this.empty == null || !this.empty.equals(other.empty))) {
-            return false;
-        }
-        return true;
+        return this.empty == other.empty
+                    || (JSONTestHelper.isCollectionEmpty(this.empty) && JSONTestHelper.isCollectionEmpty(other.empty))
+                    || (this.empty != null && this.empty.equals(other.empty));
     }
 
     @Override

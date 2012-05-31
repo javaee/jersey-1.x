@@ -40,6 +40,7 @@
 package com.sun.jersey.json.impl.reader;
 
 import java.io.IOException;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
@@ -77,6 +78,60 @@ public abstract class XmlEventProvider {
         }
     }
 
+    /**
+     * This wrapper of the {@code JsonParser} allows to peek at the following tokens without actually processing them.
+     */
+    private static class CachedJsonParser {
+
+        /**
+         * JSON parser.
+         */
+        private final JsonParser parser;
+        private final Queue<JsonToken> tokens = new LinkedList<JsonToken>();
+
+        public CachedJsonParser(final JsonParser parser) {
+            this.parser = parser;
+        }
+
+        public JsonToken nextToken() throws IOException {
+            return tokens.isEmpty() ? parser.nextToken() : tokens.poll();
+        }
+
+        public JsonToken peekNext() throws IOException {
+            final JsonToken jsonToken = parser.nextToken();
+            tokens.add(jsonToken);
+            return jsonToken;
+        }
+
+        public JsonToken peek() throws IOException {
+            if (tokens.isEmpty()) {
+                tokens.add(parser.nextToken());
+            }
+            return tokens.peek();
+        }
+
+        public JsonToken poll() throws IOException {
+            return tokens.poll();
+        }
+
+        public void close() throws IOException {
+            parser.close();
+        }
+
+        public JsonLocation getCurrentLocation() {
+            return parser.getCurrentLocation();
+        }
+
+        public String getText() throws IOException {
+            return parser.getText();
+        }
+
+        public String getCurrentName() throws IOException {
+            return parser.getCurrentName();
+        }
+
+    }
+
     private static final Logger LOGGER = Logger.getLogger(XmlEventProvider.class.getName());
 
     private final JSONConfiguration configuration;
@@ -84,17 +139,17 @@ public abstract class XmlEventProvider {
     /**
      * JSON parser.
      */
-    private final JsonParser parser;
+    private final CachedJsonParser parser;
 
     /**
      * Queue of unprocessed events.
      */
-    private final Queue<JsonXmlEvent> eventQueue = new LinkedList<JsonXmlEvent>();
+    private final Deque<JsonXmlEvent> eventQueue = new LinkedList<JsonXmlEvent>();
 
     final Stack<ProcessingInfo> processingStack = new Stack<ProcessingInfo>();
     
     protected XmlEventProvider(final JsonParser parser, final JSONConfiguration configuration) throws XMLStreamException {
-        this.parser = parser;
+        this.parser = new CachedJsonParser(parser);
         this.configuration = configuration;
 
         try {
@@ -255,8 +310,14 @@ public abstract class XmlEventProvider {
                                     // element event
                                     final QName elementName = getElementQName(fieldName);
                                     final JsonLocation currentLocation = parser.getCurrentLocation();
-                                    eventQueue.add(createStartElementEvent(elementName, new StaxLocation(currentLocation)));
-                                    processingStack.add(new ProcessingInfo(elementName, false, true));
+
+                                    if (!isEmptyArray()) {
+                                        eventQueue.add(createStartElementEvent(elementName, new StaxLocation(currentLocation)));
+                                        processingStack.add(new ProcessingInfo(elementName, false, true));
+                                    }
+                                    if (eventQueue.isEmpty()) {
+                                        continue;
+                                    }
 
                                     return getCurrentNode();
                                 }
@@ -326,6 +387,31 @@ public abstract class XmlEventProvider {
         } catch (Exception e) {
             throw new XMLStreamException(e);
         }
+    }
+
+    /**
+     * Checks if the currently processed JSON field is represented as an empty array. If so array tokens are thrown away and no
+     * {@code StartElementEvent} should be created.
+     *
+     * @return {@code true} if next tokens signalize an empty array, {@code false} otherwise.
+     * @throws IOException if there is a problem reading next {@code JsonToken}.
+     */
+    private boolean isEmptyArray() throws IOException {
+        final JsonToken jsonToken = parser.peekNext();
+
+        if (jsonToken == JsonToken.VALUE_NULL
+                || (jsonToken == JsonToken.START_ARRAY && parser.peekNext() == JsonToken.END_ARRAY)) {
+            // throw away parser tokens
+            parser.poll();
+
+            if (parser.peek() == JsonToken.END_ARRAY) {
+                parser.poll();
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

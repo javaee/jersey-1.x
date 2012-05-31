@@ -138,4 +138,13 @@ public interface JaxbXmlDocumentStructure {
      * {@code false} otherwise.
      */
     public boolean isSameArrayCollection();
+
+    /**
+     * Returns {@code true} if JAXB bean of the currently processed element can contain any subelements.
+     *
+     * @return {@code true} if JAXB bean of the currently processed element can contain any subelements,
+     * {@code false} otherwise.
+     */
+    public boolean hasSubElements();
+
 }

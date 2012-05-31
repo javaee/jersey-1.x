@@ -128,6 +128,10 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
         tryBean(SimpleBean.class, "simpleBean_natural.json", SimpleBean.createTestInstance());
     }
 
+    public void testSimpleEmptyBean() throws Exception {
+        tryBean(SimpleBean.class, "simpleBeanEmpty_natural.json", new SimpleBean());
+    }
+
     public void testSimpleBeanWithAttributes() throws Exception {
         tryBean(SimpleBeanWithAttributes.class, "simpleBeanWithAttributes_natural.json",
                 SimpleBeanWithAttributes.createTestInstance());
@@ -157,6 +161,17 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
 
     public void testUserTable() throws Exception {
         tryBean(UserTable.class, "userTable_natural.json", UserTable.createTestInstance());
+    }
+
+    public void testListEmptyBeanVerbose() throws Exception {
+        Map<String, Object> props = new HashMap<String, Object>();
+
+        props.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+        Class[] classes = new Class[]{ListEmptyBean.class};
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);
+
+        tryReadingBean(ListEmptyBean.class, "listEmptyBeanVerbose_natural.json", ListEmptyBean.createTestInstance(), jaxbContext);
     }
 
     private void tryBean(final Class clazz,
