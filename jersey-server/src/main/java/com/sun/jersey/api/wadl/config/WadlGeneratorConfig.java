@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -123,7 +123,7 @@ import com.sun.jersey.server.wadl.generators.resourcedoc.WadlGeneratorResourceDo
  * <ul>
  *  <li>{@link WadlGeneratorApplicationDoc}</li>
  *  <li>{@link WadlGeneratorGrammarsSupport}</li>
- *  <li>{@link WadlGeneratorJAXBGrammarGenerator}</li>
+ *  <li>{@link com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator}</li>
  *  <li>{@link WadlGeneratorResourceDocSupport}</li>
  * </ul>
  * </p>

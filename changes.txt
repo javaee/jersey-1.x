@@ -1,4 +1,8 @@
 release 1.13
+- Fixed issue 1161
+  http://java.net/jira/browse/JERSEY-1161
+  Added log message when GET method is going to be replaced with POST
+  (HttpUrlConnection implementation "detail").
 - Fixed issue 1130
   http://java.net/jira/browse/JERSEY-1130
   BeanGenerator.generatedClassCounter is now static (there were issues with
