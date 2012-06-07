@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1198
+  http://java.net/jira/browse/JERSEY-1198
+  UriTemplates containing characters that had special meaning (for regex expressions) did not work correctly.
 - Fixed issue 1168
   http://java.net/jira/browse/JERSEY-1168
   XML Trees don't serialize children arrays correctly when the sub element is the same
