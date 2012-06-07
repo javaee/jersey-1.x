@@ -92,15 +92,22 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
         private Map<String, QName> qNamesOfExpAttrs = new HashMap<String, QName>();
 
         private final XPathNode xPathNode;
+        private final XPathNodeWrapper parent;
         private final ClassDescriptor classDescriptor;
         private final QName name;
         private final MappingNodeValue nodeValue;
 
+        public XPathNodeWrapper(final QName name) {
+            this(null, null, null, null, name);
+        }
+
         public XPathNodeWrapper(final XPathNode xPathNode,
+                                final XPathNodeWrapper parent,
                                 final MappingNodeValue nodeValue,
                                 final ClassDescriptor classDescriptor,
                                 final QName name) {
             this.xPathNode = xPathNode;
+            this.parent = parent;
             this.nodeValue = nodeValue;
             this.classDescriptor = classDescriptor;
             this.name = name;
@@ -144,6 +151,11 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
             return classDescriptor;
         }
 
+        public boolean isInSameArrayAs(final XPathNodeWrapper wrapper) {
+            return wrapper != null
+                    && this.classDescriptor == wrapper.classDescriptor && this.parent == wrapper.parent;
+        }
+
     }
 
     /**
@@ -152,6 +164,12 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
      * @see XPathNodeWrapper
      */
     private Stack<XPathNodeWrapper> xPathNodes = new Stack<XPathNodeWrapper>();
+
+    /**
+     * Last {@code XPathNodeWrapper} that was created in the {@link #startElement(javax.xml.namespace.QName)} method (can be an
+     * element representing primitive value or an attribute so it may not be stored in the {@link #xPathNodes} stack).
+     */
+    private XPathNodeWrapper lastAccessedNode = null;
 
     /**
      * Expected type of unmarshalled entity. For {@code MoxyXmlStructure}.
@@ -171,7 +189,9 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
 
     private final boolean isReader;
 
-    MoxyXmlStructure(final JAXBContext jaxbContext, final Class<?> expectedType, final boolean isReader) {
+    public MoxyXmlStructure(final JAXBContext jaxbContext, final Class<?> expectedType, final boolean isReader) {
+        super(jaxbContext, expectedType, isReader);
+
         this.jaxbContext = jaxbContext;
         this.expectedType = expectedType;
         this.isReader = isReader;
@@ -185,6 +205,10 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
      * {@link JAXBElement}.
      */
     private void createRootNodeWrapperForExpectedElement(final QName elementName) {
+        if (jaxbContext == null) {
+            return;
+        }
+
         final org.eclipse.persistence.jaxb.JAXBContext moxyJaxbContext = JAXBHelper.getJAXBContext(jaxbContext);
         final XMLContext xmlContext = moxyJaxbContext.getXMLContext();
         final DatabaseSession session = xmlContext.getSession(0);
@@ -216,7 +240,8 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
         if (descriptor != null) {
             final TreeObjectBuilder objectBuilder = (TreeObjectBuilder) descriptor.getObjectBuilder();
 
-            xPathNodes.push(new XPathNodeWrapper(objectBuilder.getRootXPathNode(), null, descriptor, new QName(expectedType.getSimpleName())));
+            xPathNodes.push(new XPathNodeWrapper(objectBuilder.getRootXPathNode(),
+                    null, null, descriptor, new QName(expectedType.getSimpleName())));
         }
     }
 
@@ -282,6 +307,7 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
         }
 
         XPathNode childNode = null;
+        XPathNodeWrapper newNodeWrapper = null;
 
         // find our child node
         final XPathNodeWrapper currentNodeWrapper = getCurrentNodeWrapper();
@@ -308,11 +334,19 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
 
                     if (descriptor != null) {
                         TreeObjectBuilder objectBuilder = (TreeObjectBuilder) descriptor.getObjectBuilder();
-                        xPathNodes.push(new XPathNodeWrapper(objectBuilder.getRootXPathNode(), nodeValue, descriptor, name));
+                        final XPathNodeWrapper nodeWrapper = getCurrentNodeWrapper();
+
+                        newNodeWrapper = new XPathNodeWrapper(
+                                objectBuilder.getRootXPathNode(),
+                                nodeWrapper,
+                                nodeValue, descriptor, name);
+
+                        xPathNodes.push(newNodeWrapper);
                     }
                 }
             }
         }
+        lastAccessedNode = newNodeWrapper == null ? new XPathNodeWrapper(name) : newNodeWrapper;
     }
 
     @Override
@@ -322,6 +356,8 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
         if (xPathNodeWrapper != null && xPathNodeWrapper.name.equals(name)) {
             xPathNodes.pop();
         }
+
+        lastAccessedNode = getCurrentNodeWrapper();
     }
 
     @Override
@@ -357,7 +393,8 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
     public boolean isArrayCollection() {
         final XPathNodeWrapper currentNodeWrapper = getCurrentNodeWrapper();
 
-        if (currentNodeWrapper != null) {
+        if (currentNodeWrapper != null && lastAccessedNode != null
+                && lastAccessedNode.name == currentNodeWrapper.name) {
             final MappingNodeValue nodeValue = currentNodeWrapper.getNodeValue();
 
             return nodeValue != null && nodeValue.isContainerValue();
@@ -368,7 +405,16 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
 
     @Override
     public boolean isSameArrayCollection() {
-        return true;
+        final int size = xPathNodes.size();
+        if (size >= 2) {
+            final XPathNodeWrapper last = xPathNodes.peek();
+            final XPathNodeWrapper beforeLast = xPathNodes.get(size - 2);
+
+            if (last.isInSameArrayAs(beforeLast)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

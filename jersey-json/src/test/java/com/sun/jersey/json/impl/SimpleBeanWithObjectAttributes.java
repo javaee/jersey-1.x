@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,46 +39,76 @@
  */
 package com.sun.jersey.json.impl;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.lang.reflect.Method;
-import java.util.Collection;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Formatter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ *
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
-public class JSONTestHelper {
+@XmlRootElement
+public class SimpleBeanWithObjectAttributes {
 
-    public static String getResourceAsString(String prefix, String resource) throws IOException {
-        Reader reader = new InputStreamReader(
-                Thread.currentThread().getContextClassLoader().getResourceAsStream(prefix + resource));
-        StringBuilder sb = new StringBuilder();
-        char[] c = new char[1024];
-        int l;
-        while ((l = reader.read(c)) != -1) {
-            sb.append(c, 0, l);
+    @XmlAttribute public URI uri;
+    public String s1;
+    @XmlAttribute public Integer i;
+    @XmlAttribute public String j;
+
+    public SimpleBeanWithObjectAttributes() {
+    }
+
+    public static Object createTestInstance() {
+        return new SimpleBeanWithObjectAttributes();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
         }
-        return sb.toString();
-    }
-
-    public static <T> T createTestInstance(Class<T> clazz) {
-        try {
-            Method createMethod = clazz.getDeclaredMethod("createTestInstance");
-            return (T) createMethod.invoke(clazz);
-        } catch (Exception ex) {
-            return null;
+        if (getClass() != obj.getClass()) {
+            return false;
         }
+        final SimpleBeanWithObjectAttributes other = (SimpleBeanWithObjectAttributes) obj;
+        if (this.s1 != other.s1 && (this.s1 == null || !this.s1.equals(other.s1))) {
+            return false;
+        }
+        if (this.j != other.j && (this.j == null || !this.j.equals(other.j))) {
+            return false;
+        }
+        if (this.uri != other.uri && (this.uri == null || !this.uri.equals(other.uri))) {
+            return false;
+        }
+        if (this.i != other.i && (this.i == null || !this.i.equals(other.i))) {
+            return false;
+        }
+        return true;
     }
 
-    public static boolean isCollectionEmpty(final Collection<?> collection) {
-        return collection == null || collection.isEmpty();
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        if (null != s1) {
+            hash += 17 * s1.hashCode();
+        }
+        if (null != j) {
+            hash += 17 * j.hashCode();
+        }
+        if (null != uri) {
+            hash += 17 * uri.hashCode();
+        }
+        hash += 13 * i;
+        return hash;
     }
 
-    public static <T> boolean areCollectionsEqual(final Collection<T> collection1,
-                                                  final Collection<T> collection2) {
-        return collection1 == collection2
-                || (JSONTestHelper.isCollectionEmpty(collection1) && JSONTestHelper.isCollectionEmpty(collection2))
-                || (collection1 != null && collection1.equals(collection2));
+    @Override
+    public String toString() {
+        return (new Formatter()).format("SBWOA(%s,%d,%s,%s)", s1, i, j, uri).toString();
     }
 }

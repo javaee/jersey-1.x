@@ -41,7 +41,7 @@ package com.sun.jersey.json.impl;
 
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
@@ -56,7 +56,6 @@ import com.sun.jersey.json.impl.writer.Stax2JacksonWriter;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
 import static com.sun.jersey.json.impl.util.JSONNormalizer.normalizeJsonString;
 
 import junit.framework.TestCase;
@@ -104,6 +103,11 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
                 ComplexBeanWithAttributes3.createTestInstance());
     }
 
+    public void testComplexBeanWithAttributes4() throws Exception {
+        tryBean(ComplexBeanWithAttributes4.class, "complexBeanWithAttributes4_natural.json",
+                ComplexBeanWithAttributes4.createTestInstance());
+    }
+
     public void testEncodedContentBean() throws Exception {
         tryBean(EncodedContentBean.class, "encodedContentBean_natural.json", EncodedContentBean.createTestInstance());
     }
@@ -137,6 +141,11 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
                 SimpleBeanWithAttributes.createTestInstance());
     }
 
+    public void testSimpleBeanWithObjectAttributes() throws Exception {
+        tryBean(SimpleBeanWithObjectAttributes.class, "simpleBeanWithObjectAttributes_natural.json",
+                SimpleBeanWithObjectAttributes.createTestInstance());
+    }
+
     public void testSimpleBeanWithJustOneAttribute() throws Exception {
         tryBean(SimpleBeanWithJustOneAttribute.class, "simpleBeanWithJustOneAttribute_natural.json",
                 SimpleBeanWithJustOneAttribute.createTestInstance());
@@ -149,6 +158,14 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
 
     public void testTreeModelBean() throws Exception {
         tryBean(TreeModel.class, "treeModel_natural.json", TreeModel.createTestInstance());
+    }
+
+    public void testTreeModelRootWithOneChild() throws Exception {
+        tryBean(TreeModel.class, "treeModelRootWithOneChild_natural.json", TreeModel.createTestInstanceWithRootAndOneChildNode());
+    }
+
+    public void testTreeModelRootWithMultipleChildren() throws Exception {
+        tryBean(TreeModel.class, "treeModelRootWithMultipleChildren_natural.json", TreeModel.createTestInstanceWithRootAndMultipleChildNodes());
     }
 
     public void testTwoListsWrapperBean() throws Exception {
@@ -164,9 +181,7 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
     }
 
     public void testListEmptyBeanVerbose() throws Exception {
-        Map<String, Object> props = new HashMap<String, Object>();
-
-        props.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+        Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
         Class[] classes = new Class[]{ListEmptyBean.class};
 
         JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);
@@ -177,10 +192,7 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
     private void tryBean(final Class clazz,
                          final String jsonExprFilename,
                          final Object jaxbBean) throws Exception {
-
-        Map<String, Object> props = new HashMap<String, Object>();
-
-        props.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+        Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
         Class[] classes = new Class[]{clazz};
 
         JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);

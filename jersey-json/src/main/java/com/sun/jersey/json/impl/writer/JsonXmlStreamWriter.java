@@ -51,14 +51,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.json.impl.JSONHelper;
-import com.sun.jersey.json.impl.JaxbXmlDocumentStructure;
 
 /**
  * Implementation of {@link XMLStreamWriter} for JSON streams in mapped notation.
@@ -150,18 +147,15 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
     final Collection<String> nonStringElementNames = new LinkedList<String>();
     final Map<String, String> xml2JsonNs = new HashMap<String, String>();
 
-    /**
-     * Document structure to obtain the expected elements and attributes from.
-     */
-    private JaxbXmlDocumentStructure documentStructure;
+    private final String rootName;
 
     private JsonXmlStreamWriter(final Writer writer,
                                 final JSONConfiguration config,
-                                final Class<?> expectedType,
-                                final JAXBContext jaxbContext) {
+                                final String rootName) {
 
         this.mainWriter = writer;
         this.stripRoot = config.isRootUnwrapping();
+        this.rootName = rootName;
         this.nsSeparator = config.getNsSeparator();
         if (null != config.getArrays()) {
             this.arrayElementNames.addAll(config.getArrays());
@@ -174,20 +168,17 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
         }
         processingStack.add(createProcessingState());
         depth = 0;
-
-        this.documentStructure = JSONHelper.getXmlDocumentStructure(jaxbContext, expectedType, false);
     }
 
     public static XMLStreamWriter createWriter(final Writer writer,
                                                final JSONConfiguration config,
-                                               final Class<?> expectedType,
-                                               final JAXBContext jaxbContext) {
+                                               final String rootName) {
         final Collection<String> attrsAsElems = config.getAttributeAsElements();
         if ((attrsAsElems != null) && !attrsAsElems.isEmpty()) {
             return new A2EXmlStreamWriterProxy(
-                    new JsonXmlStreamWriter(writer, config, expectedType, jaxbContext), attrsAsElems);
+                    new JsonXmlStreamWriter(writer, config, rootName), attrsAsElems);
         } else {
-            return new JsonXmlStreamWriter(writer, config, expectedType, jaxbContext);
+            return new JsonXmlStreamWriter(writer, config, rootName);
         }
     }
 
@@ -240,7 +231,12 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
                 }
             }
             if (processingStack.get(depth).writer.isEmpty) {
-                if(documentStructure.isArrayCollection() || documentStructure.hasSubElements()) {
+                String currentName = processingStack.get(depth).currentName;
+                currentName = currentName == null ? processingStack.get(depth - 1).currentName : currentName;
+
+                if(arrayElementNames.contains(currentName)
+                        || nonStringElementNames.contains(currentName)
+                        || rootName.equals(currentName)) {
                     processingStack.get(depth).writer.write("{}");
                 } else {
                     processingStack.get(depth).writer.write("null");
@@ -251,8 +247,6 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
             processingStack.get(depth - 1).lastName = processingStack.get(depth - 1).currentName;
             processingStack.get(depth - 1).lastWasPrimitive = false;
             processingStack.get(depth - 1).lastElementWriter = processingStack.get(depth).writer;
-
-            documentStructure.endElement(getQName(processingStack.get(depth - 1).currentName));
             pollStack();
         } catch (IOException ex) {
             throw new XMLStreamException(ex);
@@ -404,7 +398,6 @@ public class JsonXmlStreamWriter extends DefaultXmlStreamWriter implements XMLSt
             }
             depth++;
             processingStack.add(depth, createProcessingState());
-            documentStructure.startElement(new QName(namespaceURI, localName));
         } catch (IOException ex) {
             throw new XMLStreamException(ex);
         }

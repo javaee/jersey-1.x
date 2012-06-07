@@ -90,12 +90,22 @@ public class JSONJAXBRoudtripTest extends TestCase {
     
     public void testDefaultConfig() throws Exception {
         System.out.println("DEFAULT CONFIG");
-        allBeansTest(new JSONJAXBContext(classes), beans);
+        allBeansTest(beans);
+    }
+
+    public void testDefaultConfigOld() throws Exception {
+        System.out.println("DEFAULT CONFIG OLD");
+        allBeansTest(beans, true);
     }
     
     public void testInternalNotation() throws Exception {
         System.out.println("INTERNAL NOTATION");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.mapped().rootUnwrapping(false).build(), classes), beans);
+        allBeansTest(JSONConfiguration.mapped().rootUnwrapping(false).build(), beans);
+    }
+
+    public void testInternalNotationOld() throws Exception {
+        System.out.println("INTERNAL NOTATION OLD");
+        allBeansTest(JSONConfiguration.mapped().rootUnwrapping(false).build(), beans, true);
     }
 
     public void testInternalNotationDeprecatedConfig() throws Exception {
@@ -103,12 +113,27 @@ public class JSONJAXBRoudtripTest extends TestCase {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
         props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.FALSE);
-        allBeansTest(new JSONJAXBContext(classes, props), beans);
+        props.put(JSONJAXBContext.JSON_ARRAYS, new HashSet<String>(1){{add("list");}});
+        props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet<String>(1){{add("b");}});
+        allBeansTest(props, beans);
+    }
+
+    public void testInternalNotationDeprecatedConfigOld() throws Exception {
+        System.out.println("INTERNAL NOTATION DEPRECATED CONFIG OLD");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
+        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.FALSE);
+        allBeansTest(props, beans, true);
     }
 
     public void testInternalNotationAttrAsElems() throws Exception {
         System.out.println("INTERNAL NOTATION WITH SOME ATTR AS ELEMS");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.mapped().rootUnwrapping(true).attributeAsElement("i", "j").build(), classes), beans);
+        allBeansTest(JSONConfiguration.mapped().rootUnwrapping(true).attributeAsElement("i", "j").build(), beans);
+    }
+
+    public void testInternalNotationAttrAsElemsOld() throws Exception {
+        System.out.println("INTERNAL NOTATION WITH SOME ATTR AS ELEMS OLD");
+        allBeansTest(JSONConfiguration.mapped().rootUnwrapping(true).attributeAsElement("i", "j").build(), beans, true);
     }
 
     public void testInternalNotationAttrAsElemsDeprecatedConfig() throws Exception {
@@ -117,29 +142,40 @@ public class JSONJAXBRoudtripTest extends TestCase {
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
         props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
         props.put(JSONJAXBContext.JSON_ATTRS_AS_ELEMS, new HashSet<String>(2){{add("i");add("j");}});
-        allBeansTest(new JSONJAXBContext(classes, props), beans);
+        props.put(JSONJAXBContext.JSON_ARRAYS, new HashSet<String>(1){{add("list");}});
+        props.put(JSONJAXBContext.JSON_NON_STRINGS, new HashSet<String>(1){{add("b");}});
+        allBeansTest(props, beans);
+    }
+
+    public void testInternalNotationAttrAsElemsDeprecatedConfigOld() throws Exception {
+        System.out.println("INTERNAL NOTATION WITH SOME ATTR AS ELEMS DEPRECATED CONFIG OLD");
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.MAPPED);
+        props.put(JSONJAXBContext.JSON_ROOT_UNWRAPPING, Boolean.TRUE);
+        props.put(JSONJAXBContext.JSON_ATTRS_AS_ELEMS, new HashSet<String>(2){{add("i");add("j");}});
+        allBeansTest(props, beans, true);
     }
 
     public void testJettisonBadgerfishNotation() throws Exception {
         System.out.println("BADGERFISH NOTATION");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.badgerFish().build(), classes), beans);
+        allBeansTest(JSONConfiguration.badgerFish().build(), beans);
     }
 
     public void testJettisonBadgerfishNotationDeprecatedConfig() throws Exception {
         System.out.println("BADGERFISH NOTATION DEPRECATED CONFIG");
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.BADGERFISH);
-        allBeansTest(new JSONJAXBContext(classes, props), beans);
+        allBeansTest(props, beans);
     }
 
     public void testNaturalNotation() throws Exception {
         System.out.println("NATURAL NOTATION");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.natural().build(), classes), beans);
+        allBeansTest(JSONConfiguration.natural().build(), beans);
     }
 
     public void testNaturalNotationFormatted() throws Exception {
         System.out.println("NATURAL NOTATION FORMATTED");
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.natural().humanReadableFormatting(true).build(), classes), beans);
+        allBeansTest(JSONConfiguration.natural().humanReadableFormatting(true).build(), beans);
     }
 
 
@@ -147,35 +183,115 @@ public class JSONJAXBRoudtripTest extends TestCase {
         System.out.println("NATURAL NOTATION DEPRECATED CONFIG");
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, JSONJAXBContext.JSONNotation.NATURAL);
-        allBeansTest(new JSONJAXBContext(classes, props), beans);
+        allBeansTest(props, beans);
     }
 
     public void testJettisonMappedNotation() throws Exception {
         System.out.println("MAPPED (JETTISON) NOTATION");
         Map<String, Object> props = new HashMap<String, Object>();
-        allBeansTest(new JSONJAXBContext(JSONConfiguration.mappedJettison().build(), classes), beans);
+        allBeansTest(JSONConfiguration.mappedJettison().build(), beans);
     }
 
     public void testJettisonMappedNotationDeprecatedConfig() throws Exception {
         System.out.println("MAPPED (JETTISON) NOTATION DEPRECATED CONFIG");
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(JSONJAXBContext.JSON_NOTATION, "MAPPED_JETTISON");
-        allBeansTest(new JSONJAXBContext(classes, props), beans);
+        allBeansTest(props, beans);
+    }
+
+    public synchronized void allBeansTest(final Collection<Object> beans) throws Exception {
+        allBeansTest(beans, false);
+    }
+
+    public synchronized void allBeansTest(final Collection<Object> beans, final boolean useDefaultConfiguration) throws Exception {
+        allBeansTest(JSONConfiguration.DEFAULT, Collections.<String, Object>emptyMap(), beans, useDefaultConfiguration);
+    }
+
+    public synchronized void allBeansTest(JSONConfiguration configuration,
+                                          final Collection<Object> beans) throws Exception {
+        allBeansTest(configuration, beans, false);
+    }
+
+    public synchronized void allBeansTest(JSONConfiguration configuration,
+                                          final Collection<Object> beans,
+                                          final boolean useDefaultConfiguration) throws Exception {
+        allBeansTest(configuration, Collections.<String, Object>emptyMap(), beans, useDefaultConfiguration);
+    }
+
+    public synchronized void allBeansTest(final Map<String, Object> properties,
+                                          final Collection<Object> beans) throws Exception {
+        allBeansTest(JSONConfiguration.DEFAULT, properties, beans, false);
+    }
+
+    public synchronized void allBeansTest(final Map<String, Object> properties,
+                                          final Collection<Object> beans,
+                                          final boolean useDefaultConfiguration) throws Exception {
+        allBeansTest(JSONConfiguration.DEFAULT, properties, beans, useDefaultConfiguration);
     }
     
-    public synchronized void allBeansTest(JSONJAXBContext context, Collection<Object> beans) throws Exception {
-
-        JSONMarshaller marshaller = context.createJSONMarshaller();
-        JSONUnmarshaller unmarshaller = context.createJSONUnmarshaller();
-
+    public synchronized void allBeansTest(JSONConfiguration configuration,
+                                          final Map<String, Object> properties,
+                                          final Collection<Object> beans,
+                                          final boolean useDefaultConfiguration) throws Exception {
         for (Object originalBean : beans) {
+            if (!useDefaultConfiguration && JSONConfiguration.Notation.MAPPED.equals(configuration.getNotation())) {
+                final JSONConfiguration.MappedBuilder builder
+                        = (JSONConfiguration.MappedBuilder) JSONConfiguration.copyBuilder(configuration);
+
+                builder.arrays(getArrayElements(originalBean));
+                builder.nonStrings(getNonStringElements(originalBean));
+
+                configuration = builder.build();
+            }
+
+            final Class<? extends Object> beanClass = originalBean.getClass();
+            final Class<?>[] classesToBeBound = {beanClass};
+            JSONJAXBContext context = properties.isEmpty() ?
+                    new JSONJAXBContext(configuration, classesToBeBound) : new JSONJAXBContext(classesToBeBound, properties);
+
+            JSONMarshaller marshaller = context.createJSONMarshaller();
+            JSONUnmarshaller unmarshaller = context.createJSONUnmarshaller();
+
             printAsXml(originalBean);
 
             StringWriter sWriter = new StringWriter();
             marshaller.marshallToJSON(originalBean, sWriter);
 
             System.out.println(sWriter.toString());
-            assertEquals(originalBean, unmarshaller.unmarshalFromJSON(new StringReader(sWriter.toString()), originalBean.getClass()));
+            final Object actual = unmarshaller.unmarshalFromJSON(new StringReader(sWriter.toString()), beanClass);
+
+            if (useDefaultConfiguration) {
+                // let know the bean that the old approach (instance with empty properties -> 'null') is being tested so it should
+                // handle the equals method a little bit different
+                try {
+                    final Method useOldApproachMethod = beanClass.getMethod("setUseOldApproach", boolean.class);
+                    useOldApproachMethod.invoke(originalBean, true);
+                    useOldApproachMethod.invoke(actual, true);
+                } catch (Exception e) {
+                    // Ignore this - if this invocation fails the test will fail as well.
+                }
+            }
+
+            assertEquals(originalBean, actual);
+        }
+    }
+
+    private String[] getArrayElements(final Object originalBean) {
+        return getBeanElements(originalBean, "getArrayElements");
+    }
+
+    private String[] getNonStringElements(final Object originalBean) {
+        return getBeanElements(originalBean, "getNonStringElements");
+    }
+
+    private String[] getBeanElements(final Object originalBean, final String methodToInvoke) {
+        try {
+            final Method method = originalBean.getClass().getDeclaredMethod(methodToInvoke);
+            Object arrays = method.invoke(null);
+
+            return arrays instanceof String[] ? (String[]) arrays : new String[0];
+        } catch (Exception e) {
+            return new String[0];
         }
     }
 

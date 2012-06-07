@@ -107,7 +107,7 @@ public class Stax2JsonFactory {
                     return new Stax2JacksonWriter(bodyGenerator, config, expectedType, jaxbContext);
                     }
             case MAPPED:
-                return JsonXmlStreamWriter.createWriter(writer, config, expectedType, jaxbContext);
+                return JsonXmlStreamWriter.createWriter(writer, config, JSONHelper.getRootElementName((Class<Object>) expectedType));
             case BADGERFISH:
                 return new BadgerFishXMLStreamWriter(writer);
             case MAPPED_JETTISON:

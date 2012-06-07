@@ -40,16 +40,6 @@
 
 package com.sun.jersey.impl.entity;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Feed;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.representation.Form;
-import com.sun.jersey.core.util.MultivaluedMapImpl;
-import com.sun.jersey.atom.rome.impl.provider.entity.AtomEntryProvider;
-import com.sun.jersey.atom.rome.impl.provider.entity.AtomFeedProvider;
-import com.sun.jersey.core.impl.provider.entity.FileProvider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -61,11 +51,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import javax.activation.DataSource;
-import javax.mail.internet.InternetHeaders;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.util.ByteArrayDataSource;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -77,6 +63,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
+
+import javax.activation.DataSource;
+import javax.mail.internet.InternetHeaders;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -85,13 +77,27 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
+
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
+import com.sun.jersey.api.representation.Form;
+import com.sun.jersey.atom.rome.impl.provider.entity.AtomEntryProvider;
+import com.sun.jersey.atom.rome.impl.provider.entity.AtomFeedProvider;
+import com.sun.jersey.core.impl.provider.entity.FileProvider;
+import com.sun.jersey.core.util.MultivaluedMapImpl;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
+import static org.junit.Assert.assertEquals;
 
-import static org.junit.Assert.*;
+import com.sun.syndication.feed.atom.Entry;
+import com.sun.syndication.feed.atom.Feed;
 
 /**
  *
@@ -603,6 +609,32 @@ public class EntityTypesTest extends AbstractTypeTester {
         JAXBBean out = r.entity(in, "application/json").
                 post(JAXBBean.class);
         assertEquals(in.value, out.value);
+    }
+
+    @Provider
+    public static class JAXBBeanContextResolver implements ContextResolver<JAXBContext> {
+
+        private final JAXBContext context;
+
+        public JAXBBeanContextResolver() throws Exception {
+            context = new JSONJAXBContext(JSONConfiguration.natural().build(), JAXBBean.class);
+        }
+
+        public JAXBContext getContext(Class<?> c) {
+            return JAXBBean.class.isAssignableFrom(c) ? context : null;
+        }
+    }
+
+    @Test
+    public void testJAXBBeanRepresentationNaturalJSON() throws Exception {
+        initiateWebApplication(JAXBBeanContextResolver.class, JAXBBeanResourceJSON.class);
+
+        WebResource r = resource("/");
+
+        JAXBBean in = new JAXBBean("CONTENT");
+        JAXBBean out = r.entity(in, MediaType.APPLICATION_JSON_TYPE).post(JAXBBean.class);
+
+        assertEquals(in, out);
     }
 
     @Path("/")

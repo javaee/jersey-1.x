@@ -175,8 +175,8 @@ public class JacksonRootAddingParser extends JsonParser {
                 return _currToken;
             case END :
             default :
-                    _currToken = null;
-                    return _currToken;
+                _currToken = null;
+                return _currToken;
         }
     }
 

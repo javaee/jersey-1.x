@@ -41,7 +41,7 @@ package com.sun.jersey.json.impl.writer;
 
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
@@ -52,6 +52,7 @@ import com.sun.jersey.json.impl.ComplexBeanWithAttributes;
 import com.sun.jersey.json.impl.ComplexBeanWithAttributes2;
 import com.sun.jersey.json.impl.ComplexBeanWithAttributes3;
 import com.sun.jersey.json.impl.EncodedContentBean;
+import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.ListAndNonListBean;
 import com.sun.jersey.json.impl.ListEmptyBean;
 import com.sun.jersey.json.impl.ListWrapperBean;
@@ -68,12 +69,11 @@ import com.sun.jersey.json.impl.UserTable;
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonGenerator;
 
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-
 import junit.framework.TestCase;
 
 /**
  * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class Stax2JacksonWriterTest extends TestCase {
 
@@ -137,6 +137,14 @@ public class Stax2JacksonWriterTest extends TestCase {
         _testBean(TreeModel.class, TreeModel.createTestInstance());
     }
 
+    public void testTreeModelRootWithOneChild() throws Exception {
+        _testBean(TreeModel.class, TreeModel.createTestInstanceWithRootAndOneChildNode());
+    }
+
+    public void testTreeModelRootWithMultipleChildren() throws Exception {
+        _testBean(TreeModel.class, TreeModel.createTestInstanceWithRootAndMultipleChildNodes());
+    }
+
     public void testTwoListsWrapperBean() throws Exception {
         _testBean(TwoListsWrapperBean.class, TwoListsWrapperBean.createTestInstance());
     }
@@ -150,9 +158,7 @@ public class Stax2JacksonWriterTest extends TestCase {
     }
 
     private void _testBean(Class clazz, Object bean) throws Exception {
-        Map<String, Object> props = new HashMap<String, Object>();
-
-        props.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+        Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
         Class[] classes = new Class[]{clazz};
 
         JAXBContext ctx = JAXBContext.newInstance(classes, props);

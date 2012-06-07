@@ -86,6 +86,6 @@ public class ComplexBeanWithAttributes3 {
     
     @Override
     public String toString() {
-        return String.format("CBWA2(%s,%s)", b, c);
+        return String.format("CBWA3(%s,%s)", b, c);
     }
 }

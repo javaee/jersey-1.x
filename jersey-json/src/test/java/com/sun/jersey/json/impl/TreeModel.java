@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.json.impl;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +49,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 @XmlRootElement
 public class TreeModel {
@@ -77,10 +79,10 @@ public class TreeModel {
         @Override
         public int hashCode() {
             int result = 13;
-            result = 5 + 17 * label.hashCode();
+            result += 17 * label.hashCode();
             if (!JSONTestHelper.isCollectionEmpty(children)) {
                 for (Node n : children) {
-                    result = 5 + 17 * n.hashCode();
+                    result += 17 * n.hashCode();
                 }
             }
             return result;
@@ -92,7 +94,7 @@ public class TreeModel {
                 return false;
             }
             final Node other = (Node) obj;
-            if (this.label != other.label && (this.label == null || !this.label.equals(other.label))) {
+            if (!this.label.equals(other.label) && (this.label == null || !this.label.equals(other.label))) {
                 return false;
             }
             if ((this.children != other.children && JSONTestHelper.isCollectionEmpty(this.children) != JSONTestHelper.isCollectionEmpty(other.children))
@@ -127,6 +129,23 @@ public class TreeModel {
     public static Object createTestInstance() {
         TreeModel instance = new TreeModel();
         instance.root = new Node();
+        return instance;
+    }
+
+    public static Object createTestInstanceWithRootAndOneChildNode() {
+        TreeModel instance = new TreeModel();
+        instance.root = new Node("A", Arrays.asList(new Node("A1")));
+        return instance;
+    }
+
+    public static Object createTestInstanceWithRootAndMultipleChildNodes() {
+        TreeModel instance = new TreeModel();
+        instance.root = new Node("A",
+                Arrays.asList(
+                        new Node("A1"),
+                        new Node("A2", Arrays.asList(new Node("B1"))),
+                        new Node("A3", Arrays.asList(new Node("C1"), new Node("C2")))
+                ));
         return instance;
     }
 

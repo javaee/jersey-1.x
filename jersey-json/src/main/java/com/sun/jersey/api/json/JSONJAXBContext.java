@@ -39,14 +39,23 @@
  */
 package com.sun.jersey.api.json;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.Validator;
+
 import com.sun.jersey.json.impl.BaseJSONMarshaller;
 import com.sun.jersey.json.impl.BaseJSONUnmarshaller;
+import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.JSONMarshallerImpl;
 import com.sun.jersey.json.impl.JSONUnmarshallerImpl;
-import com.sun.xml.bind.v2.runtime.JAXBContextImpl;
-
-import javax.xml.bind.*;
-import java.util.*;
 
 /**
  * An adaption of {@link JAXBContext} that supports marshalling
@@ -244,7 +253,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         jsonConfiguration = config;
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
             jaxbContext = JAXBContext.newInstance(classesToBeBound,
-                    Collections.singletonMap(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, true));
+                    JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap()));
         } else {
             jaxbContext = JAXBContext.newInstance(classesToBeBound);
         }
@@ -293,9 +302,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
 
         jsonConfiguration = config;
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
-            Map<String, Object> myProps = new HashMap<String, Object>(properties.size() + 1);
-            myProps.putAll(properties);
-            myProps.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+            Map<String, Object> myProps = JSONHelper.createPropertiesForJaxbContext(properties);
             jaxbContext = JAXBContext.newInstance(classesToBeBound, myProps);
         } else {
             jaxbContext = JAXBContext.newInstance(classesToBeBound, properties);
@@ -337,7 +344,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
             jaxbContext = JAXBContext.newInstance(contextPath,
                     Thread.currentThread().getContextClassLoader(),
-                    Collections.singletonMap(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, true));
+                    createProperties(Collections.<String, Object>emptyMap()));
         } else {
             jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader());
         }
@@ -402,9 +409,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         }
 
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
-            Map<String, Object> myProps = new HashMap<String, Object>(properties.size() + 1);
-            myProps.putAll(properties);
-            myProps.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+            Map<String, Object> myProps = JSONHelper.createPropertiesForJaxbContext(properties);
             jaxbContext = JAXBContext.newInstance(contextPath, classLoader, myProps);
         } else {
             jaxbContext = JAXBContext.newInstance(contextPath, classLoader, properties);
@@ -424,7 +429,6 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         } else {
             return new BaseJSONMarshaller(marshaller, jaxbContext, JSONConfiguration.DEFAULT);
         }
-
     }
 
     /**
@@ -532,13 +536,13 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         workProperties.putAll(defaultJsonProperties);
         workProperties.putAll(properties);
         if (JSONJAXBContext.JSONNotation.NATURAL == workProperties.get(JSONJAXBContext.JSON_NOTATION)) {
-            workProperties.put(JAXBContextImpl.RETAIN_REFERENCE_TO_INFO, Boolean.TRUE);
+            workProperties = JSONHelper.createPropertiesForJaxbContext(workProperties);
         }
         processProperties(workProperties);
         return workProperties;
     }
 
-    private final void processProperties(Map<String, Object> properties) {
+    private void processProperties(Map<String, Object> properties) {
         final Collection<String> jsonKeys = new HashSet<String>();
         for (String k : Collections.unmodifiableSet(properties.keySet())) {
             if (k.startsWith(NAMESPACE)) {

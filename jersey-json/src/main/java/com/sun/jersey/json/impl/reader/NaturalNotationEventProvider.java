@@ -45,6 +45,7 @@ import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 
 import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.json.impl.DefaultJaxbXmlDocumentStructure;
 import com.sun.jersey.json.impl.JSONHelper;
 import com.sun.jersey.json.impl.JaxbXmlDocumentStructure;
 
@@ -64,11 +65,11 @@ public class NaturalNotationEventProvider extends XmlEventProvider {
      */
     private JaxbXmlDocumentStructure documentStructure;
 
-    public NaturalNotationEventProvider(final JsonParser parser, final JSONConfiguration configuration,
+    public NaturalNotationEventProvider(final JsonParser parser, final JSONConfiguration configuration, final String rootName,
                                         final JAXBContext jaxbContext, final Class<?> expectedType) throws XMLStreamException {
-        super(parser, configuration);
+        super(parser, configuration, rootName);
 
-        this.documentStructure = JSONHelper.getXmlDocumentStructure(jaxbContext, expectedType, true);
+        this.documentStructure = DefaultJaxbXmlDocumentStructure.getXmlDocumentStructure(jaxbContext, expectedType, true);
 
         attrsWithPrefix = configuration.isUsingPrefixesAtNaturalAttributes();
     }

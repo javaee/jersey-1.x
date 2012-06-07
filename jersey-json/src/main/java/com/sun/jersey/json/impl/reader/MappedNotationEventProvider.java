@@ -61,16 +61,13 @@ class MappedNotationEventProvider extends XmlEventProvider {
 
     private final char nsSeparator;
     private final CharSequence nsSeparatorAsSequence;
-    private final Collection<String> arrays;
 
-    protected MappedNotationEventProvider(final JsonParser parser, final JSONConfiguration configuration)
+    protected MappedNotationEventProvider(final JsonParser parser, final JSONConfiguration configuration, final String rootName)
             throws XMLStreamException {
-        super(parser, configuration);
+        super(parser, configuration, rootName);
 
         nsSeparator = configuration.getNsSeparator();
         nsSeparatorAsSequence = new StringBuffer(1).append(nsSeparator);
-
-        arrays = configuration.getArrays();
 
         // xmlNs-jsonNs -> jsonNs-xmlNs
         final Map<String, String> xml2JsonNs = configuration.getXml2JsonNs();

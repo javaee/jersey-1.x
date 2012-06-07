@@ -60,6 +60,10 @@ public class ListEmptyBean {
         return instance;
     }
 
+    public static String[] getArrayElements() {
+        return new String[] {"empty"};
+    }
+
     public List<String> getEmpty() {
         return empty;
     }

@@ -58,7 +58,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.json.impl.JSONHelper;
+import com.sun.jersey.json.impl.DefaultJaxbXmlDocumentStructure;
 import com.sun.jersey.json.impl.JaxbXmlDocumentStructure;
 
 import org.codehaus.jackson.JsonGenerator;
@@ -158,7 +158,7 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
                               JAXBContext jaxbContext) {
         this.attrsWithPrefix = config.isUsingPrefixesAtNaturalAttributes();
         this.generator = JacksonStringMergingGenerator.createGenerator(generator);
-        this.documentStructure = JSONHelper.getXmlDocumentStructure(jaxbContext, expectedType, false);
+        this.documentStructure = DefaultJaxbXmlDocumentStructure.getXmlDocumentStructure(jaxbContext, expectedType, false);
     }
 
     @Override
@@ -220,11 +220,6 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
         Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Boolean.class, Character.class, 
         String.class
     };
-    static final Type[] _pta = new Type[]{
-        byte[].class, short[].class, int[].class, long[].class, float[].class, double[].class, boolean[].class, char[].class,
-        Byte[].class, Short[].class, Integer[].class, Long[].class, Float[].class, Double[].class, Boolean[].class, Character[].class, 
-        String[].class
-    };
     static final Type[] _nst = new Type[]{
         byte.class, short.class, int.class, long.class, float.class, double.class, boolean.class,
         Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Boolean.class, BigInteger.class, BigDecimal.class,
@@ -248,7 +243,12 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
 
         ProcessingInfo parentPI = peek(processingStack);
         // still the same array, no need to dig out runtime property info
-        if ((localName != null) && (parentPI != null) && (parentPI.lastUnderlyingPI != null) && (localName.equals(parentPI.lastUnderlyingPI.elementName.getLocalPart()))) {
+        final boolean sameArrayCollection = documentStructure.isSameArrayCollection();
+
+        if ((localName != null) && (parentPI != null)
+                && (parentPI.lastUnderlyingPI != null)
+                // first is for RI and the second part of the next condition is for MOXy
+                && (localName.equals(parentPI.lastUnderlyingPI.elementName.getLocalPart()) || sameArrayCollection)) {
             processingStack.add(new ProcessingInfo(parentPI.lastUnderlyingPI));
             return;
         }
@@ -266,7 +266,7 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
 
         // TODO: wildcard could still simulate an array by adding several elements of the same name
         if (documentStructure.isArrayCollection()) { // another array
-            if (!((parentPI != null) && (parentPI.isArray) && (documentStructure.isSameArrayCollection()))) {
+            if (!((parentPI != null) && (parentPI.isArray) && sameArrayCollection)) {
                 // another array
                 processingStack.add(new ProcessingInfo(qname, true, rt));
                 return;

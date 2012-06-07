@@ -39,6 +39,9 @@
  */
 package com.sun.jersey.json.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -49,6 +52,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public final class JSONHelper {
+
+    private static JaxbProvider jaxbProvider;
 
     // just to make clear no instances are meant to be created
     private JSONHelper() {
@@ -62,7 +67,7 @@ public final class JSONHelper {
      *  TODO: work out with JAXB guys a better way of doing it,
      *        probably we could take it from an existing JAXBContext?
      */
-    public static final String getRootElementName(Class<Object> clazz) {
+    public static String getRootElementName(Class<Object> clazz) {
         XmlRootElement e = clazz.getAnnotation(XmlRootElement.class);
         if (e == null) {
             return getVariableName(clazz.getSimpleName());
@@ -74,32 +79,64 @@ public final class JSONHelper {
         }
     }
 
-    private static final String getVariableName(String baseName) {
+    private static String getVariableName(String baseName) {
         return NameUtil.toMixedCaseName(NameUtil.toWordList(baseName), false);
     }
 
-    /**
-     * Creates an {@link JaxbXmlDocumentStructure} for {@link javax.xml.stream.XMLStreamReader} or
-     * {@link javax.xml.stream.XMLStreamWriter} based on a given {@link JAXBContext}.
-     *
-     * @param jaxbContext {@link JAXBContext} to create this {@code JaxbXmlDocumentStructure} for.
-     * @param expectedType expected type that is going to be (un)marshalled.
-     * @param isReader {@code true} if the instance should be created for a reader, {@code false} if the instance is intended
-     * for a writer.
-     * @return an {@link JaxbXmlDocumentStructure} instance for the {@link JAXBContext}
-     * @throws IllegalStateException if the given {@code JAXBContext} is an unsupported implementation.
-     */
-    public static JaxbXmlDocumentStructure getXmlDocumentStructure(final JAXBContext jaxbContext,
-                                                                   final Class<?> expectedType,
-                                                                   final boolean isReader) throws IllegalStateException {
-        if (jaxbContext == null || jaxbContext instanceof com.sun.xml.bind.v2.runtime.JAXBContextImpl) {
-            return new JaxbRiXmlStructure(isReader);
-        } else if (jaxbContext instanceof org.eclipse.persistence.jaxb.JAXBContext) {
-            return new MoxyXmlStructure(jaxbContext, expectedType, isReader);
-        } else {
-            throw new IllegalStateException("Following JAXB context class is not supported for natural JSON notation: "
-                    + jaxbContext.getClass());
+    public static JaxbProvider getJaxbProvider(final JAXBContext jaxbContext) {
+        for (SupportedJaxbProvider provider : SupportedJaxbProvider.values()) {
+            try {
+                final Class<?> jaxbContextClass = getJaxbContextClass(jaxbContext);
+
+                Class<?> clazz = null;
+                if (SupportedJaxbProvider.JAXB_JDK.equals(provider)) {
+                    // We can be in OSGi runtime, so try to use system classloader.
+                    clazz = ClassLoader.getSystemClassLoader().loadClass(SupportedJaxbProvider.JAXB_JDK.getJaxbContextClassName());
+                } else {
+                    clazz = Class.forName(provider.getJaxbContextClassName());
+                }
+
+                if (clazz.isAssignableFrom(jaxbContextClass)) {
+                    return jaxbProvider = provider;
+                }
+            } catch (ClassNotFoundException e) {
+                // Do nothing, try the next provider.
+            }
         }
+        throw new IllegalStateException("No JAXB provider found for the following JAXB context: "
+                + (jaxbContext == null ? null : jaxbContext.getClass()));
+    }
+
+    private static Class<?> getJaxbContextClass(final JAXBContext jaxbContext) throws ClassNotFoundException {
+        if (jaxbContext != null) {
+            return jaxbContext.getClass();
+        }
+
+        return ClassLoader.getSystemClassLoader().loadClass(SupportedJaxbProvider.JAXB_JDK.getJaxbContextClassName());
+    }
+
+    public static boolean isNaturalNotationEnabled() {
+        try {
+            if (jaxbProvider == SupportedJaxbProvider.JAXB_RI) {
+                Class.forName("com.sun.xml.bind.annotation.OverrideAnnotationOf");
+            } else if (jaxbProvider == null || jaxbProvider == SupportedJaxbProvider.JAXB_JDK) {
+                Class.forName("com.sun.xml.internal.bind.annotation.OverrideAnnotationOf");
+            }
+
+            return true;
+        } catch (ClassNotFoundException ex) {
+            return false;
+        }
+    }
+
+    public static Map<String, Object> createPropertiesForJaxbContext(final Map<String, Object> properties) {
+        final Map<String, Object> jaxbProperties = new HashMap<String, Object>(properties.size() + 1);
+        final String retainReferenceToInfo = "retainReferenceToInfo"; // JAXBContextImpl.RETAIN_REFERENCE_TO_INFO;
+
+        jaxbProperties.putAll(properties);
+        jaxbProperties.put(retainReferenceToInfo, Boolean.TRUE);
+
+        return jaxbProperties;
     }
 
 }

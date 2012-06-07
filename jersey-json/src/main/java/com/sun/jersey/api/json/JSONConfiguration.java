@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,8 @@
 package com.sun.jersey.api.json;
 
 import com.sun.jersey.json.impl.ImplMessages;
+import com.sun.jersey.json.impl.JSONHelper;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -100,7 +102,7 @@ public class JSONConfiguration {
          * </pre>
          */
         NATURAL
-    };
+    }
 
     private final Notation notation;
     private final Collection<String> arrays;
@@ -183,9 +185,10 @@ public class JSONConfiguration {
          * If set to true, generated JSON will contain new-line characters and indentation, so that
          * the output is easy to read for people.
          * This property is valid for the  {@link JSONConfiguration.Notation#NATURAL} notation only.
-         * <p>
+         * <p/>
          * The default value is false.
-         * @param humanReadableFormatting
+         *
+         * @param humanReadableFormatting whether the output should be formatted to be readable by humans easily.
          * @return the natural builder.
          */
         public NaturalBuilder humanReadableFormatting(boolean humanReadableFormatting) {
@@ -381,7 +384,7 @@ public class JSONConfiguration {
      * set according to formatted parameter.
      *
      * @param c original instance of {@link JSONConfiguration}, can't be null
-     * @param formatted
+     * @param formatted whether the output should be formatted.
      * @return copy of provided {@link JSONConfiguration} with humanReadableFormatting set to formatted.
      * @throws IllegalArgumentException when provided JSONConfiguration is null.
      */
@@ -439,10 +442,8 @@ public class JSONConfiguration {
      * @return a builder for JSONConfiguration instance
      */
     public static NaturalBuilder natural() {
-          // this is to make sure people trying to use NATURAL notation will get clear message what is missing, when an old JAXB RI version is used
-        try {
-            Class.forName("com.sun.xml.bind.annotation.OverrideAnnotationOf");
-        } catch (ClassNotFoundException ex) {
+        // this is to make sure people trying to use NATURAL notation will get clear message what is missing, when an old JAXB RI version is used
+        if (!JSONHelper.isNaturalNotationEnabled()) {
             Logger.getLogger(JSONConfiguration.class.getName()).log(Level.SEVERE, ImplMessages.ERROR_JAXB_RI_2_1_10_MISSING());
             throw new RuntimeException(ImplMessages.ERROR_JAXB_RI_2_1_10_MISSING());
         }

@@ -1,9 +1,11 @@
 SimpleBeanWithAttributes
+SimpleBeanWithObjectAttributes
 ComplexBeanWithAttributes
 SimpleBeanWithJustOneAttribute
 SimpleBeanWithJustOneAttributeAndValue
 ComplexBeanWithAttributes2
 ComplexBeanWithAttributes3
+ComplexBeanWithAttributes4
 User
 UserTable
 TreeModel

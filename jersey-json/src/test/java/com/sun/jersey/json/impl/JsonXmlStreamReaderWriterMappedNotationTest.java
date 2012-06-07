@@ -131,6 +131,11 @@ public class JsonXmlStreamReaderWriterMappedNotationTest extends TestCase {
         tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
     }
 
+    public void testSimpleBeanWithObjectAttributes() throws Exception {
+        SimpleBeanWithObjectAttributes bean = JSONTestHelper.createTestInstance(SimpleBeanWithObjectAttributes.class);
+        tryBean(bean, "simpleBeanWithObjectAttributes.json", true, null, null);
+    }
+
     public void testSimpleBeanWithAttributesAsElems() throws Exception {
         SimpleBeanWithAttributes bean = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         Collection<String> attrAsElems = new LinkedList<String>();
@@ -171,9 +176,14 @@ public class JsonXmlStreamReaderWriterMappedNotationTest extends TestCase {
         tryBean(bean, "complexBeanWithAttributes.json", true, null, null);
     }
 
+    public void testEmptyComplexBeanWithAttributes() throws Exception {
+        ComplexBeanWithAttributes4 bean = JSONTestHelper.createTestInstance(ComplexBeanWithAttributes4.class);
+        tryBean(bean, "complexBeanWithAttributes4.json", true, "list", "b");
+    }
+
     public void testEmptyListWrapper() throws Exception {
         ListWrapperBean bean = JSONTestHelper.createTestInstance(ListWrapperBean.class);
-        tryBean(bean, "emptyListWrapper.json", false, null, null);
+        tryBean(bean, "emptyListWrapper.json", false, null, "item");
     }
     
     public void testTwoListsWrapper() throws Exception {
@@ -248,7 +258,8 @@ public class JsonXmlStreamReaderWriterMappedNotationTest extends TestCase {
         String expectedJsonExpr = JSONTestHelper.getResourceAsString(PKG_NAME, expectedJsonExprFilename);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter resultWriter = new StringWriter();
-        marshaller.marshal(jaxbBean, JsonXmlStreamWriter.createWriter(resultWriter, config, jaxbBean.getClass(), jaxbContext));
+        marshaller.marshal(jaxbBean,
+                JsonXmlStreamWriter.createWriter(resultWriter, config, JSONHelper.getRootElementName((Class<Object>) jaxbBean.getClass())));
         assertEquals("MISMATCH:\n" + expectedJsonExpr + "\n" + resultWriter.toString() + "\n", 
                 normalizeJsonString(expectedJsonExpr), normalizeJsonString(resultWriter.toString()));
     }

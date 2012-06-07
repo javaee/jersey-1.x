@@ -114,7 +114,7 @@ public class JsonXmlStreamReader implements XMLStreamReader {
             XmlEventProvider eventStack = null;
             switch (configuration.getNotation()) {
                 case MAPPED:
-                    eventStack = new MappedNotationEventProvider(nonListParser, configuration);
+                    eventStack = new MappedNotationEventProvider(nonListParser, configuration, rootName);
                     break;
                 case NATURAL:
                     if (jaxbContext instanceof JSONJAXBContext) {
@@ -122,11 +122,12 @@ public class JsonXmlStreamReader implements XMLStreamReader {
                     }
 
                     if (!readingList) {
-                        eventStack = new NaturalNotationEventProvider(nonListParser, configuration, jaxbContext, expectedType);
+                        eventStack = new NaturalNotationEventProvider(nonListParser, configuration, rootName, jaxbContext, expectedType);
                     } else {
                         eventStack = new NaturalNotationEventProvider(
                                 JacksonRootAddingParser.createRootAddingParser(nonListParser, "jsonArrayRootElement"),
                                 configuration,
+                                rootName,
                                 jaxbContext,
                                 expectedType);
                     }

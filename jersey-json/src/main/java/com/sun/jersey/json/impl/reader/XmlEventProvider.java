@@ -130,6 +130,13 @@ public abstract class XmlEventProvider {
             return parser.getCurrentName();
         }
 
+        public boolean hasMoreTokens() throws IOException {
+            try {
+                return peek() != null;
+            } catch (IOException e) {
+                return false;
+            }
+        }
     }
 
     private static final Logger LOGGER = Logger.getLogger(XmlEventProvider.class.getName());
@@ -141,16 +148,20 @@ public abstract class XmlEventProvider {
      */
     private final CachedJsonParser parser;
 
+    private final String rootName;
+
     /**
      * Queue of unprocessed events.
      */
     private final Deque<JsonXmlEvent> eventQueue = new LinkedList<JsonXmlEvent>();
 
-    final Stack<ProcessingInfo> processingStack = new Stack<ProcessingInfo>();
+    private final Stack<ProcessingInfo> processingStack = new Stack<ProcessingInfo>();
     
-    protected XmlEventProvider(final JsonParser parser, final JSONConfiguration configuration) throws XMLStreamException {
+    protected XmlEventProvider(final JsonParser parser, final JSONConfiguration configuration, final String rootName)
+            throws XMLStreamException {
         this.parser = new CachedJsonParser(parser);
         this.configuration = configuration;
+        this.rootName = rootName;
 
         try {
             readNext();
@@ -288,6 +299,10 @@ public abstract class XmlEventProvider {
                     final JsonToken jsonToken = parser.nextToken();
                     final ProcessingInfo pi = processingStack.isEmpty() ? null : processingStack.peek();
 
+                    if (jsonToken == null) {
+                        return getCurrentNode();
+                    }
+
                     switch (jsonToken) {
                         case FIELD_NAME:
                             final String fieldName = parser.getCurrentName();
@@ -311,10 +326,21 @@ public abstract class XmlEventProvider {
                                     final QName elementName = getElementQName(fieldName);
                                     final JsonLocation currentLocation = parser.getCurrentLocation();
 
-                                    if (!isEmptyArray()) {
+                                    final boolean isRootEmpty = isEmptyElement(fieldName, true);
+                                    if (isRootEmpty) {
                                         eventQueue.add(createStartElementEvent(elementName, new StaxLocation(currentLocation)));
-                                        processingStack.add(new ProcessingInfo(elementName, false, true));
+                                        eventQueue.add(createEndElementEvent(elementName, new StaxLocation(currentLocation)));
+                                        eventQueue.add(new EndDocumentEvent(new StaxLocation(parser.getCurrentLocation())));
+                                    } else {
+                                        if (!isEmptyArray() && !isEmptyElement(fieldName, false)) {
+                                            eventQueue.add(createStartElementEvent(elementName, new StaxLocation(currentLocation)));
+                                            processingStack.add(new ProcessingInfo(elementName, false, true));
+                                        }
+                                        if (!parser.hasMoreTokens()) {
+                                            eventQueue.add(new EndDocumentEvent(new StaxLocation(parser.getCurrentLocation())));
+                                        }
                                     }
+
                                     if (eventQueue.isEmpty()) {
                                         continue;
                                     }
@@ -397,18 +423,33 @@ public abstract class XmlEventProvider {
      * @throws IOException if there is a problem reading next {@code JsonToken}.
      */
     private boolean isEmptyArray() throws IOException {
-        final JsonToken jsonToken = parser.peekNext();
+        final JsonToken jsonToken = parser.peek();
 
-        if (jsonToken == JsonToken.VALUE_NULL
-                || (jsonToken == JsonToken.START_ARRAY && parser.peekNext() == JsonToken.END_ARRAY)) {
+        if (jsonToken == JsonToken.START_ARRAY && parser.peekNext() == JsonToken.END_ARRAY) {
             // throw away parser tokens
             parser.poll();
-
-            if (parser.peek() == JsonToken.END_ARRAY) {
-                parser.poll();
-            }
+            parser.poll();
 
             return true;
+        }
+
+        return false;
+    }
+
+    private boolean isEmptyElement(final String fieldName, boolean checkRoot) throws IOException {
+        if (!checkRoot || (fieldName != null && fieldName.equals(rootName))) {
+            final JsonToken jsonToken = parser.peek();
+
+            if (jsonToken == JsonToken.VALUE_NULL) {
+                parser.poll();
+
+                if (parser.peek() == JsonToken.END_OBJECT) {
+                    // in case jsonToken == JsonToken.VALUE_NULL - check if the next token is '}'
+                    parser.poll();
+
+                    return true;
+                }
+            }
         }
 
         return false;

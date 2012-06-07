@@ -39,40 +39,33 @@
  */
 package com.sun.jersey.json.impl;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 
-import com.sun.xml.bind.v2.model.runtime.RuntimePropertyInfo;
-import com.sun.xml.bind.v2.model.runtime.RuntimeReferencePropertyInfo;
-import com.sun.xml.bind.v2.runtime.XMLSerializer;
-import com.sun.xml.bind.v2.runtime.property.Property;
-import com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext;
-
 /**
- * Implementation of {@code JaxbXmlDocumentStructure} for JAXB RI provider.
+ * Implementation of {@code JaxbXmlDocumentStructure} for JAXB provider in JDK.
  * <p/>
- * Note: If you're changing this class consider changing {@link JaxbJdkXmlStructure} as well.
+ * Note: If you're changing this class consider changing {@link JaxbRiXmlStructure} as well.
  *
  * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
-public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
+public class JaxbJdkXmlStructure extends DefaultJaxbXmlDocumentStructure {
 
     private static class NodeWrapper {
 
         private final NodeWrapper parent;
-        private final RuntimePropertyInfo runtimePropertyInfo;
+        private final Object runtimePropertyInfo;
 
-        private NodeWrapper(NodeWrapper parent, RuntimePropertyInfo runtimePropertyInfo) {
+        private NodeWrapper(NodeWrapper parent, Object runtimePropertyInfo) {
             this.parent = parent;
             this.runtimePropertyInfo = runtimePropertyInfo;
         }
@@ -98,6 +91,8 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
         }
     }
 
+    private final static ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
+
     private Map<String, QName> qNamesOfExpElems = new HashMap<String, QName>();
     private Map<String, QName> qNamesOfExpAttrs = new HashMap<String, QName>();
 
@@ -105,18 +100,25 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
 
     private final boolean isReader;
 
-    public JaxbRiXmlStructure(JAXBContext jaxbContext, Class<?> expectedType, boolean isReader) {
+    public JaxbJdkXmlStructure(JAXBContext jaxbContext, Class<?> expectedType, boolean isReader) {
         super(jaxbContext, expectedType, isReader);
         this.isReader = isReader;
     }
 
-    @Override
-    public Collection<QName> getExpectedElements() {
+    private Collection<QName> getExpectedEntities(final String methodName) {
         try {
-            return UnmarshallingContext.getInstance().getCurrentExpectedElements();
-        }  catch (NullPointerException npe) {
+            final Class<?> aClass = systemClassLoader
+                    .loadClass("com.sun.xml.internal.bind.v2.runtime.unmarshaller.UnmarshallingContext");
+
+            final Object getInstance = aClass.getMethod("getInstance").invoke(null);
+            final Object getCurrentExpectedElements = aClass.getMethod(methodName).invoke(getInstance);
+
+            return (Collection<QName>) getCurrentExpectedElements;
+        } catch (NullPointerException npe) {
             // TODO: need to check what could be done in JAXB in order to prevent the npe
             // thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext#1206
+        } catch (Exception e) {
+            // Reflection problem. Ignore that and return empty list.
         }
 
         // something went wrong - return empty list
@@ -124,20 +126,16 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
     }
 
     @Override
+    public Collection<QName> getExpectedElements() {
+        return getExpectedEntities("getCurrentExpectedElements");
+    }
+
+    @Override
     public Collection<QName> getExpectedAttributes() {
-        if (JSONHelper.isNaturalNotationEnabled()) {
-            try {
-                return UnmarshallingContext.getInstance().getCurrentExpectedAttributes();
-            } catch (NullPointerException npe) {
-                // thrown from com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext
-            } catch (NoSuchMethodError nsme) {
-                // thrown when JAXB version is less than 2.1.12
-                Logger.getLogger(getClass().getName())
-                        .log(Level.SEVERE, com.sun.jersey.json.impl.ImplMessages.ERROR_JAXB_RI_2_1_12_MISSING(), nsme);
-            }
+        if (canHandleAttributes()) {
+            return getExpectedEntities("getCurrentExpectedAttributes");
         }
 
-        // something went wrong - return empty list
         return Collections.emptyList();
     }
 
@@ -167,32 +165,69 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
     @Override
     public Type getEntityType(QName entity, boolean isAttribute) {
         final NodeWrapper peek = processedNodes.getLast();
-        return peek.runtimePropertyInfo == null ? null : peek.runtimePropertyInfo.getRawType();
+
+        Object rawType;
+        try {
+            Class<?> runtimeReferencePropertyInfo = systemClassLoader
+                    .loadClass("com.sun.xml.internal.bind.v2.model.runtime.RuntimePropertyInfo");
+            rawType = runtimeReferencePropertyInfo.getMethod("getRawType").invoke(peek.runtimePropertyInfo);
+        } catch (Exception e) {
+            rawType = null;
+        }
+
+        return peek.runtimePropertyInfo == null ? null : (Type) rawType;
     }
 
     @Override
     public void startElement(final QName name) {
         if (!isReader) {
-            processedNodes.add(new NodeWrapper(processedNodes.isEmpty() ? null : processedNodes.getLast(), getCurrentElementRuntimePropertyInfo()));
+            processedNodes.add(new NodeWrapper(
+                    processedNodes.isEmpty() ? null : processedNodes.getLast(),
+                    getCurrentElementRuntimePropertyInfo()));
         }
     }
 
-    private RuntimePropertyInfo getCurrentElementRuntimePropertyInfo() {
-        final XMLSerializer xs = XMLSerializer.getInstance();
-        final Property cp = (xs == null) ? null : xs.getCurrentProperty();
-        return (cp == null) ? null : cp.getInfo();
+    private Object getCurrentElementRuntimePropertyInfo() {
+        try {
+            final Class<?> aClass = systemClassLoader.loadClass("com.sun.xml.internal.bind.v2.runtime.XMLSerializer");
+
+            // XMLSerializer
+            final Object xs = aClass.getMethod("getInstance").invoke(null);
+            final Method getCurrentProperty = aClass.getMethod("getCurrentProperty");
+
+            // Property
+            final Object cp = (xs == null) ? null : getCurrentProperty.invoke(xs);
+            final Class<?> bClass = systemClassLoader.loadClass("com.sun.xml.internal.bind.v2.runtime.property.Property");
+            final Method getInfo = bClass.getMethod("getInfo");
+
+            // RuntimePropertyInfo
+            return (cp == null) ? null : getInfo.invoke(cp);
+        } catch (Exception e) {
+            // Reflection problem.
+            return null;
+        }
     }
 
     @Override
     public boolean isArrayCollection() {
-        RuntimePropertyInfo runtimePropertyInfo = isReader ? null : getCurrentElementRuntimePropertyInfo();
+        Object runtimePropertyInfo = isReader ? null : getCurrentElementRuntimePropertyInfo();
 
         if (runtimePropertyInfo == null && !processedNodes.isEmpty()) {
             final NodeWrapper peek = processedNodes.getLast();
             runtimePropertyInfo = peek.runtimePropertyInfo;
         }
 
-        return runtimePropertyInfo != null && runtimePropertyInfo.isCollection() && !isWildcardElement(runtimePropertyInfo);
+        boolean isCollection = false;
+        try {
+            Class<?> runtimeReferencePropertyInfo = systemClassLoader
+                    .loadClass("com.sun.xml.internal.bind.v2.model.runtime.RuntimePropertyInfo");
+            isCollection = (Boolean) runtimeReferencePropertyInfo.getMethod("isCollection").invoke(runtimePropertyInfo);
+        } catch (Exception e) {
+            // Reflection problem.
+            isCollection = false;
+        }
+
+        return runtimePropertyInfo != null && isCollection && !isWildcardElement(runtimePropertyInfo);
     }
 
     @Override
@@ -214,8 +249,8 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
         if (isReader) {
             return !getExpectedElements().isEmpty();
         } else {
-            final RuntimePropertyInfo rpi = getCurrentElementRuntimePropertyInfo();
-            return !processedNodes.isEmpty() && (rpi == null || (rpi.elementOnlyContent()));
+            return !processedNodes.isEmpty()
+                    && processedNodes.getLast() != getCurrentElementRuntimePropertyInfo();
         }
     }
 
@@ -226,8 +261,14 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
         }
     }
 
-    private boolean isWildcardElement(RuntimePropertyInfo ri) {
-        return (ri instanceof RuntimeReferencePropertyInfo) && (((RuntimeReferencePropertyInfo)ri).getWildcard() != null);
+    private boolean isWildcardElement(Object ri) {
+        try {
+            Class<?> runtimeReferencePropertyInfo = systemClassLoader
+                    .loadClass("com.sun.xml.internal.bind.v2.model.runtime.RuntimeReferencePropertyInfo");
+            return runtimeReferencePropertyInfo.getMethod("getWildcard").invoke(ri) != null;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

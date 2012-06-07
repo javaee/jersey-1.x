@@ -39,12 +39,14 @@
  */
 package com.sun.jersey.json.impl;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 
 /**
@@ -52,7 +54,47 @@ import javax.xml.namespace.QName;
  *
  * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
-abstract class DefaultJaxbXmlDocumentStructure implements JaxbXmlDocumentStructure {
+public abstract class DefaultJaxbXmlDocumentStructure implements JaxbXmlDocumentStructure {
+
+    /**
+     * Creates an {@link JaxbXmlDocumentStructure} for {@link javax.xml.stream.XMLStreamReader} or
+     * {@link javax.xml.stream.XMLStreamWriter} based on a given {@link javax.xml.bind.JAXBContext}.
+     *
+     * @param jaxbContext {@link javax.xml.bind.JAXBContext} to create this {@code JaxbXmlDocumentStructure} for.
+     * @param expectedType expected type that is going to be (un)marshalled.
+     * @param isReader {@code true} if the instance should be created for a reader, {@code false} if the instance is intended
+     * for a writer.
+     * @return an {@link JaxbXmlDocumentStructure} instance for the {@link javax.xml.bind.JAXBContext}
+     * @throws IllegalStateException if the given {@code JAXBContext} is an unsupported implementation.
+     */
+    public static JaxbXmlDocumentStructure getXmlDocumentStructure(final JAXBContext jaxbContext,
+                                                                   final Class<?> expectedType,
+                                                                   final boolean isReader) throws IllegalStateException {
+        Throwable throwable = null;
+
+        try {
+            return JSONHelper.getJaxbProvider(jaxbContext)
+                    .getDocumentStructureClass()
+                    .getConstructor(JAXBContext.class, Class.class, boolean.class)
+                    .newInstance(jaxbContext, expectedType, isReader);
+        } catch (InvocationTargetException e) {
+            throwable = e;
+        } catch (NoSuchMethodException e) {
+            throwable = e;
+        } catch (InstantiationException e) {
+            throwable = e;
+        } catch (IllegalAccessException e) {
+            throwable = e;
+        }
+
+        throw new IllegalStateException("Cannot create a JaxbXmlDocumentStructure instance.", throwable);
+    }
+
+    protected DefaultJaxbXmlDocumentStructure(final JAXBContext jaxbContext,
+                                              final Class<?> expectedType,
+                                              final boolean isReader) {
+        // This constructor should be implemented in descendants.
+    }
 
     @Override
     public Collection<QName> getExpectedElements() {

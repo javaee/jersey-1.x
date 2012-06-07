@@ -108,10 +108,18 @@
             <artifactId>jettison</artifactId>
             <version>1.1</version>
         </dependency>
+
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.moxy</artifactId>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
@@ -127,11 +135,6 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-xc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.persistence</groupId>
-            <artifactId>org.eclipse.persistence.moxy</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -222,6 +225,7 @@
                         <Export-Package>com.sun.jersey.api.json, com.sun.jersey.json.impl.*</Export-Package>
                         <Import-Package>
                             com.sun.xml.bind.annotation;resolution:=optional,com.sun.xml.bind.v2.*;resolution:=optional,
+                            org.eclipse.persistence.*;resolution:=optional,com.sun.xml.internal.bind.v2.*;resolution:=optional,
                             *
                         </Import-Package>
                     </instructions>

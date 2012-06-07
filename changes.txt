@@ -1,4 +1,11 @@
 release 1.13
+- Fixed issue 1168
+  http://java.net/jira/browse/JERSEY-1168
+  XML Trees don't serialize children arrays correctly when the sub element is the same
+  as the root element after the first level with Natural Json formatting
+- Fixed issue 1132
+  http://java.net/jira/browse/JERSEY-1132
+  Add param to @Produces to indicate desire to produce valid JSON syntax
 - Fixed issue 1161
   http://java.net/jira/browse/JERSEY-1161
   Added log message when GET method is going to be replaced with POST
