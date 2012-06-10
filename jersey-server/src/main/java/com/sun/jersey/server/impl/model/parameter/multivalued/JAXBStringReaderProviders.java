@@ -39,18 +39,15 @@
  */
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.impl.ImplMessages;
-import com.sun.jersey.spi.StringReader;
-import com.sun.jersey.spi.StringReaderProvider;
-import com.sun.jersey.spi.inject.Injectable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.WeakHashMap;
+
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
@@ -59,27 +56,29 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-import javax.xml.transform.stream.StreamSource;
+
 import org.xml.sax.InputSource;
+
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.impl.ImplMessages;
+import com.sun.jersey.spi.StringReader;
+import com.sun.jersey.spi.StringReaderProvider;
+import com.sun.jersey.spi.inject.Injectable;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public class JAXBStringReaderProviders {
 
     private static final Map<Class, JAXBContext> jaxbContexts =
             new WeakHashMap<Class, JAXBContext>();
 
-    private final Providers ps;
-
     private final ContextResolver<JAXBContext> context;
 
     private final ContextResolver<Unmarshaller> unmarshaller;
 
     public JAXBStringReaderProviders(Providers ps) {
-        this.ps = ps;
-
         this.context = ps.getContextResolver(JAXBContext.class, null);
         this.unmarshaller = ps.getContextResolver(Unmarshaller.class, null);
     }

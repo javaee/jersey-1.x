@@ -40,12 +40,12 @@
 
 package com.sun.jersey.core.impl.provider.entity;
 
-import com.sun.jersey.spi.inject.Injectable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -55,6 +55,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -65,39 +66,42 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import com.sun.jersey.spi.inject.Injectable;
+
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public final class SourceProvider {
-    
+
     @Produces({"application/xml", "text/xml", "*/*"})
     @Consumes({"application/xml", "text/xml", "*/*"})
-    public static final class StreamSourceReader implements 
+    public static final class StreamSourceReader implements
             MessageBodyReader<StreamSource> {
         public boolean isReadable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
             return StreamSource.class == t;
         }
 
         public StreamSource readFrom(
-                Class<StreamSource> t, 
-                Type gt, 
-                Annotation[] as, 
-                MediaType mediaType, 
+                Class<StreamSource> t,
+                Type gt,
+                Annotation[] as,
+                MediaType mediaType,
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             return new StreamSource(entityStream);
         }
     }
-    
+
     @Produces({"application/xml", "text/xml", "*/*"})
     @Consumes({"application/xml", "text/xml", "*/*"})
-    public static final class SAXSourceReader implements 
+    public static final class SAXSourceReader implements
             MessageBodyReader<SAXSource> {
         // Delay construction of factory
         private final Injectable<SAXParserFactory> spf;
@@ -111,10 +115,10 @@ public final class SourceProvider {
         }
 
         public SAXSource readFrom(
-                Class<SAXSource> t, 
-                Type gt, 
-                Annotation[] as, 
-                MediaType mediaType, 
+                Class<SAXSource> t,
+                Type gt,
+                Annotation[] as,
+                MediaType mediaType,
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             try {
@@ -129,27 +133,27 @@ public final class SourceProvider {
             }
         }
     }
-    
+
     @Produces({"application/xml", "text/xml", "*/*"})
     @Consumes({"application/xml", "text/xml", "*/*"})
-    public static final class DOMSourceReader implements 
+    public static final class DOMSourceReader implements
             MessageBodyReader<DOMSource> {
         // Delay construction of factory
         private final Injectable<DocumentBuilderFactory> dbf;
-        
+
         public DOMSourceReader(@Context Injectable<DocumentBuilderFactory> dbf) {
             this.dbf = dbf;
         }
-        
+
         public boolean isReadable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
             return DOMSource.class == t;
         }
 
         public DOMSource readFrom(
-                Class<DOMSource> t, 
-                Type gt, 
-                Annotation[] as, 
-                MediaType mediaType, 
+                Class<DOMSource> t,
+                Type gt,
+                Annotation[] as,
+                MediaType mediaType,
                 MultivaluedMap<String, String> httpHeaders,
                 InputStream entityStream) throws IOException {
             try {
@@ -164,24 +168,24 @@ public final class SourceProvider {
             }
         }
     }
-    
+
     @Produces({"application/xml", "text/xml", "*/*"})
     @Consumes({"application/xml", "text/xml", "*/*"})
-    public static final class SourceWriter implements 
+    public static final class SourceWriter implements
             MessageBodyWriter<Source> {
 
         // Delay construction of factory
         private final Injectable<SAXParserFactory> spf;
-        
+
         // Delay construction of factory
         private final Injectable<TransformerFactory> tf;
-        
+
         public SourceWriter(@Context Injectable<SAXParserFactory> spf,
                 @Context Injectable<TransformerFactory> tf) {
             this.spf = spf;
             this.tf = tf;
         }
-        
+
         public boolean isWriteable(Class<?> t, Type gt, Annotation[] as, MediaType mediaType) {
             return Source.class.isAssignableFrom(t);
         }
@@ -190,8 +194,8 @@ public final class SourceProvider {
             return -1;
         }
 
-        public void writeTo(Source o, Class<?> t, Type gt, Annotation[] as, 
-                MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, 
+        public void writeTo(Source o, Class<?> t, Type gt, Annotation[] as,
+                MediaType mediaType, MultivaluedMap<String, Object> httpHeaders,
                 OutputStream entityStream) throws IOException {
 
             try {
@@ -209,6 +213,6 @@ public final class SourceProvider {
             } catch (TransformerException ex) {
                 throw new WebApplicationException(ex, Status.INTERNAL_SERVER_ERROR);
             }
-        }        
+        }
     }
 }

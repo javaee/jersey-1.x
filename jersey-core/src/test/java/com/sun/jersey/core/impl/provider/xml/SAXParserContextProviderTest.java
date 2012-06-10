@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,34 +38,61 @@
  * holder.
  */
 
+/*
+ * Portions contributed by Joseph Walton (Atlassian)
+ */
+
 package com.sun.jersey.core.impl.provider.xml;
 
-import javax.ws.rs.core.Context;
+import java.io.ByteArrayInputStream;
+import java.util.Collections;
+import java.util.Map;
 
+import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.junit.Test;
+import org.xml.sax.InputSource;
 
 import com.sun.jersey.core.util.FeaturesAndProperties;
 
-/**
- *
- * @author Paul Sandoz (paul.sandoz at oracle.com)
- * @author Martin Matula (martin.matula at oracle.com)
- */
-public class SAXParserContextProvider extends ThreadLocalSingletonContextProvider<SAXParserFactory> {
-    private final boolean disableXmlSecurity;
+public class SAXParserContextProviderTest {
+    private static final FeaturesAndProperties EMPTY_FEATURES_AND_PROPERTIES = new FeaturesAndProperties() {
+        @Override
+        public Object getProperty(String propertyName) {
+            return null;
+        }
 
-    public SAXParserContextProvider(@Context FeaturesAndProperties fps) {
-        super(SAXParserFactory.class);
-        disableXmlSecurity = fps.getFeature(FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY);
+        @Override
+        public Map<String, Object> getProperties() {
+            return Collections.emptyMap();
+        }
+
+        @Override
+        public Map<String, Boolean> getFeatures() {
+            return Collections.emptyMap();
+        }
+
+        @Override
+        public boolean getFeature(String featureName) {
+            return false;
+        }
+    };
+
+    public static SAXParserFactory createSAXParserFactory() {
+        SAXParserContextProvider provider = new SAXParserContextProvider(EMPTY_FEATURES_AND_PROPERTIES);
+        return provider.getInstance();
     }
 
-    @Override
-    protected SAXParserFactory getInstance() {
-        SAXParserFactory f = SAXParserFactory.newInstance();
-        f.setNamespaceAware(true);
-        if (!disableXmlSecurity) {
-            f = new SecureSAXParserFactory(f);
-        }
-        return f;
+    @Test
+    public void xmlReaderDoesNotResolveExternalParameterEntities() throws Exception {
+
+        SAXParser sp = createSAXParserFactory().newSAXParser();
+
+        String url = "file:///no-such-file";
+
+        String content = "<!DOCTYPE x [<!ENTITY % pe SYSTEM '" + url + "'> %pe;]><x/>";
+
+        sp.getXMLReader().parse(new InputSource(new ByteArrayInputStream(content.getBytes("us-ascii"))));
     }
 }

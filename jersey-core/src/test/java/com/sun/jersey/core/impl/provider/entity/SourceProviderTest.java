@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -38,34 +38,39 @@
  * holder.
  */
 
-package com.sun.jersey.core.impl.provider.xml;
+/*
+ * Portions contributed by Joseph Walton (Atlassian)
+ */
 
-import javax.ws.rs.core.Context;
+package com.sun.jersey.core.impl.provider.entity;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamResult;
 
-import com.sun.jersey.core.util.FeaturesAndProperties;
+import org.junit.Test;
 
-/**
- *
- * @author Paul Sandoz (paul.sandoz at oracle.com)
- * @author Martin Matula (martin.matula at oracle.com)
- */
-public class SAXParserContextProvider extends ThreadLocalSingletonContextProvider<SAXParserFactory> {
-    private final boolean disableXmlSecurity;
+import com.sun.jersey.core.impl.provider.xml.SAXParserContextProviderTest;
+import com.sun.jersey.spi.inject.Injectable;
 
-    public SAXParserContextProvider(@Context FeaturesAndProperties fps) {
-        super(SAXParserFactory.class);
-        disableXmlSecurity = fps.getFeature(FeaturesAndProperties.FEATURE_DISABLE_XML_SECURITY);
-    }
+public class SourceProviderTest {
+    @Test
+    public void saxSourceReaderDoesNotReadExternalDtds() throws Exception {
+        Injectable<SAXParserFactory> spf = new Injectable<SAXParserFactory>() {
+            @Override
+            public SAXParserFactory getValue() {
+                return SAXParserContextProviderTest.createSAXParserFactory();
+            }
+        };
+        SourceProvider.SAXSourceReader reader = new SourceProvider.SAXSourceReader(spf);
+        InputStream entityStream = new ByteArrayInputStream("<!DOCTYPE x SYSTEM 'file:///no-such-file'> <rootObject/>".getBytes("us-ascii"));
+        SAXSource ss = reader.readFrom(null, null, null, null, null, entityStream);
 
-    @Override
-    protected SAXParserFactory getInstance() {
-        SAXParserFactory f = SAXParserFactory.newInstance();
-        f.setNamespaceAware(true);
-        if (!disableXmlSecurity) {
-            f = new SecureSAXParserFactory(f);
-        }
-        return f;
+        TransformerFactory.newInstance().newTransformer().transform(ss, new StreamResult(new ByteArrayOutputStream()));
     }
 }

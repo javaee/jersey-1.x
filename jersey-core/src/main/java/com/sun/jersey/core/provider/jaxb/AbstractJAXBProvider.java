@@ -40,63 +40,66 @@
 
 package com.sun.jersey.core.provider.jaxb;
 
-import com.sun.jersey.api.provider.jaxb.XmlHeader;
-import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
-import com.sun.jersey.core.util.FeaturesAndProperties;
-import javax.xml.bind.PropertyException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.sax.SAXSource;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Providers;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
+
 import org.xml.sax.InputSource;
+
+import com.sun.jersey.api.provider.jaxb.XmlHeader;
+import com.sun.jersey.core.provider.AbstractMessageReaderWriterProvider;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 
 /**
  * A base class for implementing JAXB-based readers and writers.
- * 
- * @author Paul.Sandoz@Sun.Com
+ *
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
-public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWriterProvider<T> {    
-    private static final Map<Class, JAXBContext> jaxbContexts = 
+public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWriterProvider<T> {
+    private static final Map<Class, JAXBContext> jaxbContexts =
             new WeakHashMap<Class, JAXBContext>();
 
     private final Providers ps;
-    
+
     private final boolean fixedMediaType;
-    
+
     private final ContextResolver<JAXBContext> mtContext;
 
     private final ContextResolver<Unmarshaller> mtUnmarshaller;
-    
+
     private final ContextResolver<Marshaller> mtMarshaller;
 
     private boolean formattedOutput = false;
-
     private boolean xmlRootElementProcessing = false;
 
     public AbstractJAXBProvider(Providers ps) {
         this(ps, null);
     }
-    
+
     public AbstractJAXBProvider(Providers ps, MediaType mt) {
         this.ps = ps;
-        
+
         fixedMediaType = mt != null;
         if (fixedMediaType) {
             this.mtContext = ps.getContextResolver(JAXBContext.class, mt);
             this.mtUnmarshaller = ps.getContextResolver(Unmarshaller.class, mt);
-            this.mtMarshaller = ps.getContextResolver(Marshaller.class, mt);            
+            this.mtMarshaller = ps.getContextResolver(Marshaller.class, mt);
         } else {
             this.mtContext = null;
             this.mtUnmarshaller = null;
@@ -113,12 +116,12 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
     protected boolean isSupported(MediaType m) {
         return true;
     }
-    
+
     protected final Unmarshaller getUnmarshaller(Class type, MediaType mt) throws JAXBException {
         if (fixedMediaType)
             return getUnmarshaller(type);
-        
-        final ContextResolver<Unmarshaller> uncr = ps.getContextResolver(Unmarshaller.class, mt);            
+
+        final ContextResolver<Unmarshaller> uncr = ps.getContextResolver(Unmarshaller.class, mt);
         if (uncr != null) {
             Unmarshaller u = uncr.getContext(type);
             if (u != null) return u;
@@ -126,21 +129,21 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
 
         return getJAXBContext(type, mt).createUnmarshaller();
     }
-    
+
     private Unmarshaller getUnmarshaller(Class type) throws JAXBException {
         if (mtUnmarshaller != null) {
             Unmarshaller u = mtUnmarshaller.getContext(type);
             if (u != null) return u;
         }
-        
+
         return getJAXBContext(type).createUnmarshaller();
     }
-    
+
     protected final Marshaller getMarshaller(Class type, MediaType mt) throws JAXBException {
         if (fixedMediaType)
             return getMarshaller(type);
-        
-        final ContextResolver<Marshaller> mcr = ps.getContextResolver(Marshaller.class, mt);            
+
+        final ContextResolver<Marshaller> mcr = ps.getContextResolver(Marshaller.class, mt);
         if (mcr != null) {
             Marshaller m = mcr.getContext(type);
             if (m != null) return m;
@@ -152,7 +155,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         return m;
 
     }
-    
+
     private Marshaller getMarshaller(Class type) throws JAXBException {
         if (mtMarshaller != null) {
             Marshaller u = mtMarshaller.getContext(type);
@@ -164,7 +167,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, formattedOutput);
         return m;
     }
-    
+
     private JAXBContext getJAXBContext(Class type, MediaType mt) throws JAXBException {
         final ContextResolver<JAXBContext> cr = ps.getContextResolver(JAXBContext.class, mt);
         if (cr != null) {
@@ -180,10 +183,10 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
             JAXBContext c = mtContext.getContext(type);
             if (c != null) return c;
         }
-        
+
         return getStoredJAXBContext(type);
     }
-    
+
     protected JAXBContext getStoredJAXBContext(Class type) throws JAXBException {
         synchronized (jaxbContexts) {
             JAXBContext c = jaxbContexts.get(type);
@@ -192,9 +195,9 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
                 jaxbContexts.put(type, c);
             }
             return c;
-        }        
+        }
     }
-    
+
     protected static SAXSource getSAXSource(SAXParserFactory spf,
             InputStream entityStream) throws JAXBException {
         try {
