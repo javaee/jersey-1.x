@@ -180,13 +180,27 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
         tryBean(UserTable.class, "userTable_natural.json", UserTable.createTestInstance());
     }
 
+    public void testJersey1199() throws Exception {
+        Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
+        Class[] classes = new Class[] {ColorHolder.class, Jersey1199List.class};
+
+        final JSONConfiguration.NaturalBuilder builder = JSONConfiguration.natural();
+        builder.usePrefixesAtNaturalAttributes();
+        builder.rootUnwrapping(false);
+
+        final JSONConfiguration jsonConfiguration = builder.build();
+        final JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);
+
+        tryBean(Jersey1199List.class, "jersey1199_natural.json", Jersey1199List.createTestInstance(), jaxbContext, jsonConfiguration);
+    }
+
     public void testListEmptyBeanVerbose() throws Exception {
         Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
-        Class[] classes = new Class[]{ListEmptyBean.class};
+        Class[] classes = new Class[] {ListEmptyBean.class};
 
         JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);
 
-        tryReadingBean(ListEmptyBean.class, "listEmptyBeanVerbose_natural.json", ListEmptyBean.createTestInstance(), jaxbContext);
+        tryReadingBean(ListEmptyBean.class, "listEmptyBeanVerbose_natural.json", ListEmptyBean.createTestInstance(), jaxbContext, null);
     }
 
     private void tryBean(final Class clazz,
@@ -197,14 +211,23 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
 
         JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);
 
-        tryWritingBean(clazz, jsonExprFilename, jaxbBean, jaxbContext);
-        tryReadingBean(clazz, jsonExprFilename, jaxbBean, jaxbContext);
+        tryBean(clazz, jsonExprFilename, jaxbBean, jaxbContext, null);
+    }
+
+    private void tryBean(final Class clazz,
+                         final String jsonExprFilename,
+                         final Object jaxbBean,
+                         final JAXBContext jaxbContext,
+                         final JSONConfiguration configuration) throws Exception {
+        tryWritingBean(clazz, jsonExprFilename, jaxbBean, jaxbContext, configuration);
+        tryReadingBean(clazz, jsonExprFilename, jaxbBean, jaxbContext, configuration);
     }
 
     private void tryWritingBean(final Class clazz,
                                 final String jsonExprFilename,
                                 final Object jaxbBean,
-                                final JAXBContext jaxbContext) throws Exception {
+                                final JAXBContext jaxbContext,
+                                final JSONConfiguration configuration) throws Exception {
         String expectedJsonExpr = JSONTestHelper.getResourceAsString(PKG_NAME, jsonExprFilename);
         Marshaller marshaller = jaxbContext.createMarshaller();
         StringWriter resultWriter = new StringWriter();
@@ -212,7 +235,10 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
         JsonFactory jsonFactory = new JsonFactory();
         JsonGenerator jsonGenerator = jsonFactory.createJsonGenerator(resultWriter);
 
-        marshaller.marshal(jaxbBean, new Stax2JacksonWriter(jsonGenerator, clazz, jaxbContext));
+        final Stax2JacksonWriter writer = configuration != null
+                ? new Stax2JacksonWriter(jsonGenerator, configuration, clazz, jaxbContext) : new Stax2JacksonWriter(jsonGenerator, clazz, jaxbContext);
+
+        marshaller.marshal(jaxbBean, writer);
         System.out.println(String.format("Marshalled: %s", resultWriter.toString()));
         assertEquals("MISMATCH:\n" + expectedJsonExpr + "\n" + resultWriter.toString() + "\n",
                 normalizeJsonString(expectedJsonExpr), normalizeJsonString(resultWriter.toString()));
@@ -221,13 +247,18 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
     private void tryReadingBean(final Class clazz,
                                 final String jsonExprFilename,
                                 final Object jaxbBean,
-                                final JAXBContext jaxbContext) throws Exception {
+                                final JAXBContext jaxbContext,
+                                JSONConfiguration configuration) throws Exception {
 
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
+        if (configuration == null) {
+            configuration = JSONConfiguration.natural().rootUnwrapping(false).build();
+        }
+
         final XMLStreamReader xmlStreamReader = JsonXmlStreamReader.create(
                 new StringReader(JSONTestHelper.getResourceAsString(PKG_NAME, jsonExprFilename)),
-                JSONConfiguration.natural().rootUnwrapping(false).build(),
+                configuration,
                 null, clazz, jaxbContext, false);
 
         Object unmarshalledBean = unmarshaller.unmarshal(xmlStreamReader, clazz).getValue();

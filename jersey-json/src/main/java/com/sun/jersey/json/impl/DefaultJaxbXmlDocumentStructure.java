@@ -135,6 +135,10 @@ public abstract class DefaultJaxbXmlDocumentStructure implements JaxbXmlDocument
     }
 
     @Override
+    public void handleAttribute(final QName attributeName, final String value) {
+    }
+
+    @Override
     public boolean isArrayCollection() {
         return false;
     }

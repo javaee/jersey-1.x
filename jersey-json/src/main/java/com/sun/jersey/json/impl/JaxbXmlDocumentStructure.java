@@ -85,6 +85,15 @@ public interface JaxbXmlDocumentStructure {
     public boolean canHandleAttributes();
 
     /**
+     * Notifies this structure provider about an attribute event with the given name has been fired and that this attribute
+     * will be processed.
+     *
+     * @param attributeName name of the attribute that will be processed.
+     * @param value value of the attribute.
+     */
+    public void handleAttribute(QName attributeName, String value);
+
+    /**
      * Returns the {@link Type} of entity (element, attribute) with the given name. The given entity name is expected to be either
      * name of the current element or name of it's direct child.
      *

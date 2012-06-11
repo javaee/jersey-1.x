@@ -1,4 +1,10 @@
 release 1.13
+- Fixed issue 1057
+  http://java.net/jira/browse/JERSEY-1057
+  SAXParserContextProvider fail inconsistenly for missing XML parser features
+- Fixed issue 1199
+  http://java.net/jira/browse/JERSEY-1199
+  Incorrect JSON serialization of xsi:type when preceding object ends with an array property
 - Improved handling of external XML entities
 - Fixed issue 1198
   http://java.net/jira/browse/JERSEY-1198

@@ -97,6 +97,8 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
         private final QName name;
         private final MappingNodeValue nodeValue;
 
+        public XPathNodeWrapper currentType;
+
         public XPathNodeWrapper(final QName name) {
             this(null, null, null, null, name);
         }
@@ -204,9 +206,9 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
      * @param elementName name to obtain expected type of the element if the {@code expectedType} of this class is
      * {@link JAXBElement}.
      */
-    private void createRootNodeWrapperForExpectedElement(final QName elementName) {
+    private XPathNodeWrapper getRootNodeWrapperForElement(final QName elementName, boolean isRoot) {
         if (jaxbContext == null) {
-            return;
+            return null;
         }
 
         final org.eclipse.persistence.jaxb.JAXBContext moxyJaxbContext = JAXBHelper.getJAXBContext(jaxbContext);
@@ -214,6 +216,17 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
         final DatabaseSession session = xmlContext.getSession(0);
 
         Class<?> expectedType = this.expectedType;
+        if (!isRoot) {
+            final HashMap<Type, QName> typeToSchemaType = moxyJaxbContext.getTypeToSchemaType();
+
+            for (Map.Entry<Type, QName> entry : typeToSchemaType.entrySet()) {
+                if (entry.getValue().getLocalPart().equals(elementName.getLocalPart())) {
+                    expectedType = (Class<?>) entry.getKey();
+                    break;
+                }
+            }
+        }
+
         if (JAXBElement.class.isAssignableFrom(expectedType)) {
             final Map<Class, ClassDescriptor> descriptors = session.getDescriptors();
 
@@ -240,9 +253,11 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
         if (descriptor != null) {
             final TreeObjectBuilder objectBuilder = (TreeObjectBuilder) descriptor.getObjectBuilder();
 
-            xPathNodes.push(new XPathNodeWrapper(objectBuilder.getRootXPathNode(),
-                    null, null, descriptor, new QName(expectedType.getSimpleName())));
+            return new XPathNodeWrapper(objectBuilder.getRootXPathNode(),
+                    null, null, descriptor, new QName(expectedType.getSimpleName()));
         }
+
+        return null;
     }
 
     @Override
@@ -300,7 +315,7 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
             firstDocumentElement = false;
 
             if (name != null) {
-                createRootNodeWrapperForExpectedElement(name);
+                xPathNodes.push(getRootNodeWrapperForElement(name, true));
             }
 
             return;
@@ -311,8 +326,10 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
 
         // find our child node
         final XPathNodeWrapper currentNodeWrapper = getCurrentNodeWrapper();
+        final XPathNodeWrapper actualNodeWrapper = currentNodeWrapper.currentType == null ? currentNodeWrapper : currentNodeWrapper.currentType;
+
         final Map<XPathFragment, XPathNode> nonAttributeChildrenMap =
-                currentNodeWrapper == null ? null : currentNodeWrapper.xPathNode.getNonAttributeChildrenMap();
+                actualNodeWrapper == null ? null : actualNodeWrapper.xPathNode.getNonAttributeChildrenMap();
 
         if (nonAttributeChildrenMap != null) {
             for (Map.Entry<XPathFragment, XPathNode> child : nonAttributeChildrenMap.entrySet()) {
@@ -334,7 +351,7 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
 
                     if (descriptor != null) {
                         TreeObjectBuilder objectBuilder = (TreeObjectBuilder) descriptor.getObjectBuilder();
-                        final XPathNodeWrapper nodeWrapper = getCurrentNodeWrapper();
+                        final XPathNodeWrapper nodeWrapper = actualNodeWrapper;
 
                         newNodeWrapper = new XPathNodeWrapper(
                                 objectBuilder.getRootXPathNode(),
@@ -415,6 +432,16 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
             }
         }
         return false;
+    }
+
+    @Override
+    public void handleAttribute(final QName attributeName, final String value) {
+        final String localPart = attributeName.getLocalPart();
+
+        if ("@type".equals(localPart) || "type".equals(localPart)) {
+            getCurrentNodeWrapper().currentType =
+                getRootNodeWrapperForElement(new QName(value), false);
+        }
     }
 
     @Override

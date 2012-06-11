@@ -177,6 +177,11 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
         }
     }
 
+    @Override
+    public void handleAttribute(final QName attributeName, final String value) {
+        startElement(attributeName);
+    }
+
     private RuntimePropertyInfo getCurrentElementRuntimePropertyInfo() {
         final XMLSerializer xs = XMLSerializer.getInstance();
         final Property cp = (xs == null) ? null : xs.getCurrentProperty();

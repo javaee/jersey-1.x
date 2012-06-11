@@ -187,6 +187,11 @@ public class JaxbJdkXmlStructure extends DefaultJaxbXmlDocumentStructure {
         }
     }
 
+    @Override
+    public void handleAttribute(final QName attributeName, final String value) {
+        startElement(attributeName);
+    }
+
     private Object getCurrentElementRuntimePropertyInfo() {
         try {
             final Class<?> aClass = systemClassLoader.loadClass("com.sun.xml.internal.bind.v2.runtime.XMLSerializer");

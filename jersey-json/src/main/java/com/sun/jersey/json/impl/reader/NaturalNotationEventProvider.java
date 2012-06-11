@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.json.impl.reader;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.Location;
@@ -75,9 +76,13 @@ public class NaturalNotationEventProvider extends XmlEventProvider {
     }
 
     private QName getFieldQName(final String jsonFieldName, final boolean isAttribute) {
-        final QName result = isAttribute
+        QName result = isAttribute
                 ? documentStructure.getExpectedAttributesMap().get(jsonFieldName)
                 : documentStructure.getExpectedElementsMap().get(jsonFieldName);
+
+        if (isAttribute && "type".equals(jsonFieldName)) {
+            result = new QName(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type");
+        }
 
         return result == null ? new QName(jsonFieldName) : result;
     }
@@ -98,13 +103,14 @@ public class NaturalNotationEventProvider extends XmlEventProvider {
     }
 
     @Override
-    protected boolean isAttribute(String jsonFieldName) {
-        jsonFieldName = getAttributeName(jsonFieldName);
+    protected boolean isAttribute(final String jsonFieldName) {
+        final String attributeName = getAttributeName(jsonFieldName);
 
-        return !"$".equals(jsonFieldName)
+        return !"$".equals(attributeName)
                 && (documentStructure.canHandleAttributes()
-                    ? documentStructure.getExpectedAttributesMap().containsKey(jsonFieldName)
-                    : !documentStructure.getExpectedElementsMap().containsKey(jsonFieldName));
+                    ? documentStructure.getExpectedAttributesMap().containsKey(attributeName)
+                    : !documentStructure.getExpectedElementsMap().containsKey(attributeName))
+                || !jsonFieldName.equals(attributeName);
     }
 
     @Override

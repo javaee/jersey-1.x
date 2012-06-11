@@ -182,7 +182,10 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
     @Override
     public void writeStartElement(String prefix, String localName, String namespaceURI) throws XMLStreamException {
         try {
-            pushPropInfo(namespaceURI, localName);
+            if (!writingAttr) {
+                pushPropInfo(namespaceURI, localName, null);
+            }
+
             ProcessingInfo currentPI = peek(processingStack);
             ProcessingInfo parentPI = peek2nd(processingStack);
             if (!currentPI.isArray) {
@@ -237,9 +240,13 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
         }
     };
 
-    private void pushPropInfo(String namespaceUri, String localName) {
+    private void pushPropInfo(String namespaceUri, String localName, String value) {
         final QName qname = new QName(namespaceUri == null ? XMLConstants.NULL_NS_URI : namespaceUri, localName);
-        documentStructure.startElement(qname);
+        if (writingAttr) {
+            documentStructure.handleAttribute(qname, value);
+        } else {
+            documentStructure.startElement(qname);
+        }
 
         ProcessingInfo parentPI = peek(processingStack);
         // still the same array, no need to dig out runtime property info
@@ -265,7 +272,7 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
         }
 
         // TODO: wildcard could still simulate an array by adding several elements of the same name
-        if (documentStructure.isArrayCollection()) { // another array
+        if (documentStructure.isArrayCollection() && !writingAttr) { // another array
             if (!((parentPI != null) && (parentPI.isArray) && sameArrayCollection)) {
                 // another array
                 processingStack.add(new ProcessingInfo(qname, true, rt));
@@ -371,6 +378,7 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
     @Override
     public void writeAttribute(String prefix, String namespaceURI, String localName, String value) throws XMLStreamException {
         writingAttr = true;
+        pushPropInfo(namespaceURI, localName, value);
         writeStartElement(prefix, attrsWithPrefix ? ("@" + localName) : localName, namespaceURI);
         writingAttr = false;
         // a dirty hack, since jaxb ri is giving us wrong info on the actual attribute type in this case
