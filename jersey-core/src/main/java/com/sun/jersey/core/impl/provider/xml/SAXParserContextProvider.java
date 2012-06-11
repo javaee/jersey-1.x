@@ -37,21 +37,27 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
-
 package com.sun.jersey.core.impl.provider.xml;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.Context;
 
 import javax.xml.parsers.SAXParserFactory;
 
 import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.core.util.SaxHelper;
 
 /**
  *
  * @author Paul Sandoz (paul.sandoz at oracle.com)
  * @author Martin Matula (martin.matula at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class SAXParserContextProvider extends ThreadLocalSingletonContextProvider<SAXParserFactory> {
+    private static final Logger LOGGER = Logger.getLogger(SAXParserContextProvider.class.getName());
+
     private final boolean disableXmlSecurity;
 
     public SAXParserContextProvider(@Context FeaturesAndProperties fps) {
@@ -63,7 +69,10 @@ public class SAXParserContextProvider extends ThreadLocalSingletonContextProvide
     protected SAXParserFactory getInstance() {
         SAXParserFactory f = SAXParserFactory.newInstance();
         f.setNamespaceAware(true);
-        if (!disableXmlSecurity) {
+
+        if (SaxHelper.isXdkParserFactory(f)) {
+            LOGGER.log(Level.WARNING, "Using XDK. No security features will be enabled for the SAX parser.");
+        } else if (!disableXmlSecurity) {
             f = new SecureSAXParserFactory(f);
         }
         return f;

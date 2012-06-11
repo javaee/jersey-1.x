@@ -88,6 +88,7 @@ import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
 import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.core.util.SaxHelper;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.impl.entity.JAXBBean;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
@@ -197,7 +198,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -268,7 +271,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -351,7 +356,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -380,7 +387,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -443,7 +452,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -462,7 +473,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         b = bf.newDocumentBuilder();
         d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -500,7 +513,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -541,7 +556,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -655,7 +672,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
@@ -749,7 +768,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
         bf.setNamespaceAware(true);
         bf.setValidating(false);
-        bf.setXIncludeAware(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
         DocumentBuilder b = bf.newDocumentBuilder();
         Document d = b.parse(tmpFile);
         printSource(new DOMSource(d));
