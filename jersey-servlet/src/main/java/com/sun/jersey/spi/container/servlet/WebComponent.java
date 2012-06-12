@@ -40,6 +40,39 @@
 
 package com.sun.jersey.spi.container.servlet;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.SecurityContext;
+
+import javax.naming.NamingException;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
 import com.sun.jersey.api.core.ApplicationAdapter;
@@ -72,37 +105,6 @@ import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-
-import javax.naming.NamingException;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * An abstract Web component that may be extended a Servlet and/or
@@ -827,8 +829,7 @@ public class WebComponent implements ContainerListener {
     }
 
     private void filterFormParameters(HttpServletRequest hsr, ContainerRequest cr) throws IOException {
-        if (cr.getMethod().equals("POST")
-                && MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, cr.getMediaType())
+        if (MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, cr.getMediaType())
                 && !isEntityPresent(cr)) {
             Form f = new Form();
 
@@ -844,7 +845,7 @@ public class WebComponent implements ContainerListener {
                 cr.getProperties().put(FormDispatchProvider.FORM_PROPERTY, f);
                 if (LOGGER.isLoggable(Level.WARNING)) {
                     LOGGER.log(Level.WARNING,
-                            "A servlet POST request, to the URI " + cr.getRequestUri() + ", " +
+                            "A servlet request, to the URI " + cr.getRequestUri() + ", " +
                                     "contains form parameters in " +
                                     "the request body but the request body has been consumed " +
                                     "by the servlet or a servlet filter accessing the request " +
