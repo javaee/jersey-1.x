@@ -57,6 +57,9 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.validation.Schema;
 
+import com.sun.jersey.core.util.SaxHelper;
+import com.sun.jersey.impl.ImplMessages;
+
 import org.xml.sax.EntityResolver;
 import org.xml.sax.HandlerBase;
 import org.xml.sax.InputSource;
@@ -68,8 +71,9 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
-* @author Martin Matula (martin.matula at oracle.com)
-*/
+ * @author Martin Matula (martin.matula at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
+ */
 final class SecureSAXParserFactory extends SAXParserFactory {
     private static final Logger LOGGER = Logger.getLogger(SecureSAXParserFactory.class.getName());
     private static final EntityResolver EMPTY_ENTITY_RESOLVER = new EntityResolver() {
@@ -82,21 +86,22 @@ final class SecureSAXParserFactory extends SAXParserFactory {
 
     SecureSAXParserFactory(SAXParserFactory spf) {
         this.spf = spf;
-        try {
-            spf.setFeature("http://xml.org/sax/features/external-general-entities", Boolean.FALSE);
-            spf.setFeature("http://xml.org/sax/features/external-parameter-entities", Boolean.FALSE);
-        } catch (Exception ex) {
-            throw new RuntimeException("Security features for the SAX parser could not be enabled",  ex);
-        }
 
-        try {
-            spf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
-        } catch (Exception ex) {
-            LOGGER.log(Level.WARNING,
-                    "JAXP feature XMLConstants.FEATURE_SECURE_PROCESSING cannot be set on a SAXParserFactory. " +
-                            "External general entity processing is disabled but other potential security related" +
-                            " features will not be enabled.",
-                    ex);
+        if (SaxHelper.isXdkParserFactory(spf)) {
+            LOGGER.log(Level.WARNING, ImplMessages.SAX_XDK_NO_SECURITY_FEATURES());
+        } else {
+            try {
+                spf.setFeature("http://xml.org/sax/features/external-general-entities", Boolean.FALSE);
+                spf.setFeature("http://xml.org/sax/features/external-parameter-entities", Boolean.FALSE);
+            } catch (Exception ex) {
+                throw new RuntimeException(ImplMessages.SAX_CANNOT_ENABLE_SECURITY_FEATURES(),  ex);
+            }
+
+            try {
+                spf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, Boolean.TRUE);
+            } catch (Exception ex) {
+                LOGGER.log(Level.WARNING, ImplMessages.SAX_CANNOT_ENABLE_SECURE_PROCESSING_FEATURE(), ex);
+            }
         }
     }
 
