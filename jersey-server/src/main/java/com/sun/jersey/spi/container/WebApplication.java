@@ -41,9 +41,14 @@
 package com.sun.jersey.spi.container;
 
 
+import java.io.IOException;
+
+import javax.ws.rs.ext.Providers;
+
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.ResourceContext;
 import com.sun.jersey.api.core.Traceable;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.util.FeaturesAndProperties;
@@ -52,9 +57,6 @@ import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.monitoring.DispatchingListener;
 import com.sun.jersey.spi.monitoring.RequestListener;
 import com.sun.jersey.spi.monitoring.ResponseListener;
-
-import javax.ws.rs.ext.Providers;
-import java.io.IOException;
 
 /**
  * A Web application that manages a set of resource classes.
@@ -80,7 +82,7 @@ public interface WebApplication extends Traceable {
      * @param resourceConfig the resource configuration containing the set
      *        of Web resources to be managed by the Web application.
      * @throws IllegalArgumentException if resourceConfig is null.
-     * @throws ContainerException if a second or further call to the method 
+     * @throws ContainerException if a second or further call to the method
      *         is invoked.
      */
     void initiate(ResourceConfig resourceConfig)
@@ -97,7 +99,7 @@ public interface WebApplication extends Traceable {
      * @param provider the IoC component provider factory to use, if null the default
      *        component provider factory will be used.
      * @throws IllegalArgumentException if resourceConfig is null.
-     * @throws ContainerException if a second or further call to the method 
+     * @throws ContainerException if a second or further call to the method
      *         is invoked.
      */
     void initiate(ResourceConfig resourceConfig, IoCComponentProviderFactory provider)
@@ -130,10 +132,17 @@ public interface WebApplication extends Traceable {
     Providers getProviders();
 
     /**
+     * Get the ResourceContext
+     * @return ResourceContext
+     * @since 1.13
+     */
+    ResourceContext getResourceContext();
+
+    /**
      * Get the message body workers that can be used for getting
-     * message body readers and writers. 
+     * message body readers and writers.
      *
-     * @return the message body workers. The return value is 
+     * @return the message body workers. The return value is
      *         undefined before the web application is initialized.
      */
     MessageBodyWorkers getMessageBodyWorkers();
@@ -187,7 +196,7 @@ public interface WebApplication extends Traceable {
 
     /**
      * Handle an HTTP request by dispatching the request to the appropriate
-     * matching Web resource that produces the response or otherwise producing 
+     * matching Web resource that produces the response or otherwise producing
      * the appropriate HTTP error response.
      * <p>
      * @param request the HTTP container request.
@@ -199,7 +208,7 @@ public interface WebApplication extends Traceable {
 
     /**
      * Handle an HTTP request by dispatching the request to the appropriate
-     * matching Web resource that produces the response or otherwise producing 
+     * matching Web resource that produces the response or otherwise producing
      * the appropriate HTTP error response.
      * <p>
      * @param request the HTTP container request.

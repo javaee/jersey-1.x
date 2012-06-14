@@ -39,23 +39,26 @@
  */
 package com.sun.jersey.guice;
 
-import com.google.inject.Provides;
-import com.google.inject.servlet.RequestScoped;
-import com.google.inject.servlet.ServletModule;
-import com.sun.jersey.api.core.ExtendedUriInfo;
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.core.util.FeaturesAndProperties;
-import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
-import com.sun.jersey.spi.MessageBodyWorkers;
-import com.sun.jersey.spi.container.ExceptionMapperContext;
-import com.sun.jersey.spi.container.WebApplication;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.Providers;
+
+import com.google.inject.Provides;
+import com.google.inject.servlet.RequestScoped;
+import com.google.inject.servlet.ServletModule;
+
+import com.sun.jersey.api.core.ExtendedUriInfo;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.core.ResourceContext;
+import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
+import com.sun.jersey.spi.MessageBodyWorkers;
+import com.sun.jersey.spi.container.ExceptionMapperContext;
+import com.sun.jersey.spi.container.WebApplication;
 
 /**
  * A {@link ServletModule} module that provides JAX-RS and Jersey related
@@ -66,20 +69,20 @@ import javax.ws.rs.ext.Providers;
  * <p>
  * The following bindings are defined:
  * <ul>
- * <li>{@link WebApplication}
- * <li>{@link WebApplication}
- * <li>{@link Providers}
- * <li>{@link FeaturesAndProperties}
- * <li>{@link MessageBodyWorkers}
- * <li>{@link ExceptionMapperContext}
- * <li>{@link HttpContext}
- * <li>{@link UriInfo}
- * <li>{@link ExtendedUriInfo}
- * <li>{@link HttpRequestContext}
- * <li>{@link HttpHeaders}
- * <li>{@link Request}
- * <li>{@link SecurityContext}
- * <li>{@link HttpResponseContext}
+ * <li>{@link WebApplication}</li>
+ * <li>{@link Providers}</li>
+ * <li>{@link FeaturesAndProperties}</li>
+ * <li>{@link MessageBodyWorkers}</li>
+ * <li>{@link ExceptionMapperContext}</li>
+ * <li>{@link HttpContext}</li>
+ * <li>{@link UriInfo}</li>
+ * <li>{@link ExtendedUriInfo}</li>
+ * <li>{@link HttpRequestContext}</li>
+ * <li>{@link HttpHeaders}</li>
+ * <li>{@link Request}</li>
+ * <li>{@link SecurityContext}</li>
+ * <li>{@link HttpResponseContext}</li>
+ * <li>{@link ResourceContext}</li>
  * </ul>
  * @author Paul.Sandoz@Sun.Com
  */
@@ -108,6 +111,11 @@ public class JerseyServletModule extends ServletModule {
     @Provides
     public ExceptionMapperContext exceptionMapperContext(WebApplication webApplication) {
         return webApplication.getExceptionMapperContext();
+    }
+
+    @Provides
+    public ResourceContext resourceContext(WebApplication webApplication) {
+        return webApplication.getResourceContext();
     }
 
     @RequestScoped

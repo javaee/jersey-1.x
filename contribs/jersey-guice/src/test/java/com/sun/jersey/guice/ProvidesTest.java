@@ -1,5 +1,16 @@
 package com.sun.jersey.guice;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
+
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -8,6 +19,7 @@ import com.google.inject.Singleton;
 import com.google.inject.Stage;
 import com.google.inject.servlet.GuiceServletContextListener;
 import com.google.inject.servlet.RequestScoped;
+
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.HttpContext;
@@ -19,16 +31,6 @@ import com.sun.jersey.guice.spi.container.servlet.GuiceContainer;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.container.ExceptionMapperContext;
 import com.sun.jersey.spi.container.WebApplication;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Providers;
 
 /**
  *
@@ -53,6 +55,11 @@ public class ProvidesTest extends AbstractGuiceGrizzlyTest {
         @Inject Request r;
         @Inject SecurityContext sc;
         @Inject HttpResponseContext hresponsec;
+
+        @Inject
+        public InjectResource(ResourceContext rc) {
+            assert rc != null;
+        }
 
         @GET
         @Produces("text/plain")
@@ -92,7 +99,7 @@ public class ProvidesTest extends AbstractGuiceGrizzlyTest {
     public static class BoundPerRequestResource {
 
         @Inject UriInfo ui;
-        
+
         @QueryParam("x") String x;
 
         @GET

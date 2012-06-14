@@ -39,6 +39,42 @@
  */
 package com.sun.jersey.server.impl.application;
 
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Providers;
+
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.container.MappableContainerException;
@@ -102,16 +138,7 @@ import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.StringReaderWorkers;
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerRequestFilter;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ContainerResponseWriter;
-import com.sun.jersey.spi.container.ExceptionMapperContext;
-import com.sun.jersey.spi.container.ResourceMethodCustomInvokerDispatchFactory;
-import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
-import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.container.WebApplicationListener;
+import com.sun.jersey.spi.container.*;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.inject.Injectable;
@@ -127,43 +154,8 @@ import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Providers;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
- * A Web application that contains a set of resources, each referenced by 
+ * A Web application that contains a set of resources, each referenced by
  * an absolute URI template.
  *
  * @author Paul.Sandoz@Sun.Com
@@ -1326,6 +1318,11 @@ public final class WebApplicationImpl implements WebApplication {
     @Override
     public Providers getProviders() {
         return providers;
+    }
+
+    @Override
+    public ResourceContext getResourceContext() {
+        return resourceContext;
     }
 
     @Override

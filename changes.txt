@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1219
+  http://java.net/jira/browse/JERSEY-1219
+  Added ResourceContext binding to Guice
 - Fixed issue 1200
   http://java.net/jira/browse/JERSEY-1200
   Extracting Form parameters when consumed by filters was specific to POST method. Now it works for PUT and other methods as well.
