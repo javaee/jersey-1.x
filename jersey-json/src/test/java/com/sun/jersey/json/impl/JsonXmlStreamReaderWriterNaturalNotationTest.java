@@ -180,6 +180,10 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
         tryBean(UserTable.class, "userTable_natural.json", UserTable.createTestInstance());
     }
 
+    public void testUserTable2() throws Exception {
+        tryBean(UserTable.class, "userTable2_natural.json", UserTable.createTestInstance2());
+    }
+
     public void testJersey1199() throws Exception {
         Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
         Class[] classes = new Class[] {ColorHolder.class, Jersey1199List.class};

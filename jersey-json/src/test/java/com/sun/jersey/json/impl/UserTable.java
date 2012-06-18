@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,15 +39,30 @@
  */
 package com.sun.jersey.json.impl;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Note: With MOXy we need to ensure that collections (a list in this case) with predefined values (assigned to the list during
+ * object initialization) are either uninitialized or empty during the object creation, otherwise there is a possibility that
+ * these default values are doubled in the list (list is filled with default values when a new instance is created and after
+ * unmarshalling XML/JSON stream additional elements are added to this list - MOXy doesn't override the existing list with a
+ * new one created during unmarshalling).
+ * <p/>
+ * Workaround: Set {@link XmlAccessorType} to {@link XmlAccessType#FIELD}, do not initialize the list in the default constructor
+ * (field initializer) and assign the value to the list that should contain predefined values manually (in this case the value
+ * object is represented by {@code #DEFAULT_HEADERS}).
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 public class UserTable {
 
     public static class JMakiTableHeader {
@@ -62,15 +77,95 @@ public class UserTable {
             this.id = id;
             this.label = label;
         }
+
+        @Override
+        public int hashCode() {
+            int hash = 13;
+            hash = id != null ? 29 * id.hashCode() : hash;
+            hash = label != null ? 29 * label.hashCode() : hash;
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof JMakiTableHeader)) {
+                return false;
+            }
+            JMakiTableHeader that = (JMakiTableHeader)obj;
+
+            if ((id != null && !id.equals(that.id)) && that.id != null) {
+                return false;
+            }
+            if ((label != null && !label.equals(that.label)) && that.label != null) {
+                return false;
+            }
+
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return "JMakiTableHeader(id = " + id + ", label = " + label + ")";
+        }
     }
-    public List<JMakiTableHeader> columns = initHeaders();
-    public List<User> rows;
+
+    public static Object createTestInstance() {
+        UserTable instance = new UserTable();
+        instance.rows = new LinkedList<User>();
+        instance.rows.add(JSONTestHelper.createTestInstance(User.class));
+        instance.columns = DEFAULT_HEADERS;
+        return instance;
+    }
+
+    public static Object createTestInstance2() {
+        UserTable instance = new UserTable();
+        instance.rows = new LinkedList<User>();
+        instance.rows.add(JSONTestHelper.createTestInstance(User.class));
+        instance.addColumn(new JMakiTableHeader("password", "Password"));
+        return instance;
+    }
+
+    static List<JMakiTableHeader> initHeaders() {
+        List<JMakiTableHeader> headers = new LinkedList<JMakiTableHeader>();
+        headers.add(new JMakiTableHeader("userid", "UserID"));
+        headers.add(new JMakiTableHeader("name", "User Name"));
+        return Collections.unmodifiableList(headers);
+    }
+
+    public final static List<JMakiTableHeader> DEFAULT_HEADERS = initHeaders();
+
+    private List<JMakiTableHeader> columns;
+    private List<User> rows;
 
     public UserTable() {}
-    
+
     public UserTable(List<User> users) {
         this.rows = new LinkedList<User>();
         this.rows.addAll(users);
+        this.columns = DEFAULT_HEADERS;
+    }
+
+    public void addColumn(final JMakiTableHeader column) {
+        getColumns().add(column);
+    }
+
+    public List<JMakiTableHeader> getColumns() {
+        if (columns == null) {
+            columns = new LinkedList<JMakiTableHeader>(DEFAULT_HEADERS);
+        }
+        return columns;
+    }
+
+    public void setColumns(final List<JMakiTableHeader> columns) {
+        this.columns = columns;
+    }
+
+    public List<User> getRows() {
+        return rows;
+    }
+
+    public void setRows(final List<User> rows) {
+        this.rows = rows;
     }
 
     @Override
@@ -79,13 +174,8 @@ public class UserTable {
             return false;
         }
         final UserTable other = (UserTable) obj;
-        if ((this.rows == other.rows) || ((null == this.rows) && (null == other.rows))) {
-            return true;
-        }
-        if (this.rows.size() != other.rows.size()) {
-            return false;
-        }
-        return this.rows.containsAll(other.rows) && other.rows.containsAll(this.rows);
+        return JSONTestHelper.areCollectionsEqual(this.rows, other.rows)
+                && JSONTestHelper.areCollectionsEqual(this.columns, other.columns);
     }
 
     @Override
@@ -93,29 +183,19 @@ public class UserTable {
         int hash = 16;
         if (null != rows) {
             for (User u : rows) {
-                hash = 17 * hash + u.hashCode(); 
+                hash = 17 * hash + u.hashCode();
+            }
+        }
+        if (null != columns) {
+            for (JMakiTableHeader u : columns) {
+                hash = 17 * hash + u.hashCode();
             }
         }
         return hash;
     }
-    
-    
-    public static Object createTestInstance() {
-        UserTable instance = new UserTable();
-        instance.rows = new LinkedList<User>();
-        instance.rows.add(JSONTestHelper.createTestInstance(User.class));
-        return instance;
-    }
-
-    static List<JMakiTableHeader> initHeaders() {
-        List<JMakiTableHeader> headers = new LinkedList<JMakiTableHeader>();
-        headers.add(new JMakiTableHeader("userid", "UserID"));
-        headers.add(new JMakiTableHeader("name", "User Name"));
-        return headers;
-    }
 
     @Override
     public String toString() {
-        return "UserTable(" + rows.toString() + ")";
+        return "UserTable(" + rows.toString() + ", " + columns.toString() + ")";
     }
 }

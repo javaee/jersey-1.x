@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1165
+  http://java.net/jira/browse/JERSEY-1165
+  Fix failing tests when MOXy is used as the JAXB provider
 - Fixed issue 1221
   http://java.net/jira/browse/JERSEY-1221
   Helloworld OSGi WebApp won't build under Java7
