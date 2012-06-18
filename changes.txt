@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1221
+  http://java.net/jira/browse/JERSEY-1221
+  Helloworld OSGi WebApp won't build under Java7
 - Fixed issue 1219
   http://java.net/jira/browse/JERSEY-1219
   Added ResourceContext binding to Guice
