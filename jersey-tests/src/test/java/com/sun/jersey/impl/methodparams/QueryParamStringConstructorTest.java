@@ -40,20 +40,21 @@
 
 package com.sun.jersey.impl.methodparams;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.Path;
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.api.client.ClientResponse;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
 import java.util.List;
+
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.impl.AbstractResourceTester;
 
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
  */
 public class QueryParamStringConstructorTest extends AbstractResourceTester {
 
@@ -65,7 +66,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
     public static class ResourceString {
         @GET
         public String doGet(
-                @QueryParam("arg1") BigDecimal arg1, 
+                @QueryParam("arg1") BigDecimal arg1,
                 @QueryParam("arg2") BigInteger arg2,
                 @QueryParam("arg3") URI arg3) {
             assertEquals("3.145", arg1.toString());
@@ -74,7 +75,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     @Path("/")
     public static class ResourceStringList {
         @GET
@@ -85,7 +86,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     @Path("/")
     public static class ResourceStringListEmpty {
         @GET
@@ -97,7 +98,19 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
+    @Path("/")
+    public static class ResourceStringNull {
+        @GET
+        public String doGet(
+                @QueryParam("arg1") BigDecimal arg1,
+                @QueryParam("arg2") BigInteger arg2) {
+            assertEquals(null, arg1);
+            assertEquals(null, arg2);
+            return "content";
+        }
+    }
+
     @Path("/")
     public static class ResourceStringNullDefault {
         @GET
@@ -107,7 +120,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     @Path("/")
     public static class ResourceStringDefault {
         @GET
@@ -117,7 +130,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     @Path("/")
     public static class ResourceStringDefaultOverride {
         @GET
@@ -127,7 +140,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     @Path("/")
     public static class ResourceStringListEmptyDefault {
         @GET
@@ -136,7 +149,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     @Path("/")
     public static class ResourceStringListDefault {
         @GET
@@ -146,7 +159,7 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     @Path("/")
     public static class ResourceStringListDefaultOverride {
         @GET
@@ -156,71 +169,77 @@ public class QueryParamStringConstructorTest extends AbstractResourceTester {
             return "content";
         }
     }
-    
+
     public void testStringConstructorGet() {
         initiateWebApplication(ResourceString.class);
-        
+
         resource("/?arg1=3.145&arg2=3145&arg3=http:%2F%2Ftest").
                 get(String.class);
     }
-    
+
     public void testStringConstructorListGet() {
         initiateWebApplication(ResourceStringList.class);
-        
+
         resource("/?args=3.145&args=2.718&args=1.618").
                 accept("application/stringlist").
                 get(String.class);
     }
-    
+
     public void testStringConstructorListEmptyGet() {
         initiateWebApplication(ResourceStringListEmpty.class);
-        
+
         resource("/?args&args&args").
                 accept("application/stringlist").
                 get(String.class);
     }
-    
+
     public void testStringConstructorNullDefault() {
         initiateWebApplication(ResourceStringNullDefault.class);
-        
+
         resource("/").get(String.class);
     }
-    
+
     public void testStringConstructorDefault() {
         initiateWebApplication(ResourceStringDefault.class);
-        
+
         resource("/").get(String.class);
     }
-    
+
     public void testStringConstructorDefaultOverride() {
         initiateWebApplication(ResourceStringDefault.class);
-        
+
         resource("/?args=2.718").
                 get(String.class);
     }
-    
+
     public void testStringConstructorListEmptyDefault() {
         initiateWebApplication(ResourceStringListEmptyDefault.class);
-        
+
         resource("/").get(String.class);
     }
-    
+
     public void testStringConstructorListDefault() {
         initiateWebApplication(ResourceStringListDefault.class);
-        
+
         resource("/").get(String.class);
     }
-    
+
     public void testStringConstructorListDefaultOverride() {
         initiateWebApplication(ResourceStringListDefaultOverride.class);
-        
+
         resource("/?args=2.718").
                 get(String.class);
     }
-    
+
+    public void testStringConstructorNullGet() {
+        initiateWebApplication(ResourceStringNull.class);
+
+        resource("/?arg1=&arg2=").get(String.class);
+    }
+
     public void testBadStringConstructorValue() {
         initiateWebApplication(ResourceString.class);
-        
+
         ClientResponse response = resource("/?arg1=ABCDEF&arg2=3145&arg3=http:%2F%2Ftest", false).
                 get(ClientResponse.class);
         assertEquals(404, response.getStatus());

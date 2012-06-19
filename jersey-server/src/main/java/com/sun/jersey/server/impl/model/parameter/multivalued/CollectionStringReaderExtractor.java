@@ -39,7 +39,6 @@
  */
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.spi.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -47,11 +46,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
 import javax.ws.rs.core.MultivaluedMap;
+
+import com.sun.jersey.spi.StringReader;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
  */
 abstract class CollectionStringReaderExtractor<V extends Collection>
         extends AbstractStringReaderExtractor {
@@ -65,7 +67,7 @@ abstract class CollectionStringReaderExtractor<V extends Collection>
         if (stringList != null) {
             final V valueList = getInstance();
             for (String v : stringList) {
-                valueList.add((v.length() == 0) ? null : sr.fromString(v));
+                valueList.add(sr.fromString(v));
             }
 
             return valueList;

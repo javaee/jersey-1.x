@@ -40,10 +40,7 @@
 
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.spi.StringReader;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MultivaluedMap;
 
 /**
  *

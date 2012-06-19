@@ -40,14 +40,15 @@
 
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.spi.StringReader;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.spi.StringReader;
+
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
  */
 final class StringReaderExtractor extends AbstractStringReaderExtractor {
 
@@ -57,9 +58,10 @@ final class StringReaderExtractor extends AbstractStringReaderExtractor {
 
     public Object extract(MultivaluedMap<String, String> parameters) {
         String v = parameters.getFirst(parameter);
+        Object result = null;
         if (v != null) {
             try {
-                return sr.fromString(v);
+                result = sr.fromString(v);
             } catch (WebApplicationException ex) {
                 throw ex;
             } catch (ContainerException ex) {
@@ -67,10 +69,11 @@ final class StringReaderExtractor extends AbstractStringReaderExtractor {
             } catch (Exception ex) {
                 throw new ExtractorContainerException(ex);
             }
-        } else if (defaultStringValue != null) {
-            return sr.fromString(defaultStringValue);
+        }
+        if (result == null && defaultStringValue != null) {
+            result = sr.fromString(defaultStringValue);
         }
 
-        return null;
+        return result;
     }
 }

@@ -39,11 +39,6 @@
  */
 package com.sun.jersey.server.impl.model.parameter.multivalued;
 
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.core.header.HttpDateFormat;
-import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.spi.StringReader;
-import com.sun.jersey.spi.StringReaderProvider;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -51,11 +46,18 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.Date;
+
 import javax.ws.rs.WebApplicationException;
+
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.core.header.HttpDateFormat;
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.spi.StringReader;
+import com.sun.jersey.spi.StringReaderProvider;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
  */
 public class StringReaderProviders {
 
@@ -65,6 +67,10 @@ public class StringReaderProviders {
             try {
                 return _fromString(value);
             } catch (InvocationTargetException ex) {
+                // if the value is an empty string, return null
+                if (value.length() == 0) {
+                    return null;
+                }
                 Throwable target = ex.getTargetException();
                 if (target instanceof WebApplicationException) {
                     throw (WebApplicationException)target;
@@ -130,7 +136,7 @@ public class StringReaderProviders {
         public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
             if (!Enum.class.isAssignableFrom(type))
                 return null;
-            
+
             return super.getStringReader(type, genericType, annotations);
         }
     }
@@ -140,7 +146,7 @@ public class StringReaderProviders {
         public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
             if (type != Date.class)
                 return null;
-            
+
             return new StringReader() {
                 public Object fromString(String value) {
                     try {

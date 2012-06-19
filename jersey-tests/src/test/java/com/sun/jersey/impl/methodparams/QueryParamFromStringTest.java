@@ -40,14 +40,17 @@
 
 package com.sun.jersey.impl.methodparams;
 
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.Path;
-import com.sun.jersey.impl.AbstractResourceTester;
+import java.util.List;
+
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+import com.sun.jersey.impl.AbstractResourceTester;
 
 /**
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
  */
 public class QueryParamFromStringTest extends AbstractResourceTester {
 
@@ -65,6 +68,11 @@ public class QueryParamFromStringTest extends AbstractResourceTester {
         public static Parameter fromString(String s) {
             return new Parameter(s + "fromString");
         }
+
+        @Override
+        public String toString() {
+            return s;
+        }
     }
 
     @Path("/")
@@ -75,6 +83,22 @@ public class QueryParamFromStringTest extends AbstractResourceTester {
             assertEquals("3.145fromString", p.s);
             return "content";
         }
+
+        @GET
+        @Path("list")
+        public String doGet(@QueryParam("arg") List<Parameter> p) {
+            System.err.println(p.toString());
+            assertEquals("[afromString, fromString, bfromString]", p.toString());
+            return "content";
+        }
+
+        @GET
+        @Path("empty")
+        public String doGetEmpty(
+                @QueryParam("arg1") Parameter p) {
+            assertEquals("fromString", p.s);
+            return "content";
+        }
     }
 
 
@@ -83,5 +107,17 @@ public class QueryParamFromStringTest extends AbstractResourceTester {
 
         resource("/?arg1=3.145").
                 get(String.class);
+    }
+
+    public void testListFromStringGet() {
+        initiateWebApplication(ResourceString.class);
+
+        resource("/list/?arg=a&arg=&arg=b").get(String.class);
+    }
+
+    public void testFromEmptyStringGet() {
+        initiateWebApplication(ResourceString.class);
+
+        resource("/empty/?arg1=").get(String.class);
     }
 }

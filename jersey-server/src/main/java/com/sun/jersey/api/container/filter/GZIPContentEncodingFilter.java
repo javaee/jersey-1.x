@@ -39,17 +39,19 @@
  */
 package com.sun.jersey.api.container.filter;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+import javax.ws.rs.core.HttpHeaders;
+
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
 import com.sun.jersey.spi.container.ContainerResponseWriter;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import javax.ws.rs.core.HttpHeaders;
 
 /**
  * A GZIP content encoding filter.
@@ -102,7 +104,7 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
         Adapter(ContainerResponseWriter crw) {
             this.crw = crw;
         }
-        
+
         public OutputStream writeStatusAndHeaders(long contentLength, ContainerResponse response) throws IOException {
            gos = new GZIPOutputStream(crw.writeStatusAndHeaders(-1, response));
            return gos;
@@ -115,7 +117,7 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
     }
 
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        if (response.getEntity() != null && 
+        if (response.getEntity() != null &&
                 request.getRequestHeaders().containsKey(HttpHeaders.ACCEPT_ENCODING) &&
                 !response.getHttpHeaders().containsKey(HttpHeaders.CONTENT_ENCODING)) {
             if (request.getRequestHeaders().getFirst(HttpHeaders.ACCEPT_ENCODING).contains("gzip")) {
@@ -123,7 +125,7 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
                 response.setContainerResponseWriter(
                         new Adapter(response.getContainerResponseWriter()));
             }
-        }        
+        }
         return response;
     }
 }
