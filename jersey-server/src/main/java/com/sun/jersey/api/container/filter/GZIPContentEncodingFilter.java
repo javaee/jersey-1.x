@@ -56,18 +56,18 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
 
 /**
  * A GZIP content encoding filter.
- * <p>
+ * <p/>
  * If the request contains a Content-Encoding header of "gzip"
  * then the request entity (if any) is uncompressed using gzip.
  * If the request contains an Accept-Encoding header containing "gzip" and an "If-None-Match" Header, entitytag value is checked:
  * if it contains the -gzip suffix, remove this suffix, otherwise, completely remove the "if-none-match" header.
- * <p>
+ * <p/>
  * If the request contains a Accept-Encoding header that contains
  * "gzip" then the response entity (if any) is compressed using gzip and a
  * Content-Encoding header of "gzip" is added to the response.
  * As this filter is active, the resource representation can be compressed. the value "Accept-Encoding" is so added to the Vary header.
  * If any entityTag is used and content may be gzipped, the "-gzip" suffix is added to entitytag value.
- * <p>
+ * <p/>
  * When an application is deployed as a Servlet or Filter this Jersey filter can be
  * registered using the following initialization parameters:
  * <blockquote><pre>
@@ -88,10 +88,10 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
  */
 public class GZIPContentEncodingFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
-	private static final String ENTITY_TAG_GZIP_SUFFIX_VALUE = "-gzip";
-	private static final String ENTITY_TAG_GZIP_SUFFIX_HEADER_VALUE = "-gzip\""; // Entity tag raw values always finish with a quotation mark within http headers.
+    private static final String ENTITY_TAG_GZIP_SUFFIX_VALUE = "-gzip";
+    private static final String ENTITY_TAG_GZIP_SUFFIX_HEADER_VALUE = "-gzip\""; // Entity tag raw values always finish with a quotation mark within http headers.
 
-	public ContainerRequest filter(ContainerRequest request) {
+    public ContainerRequest filter(ContainerRequest request) {
         String contentEncoding = request.getRequestHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
         if (contentEncoding != null && contentEncoding.trim().equals("gzip")) {
             request.getRequestHeaders().remove(HttpHeaders.CONTENT_ENCODING);
@@ -109,14 +109,14 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
         if (acceptEncoding != null && acceptEncoding.contains("gzip") && entityTag != null) {
             // normalize entitytag (Note: maybe it should check whether it ends with a quotation mark ?)
             if (entityTag.endsWith(ENTITY_TAG_GZIP_SUFFIX_HEADER_VALUE)) {
-            	final int gzipsuffixbeginIndex = entityTag.lastIndexOf(ENTITY_TAG_GZIP_SUFFIX_HEADER_VALUE);
-            	final StringBuilder sb = new StringBuilder();
-            	sb.append(entityTag.substring(0, gzipsuffixbeginIndex));
-            	sb.append('\"');
-            	request.getRequestHeaders().putSingle(HttpHeaders.IF_NONE_MATCH, sb.toString());
+                final int gzipsuffixbeginIndex = entityTag.lastIndexOf(ENTITY_TAG_GZIP_SUFFIX_HEADER_VALUE);
+                final StringBuilder sb = new StringBuilder();
+                sb.append(entityTag.substring(0, gzipsuffixbeginIndex));
+                sb.append('\"');
+                request.getRequestHeaders().putSingle(HttpHeaders.IF_NONE_MATCH, sb.toString());
             } else {
                 // otherwise, remove if-none-match header
-            	request.getRequestHeaders().remove(HttpHeaders.IF_NONE_MATCH);
+                request.getRequestHeaders().remove(HttpHeaders.IF_NONE_MATCH);
             }
         }
         return request;
@@ -132,8 +132,8 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
         }
 
         public OutputStream writeStatusAndHeaders(long contentLength, ContainerResponse response) throws IOException {
-           gos = new GZIPOutputStream(crw.writeStatusAndHeaders(-1, response));
-           return gos;
+            gos = new GZIPOutputStream(crw.writeStatusAndHeaders(-1, response));
+            return gos;
         }
 
         public void finish() throws IOException {
@@ -143,7 +143,7 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
     }
 
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-    	response.getHttpHeaders().add(HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING); // add vary header
+        response.getHttpHeaders().add(HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING); // add vary header
 
         String acceptEncoding = request.getRequestHeaders().getFirst(HttpHeaders.ACCEPT_ENCODING);
         String contentEncoding = (String) response.getHttpHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
@@ -151,14 +151,15 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
         if (acceptEncoding != null && contentEncoding == null && acceptEncoding.contains("gzip")) {
             // Check EntityTag header
             if (response.getHttpHeaders().containsKey(HttpHeaders.ETAG)) {
-                 EntityTag entityTag  = (EntityTag) response.getHttpHeaders().getFirst(HttpHeaders.ETAG);
-                 if(entityTag != null){
-                    response.getHttpHeaders().putSingle(HttpHeaders.ETAG, new EntityTag(entityTag.getValue() + ENTITY_TAG_GZIP_SUFFIX_VALUE,entityTag.isWeak()));
-                 }
+                EntityTag entityTag = (EntityTag) response.getHttpHeaders().getFirst(HttpHeaders.ETAG);
+                if (entityTag != null) {
+                    response.getHttpHeaders().putSingle(HttpHeaders.ETAG, new EntityTag(entityTag.getValue()
+                            + ENTITY_TAG_GZIP_SUFFIX_VALUE, entityTag.isWeak()));
+                }
             }
 
             // wrap entity with gzip
-            if (response.getEntity() != null ) {
+            if (response.getEntity() != null) {
                 response.getHttpHeaders().add(HttpHeaders.CONTENT_ENCODING, "gzip");
                 response.setContainerResponseWriter(new Adapter(response.getContainerResponseWriter()));
             }
