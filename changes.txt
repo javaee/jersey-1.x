@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1228
+  http://java.net/jira/browse/JERSEY-1228
+  Add Vary header in GZIPContentEncodingFilter, other improvements wrt. GZIP encoding vs. ETags
 - Fixed issue 1220
   http://java.net/jira/browse/JERSEY-1220
   Improved string to object conversion for request parameters.
@@ -120,7 +123,7 @@ release 1.12 (02-2012)
 - Fixed issue 874
   http://java.net/jira/browse/JERSEY-874
   Added "throws ClientHandlerException" to all methods declared in UniformInterface, same for its successors.
-- Fixed issue 883 
+- Fixed issue 883
   http://java.net/jira/browse/JERSEY-883
   Improved support for CDI Bean manager lookup
 - Fixed issue 943
@@ -171,8 +174,8 @@ release 1.11 (12-2011)
   Normalization of the request parameters now correctly orders request parameters.
 - Jackson dependency upgrade: 1.8.3 -> 1.9.0
 - Added EclipseLink MOXy support (http://wiki.eclipse.org/EclipseLink/Examples/MOXy)
-  The main added value is the external JAXB binding feature, 
-  see moxy-oxm-mapping example for details 
+  The main added value is the external JAXB binding feature,
+  see moxy-oxm-mapping example for details
 - Workarounded issue 802
   http://java.net/jira/browse/JERSEY-802
   Client filters are not executed when using NonBlockingClient and making
@@ -211,7 +214,7 @@ release 1.10 (11-2011)
   Provide support for byte[] in FormDataBodyPart
 - Fixed issue 784
   http://java.net/jira/browse/JERSEY-784
-  Base64.isBase64 fix (was not applicable to all values from byte value range) 
+  Base64.isBase64 fix (was not applicable to all values from byte value range)
 - Fixed issue 773
   http://java.net/jira/browse/JERSEY-773
   Regression: WADL resurces base URI customization stopped working in Jersey 1.9
