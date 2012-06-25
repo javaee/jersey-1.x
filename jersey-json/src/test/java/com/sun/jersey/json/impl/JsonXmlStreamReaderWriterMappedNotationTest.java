@@ -43,8 +43,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.xml.bind.JAXBContext;
@@ -209,6 +211,10 @@ public class JsonXmlStreamReaderWriterMappedNotationTest extends TestCase {
     public void testAttrAndXmlVal() throws Exception {
         SimpleBeanWithAttributes bean = JSONTestHelper.createTestInstance(SimpleBeanWithAttributes.class);
         tryBean(bean, "simpleBeanWithAttributes.json", true, null, null);
+    }
+
+    public void testMultipleArrayElements() throws Exception {
+        tryReadingBean("userTableVerbose.json", UserTable.createTestInstance(), JSONConfiguration.mapped().rootUnwrapping(true).build());
     }
 
     public void tryBean(Object jaxbBean, String filename, boolean stripRoot) throws Exception {

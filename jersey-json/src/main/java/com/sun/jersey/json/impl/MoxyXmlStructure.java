@@ -58,8 +58,13 @@ import org.eclipse.persistence.internal.oxm.TreeObjectBuilder;
 import org.eclipse.persistence.internal.oxm.XPathFragment;
 import org.eclipse.persistence.internal.oxm.XPathNode;
 import org.eclipse.persistence.jaxb.JAXBHelper;
+import org.eclipse.persistence.mappings.DatabaseMapping;
+import org.eclipse.persistence.mappings.converters.Converter;
+import org.eclipse.persistence.mappings.converters.TypeConversionConverter;
+import org.eclipse.persistence.mappings.foundation.AbstractCompositeDirectCollectionMapping;
 import org.eclipse.persistence.oxm.XMLContext;
 import org.eclipse.persistence.oxm.XMLDescriptor;
+import org.eclipse.persistence.oxm.mappings.XMLCompositeCollectionMapping;
 import org.eclipse.persistence.sessions.DatabaseSession;
 
 /**
@@ -391,15 +396,52 @@ public class MoxyXmlStructure extends DefaultJaxbXmlDocumentStructure {
 
     @Override
     public Type getEntityType(QName entity, boolean isAttribute) {
+        return getType(entity, isAttribute, false);
+    }
+
+    @Override
+    public Type getIndividualType() {
+        return getContainerType(true);
+    }
+
+    private Type getType(QName entity, boolean isAttribute, boolean isIndividual) {
         final XPathNodeWrapper currentNodeWrapper = getCurrentNodeWrapper();
         final ClassDescriptor classDescriptor = currentNodeWrapper == null ? null : currentNodeWrapper.getClassDescriptor();
 
         if (classDescriptor != null) {
             if (currentNodeWrapper.name.equals(entity)) {
-                return classDescriptor.getJavaClass();
+                final Type containerType = getContainerType(isIndividual);
+                return containerType != null ? containerType : classDescriptor.getJavaClass();
             } else {
                 final EntityType entityType = currentNodeWrapper.getEntitiesTypesMap(isAttribute).get(entity.getLocalPart());
                 return entityType == null ? null : entityType.type;
+            }
+        }
+
+        return null;
+    }
+
+    private Type getContainerType(final boolean isIndividual) {
+        final XPathNodeWrapper currentNodeWrapper = getCurrentNodeWrapper();
+
+        if (currentNodeWrapper.nodeValue != null && currentNodeWrapper.nodeValue.isContainerValue()) {
+            final DatabaseMapping mapping = currentNodeWrapper.nodeValue.getMapping();
+            Converter valueConverter = null;
+
+            if (mapping != null) {
+                if (isIndividual) {
+                    if (mapping instanceof AbstractCompositeDirectCollectionMapping) {
+                        valueConverter = ((AbstractCompositeDirectCollectionMapping) mapping).getValueConverter();
+                    } else if (mapping instanceof XMLCompositeCollectionMapping) {
+                        valueConverter = ((XMLCompositeCollectionMapping) mapping).getConverter();
+                    }
+                }
+
+                if (valueConverter instanceof TypeConversionConverter) {
+                    return ((TypeConversionConverter) valueConverter).getObjectClass();
+                } else if (mapping.getContainerPolicy() != null) {
+                    return mapping.getContainerPolicy().getContainerClass();
+                }
             }
         }
 

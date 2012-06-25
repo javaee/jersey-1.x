@@ -171,6 +171,13 @@ public class JaxbRiXmlStructure extends DefaultJaxbXmlDocumentStructure {
     }
 
     @Override
+    public Type getIndividualType() {
+        final NodeWrapper peek = processedNodes.getLast();
+        return peek.runtimePropertyInfo == null ? null :
+                (peek.runtimePropertyInfo.isCollection() ? peek.runtimePropertyInfo.getIndividualType() : null);
+    }
+
+    @Override
     public void startElement(final QName name) {
         if (!isReader) {
             processedNodes.add(new NodeWrapper(processedNodes.isEmpty() ? null : processedNodes.getLast(), getCurrentElementRuntimePropertyInfo()));

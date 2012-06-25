@@ -179,6 +179,26 @@ public class JaxbJdkXmlStructure extends DefaultJaxbXmlDocumentStructure {
     }
 
     @Override
+    public Type getIndividualType() {
+        final NodeWrapper peek = processedNodes.getLast();
+
+        Object individualType = null;
+        try {
+            Class<?> runtimeReferencePropertyInfo = systemClassLoader
+                    .loadClass("com.sun.xml.internal.bind.v2.model.runtime.RuntimePropertyInfo");
+            final Boolean isCollection = (Boolean) runtimeReferencePropertyInfo.getMethod("isCollection").invoke(peek.runtimePropertyInfo);
+
+            if (isCollection) {
+                individualType = runtimeReferencePropertyInfo.getMethod("getIndividualType").invoke(peek.runtimePropertyInfo);
+            }
+        } catch (Exception e) {
+            individualType = null;
+        }
+
+        return peek.runtimePropertyInfo == null ? null : (Type) individualType;
+    }
+
+    @Override
     public void startElement(final QName name) {
         if (!isReader) {
             processedNodes.add(new NodeWrapper(

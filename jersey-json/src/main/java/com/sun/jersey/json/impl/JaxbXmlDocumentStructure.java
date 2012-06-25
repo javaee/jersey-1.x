@@ -104,6 +104,16 @@ public interface JaxbXmlDocumentStructure {
     public Type getEntityType(QName entityName, boolean isAttribute);
 
     /**
+     * Returns the {@link Type} of individuals stored in an array/list.
+     * <p/>
+     * Note: This method should be called only if an invocation of {@link #getEntityType(javax.xml.namespace.QName, boolean)}
+     * returns a collection/array type.
+     *
+     * @return type of the entity or {@code null} if the entity cannot be retrieved from the structure.
+     */
+    public Type getIndividualType();
+
+    /**
      * Returns a collection of expected attributes of currently processed element.
      *
      * @return a collection of expected attributes.

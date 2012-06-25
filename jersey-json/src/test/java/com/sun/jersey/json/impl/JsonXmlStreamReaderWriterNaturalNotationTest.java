@@ -198,13 +198,44 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
         tryBean(Jersey1199List.class, "jersey1199_natural.json", Jersey1199List.createTestInstance(), jaxbContext, jsonConfiguration);
     }
 
-    public void testListEmptyBeanVerbose() throws Exception {
+    private void _testReadingBean(final Class<?> expectedType, final String jsonFileName, final Object testInstance) throws Exception {
         Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
-        Class[] classes = new Class[] {ListEmptyBean.class};
+        Class[] classes = new Class[] {expectedType};
 
         JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);
 
-        tryReadingBean(ListEmptyBean.class, "listEmptyBeanVerbose_natural.json", ListEmptyBean.createTestInstance(), jaxbContext, null);
+        tryReadingBean(expectedType, jsonFileName, testInstance, jaxbContext, null);
+    }
+
+    public void testListEmptyBeanVerbose() throws Exception {
+        _testReadingBean(ListEmptyBean.class, "listEmptyBeanVerbose_natural.json", ListEmptyBean.createTestInstance());
+    }
+
+    public void testMultipleArrayElements() throws Exception {
+        _testReadingBean(UserTable.class, "userTableVerbose_natural.json", UserTable.createTestInstance());
+    }
+
+    public void testMultipleArrayElementsAsArrays() throws Exception {
+        _testReadingBean(UserTable.class, "userTableVerboseAsArrays_natural.json", UserTable.createTestInstance());
+    }
+
+    public void testUserTableNullColumns() throws Exception {
+        final UserTable testInstance = (UserTable) UserTable.createTestInstance();
+        testInstance.setColumns(null);
+
+        _testReadingBean(UserTable.class, "userTableNullColumns_natural.json", testInstance);
+    }
+
+    public void testUserTableEmptyColumns() throws Exception {
+        Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
+        Class[] classes = new Class[] {UserTable.class};
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);
+
+        final UserTable testInstance = (UserTable) UserTable.createTestInstance();
+        testInstance.setColumns(null);
+
+        tryReadingBean(UserTable.class, "userTableEmptyColumns_natural.json", testInstance, jaxbContext, null);
     }
 
     private void tryBean(final Class clazz,

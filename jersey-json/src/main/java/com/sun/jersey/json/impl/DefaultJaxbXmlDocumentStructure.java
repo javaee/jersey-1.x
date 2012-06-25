@@ -135,6 +135,11 @@ public abstract class DefaultJaxbXmlDocumentStructure implements JaxbXmlDocument
     }
 
     @Override
+    public Type getIndividualType() {
+        return null;
+    }
+
+    @Override
     public void handleAttribute(final QName attributeName, final String value) {
     }
 

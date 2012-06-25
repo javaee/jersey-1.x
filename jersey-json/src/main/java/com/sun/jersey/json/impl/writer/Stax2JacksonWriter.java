@@ -40,11 +40,13 @@
 package com.sun.jersey.json.impl.writer;
 
 import java.io.IOException;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,21 +76,23 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
     private static class ProcessingInfo {
 
         boolean isArray;
-        Type t;
+        Type rawType;
+        Type individualType;
         ProcessingInfo lastUnderlyingPI;
         boolean startObjectWritten = false;
         boolean afterFN = false;
         QName elementName;
 
-        public ProcessingInfo(QName elementName, boolean isArray, Type t) {
+        public ProcessingInfo(QName elementName, boolean isArray, Type rawType, Type individualType) {
             this.elementName = elementName;
 
             this.isArray = isArray;
-            this.t = t;
+            this.rawType = rawType;
+            this.individualType = individualType;
         }
 
         public ProcessingInfo(ProcessingInfo pi) {
-            this(pi.elementName, pi.isArray, pi.t);
+            this(pi.elementName, pi.isArray, pi.rawType, pi.individualType);
         }
 
         @Override
@@ -107,7 +111,10 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
                     && (this.elementName == null || !this.elementName.equals(other.elementName))) {
                 return false;
             }
-            if (this.t != other.t && (this.t == null || !this.t.equals(other.t))) {
+            if (this.rawType != other.rawType && (this.rawType == null || !this.rawType.equals(other.rawType))) {
+                return false;
+            }
+            if (this.individualType != other.individualType && (this.individualType == null || !this.individualType.equals(other.individualType))) {
                 return false;
             }
             return true;
@@ -118,7 +125,8 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
             int hash = 5;
             hash = 47 * hash + (this.isArray ? 1 : 0);
             hash = 47 * hash + (this.elementName != null ?this.elementName.hashCode() : 0);
-            hash = 47 * hash + (this.t != null ? this.t.hashCode() : 0);
+            hash = 47 * hash + (this.rawType != null ? this.rawType.hashCode() : 0);
+            hash = 47 * hash + (this.individualType != null ? this.individualType.hashCode() : 0);
             return hash;
         }
     }
@@ -261,13 +269,14 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
         }
 
         final Type rt = documentStructure.getEntityType(qname, writingAttr);
+        final Type individualType = documentStructure.getIndividualType();
         // rt is null for root elements
         if (null == rt) {
-            processingStack.add(new ProcessingInfo(qname, false, null));
+            processingStack.add(new ProcessingInfo(qname, false, null, null));
             return;
         }
         if (primitiveTypes.contains(rt)) {
-            processingStack.add(new ProcessingInfo(qname, false, rt));
+            processingStack.add(new ProcessingInfo(qname, false, rt, individualType));
             return;
         }
 
@@ -275,12 +284,12 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
         if (documentStructure.isArrayCollection() && !writingAttr) { // another array
             if (!((parentPI != null) && (parentPI.isArray) && sameArrayCollection)) {
                 // another array
-                processingStack.add(new ProcessingInfo(qname, true, rt));
+                processingStack.add(new ProcessingInfo(qname, true, rt, individualType));
                 return;
             }
         }
         // something else
-        processingStack.add(new ProcessingInfo(qname, false, rt));
+        processingStack.add(new ProcessingInfo(qname, false, rt, individualType));
     }
 
     @Override
@@ -419,23 +428,51 @@ public class Stax2JacksonWriter extends DefaultXmlStreamWriter implements XMLStr
                 generator.writeFieldName("$");
             }
             currentPI.afterFN = false;
-            if (forceString || !nonStringTypes.contains(currentPI.t)) {
+            final Type valueType = getValueType(currentPI.rawType, currentPI.individualType);
+            if (forceString || !nonStringTypes.contains(valueType)) {
                 if (!currentPI.isArray) {
                     generator.writeStringToMerge(text);
                 } else {
                     generator.writeString(text);
                 }
             } else {
-                if ((boolean.class == currentPI.t) || (Boolean.class == currentPI.t)) {
-                    generator.writeBoolean(Boolean.parseBoolean(text));
-                } else {
-                    generator.writeNumber(text);
-                }
+                writePrimitiveType(text, valueType);
             }
         } catch (IOException ex) {
             Logger.getLogger(Stax2JacksonWriter.class.getName()).log(Level.SEVERE, null, ex);
             throw new XMLStreamException(ex);
         }
+    }
+
+    private void writePrimitiveType(final String text, final Type valueType) throws IOException {
+        if ((boolean.class == valueType) || (Boolean.class == valueType)) {
+            generator.writeBoolean(Boolean.parseBoolean(text));
+        } else {
+            generator.writeNumber(text);
+        }
+    }
+
+
+    private Type getValueType(final Type rawType, final Type individualType) {
+        // Individual type.
+        if (individualType != null) {
+            return individualType;
+        }
+
+        // Collections.
+        if (rawType instanceof ParameterizedType) {
+            final ParameterizedType parameterizedType = (ParameterizedType) rawType;
+            final Type parameterizedTypeRawType = parameterizedType.getRawType();
+            if (parameterizedTypeRawType instanceof Class
+                    && Collection.class.isAssignableFrom((Class) parameterizedTypeRawType)) {
+                final Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+
+                if (actualTypeArguments != null && actualTypeArguments.length > 0) {
+                    return actualTypeArguments[0];
+                }
+            }
+        }
+        return rawType;
     }
 
     @Override

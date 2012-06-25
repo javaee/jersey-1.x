@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,12 +40,15 @@
 
 package com.sun.jersey.json.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 @XmlRootElement(name="intArray")
 public class IntArray {
@@ -53,6 +56,8 @@ public class IntArray {
     public int[] intArray;
 
     public Integer[] integerArray;
+
+    public List<Integer> integerList;
 
     public  int number;
 
@@ -76,6 +81,9 @@ public class IntArray {
         if (this.number != other.number) {
             return false;
         }
+        if (!JSONTestHelper.areCollectionsEqual(integerList, other.integerList)) {
+            return false;
+        }
         return true;
     }
 
@@ -84,6 +92,7 @@ public class IntArray {
         int hash = 7;
         hash = 89 * hash + Arrays.hashCode(this.intArray);
         hash = 89 * hash + Arrays.deepHashCode(this.integerArray);
+        hash = (integerList != null ? 89 * hash + integerList.hashCode() : 0);
         hash = 89 * hash + this.number;
         return hash;
     }
@@ -91,7 +100,8 @@ public class IntArray {
 
     @Override
     public String toString() {
-        return String.format("{ \"intArray\":%s, \"integerArray\":%s, \"number\":%d}", intArray, integerArray, number);
+        return String.format("{ \"intArray\":%s, \"integerArray\":%s, \"integerList\":%s, \"number\":%d}",
+                Arrays.toString(intArray), Arrays.toString(integerArray), integerList, number);
     }
 
     public static Object createTestInstance() {
@@ -100,6 +110,7 @@ public class IntArray {
         result.number = 8;
         result.intArray = new int[]{4};
         result.integerArray = new Integer[]{3};
+        result.integerList = new ArrayList<Integer>() {{ add(5); }};
 
         return result;
     }

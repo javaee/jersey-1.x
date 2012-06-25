@@ -196,6 +196,6 @@ public class UserTable {
 
     @Override
     public String toString() {
-        return "UserTable(" + rows.toString() + ", " + columns.toString() + ")";
+        return String.format("UserTable(%s,%s)", rows, columns);
     }
 }

@@ -446,9 +446,9 @@ public abstract class XmlEventProvider {
                 if (parser.peek() == JsonToken.END_OBJECT) {
                     // in case jsonToken == JsonToken.VALUE_NULL - check if the next token is '}'
                     parser.poll();
-
-                    return true;
                 }
+
+                return true;
             }
         }
 
