@@ -118,7 +118,7 @@ your ObjectMapper instance into your Jersey application.
      Taking this approach will save you a lot of time, if you want to easily produce/consume both JSON and XML data format.
      Because even then you will still be able to use a unified Java model.
      Another advantage is simplicity of working with such a model, as JAXB leverages annotated POJOs and these could be handled
-     as simple Java beans
+     as simple Java beans.
     </para>
     <para>
      A disadvantage of JAXB based approach could be if you need to work with a very specific JSON format. Then it could be
