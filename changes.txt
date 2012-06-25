@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1124
+  http://java.net/jira/browse/JERSEY-1124
+  ServiceFinder not returning services in META-INF/services
 - Fixed issue 1228
   http://java.net/jira/browse/JERSEY-1228
   Add Vary header in GZIPContentEncodingFilter, other improvements wrt. GZIP encoding vs. ETags

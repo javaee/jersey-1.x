@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,8 +40,6 @@
 
 package com.sun.jersey.spi.service;
 
-import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.impl.SpiMessages;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,20 +49,17 @@ import java.lang.reflect.ReflectPermission;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.impl.SpiMessages;
 
 
 /**
@@ -154,196 +149,19 @@ import java.util.logging.Logger;
  * class from within a privileged security context.
  *
  * @param <T> the type of the service instance.
- * @author Mark Reinhold, Jakub Podlesak
+ * @author Mark Reinhold (mark.reinhold at oracle.com)
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public final class ServiceFinder<T> implements Iterable<T> {
     private static final Logger LOGGER = Logger.getLogger(ServiceFinder.class.getName());
 
-    private static final String MANIFEST = "META-INF/MANIFEST.MF";
-
-    private static final String MODULE_VERSION = "META-INF/jersey-module-version";
-
     private static final String PREFIX = "META-INF/services/";
-
-    private static final String BUNDLE_VERSION_ATTRIBUTE = "Bundle-Version";
-
-    private static final String BUNDLE_SYMBOLIC_NAME_ATTRIBUTE = "Bundle-SymbolicName";
-
-    private static final String BUNDLE_VERSION = getBundleAttribute(BUNDLE_VERSION_ATTRIBUTE);
-
-    private static final String BUNDLE_SYMBOLIC_NAME = getBundleAttribute(BUNDLE_SYMBOLIC_NAME_ATTRIBUTE);
-
-    private static final String MODULE_VERSION_VALUE = getModuleVersion();
 
     private final Class<T> serviceClass;
     private final String serviceName;
     private final ClassLoader classLoader;
     private final boolean ignoreOnClassNotFound;
-
-    private static String getBundleAttribute(String attributeName) {
-        try {
-            final String version = getManifest(ServiceFinder.class).
-                    getMainAttributes().
-                    getValue(attributeName);
-            if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.fine("ServiceFinder " + attributeName + ": " + version);
-            }
-            return version;
-        } catch (IOException ex) {
-            LOGGER.log(Level.FINE, "Error loading META-INF/MANIFEST.MF associated with " + ServiceFinder.class.getName(), ex);
-            return null;
-        }
-    }
-
-    private static String getModuleVersion() {
-        try {
-            String resource = ServiceFinder.class.getName().replace(".", "/") + ".class";
-            URL url = getResource(ServiceFinder.class.getClassLoader(), resource);
-            if (url == null) {
-                LOGGER.log(Level.FINE, "Error getting " + ServiceFinder.class.getName() + " class as a resource");
-                return null;
-            }
-
-            return getJerseyModuleVersion(getManifestURL(resource, url));
-        } catch(IOException ioe) {
-            LOGGER.log(Level.FINE, "Error loading META-INF/jersey-module-version associated with " + ServiceFinder.class.getName(), ioe);
-            return null;
-        }
-    }
-
-    private static final Map<URL, Boolean> manifestURLs = new HashMap<URL, Boolean>();
-
-    private static Enumeration<URL> filterServiceURLsWithVersion(String serviceName, Enumeration<URL> serviceUrls) {
-        if (BUNDLE_VERSION == null || !serviceUrls.hasMoreElements())
-            return serviceUrls;
-
-        final List<URL> urls = Collections.list(serviceUrls);
-        final ListIterator<URL> li = urls.listIterator();
-        while (li.hasNext()) {
-            final URL url = li.next();
-            try {
-                final URL manifestURL = getManifestURL(serviceName, url);
-
-                synchronized(manifestURLs) {
-                    Boolean keep = manifestURLs.get(manifestURL);
-                    if (keep != null) {
-                        if (!keep) {
-                            if (LOGGER.isLoggable(Level.CONFIG)) {
-                                LOGGER.config("Ignoring service URL: " + url);
-                            }
-                            li.remove();
-                        } else {
-                            if (LOGGER.isLoggable(Level.FINE)) {
-                                LOGGER.fine("Including service URL: " + url);
-                            }
-                        }
-                    } else {
-                        if (!compatibleManifest(manifestURL)) {
-                            if (LOGGER.isLoggable(Level.CONFIG)) {
-                                LOGGER.config("Ignoring service URL: " + url);
-                            }
-                            li.remove();
-                            manifestURLs.put(manifestURL, false);
-                        } else {
-                            if (LOGGER.isLoggable(Level.FINE)) {
-                                LOGGER.fine("Including service URL: " + url);
-                            }
-                            manifestURLs.put(manifestURL, true);
-                        }
-                    }
-                }
-            } catch (IOException ex) {
-                LOGGER.log(Level.FINE, "Error loading META-INF/MANIFEST.MF associated with " + url, ex);
-            }
-        }
-        return Collections.enumeration(urls);
-    }
-
-    private static boolean compatibleManifest(URL manifestURL) throws IOException {
-        final Attributes as = getManifest(manifestURL).getMainAttributes();
-        final String symbolicName = as.getValue(BUNDLE_SYMBOLIC_NAME_ATTRIBUTE);
-        final String version = as.getValue(BUNDLE_VERSION_ATTRIBUTE);
-
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Checking META-INF/MANIFEST.MF URL: " + manifestURL +
-                    "\n  " + BUNDLE_SYMBOLIC_NAME_ATTRIBUTE + ": " + symbolicName +
-                    "\n  " + BUNDLE_VERSION_ATTRIBUTE + ": " + version);
-        }
-
-        if (symbolicName != null &&
-                symbolicName.startsWith("com.sun.jersey") &&
-                !BUNDLE_VERSION.equals(version)) {
-            return false;
-        } else {
-            String moduleVersion = getJerseyModuleVersion(manifestURL);
-
-            if(moduleVersion != null &&
-                    (!moduleVersion.equals(MODULE_VERSION_VALUE) ||
-                        (symbolicName != null &&
-                        (BUNDLE_SYMBOLIC_NAME.startsWith("com.sun.jersey") ^ symbolicName.startsWith("com.sun.jersey"))))) {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-    private static String getJerseyModuleVersion(URL manifestURL) {
-        try {
-            URL moduleVersionURL = new URL(manifestURL.toString().replace(MANIFEST, MODULE_VERSION));
-
-            return new BufferedReader(new InputStreamReader(moduleVersionURL.openStream())).readLine();
-        } catch (IOException ioe) {
-            LOGGER.log(Level.FINE, "Error loading META-INF/jersey-module-version associated with " + ServiceFinder.class.getName(), ioe);
-            return null;
-        }
-    }
-
-    private static Manifest getManifest(Class c) throws IOException {
-        String resource = c.getName().replace(".", "/") + ".class";
-        URL url = getResource(c.getClassLoader(), resource);
-        if (url == null)
-            throw new IOException("Resource not found: " + url);
-
-        return getManifest(resource, url);
-    }
-
-    private static Manifest getManifest(String name, URL serviceURL) throws IOException {
-        return getManifest(getManifestURL(name, serviceURL));
-    }
-
-    private static URL getManifestURL(String name, URL serviceURL) throws IOException {
-        return new URL(serviceURL.toString().replace(name, MANIFEST));
-    }
-
-    private static Manifest getManifest(URL url) throws IOException {
-        final InputStream in = url.openStream();
-        try {
-            return new Manifest(in);
-        } finally {
-            in.close();
-        }
-    }
-
-    private static URL getResource(ClassLoader loader, String name) throws IOException {
-        if (loader == null)
-            return getResource(name);
-        else {
-            final URL resource = loader.getResource(name);
-            if (resource != null) {
-                return resource;
-            } else {
-                return getResource(name);
-            }
-        }
-    }
-
-    private static URL getResource(String name) throws IOException {
-        if (ServiceFinder.class.getClassLoader() != null)
-            return ServiceFinder.class.getClassLoader().getResource(name);
-        else
-            return ClassLoader.getSystemResource(name);
-    }
 
     private static Enumeration<URL> getResources(ClassLoader loader, String name) throws IOException {
         if (loader == null) {
@@ -717,8 +535,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
             if (configs == null) {
                 try {
                     final String fullName = PREFIX + serviceName;
-                    configs = filterServiceURLsWithVersion(fullName,
-                            getResources(loader, fullName));
+                    configs = getResources(loader, fullName);
                 } catch (IOException x) {
                     fail(serviceName, ": " + x);
                 }
