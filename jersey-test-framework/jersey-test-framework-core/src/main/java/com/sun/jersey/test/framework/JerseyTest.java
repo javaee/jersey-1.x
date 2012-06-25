@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,11 @@
 
 package com.sun.jersey.test.framework;
 
+import java.net.URI;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.UriBuilder;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -49,12 +54,9 @@ import com.sun.jersey.test.framework.spi.client.ClientFactory;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+
 import org.junit.After;
 import org.junit.Before;
-
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.util.logging.Logger;
 
 /**
  * An abstract JUnit 4.x-based unit test class for testing JAX-RS and 
@@ -81,7 +83,7 @@ import java.util.logging.Logger;
  * will be thrown if the class cannot be loaded or instantiated.
  * If the system property {@literal jersey.test.containerFactory} is not set then
  * the default test container factory will be an instance of 
- * {@link com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory}.
+ * {@value JerseyTest#DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME}.
  * The exception {@link TestContainerException} will be thrown if this class 
  * cannot be loaded or instantiated.
  * <p>
@@ -122,8 +124,9 @@ import java.util.logging.Logger;
  *      tests. For example, the application may be deployed to the
  *      Glassfish v2 or v3 application server.</li>
  * </ul>
- * 
- * @author Paul.Sandoz@Sun.COM, Srinivas.Bhimisetty@Sun.COM
+ *
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
+ * @author Srinivas Bhimisetty
  */
 public abstract class JerseyTest {
 
@@ -224,7 +227,7 @@ public abstract class JerseyTest {
      * <p>
      * This constructor builds an instance of {@link WebAppDescriptor} passing
      * the package names to the constructor.
-     * 
+     *
      * @param packages array or a colon separated list of package names which
      *        contain resource and provider classes.
      * @throws TestContainerException if the default test container factory
@@ -237,7 +240,7 @@ public abstract class JerseyTest {
 
     /**
      * Sets the test container factory to to be used for testing.
-     * 
+     *
      * @param testContainerFactory the test container factory to to be used for
      *        testing.
      */
@@ -259,7 +262,7 @@ public abstract class JerseyTest {
      * will be thrown if the class cannot be loaded or instantiated.
      * If the system property {@literal jersey.test.containerFactory} is not set then
      * the default test container factory will be an instance of
-     * {@link com.sun.jersey.test.framework.spi.container.grizzly.web.GrizzlyWebTestContainerFactory}.
+     * {@value JerseyTest#DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME}.
      * The exception {@link TestContainerException} will be thrown if this class
      * cannot be loaded or instantiated.
      *
@@ -344,11 +347,11 @@ public abstract class JerseyTest {
 
     /**
      * Creates an instance of the default test container factory.
-     * 
+     *
      * @return An instance of {@link TestContainerFactory}
      */
     private static TestContainerFactory getDefaultTestContainerFactory() {
-        
+
         if (defaultTestContainerFactoryClass == null) {
             if ((System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME) == null) &&
                     (System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY) == null)) {
@@ -384,7 +387,7 @@ public abstract class JerseyTest {
 
                 if(tcfClassName == null)
                     tcfClassName = System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY,
-                        DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME);
+                            DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME);
 
                 try {
                     defaultTestContainerFactoryClass = Class.forName(tcfClassName).asSubclass(TestContainerFactory.class);
@@ -407,8 +410,8 @@ public abstract class JerseyTest {
         } catch (Exception ex) {
             throw new TestContainerException(
                     "The default test container factory, " +
-                    defaultTestContainerFactoryClass +
-                    ", could not be instantiated", ex);
+                            defaultTestContainerFactoryClass +
+                            ", could not be instantiated", ex);
         }
     }
 
@@ -421,7 +424,7 @@ public abstract class JerseyTest {
     @Deprecated
     private static final String TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY =
             "test.containerFactory";
-    
+
     private static final String TEST_CONTAINER_FACTORY_PROPERTY_NAME =
             "jersey.test.containerFactory";
 
@@ -450,9 +453,9 @@ public abstract class JerseyTest {
 
         //check if logging is required
         boolean enableLogging = System.getProperty("enableLogging") != null;
-        
+
         if (enableLogging) {
-                c.addFilter(new LoggingFilter());
+            c.addFilter(new LoggingFilter());
         }
 
         return c;

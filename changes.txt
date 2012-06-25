@@ -1,4 +1,7 @@
 release 1.13
+- Fixed issue 1225
+  http://java.net/jira/browse/JERSEY-1225
+  Javadoc for JerseyTest is out of date
 - Fixed issue 1124
   http://java.net/jira/browse/JERSEY-1124
   ServiceFinder not returning services in META-INF/services
