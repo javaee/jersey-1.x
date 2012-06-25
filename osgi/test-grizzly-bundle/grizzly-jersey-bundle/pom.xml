@@ -5,7 +5,7 @@
 
     <groupId>com.sun.jersey.osgi</groupId>
     <artifactId>grizzly-jersey-bundle</artifactId>
-    <version>1.13-SNAPSHOT</version>
+    <version>1.14-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <name>grizzly-jersey-bundle - osgi bundle</name>
 

@@ -46,7 +46,7 @@
     <parent>
         <artifactId>jersey-contribs</artifactId>
         <groupId>com.sun.jersey.contribs</groupId>
-        <version>1.13-SNAPSHOT</version>
+        <version>1.14-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-non-blocking-client</artifactId>
     <packaging>jar</packaging>

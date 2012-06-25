@@ -49,7 +49,7 @@
       <version>1</version>
     </parent>
     <groupId>com.sun.jersey.archetypes</groupId>
-    <version>1.13-SNAPSHOT</version>
+    <version>1.14-SNAPSHOT</version>
     <artifactId>jersey-archetypes</artifactId>
     <packaging>pom</packaging>
     <name>All Jersey Archetypes</name>

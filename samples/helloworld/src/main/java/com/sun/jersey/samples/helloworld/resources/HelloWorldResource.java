@@ -42,6 +42,7 @@ package com.sun.jersey.samples.helloworld.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 // The Java class will be hosted at the URI path "/helloworld"
@@ -56,5 +57,18 @@ public class HelloWorldResource {
     public String getClichedMessage() {
         // Return some cliched textual content
         return "Hello World";
+    }
+
+    @GET
+    @Produces("text/plain")
+    @Path("{partition}/{composite:[^\\!]*}\\!{revision:[\\d\\.]\\*}\\*{label:[\\d]*}/{service}")
+    public String getsd(@PathParam("partition") String partition,
+                        @PathParam("composite") String composite,
+                        @PathParam("revision") float revision,
+                        @PathParam("label") int label,
+                        @PathParam("service") String service) {
+
+
+        return partition + " # " + composite + " # " + revision + " # " + label + " # " + service;
     }
 }
