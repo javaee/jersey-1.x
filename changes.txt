@@ -1,4 +1,8 @@
 release 1.13
+- Fixed regression in EJB dispatching. Original GlassFish issue 16199
+  http://java.net/jira/browse/GLASSFISH-16199
+  IllegalArgumentException: object is not an instance of declaring class - on a REST / EJB Service
+  This was broken again after Servlet stuff was separated out from the jersey-server module
 - Fixed issue 1225
   http://java.net/jira/browse/JERSEY-1225
   Javadoc for JerseyTest is out of date
