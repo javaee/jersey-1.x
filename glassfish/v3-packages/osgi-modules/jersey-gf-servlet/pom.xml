@@ -102,7 +102,7 @@
                             *
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
-                        <Embed-Dependency>jersey-servlet;inline=META-INF/services/**|META-INF/taglib.tld</Embed-Dependency>
+                        <Embed-Dependency>jersey-servlet;inline=META-INF/services/**|META-INF/taglib.tld|META-INF/jersey-module-version</Embed-Dependency>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>

@@ -39,6 +39,8 @@
  */
 package com.sun.jersey.qe.tests.end2end;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.jar.Manifest;
 
 import com.sun.jersey.oauth.signature.HMAC_SHA1;
@@ -162,6 +164,40 @@ public class MainTest {
 
         assertNotSame(manifestServiceFinder.getMainAttributes().getValue("Implementation-Version"),
                 manifestOAuth.getMainAttributes().getValue("Implementation-Version"));
+    }
+
+    @Test
+    public void testJerseyModuleVersion() throws Exception {
+        final String jerseyModuleVersionServiceFinder = Helper.getJerseyModuleVersion(ServiceFinder.class);
+        final String jerseyModuleVersionOAuth = Helper.getJerseyModuleVersion(OAuthSignature.class);
+
+        assertNotSame(jerseyModuleVersionServiceFinder, jerseyModuleVersionOAuth);
+    }
+
+    @Test
+    public void testJsonMessageBodyReaders() throws Exception {
+        final ServiceFinder<?> readers = ServiceFinder.find("javax.ws.rs.ext.MessageBodyReader");
+        final Set<String> jsonReaders = new HashSet<String>();
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONRootElementProvider$App");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONRootElementProvider$General");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONJAXBElementProvider$App");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONJAXBElementProvider$General");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONListElementProvider$App");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONListElementProvider$General");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONArrayProvider$App");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONArrayProvider$General");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONObjectProvider$App");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JSONObjectProvider$General");
+        jsonReaders.add("com.sun.jersey.json.impl.provider.entity.JacksonProviderProxy");
+
+        final Class<?>[] classes = readers.toClassArray();
+        for (Class<?> reader : classes) {
+            if (jsonReaders.contains(reader.getName())) {
+                fail(reader + " should not be found by ServiceFinder.");
+            }
+        }
+
+        assertTrue(classes.length > 0);
     }
 
 }

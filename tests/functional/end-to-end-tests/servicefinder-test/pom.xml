@@ -52,12 +52,12 @@
         <version>${jersey.version}</version>
     </parent>
 
-    <artifactId>oauth-test</artifactId>
+    <artifactId>servicefinder-test</artifactId>
     <packaging>jar</packaging>
-    <name>oauth-tests</name>
+    <name>servicefinder-tests</name>
 
     <build>
-        <finalName>oauth-test</finalName>
+        <finalName>servicefinder-test</finalName>
     </build>
 
     <dependencies>
@@ -69,7 +69,19 @@
         <dependency>
             <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
             <artifactId>oauth-signature</artifactId>
-            <version>${oauth.version}</version>
+            <version>${jersey.old.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>${jersey.old.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-core</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.sun.grizzly</groupId>
@@ -103,6 +115,6 @@
     </dependencies>
 
     <properties>
-        <oauth.version>1.12</oauth.version>
+        <jersey.old.version>1.12</jersey.old.version>
     </properties>
 </project>

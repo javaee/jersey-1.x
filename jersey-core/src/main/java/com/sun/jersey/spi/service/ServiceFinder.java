@@ -49,9 +49,12 @@ import java.lang.reflect.ReflectPermission;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.TreeSet;
@@ -156,12 +159,123 @@ import com.sun.jersey.impl.SpiMessages;
 public final class ServiceFinder<T> implements Iterable<T> {
     private static final Logger LOGGER = Logger.getLogger(ServiceFinder.class.getName());
 
+    private static final String MODULE_VERSION = "META-INF/jersey-module-version";
+
     private static final String PREFIX = "META-INF/services/";
+
+    private static final String MODULE_VERSION_VALUE = getModuleVersion();
+
+    private static final Set<String> MODULES_BLACKLIST;
 
     private final Class<T> serviceClass;
     private final String serviceName;
     private final ClassLoader classLoader;
     private final boolean ignoreOnClassNotFound;
+
+    static {
+        MODULES_BLACKLIST = new HashSet<String>() {{
+
+            // Jersey
+            add("jersey-client");
+            add("jersey-core");
+            add("jersey-gf-server");
+            add("jersey-gf-servlet");
+            add("jersey-gf-statsproviders");
+            add("jersey-grizzly");
+            add("jersey-json");
+            add("jersey-moxy");
+            add("jersey-multipart");
+            add("jersey-server");
+            add("jersey-servlet");
+            add("jersey-statsproviders");
+
+            // GF
+            add("glassfish-embedded");
+
+        }};
+    }
+
+    private static String getModuleVersion() {
+        try {
+            String resource = ServiceFinder.class.getName().replace(".", "/") + ".class";
+            URL url = getResource(ServiceFinder.class.getClassLoader(), resource);
+            if (url == null) {
+                LOGGER.log(Level.FINE, "Error getting " + ServiceFinder.class.getName() + " class as a resource");
+                return null;
+            }
+
+            return getJerseyModuleVersion(ServiceFinder.class.getName(), url);
+        } catch(IOException ioe) {
+            LOGGER.log(Level.FINE, "Error loading META-INF/jersey-module-version associated with " + ServiceFinder.class.getName(), ioe);
+            return null;
+        }
+    }
+
+    private static Enumeration<URL> filterServiceURLsWithVersion(String serviceName, Enumeration<URL> serviceUrls) {
+        if (MODULE_VERSION_VALUE == null || !serviceUrls.hasMoreElements()) {
+            return serviceUrls;
+        }
+
+        final List<URL> urls = Collections.list(serviceUrls);
+        final ListIterator<URL> li = urls.listIterator();
+        while (li.hasNext()) {
+            final URL url = li.next();
+
+            if (isServiceInBlacklistedModule(url)) {
+                String jerseyModuleVersion = getJerseyModuleVersion(serviceName, url);
+
+                if (jerseyModuleVersion != null) {
+                    if (!MODULE_VERSION_VALUE.equals(jerseyModuleVersion)) {
+                        li.remove();
+                    }
+                }
+            }
+        }
+        return Collections.enumeration(urls);
+    }
+
+    private static boolean isServiceInBlacklistedModule(final URL serviceUrl) {
+        final String service = serviceUrl.toString();
+        for (final String module : MODULES_BLACKLIST) {
+            if (service.contains(module)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static String getJerseyModuleVersion(final String serviceName, final URL serviceUrl) {
+        try {
+            final String url = serviceUrl.toString();
+            final String resource = url.endsWith("class") ? serviceName.replace(".", "/") + ".class" : serviceName;
+            final URL moduleVersionURL = new URL(url.replace(resource, MODULE_VERSION));
+
+            return new BufferedReader(new InputStreamReader(moduleVersionURL.openStream())).readLine();
+        } catch (IOException ioe) {
+            LOGGER.log(Level.FINE, "Error loading META-INF/jersey-module-version associated with " + ServiceFinder.class.getName());
+            return null;
+        }
+    }
+
+    private static URL getResource(ClassLoader loader, String name) throws IOException {
+        if (loader == null)
+            return getResource(name);
+        else {
+            final URL resource = loader.getResource(name);
+            if (resource != null) {
+                return resource;
+            } else {
+                return getResource(name);
+            }
+        }
+    }
+
+    private static URL getResource(String name) throws IOException {
+        if (ServiceFinder.class.getClassLoader() != null)
+            return ServiceFinder.class.getClassLoader().getResource(name);
+        else
+            return ClassLoader.getSystemResource(name);
+    }
 
     private static Enumeration<URL> getResources(ClassLoader loader, String name) throws IOException {
         if (loader == null) {
@@ -535,7 +649,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
             if (configs == null) {
                 try {
                     final String fullName = PREFIX + serviceName;
-                    configs = getResources(loader, fullName);
+                    configs = filterServiceURLsWithVersion(fullName, getResources(loader, fullName));
                 } catch (IOException x) {
                     fail(serviceName, ": " + x);
                 }

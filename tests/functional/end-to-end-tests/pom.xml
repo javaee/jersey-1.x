@@ -60,7 +60,7 @@
     <modules>
         <!--<module>exceptions</module>-->
         <module>listeners-test</module>
-        <module>oauth-test</module>
+        <module>servicefinder-test</module>
     </modules>
 
 </project>

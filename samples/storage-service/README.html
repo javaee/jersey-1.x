@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -128,7 +128,7 @@ mvn clean compile exec:java</pre></blockquote>
     <blockquote><pre>&lt;containers&gt;
     &lt;container&gt;
         &lt;name&gt;quotes&lt;/name&gt;
-        &lt;uri&gt;http://localhost:9998/storage/containers/quotes&lt;/uri&gt;
+        &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes&lt;/uri&gt;
     &lt;/container&gt;
 &lt;/containers&gt;</pre></blockquote>
     <p>Create some content:</p>
@@ -145,31 +145,31 @@ curl -X PUT -HContent-type:text/plain --data "Get thee to a nunnery" http://127.
         &lt;lastModified&gt;2007-01-10T15:07:48+01:00&lt;/lastModified&gt;
         &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
         &lt;name&gt;1&lt;/name&gt;
-        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/1&lt;/uri&gt;
+        &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes/1&lt;/uri&gt;
     &lt;/item&gt;
     &lt;item&gt;
         &lt;digest&gt;4769363fcf4d0513619c6a30724daab396a1d196&lt;/digest&gt;
         &lt;lastModified&gt;2007-01-10T15:08:37+01:00&lt;/lastModified&gt;
         &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
         &lt;name&gt;2&lt;/name&gt;
-        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/2&lt;/uri&gt;
+        &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes/2&lt;/uri&gt;
     &lt;/item&gt;
     &lt;item&gt;
         &lt;digest&gt;-71240529c42b5b92e3086e624618d19164658616&lt;/digest&gt;
         &lt;lastModified&gt;2007-01-10T15:11:51+01:00&lt;/lastModified&gt;
         &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
         &lt;name&gt;3&lt;/name&gt;
-        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/3&lt;/uri&gt;
+        &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes/3&lt;/uri&gt;
     &lt;/item&gt;
     &lt;item&gt;
         &lt;digest&gt;493388267529403c84628e12141ffe9a013205a4&lt;/digest&gt;
         &lt;lastModified&gt;2007-01-10T15:12:08+01:00&lt;/lastModified&gt;
         &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
         &lt;name&gt;4&lt;/name&gt;
-        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/4&lt;/uri&gt;
+        &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes/4&lt;/uri&gt;
     &lt;/item&gt;
     &lt;name&gt;quotes&lt;/name&gt;
-    &lt;uri&gt;http://localhost:9998/storage/containers/quotes&lt;/uri&gt;
+    &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes&lt;/uri&gt;
 &lt;/container&gt;</pre></blockquote>
     <p>Search the container for all items containing the word 'king':</p>
     <blockquote><pre>curl "http://127.0.0.1:9998/storage/containers/quotes?search=king"</pre></blockquote>
@@ -180,10 +180,10 @@ curl -X PUT -HContent-type:text/plain --data "Get thee to a nunnery" http://127.
         &lt;lastModified&gt;2007-01-10T15:11:51+01:00&lt;/lastModified&gt;
         &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
         &lt;name&gt;3&lt;/name&gt;
-        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/3&lt;/uri&gt;
+        &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes/3&lt;/uri&gt;
     &lt;/item&gt;
     &lt;name&gt;quotes&lt;/name&gt;
-    &lt;uri&gt;http://localhost:9998/storage/containers/quotes&lt;/uri&gt;
+    &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes&lt;/uri&gt;
 &lt;/container&gt;</pre></blockquote>
     <p>Get the contents of item 3:</p>
     <blockquote><pre>curl http://127.0.0.1:9998/storage/containers/quotes/3</pre></blockquote>
@@ -198,10 +198,10 @@ curl -X PUT -HContent-type:text/plain --data "Get thee to a nunnery" http://127.
         &lt;lastModified&gt;<b>2007-01-10T15:46:46+01:00</b>&lt;/lastModified&gt;
         &lt;mimeType&gt;text/plain&lt;/mimeType&gt;
         &lt;name&gt;3&lt;/name&gt;
-        &lt;uri&gt;http://localhost:9998/storage/containers/quotes/3&lt;/uri&gt;
+        &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes/3&lt;/uri&gt;
     &lt;/item&gt;
     &lt;name&gt;quotes&lt;/name&gt;
-    &lt;uri&gt;http://localhost:9998/storage/containers/quotes&lt;/uri&gt;
+    &lt;uri&gt;http://127.0.0.1:9998/storage/containers/quotes&lt;/uri&gt;
 &lt;/container&gt;</pre></blockquote>
     <p>Get the updated contents of item 3:</p>
     <blockquote><pre>curl http://127.0.0.1:9998/storage/containers/quotes/3</pre></blockquote>

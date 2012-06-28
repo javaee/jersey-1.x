@@ -39,10 +39,14 @@
  */
 package com.sun.jersey.qe.tests.end2end;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.jar.Manifest;
+
+import com.sun.jersey.spi.service.ServiceFinder;
 
 /**
  * @author Michal Gajdos (michal.gajdos at oracle.com)
@@ -50,6 +54,8 @@ import java.util.jar.Manifest;
 public class Helper {
 
     private static final String MANIFEST = "META-INF/MANIFEST.MF";
+
+    private static final String MODULE_VERSION = "META-INF/jersey-module-version";
 
     private Helper() {
     }
@@ -61,6 +67,17 @@ public class Helper {
             throw new IOException("Resource not found: " + url);
 
         return getManifest(resource, url);
+    }
+
+    public static String getJerseyModuleVersion(final Class<?> service) {
+        try {
+            final String serviceClassName = service.getName().replace(".", "/") + ".class";
+            URL moduleVersionURL = new URL(getResource(serviceClassName).toString().replace(serviceClassName, MODULE_VERSION));
+
+            return new BufferedReader(new InputStreamReader(moduleVersionURL.openStream())).readLine();
+        } catch (IOException ioe) {
+            return null;
+        }
     }
 
     private static URL getResource(ClassLoader loader, String name) throws IOException {
@@ -94,8 +111,8 @@ public class Helper {
     }
 
     private static URL getResource(String name) throws IOException {
-        if (Helper.class.getClassLoader() != null)
-            return Helper.class.getClassLoader().getResource(name);
+        if (ServiceFinder.class.getClassLoader() != null)
+            return ServiceFinder.class.getClassLoader().getResource(name);
         else
             return ClassLoader.getSystemResource(name);
     }
