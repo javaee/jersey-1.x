@@ -365,7 +365,7 @@ JAXBBean bean = r.
                     following appends a new path segment and adds some query parameters:
                 <programlisting language="java">    WebResource r = c.resource(&quot;http://localhost:8080/xyz&quot;);
 
-    MultivaluedMap&lt;String, String&gt; params = MultivaluedMapImpl();
+    MultivaluedMap&lt;String, String&gt; params = new MultivaluedMapImpl();
     params.add(&quot;foo&quot;, &quot;x&quot;);
     params.add(&quot;bar&quot;, &quot;y&quot;);
     
