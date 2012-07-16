@@ -56,6 +56,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.representation.Form;
 
@@ -98,10 +99,12 @@ public final class WebResourceFactory implements InvocationHandler {
      * @param <C> Type of the resource to be created.
      * @param resourceInterface Interface describing the resource to be created.
      * @param resource WebResource pointing to the resource or the parent of the resource.
-     * @param uriBuilder
+     * @param uriBuilder Uri builder holding the URI path of the resource to be created (if {@code null}, URI from the
+     *                   provided web resource appended by path annotation on this resource will be used).
      * @return Instance of a class implementing the resource interface that can
      * be used for making requests to the server.
      */
+    @SuppressWarnings("unchecked")
     static <C> C newResource(Class<C> resourceInterface, WebResource resource, UriBuilder uriBuilder,
                              MultivaluedMap<String, Object> headers, Map<String, Cookie> cookies,
                              Map<String, Object> pathParams, Form form) {
@@ -123,9 +126,10 @@ public final class WebResourceFactory implements InvocationHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         // get the interface describing the resource
-        Class<?> proxyIfc = proxy.getClass().getInterfaces()[0];
+        final Class<?> proxyIfc = proxy.getClass().getInterfaces()[0];
 
         // response type
         Class<?> responseType = method.getReturnType();
@@ -276,10 +280,11 @@ public final class WebResourceFactory implements InvocationHandler {
             responseType = ClientResponse.class;
         }
 
+        final GenericType responseGenericType = new GenericType(method.getGenericReturnType());
         if (entity != null) {
-            result = b.type(contentType).method(httpMethod, responseType, entity);
+            result = b.type(contentType).method(httpMethod, responseGenericType, entity);
         } else {
-            result = b.method(httpMethod, responseType);
+            result = b.method(httpMethod, responseGenericType);
         }
 
         if (responseType == ClientResponse.class) {
