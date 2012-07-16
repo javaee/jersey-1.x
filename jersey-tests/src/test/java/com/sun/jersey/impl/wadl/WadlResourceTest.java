@@ -61,6 +61,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -98,6 +99,7 @@ import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.sun.research.ws.wadl.Resources;
@@ -802,5 +804,52 @@ public class WadlResourceTest extends AbstractResourceTester {
         WebResource r = resource("/application.wadl");
 
         assertTrue(r.get(String.class).length() > 0);
+    }
+
+    @Path("emptyproduces")
+    public static class EmptyProducesTestResource {
+
+        @PUT
+        @Produces({})
+        public Response put(final String str) {
+            return Response.ok().build();
+        }
+
+        @POST
+        @Path("/sub")
+        @Produces({})
+        public Response post(final String str) {
+            return Response.ok().build();
+        }
+    }
+
+    public void testEmptyProduces() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(EmptyProducesTestResource.class);
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/application.wadl");
+
+        File tmpFile = r.get(File.class);
+        DocumentBuilderFactory bf = DocumentBuilderFactory.newInstance();
+        bf.setNamespaceAware(true);
+        bf.setValidating(false);
+        if (!SaxHelper.isXdkDocumentBuilderFactory(bf)) {
+            bf.setXIncludeAware(false);
+        }
+        DocumentBuilder b = bf.newDocumentBuilder();
+        Document d = b.parse(tmpFile);
+        printSource(new DOMSource(d));
+        XPath xp = XPathFactory.newInstance().newXPath();
+        xp.setNamespaceContext(new NSResolver("wadl", "http://wadl.dev.java.net/2009/02"));
+
+        final NodeList responseElements = (NodeList) xp.evaluate(
+                "/wadl:application/wadl:resources//wadl:method/wadl:response", d, XPathConstants.NODESET);
+
+        for (int i = 0; i < responseElements.getLength(); i++) {
+            final Node item = responseElements.item(i);
+
+            assertEquals(0, item.getChildNodes().getLength());
+            assertEquals(0, item.getAttributes().getLength());
+        }
     }
 }

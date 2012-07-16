@@ -40,10 +40,21 @@
 
 package com.sun.jersey.server.wadl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import javax.xml.namespace.QName;
+
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Param;
 import com.sun.research.ws.wadl.ParamStyle;
@@ -52,11 +63,6 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.namespace.QName;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This WadlGenerator creates the basic wadl artifacts.<br>
@@ -95,7 +101,7 @@ public class WadlGeneratorImpl implements WadlGenerator {
     @Override
     public com.sun.research.ws.wadl.Method createMethod(
             AbstractResource r, final AbstractResourceMethod m ) {
-        com.sun.research.ws.wadl.Method wadlMethod = 
+        com.sun.research.ws.wadl.Method wadlMethod =
                 new com.sun.research.ws.wadl.Method();
         wadlMethod.setName(m.getHttpMethod());
         wadlMethod.setId( m.getMethod().getName() );
@@ -148,7 +154,7 @@ public class WadlGeneratorImpl implements WadlGenerator {
             default:
                 break;
         }
-        
+
         if (p.hasDefaultValue())
             wadlParam.setDefault(p.getDefaultValue());
         Class<?> pClass = p.getParameterClass();
@@ -190,12 +196,11 @@ public class WadlGeneratorImpl implements WadlGenerator {
         final Response response = new Response();
 
         for (MediaType mediaType: m.getSupportedOutputTypes()) {
-            Representation wadlRepresentation = createResponseRepresentation( r, m, mediaType );
-//            JAXBElement<Representation> element = new JAXBElement<Representation>(
-//                    new QName("http://wadl.dev.java.net/2009/02","representation"),
-//                    Representation.class,
-//                    wadlRepresentation);
-            response.getRepresentation().add(wadlRepresentation);
+            if (!MediaType.WILDCARD_TYPE.equals(mediaType)
+                    || !hasEmptyProducibleMediaTypeSet(m)) {
+                Representation wadlRepresentation = createResponseRepresentation( r, m, mediaType );
+                response.getRepresentation().add(wadlRepresentation);
+            }
         }
 
         List<Response> responses = new ArrayList<Response>();
@@ -203,21 +208,37 @@ public class WadlGeneratorImpl implements WadlGenerator {
         return responses;
     }
 
+    private boolean hasEmptyProducibleMediaTypeSet(final AbstractResourceMethod method) {
+        final Produces produces = method.getMethod().getAnnotation(Produces.class);
+        return produces != null && getProducibleMediaTypes(method).isEmpty();
+    }
+
+    private List<String> getProducibleMediaTypes(final AbstractResourceMethod method) {
+        List<String> mediaTypes = Collections.emptyList();
+        final Produces produces = method.getMethod().getAnnotation(Produces.class);
+
+        if (produces != null && produces.value() != null) {
+            mediaTypes = Arrays.asList(produces.value());
+        }
+
+        return mediaTypes;
+    }
+
     public Representation createResponseRepresentation( AbstractResource r, AbstractResourceMethod m, MediaType mediaType ) {
         Representation wadlRepresentation = new Representation();
         wadlRepresentation.setMediaType(mediaType.toString());
         return wadlRepresentation;
     }
-    
-    
+
+
     // ================ methods for post build actions =======================
-    
+
     @Override
     public ExternalGrammarDefinition createExternalGrammar() {
         // Return an empty list to add to
         return new ExternalGrammarDefinition();
-    }    
-    
+    }
+
     @Override
     public void attachTypes(ApplicationDescription egd) {
     }

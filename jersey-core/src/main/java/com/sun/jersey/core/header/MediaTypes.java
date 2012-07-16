@@ -55,22 +55,22 @@ import java.util.Map;
 
 /**
  * Common media types and functionality.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class MediaTypes {
     private MediaTypes() { }
-    
-    public final static MediaType WADL = 
+
+    public final static MediaType WADL =
             MediaType.valueOf("application/vnd.sun.wadl+xml");
-    
+
     public final static MediaType FAST_INFOSET =
             MediaType.valueOf("application/fastinfoset");
 
     public final static boolean typeEquals(MediaType m1, MediaType m2) {
         if (m1 == null || m2 == null)
             return false;
-        
+
         return m1.getSubtype().equalsIgnoreCase(m2.getSubtype()) && m1.getType().equalsIgnoreCase(m2.getType());
     }
 
@@ -83,7 +83,7 @@ public class MediaTypes {
         }
         return false;
     }
-    
+
     /**
      * Comparator for media types.
      * <p>
@@ -115,7 +115,7 @@ public class MediaTypes {
      * Get the most specific media type from a pair of media types. The most
      * specific media type is the media type from the pair that has least
      * wild cards present.
-     * 
+     *
      * @param m1 the first media type
      * @param m2 the second media type
      * @return the most specific media type. If the media types are equally
@@ -140,18 +140,18 @@ public class MediaTypes {
      */
     public static final Comparator<List<? extends MediaType>> MEDIA_TYPE_LIST_COMPARATOR =
             new Comparator<List<? extends MediaType>>() {
-        public int compare(List<? extends MediaType> o1, List<? extends MediaType> o2) {
-            return MEDIA_TYPE_COMPARATOR.compare(getLeastSpecific(o1), getLeastSpecific(o2));
-        }
+                public int compare(List<? extends MediaType> o1, List<? extends MediaType> o2) {
+                    return MEDIA_TYPE_COMPARATOR.compare(getLeastSpecific(o1), getLeastSpecific(o2));
+                }
 
-        public MediaType getLeastSpecific(List<? extends MediaType> l) {
-            return l.get(l.size() - 1);
-        }
-    };
+                public MediaType getLeastSpecific(List<? extends MediaType> l) {
+                    return l.get(l.size() - 1);
+                }
+            };
 
     /**
      * The general media type corresponding to *\\/*.
-     * 
+     *
      */
     public static final MediaType GENERAL_MEDIA_TYPE = new MediaType("*", "*");
 
@@ -259,11 +259,11 @@ public class MediaTypes {
      * Create a list of quality source media type from the Produces annotation.
      * <p>
      * @param mime the Produces annotation.
-     * @return the list of {@link QualitySourceMediaType}, ordered according to 
+     * @return the list of {@link QualitySourceMediaType}, ordered according to
      *         {@link #QUALITY_SOURCE_MEDIA_TYPE_COMPARATOR}.
      */
     public static List<MediaType> createQualitySourceMediaTypes(Produces mime) {
-        if (mime == null) {
+        if (mime == null || mime.value().length == 0) {
             return GENERAL_QUALITY_SOURCE_MEDIA_TYPE_LIST;
         }
 
