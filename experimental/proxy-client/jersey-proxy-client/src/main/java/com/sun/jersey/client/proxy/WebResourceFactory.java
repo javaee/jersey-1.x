@@ -43,13 +43,16 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -174,6 +177,7 @@ public final class WebResourceFactory implements InvocationHandler {
         form.putAll(this.form);
         Annotation[][] paramAnns = method.getParameterAnnotations();
         Object entity = null;
+        Type entityType = null;
         for (int i = 0; i < paramAnns.length; i++) {
             Map<Class, Annotation> anns = new HashMap<Class, Annotation>();
             for (Annotation ann : paramAnns[i]) {
@@ -182,6 +186,7 @@ public final class WebResourceFactory implements InvocationHandler {
             Annotation ann;
             Object value = args[i];
             if (anns.isEmpty()) {
+                entityType = method.getGenericParameterTypes()[i];
                 entity = value;
             } else {
                 if (value == null && (ann = anns.get(DefaultValue.class)) != null) {
@@ -282,6 +287,9 @@ public final class WebResourceFactory implements InvocationHandler {
 
         final GenericType responseGenericType = new GenericType(method.getGenericReturnType());
         if (entity != null) {
+            if (entityType instanceof ParameterizedType) {
+                entity = new GenericEntity(entity, entityType);
+            }
             result = b.type(contentType).method(httpMethod, responseGenericType, entity);
         } else {
             result = b.method(httpMethod, responseGenericType);
