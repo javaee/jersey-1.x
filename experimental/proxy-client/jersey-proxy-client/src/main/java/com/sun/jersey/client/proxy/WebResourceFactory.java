@@ -281,11 +281,13 @@ public final class WebResourceFactory implements InvocationHandler {
             }
         }
 
+        final GenericType responseGenericType;
         if (Response.class.isAssignableFrom(responseType)) {
             responseType = ClientResponse.class;
+            responseGenericType = new GenericType(ClientResponse.class);
+        } else {
+            responseGenericType = new GenericType(method.getGenericReturnType());
         }
-
-        final GenericType responseGenericType = new GenericType(method.getGenericReturnType());
         if (entity != null) {
             if (entityType instanceof ParameterizedType) {
                 entity = new GenericEntity(entity, entityType);
