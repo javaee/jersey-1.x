@@ -1,4 +1,7 @@
 release 1.14
+- Fixed issue 677
+  http://java.net/jira/browse/JERSEY-677
+  OSGi Manifest imports incomplete in jersey-spring
 - Fixed issue 1259
   http://java.net/jira/browse/JERSEY-1259
   Array out of bounds error when you specify an empty list of @Produces annotation

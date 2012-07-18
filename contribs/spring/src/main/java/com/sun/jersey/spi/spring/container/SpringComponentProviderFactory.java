@@ -39,13 +39,16 @@
  */
 package com.sun.jersey.spi.spring.container;
 
-import com.sun.jersey.api.core.InjectParam;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.ws.rs.core.Context;
 
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
@@ -56,6 +59,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.util.ClassUtils;
 
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.spring.Autowire;
 import com.sun.jersey.core.spi.component.ComponentContext;
@@ -66,22 +70,19 @@ import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
-import java.util.HashMap;
-import java.util.Map;
-import javax.ws.rs.core.Context;
 
 /**
  * The Spring-based {@link IoCComponentProviderFactory}.
  * <p>
  * Resource and provider classes can be registered Spring-based beans using
  * XML-based registration or auto-wire-based registration.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class SpringComponentProviderFactory implements IoCComponentProviderFactory {
 
     private static final Logger LOGGER = Logger.getLogger(SpringComponentProviderFactory.class.getName());
-    
+
     private final ConfigurableApplicationContext springContext;
 
     public SpringComponentProviderFactory(ResourceConfig rc, ConfigurableApplicationContext springContext) {
@@ -297,7 +298,7 @@ public class SpringComponentProviderFactory implements IoCComponentProviderFacto
                 if (beanName != null)
                     return beanName;
             }
-            
+
             final StringBuilder sb = new StringBuilder();
             sb.append("There are multiple beans configured in spring for the type ").
                     append(c.getName()).append(".");

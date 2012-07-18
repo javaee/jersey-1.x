@@ -76,23 +76,4 @@
         <module>scala</module>
         <module>bill-burke-book</module>
     </modules>
-    <!--build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>osgi-bundle</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>bundle</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-             </plugins>
-        </pluginManagement>
-    </build-->
- </project>
+</project>

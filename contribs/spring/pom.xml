@@ -120,6 +120,11 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                  <instructions>
+                    <Import-Package>*, javax.ws.rs.core</Import-Package>
+                  </instructions>
+                </configuration>
             </plugin>
 
             <plugin>
