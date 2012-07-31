@@ -51,7 +51,7 @@ import com.sun.jersey.server.wadl.generators.resourcedoc.WadlGeneratorResourceDo
 /**
  * This subclass of {@link WadlGeneratorConfig} defines/configures {@link WadlGenerator}s
  * to be used for generating WADL.
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
@@ -60,12 +60,13 @@ public class SampleWadlGeneratorConfig extends WadlGeneratorConfig {
     @Override
     public List<WadlGeneratorDescription> configure() {
         return generator( WadlGeneratorApplicationDoc.class )
-        .prop( "applicationDocsStream", "application-doc.xml" )
-        .generator( WadlGeneratorGrammarsSupport.class )
-        .prop( "grammarsStream", "application-grammars.xml" )
-        .generator( WadlGeneratorResourceDocSupport.class )
-        .prop( "resourceDocStream", "resourcedoc.xml" )
-        .descriptions();
+                .prop( "applicationDocsStream", "application-doc.xml" )
+                .generator( WadlGeneratorGrammarsSupport.class )
+                .prop( "grammarsStream", "application-grammars.xml" )
+                .prop("overrideGrammars", true)
+                .generator( WadlGeneratorResourceDocSupport.class )
+                .prop( "resourceDocStream", "resourcedoc.xml" )
+                .descriptions();
     }
 
 }

@@ -40,12 +40,14 @@
 
 package com.sun.jersey.samples.extendedwadl;
 
+import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  *
@@ -57,7 +59,7 @@ public class ExtendedWadlWebappTest extends JerseyTest {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.extendedwadl.resources")
                 .contextPath("extended-wadl-webapp")
                 .initParam("com.sun.jersey.config.property.WadlGeneratorConfig",
-                "com.sun.jersey.samples.extendedwadl.SampleWadlGeneratorConfig")
+                        "com.sun.jersey.samples.extendedwadl.SampleWadlGeneratorConfig")
                 .build());
 
     }
@@ -72,9 +74,12 @@ public class ExtendedWadlWebappTest extends JerseyTest {
 
         WebResource webResource = resource();
         String wadl = webResource.path("application.wadl").accept(MediaTypes.WADL).get(String.class);
-        Assert.assertTrue("Generated wadl is of null length", wadl.length() > 0);
-        Assert.assertTrue("Generated wadl doesn't contain the expected text",
+
+        assertTrue("Generated wadl is of null length", wadl.length() > 0);
+        assertTrue("Generated wadl doesn't contain the expected text",
                 wadl.contains("This is a paragraph"));
+
+        assertFalse(wadl.contains("application.wadl/xsd0.xsd"));
     }
 
     @Test
@@ -82,8 +87,9 @@ public class ExtendedWadlWebappTest extends JerseyTest {
 
         WebResource webResource = resource();
         String wadl = webResource.path("items").accept(MediaTypes.WADL).options(String.class);
-        Assert.assertTrue("Generated wadl is of null length", wadl.length() > 0);
-        Assert.assertTrue("Generated wadl doesn't contain the expected text",
+
+        assertTrue("Generated wadl is of null length", wadl.length() > 0);
+        assertTrue("Generated wadl doesn't contain the expected text",
                 wadl.contains("This is a paragraph"));
     }
 }

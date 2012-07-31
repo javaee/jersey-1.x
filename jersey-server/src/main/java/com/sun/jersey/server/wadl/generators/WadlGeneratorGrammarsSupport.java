@@ -39,6 +39,16 @@
  */
 package com.sun.jersey.server.wadl.generators;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.List;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.MediaType;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -56,14 +66,6 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-import java.io.File;
-import java.io.InputStream;
-import java.util.List;
-import java.util.logging.Logger;
-
 /**
  * This {@link WadlGenerator} adds the provided {@link Grammars} element to the
  * generated wadl-file.
@@ -77,36 +79,41 @@ import java.util.logging.Logger;
  * using the {@link WadlGeneratorConfig} for configuration.
  * </p>
  * Created on: Jun 24, 2008<br>
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
 public class WadlGeneratorGrammarsSupport implements WadlGenerator {
-    
+
     private static final Logger LOG = Logger.getLogger( WadlGeneratorGrammarsSupport.class.getName() );
 
     private WadlGenerator _delegate;
     private File _grammarsFile;
     private InputStream _grammarsStream;
     private Grammars _grammars;
-    
+    private Boolean overrideGrammars = false;
+
     public WadlGeneratorGrammarsSupport() {
     }
 
     public WadlGeneratorGrammarsSupport( WadlGenerator delegate,
-            Grammars grammars ) {
+                                         Grammars grammars ) {
         _delegate = delegate;
         _grammars = grammars;
     }
-    
+
     public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
         _delegate = delegate;
+    }
+
+    public void setOverrideGrammars(Boolean overrideGrammars) {
+        this.overrideGrammars = overrideGrammars;
     }
 
     public String getRequiredJaxbContextPath() {
         return _delegate.getRequiredJaxbContextPath();
     }
-    
+
     public void setGrammarsFile( File grammarsFile ) {
         if ( _grammarsStream != null ) {
             throw new IllegalStateException( "The grammarsStream property is already set," +
@@ -114,7 +121,7 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
         }
         _grammarsFile = grammarsFile;
     }
-    
+
     public void setGrammarsStream( InputStream grammarsStream ) {
         if ( _grammarsFile != null ) {
             throw new IllegalStateException( "The grammarsFile property is already set," +
@@ -122,7 +129,7 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
         }
         _grammarsStream = grammarsStream;
     }
-    
+
     public void init() throws Exception {
         if ( _grammarsFile == null && _grammarsStream == null ) {
             throw new IllegalStateException( "Neither the grammarsFile nor the grammarsStream" +
@@ -141,9 +148,9 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      */
     public Application createApplication() {
         final Application result = _delegate.createApplication();
-        if ( result.getGrammars() != null ) {
+        if ( result.getGrammars() != null && !overrideGrammars) {
             LOG.info( "The wadl application created by the delegate ("+ _delegate +") already contains a grammars element," +
-            		" we're adding elements of the provided grammars file." );
+                    " we're adding elements of the provided grammars file." );
             if ( !_grammars.getAny().isEmpty() ) {
                 result.getGrammars().getAny().addAll( _grammars.getAny() );
             }
@@ -167,7 +174,7 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      * @see com.sun.jersey.server.wadl.WadlGenerator#createMethod(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Method createMethod( AbstractResource ar,
-            AbstractResourceMethod arm ) {
+                                AbstractResourceMethod arm ) {
         return _delegate.createMethod( ar, arm );
     }
 
@@ -178,7 +185,7 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      * @see com.sun.jersey.server.wadl.WadlGenerator#createRequest(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public Request createRequest( AbstractResource ar,
-            AbstractResourceMethod arm ) {
+                                  AbstractResourceMethod arm ) {
         return _delegate.createRequest( ar, arm );
     }
 
@@ -190,7 +197,7 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      * @see com.sun.jersey.server.wadl.WadlGenerator#createParam(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractMethod, com.sun.jersey.api.model.Parameter)
      */
     public Param createParam( AbstractResource ar,
-            AbstractMethod am, Parameter p ) {
+                              AbstractMethod am, Parameter p ) {
         return _delegate.createParam( ar, am, p );
     }
 
@@ -228,7 +235,7 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      * @param ar abstract resource
      * @param arm abstract resource method
      * @return response
-     * @see com.sun.jersey.server.wadl.WadlGenerator#createResponse(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
+     * @see com.sun.jersey.server.wadl.WadlGenerator#createResponses(com.sun.jersey.api.model.AbstractResource, com.sun.jersey.api.model.AbstractResourceMethod)
      */
     public List<Response> createResponses(AbstractResource ar,
                                           AbstractResourceMethod arm ) {
@@ -236,13 +243,16 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
     }
 
     // ================ methods for post build actions =======================
-    
-    @Override 
+
+    @Override
     public ExternalGrammarDefinition createExternalGrammar() {
+        if(overrideGrammars) {
+            return new ExternalGrammarDefinition();
+        }
         return _delegate.createExternalGrammar();
     }
 
-    @Override 
+    @Override
     public void attachTypes(ApplicationDescription egd) {
         _delegate.attachTypes(egd);
     }

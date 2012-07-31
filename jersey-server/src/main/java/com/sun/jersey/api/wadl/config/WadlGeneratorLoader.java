@@ -39,9 +39,6 @@
  */
 package com.sun.jersey.api.wadl.config;
 
-import com.sun.jersey.server.wadl.WadlGenerator;
-import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +51,9 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
 
 /**
  * Loads {@link WadlGenerator}s from a provided list of {@link WadlGeneratorDescription}s.<br/>
@@ -168,7 +168,7 @@ class WadlGeneratorLoader {
         } else if (File.class.equals(paramClazz) && propertyValue instanceof String) {
 
             /* This is now deprecated and can be removed in future versions.
-             * It's beeing replaced by the InputStream support, which must be used in
+             * It's being replaced by the InputStream support, which must be used in
              * a JEE environment instead of files.
              */
 

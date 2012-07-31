@@ -40,8 +40,12 @@
 
 package com.sun.jersey.client.apache.impl;
 
-import com.sun.jersey.api.client.ClientResponse;
+import java.util.Arrays;
+
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.filter.GZIPContentEncodingFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
@@ -49,8 +53,6 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.client.apache.ApacheHttpClient;
 import com.sun.jersey.client.apache.config.ApacheHttpClientConfig;
 import com.sun.jersey.client.apache.config.DefaultApacheHttpClientConfig;
-import java.util.Arrays;
-import javax.ws.rs.POST;
 
 /**
  *

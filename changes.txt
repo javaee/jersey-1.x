@@ -1,11 +1,19 @@
 release 1.14
+- Fixed issue JERSEY-1293
+  http://java.net/jira/browse/JERSEY-1293
+  ApacheHttpClient4 proxy uri was not used when credentials were not specified.
+- Fixed issue JERSEY-1230
+  http://java.net/jira/browse/JERSEY-1230
+  Added property to WadlGeneratorGrammarsSupport which controls whether Jersey generated
+  grammars should be used when user explicitly sets its own grammar.
 - Fixed issue 677
   http://java.net/jira/browse/JERSEY-677
   OSGi Manifest imports incomplete in jersey-spring
 - Fixed issue 1259
   http://java.net/jira/browse/JERSEY-1259
   Array out of bounds error when you specify an empty list of @Produces annotation
-release 1.13
+
+release 1.13 (07-2012)
 - Fixed regression in EJB dispatching. Original GlassFish issue 16199
   http://java.net/jira/browse/GLASSFISH-16199
   IllegalArgumentException: object is not an instance of declaring class - on a REST / EJB Service

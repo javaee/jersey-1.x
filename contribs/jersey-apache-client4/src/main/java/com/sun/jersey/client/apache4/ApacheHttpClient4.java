@@ -39,12 +39,11 @@
  */
 package com.sun.jersey.client.apache4;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import java.net.URI;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -58,10 +57,12 @@ import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpParams;
 
-import java.net.URI;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 
 /**
  * A {@link Client} that utilizes the Apache HTTP Client to send and receive
@@ -262,8 +263,8 @@ public class ApacheHttpClient4 extends Client {
                                     cc.getProperty(ApacheHttpClient4Config.PROPERTY_PROXY_PASSWORD).toString())
                     );
 
-                    client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
                 }
+                client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, proxy);
             }
 
             preemptiveBasicAuth = cc.getPropertyAsFeature(ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION);
