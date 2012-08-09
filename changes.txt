@@ -1,4 +1,7 @@
 release 1.14
+- Fixed issue JERSEY-1341
+  http://java.net/jira/browse/JERSEY-1341
+  UriBuilderImpl is now adding "=" after the query parameter name even if the value is empty.
 - Fixed issue JERSEY-1293
   http://java.net/jira/browse/JERSEY-1293
   ApacheHttpClient4 proxy uri was not used when credentials were not specified.

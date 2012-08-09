@@ -119,4 +119,11 @@ public class UriBuilderImplTest {
         URI uri = new UriBuilderImpl().path("http://localhost/").replaceQueryParam("foo", "test").clone().build();
         assertEquals("http://localhost/?foo=test", uri.toString());
     }
+
+    // regression test for JERSEY-1341
+    @Test
+    public void testEmptyQueryParamValue() {
+        URI uri = new UriBuilderImpl().path("http://localhost/").queryParam("test", "").build();
+        assertEquals("http://localhost/?test=", uri.toString());
+    }
 }
