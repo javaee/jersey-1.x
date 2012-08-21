@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -52,29 +52,35 @@ import java.util.TreeMap;
  * ensures timestamp is monotonically increasing and tracks all nonces
  * for a given timestamp.
  *
- * @author Paul C. Bryan <pbryan@sun.com>
- * @author Martin Matula
+ * @author Paul C. Bryan
+ * @author Martin Matula (martin.matula at oracle.com)
+ * @author Thomas Meire
  */
-public class NonceManager {
-    /** The maximum valid age of a nonce timestamp, in milliseconds. */
+public final class NonceManager {
+    /**
+     * The maximum valid age of a nonce timestamp, in milliseconds.
+     */
     private final long maxAge;
 
-    /** Verifications to perform on average before performing garbage collection. */
+    /**
+     * Verifications to perform on average before performing garbage collection.
+     */
     private final int gcPeriod;
 
-    /** Counts number of verification requests performed to schedule garbage collection. */
+    /**
+     * Counts number of verification requests performed to schedule garbage collection.
+     */
     private int gcCounter = 0;
 
-    /** Maps keys to nonces. */
-    private final Map<String, Map<Long, Set<String>>> map = new HashMap<String, Map<Long, Set<String>>>();
-
-    /** Index by timestamps (for garbage collection) */
-    private final SortedMap<Long, String> tsIndex = new TreeMap<Long, String>();
+    /**
+     * Maps timestamps to key-nonce pairs.
+     */
+    private final SortedMap<Long, Map<String, Set<String>>> tsToKeyNoncePairs = new TreeMap<Long, Map<String, Set<String>>>();
 
     /**
      * TODO: Description.
      *
-     * @param maxAge the maximum valid age of a nonce timestamp, in milliseconds.
+     * @param maxAge   the maximum valid age of a nonce timestamp, in milliseconds.
      * @param gcPeriod verifications to perform on average before performing garbage collection.
      */
     public NonceManager(long maxAge, int gcPeriod) {
@@ -90,14 +96,15 @@ public class NonceManager {
      * Evaluates the timestamp/nonce combination for validity, storing and/or
      * clearing nonces as required.
      *
+     * @param key       the oauth_consumer_key value for a given consumer request
      * @param timestamp the oauth_timestamp value for a given consumer request.
-     * @param nonce the oauth_nonce value for a given consumer request.
+     * @param nonce     the oauth_nonce value for a given consumer request.
      * @return true if the timestamp/nonce are valid.
      */
     public synchronized boolean verify(String key, String timestamp, String nonce) {
         long now = System.currentTimeMillis();
 
-        // convert timestap to milliseconds since epoch to deal with uniformly
+        // convert timestamp to milliseconds since epoch to deal with uniformly
         long stamp = longValue(timestamp) * 1000;
 
         // invalid timestamp supplied; automatically invalid
@@ -105,40 +112,56 @@ public class NonceManager {
             return false;
         }
 
-        Map<Long, Set<String>> timestamps = map.get(key);
-        if (timestamps == null) {
-            timestamps = new HashMap<Long, Set<String>>();
-            map.put(key, timestamps);
+        Map<String, Set<String>> keyToNonces = tsToKeyNoncePairs.get(stamp);
+        if (keyToNonces == null) {
+            keyToNonces = new HashMap<String, Set<String>>();
+            tsToKeyNoncePairs.put(stamp, keyToNonces);
         }
 
-        Set<String> nonces = timestamps.get(stamp);
+        Set<String> nonces = keyToNonces.get(key);
         if (nonces == null) {
             nonces = new HashSet<String>();
-            timestamps.put(stamp, nonces);
-            tsIndex.put(stamp, key);
+            keyToNonces.put(key, nonces);
         }
 
         boolean result = nonces.add(nonce);
 
         // perform garbage collection if counter is up to established number of passes
         if (++gcCounter >= gcPeriod) {
-            gcCounter = 0;
-            SortedMap<Long, String> toCollect = tsIndex.headMap(now - maxAge);
-            for (Map.Entry<Long, String> entry : toCollect.entrySet()) {
-                map.get(entry.getValue()).remove(entry.getKey());
-            }
-            toCollect.clear();
+            gc(now);
         }
 
         // returns false if nonce already encountered for given timestamp
         return result;
     }
 
+    /**
+     * Deletes all nonces older than maxAge.
+     * This method is package private (instead of private) for testability purposes.
+     *
+     * @param now milliseconds since epoch representing "now"
+     */
+    void gc(long now) {
+        gcCounter = 0;
+        tsToKeyNoncePairs.headMap(now - maxAge).clear();
+    }
+
+    /**
+     * Returns number of currently tracked timestamp-key-nonce tuples. The method is used by tests.
+     * @return number of currently tracked timestamp-key-nonce tuples.
+     */
+    long size() {
+        long size = 0;
+        for (Map<String, Set<String>> keyToNonces : tsToKeyNoncePairs.values()) {
+            size += keyToNonces.values().size();
+        }
+        return size;
+    }
+
     private static long longValue(String value) {
         try {
             return Long.valueOf(value);
-        }
-        catch (NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) {
             return -1;
         }
     }
