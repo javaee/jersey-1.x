@@ -1,4 +1,8 @@
 release 1.14
+- Fixed issue JERSEY-1336
+  http://java.net/jira/browse/JERSEY-1336
+  WADL: Matrix params were generated in "request" element, which violates WADL spec; moved
+  to resource where it should be.
 - Fixed issue JERSEY-1350
   http://java.net/jira/browse/JERSEY-1350
   Memory leak in OAuth NonceManager

@@ -39,6 +39,19 @@
  */
 package com.sun.jersey.server.wadl;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.ws.rs.FormParam;
+import javax.ws.rs.core.MediaType;
+
+import javax.xml.namespace.QName;
+
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -58,17 +71,6 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
-
-import javax.ws.rs.FormParam;
-import javax.ws.rs.core.MediaType;
-import javax.xml.namespace.QName;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * This class implements the algorithm how the wadl is built for one or more
@@ -258,7 +260,7 @@ public class WadlBuilder {
                 if (wadlParam == null) {
                     continue;
                 }
-                if (wadlParam.getStyle() == ParamStyle.TEMPLATE) {
+                if (wadlParam.getStyle() == ParamStyle.TEMPLATE || wadlParam.getStyle() == ParamStyle.MATRIX) {
                     wadlResourceParams.put(wadlParam.getName(), wadlParam);
                 } else {
                     wadlRequest.getParam().add(wadlParam);

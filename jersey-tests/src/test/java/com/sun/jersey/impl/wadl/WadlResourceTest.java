@@ -78,6 +78,12 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import com.sun.jersey.api.JResponse;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -95,13 +101,6 @@ import com.sun.jersey.impl.entity.JAXBBean;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import com.sun.research.ws.wadl.Resources;
 
 /**
@@ -137,7 +136,7 @@ public class WadlResourceTest extends AbstractResourceTester {
         @POST
         @Consumes({"application/xml"})
         @Produces({"application/xml", "application/json"})
-        public String createWidget(String bar) {
+        public String createWidget(String bar, @MatrixParam("test") String test) {
             return bar;
         }
 
@@ -229,6 +228,9 @@ public class WadlResourceTest extends AbstractResourceTester {
         // check 2 methods for widgets
         val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:method)", d, XPathConstants.STRING);
         assertEquals(val,"2");
+        // check 1 matrix param on resource
+        val = (String)xp.evaluate("count(//wadl:resource[@path='widgets']/wadl:param[@name='test'])", d, XPathConstants.STRING);
+        assertEquals(val,"1");
         // check type of {id} is int
         String prefix = getXmlSchemaNamespacePrefix(
                 (Node) xp.evaluate("//wadl:resource[@path='{id}']/wadl:param[@name='id']", d, XPathConstants.NODE));
