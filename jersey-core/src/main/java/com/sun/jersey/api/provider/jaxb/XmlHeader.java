@@ -50,9 +50,9 @@ import java.lang.annotation.Target;
  * <p>
  * Example usage:
  * <pre>
- * @GET
- * @Produces("application/xml")
- * @XmlHeader("&lt;?xml-stylesheet type='text/xsl' href='foobar.xsl' ?&gt;")
+ * &#64;GET
+ * &#64;Produces("application/xml")
+ * &#64;XmlHeader("&lt;?xml-stylesheet type='text/xsl' href='foobar.xsl' ?&gt;")
  * public JaxbBean get() {
  *     ...
  * }
