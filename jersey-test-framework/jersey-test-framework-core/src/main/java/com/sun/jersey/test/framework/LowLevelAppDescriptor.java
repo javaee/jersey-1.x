@@ -47,6 +47,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 //import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
 //import com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory;
 //import com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -215,8 +216,8 @@ public class LowLevelAppDescriptor extends AppDescriptor {
     public static LowLevelAppDescriptor transform(WebAppDescriptor wad) {
         // TODO need to check contraints on wad
         if (wad.getInitParams().get(PackagesResourceConfig.PROPERTY_PACKAGES) != null) {
-            String packages = wad.getInitParams().get(PackagesResourceConfig.PROPERTY_PACKAGES);
-            PackagesResourceConfig packagesResourceConfig = new PackagesResourceConfig(packages);
+            final Map<String, Object> init = new HashMap<String, Object>(wad.getInitParams());
+            PackagesResourceConfig packagesResourceConfig = new PackagesResourceConfig(init);
             populateResourceConfigFeatures(packagesResourceConfig, wad.getInitParams());
             return new LowLevelAppDescriptor.Builder(packagesResourceConfig).build();
         } else if (wad.getInitParams().get(ClassNamesResourceConfig.PROPERTY_CLASSNAMES) != null) {

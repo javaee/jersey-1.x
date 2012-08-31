@@ -1,4 +1,7 @@
 release 1.14
+- Fixed issue JERSEY-1197
+  http://java.net/jira/browse/JERSEY-1197
+  Jersey Test Framework constructor fails when given multiple packages
 - Fixed issue JERSEY-1336
   http://java.net/jira/browse/JERSEY-1336
   WADL: Matrix params were generated in "request" element, which violates WADL spec; moved

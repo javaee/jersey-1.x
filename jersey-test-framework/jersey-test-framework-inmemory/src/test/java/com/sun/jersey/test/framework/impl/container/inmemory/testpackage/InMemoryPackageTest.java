@@ -35,7 +35,8 @@ public class InMemoryPackageTest extends JerseyTest {
     }
 
     public InMemoryPackageTest() {
-        super("com.sun.jersey.test.framework.impl.container.inmemory.testpackage");
+        super("com.sun.jersey.test.framework.impl.container.inmemory.testpackage;" +
+                "com.sun.jersey.test.framework.impl.container.inmemory.imaginarypackage");
     }
 
     @Test
