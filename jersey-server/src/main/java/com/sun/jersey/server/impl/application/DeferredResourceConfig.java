@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,34 +39,35 @@
  */
 package com.sun.jersey.server.impl.application;
 
-import com.sun.jersey.api.container.ContainerException;
-import com.sun.jersey.api.core.DefaultResourceConfig;
-import com.sun.jersey.core.spi.component.ComponentProvider;
-import com.sun.jersey.core.spi.component.ProviderFactory;
 import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Logger;
+
 import javax.ws.rs.core.Application;
 
+import com.sun.jersey.api.container.ContainerException;
+import com.sun.jersey.api.core.DefaultResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ComponentProvider;
+import com.sun.jersey.core.spi.component.ProviderFactory;
+
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class DeferredResourceConfig extends DefaultResourceConfig {
 
-    private static final Logger LOGGER =
-            Logger.getLogger(DeferredResourceConfig.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DeferredResourceConfig.class.getName());
 
     private final Class<? extends Application> appClass;
 
     private final Set<Class<?>> defaultClasses;
-    
+
     public DeferredResourceConfig(Class<? extends Application> appClass) {
         this(appClass, Collections.<Class<?>>emptySet());
     }
 
-    public DeferredResourceConfig(Class<? extends Application> appClass, 
-            Set<Class<?>> defaultClasses) {
+    public DeferredResourceConfig(Class<? extends Application> appClass, Set<Class<?>> defaultClasses) {
         this.appClass = appClass;
         this.defaultClasses = defaultClasses;
     }
@@ -76,6 +77,7 @@ public class DeferredResourceConfig extends DefaultResourceConfig {
     }
 
     public class ApplicationHolder {
+
         private final Application originalApp;
 
         private final DefaultResourceConfig adaptedApp;
@@ -85,12 +87,14 @@ public class DeferredResourceConfig extends DefaultResourceConfig {
             if (cp == null) {
                 throw new ContainerException("The Application class " + appClass.getName() + " could not be instantiated");
             }
-            this.originalApp = (Application)cp.getInstance();
+            this.originalApp = (Application) cp.getInstance();
 
-            if ((originalApp.getClasses() == null || originalApp.getClasses().isEmpty()) &&
-                    (originalApp.getSingletons() == null || originalApp.getSingletons().isEmpty())) {
+            if ((originalApp.getClasses() == null || originalApp.getClasses().isEmpty())
+                    && (originalApp.getSingletons() == null || originalApp.getSingletons().isEmpty())) {
+
                 LOGGER.info("Instantiated the Application class " + appClass.getName() +
                         ". The following root resource and provider classes are registered: " + defaultClasses);
+
                 this.adaptedApp = new DefaultResourceConfig(defaultClasses);
                 adaptedApp.add(originalApp);
             } else {
@@ -98,6 +102,16 @@ public class DeferredResourceConfig extends DefaultResourceConfig {
                 adaptedApp = null;
             }
 
+            if (originalApp instanceof ResourceConfig) {
+                final ResourceConfig rc = (ResourceConfig)originalApp;
+
+                getFeatures().putAll(rc.getFeatures());
+                getProperties().putAll(rc.getProperties());
+
+                getExplicitRootResources().putAll(rc.getExplicitRootResources());
+                getMediaTypeMappings().putAll(rc.getMediaTypeMappings());
+                getLanguageMappings().putAll(rc.getLanguageMappings());
+            }
         }
 
         public Application getOriginalApplication() {
