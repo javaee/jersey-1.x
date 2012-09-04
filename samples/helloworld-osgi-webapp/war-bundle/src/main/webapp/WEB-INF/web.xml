@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -50,11 +50,11 @@
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.resourceConfigClass</param-name>
-            <param-value>com.sun.jersey.api.core.ClassNamesResourceConfig</param-value>
+            <param-value>com.sun.jersey.api.core.PackagesResourceConfig</param-value>
         </init-param>
         <init-param>
-            <param-name>com.sun.jersey.config.property.classnames</param-name>
-            <param-value>com.sun.jersey.samples.helloworld.HelloWorldResource;com.sun.jersey.samples.helloworld.AnotherResource</param-value>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.sun.jersey.samples.helloworld</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,14 +39,17 @@
  */
 package com.sun.jersey.spi.scanning;
 
-import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.core.spi.scanning.ScannerListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import com.sun.jersey.core.osgi.OsgiRegistry;
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.core.spi.scanning.ScannerListener;
+
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.ClassReader;
@@ -62,11 +65,11 @@ import org.objectweb.asm.Opcodes;
  * <p>
  * Java classes of a Java class file are processed, using ASM, to ascertain
  * if those classes are annotated with one or more of the set of declared
- * annotations. 
+ * annotations.
  * <p>
  * Such an annotated Java class of a Java class file is loaded if the class
  * is public or is an inner class that is static and public.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class AnnotationScannerListener implements ScannerListener {
@@ -75,7 +78,7 @@ public class AnnotationScannerListener implements ScannerListener {
     private final Set<Class<?>> classes;
 
     private final Set<String> annotations;
-    
+
     private final AnnotatedClassVisitor classVisitor;
 
     /**
@@ -92,14 +95,14 @@ public class AnnotationScannerListener implements ScannerListener {
     /**
      * Create a scanner listener to check for annotated Java classes in Java
      * class files.
-     * 
+     *
      * @param classloader the class loader to use to load Java classes that
      *        are annotated with any one of the annotations.
      * @param annotations the set of annotation classes to check on Java class
      *        files.
      */
     public AnnotationScannerListener(ClassLoader classloader,
-            Class<? extends Annotation>... annotations) {
+                                     Class<? extends Annotation>... annotations) {
         this.classloader = classloader;
         this.classes = new LinkedHashSet<Class<?>>();
         this.annotations = getAnnotationSet(annotations);
@@ -108,13 +111,13 @@ public class AnnotationScannerListener implements ScannerListener {
 
     /**
      * Get the set of annotated classes.
-     * 
+     *
      * @return the set of annotated classes.
      */
     public Set<Class<?>> getAnnotatedClasses() {
         return classes;
     }
-    
+
     private Set<String> getAnnotationSet(Class<? extends Annotation>... annotations) {
         Set<String> a = new HashSet<String>();
         for (Class c : annotations) {
@@ -151,7 +154,7 @@ public class AnnotationScannerListener implements ScannerListener {
         private boolean isAnnotated;
 
         public void visit(int version, int access, String name,
-                String signature, String superName, String[] interfaces) {
+                          String signature, String superName, String[] interfaces) {
             className = name;
             isScoped = (access & Opcodes.ACC_PUBLIC) != 0;
             isAnnotated = false;
@@ -163,7 +166,7 @@ public class AnnotationScannerListener implements ScannerListener {
         }
 
         public void visitInnerClass(String name, String outerName,
-                String innerName, int access) {
+                                    String innerName, int access) {
             // If the name of the class that was visited is equal
             // to the name of this visited inner class then
             // this access field needs to be used for checking the scope
@@ -185,12 +188,12 @@ public class AnnotationScannerListener implements ScannerListener {
         }
 
         public void visitOuterClass(String string, String string0,
-                String string1) {
+                                    String string1) {
             // Do nothing
         }
 
         public FieldVisitor visitField(int i, String string,
-                String string0, String string1, Object object) {
+                                       String string0, String string1, Object object) {
             // Do nothing
             return null;
         }
@@ -204,14 +207,20 @@ public class AnnotationScannerListener implements ScannerListener {
         }
 
         public MethodVisitor visitMethod(int i, String string,
-                String string0, String string1, String[] string2) {
+                                         String string0, String string1, String[] string2) {
             // Do nothing
             return null;
         }
 
         private Class getClassForName(String className) {
             try {
-                return ReflectionHelper.classForNameWithException(className, classloader);
+                final OsgiRegistry osgiRegistry = ReflectionHelper.getOsgiRegistryInstance();
+
+                if (osgiRegistry != null) {
+                    return osgiRegistry.classForNameWithException(className);
+                } else {
+                    return ReflectionHelper.classForNameWithException(className, classloader);
+                }
             } catch (ClassNotFoundException ex) {
                 String s = "A class file of the class name, " +
                         className +
@@ -220,5 +229,5 @@ public class AnnotationScannerListener implements ScannerListener {
             }
         }
 
-    };
+    }
 }

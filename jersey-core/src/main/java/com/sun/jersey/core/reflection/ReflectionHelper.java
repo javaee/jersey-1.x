@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,7 +40,6 @@
 
 package com.sun.jersey.core.reflection;
 
-import com.sun.jersey.impl.ImplMessages;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -55,6 +54,9 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.sun.jersey.core.osgi.OsgiRegistry;
+import com.sun.jersey.impl.ImplMessages;
 
 /**
  * Utility methods for Java reflection.
@@ -119,7 +121,7 @@ public class ReflectionHelper {
      * o.getClass().getName() + '@' + Integer.toHexString(o.hashCode()) +
      * '.' + m.getName() + '(' + &lt;parameters&gt; + ')'.
      * </pre></blockquote>
-     * 
+     *
      * @param o the object whose class implements <code>m</code>.
      * @param m the method.
      * @return the string representation of the method and instance.
@@ -143,7 +145,7 @@ public class ReflectionHelper {
     }
 
     /**
-     * 
+     *
      * @param type
      * @return
      */
@@ -173,7 +175,7 @@ public class ReflectionHelper {
      * The context class loader will be utilized if accessible and non-null.
      * Otherwise the defining class loader of this class will
      * be utilized.
-     * 
+     *
      * @param name the class name.
      * @return the Class, otherwise null if the class cannot be found.
      */
@@ -242,22 +244,22 @@ public class ReflectionHelper {
 
     /**
      * Get the context class loader.
-     * 
+     *
      * @return the context class loader, otherwise null security privilages
      *         are not set.
      */
     public static ClassLoader getContextClassLoader() {
         return AccessController.doPrivileged(
-            new PrivilegedAction<ClassLoader>() {
-                public ClassLoader run() {
-                    ClassLoader cl = null;
-                    try {
-                        cl = Thread.currentThread().getContextClassLoader();
-                    } catch (SecurityException ex) {
+                new PrivilegedAction<ClassLoader>() {
+                    public ClassLoader run() {
+                        ClassLoader cl = null;
+                        try {
+                            cl = Thread.currentThread().getContextClassLoader();
+                        } catch (SecurityException ex) {
+                        }
+                        return cl;
                     }
-                    return cl;
-                }
-        });
+                });
     }
 
     /**
@@ -268,7 +270,7 @@ public class ReflectionHelper {
     public static void setAccessibleMethod(final Method m) {
         if (Modifier.isPublic(m.getModifiers()))
             return;
-        
+
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
             public Object run() {
                 if (!m.isAccessible()) {
@@ -380,7 +382,7 @@ public class ReflectionHelper {
 
     /**
      * Get the static valueOf(String ) method.
-     * 
+     *
      * @param c The class to obtain the method.
      * @return the method, otherwise null if the method is not present.
      */
@@ -429,7 +431,7 @@ public class ReflectionHelper {
         } catch (Exception e) {
             return null;
         }
-    }    
+    }
 
 
     /**
@@ -481,7 +483,7 @@ public class ReflectionHelper {
             return null;
         }
     }
-    
+
     /**
      * Get the parameterized type arguments for a declaring class that
      * declares a generic interface type.
@@ -580,20 +582,20 @@ public class ReflectionHelper {
          * The type of the class.
          */
         public final Type t;
-        
+
         public ClassTypePair(Class c) {
             this(c, c);
         }
-        
+
         public ClassTypePair(Class c, Type t) {
             this.c = c;
             this.t = t;
         }
     }
-    
+
     /**
      * Given a type variable resolve the Java class of that variable.
-     * 
+     *
      * @param c the concrete class from which all type variables are resolved
      * @param dc the declaring class where the type variable was defined
      * @param tv the type variable
@@ -603,9 +605,9 @@ public class ReflectionHelper {
     public static ClassTypePair resolveTypeVariable(Class c, Class dc, TypeVariable tv) {
         return resolveTypeVariable(c, dc, tv, new HashMap<TypeVariable, Type>());
     }
-    
+
     private static ClassTypePair resolveTypeVariable(Class c, Class dc, TypeVariable tv,
-            Map<TypeVariable, Type> map) {
+                                                     Map<TypeVariable, Type> map) {
         Type[] gis = c.getGenericInterfaces();
         for (Type gi : gis) {
             if (gi instanceof ParameterizedType) {
@@ -629,7 +631,7 @@ public class ReflectionHelper {
     }
 
     private static ClassTypePair resolveTypeVariable(ParameterizedType pt, Class c, Class dc, TypeVariable tv,
-            Map<TypeVariable, Type> map) {
+                                                     Map<TypeVariable, Type> map) {
         Type[] typeArguments = pt.getActualTypeArguments();
 
         TypeVariable[] typeParameters = c.getTypeParameters();
@@ -719,6 +721,25 @@ public class ReflectionHelper {
                 }
             }
         }
+        return null;
+    }
+
+    /**
+     * Returns an {@link OsgiRegistry} instance.
+     *
+     * @return an {@link OsgiRegistry} instance or {@code null} if the class cannot be instantiated (not in OSGi environment).
+     */
+    public static OsgiRegistry getOsgiRegistryInstance() {
+        try {
+            final Class<?> bundleReferenceClass = Class.forName("org.osgi.framework.BundleReference");
+
+            if (bundleReferenceClass != null) {
+                return OsgiRegistry.getInstance();
+            }
+        } catch (Exception e) {
+            // Do nothing - instance is null.
+        }
+
         return null;
     }
 

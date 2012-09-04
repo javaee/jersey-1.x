@@ -1,4 +1,10 @@
 release 1.14
+- Fixed issue JERSEY-881
+  http://java.net/jira/browse/JERSEY-881
+  Package name resource config does not work in OSGi environment
+- Fixed issue JERSEY-1373
+  http://java.net/jira/browse/JERSEY-1373
+  Features are lost when configuring PackagesResourceConfig using @ApplicationPath
 - Fixed issue JERSEY-1392
   http://java.net/jira/browse/JERSEY-1392
   Jersey Inmemory container rewrites Container Request/Response Filters

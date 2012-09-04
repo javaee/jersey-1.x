@@ -79,9 +79,13 @@ public abstract class AbstractWebAppTest {
 
     public List<Option> genericOsgiOptions() {
 
-        String bundleLocation = mavenBundle().groupId("com.sun.jersey.samples.helloworld-osgi-webapp").artifactId("war-bundle").type("war").versionAsInProject().getURL().toString();
+        String bundleLocation = mavenBundle().
+                groupId("com.sun.jersey.samples.helloworld-osgi-webapp").artifactId("war-bundle").
+                type("war").versionAsInProject().getURL();
 
         List<Option> options = Arrays.asList(options(
+                // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),
+
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
                 systemProperty("jersey.test.port").value(String.valueOf(port)),
                 systemProperty(BundleLocationProperty).value(bundleLocation),
@@ -92,8 +96,11 @@ public abstract class AbstractWebAppTest {
                         "http://repository.springsource.com/maven/bundles/release",
                         "http://repository.springsource.com/maven/bundles/external",
                         "http://maven.java.net/content/repositories/snapshots"),
+
                 mavenBundle("org.ops4j.pax.url", "pax-url-mvn"),
+
                 mavenBundle().groupId("org.osgi").artifactId("org.osgi.compendium").versionAsInProject(),
+                mavenBundle().groupId("asm").artifactId("asm-all").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-servlet").versionAsInProject(),
@@ -155,15 +162,15 @@ public abstract class AbstractWebAppTest {
     @Inject BundleContext bundleContext;
 
     @Configuration
+    @SuppressWarnings("UnusedDeclaration")
     public Option[] configuration() {
-
         List<Option> options = new LinkedList<Option>();
 
         options.addAll(genericOsgiOptions());
         options.addAll(jettyOptions());
         options.addAll(osgiRuntimeOptions());
 
-        return options.toArray(new Option[0]);
+        return options.toArray(new Option[options.size()]);
     }
 
     public void defaultMandatoryBeforeMethod() {
@@ -205,13 +212,11 @@ public abstract class AbstractWebAppTest {
     }
 
     public WebResource resource() {
-        final Client c = Client.create();
-        final WebResource rootResource = c.resource(baseUri);
-        return rootResource;
+        return Client.create().resource(baseUri);
     }
 
     private Dictionary getHandlerServiceProperties(String... topics) {
-        Dictionary result = new Hashtable();
+        final Dictionary<String, String[]> result = new Hashtable<String, String[]>();
         result.put(EventConstants.EVENT_TOPIC, topics);
         return result;
     }

@@ -61,6 +61,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.sun.jersey.core.osgi.OsgiRegistry;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.impl.SpiMessages;
 
@@ -193,6 +194,16 @@ public final class ServiceFinder<T> implements Iterable<T> {
             add("glassfish-embedded");
 
         }};
+
+        final OsgiRegistry osgiRegistry = ReflectionHelper.getOsgiRegistryInstance();
+
+        if (osgiRegistry != null) {
+            LOGGER.log(Level.CONFIG, "Running in an OSGi environment");
+
+            osgiRegistry.hookUp();
+        } else {
+            LOGGER.log(Level.CONFIG, "Running in a non-OSGi environment");
+        }
     }
 
     private static String getModuleVersion() {
@@ -359,8 +370,8 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service,
-            ClassLoader loader,
-            boolean ignoreOnClassNotFound) throws ServiceConfigurationError {
+                                            ClassLoader loader,
+                                            boolean ignoreOnClassNotFound) throws ServiceConfigurationError {
         return new ServiceFinder<T>(service,
                 loader,
                 ignoreOnClassNotFound);
@@ -409,7 +420,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * @return the service finder
      */
     public static <T> ServiceFinder<T> find(Class<T> service,
-            boolean ignoreOnClassNotFound) throws ServiceConfigurationError {
+                                            boolean ignoreOnClassNotFound) throws ServiceConfigurationError {
         return find(service,
                 Thread.currentThread().getContextClassLoader(),
                 ignoreOnClassNotFound);
@@ -530,7 +541,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
     }
 
     private static void fail(String serviceName, String msg, Throwable cause)
-    throws ServiceConfigurationError {
+            throws ServiceConfigurationError {
         ServiceConfigurationError sce
                 = new ServiceConfigurationError(serviceName + ": " + msg);
         sce.initCause(cause);
@@ -538,12 +549,12 @@ public final class ServiceFinder<T> implements Iterable<T> {
     }
 
     private static void fail(String serviceName, String msg)
-    throws ServiceConfigurationError {
+            throws ServiceConfigurationError {
         throw new ServiceConfigurationError(serviceName + ": " + msg);
     }
 
     private static void fail(String serviceName, URL u, int line, String msg)
-    throws ServiceConfigurationError {
+            throws ServiceConfigurationError {
         fail(serviceName, u + ":" + line + ": " + msg);
     }
 
@@ -553,7 +564,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      * not already a member of the returned set.
      */
     private static int parseLine(String serviceName, URL u, BufferedReader r, int lc,
-            List<String> names, Set<String> returned)
+                                 List<String> names, Set<String> returned)
             throws IOException, ServiceConfigurationError {
         String ln = r.readLine();
         if (ln == null) {
@@ -599,7 +610,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
      */
     @SuppressWarnings({"StatementWithEmptyBody"})
     private static Iterator<String> parse(String serviceName, URL u, Set<String> returned)
-    throws ServiceConfigurationError {
+            throws ServiceConfigurationError {
         InputStream in = null;
         BufferedReader r = null;
         ArrayList<String> names = new ArrayList<String>();
@@ -687,7 +698,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                             // the name of a dependent class that is not found
                             LOGGER.log(Level.CONFIG ,
                                     SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
-                                    ex.getLocalizedMessage(), nextName, service));
+                                            ex.getLocalizedMessage(), nextName, service));
                         }
                         nextName = null;
                     } catch(ClassFormatError ex) {
@@ -695,7 +706,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         if(LOGGER.isLoggable(Level.CONFIG)) {
                             LOGGER.log(Level.CONFIG ,
                                     SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(
-                                    ex.getLocalizedMessage(), nextName, service));
+                                            ex.getLocalizedMessage(), nextName, service));
                         }
                         nextName = null;
                     }
@@ -735,11 +746,11 @@ public final class ServiceFinder<T> implements Iterable<T> {
             } catch (NoClassDefFoundError ex) {
                 fail(serviceName,
                         SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
-                        ex.getLocalizedMessage(), cn, service));
+                                ex.getLocalizedMessage(), cn, service));
             } catch (ClassFormatError ex) {
                 fail(serviceName,
                         SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(
-                        ex.getLocalizedMessage(), cn, service));
+                                ex.getLocalizedMessage(), cn, service));
             } catch (Exception x) {
                 fail(serviceName,
                         SpiMessages.PROVIDER_CLASS_COULD_NOT_BE_LOADED(cn, service, x.getLocalizedMessage()),
@@ -799,7 +810,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                             // the name of a dependent class that is not found
                             LOGGER.log(Level.CONFIG ,
                                     SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
-                                    ex.getLocalizedMessage(), nextName, service));
+                                            ex.getLocalizedMessage(), nextName, service));
                         }
                         nextName = null;
                     } else
@@ -812,7 +823,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
                         if(LOGGER.isLoggable(Level.CONFIG)) {
                             LOGGER.log(Level.CONFIG ,
                                     SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(
-                                    ex.getLocalizedMessage(), nextName, service));
+                                            ex.getLocalizedMessage(), nextName, service));
                         }
                         nextName = null;
                     } else
@@ -890,7 +901,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
          * @return the provider instance iterator.
          */
         public abstract Iterator<T> createIterator(Class<T> service,
-                String serviceName, ClassLoader loader, boolean ignoreOnClassNotFound);
+                                                   String serviceName, ClassLoader loader, boolean ignoreOnClassNotFound);
 
         /**
          * Iterate over provider classes of a service.
@@ -905,7 +916,7 @@ public final class ServiceFinder<T> implements Iterable<T> {
          * @return the provider class iterator.
          */
         public abstract Iterator<Class<T>> createClassIterator(Class<T> service,
-                String serviceName, ClassLoader loader, boolean ignoreOnClassNotFound);
+                                                               String serviceName, ClassLoader loader, boolean ignoreOnClassNotFound);
     }
 
 
@@ -922,13 +933,13 @@ public final class ServiceFinder<T> implements Iterable<T> {
 
         @Override
         public Iterator<T> createIterator(Class<T> service, String serviceName,
-                ClassLoader loader, boolean ignoreOnClassNotFound) {
+                                          ClassLoader loader, boolean ignoreOnClassNotFound) {
             return new LazyObjectIterator(service, serviceName, loader, ignoreOnClassNotFound);
         }
 
         @Override
         public Iterator<Class<T>> createClassIterator(Class<T> service, String serviceName,
-                ClassLoader loader, boolean ignoreOnClassNotFound) {
+                                                      ClassLoader loader, boolean ignoreOnClassNotFound) {
             return new LazyClassIterator(service, serviceName, loader, ignoreOnClassNotFound);
         }
     }

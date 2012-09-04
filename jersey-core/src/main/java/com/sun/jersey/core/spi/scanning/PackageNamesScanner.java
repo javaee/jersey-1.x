@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,6 +42,7 @@ package com.sun.jersey.core.spi.scanning;
 import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.api.uri.UriComponent.Type;
 import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.core.spi.scanning.uri.BundleSchemeScanner;
 import com.sun.jersey.core.spi.scanning.uri.FileSchemeScanner;
 import com.sun.jersey.core.spi.scanning.uri.JarZipSchemeScanner;
 import com.sun.jersey.core.spi.scanning.uri.UriSchemeScanner;
@@ -83,7 +84,7 @@ import java.util.Map;
  * <p>
  * If a URI scheme is not supported a {@link ScannerException} will be thrown
  * and package scanning deployment will fail.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  * @author Jakub.Podlesak@Sun.Com
  */
@@ -104,7 +105,7 @@ public class PackageNamesScanner implements Scanner {
 
     /**
      * Scan from a set of packages using declared class loader.
-     * 
+     *
      * @param classloader the class loader to load classes from.
      * @param packages an array of package names.
      */
@@ -116,6 +117,7 @@ public class PackageNamesScanner implements Scanner {
         add(new JarZipSchemeScanner());
         add(new FileSchemeScanner());
         add(new VfsSchemeScanner());
+        add(new BundleSchemeScanner());
 
         for (UriSchemeScanner s : ServiceFinder.find(UriSchemeScanner.class)) {
             add(s);
@@ -224,7 +226,7 @@ public class PackageNamesScanner implements Scanner {
         } else {
             throw new ScannerException("The URI scheme " + u.getScheme() +
                     " of the URI " + u +
-                    " is not supported. Package scanning deployment is not" + 
+                    " is not supported. Package scanning deployment is not" +
                     " supported for such URIs." +
                     "\nTry using a different deployment mechanism such as" +
                     " explicitly declaring root resource and provider classes" +
@@ -260,7 +262,7 @@ public class PackageNamesScanner implements Scanner {
             len += 1 + u.getRef().length();
         }
 
-        StringBuffer result = new StringBuffer(len);
+        StringBuilder result = new StringBuilder(len);
         result.append(u.getProtocol());
         result.append(":");
         if (u.getAuthority() != null && u.getAuthority().length() > 0) {
