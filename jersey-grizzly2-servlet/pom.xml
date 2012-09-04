@@ -127,7 +127,7 @@
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
             <artifactId>grizzly-http-servlet</artifactId>
-            <version>2.2.4</version>
+            <version>${grizzly2.version}</version>
         </dependency>
         <dependency>
           <groupId>com.sun.jersey</groupId>

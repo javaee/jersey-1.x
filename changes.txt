@@ -1,4 +1,8 @@
 release 1.14
+- Fixed issue JERSEY-1277
+  The web container Grizzly doesn't call anymore the ServletContextListener instances at shutdown
+  Grizzly version upgraded to 2.2.16
+  Grizzly HTTP Client upgraded to 1.2
 - Fixed issue JERSEY-881
   http://java.net/jira/browse/JERSEY-881
   Package name resource config does not work in OSGi environment

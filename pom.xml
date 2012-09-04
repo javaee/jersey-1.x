@@ -523,6 +523,7 @@
         <gf.embedded.version>3.1.1</gf.embedded.version>
         <moxy.version>2.3.2</moxy.version>
         <xdk.absolute.path></xdk.absolute.path>
+        <grizzly2.version>2.2.16</grizzly2.version>
     </properties>
 
 </project>
