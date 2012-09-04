@@ -1,4 +1,7 @@
 release 1.14
+- Fixed issue JERSEY-1407
+  http://java.net/jira/browse/JERSEY-1407
+  Licensee bundle now includes JAX-RS sources
 - Fixed issue JERSEY-1277
   The web container Grizzly doesn't call anymore the ServletContextListener instances at shutdown
   Grizzly version upgraded to 2.2.16

@@ -28,6 +28,14 @@
             </includes>
         </fileSet>
         <fileSet>
+            <directory>../../jersey-core/target/generated-sources/jsr311/</directory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <outputDirectory>jsr311/src/main/java</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
           <directory>../../contribs</directory>
           <useDefaultExcludes>true</useDefaultExcludes>
             <outputDirectory></outputDirectory>
