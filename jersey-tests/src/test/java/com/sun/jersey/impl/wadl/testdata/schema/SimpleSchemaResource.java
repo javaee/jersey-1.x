@@ -40,13 +40,10 @@
 
 package com.sun.jersey.impl.wadl.testdata.schema;
 
-import com.sun.jersey.impl.wadl.testdata.schema.RequestMessage;
-import com.sun.jersey.impl.wadl.testdata.schema.ResponseMessage;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
-import javax.xml.bind.annotation.XmlSeeAlso;
 
 /**
  * A simple test case for direct references.
@@ -72,11 +69,9 @@ public class SimpleSchemaResource {
     public ResponseMessage hello(RequestMessage message) {
         return null;
     }
-    
+
     @Path("sub")
     public SubResource subResource() {
         return new SubResource();
     }
-    
-    
 }

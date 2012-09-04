@@ -39,6 +39,14 @@
  */
 package com.sun.jersey.test.framework.spi.container.inmemory;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.UriBuilder;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -51,11 +59,6 @@ import com.sun.jersey.test.framework.LowLevelAppDescriptor;
 import com.sun.jersey.test.framework.impl.container.inmemory.TestResourceClientHandler;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
-
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * A low-level test container factory for creating test container instances
@@ -105,11 +108,31 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
                     + this.baseUri);
 
             this.resourceConfig = ad.getResourceConfig();
-            this.resourceConfig.getProperties()
-                    .put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, LoggingFilter.class.getName());
-            this.resourceConfig.getProperties()
-                    .put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, LoggingFilter.class.getName());
+
+            addLoggingFilter(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, resourceConfig);
+            addLoggingFilter(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, resourceConfig);
+
             this.webApp = initiateWebApplication(resourceConfig);
+        }
+
+        @SuppressWarnings("unchecked")
+        private void addLoggingFilter(String property, ResourceConfig rc) {
+            final Object requestFilters = rc.getProperties().get(property);
+            if(requestFilters == null) {
+                rc.getProperties()
+                        .put(property, LoggingFilter.class.getName());
+            } else if(requestFilters instanceof List) {
+                List requestFilterList = (List)requestFilters;
+                requestFilterList.add(LoggingFilter.class.getName());
+                rc.getProperties()
+                        .put(property, requestFilterList);
+            } else {
+                List requestFilterList = new ArrayList();
+                requestFilterList.add(requestFilters);
+                requestFilterList.add(LoggingFilter.class.getName());
+                rc.getProperties()
+                        .put(property, requestFilterList);
+            }
         }
 
         public Client getClient() {
@@ -124,9 +147,9 @@ public class InMemoryTestContainerFactory implements TestContainerFactory {
             }
 
             Client client = (clientConfig == null) ?
-                new Client(new TestResourceClientHandler(baseUri, webApp)) :
-                new Client(new TestResourceClientHandler(baseUri, webApp), clientConfig);
-            
+                    new Client(new TestResourceClientHandler(baseUri, webApp)) :
+                    new Client(new TestResourceClientHandler(baseUri, webApp), clientConfig);
+
             return client;
         }
 
