@@ -56,7 +56,6 @@ import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemPackage;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
-import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.vmOption;
 import static org.ops4j.pax.swissbox.tinybundles.core.TinyBundles.modifyBundle;
 
 @RunWith(JUnit4TestRunner.class)
@@ -71,7 +70,7 @@ public class OsgiIntegrationTest {
     @Configuration
     public static Option[] configuration() {
         return options(
-                vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),
+                // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),
 
                 // systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
