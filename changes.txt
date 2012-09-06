@@ -1,4 +1,7 @@
 release 1.14
+- Fixed issue JERSEY-1410
+  http://java.net/jira/browse/JERSEY-1410
+  Added length check (prevents StringIndexOutOfBoundsException)
 - Fixed issue JERSEY-1407
   http://java.net/jira/browse/JERSEY-1407
   Licensee bundle now includes JAX-RS sources
