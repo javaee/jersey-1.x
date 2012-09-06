@@ -113,6 +113,7 @@ public final class OsgiRegistry implements SynchronousBundleListener {
             final ClassLoader classLoader = ReflectionHelper.class.getClassLoader();
             if (classLoader instanceof BundleReference) {
                 instance = new OsgiRegistry(classLoader);
+                instance.hookUp();
             }
         }
         return instance;
@@ -368,7 +369,7 @@ public final class OsgiRegistry implements SynchronousBundleListener {
      * This is to actually update SPI provider lookup and class loading mechanisms in Jersey
      * to utilize OSGi features.
      */
-    public void hookUp() {
+    private void hookUp() {
         setOSGiPackageScannerResourceProvider();
         setOSGiServiceFinderIteratorProvider();
 
@@ -399,7 +400,8 @@ public final class OsgiRegistry implements SynchronousBundleListener {
     private Bundle getJerseyServerBundle(BundleContext bc) {
         for (Bundle b : bc.getBundles()) {
             final String symbolicName = b.getSymbolicName();
-            if ((symbolicName != null) && symbolicName.endsWith("jersey-server")) {
+            if ((symbolicName != null)
+                    && (symbolicName.endsWith("jersey-server") || symbolicName.endsWith("jersey-gf-server"))) {
                 return b;
             }
         }

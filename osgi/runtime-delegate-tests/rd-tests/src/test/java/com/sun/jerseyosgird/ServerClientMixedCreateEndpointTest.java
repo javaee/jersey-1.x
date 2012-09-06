@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,28 +40,17 @@
 
 package com.sun.jerseyosgird;
 
-import com.sun.grizzly.http.SelectorThread;
-import com.sun.grizzly.tcp.Adapter;
+import java.net.URI;
+
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.ext.RuntimeDelegate;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.container.grizzly.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.osgi.rdtestbundle.SimpleResource;
-import com.sun.jerseyosgird.util.Helper;
-
-import javax.ws.rs.core.UriBuilder;
-
-import java.net.URI;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.ext.RuntimeDelegate;
-import static org.ops4j.pax.exam.CoreOptions.options;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.felix;
-import static org.ops4j.pax.exam.CoreOptions.systemPackage;
-
-import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -70,9 +59,19 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.systemPackage;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
+import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
-import static org.junit.Assert.*;
-
+import com.sun.grizzly.http.SelectorThread;
+import com.sun.grizzly.tcp.Adapter;
+import com.sun.jerseyosgird.util.Helper;
 
 @RunWith(JUnit4TestRunner.class)
 public class ServerClientMixedCreateEndpointTest {
@@ -86,7 +85,6 @@ public class ServerClientMixedCreateEndpointTest {
 
     @Test
     public void testSimpleResource() throws Exception {
-
         Application app = new ClassNamesResourceConfig(SimpleResource.class);
 
         RuntimeDelegate rd = RuntimeDelegate.getInstance();
@@ -105,18 +103,15 @@ public class ServerClientMixedCreateEndpointTest {
         server.stopEndpoint();
     }
 
-
     public WebResource createResource() {
-        final Client c = Client.create();
-        final WebResource rootResource = c.resource(baseUri);
-        return rootResource;
+        return Client.create().resource(baseUri);
     }
-
 
     @Configuration
     public static Option[] configuration() {
+        return options(
+                // vmOption("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005"),
 
-        Option[] options = options(
                 systemProperty("org.ops4j.pax.logging.DefaultServiceLog.level").value("INFO"),//"DEBUG"),
                 systemProperty("org.osgi.service.http.port").value(String.valueOf(port)),
                 systemPackage("sun.misc"),
@@ -141,17 +136,17 @@ public class ServerClientMixedCreateEndpointTest {
 
                 // felix config admin
                 mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4"),
-                
+
                 // felix preference service
                 mavenBundle("org.apache.felix", "org.apache.felix.prefs","1.0.2"),
-                
+
                 // blueprint
                 mavenBundle("org.apache.geronimo.blueprint", "geronimo-blueprint", "1.0.0"),
-                
+
                 // bundles
                 mavenBundle("org.apache.mina", "mina-core", "2.0.0-RC1"),
                 mavenBundle("org.apache.sshd", "sshd-core", "0.3.0"),
-                
+
                 // HTTP SPEC
                 mavenBundle("org.apache.geronimo.specs","geronimo-servlet_2.5_spec","1.1.2"),
 
@@ -160,11 +155,11 @@ public class ServerClientMixedCreateEndpointTest {
                 mavenBundle("org.ops4j.pax.url","pax-url-war","1.1.2"),
 
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
-        	mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-servlet").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-grizzly").versionAsInProject(),
-        	mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
-        	mavenBundle().groupId("com.sun.jersey.test.osgi.runtime-delegate-tests").artifactId("runtime-delegate-test-bundle").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey.test.osgi.runtime-delegate-tests").artifactId("runtime-delegate-test-bundle").versionAsInProject(),
 
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http").versionAsInProject(),
@@ -179,8 +174,6 @@ public class ServerClientMixedCreateEndpointTest {
 
                 // start felix framework
                 felix());
-
-        return options;
     }
 }
 

@@ -192,7 +192,6 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>com.sun.jersey.jersey-server</Bundle-SymbolicName>
-                        <Private-Package>com.sun.jersey.server.osgi</Private-Package>
                         <Export-Package>
                             com.sun.jersey.server.*,
                             com.sun.jersey.spi.scanning,

@@ -150,7 +150,6 @@
                 <configuration>
                     <instructions>
                         <Import-Package>javax.mail.*;resolution:=optional, *</Import-Package>
-                        <Private-Package>com.sun.jersey.client.osgi</Private-Package>
                         <Export-Package>com.sun.jersey.api.client.*,com.sun.jersey.client.*,com.sun.ws.rs.ext</Export-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>

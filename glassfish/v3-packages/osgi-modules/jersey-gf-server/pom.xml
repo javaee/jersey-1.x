@@ -67,8 +67,6 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
-                        <Bundle-Activator>com.sun.jersey.server.osgi.Activator</Bundle-Activator>
-                        <Private-Package>com.sun.jersey.server.osgi</Private-Package>
                         <Export-Package>
                             com.sun.jersey.server.*,
                             com.sun.jersey.spi.scanning,

@@ -199,8 +199,6 @@ public final class ServiceFinder<T> implements Iterable<T> {
 
         if (osgiRegistry != null) {
             LOGGER.log(Level.CONFIG, "Running in an OSGi environment");
-
-            osgiRegistry.hookUp();
         } else {
             LOGGER.log(Level.CONFIG, "Running in a non-OSGi environment");
         }

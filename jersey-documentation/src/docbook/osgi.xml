@@ -84,33 +84,9 @@
   </para>
 
   <para>
-  The rest of the chapter describes how to run the above mentioned examples on <ulink url="http://glassfish.java.net/">GlassFish 3.1</ulink> application server.
+  The rest of the chapter describes how to run the above mentioned examples on <ulink url="http://glassfish.java.net/">GlassFish 3.1.2</ulink> application server.
   Since GlassFish utilizes Apache Felix, an OSGi runtime comes out of the box with GlassFish.
-  However, for security reasons, the OSGi shell has been turned off. You can explicitly enable it. There is a system property called
-  <code>org.glassfish.additionalOSGiBundlesToStart</code> in <code>domain.xml</code> that contains a list of additional bundles
-  to be started by glassfish. One has to add <code>org.apache.felix.shell.remote</code> there.  Here are a few ways to do it:
-
-<para>
-Option #1: You can delete the property and create it again using following <code>asadmin</code> commands:
-</para>
-<para>
-<code>
-asadmin delete-jvm-options --target server-config -Dorg.glassfish.additionalOSGiBundlesToStart=org.apache.felix.shell,org.apache.felix.gogo.runtime,org.apache.felix.gogo.shell,org.apache.felix.gogo.command
-</code>
-</para>
-<para>
-<code>
-asadmin create-jvm-options --target server-config -Dorg.glassfish.additionalOSGiBundlesToStart=org.apache.felix.shell,org.apache.felix.gogo.runtime,org.apache.felix.gogo.shell,org.apache.felix.gogo.command,org.apache.felix.shell.remote
-</code>
-</para>
-
-<para>
-Option #2: You can use GlassFish Admin Console to edit the <code>jvm-option</code>.
-</para>
-
-<para>
-Option #3: You can edit the <code>domain.xml</code> directly.
-</para>
+  However, for security reasons, the OSGi shell has been turned off. You can explicitly enable it. Either by starting GlassFish with <code>asadmin -Dglassfish.osgi.start.level.final=3 start-domain</code> or by setting <code>glassfish.osgi.start.level.final</code> property to <code>3</code> in <code>glassfish/config/osgi.properties</code> file.
 
 Presuming you have the default GlassFish instance running, after enabling shell as described above, you should now be able to connect
   to the Felix console with 

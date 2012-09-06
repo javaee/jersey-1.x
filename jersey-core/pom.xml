@@ -214,6 +214,7 @@
                     <instructions>
                         <Export-Package>javax.ws.rs.*;-split-package:=merge-first,com.sun.jersey.*;-split-package:=merge-first</Export-Package>
                         <Import-Package>!javax.ws.rs.*,javax.mail.*;resolution:=optional, *</Import-Package>
+                        <Bundle-Activator>com.sun.jersey.core.osgi.Activator</Bundle-Activator>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Private-Package>com.sun.jersey.core.osgi;-split-package:=merge-first</Private-Package>
                         <Implementation-Title>jersey-core osgi</Implementation-Title>
