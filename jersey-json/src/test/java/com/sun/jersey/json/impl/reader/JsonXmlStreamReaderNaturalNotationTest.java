@@ -48,7 +48,9 @@ import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import com.sun.jersey.api.json.JSONConfiguration;
@@ -168,7 +170,6 @@ public class JsonXmlStreamReaderNaturalNotationTest extends TestCase {
         g = factory.createJsonGenerator(sWriter);
 
         Marshaller marshaller = ctx.createMarshaller();
-//        marshaller.marshal(bean, System.out);
         marshaller.marshal(bean, new Stax2JacksonWriter(g, clazz, ctx));
 
         g.flush();
@@ -184,6 +185,92 @@ public class JsonXmlStreamReaderNaturalNotationTest extends TestCase {
         System.out.println(String.format("Unmarshalled bean = %s", unmarshalledBean));
 
         assertEquals(bean, unmarshalledBean);
+    }
+
+    public void testUserNegativeInvalidJsonWithoutEndObjectToken() throws Exception {
+        final Object testInstance = User.createTestInstance();
+
+        final JAXBContext context = getContext(User.class);
+
+        String jsonExpression = _testBeanMarshallNegative(User.class, context, testInstance);
+        jsonExpression = jsonExpression.substring(0, jsonExpression.length() - 1);
+        System.out.println(jsonExpression);
+
+        _testBeanUnmarshallNegative(User.class, context, jsonExpression);
+    }
+
+    public void testUserNegativeInvalidJson() throws Exception {
+        final Object testInstance = User.createTestInstance();
+
+        final JAXBContext context = getContext(User.class);
+
+        String jsonExpression = _testBeanMarshallNegative(User.class, context, testInstance);
+        jsonExpression = jsonExpression.substring(0, jsonExpression.length() - 1) + ",";
+        System.out.println(jsonExpression);
+
+        _testBeanUnmarshallNegative(User.class, context, jsonExpression);
+    }
+
+    public void testUserNegativeInvalidJsonMoreFields() throws Exception {
+        final Object testInstance = User.createTestInstance();
+
+        final JAXBContext context = getContext(User.class);
+
+        String jsonExpression = _testBeanMarshallNegative(User.class, context, testInstance);
+        jsonExpression = jsonExpression.substring(0, jsonExpression.length() - 1) + ",\"hello\":1";
+        System.out.println(jsonExpression);
+
+        _testBeanUnmarshallNegative(User.class, context, jsonExpression);
+    }
+
+    public void testUserNegativeInvalidJsonMoreEndObjectToken() throws Exception {
+        final Object testInstance = User.createTestInstance();
+
+        final JAXBContext context = getContext(User.class);
+
+        String jsonExpression = _testBeanMarshallNegative(User.class, context, testInstance);
+        jsonExpression += "}";
+        System.out.println(jsonExpression);
+
+        _testBeanUnmarshallNegative(User.class, context, jsonExpression);
+    }
+
+    private JAXBContext getContext(final Class<User> clazz) throws Exception {
+        final Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
+        final Class[] classes = new Class[]{clazz};
+
+        return JAXBContext.newInstance(classes, props);
+    }
+
+    private void _testBeanUnmarshallNegative(final Class<User> clazz, final JAXBContext context, final String jsonExpression)
+            throws Exception {
+        final Unmarshaller unmarshaller = context.createUnmarshaller();
+        final XMLStreamReader xmlStreamReader = JsonXmlStreamReader.create(new StringReader(jsonExpression), JSONConfiguration
+                .natural().rootUnwrapping(false).build(), null, clazz, context, false);
+
+        try {
+            unmarshaller.unmarshal(xmlStreamReader);
+
+            fail("JSON should not be unmarshalled: " + jsonExpression);
+        } catch (UnmarshalException e) {
+            // ok
+            assertTrue(e.getLinkedException() instanceof XMLStreamException
+                || e.getLinkedException().getCause() instanceof XMLStreamException);
+            System.out.println("Unmashalling failed.");
+        }
+    }
+
+    private String _testBeanMarshallNegative(final Class<User> clazz, final JAXBContext context, final Object testInstance)
+            throws Exception {
+        final JsonFactory factory = new JsonFactory();
+        final Writer sWriter = new StringWriter();
+        final JsonGenerator jsonGenerator = factory.createJsonGenerator(sWriter);
+
+        final Marshaller marshaller = context.createMarshaller();
+        marshaller.marshal(testInstance, new Stax2JacksonWriter(jsonGenerator, clazz, context));
+
+        jsonGenerator.flush();
+        return sWriter.toString();
     }
 
     @Override

@@ -371,6 +371,13 @@ public abstract class XmlEventProvider {
                             }
                             if (processingStack.isEmpty()) {
                                 eventQueue.add(new EndDocumentEvent(new StaxLocation(parser.getCurrentLocation())));
+
+                                // Eat the last '}' and check whether there is another (unexpected) token.
+                                final JsonToken nextToken = parser.nextToken();
+                                if ((nextToken != null && nextToken != JsonToken.END_OBJECT)
+                                        || parser.peek() != null) {
+                                    throw new RuntimeException("Unexpected token: " + parser.getText());
+                                }
                             }
                             return getCurrentNode();
                         case VALUE_FALSE:
