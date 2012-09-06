@@ -40,16 +40,18 @@
 
 package com.sun.jersey.multipart;
 
-import com.sun.jersey.core.header.ContentDisposition;
-import com.sun.jersey.core.header.ParameterizedHeader;
-import com.sun.jersey.core.util.UnmodifiableMultivaluedMap;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.text.ParseException;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Providers;
+
+import com.sun.jersey.core.header.ContentDisposition;
+import com.sun.jersey.core.header.ParameterizedHeader;
+import com.sun.jersey.core.util.UnmodifiableMultivaluedMap;
 
 /**
  * <p>A mutable model representing a body part nested inside a MIME MultiPart
@@ -57,9 +59,7 @@ import javax.ws.rs.ext.Providers;
  */
 public class BodyPart {
 
-
     // ------------------------------------------------------------ Constructors
-
 
     /**
      * <p>Instantiate a new {@link BodyPart} with a <code>mediaType</code> of
@@ -68,7 +68,6 @@ public class BodyPart {
     public BodyPart() {
         this(MediaType.TEXT_PLAIN_TYPE);
     }
-
 
     /**
      * <p>Instantiate a new {@link BodyPart} with the specified characteristics.</p>
@@ -169,7 +168,7 @@ public class BodyPart {
             String scd = headers.getFirst("Content-Disposition");
             if (scd != null) {
                 try {
-                    cd = new ContentDisposition(scd);
+                    cd = new ContentDisposition(scd, false);
                 } catch (ParseException ex) {
                     throw new IllegalArgumentException("Error parsing content disposition: " + scd, ex);
                 }
@@ -187,7 +186,7 @@ public class BodyPart {
         this.cd = cd;
         headers.remove("Content-Disposition");
     }
-    
+
     private MediaType mediaType = null;
 
     /**
@@ -208,7 +207,7 @@ public class BodyPart {
     public void setMediaType(MediaType mediaType) {
         if (mediaType == null)
             throw new IllegalArgumentException("mediaType cannot be null");
-        
+
         this.mediaType = mediaType;
     }
 

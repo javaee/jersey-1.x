@@ -1,4 +1,7 @@
 release 1.14
+- Fixed issue JERSEY-759
+  http://java.net/jira/browse/JERSEY-759
+  Getting file name from the content disposition header of multi-part messages sent by Internet Explorer was broken.
 - Fixed issue JERSEY-1410
   http://java.net/jira/browse/JERSEY-1410
   Added length check (prevents StringIndexOutOfBoundsException)

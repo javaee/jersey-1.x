@@ -40,13 +40,14 @@
 
 package com.sun.jersey.core.header;
 
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.text.ParseException;
 import java.util.Date;
 
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+
 /**
  * A form-data content disposition header.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  * @author imran@smartitengineering.com
  */
@@ -75,18 +76,26 @@ public class FormDataContentDisposition extends ContentDisposition {
         if (!getType().equalsIgnoreCase("form-data")) {
             throw new IllegalArgumentException("The content dispostion type is not equal to form-data");
         }
-        
+
         if (name == null) {
             throw new IllegalArgumentException("The name parameter is not present");
         }
     }
 
     public FormDataContentDisposition(String header) throws ParseException {
-        this(HttpHeaderReader.newInstance(header));
+        this(header, false);
+    }
+
+    public FormDataContentDisposition(String header, boolean fileNameFix) throws ParseException {
+        this(HttpHeaderReader.newInstance(header), fileNameFix);
     }
 
     public FormDataContentDisposition(HttpHeaderReader reader) throws ParseException {
-        super(reader);
+        this(reader, false);
+    }
+
+    public FormDataContentDisposition(HttpHeaderReader reader, boolean fileNameFix) throws ParseException {
+        super(reader, fileNameFix);
         if (!getType().equalsIgnoreCase("form-data")) {
             throw new IllegalArgumentException("The content dispostion type is not equal to form-data");
         }
@@ -127,7 +136,7 @@ public class FormDataContentDisposition extends ContentDisposition {
 
     /**
      * Builder to build form data content disposition.
-     * 
+     *
      */
     public static class FormDataContentDispositionBuilder extends ContentDispositionBuilder<FormDataContentDispositionBuilder, FormDataContentDisposition> {
         private String name;

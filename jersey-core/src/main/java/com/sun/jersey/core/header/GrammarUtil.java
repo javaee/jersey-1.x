@@ -169,6 +169,10 @@ public final class GrammarUtil {
     }
 
     public static String filterToken(String s, int start, int end) {
+        return filterToken(s, start, end, false);
+    }
+
+    public static String filterToken(String s, int start, int end, boolean preserveBackslash) {
         StringBuilder sb = new StringBuilder();
         char c;
         boolean gotEscape = false;
@@ -186,7 +190,8 @@ public final class GrammarUtil {
             gotCR = false;
             if (!gotEscape) {
                 // Previous character was NOT '\'
-                if (c == '\\') { // skip this character
+                // preserveBackslash = fix for http://java.net/jira/browse/JERSEY-759
+                if (!preserveBackslash && c == '\\') { // skip this character
                     gotEscape = true;
                 } else if (c == '\r') { // skip this character
                     gotCR = true;

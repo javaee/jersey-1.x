@@ -39,11 +39,12 @@
  */
 package com.sun.jersey.impl.http.header;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.header.HttpDateFormat;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import java.text.ParseException;
-import java.util.Date;
 
 /**
  *

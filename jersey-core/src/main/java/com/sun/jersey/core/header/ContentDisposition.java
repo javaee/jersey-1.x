@@ -40,15 +40,16 @@
 
 package com.sun.jersey.core.header;
 
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+
 /**
  * A content disposition header.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  * @author imran@smartitengineering.com
  */
@@ -56,7 +57,7 @@ public class ContentDisposition {
     private String type;
 
     private Map<String, String> parameters;
-    
+
     private String fileName;
 
     private Date creationDate;
@@ -79,20 +80,28 @@ public class ContentDisposition {
     }
 
     public ContentDisposition(String header) throws ParseException {
-        this(HttpHeaderReader.newInstance(header));
+        this(header, false);
+    }
+
+    public ContentDisposition(String header, boolean fileNameFix) throws ParseException {
+        this(HttpHeaderReader.newInstance(header), fileNameFix);
     }
 
     public ContentDisposition(HttpHeaderReader reader) throws ParseException {
+        this(reader, false);
+    }
+
+    public ContentDisposition(HttpHeaderReader reader, boolean fileNameFix) throws ParseException {
         reader.hasNext();
 
         type = reader.nextToken();
 
-        if (reader.hasNext())
-            parameters = HttpHeaderReader.readParameters(reader);        
-        if (parameters == null)
-            parameters = Collections.emptyMap();
-        else
-            parameters = Collections.unmodifiableMap(parameters);
+        if (reader.hasNext()) {
+            parameters = HttpHeaderReader.readParameters(reader, fileNameFix);
+        }
+
+        parameters = parameters == null ? Collections.<String, String>emptyMap()
+                : Collections.unmodifiableMap(parameters);
 
         createParameters();
     }
@@ -117,7 +126,7 @@ public class ContentDisposition {
 
     /**
      * Get the filename parameter.
-     * 
+     *
      * @return the size
      */
     public String getFileName() {
@@ -153,7 +162,7 @@ public class ContentDisposition {
 
     /**
      * Get the size parameter.
-     * 
+     *
      * @return the size
      */
     public long getSize() {
@@ -323,7 +332,7 @@ public class ContentDisposition {
 
         /**
          * Build the content disposition.
-         * 
+         *
          * @return the content disposition.
          */
         public V build() {

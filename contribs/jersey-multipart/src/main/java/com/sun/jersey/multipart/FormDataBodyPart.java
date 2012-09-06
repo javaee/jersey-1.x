@@ -40,11 +40,13 @@
 
 package com.sun.jersey.multipart;
 
+import java.text.ParseException;
+
+import javax.ws.rs.core.MediaType;
+
 import com.sun.jersey.core.header.ContentDisposition;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.core.header.MediaTypes;
-import java.text.ParseException;
-import javax.ws.rs.core.MediaType;
 
 /**
  * <p>Subclass of {@link BodyPart} with specialized support for media type
@@ -82,14 +84,28 @@ import javax.ws.rs.core.MediaType;
  */
 public class FormDataBodyPart extends BodyPart {
 
+    private final boolean fileNameFix;
+
     /**
-     * <Instantiate an unnamed new {@link FormDataBodyPart} with a
+     * Instantiate an unnamed new {@link FormDataBodyPart} with a
      * <code>mediaType</code> of <code>text/plain</code>.
      */
     public FormDataBodyPart() {
-        super();
+        this(false);
     }
 
+    /**
+     * Instantiate an unnamed new {@link FormDataBodyPart} with <code>mediaType</code> of <code>text/plain</code>
+     * and setting the flag for applying the fix for erroneous file name value if content disposition header of
+     * messages coming from MS Internet Explorer (see <a href="http://java.net/jira/browse/JERSEY-759">JERSEY-759</a>).
+     * @param fileNameFix If set to <code>true</code>, header parser will not treat backslash as an escape character
+     *                    when retrieving the value of <code>filename</code> parameter of
+     *                    <code>Content-Disposition</code> header.
+     */
+    public FormDataBodyPart(boolean fileNameFix) {
+        super();
+        this.fileNameFix = fileNameFix;
+    }
 
     /**
      * Instantiate an unnamed {@link FormDataBodyPart} with the
@@ -99,6 +115,7 @@ public class FormDataBodyPart extends BodyPart {
      */
     public FormDataBodyPart(MediaType mediaType) {
         super(mediaType);
+        this.fileNameFix = false;
     }
 
 
@@ -111,6 +128,7 @@ public class FormDataBodyPart extends BodyPart {
      */
     public FormDataBodyPart(Object entity, MediaType mediaType) {
         super(entity, mediaType);
+        this.fileNameFix = false;
     }
 
 
@@ -123,6 +141,7 @@ public class FormDataBodyPart extends BodyPart {
      */
     public FormDataBodyPart(String name, String value) {
         super(value, MediaType.TEXT_PLAIN_TYPE);
+        this.fileNameFix = false;
         setName(name);
     }
 
@@ -137,6 +156,7 @@ public class FormDataBodyPart extends BodyPart {
      */
     public FormDataBodyPart(String name, Object entity, MediaType mediaType) {
         super(entity, mediaType);
+        this.fileNameFix = false;
         setName(name);
     }
 
@@ -150,6 +170,7 @@ public class FormDataBodyPart extends BodyPart {
      */
     public FormDataBodyPart(FormDataContentDisposition fdcd, String value) {
         super(value, MediaType.TEXT_PLAIN_TYPE);
+        this.fileNameFix = false;
         setFormDataContentDisposition(fdcd);
     }
 
@@ -164,6 +185,7 @@ public class FormDataBodyPart extends BodyPart {
      */
     public FormDataBodyPart(FormDataContentDisposition fdcd, Object entity, MediaType mediaType) {
         super(entity, mediaType);
+        this.fileNameFix = false;
         setFormDataContentDisposition(fdcd);
     }
 
@@ -178,7 +200,7 @@ public class FormDataBodyPart extends BodyPart {
 
     /**
      * Set the form data content disposition.
-     * 
+     *
      * @param cd the form data content disposition.
      */
     public void setFormDataContentDisposition(FormDataContentDisposition cd) {
@@ -199,7 +221,7 @@ public class FormDataBodyPart extends BodyPart {
             String scd = getHeaders().getFirst("Content-Disposition");
             if (scd != null) {
                 try {
-                    cd = new FormDataContentDisposition(scd);
+                    cd = new FormDataContentDisposition(scd, fileNameFix);
                 } catch (ParseException ex) {
                     throw new IllegalArgumentException("Error parsing content disposition: " + scd, ex);
                 }
@@ -242,7 +264,7 @@ public class FormDataBodyPart extends BodyPart {
 
     /**
      * Set the control name.
-     * 
+     *
      * @param name the control name.
      */
     public void setName(String name) {
@@ -255,8 +277,7 @@ public class FormDataBodyPart extends BodyPart {
                 .build();
             super.setContentDisposition(contentDisposition);
         } else {
-            FormDataContentDisposition _cd = getFormDataContentDisposition();
-            _cd = FormDataContentDisposition.name(name).
+            FormDataContentDisposition _cd = FormDataContentDisposition.name(name).
                     fileName(cd.getFileName()).
                     creationDate(cd.getCreationDate()).
                     modificationDate(cd.getModificationDate()).
@@ -291,7 +312,7 @@ public class FormDataBodyPart extends BodyPart {
     /**
      * Get the field value after appropriate conversion to the requested
      * type.  This is useful only when the containing {@link FormDataMultiPart}
-     * instance has been received, which causes the <code>providers</code> 
+     * instance has been received, which causes the <code>providers</code>
      * property to have been set.
      *
      * @param <T> the type of the field value.
@@ -333,7 +354,7 @@ public class FormDataBodyPart extends BodyPart {
         setMediaType(mediaType);
         setEntity(value);
     }
-    
+
     /**
      *
      * @return true if this body part represents a simple, string-based,

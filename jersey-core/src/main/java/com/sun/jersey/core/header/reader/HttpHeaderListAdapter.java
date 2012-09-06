@@ -48,22 +48,23 @@ import java.text.ParseException;
  */
 /* package */ class HttpHeaderListAdapter extends HttpHeaderReader {
     private HttpHeaderReader reader;
-            
+
     boolean isTerminated;
-        
+
     public HttpHeaderListAdapter(HttpHeaderReader reader) {
         this.reader = reader;
     }
-    
+
     public void reset() {
         isTerminated = false;
     }
 
-    
+
+    @Override
     public boolean hasNext() {
         if (isTerminated)
             return false;
-        
+
         if (reader.hasNext()) {
             if (reader.hasNextSeparator(',', true)) {
                 isTerminated = true;
@@ -71,37 +72,46 @@ import java.text.ParseException;
             } else
                 return true;
         }
-        
+
         return false;
     }
 
+    @Override
     public boolean hasNextSeparator(char separator, boolean skipWhiteSpace) {
         if (isTerminated)
             return false;
-        
+
         if (reader.hasNextSeparator(',', skipWhiteSpace)) {
             isTerminated = true;
             return false;
         } else
             return reader.hasNextSeparator(separator, skipWhiteSpace);
     }
-    
+
+    @Override
     public Event next() throws ParseException {
         return next(true);
     }
 
+    @Override
     public HttpHeaderReader.Event next(boolean skipWhiteSpace) throws ParseException {
+        return next(skipWhiteSpace, false);
+    }
+
+    @Override
+    public HttpHeaderReader.Event next(boolean skipWhiteSpace, boolean preserveBackslash) throws ParseException {
         if (isTerminated)
             throw new ParseException("End of header", getIndex());
-        
+
         if (reader.hasNextSeparator(',', skipWhiteSpace)) {
             isTerminated = true;
             throw new ParseException("End of header", getIndex());
         }
-        
-        return reader.next(skipWhiteSpace);
+
+        return reader.next(skipWhiteSpace, preserveBackslash);
     }
 
+    @Override
     public String nextSeparatedString(char startSeparator, char endSeparator) throws ParseException {
         if (isTerminated)
             throw new ParseException("End of header", getIndex());
@@ -114,18 +124,22 @@ import java.text.ParseException;
         return reader.nextSeparatedString(startSeparator, endSeparator);
     }
 
+    @Override
     public HttpHeaderReader.Event getEvent() {
         return reader.getEvent();
     }
 
+    @Override
     public String getEventValue() {
         return reader.getEventValue();
     }
 
+    @Override
     public String getRemainder() {
         return reader.getRemainder();
-    }    
+    }
 
+    @Override
     public int getIndex() {
         return reader.getIndex();
     }

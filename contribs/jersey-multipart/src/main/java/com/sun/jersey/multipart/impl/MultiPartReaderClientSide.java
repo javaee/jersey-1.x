@@ -40,6 +40,30 @@
 
 package com.sun.jersey.multipart.impl;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.Provider;
+import javax.ws.rs.ext.Providers;
+
+import org.jvnet.mimepull.Header;
+import org.jvnet.mimepull.MIMEConfig;
+import org.jvnet.mimepull.MIMEMessage;
+import org.jvnet.mimepull.MIMEParsingException;
+import org.jvnet.mimepull.MIMEPart;
+
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
@@ -49,26 +73,6 @@ import com.sun.jersey.multipart.MultiPart;
 import com.sun.jersey.multipart.MultiPartConfig;
 import com.sun.jersey.spi.inject.ClientSide;
 import com.sun.jersey.spi.inject.ConstrainedTo;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.Provider;
-import javax.ws.rs.ext.Providers;
-import org.jvnet.mimepull.Header;
-import org.jvnet.mimepull.MIMEConfig;
-import org.jvnet.mimepull.MIMEMessage;
-import org.jvnet.mimepull.MIMEParsingException;
-import org.jvnet.mimepull.MIMEPart;
 
 /**
  * <p>{@link Provider} {@link MessageBodyReader} implementation for
@@ -97,7 +101,7 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
      */
     public MultiPartReaderClientSide(@Context Providers providers, @Context MultiPartConfig config) {
         this.providers = providers;
-        
+
         if (config == null) {
             throw new IllegalArgumentException("The MultiPartConfig instance we expected is not present.  Have you registered the MultiPartConfigProvider class?");
         }
@@ -170,17 +174,19 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
             }
         }
 
+        boolean fileNameFix;
         if (!formData) {
             multiPart.setMediaType(mediaType);
+            fileNameFix = false;
+        } else {
+            // see if the User-Agent header corresponds to some version of MS Internet Explorer
+            // if so, need to set fileNameFix to true to handle issue http://java.net/jira/browse/JERSEY-759
+            String userAgent = headers.getFirst(HttpHeaders.USER_AGENT);
+            fileNameFix = userAgent != null && userAgent.contains(" MSIE ");
         }
 
         for (MIMEPart mp : mm.getAttachments()) {
-            BodyPart bodyPart = null;
-            if (formData) {
-                bodyPart = new FormDataBodyPart();
-            } else {
-                bodyPart = new BodyPart();
-            }
+            BodyPart bodyPart = formData ? new FormDataBodyPart(fileNameFix) : new BodyPart();
 
             // Configure providers
             bodyPart.setProviders(providers);
@@ -205,7 +211,7 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
             // Add this BodyPart to our MultiPart
             multiPart.getBodyParts().add(bodyPart);
         }
-        
+
         return multiPart;
     }
 }
