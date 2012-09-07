@@ -116,17 +116,30 @@ public final class JSONHelper {
     }
 
     public static boolean isNaturalNotationEnabled() {
+        // JAXB-RI.
         try {
-            if (jaxbProvider == SupportedJaxbProvider.JAXB_RI) {
-                Class.forName("com.sun.xml.bind.annotation.OverrideAnnotationOf");
-            } else if (jaxbProvider == null || jaxbProvider == SupportedJaxbProvider.JAXB_JDK) {
-                Class.forName("com.sun.xml.internal.bind.annotation.OverrideAnnotationOf");
-            }
-
+            Class.forName("com.sun.xml.bind.annotation.OverrideAnnotationOf");
             return true;
-        } catch (ClassNotFoundException ex) {
-            return false;
+        } catch (ClassNotFoundException e) {
+            if (jaxbProvider == SupportedJaxbProvider.JAXB_RI) {
+                return false;
+            }
         }
+
+        // JAXB-RI in JDK.
+        try {
+            ClassLoader.getSystemClassLoader().loadClass("com.sun.xml.internal.bind.annotation.OverrideAnnotationOf");
+            return true;
+        } catch (ClassNotFoundException e) {
+            if (jaxbProvider == SupportedJaxbProvider.JAXB_JDK) {
+                return false;
+            }
+        }
+
+        // If jaxbProvider is null now and later will be resolved either as SupportedJaxbProvider.JAXB_RI or
+        // SupportedJaxbProvider.JAXB_JDK the processing of (natural) JSON may throw an exception (because classes mentioned above
+        // was not found).
+        return jaxbProvider == null || jaxbProvider == SupportedJaxbProvider.MOXY;
     }
 
     public static Map<String, Object> createPropertiesForJaxbContext(final Map<String, Object> properties) {

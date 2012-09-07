@@ -73,6 +73,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleReference;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.SynchronousBundleListener;
 
 /**
@@ -112,8 +113,11 @@ public final class OsgiRegistry implements SynchronousBundleListener {
         if (instance == null) {
             final ClassLoader classLoader = ReflectionHelper.class.getClassLoader();
             if (classLoader instanceof BundleReference) {
-                instance = new OsgiRegistry(classLoader);
-                instance.hookUp();
+                final BundleContext context = FrameworkUtil.getBundle(OsgiRegistry.class).getBundleContext();
+                if (context != null) { // context could be still null in GlassFish
+                    instance = new OsgiRegistry(context);
+                    instance.hookUp();
+                }
             }
         }
         return instance;
@@ -353,15 +357,12 @@ public final class OsgiRegistry implements SynchronousBundleListener {
 
     /**
      * Creates a new OsgiRegistry instance bound to a particular OSGi runtime.
-     * The only parameter must be an instance of a {@link BundleReference}.
-     * The parameter is typed as an Object to protect callers from having
-     * to load OSGi classes directly.
+     * The only parameter must be an instance of a {@link BundleContext}.
      *
-     * @param bundleReference must be a non-null instance of a BundleReference
+     * @param bundleContext must be a non-null instance of a BundleContext
      */
-    private OsgiRegistry(Object bundleReference) {
-        BundleReference br = (BundleReference)bundleReference;
-        bundleContext = br.getBundle().getBundleContext();
+    private OsgiRegistry(final BundleContext bundleContext) {
+        this.bundleContext = bundleContext;
     }
 
     /**
