@@ -46,7 +46,7 @@
     <parent>
         <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
         <artifactId>jersey-oauth</artifactId>
-        <version>1.14-SNAPSHOT</version>
+        <version>1.15-SNAPSHOT</version>
     </parent>
     <artifactId>oauth-client</artifactId>
     <packaging>jar</packaging>

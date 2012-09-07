@@ -46,7 +46,7 @@
     <parent>
         <groupId>com.sun.jersey.test</groupId>
         <artifactId>functional-tests</artifactId>
-        <version>1.14-SNAPSHOT</version>
+        <version>1.15-SNAPSHOT</version>
     </parent>
     <groupId>com.sun.jersey.test.functional</groupId>
     <artifactId>jersey-qe-tests</artifactId>
@@ -54,7 +54,7 @@
     <packaging>pom</packaging>
 
     <properties>
-       <jersey.version>1.14-SNAPSHOT</jersey.version>
+       <jersey.version>1.15-SNAPSHOT</jersey.version>
     </properties>
 
     <name>Jersey QE Tests</name>

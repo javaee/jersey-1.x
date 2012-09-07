@@ -75,7 +75,7 @@
         </dependency>
     </dependencies>
     <properties>
-        <jersey.version>1.14-SNAPSHOT</jersey.version>
+        <jersey.version>1.15-SNAPSHOT</jersey.version>
         <glassfish.version>3.1.1</glassfish.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
