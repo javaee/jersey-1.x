@@ -1,4 +1,6 @@
-release 1.14
+release 1.15
+
+release 1.14 (09-2012)
 - Fixed issue JERSEY-1400
   http://java.net/jira/browse/JERSEY-1400
   Bad format JSON request got Http200(OK)
