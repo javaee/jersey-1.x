@@ -1,4 +1,7 @@
 release 1.15
+- Fixed issue JERSEY-1386
+  http://java.net/jira/browse/JERSEY-1386
+  Applied the patch from Charlie Groves to unwrap WebApplicationException from the Guice ProvisionException.
 
 release 1.14 (09-2012)
 - Fixed issue JERSEY-1400

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -49,9 +49,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
+
 import com.google.inject.ConfigurationException;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import com.google.inject.ProvisionException;
 import com.google.inject.Scope;
 import com.google.inject.Scopes;
 import com.google.inject.spi.BindingScopingVisitor;
@@ -69,6 +72,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCProxiedComponentProvider;
  *
  * @author Gili Tzabari
  * @author Paul Sandoz
+ * @author Charlie Groves
  */
 public class GuiceComponentProviderFactory implements IoCComponentProviderFactory {
 
@@ -250,11 +254,7 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
             }
         }
 
-        if (!c.equals(Object.class)) {
-            return isGuiceFieldOrMethodInjected(c.getSuperclass());
-        }
-
-        return false;
+        return !c.equals(Object.class) && isGuiceFieldOrMethodInjected(c.getSuperclass());
     }
 
     private static boolean isInjectable(AnnotatedElement element) {
@@ -290,7 +290,14 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
         @Override
         public Object proxy(Object o) {
-            injector.injectMembers(o);
+            try {
+                injector.injectMembers(o);
+            } catch (ProvisionException e) {
+                if (e.getCause() instanceof WebApplicationException) {
+                    throw (WebApplicationException)e.getCause();
+                }
+                throw e;
+            }
             return o;
         }
     }
@@ -329,7 +336,14 @@ public class GuiceComponentProviderFactory implements IoCComponentProviderFactor
 
         @Override
         public Object getInstance() {
-            return injector.getInstance(clazz);
+            try {
+                return injector.getInstance(clazz);
+            } catch (ProvisionException e) {
+                if (e.getCause() instanceof WebApplicationException) {
+                    throw (WebApplicationException)e.getCause();
+                }
+                throw e;
+            }
         }
     }
 
