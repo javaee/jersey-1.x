@@ -762,7 +762,7 @@ public class UriTemplate {
                     offset, encode, mapValues, sb);
         }
 
-        if (path != null) {
+        if (path != null && path.length() > 0) {
             if (sb.length() > 0 && path.charAt(0) != '/') {
                 sb.append('/');
             }

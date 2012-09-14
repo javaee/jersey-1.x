@@ -292,7 +292,7 @@ public class UriBuilderTest extends TestCase {
             } catch (IllegalArgumentException iae) {
                 caught = true;
             }
-            
+
             assertTrue(caught);
         }
 
@@ -760,5 +760,20 @@ public class UriBuilderTest extends TestCase {
                 replaceQuery("q={c}").
                 build();
         assertEquals(URI.create("http://localhost:8080/%7Ba%7D/%7Bb%7D?q=%7Bc%7D"), bu);
+    }
+
+
+    public void testEmptyPath() {
+        assertEquals("http://localhost:8080", UriBuilder.fromUri("http://localhost:8080").build().toString());
+        assertEquals("http://localhost:8080/", UriBuilder.fromUri("http://localhost:8080/").build
+                ("nothingreally").toString());
+
+        assertEquals("http://localhost:8080", UriBuilder.fromUri("http://localhost:8080").build
+                ("nothingreally").toString());
+        assertEquals("http://localhost", UriBuilder.fromUri("http://localhost").build
+                ("nothingreally").toString());
+
+        assertEquals("http://user@localhost", UriBuilder.fromUri("http://user@localhost").build
+                ("nothingreally").toString());
     }
 }
