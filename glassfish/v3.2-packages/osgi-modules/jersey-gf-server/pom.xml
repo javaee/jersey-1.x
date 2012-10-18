@@ -68,26 +68,29 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                            com.sun.jersey.server.*,
-                            com.sun.jersey.spi.scanning,
-                            com.sun.jersey.spi.resource,
-                            com.sun.jersey.spi.template,
-                            com.sun.jersey.spi.dispatch,
-                            com.sun.jersey.spi.uri.*,
-                            com.sun.jersey.spi.container.*,
-                            com.sun.jersey.spi.monitoring,
                             com.sun.jersey.api,
+                            com.sun.jersey.api.container.*,
                             com.sun.jersey.api.core,
-                            com.sun.jersey.api.wadl.*,
                             com.sun.jersey.api.model,
                             com.sun.jersey.api.view,
-                            com.sun.jersey.api.container.*,
+                            com.sun.jersey.api.wadl.*,
+                            com.sun.jersey.server.*,
+                            com.sun.jersey.spi.container.*,
+                            com.sun.jersey.spi.dispatch,
+                            com.sun.jersey.spi.monitoring,
+                            com.sun.jersey.spi.resource,
+                            com.sun.jersey.spi.scanning,
+                            com.sun.jersey.spi.template,
+                            com.sun.jersey.spi.uri.*,
                             com.sun.research.ws.wadl
                         </Export-Package>
                         <Import-Package>
                             com.sun.grizzly.*;resolution:="optional",
+                            com.sun.jersey.core.osgi;resolution:=optional,
                             com.sun.net.httpserver;resolution:="optional",
+                            javax.annotation.*;resolution:=optional,
                             javax.ejb;version="3.1";resolution:="optional",
+                            javax.enterprise.*;resolution:=optional,
                             javax.interceptor;version="3.1";resolution:="optional",
                             javax.mail.*;resolution:="optional",
                             javax.persistence;resolution:="optional",
@@ -97,10 +100,6 @@
                             javax.xml.transform.*;resolution:="optional",
                             org.apache.tools.ant.*;resolution:="optional",
                             org.objectweb.asm.*;password=GlassFish;version="3.1",
-                            javax.mail.*;resolution:=optional,
-                            javax.annotation.*;resolution:=optional,
-                            javax.enterprise.*;resolution:=optional,
-                            com.sun.jersey.core.osgi;resolution:=optional,
                             *
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

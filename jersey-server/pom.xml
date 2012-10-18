@@ -193,33 +193,32 @@
                     <instructions>
                         <Bundle-SymbolicName>com.sun.jersey.jersey-server</Bundle-SymbolicName>
                         <Export-Package>
-                            com.sun.jersey.server.*,
-                            com.sun.jersey.spi.scanning,
-                            com.sun.jersey.spi.resource,
-                            com.sun.jersey.spi.template,
-                            com.sun.jersey.spi.dispatch,
-                            com.sun.jersey.spi.uri.*,
-                            com.sun.jersey.spi.container.*,
-                            com.sun.jersey.spi.monitoring,
                             com.sun.jersey.api,
+                            com.sun.jersey.api.container.*,
                             com.sun.jersey.api.core,
-                            com.sun.jersey.api.wadl.*,
                             com.sun.jersey.api.model,
                             com.sun.jersey.api.view,
-                            com.sun.jersey.api.container.*,
+                            com.sun.jersey.api.wadl.*,
+                            com.sun.jersey.server.*,
+                            com.sun.jersey.spi.container.*,
+                            com.sun.jersey.spi.dispatch,
+                            com.sun.jersey.spi.monitoring,
+                            com.sun.jersey.spi.resource,
+                            com.sun.jersey.spi.scanning,
+                            com.sun.jersey.spi.template,
+                            com.sun.jersey.spi.uri.*,
                             com.sun.research.ws.wadl
                         </Export-Package>
                         <Import-Package>
+                            com.sun.jersey.core.osgi;resolution:=optional,
                             com.sun.net.httpserver;resolution:="optional",
+                            javax.annotation.*;resolution:=optional,
+                            javax.inject.*;resolution:=optional,
                             javax.mail.*;resolution:="optional",
                             javax.xml.bind.*;resolution:="optional",
                             javax.xml.namespace;resolution:="optional",
                             javax.xml.transform.*;resolution:="optional",
                             org.objectweb.asm.*;resolution:="optional",
-                            javax.mail.*;resolution:=optional,
-                            javax.annotation.*;resolution:=optional,
-                            javax.inject.*;resolution:=optional,
-                            com.sun.jersey.core.osgi;resolution:=optional,
                             *
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

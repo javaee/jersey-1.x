@@ -72,10 +72,10 @@
                             com.sun.jersey.server.impl.managedbeans
                         </Private-Package>
                         <Export-Package>
-                            com.sun.jersey.spi.scanning.servlet,
-                            com.sun.jersey.spi.container.servlet,
-                            com.sun.jersey.api.core.servlet,
                             com.sun.jersey.api.container.servlet,
+                            com.sun.jersey.api.core.servlet,
+                            com.sun.jersey.spi.container.servlet,
+                            com.sun.jersey.spi.scanning.servlet,
                             <!-- the following is being used internally in GF REST API code! :-( -->
 			    com.sun.jersey.server.impl.container.servlet,
                             <!-- the following must be visible by the jersey-gf-server module
@@ -84,8 +84,12 @@
                             com.sun.jersey.server.impl.ejb
                         </Export-Package>
                        <Import-Package>
+                            com.sun.jersey.core.osgi;resolution:=optional,
                             com.sun.net.httpserver;resolution:="optional",
+                            javax.annotation.*;resolution:=optional,
                             javax.ejb;version="3.1";resolution:="optional",
+                            javax.enterprise.*;resolution:=optional,
+                            javax.inject.*;resolution:=optional,
                             javax.interceptor;version="3.1";resolution:="optional",
                             javax.mail.*;resolution:="optional",
                             javax.persistence;resolution:="optional",
@@ -94,11 +98,6 @@
                             javax.xml.namespace;resolution:="optional",
                             javax.xml.transform.*;resolution:="optional",
                             org.objectweb.asm.*;password=GlassFish;version="3.1",
-                            javax.mail.*;resolution:=optional,
-                            javax.annotation.*;resolution:=optional,
-                            javax.enterprise.*;resolution:=optional,
-                            javax.inject.*;resolution:=optional,
-                            com.sun.jersey.core.osgi;resolution:=optional,
                             *
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
