@@ -1,4 +1,7 @@
 release 1.15
+- Fixed issue JERSEY-1438
+  http://java.net/jira/browse/JERSEY-1438
+  Actual WADL generator type classloader should be used when creating JAXBContext for WADL generation
 - Fixed issue JERSEY-769
   http://java.net/jira/browse/JERSEY-769
   jersey-json has multiple dependencies on stax-api, breaks deployment in some circumstances
