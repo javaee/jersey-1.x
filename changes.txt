@@ -1,4 +1,7 @@
 release 1.15
+- Fixed issue JERSEY-769
+  http://java.net/jira/browse/JERSEY-769
+  jersey-json has multiple dependencies on stax-api, breaks deployment in some circumstances
 - Fixed issue JERSEY-1426
   http://java.net/jira/browse/JERSEY-1426
   Bad OSGi manifests for jersey-server and jersey-servlet
