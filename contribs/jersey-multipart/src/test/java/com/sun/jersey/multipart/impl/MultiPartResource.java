@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -86,8 +86,8 @@ public class MultiPartResource {
     public Response two() {
         // Exercise builder pattern with default content type
         return Response.ok(new MultiPart().
-                             bodyPart("This is the first segment", new MediaType("text", "plain")).
-                             bodyPart("<outer><inner>value</inner></outer>", new MediaType("text", "xml"))).build();
+                bodyPart("This is the first segment", new MediaType("text", "plain")).
+                bodyPart("<outer><inner>value</inner></outer>", new MediaType("text", "xml"))).build();
     }
 
     @Path("three")
@@ -97,9 +97,9 @@ public class MultiPartResource {
         // Exercise builder pattern with explicit content type
         MultiPartBean bean = new MultiPartBean("myname", "myvalue");
         return Response.ok(new MultiPart().
-                             type(new MediaType("multipart", "mixed")).
-                             bodyPart("This is the first segment", new MediaType("text", "plain")).
-                             bodyPart(bean, new MediaType("x-application", "x-format"))).build();
+                type(new MediaType("multipart", "mixed")).
+                bodyPart("This is the first segment", new MediaType("text", "plain")).
+                bodyPart(bean, new MediaType("x-application", "x-format"))).build();
     }
 
     @Path("four")
@@ -156,7 +156,7 @@ public class MultiPartResource {
     public Response six(MultiPart multiPart) {
         String response = "All OK";
         if (!"multipart".equals(multiPart.getMediaType().getType()) ||
-            !"mixed".equals(multiPart.getMediaType().getSubtype())) {
+                !"mixed".equals(multiPart.getMediaType().getSubtype())) {
             response = "MultiPart media type is " + multiPart.getMediaType().toString();
         } else if (multiPart.getBodyParts().size() != 0) {
             response = "Got " + multiPart.getBodyParts().size() + " body parts instead of zero";
@@ -236,5 +236,17 @@ public class MultiPartResource {
     public String thirteen(MultiPart multiPart) throws IOException {
         multiPart.cleanup();
         return "cleanup";
+    }
+
+    @GET
+    @Path("etag")
+    @Produces("multipart/mixed")
+    public Response etag() {
+        MultiPart entity = new MultiPart();
+        // Exercise manually adding part(s) to the bodyParts property
+        BodyPart part = new BodyPart("This is the only segment", new MediaType("text", "plain"));
+        part.getHeaders().add("ETag", "\"value\"");
+        entity.getBodyParts().add(part);
+        return Response.ok(entity).type("multipart/mixed").build();
     }
 }

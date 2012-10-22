@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,21 @@
 
 package com.sun.jersey.multipart.impl;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.lang.annotation.Annotation;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
@@ -47,31 +62,26 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.FormDataBodyPart;
+import com.sun.jersey.multipart.FormDataMultiPart;
 import com.sun.jersey.multipart.MultiPart;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.text.ParseException;
-import java.util.List;
-import java.util.Map;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
+import com.sun.jersey.multipart.MultiPartConfig;
 
 /**
- * <p>Unit tests for {@link MultiPartReader} (in the client) and
+ * <p>Unit tests for {@link MultiPartReaderClientSide} (in the client) and
  * {@link MultiPartWriter} (in the server).</p>
  */
 public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
-    
+
     public MultiPartReaderWriterTest(String testName) {
         super(testName);
     }
 
     Client client = null;
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -115,6 +125,32 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
             BodyPart part = result.getBodyParts().get(0);
             checkMediaType(new MediaType("text", "plain"), part.getMediaType());
             checkEntity("This is the only segment", (BodyPartEntity) part.getEntity());
+
+            result.getParameterizedHeaders();
+            result.cleanup();
+        } catch (IOException e) {
+            e.printStackTrace(System.out);
+            fail("Caught exception: " + e);
+        } catch(ParseException e) {
+            e.printStackTrace(System.out);
+            fail("Caught exception: " + e);
+        } catch (UniformInterfaceException e) {
+            report(e);
+            fail("Caught exception: " + e);
+        }
+    }
+
+    public void testETag() {
+        WebResource.Builder builder = client.resource(getUri())
+                .path("multipart/etag").accept("multipart/mixed");
+        try {
+            MultiPart result = builder.get(MultiPart.class);
+            checkMediaType(new MediaType("multipart", "mixed"), result.getMediaType());
+            assertEquals(1, result.getBodyParts().size());
+            BodyPart part = result.getBodyParts().get(0);
+            checkMediaType(new MediaType("text", "plain"), part.getMediaType());
+            checkEntity("This is the only segment", (BodyPartEntity) part.getEntity());
+            assertEquals("\"value\"", part.getHeaders().getFirst("ETag"));
 
             result.getParameterizedHeaders();
             result.cleanup();
@@ -194,8 +230,8 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
         try {
             MultiPartBean bean = new MultiPartBean("myname", "myvalue");
             MultiPart entity = new MultiPart().
-              bodyPart("This is the first segment", new MediaType("text", "plain")).
-              bodyPart(bean, new MediaType("x-application", "x-format"));
+                    bodyPart("This is the first segment", new MediaType("text", "plain")).
+                    bodyPart(bean, new MediaType("x-application", "x-format"));
             String response = builder.put(String.class, entity);
             if (!response.startsWith("SUCCESS:")) {
                 fail("Response is '" + response + "'");
@@ -212,8 +248,8 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
         try {
             MultiPartBean bean = new MultiPartBean("myname", "myvalue");
             MultiPart entity = new MultiPart().
-              bodyPart("This is the first segment", new MediaType("text", "plain")).
-              bodyPart(bean, new MediaType("x-application", "x-format"));
+                    bodyPart("This is the first segment", new MediaType("text", "plain")).
+                    bodyPart(bean, new MediaType("x-application", "x-format"));
             String response = builder.put(String.class, entity);
             if (!response.startsWith("SUCCESS:")) {
                 fail("Response is '" + response + "'");
@@ -229,7 +265,7 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
         WebResource.Builder builder = client.resource(getUri())
                 .path("multipart/six").type("multipart/mixed").accept("text/plain");
         try {
-            String result = builder.post(String.class, new MultiPart());
+            builder.post(String.class, new MultiPart());
             fail("Should have thrown an exception about zero body parts");
         } catch (ClientHandlerException e) {
             assertNotNull(e.getCause());
@@ -280,7 +316,7 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
                 .path("multipart/twelve").accept("multipart/mixed").type("multipart/mixed");
         try {
             MultiPart entity = new MultiPart().
-              bodyPart("CONTENT", MediaType.TEXT_PLAIN_TYPE);
+                    bodyPart("CONTENT", MediaType.TEXT_PLAIN_TYPE);
             MultiPart response = builder.put(MultiPart.class, entity);
             String actual = response.getBodyParts().get(0).getEntityAs(String.class);
             assertEquals("CONTENT", actual);
@@ -298,7 +334,7 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
                 .path("multipart/thirteen").accept("multipart/mixed").type("multipart/mixed");
         try {
             MultiPart entity = new MultiPart().
-              bodyPart("CONTENT", MediaType.TEXT_PLAIN_TYPE);
+                    bodyPart("CONTENT", MediaType.TEXT_PLAIN_TYPE);
             String response = builder.put(String.class, entity);
             assertEquals("cleanup", response);
         } catch (UniformInterfaceException e) {
@@ -308,12 +344,67 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
 
     }
 
-    /*
-    public void testListen() throws Exception {
-        System.out.println("Running for 30 seconds");
-        Thread.sleep(30000);
+    public void testQuotedBoundary() throws Exception {
+        final HashMap<String, String> parameters = new HashMap<String, String>();
+        parameters.put("foo", "bar");
+        parameters.put("hello", "world");
+        parameters.put("boundary", "\"unquotedBoundary\"");
+
+        final MediaType mediaType = new MediaType("multipart", "mixed", parameters);
+        final MediaType unquotedMediaType = MultiPartReaderClientSide.unquoteMediaTypeParameters(mediaType, "boundary");
+        final Map<String, String> unquotedParameters = unquotedMediaType.getParameters();
+
+        assertEquals("bar", unquotedParameters.get("foo"));
+        assertEquals("world", unquotedParameters.get("hello"));
+        assertEquals("unquotedBoundary", unquotedParameters.get("boundary"));
     }
-*/
+
+    public void testQuotedBoundaryMultiPartReader() throws Exception {
+        final MediaType quotedMediaType = new MediaType("multipart", "form-data", new HashMap<String, String>() {{
+            put("boundary", "\"Boundary_1_531119742_1349960036122\"");
+        }});
+        final String requestBody = "--Boundary_1_531119742_1349960036122\n" +
+                "Content-Type: text/plain\n" +
+                "Content-Disposition: form-data; name=\"part\"\n" +
+                "\n" +
+                "CONTENT\n" +
+                "--Boundary_1_531119742_1349960036122--";
+        final MultivaluedMap<String, String> headers = new StringKeyIgnoreCaseMultivaluedMap<String>();
+        headers.add("mime-version", "1.0");
+        headers.add("content-length", "160");
+        headers.add("accept", "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2");
+        headers.add("content-type", "multipart/form-data;boundary=\"Boundary_1_531119742_1349960036122\"");
+
+        final MultiPartReaderClientSide multiPartReader = new MultiPartReaderClientSide(null, new MultiPartConfig());
+
+        final ByteArrayInputStream stream = new ByteArrayInputStream(requestBody.getBytes());
+        final MultiPart multiPart = multiPartReader.readFrom(
+                MultiPart.class,
+                FormDataMultiPart.class,
+                new Annotation[0],
+                quotedMediaType,
+                headers, stream);
+
+        final BodyPart bodyPart = multiPart.getBodyParts().get(0);
+        final BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                        ((BodyPartEntity)bodyPart.getEntity()).getInputStream()
+                )
+        );
+
+        assertEquals(FormDataMultiPart.class, multiPart.getClass());
+        assertEquals(1, multiPart.getBodyParts().size());
+        assertEquals(FormDataBodyPart.class, bodyPart.getClass());
+        assertEquals("CONTENT", reader.readLine());
+        assertEquals("part", bodyPart.getContentDisposition().getParameters().get("name"));
+    }
+
+    /*
+        public void testListen() throws Exception {
+            System.out.println("Running for 30 seconds");
+            Thread.sleep(30000);
+        }
+    */
 
     private void checkEntity(String expected, BodyPartEntity entity) throws IOException {
         // Convert the raw bytes into a String
@@ -340,7 +431,7 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
                 .path("multipart/eleven").accept("multipart/mixed").type("multipart/mixed");
         try {
             MultiPart entity = new MultiPart().
-              bodyPart(expected, MediaType.TEXT_PLAIN_TYPE);
+                    bodyPart(expected, MediaType.TEXT_PLAIN_TYPE);
             MultiPart response = builder.put(MultiPart.class, entity);
             String actual = response.getBodyParts().get(0).getEntityAs(String.class);
             assertEquals("Length for multiplier " + multiplier, expected.length(), actual.length());
@@ -364,7 +455,7 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
         System.out.println("Response:");
         System.out.println("  Location=" + r.getLocation());
         System.out.println("  Status=" + r.getStatus());
-        MultivaluedMap<String,String> metadata = r.getMetadata();
+        MultivaluedMap<String,String> metadata = r.getHeaders();
         for (Map.Entry<String,List<String>> entry : metadata.entrySet()) {
             for (String value : entry.getValue()) {
                 System.out.println("  Header=" + entry.getKey() + ", Value=" + value);

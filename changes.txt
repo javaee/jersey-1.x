@@ -1,4 +1,7 @@
 release 1.15
+- Fixed issue JERSEY-1448
+  http://java.net/jira/browse/JERSEY-1448
+  Multipart.BodyPart only allowing headers that start with Content-*
 - Fixed issue JERSEY-1438
   http://java.net/jira/browse/JERSEY-1438
   Actual WADL generator type classloader should be used when creating JAXBContext for WADL generation

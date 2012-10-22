@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -84,13 +84,13 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
 
     @Override
     public long getSize(MultiPart entity, Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType) {
+                        Annotation[] annotations, MediaType mediaType) {
         return -1;
     }
 
     @Override
     public boolean isWriteable(Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType) {
+                               Annotation[] annotations, MediaType mediaType) {
         return MultiPart.class.isAssignableFrom(type);
     }
 
@@ -112,9 +112,9 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
      */
     @Override
     public void writeTo(MultiPart entity, Class<?> type, Type genericType,
-            Annotation[] annotations, MediaType mediaType,
-            MultivaluedMap<String, Object> headers,
-            OutputStream stream) throws IOException, WebApplicationException {
+                        Annotation[] annotations, MediaType mediaType,
+                        MultivaluedMap<String, Object> headers,
+                        OutputStream stream) throws IOException, WebApplicationException {
 
         // Verify that there is at least one body part
         if ((entity.getBodyParts() == null) || (entity.getBodyParts().size() < 1)) {
@@ -168,12 +168,6 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
 
             // Iterate for the nested body parts
             for (final Map.Entry<String, List<String>> entry : bodyHeaders.entrySet()) {
-
-                // Only headers that match "Content-*" are allowed on body parts
-                if (!entry.getKey().toLowerCase().startsWith("content-")) {
-                    throw new WebApplicationException(new IllegalArgumentException("Invalid body part header '" + entry.getKey() + "', only Content-* allowed"));
-                }
-
                 // Write this header and its value(s)
                 writer.write(entry.getKey());
                 writer.write(':');
@@ -216,9 +210,9 @@ public class MultiPartWriter implements MessageBodyWriter<MultiPart> {
             if (bodyWriter == null) {
                 throw new WebApplicationException(
                         new IllegalArgumentException(
-                        "No MessageBodyWriter for body part of type '" +
-                        bodyEntity.getClass().getName() + "' and media type '" +
-                        bodyMediaType + "'"));
+                                "No MessageBodyWriter for body part of type '" +
+                                        bodyEntity.getClass().getName() + "' and media type '" +
+                                        bodyMediaType + "'"));
             }
 
             bodyWriter.writeTo(

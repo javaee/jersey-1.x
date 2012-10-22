@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -113,7 +114,7 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
 
 
     public boolean isReadable(Class<?> type, Type genericType,
-                               Annotation[] annotations, MediaType mediaType) {
+                              Annotation[] annotations, MediaType mediaType) {
         return MultiPart.class.isAssignableFrom(type);
     }
 
@@ -146,17 +147,15 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
         }
     }
 
-
     protected MultiPart readMultiPart(Class<MultiPart> type, Type genericType,
-                              Annotation[] annotations, MediaType mediaType,
-                              MultivaluedMap<String, String> headers,
-                              InputStream stream) throws IOException, MIMEParsingException {
-        MIMEMessage mm = new MIMEMessage(stream,
-                mediaType.getParameters().get("boundary"),
-                mimeConfig);
+                                      Annotation[] annotations, MediaType mediaType,
+                                      MultivaluedMap<String, String> headers,
+                                      InputStream stream) throws IOException, MIMEParsingException {
+        mediaType = unquoteMediaTypeParameters(mediaType, "boundary");
+        MIMEMessage mm = new MIMEMessage(stream, mediaType.getParameters().get("boundary"), mimeConfig);
 
         boolean formData = false;
-        MultiPart multiPart = null;
+        MultiPart multiPart;
         if (MediaTypes.typeEquals(mediaType, MediaType.MULTIPART_FORM_DATA_TYPE)) {
             multiPart = new FormDataMultiPart();
             formData = true;
@@ -213,5 +212,24 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
         }
 
         return multiPart;
+    }
+
+    protected static MediaType unquoteMediaTypeParameters(final MediaType mediaType, final String... parameters) {
+        if (parameters == null || parameters.length == 0) {
+            return mediaType;
+        }
+
+        final HashMap<String, String> unquotedParams = new HashMap<String, String>(mediaType.getParameters());
+
+        for (final String parameterName : parameters) {
+            String parameterValue = mediaType.getParameters().get(parameterName);
+
+            if (parameterValue.startsWith("\"")) {
+                parameterValue = parameterValue.substring(1, parameterValue.length() - 1);
+                unquotedParams.put(parameterName, parameterValue);
+            }
+        }
+
+        return new MediaType(mediaType.getType(), mediaType.getSubtype(), unquotedParams);
     }
 }
