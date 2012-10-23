@@ -87,11 +87,19 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
             // TODO perhaps this should be done another way for the moment
             // create a temporary generator just to do this one task
             final WadlGenerator wadlGenerator = this.wadlGeneratorConfig.createWadlGenerator();
-            this.jaxbContext = JAXBContext.newInstance(
-                    wadlGenerator.getRequiredJaxbContextPath(), wadlGenerator.getClass().getClassLoader());
+            final String requiredJaxbContextPath = wadlGenerator.getRequiredJaxbContextPath();
+
+            this.jaxbContext = null;
+            try {
+                // the following works fine in WLS and non-GF environment
+                this.jaxbContext = JAXBContext.newInstance(requiredJaxbContextPath, wadlGenerator.getClass().getClassLoader());
+            } catch (JAXBException ex) {
+                // fallback for GF
+                LOG.log(Level.WARNING, ex.getMessage(), ex);
+                this.jaxbContext = JAXBContext.newInstance(requiredJaxbContextPath);
+            }
         } catch (JAXBException ex) {
             LOG.log(Level.SEVERE, ex.getMessage(), ex);
-            this.jaxbContext = null;
         }
     }
 
