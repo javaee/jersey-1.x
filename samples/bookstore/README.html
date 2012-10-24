@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -40,136 +40,151 @@
     holder.
 
 -->
-<html><head><title>Bookstore Example</title></head>
+<html>
 
+<head>
+    <title>Bookstore Example</title>
+    <style type="text/css"><!--
+    .cliSample {
+        background-color: lightgray
+    }
 
-  <body>
-    <h1>Bookstore Example</h1>
-    <p>This example demonstrates how to connect JSP pages to resources. The example is copied from
-       the <a href="http://stapler.java.net/getting-started.html">Bookstore</a> example presented
-       by the <a href="http://stapler.java.net/">Stapler</a> project that provides a way to staple
-       URIs to Java classes to build RESTful Web applications such as <a href="http://java.net/projects/hudson/">Hudson</a>.
-    </p>
-    <p>A bookstore Web application is presented that is capable of presenting books, CDs and tracks of CDs.
-     
-    </p>
+    --></style>
+</head>
 
-    <h2>Contents</h2>
-    <p>The example consists of four web resources implemented by the following:
-        </p><dl>
-            <dt><code>com.sun.jersey.samples.bookstore.resources.Bookstore</code></dt>
-            <dd>The bookstore resource that returns a list of items, either CDs or Books.
-                The resource dynamically references a Book or CD resource using the
-                getItem method that is annotated with Path.
-                The Book and CD resource both inherit from the Item class and thus the
-                resources can be managed polymorphically.
-            </dd>
-            <dt><code>com.sun.jersey.samples.bookstore.resources.Book</code></dt>
-            <dd>The book resource that has a title and an author.
-            </dd>
-            <dt><code>com.sun.jersey.samples.bookstore.resources.CD</code></dt>
-            <dd>The CD resource that has a title, author and a list of tracks.
-                The resource dynamically references the Track resource using the
-                getTrack method that is annotated with Path.
-            </dd>
-            <dt><code>com.sun.jersey.samples.bookstore.resources.Track</code></dt>
-            <dd>The Tracks resource that has a name and the length of the track.
-            </dd>
-        </dl>
-    <p>The mapping of the URI path space is presented in the following table:</p>
-	<table border="1">
-	<tr>
-	<th>URI path</th>
-	<th>Resource class</th>
-	<th>HTTP methods</th> 
-    <th>JSP page</th>
+<body>
+<h1>Bookstore Example</h1>
+<p>This example demonstrates how to connect JSP pages to resources. The example is copied from
+    the <a href="http://stapler.kohsuke.org/getting-started.html">Bookstore</a> example presented
+    by the <a href="http://stapler.kohsuke.org/">Stapler</a> project that provides a way to staple
+    URIs to Java classes to build RESTful Web applications such as <a href="http://java.net/projects/hudson/">Hudson</a>.
+</p>
+<p>A bookstore Web application is presented that is capable of presenting books, CDs and tracks of CDs.
+
+</p>
+
+<h2>Contents</h2>
+<p>The example consists of four web resources implemented by the following:
+</p><dl>
+    <dt><code>com.sun.jersey.samples.bookstore.resources.Bookstore</code></dt>
+    <dd>The bookstore resource that returns a list of items, either CDs or Books.
+        The resource dynamically references a Book or CD resource using the
+        getItem method that is annotated with Path.
+        The Book and CD resource both inherit from the Item class and thus the
+        resources can be managed polymorphically.
+    </dd>
+    <dt><code>com.sun.jersey.samples.bookstore.resources.Book</code></dt>
+    <dd>The book resource that has a title and an author.
+    </dd>
+    <dt><code>com.sun.jersey.samples.bookstore.resources.CD</code></dt>
+    <dd>The CD resource that has a title, author and a list of tracks.
+        The resource dynamically references the Track resource using the
+        getTrack method that is annotated with Path.
+    </dd>
+    <dt><code>com.sun.jersey.samples.bookstore.resources.Track</code></dt>
+    <dd>The Tracks resource that has a name and the length of the track.
+    </dd>
+</dl>
+<p>The mapping of the URI path space is presented in the following table:</p>
+<table border="1">
+    <tr>
+        <th>URI path</th>
+        <th>Resource class</th>
+        <th>HTTP methods</th>
+        <th>JSP page</th>
     </tr>
 
-	<tr>
-	<td>/</td>
-	<td>Bookstore</td>
-	<td>GET</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/index.jsp</td>
-	</tr>
-	<tr>
+    <tr>
+        <td>/</td>
+        <td>Bookstore</td>
+        <td>GET</td>
+        <td>/com/sun/jersey/samples/bookstore/resources/Bookstore/index.jsp</td>
+    </tr>
+    <tr>
 
-	<tr>
-	<td>/count</td>
-	<td>Bookstore</td>
-	<td>GET</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/count.jsp</td>
-	</tr>
+    <tr>
+        <td>/count</td>
+        <td>Bookstore</td>
+        <td>GET</td>
+        <td>/com/sun/jersey/samples/bookstore/resources/Bookstore/count.jsp</td>
+    </tr>
 
-	<tr>
-	<td>/time</td>
-	<td>Bookstore</td>
-	<td>GET</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Bookstore/time.jsp</td>
-	</tr>
+    <tr>
+        <td>/time</td>
+        <td>Bookstore</td>
+        <td>GET</td>
+        <td>/com/sun/jersey/samples/bookstore/resources/Bookstore/time.jsp</td>
+    </tr>
 
-	<tr>
-	<td>/items/{itemid}</td>
-	<td>Book, CD</td>
-	<td>GET</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Book/index.jsp,<br>
-        /com/sun/jersey/samples/bookstore/resources/CD/index.jsp </td>
-	</tr>
+    <tr>
+        <td>/items/{itemid}</td>
+        <td>Book, CD</td>
+        <td>GET</td>
+        <td>/com/sun/jersey/samples/bookstore/resources/Book/index.jsp,<br>
+            /com/sun/jersey/samples/bookstore/resources/CD/index.jsp </td>
+    </tr>
 
-	<tr>
-	<td>/items/{itemid}/tracks/{num}</td>
-	<td>Track</td>
-	<td>GET</td>
-	<td>/com/sun/jersey/samples/bookstore/resources/Track/index.jsp</td>
-	</tr>
+    <tr>
+        <td>/items/{itemid}/tracks/{num}</td>
+        <td>Track</td>
+        <td>GET</td>
+        <td>/com/sun/jersey/samples/bookstore/resources/Track/index.jsp</td>
+    </tr>
 
-	</table>
+</table>
 
-    <h2>Running the Example</h2>
+<h2>Running the Example</h2>
 
-    
-      <p>Bookstore example runs on Glassfish 3.1 application server (<a href="http://glassfish.java.net/">http://glassfish.java.net</a>), which can be run as an embedded container or Jetty.
 
-      <p>If you are working with Jersey GlassFish update center module installed into your existing GlassFish instance, 
-you will need to follow instructions at <a href="../../README.html">the module README file</a> in order to deploy the example.
+<p>Bookstore example runs on Glassfish 3.1 application server (<a href="http://glassfish.java.net/">http://glassfish.java.net</a>), which can be run as an embedded container or Jetty.
+
+<p>If you are working with Jersey GlassFish update center module installed into your existing GlassFish instance,
+    you will need to follow instructions at <a href="../../README.html">the module README file</a> in order to deploy the example.
 <p>Otherwise, you can run the example using embedded GlassFish as follows:</p>
 
-      <p>Build and deploy the project by executing the following command from the project directory</p>
-      <blockquote><code>mvn clean package embedded-glassfish:run</code></blockquote>
-      <p>or you can run the example using Jetty as follows:</p>
-      <blockquote><code>mvn clean package jetty:run</code></blockquote>
-      
-      <p>Go to the URL:<p>
-      <blockquote><a href="http://localhost:8080/bookstore/">http://localhost:8080/bookstore/</a></blockquote>
-      
-      <p>Notice: if you see an error message in your browser, just go back to the command line, where you run <code>mvn clean package embedded-glassfish:run</code> from
-      and hit <code>Enter</code> to redeploy the application. This is needed to workaround a bug in currently used embedded GlassFish version.
-      After redeployment, you should be able to refresh the page in your browser window and see the Bookstore example index page.
+<p>Build and deploy the project by executing the following command from the project directory</p>
+<blockquote><code>mvn clean package embedded-glassfish:run</code></blockquote>
+<p>or you can run the example using Jetty as follows:</p>
+<blockquote><code>mvn clean package jetty:run</code></blockquote>
 
-    <h2>How it works</h2>
-      <p>This example shows how to support polymorphism of resources and JSP pages.
-         Hence it is possible to add another resource, such as a DVD resource with associated JSP pages,
-         which extends Item without having to change the logic of Bookstore or the existing JSP pages.</p>
-         
-      <p>JSP pages are associated with resource classes. Such JSP pages are resolved
-         by converting the fully qualified class name of the resource class into a path
-         and appending last path segment of the request URI path to that path.
-         
-         For example, when a GET is performed on the URI path "/" then the path
-         to the JSP page is "/com/sun/jersey/samples/bookstore/resources/Bookstore/",
-         and in this case since the last path segment is empty "index.jsp" is
-         appended to the path. Then the request us forwarded to the JSP page
-         at that path.
-         
-         Similarly when a GET is performed on the URI path "/count" then the
-         path to the JSP page is "/com/sun/jersey/samples/bookstore/resources/Bookstore/count.jsp".
-      </p>
-      <p>The JSP variable "it" is set to the instance of Bookstore so that the index.jsp, or count.jsp,
-         has access to the Bookstore instance as a Java bean.
-      </p>
-      <p>If a resource class inherits from another resource class then it will automatically 
-         inherit the JSPs from the super class.</p>
-      <p>A JSP page may also include JSPs using the inheritance mechanism,
-         for example the index.jsp page associated with the Book resource class includes a
-         footer.jsp page whoose location is specified by the super class, Item.
-      </p>
-  </body></html>
+<p>Go to the URL:<p>
+<blockquote><a href="http://localhost:8080/bookstore/">http://localhost:8080/bookstore/</a></blockquote>
+
+<p><strong>Notice</strong>: if you see an error message in your browser, just go back to the command line, where you run <code>mvn clean package embedded-glassfish:run</code> from
+    and hit <code>Enter</code> to redeploy the application. This is needed to workaround a bug in currently used embedded GlassFish version.
+    After redeployment, you should be able to refresh the page in your browser window and see the Bookstore example index page.
+
+<h4>Test Client Running</h4>
+
+<pre class="cliSample">
+mvn test -DargLine="-Djersey.test.containerFactory=com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory -DenableLogging -Djersey.test.port=8080" -Ptest
+</pre>
+
+<h2>How it works</h2>
+<p>This example shows how to support polymorphism of resources and JSP pages.
+    Hence it is possible to add another resource, such as a DVD resource with associated JSP pages,
+    which extends Item without having to change the logic of Bookstore or the existing JSP pages.</p>
+
+<p>JSP pages are associated with resource classes. Such JSP pages are resolved
+    by converting the fully qualified class name of the resource class into a path
+    and appending last path segment of the request URI path to that path.
+
+    For example, when a GET is performed on the URI path "/" then the path
+    to the JSP page is "/com/sun/jersey/samples/bookstore/resources/Bookstore/",
+    and in this case since the last path segment is empty "index.jsp" is
+    appended to the path. Then the request us forwarded to the JSP page
+    at that path.
+
+    Similarly when a GET is performed on the URI path "/count" then the
+    path to the JSP page is "/com/sun/jersey/samples/bookstore/resources/Bookstore/count.jsp".
+</p>
+<p>The JSP variable "it" is set to the instance of Bookstore so that the index.jsp, or count.jsp,
+    has access to the Bookstore instance as a Java bean.
+</p>
+<p>If a resource class inherits from another resource class then it will automatically
+    inherit the JSPs from the super class.</p>
+<p>A JSP page may also include JSPs using the inheritance mechanism,
+    for example the index.jsp page associated with the Book resource class includes a
+    footer.jsp page whoose location is specified by the super class, Item.
+</p>
+</body></html>

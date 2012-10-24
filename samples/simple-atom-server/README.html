@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -43,117 +43,117 @@
 <html><head><title>Simple Atom Server Example</title></head>
 
 
-  <body>
-    <h1>Simple Atom Server Example</h1>
-    <p>This example demonstrates a simple
-        Atom server that partially conforms to the 
-        <a href="http://tools.ietf.org/wg/atompub/">Atom Publishing Format and Protocol</a>.
-    </p>
-    <p>Atom Entries, Atom Media Link Entries, and media are persisted to the
-        file system. The <a href="http://rometools.org/">ROME</a> Java library provides support for the parsing
-       and serializing of Atom Feed and Entry documents.</p>
-       
-    <h2>Contents</h2>
-    <p>The example consists of four web resources implemented by the following:
-        </p><dl>
-            <dt><code>com.sun.jersey.samples.atomserver.resources.ServiceResource</code></dt>
-            <dd>This Java class returns the Service Document describing the Workspace that
-                contains the Atom Collection that creates, reads, updates, and deletes
-                Atom Entries.
-            </dd>
-            <dt><code>com.sun.jersey.samples.atomserver.resources.FeedResource</code></dt>
-            <dd>This Java class provides the Feed Document describing the Atom Entries
-                in the feed. It also provides support to create Atom Entries and
-                Atom Media Link Entries.
-                The resource references the EntryResource and EditEntryResource resources
-                using the Path annotation declared on the FeedResource.getEntryResource and 
-                FeedResource.getEditEntryResource methods respectively.
-            </dd>
-            <dt><code>com.sun.jersey.samples.atomserver.resources.EntryResource</code></dt>
-            <dd>This Java class supports the reading of an Atom Entry or Atom Media Link Entry.
-                The reading of the media, associated with a Media Link Entry, is supported by a sub-resource
-                HTTP method.
-            </dd>
-            <dt><code>com.sun.jersey.samples.atomserver.resources.EditEntryResource</code></dt>
-            <dd>This Java class supports the read, update, and delete of an Atom Entry or
-                Atom Media Link Entry, and via a sub-resource HTTP method the read and update 
-                of the media.
-                This resource extends EntryResource to inherit the reading support.
-            </dd>
-        </dl>
-    <p>The mapping of the URI path space is presented in the following table:</p>
-	<table border="1">
-	<tr>
-	<th>URI path</th>
-	<th>Resource class</th>
-	<th>HTTP methods</th>
-	</tr>
-	<tr>
-	<td>/service</td>
-	<td>ServiceResource</td>
-	<td>GET</td>
-	</tr>
-	<tr>
-	<td>/collection/</td>
-	<td>FeedResource</td>
-	<td>GET, POST</td>
-	</tr>
-	<tr>
-	<td>/collection/{entry}</td>
-	<td>EntryResource</td>
-	<td>GET</td>
-	</tr>
-	<tr>
-	<td>/collection/{entry}/media</td>
-	<td>EntryResource</td>
-	<td>GET</td>
-	</tr>
-	<tr>
-	<td>/collection/edit/{entry}</td>
-	<td>EditEntryResource</td>
-	<td>PUT, DELETE</td>
-	</tr>
-	<tr>
-	<td>/collection/edit/{entry}/media</td>
-	<td>EditEntryResource</td>
-	<td>PUT</td>
-	</tr>
-	</table>
-  
-    <h2>File System Structure of Persisted Atom Feed, Atom Entries, and Media</h2>
-    <p>The Atom Feed/Entries and media are persisted to a file system. 
-        The structure of the file system is as follows:
-        </p><dl>
-            <dt><code>collection</code></dt>
-            <dd>The directory where all Atom Entries and media are stored.
-                This directory is created in the current working directory where
-                the Atom Server is run.</dd>
-            <dt><code>collection/feed.xml</code></dt>
-            <dd>The persisted Atom Feed document.</dd>
-            <dt><code>collection/&lt;uuid&gt;/entry.xml</code></dt>
-            <dd>Each Atom Entry document for the Collection is stored under a unique directory
-                (a UUID) from which the Atom Entry document is persisted. The UUID
-                corresponds to the <code>atom:id</code> of the Atom Entry.</dd>
-            <dt><code>collection/&lt;uuid&gt;/media</code></dt>
-            <dd>The media (if present) of an Atom Media Link Entry.</dd>
-        </dl>
-    <p>To remove the Atom Feed document and all the Atom (or Atom Media Link) 
-       Entries delete the <code>collection</code> directory.</p>
-    
-    <h2>Running the Example</h2>
-    <p>Run the example as follows:</p>
-    <blockquote><pre>
+<body>
+<h1>Simple Atom Server Example</h1>
+<p>This example demonstrates a simple
+    Atom server that partially conforms to the
+    <a href="http://tools.ietf.org/wg/atompub/">Atom Publishing Format and Protocol</a>.
+</p>
+<p>Atom Entries, Atom Media Link Entries, and media are persisted to the
+    file system. The <a href="https://rometools.jira.com/wiki/display/ROME/Home">ROME</a> Java library provides support for the parsing
+    and serializing of Atom Feed and Entry documents.</p>
+
+<h2>Contents</h2>
+<p>The example consists of four web resources implemented by the following:
+</p><dl>
+    <dt><code>com.sun.jersey.samples.atomserver.resources.ServiceResource</code></dt>
+    <dd>This Java class returns the Service Document describing the Workspace that
+        contains the Atom Collection that creates, reads, updates, and deletes
+        Atom Entries.
+    </dd>
+    <dt><code>com.sun.jersey.samples.atomserver.resources.FeedResource</code></dt>
+    <dd>This Java class provides the Feed Document describing the Atom Entries
+        in the feed. It also provides support to create Atom Entries and
+        Atom Media Link Entries.
+        The resource references the EntryResource and EditEntryResource resources
+        using the Path annotation declared on the FeedResource.getEntryResource and
+        FeedResource.getEditEntryResource methods respectively.
+    </dd>
+    <dt><code>com.sun.jersey.samples.atomserver.resources.EntryResource</code></dt>
+    <dd>This Java class supports the reading of an Atom Entry or Atom Media Link Entry.
+        The reading of the media, associated with a Media Link Entry, is supported by a sub-resource
+        HTTP method.
+    </dd>
+    <dt><code>com.sun.jersey.samples.atomserver.resources.EditEntryResource</code></dt>
+    <dd>This Java class supports the read, update, and delete of an Atom Entry or
+        Atom Media Link Entry, and via a sub-resource HTTP method the read and update
+        of the media.
+        This resource extends EntryResource to inherit the reading support.
+    </dd>
+</dl>
+<p>The mapping of the URI path space is presented in the following table:</p>
+<table border="1">
+    <tr>
+        <th>URI path</th>
+        <th>Resource class</th>
+        <th>HTTP methods</th>
+    </tr>
+    <tr>
+        <td>/service</td>
+        <td>ServiceResource</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>/collection/</td>
+        <td>FeedResource</td>
+        <td>GET, POST</td>
+    </tr>
+    <tr>
+        <td>/collection/{entry}</td>
+        <td>EntryResource</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>/collection/{entry}/media</td>
+        <td>EntryResource</td>
+        <td>GET</td>
+    </tr>
+    <tr>
+        <td>/collection/edit/{entry}</td>
+        <td>EditEntryResource</td>
+        <td>PUT, DELETE</td>
+    </tr>
+    <tr>
+        <td>/collection/edit/{entry}/media</td>
+        <td>EditEntryResource</td>
+        <td>PUT</td>
+    </tr>
+</table>
+
+<h2>File System Structure of Persisted Atom Feed, Atom Entries, and Media</h2>
+<p>The Atom Feed/Entries and media are persisted to a file system.
+    The structure of the file system is as follows:
+</p><dl>
+    <dt><code>collection</code></dt>
+    <dd>The directory where all Atom Entries and media are stored.
+        This directory is created in the current working directory where
+        the Atom Server is run.</dd>
+    <dt><code>collection/feed.xml</code></dt>
+    <dd>The persisted Atom Feed document.</dd>
+    <dt><code>collection/&lt;uuid&gt;/entry.xml</code></dt>
+    <dd>Each Atom Entry document for the Collection is stored under a unique directory
+        (a UUID) from which the Atom Entry document is persisted. The UUID
+        corresponds to the <code>atom:id</code> of the Atom Entry.</dd>
+    <dt><code>collection/&lt;uuid&gt;/media</code></dt>
+    <dd>The media (if present) of an Atom Media Link Entry.</dd>
+</dl>
+<p>To remove the Atom Feed document and all the Atom (or Atom Media Link)
+    Entries delete the <code>collection</code> directory.</p>
+
+<h2>Running the Example</h2>
+<p>Run the example as follows:</p>
+<blockquote><pre>
 mvn clean compile exec:java</pre></blockquote>
-    <p>This deploys the Atom server using 
-        <a href="http://grizzly.java.net/">Grizzly</a>
-    </p>
-    <p>A <a href="http://wadl.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
-    <blockquote><code><a href="http://localhost:9998/atom/application.wadl">http://localhost:9998/atom/application.wadl</a></code></blockquote>
-       <p>Following steps are using <a href="http://curl.haxx.se/">cURL</a> command line tool: 
-    <p>Get the service document:</p>
-    <blockquote><pre>curl http://127.0.0.1:9998/atom/service</pre></blockquote>
-    <p>This returns the following sevice document:</p>
-    <blockquote><pre>&lt;service xmlns="http://purl.org/atom/app#"
+<p>This deploys the Atom server using
+    <a href="http://grizzly.java.net/">Grizzly</a>
+</p>
+<p>A <a href="http://wadl.java.net/#spec">WADL description</a> may be accessed at the URL:</p>
+<blockquote><code><a href="http://localhost:9998/atom/application.wadl">http://localhost:9998/atom/application.wadl</a></code></blockquote>
+<p>Following steps are using <a href="http://curl.haxx.se/">cURL</a> command line tool:
+<p>Get the service document:</p>
+<blockquote><pre>curl http://127.0.0.1:9998/atom/service</pre></blockquote>
+<p>This returns the following sevice document:</p>
+<blockquote><pre>&lt;service xmlns="http://purl.org/atom/app#"
         xmlns:atom="http://www.w3.org/2005/Atom"&gt;
     &lt;workspace&gt;
         &lt;atom:title&gt;Service&lt;/atom:title&gt;
@@ -165,13 +165,13 @@ mvn clean compile exec:java</pre></blockquote>
         &lt;/collection&gt;
     &lt;/workspace&gt;
 &lt;/service&gt;</pre></blockquote>
-    <p>The service document contains one workspace with one collection.</p>
-    <p>Create a media link entry:</p>
-    <blockquote><pre>curl -i -X POST --data "Something is rotten in the state of Denmark" -HContent-type:text/plain  http://127.0.0.1:9998/atom/collection</pre></blockquote>
-    <p>Get the Atom Feed document:</p>
-    <blockquote><pre>curl http://127.0.0.1:9998/atom/collection</pre></blockquote>
-    <p>which returns the following:</p>
-    <blockquote><pre>    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<p>The service document contains one workspace with one collection.</p>
+<p>Create a media link entry:</p>
+<blockquote><pre>curl -i -X POST --data "Something is rotten in the state of Denmark" -HContent-type:text/plain  http://127.0.0.1:9998/atom/collection</pre></blockquote>
+<p>Get the Atom Feed document:</p>
+<blockquote><pre>curl http://127.0.0.1:9998/atom/collection</pre></blockquote>
+<p>which returns the following:</p>
+<blockquote><pre>    &lt;?xml version="1.0" encoding="UTF-8"?&gt;
     &lt;feed xmlns="http://www.w3.org/2005/Atom" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"&gt;
       &lt;title>Feed&lt;/title&gt;
       &lt;link rel="self" href="http://127.0.0.1:9998/atom/collection" /&gt;
@@ -186,26 +186,26 @@ mvn clean compile exec:java</pre></blockquote>
       &lt;/entry&gt;
     &lt;/feed&gt;
 </pre></blockquote>
-    <p>The Atom Feed document contains one Atom Media Link Entry. The 
+<p>The Atom Feed document contains one Atom Media Link Entry. The
     <code>atom:content</code> contains a link to the media. (Note that the UUIDs
     and hence the URIs will be different than those shown in this example. Substitute the UUID
     in the example for the one returned rather than copying and
     pasting these commands directly.)
     The Atom Entry document, which will be the same as the <code>entry</code>
-    element in the Atom Feed document, can be retrived from the URI of the 
+    element in the Atom Feed document, can be retrived from the URI of the
     <code>link</code> element with the <code>self</code> or <code>edit</code> value
     for the <code>rel</code> attribute. The <code>id</code> element contains the
     unique ID of the entry, which is a UUID.
-    </p><p>Get the media:</p>
-    <blockquote><pre>curl http://127.0.0.1:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media</pre></blockquote>
-    <p>which returns:</p>
-    <blockquote><pre>Something is rotten in the state of Denmark</pre></blockquote>
-    <p>Updating the media:</p>
-    <blockquote><pre>curl -X PUT --data "Hamlet said: Something is rotten in the state of Denmark" -HContent-type:text/plain http://127.0.0.1:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media</pre></blockquote>
-    <p>The entry now has an updated time when the entry is retrieved:</p>
-    <blockquote><pre>curl http://127.0.0.1:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd</pre></blockquote>
-    <p>which returns:</p>
-    <blockquote><pre>&lt;entry xmlns="http://www.w3.org/2005/Atom"&gt;
+</p><p>Get the media:</p>
+<blockquote><pre>curl http://127.0.0.1:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media</pre></blockquote>
+<p>which returns:</p>
+<blockquote><pre>Something is rotten in the state of Denmark</pre></blockquote>
+<p>Updating the media:</p>
+<blockquote><pre>curl -X PUT --data "Hamlet said: Something is rotten in the state of Denmark" -HContent-type:text/plain http://127.0.0.1:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media</pre></blockquote>
+<p>The entry now has an updated time when the entry is retrieved:</p>
+<blockquote><pre>curl http://127.0.0.1:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd</pre></blockquote>
+<p>which returns:</p>
+<blockquote><pre>&lt;entry xmlns="http://www.w3.org/2005/Atom"&gt;
   &lt;title>Media Entry&lt;/title&gt;
   &lt;link rel="self" href="http://localhost:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd" /&gt;
   &lt;link rel="edit-media" href="http://localhost:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media" /&gt;
@@ -214,16 +214,16 @@ mvn clean compile exec:java</pre></blockquote>
   &lt;updated><b>2011-03-23T06:12:46Z</b>&lt;/updated&gt;
   &lt;content type="TEXT" src="http://localhost:9998/atom/collection/bdac4727-cbc3-4c37-ad1e-206672bc48dd/media" /&gt;
 &lt;/entry&gt;</pre></blockquote>
-    
-    <p>Delete the Atom Entry:</p>
-    <blockquote><pre>curl -X DELETE http://localhost:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd</pre></blockquote>
-    <p>The <code>edit</code> link is used to delete the entry. Retrieving
+
+<p>Delete the Atom Entry:</p>
+<blockquote><pre>curl -X DELETE http://localhost:9998/atom/collection/edit/bdac4727-cbc3-4c37-ad1e-206672bc48dd</pre></blockquote>
+<p>The <code>edit</code> link is used to delete the entry. Retrieving
     the Atom Feed document:</p>
-    <blockquote><pre>curl http://localhost:9998/atom/collection</pre></blockquote>
-    <p>returns a feed with no entries:</p>
-    <blockquote><pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<blockquote><pre>curl http://localhost:9998/atom/collection</pre></blockquote>
+<p>returns a feed with no entries:</p>
+<blockquote><pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;feed xmlns="http://www.w3.org/2005/Atom" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:sy="http://purl.org/rss/1.0/modules/syndication/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"&gt;
   &lt;title>Feed&lt;/title&gt;
   &lt;link rel="self" href="http://localhost:9998/atom/collection" /&gt;
 &lt;/feed&gt;</pre></blockquote>
-    </body></html>
+</body></html>

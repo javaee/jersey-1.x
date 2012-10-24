@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,36 +40,27 @@
 
 package com.sun.jersey.samples.bookstore.resources;
 
-
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
-import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
-import com.sun.jersey.test.framework.spi.container.embedded.glassfish.EmbeddedGlassFishTestContainerFactory;
-import java.util.HashMap;
-import java.util.Map;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
- * A base class for test cases which boots up a GlassFish server for in container testing of RESTful resources
+ * A base class for test cases which boots up a GlassFish server for in container testing of RESTful resources.
  *
  * @author James Strachan
  * @author Naresh
  */
-public class TestSupport extends JerseyTest {
+public abstract class TestSupport extends JerseyTest {
 
     public TestSupport() throws Exception {
         super(new WebAppDescriptor.Builder("com.sun.jersey.samples.bookstore.resources")
                 .contextPath("bookstore")
                 .initParam("com.sun.jersey.config.feature.Redirect", "true")
                 .initParam("com.sun.jersey.config.feature.ImplicitViewables", "true")
-                .initParam("com.sun.jersey.config.property.WebPageContentRegex",
-                "/(images|css|jsp)/.*")
+                .initParam("com.sun.jersey.config.property.WebPageContentRegex", "/(images|css|jsp)/.*")
                 .build());
-        Map<String, String> INIT_PARAMS = new HashMap<String, String>();
-        INIT_PARAMS.put("com.sun.jersey.config.feature.Redirect", "true");
-        INIT_PARAMS.put("com.sun.jersey.config.feature.ImplicitViewables", "true");
-        INIT_PARAMS.put("com.sun.jersey.config.property.WebPageContentRegex",
-                "/(images|css|jsp)/.*");        
     }
 
     protected void assertHtmlResponse(String response) {

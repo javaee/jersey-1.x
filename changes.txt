@@ -1,4 +1,10 @@
 release 1.15
+- Fixed issue JERSEY-1441
+  http://java.net/jira/browse/JERSEY-1441
+  Jersey bookstore sample test cases need reactivation
+- Fixed issue JERSEY-1440
+  http://java.net/jira/browse/JERSEY-1440
+  Dead links found in sample READMEs + JERSEY-1440: Dead links found in sample READMEs
 - Fixed issue JERSEY-1409
   http://java.net/jira/browse/JERSEY-1409
   Enabled InputStream parameter to be set on a WADL generator by relaxing parameter type check
