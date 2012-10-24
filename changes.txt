@@ -1,4 +1,7 @@
 release 1.15
+- Fixed issue JERSEY-1409
+  http://java.net/jira/browse/JERSEY-1409
+  Enabled InputStream parameter to be set on a WADL generator by relaxing parameter type check
 - Fixed issue JERSEY-1436
   http://java.net/jira/browse/JERSEY-1436
   storage-service example: README clarification

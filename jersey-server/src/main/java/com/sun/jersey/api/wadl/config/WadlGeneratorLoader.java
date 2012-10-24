@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -60,25 +60,25 @@ import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
  * The properties of the {@link WadlGeneratorDescription}s can refer to {@link WadlGenerator} properties
  * of these types:
  * <ul>
- * 
+ *
  * <li>exact match: if the WadlGenerator property is of type <code>org.example.Foo</code> and the
  * property value provided by the {@link WadlGeneratorDescription} is of type <code>org.example.Foo</code></li>
- * 
+ *
  * <li>java.io.InputStream: The {@link InputStream} can e.g. represent a file. The stream is loaded from the
- * property value (provided by the {@link WadlGeneratorDescription}) via 
+ * property value (provided by the {@link WadlGeneratorDescription}) via
  * {@link ClassLoader#getResourceAsStream(String)}. It will be closed after {@link WadlGenerator#init()} was called.
  * </li>
- * 
+ *
  * <li>Types that provide a constructor for the provided type (mostly java.lang.String)</li>
- * 
- * <li><strong>Deprected, will be removed in future versions from the {@link WadlGeneratorLoader}:</strong><br/>
+ *
+ * <li><strong>Deprecated, will be removed in future versions from the {@link WadlGeneratorLoader}:</strong><br/>
  * java.lang.File: The property value can contain the prefix <em>classpath:</em> to denote, that the
- * path to the file is relative to the classpath. In this case, the property value is stripped by 
+ * path to the file is relative to the classpath. In this case, the property value is stripped by
  * the prefix <em>classpath:</em> and the java.lang.File is created via
  * <pre><code>new File( generator.getClass().getResource( strippedFilename ).toURI() )</code></pre></li>
- * 
+ *
  * </ul>
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
@@ -158,13 +158,13 @@ class WadlGeneratorLoader {
         Callback result = null;
 
         final String methodName = "set" + propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
-        final Method method = getMethodByName(methodName, generator.getClass());
-        if (method.getParameterTypes().length != 1) {
-            throw new RuntimeException("Method " + methodName + " is no setter, it does not expect exactly one parameter, but " + method.getParameterTypes().length);
+        final Method setterMethod = getMethodByName(methodName, generator.getClass());
+        if (setterMethod.getParameterTypes().length != 1) {
+            throw new RuntimeException("Method " + methodName + " is not a setter, it does not expect exactly one parameter, but " + setterMethod.getParameterTypes().length);
         }
-        final Class<?> paramClazz = method.getParameterTypes()[0];
-        if (paramClazz == propertyValue.getClass()) {
-            method.invoke(generator, propertyValue);
+        final Class<?> paramClazz = setterMethod.getParameterTypes()[0];
+        if (paramClazz.isAssignableFrom(propertyValue.getClass())) {
+            setterMethod.invoke(generator, propertyValue);
         } else if (File.class.equals(paramClazz) && propertyValue instanceof String) {
 
             /* This is now deprecated and can be removed in future versions.
@@ -172,7 +172,7 @@ class WadlGeneratorLoader {
              * a JEE environment instead of files.
              */
 
-            LOGGER.warning("Configuring the " + method.getDeclaringClass().getSimpleName()
+            LOGGER.warning("Configuring the " + setterMethod.getDeclaringClass().getSimpleName()
                     + " with the file based property " + propertyName + " is deprecated and will be removed"
                     + " in future versions of jersey! You should use the InputStream based property instead.");
 
@@ -187,9 +187,9 @@ class WadlGeneratorLoader {
                             + " classpath:/somefile.xml");
                 }
                 final File file = new File(resource.toURI());
-                method.invoke(generator, file);
+                setterMethod.invoke(generator, file);
             } else {
-                method.invoke(generator, new File(filename));
+                setterMethod.invoke(generator, new File(filename));
             }
         } else if (InputStream.class.equals(paramClazz) && propertyValue instanceof String) {
             final String resource = propertyValue.toString();
@@ -204,6 +204,7 @@ class WadlGeneratorLoader {
             }
             result = new Callback() {
 
+                @Override
                 public void callback() {
                     try {
                         is.close();
@@ -216,7 +217,7 @@ class WadlGeneratorLoader {
              * by ourselves...
              */
             try {
-                method.invoke(generator, is);
+                setterMethod.invoke(generator, is);
             } catch (Exception e) {
                 is.close();
                 throw e;
@@ -227,7 +228,7 @@ class WadlGeneratorLoader {
             final Constructor<?> paramTypeConstructor = paramClazz.getConstructor(propertyValue.getClass());
             if (paramTypeConstructor != null) {
                 final Object typedPropertyValue = paramTypeConstructor.newInstance(propertyValue);
-                method.invoke(generator, typedPropertyValue);
+                setterMethod.invoke(generator, typedPropertyValue);
             } else {
                 throw new RuntimeException("The property '" + propertyName + "' could not be set"
                         + " because the expected parameter is neither of type " + propertyValue.getClass()
@@ -277,6 +278,7 @@ class WadlGeneratorLoader {
         /**
          * Callback all registered {@link Callback} items.
          */
+        @Override
         public void callback() {
             for (Callback callback : this) {
                 callback.callback();
@@ -285,7 +287,7 @@ class WadlGeneratorLoader {
 
         /**
          * Appends the specified element to the end of the list, if the element is not null.
-         * 
+         *
          * @param e the element to append, can be null.
          * @return true if the element was appended to the list, otherwise null.
          */
