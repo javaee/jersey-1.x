@@ -39,6 +39,27 @@
  */
 package com.sun.jersey.test.framework.spi.container.grizzly2.web;
 
+import java.io.IOException;
+import java.net.URI;
+import java.util.EventListener;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.UriBuilder;
+
+import javax.servlet.Servlet;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.glassfish.grizzly.http.server.HttpHandler;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.servlet.FilterRegistration;
+import org.glassfish.grizzly.servlet.ServletRegistration;
+import org.glassfish.grizzly.servlet.WebappContext;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.test.framework.AppDescriptor;
@@ -46,22 +67,6 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
-import org.glassfish.grizzly.http.server.HttpHandler;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.grizzly.servlet.FilterRegistration;
-import org.glassfish.grizzly.servlet.ServletRegistration;
-import org.glassfish.grizzly.servlet.WebappContext;
-
-import javax.servlet.Servlet;
-import javax.ws.rs.core.UriBuilder;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.net.URI;
-import java.util.EventListener;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * A Web-based test container factory for creating test container instances
@@ -121,7 +126,7 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
                     .path(ad.getContextPath())
                     .path(ad.getServletPath())
                     .build();
-            
+
             LOGGER.info("Creating Grizzly2 Web Container configured at the base URI " + this.baseUri);
             this.contextPath = ad.getContextPath();
             this.servletPath = ad.getServletPath();
@@ -145,13 +150,13 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         public void start() {
             LOGGER.info("Starting the Grizzly2 Web Container...");
-            
+
             try {
                 httpServer.start();
             } catch (IOException ex) {
                 throw new TestContainerException(ex);
             }
-             
+
         }
 
         public void stop() {
@@ -188,27 +193,29 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
                     servletPathLocal +="/*";
                 }
             } else {
-               servletPathLocal = "/*";
+                servletPathLocal = "/*";
             }
 
-            WebappContext context = 
+            WebappContext context =
                     new WebappContext("TestContext", contextPathLocal);
 
             if (servletClass != null) {
                 ServletRegistration registration =
-                    context.addServlet(servletClass.getName(), servletClass);
+                        context.addServlet(servletClass.getName(), servletClass);
                 for(String initParamName : initParams.keySet()) {
                     registration.setInitParameter(initParamName, initParams.get(initParamName));
                 }
 
-            
+
                 registration.addMapping(servletPathLocal);
             } else {
-                ServletRegistration registration = 
-                   context.addServlet("default", new HttpServlet() {
-                       public void service() throws ServletException {
-                       }
-                   });
+                ServletRegistration registration =
+                        context.addServlet("default", new HttpServlet() {
+                            @Override
+                            protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                                resp.setStatus(404);
+                            }
+                        });
                 registration.addMapping("");
             }
 
@@ -219,7 +226,6 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             for(String contextParamName : contextParams.keySet()) {
                 context.addContextInitParameter(contextParamName, contextParams.get(contextParamName));
             }
-
 
             // Filter support
             if ( filters!=null ) {

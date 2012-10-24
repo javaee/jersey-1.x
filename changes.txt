@@ -1,4 +1,7 @@
 release 1.15
+- Fixed issue JERSEY-1433
+  http://java.net/jira/browse/JERSEY-1433
+  Incorrect implementation of default servlet (Grizzly 2)
 - Fixed issue JERSEY-1448
   http://java.net/jira/browse/JERSEY-1448
   Multipart.BodyPart only allowing headers that start with Content-*
