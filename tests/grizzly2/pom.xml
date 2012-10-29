@@ -46,7 +46,7 @@
     <parent>
         <groupId>com.sun.jersey.test</groupId>
         <artifactId>functional-tests</artifactId>
-        <version>1.15-SNAPSHOT</version>
+        <version>1.16-SNAPSHOT</version>
      </parent>
     <artifactId>grizzly2-tests</artifactId>
     <packaging>pom</packaging>

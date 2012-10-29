@@ -5,7 +5,7 @@
 
     <groupId>com.sun.jersey.test.osgi.runtime-delegate-tests</groupId>
     <artifactId>runtime-delegate-test</artifactId>
-    <version>1.15-SNAPSHOT</version>
+    <version>1.16-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Jersey OSGified - Tests for Various Scenarios of Runtime Delegation Settings</name>

@@ -47,11 +47,11 @@
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
-        <version>1.15-SNAPSHOT</version>
+        <version>1.16-SNAPSHOT</version>
     </parent>
     <groupId>com.sun.jersey.test</groupId>
     <artifactId>functional-tests</artifactId>
-    <version>1.15-SNAPSHOT</version>
+    <version>1.16-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Project Jersey tests</name>
     <description>

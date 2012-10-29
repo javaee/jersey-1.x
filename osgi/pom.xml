@@ -46,7 +46,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sun.jersey.test</groupId>
     <artifactId>osgi</artifactId>
-    <version>1.15-SNAPSHOT</version>
+    <version>1.16-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Project Jersey OSGi tests</name>
     <description>
