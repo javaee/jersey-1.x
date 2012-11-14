@@ -61,8 +61,12 @@ import java.util.Map;
 public class MediaTypes {
     private MediaTypes() { }
 
+    public final static String WADL_STRING = "application/vnd.sun.wadl+xml";
     public final static MediaType WADL =
-            MediaType.valueOf("application/vnd.sun.wadl+xml");
+            MediaType.valueOf(WADL_STRING);
+    public final static String WADL_JSON_STRING = "application/vnd.sun.wadl+json";
+    public final static MediaType WADL_JSON =
+            MediaType.valueOf(WADL_JSON_STRING);
 
     public final static MediaType FAST_INFOSET =
             MediaType.valueOf("application/fastinfoset");

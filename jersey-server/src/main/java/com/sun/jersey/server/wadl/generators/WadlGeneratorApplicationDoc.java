@@ -61,6 +61,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * This {@link WadlGenerator} adds all doc elements provided by {@link ApplicationDocs#getDocs()}
@@ -141,8 +142,8 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
      * @return the application
      * @see com.sun.jersey.server.wadl.WadlGenerator#createApplication()
      */
-    public Application createApplication() {
-        final Application result = _delegate.createApplication();
+    public Application createApplication(UriInfo requestInfo) {
+        final Application result = _delegate.createApplication(requestInfo);
         if (_applicationDocs != null && _applicationDocs.getDocs() != null &&
                 !_applicationDocs.getDocs().isEmpty()) {
             result.getDoc().addAll(_applicationDocs.getDocs());

@@ -39,15 +39,11 @@
  */
 package com.sun.jersey.server.wadl;
 
-import com.sun.research.ws.wadl.Application;
-
-import java.util.Collections;
-import java.util.Map;
-
 import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
-import javax.xml.namespace.QName;
+
+import com.sun.research.ws.wadl.Application;
 
 /**
  * This class is designed to combine the Application instance with any other
@@ -73,12 +69,12 @@ public class ApplicationDescription {
     public Application getApplication() {
         return _application;
     }
-    
+
     /**
-     * @return the QName for the given Class in the grammar
+     * @return the name for the given Class in the grammar of type resolvedType
      */
-    public QName resolve(Class type) {
-        return _externalGrammarDefiniton.resolve(type);
+    public <T> T resolve(Class type, MediaType mt, Class<T> resolvedType) {
+        return _externalGrammarDefiniton.resolve(type, mt, resolvedType);
     }
 
     /**
@@ -89,14 +85,14 @@ public class ApplicationDescription {
         return _externalGrammarDefiniton.map.get( path );
     }
 
-    
+
     /**
      * @return A set of all the external metadata keys
      */
     public Set<String> getExternalMetadataKeys() {
         return _externalGrammarDefiniton.map.keySet();
     }
-    
+
 
     /**
      * A simple holder class that stores a type and binary content
@@ -105,11 +101,13 @@ public class ApplicationDescription {
     public static class ExternalGrammar {
         private MediaType _type;
         private byte[] _content;
+        private boolean _includedInGrammar;
 
-        public ExternalGrammar( MediaType type, byte[] content ) {
+        public ExternalGrammar( MediaType type, byte[] content, boolean includedInGrammar ) {
             super();
             this._type = type;
             this._content = content;
+            this._includedInGrammar = includedInGrammar;
         }
 
         public MediaType getType() {
@@ -119,6 +117,15 @@ public class ApplicationDescription {
         public byte[] getContent() {
             // Defensive copy
             return _content.clone();
+        }
+
+        /**
+         * @return True if the URI needs to be in the grammar section
+         *  or false if this the grammars are references by URI as is the
+         *  case with JSON-Schema
+         */
+        public boolean isIncludedInGrammar() {
+            return _includedInGrammar;
         }
     }
 }

@@ -65,6 +65,7 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * This {@link WadlGenerator} adds the provided {@link Grammars} element to the
@@ -146,8 +147,8 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
      * @return application
      * @see com.sun.jersey.server.wadl.WadlGenerator#createApplication()
      */
-    public Application createApplication() {
-        final Application result = _delegate.createApplication();
+    public Application createApplication(UriInfo requestInfo) {
+        final Application result = _delegate.createApplication(requestInfo);
         if ( result.getGrammars() != null && !overrideGrammars) {
             LOG.info( "The wadl application created by the delegate ("+ _delegate +") already contains a grammars element," +
                     " we're adding elements of the provided grammars file." );

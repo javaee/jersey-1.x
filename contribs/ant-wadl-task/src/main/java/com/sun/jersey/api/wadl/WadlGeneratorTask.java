@@ -198,7 +198,7 @@ public class WadlGeneratorTask extends Task {
                 s.add(IntrospectionModeller.createResource(c));
             }
             
-            return new WadlBuilder().generate(s);
+            return new WadlBuilder().generate(null, s);
         } catch(Exception e) {
             throw new BuildException(e);
         } finally {

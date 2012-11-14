@@ -50,6 +50,7 @@ import javax.xml.namespace.QName;
 @XmlRootElement()
 public class RequestMessage {
     public static final QName name = new QName("urn:message", "requestMessage");
+    
     private String _text;
 
     public String getText() {

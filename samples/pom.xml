@@ -83,7 +83,7 @@
         <module>generate-wadl</module>
         <module>groovy</module>
         <module>helloworld</module>
-        <module>helloworld-osgi-webapp</module>
+        <!--module>helloworld-osgi-webapp</module-->
         <module>helloworld-webapp</module>
         <module>https-clientserver-grizzly</module>
         <module>https-server-glassfish</module>
@@ -102,7 +102,7 @@
         <module>moxy-oxm-mapping</module>
         <module>multipart-webapp</module>
         <module>optimistic-concurrency</module>
-        <module>osgi-http-service</module>
+        <!--module>osgi-http-service</module-->
         <module>scala-helloworld-webapp</module>
         <module>simple-atom-server</module>
         <module>simple-console</module>

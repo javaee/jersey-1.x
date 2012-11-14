@@ -92,6 +92,7 @@ import com.sun.jersey.api.model.AbstractResourceModelContext;
 import com.sun.jersey.api.model.AbstractResourceModelListener;
 import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.ResourceModelIssue;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
@@ -153,6 +154,10 @@ import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
 
 /**
  * A Web application that contains a set of resources, each referenced by
@@ -1246,6 +1251,32 @@ public final class WebApplicationImpl implements WebApplication {
             wadlApplicationContextInjectionProxy = new WadlApplicationContextInjectionProxy();
             injectableFactory.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>(
                     WadlApplicationContext.class, wadlApplicationContextInjectionProxy) {});
+
+            // In order for the application to properly marshall the Application
+            // object we need to make sure that we provide a JAXBContext that
+            // will work
+            final WadlApplicationContext wac = wadlApplicationContextInjectionProxy;
+            @Provider @Produces({MediaTypes.WADL_STRING,MediaTypes.WADL_JSON_STRING, MediaType.APPLICATION_XML}) 
+            class WadlContextResolver implements ContextResolver<JAXBContext> 
+            {
+                @Override
+                public JAXBContext getContext(Class<?> type) {
+                    
+                    if (com.sun.research.ws.wadl.Application.class.isAssignableFrom(type)) {
+                        return wac.getJAXBContext();
+                    }
+                    else {
+                        return null;
+                    }
+                }
+            }
+            
+            resourceConfig.getSingletons().add(new WadlContextResolver());
+            
+            // Update the provider services, so this is used
+            
+            providerServices.update(resourceConfig.getProviderClasses(),
+                    resourceConfig.getProviderSingletons(), injectableFactory);
         }
 
         // Initiate filter

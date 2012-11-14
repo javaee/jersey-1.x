@@ -58,6 +58,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Variant;
 
 /**
  *
@@ -109,21 +111,27 @@ import java.util.logging.Logger;
                         context.getUriInfo(),
                         resource, path);
 
-                try {
-                    final Marshaller marshaller = wadlApplicationContext.getJAXBContext().createMarshaller();
-                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                    final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                    marshaller.marshal(a, os);
-                    os.close();
-
+                List<Variant> vl = Variant.mediaTypes(MediaTypes.WADL, MediaTypes.WADL_JSON, MediaType.APPLICATION_XML_TYPE)
+                    .add().build();
+                Variant v = context.getRequest().selectVariant(vl);
+                if (v==null) {
                     context.getResponse().setResponse(
-                            Response.ok(os.toByteArray(), MediaTypes.WADL).
-                                    header("Allow", allow).header("Last-modified", lastModified).build());
-                } catch (Exception e) {
-                    LOGGER.log(Level.WARNING, "Could not marshal wadl Application.", e);
+                           Response.notAcceptable(vl).build());
+                }
+                else {
+                    try {
+                        // TODO more gracefully detect that JAX-B -> JSON
+                        // is not avaliable
+                        
+                        context.getResponse().setResponse(
+                                Response.ok(a, v).
+                                        header("Allow", allow).header("Last-modified", lastModified).build());
+                    } catch (Exception e) {
+                        LOGGER.log(Level.WARNING, "Could not marshal wadl Application.", e);
 
-                    context.getResponse().setResponse(
-                            Response.noContent().header("Allow", allow).build());
+                        context.getResponse().setResponse(
+                                Response.noContent().header("Allow", allow).build());
+                    }
                 }
             } else {
                 context.getResponse().setResponse(

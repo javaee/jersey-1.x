@@ -71,6 +71,7 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * This class implements the algorithm how the wadl is built for one or more
@@ -99,8 +100,9 @@ public class WadlBuilder {
      * @param resources the set of resources
      * @return the JAXB WADL application bean
      */
-    public ApplicationDescription generate(Set<AbstractResource> resources) {
-        Application wadlApplication = _wadlGenerator.createApplication();
+    public ApplicationDescription generate(UriInfo info, Set<AbstractResource> resources) {
+        
+        Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();
 
         // for each resource
@@ -138,9 +140,10 @@ public class WadlBuilder {
      * @return the JAXB WADL application bean
      */
     public Application generate(
+            UriInfo info,
             ApplicationDescription description,
             AbstractResource resource) {
-        Application wadlApplication = _wadlGenerator.createApplication();
+        Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateResource(resource, null);
         wadlResources.getResource().add(wadlResource);
@@ -166,9 +169,11 @@ public class WadlBuilder {
      * @return the JAXB WADL application bean
      */
     public Application generate(
+            UriInfo info,
             ApplicationDescription description,
             AbstractResource resource, String path) {
-        Application wadlApplication = _wadlGenerator.createApplication();
+        
+        Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateSubResource(resource, path);
         wadlResources.getResource().add(wadlResource);

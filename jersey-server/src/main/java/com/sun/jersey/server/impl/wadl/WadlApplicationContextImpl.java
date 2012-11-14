@@ -108,7 +108,7 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 //    }
     @Override
     public ApplicationDescription getApplication(UriInfo uriInfo) {
-        ApplicationDescription a = getWadlBuilder().generate(rootResources);
+        ApplicationDescription a = getWadlBuilder().generate(uriInfo, rootResources);
         final Application application = a.getApplication();
         for (Resources resources : application.getResources()) {
             if (resources.getBase() == null) {
@@ -130,8 +130,9 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
         ApplicationDescription description = getApplication(info);
 
         WadlGenerator wadlGenerator = wadlGeneratorConfig.createWadlGenerator();
-        Application a = path == null ? new WadlBuilder(wadlGenerator).generate(description, resource)
-                : new WadlBuilder(wadlGenerator).generate(description, resource, path);
+
+        Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(info, description,resource) :
+                new WadlBuilder( wadlGenerator ).generate(info, description, resource, path);
 
         for (Resources resources : a.getResources()) {
             resources.setBase(info.getBaseUri().toString());
@@ -222,6 +223,13 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
         //
 
         for (String path : applicationDescription.getExternalMetadataKeys()) {
+            ApplicationDescription.ExternalGrammar eg =
+                    applicationDescription.getExternalGrammar(path);
+            
+            if (!eg.isIncludedInGrammar()) {
+                continue;
+            }
+            
             URI schemaURI =
                     extendedPath.clone().path(path).build();
 

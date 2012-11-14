@@ -69,6 +69,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.List;
 import java.util.Properties;
+import javax.ws.rs.core.UriInfo;
 
 
 
@@ -214,7 +215,7 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
             return _delegate;
         }
 
-        public Application createApplication() {
+        public Application createApplication(UriInfo requestInfo) {
             return null;
         }
 

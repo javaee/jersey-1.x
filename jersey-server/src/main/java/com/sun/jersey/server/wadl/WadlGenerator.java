@@ -56,9 +56,10 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.UriInfo;
 
 
 /**
@@ -109,7 +110,7 @@ public interface WadlGenerator {
 
     // ================  methods for building the wadl application =============
 
-    public Application createApplication();
+    public Application createApplication(UriInfo requestInfo);
 
     public Resources createResources();
 
@@ -142,10 +143,14 @@ public interface WadlGenerator {
     public interface Resolver
     {
         /**
-         * @param type The type of the class
+         * @param resolvedType The type of the element to result, for XML Schema
+         *   this is going to be QName, for JSON Schema URI. If the resolver
+         *   doesn't recognise this type then it should return null.
+         * @param wadlType The type of the class
+         * @param mt The media type it needs to be resolve relative to.
          * @return The schema type of the class if defined, null if not.
          */
-        public QName resolve(Class type);
+        public <T> T resolve(Class wadlType, MediaType mt, Class<T> resolvedType);
     }
 
     /**
@@ -157,23 +162,23 @@ public interface WadlGenerator {
         // final public field to make a property was thinking about encapsulation
         // but decided code much simpler without
         public final Map<String, ApplicationDescription.ExternalGrammar>
-                map = new HashMap<String, ApplicationDescription.ExternalGrammar>();
+                map = new LinkedHashMap<String, ApplicationDescription.ExternalGrammar>();
 
         private List<Resolver> typeResolvers = new ArrayList<Resolver>();
 
         public void addResolver(Resolver resolver) {
             assert !typeResolvers.contains(resolver) : "Already in list";
-            typeResolvers.add(resolver);
+            typeResolvers.add(0,resolver);
         }
 
         /**
          * @param type the class to map
          * @return The resolved qualified name if one is defined.
          */
-        public QName resolve(Class type) {
-            QName name = null;
+        public <T> T resolve(Class type, MediaType mt, Class<T> resolvedType) {
+            T name = null;
             found : for (Resolver resolver : typeResolvers) {
-                name = resolver.resolve(type);
+                name = resolver.resolve(type, mt, resolvedType);
                 if (name!=null) break found;
             }
             return name;

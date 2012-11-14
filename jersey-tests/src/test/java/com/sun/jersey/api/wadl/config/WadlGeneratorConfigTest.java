@@ -61,6 +61,7 @@ import junit.framework.TestCase;
 
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * TODO: DESCRIBE ME<br>
@@ -142,7 +143,7 @@ public class WadlGeneratorConfigTest extends TestCase {
 
     static abstract class BaseWadlGenerator implements WadlGenerator {
 
-        public Application createApplication() {
+        public Application createApplication(UriInfo requestInfo) {
             return null;
         }
 

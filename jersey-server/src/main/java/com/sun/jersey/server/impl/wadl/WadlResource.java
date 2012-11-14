@@ -40,26 +40,36 @@
 
 package com.sun.jersey.server.impl.wadl;
 
-import com.sun.jersey.server.wadl.ApplicationDescription;
-import com.sun.jersey.server.wadl.WadlApplicationContext;
-import com.sun.jersey.spi.resource.Singleton;
-import com.sun.research.ws.wadl.Application;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.lang.annotation.Annotation;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Variant;
+import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Providers;
+
 import javax.xml.bind.Marshaller;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.server.wadl.ApplicationDescription;
+import com.sun.jersey.server.wadl.WadlApplicationContext;
+import com.sun.jersey.spi.resource.Singleton;
+import com.sun.research.ws.wadl.Application;
 
 /**
  *
@@ -73,46 +83,78 @@ public final class WadlResource {
 
     private WadlApplicationContext wadlContext;
     private URI lastBaseUri;
-    private byte[] wadlXmlRepresentation;
+    private byte[] cachedWadl;
     private String lastModified;
+    private Variant lastVariant;
+    private ApplicationDescription applicationDescription;
 
     public WadlResource(@Context WadlApplicationContext wadlContext) {
         this.wadlContext = wadlContext;
         this.lastModified = new SimpleDateFormat(HTTPDATEFORMAT).format(new Date());
     }
 
-    @Produces({"application/vnd.sun.wadl+xml", "application/xml"})
+    @Produces({MediaTypes.WADL_STRING, MediaTypes.WADL_JSON_STRING, "application/xml"})
     @GET
-    public synchronized Response getWadl(@Context UriInfo uriInfo) {
+    public synchronized Response getWadl(
+            @Context Request request,
+            @Context UriInfo uriInfo,
+            @Context Providers providers) {
         if(!wadlContext.isWadlGenerationEnabled()) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        if ((wadlXmlRepresentation == null) || ((lastBaseUri != null) && !lastBaseUri.equals(uriInfo.getBaseUri())) ) {
+        // Select the right variant based on the request type
+        List<Variant> vl = Variant.mediaTypes(MediaTypes.WADL, MediaTypes.WADL_JSON, MediaType.APPLICATION_XML_TYPE)
+            .add().build();
+        Variant v = request.selectVariant(vl);
+        if (v==null) {
+            return Response.notAcceptable(vl).build();
+        }
+        
+        // Update the last modified stamp
+        if (applicationDescription == null || ((lastBaseUri != null) && !lastBaseUri.equals(uriInfo.getBaseUri()) && !lastVariant.equals(v))) {
             this.lastBaseUri = uriInfo.getBaseUri();
             this.lastModified = new SimpleDateFormat(HTTPDATEFORMAT).format(new Date());
+            this.lastVariant = v;
 
-            ApplicationDescription applicationDescription =
-                    wadlContext.getApplication(uriInfo);
-            Application application = applicationDescription.getApplication();
+            applicationDescription = wadlContext.getApplication(uriInfo);
+            final Application application = applicationDescription.getApplication();
 
-            try {
-                final Marshaller marshaller = wadlContext.getJAXBContext().createMarshaller();
-                marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                marshaller.marshal(application, os);
-                wadlXmlRepresentation = os.toByteArray();
-                os.close();
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Could not marshal wadl Application.", e);
-                return Response.ok(applicationDescription).build();
+            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+
+            if(v.getMediaType().equals(MediaTypes.WADL)) {
+                try {
+                    final Marshaller marshaller = wadlContext.getJAXBContext().createMarshaller();
+                    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+                    marshaller.marshal(application, os);
+                    cachedWadl = os.toByteArray();
+                    os.close();
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Could not marshal wadl Application.", e);
+                    return Response.serverError().build();
+                }
+            } else {
+                final MessageBodyWriter<Application> messageBodyWriter = providers.getMessageBodyWriter(Application.class, null, new Annotation[0], v.getMediaType());
+
+                if(messageBodyWriter == null) {
+                    return Response.status(Response.Status.UNSUPPORTED_MEDIA_TYPE).build();
+                }
+
+                try {
+                    messageBodyWriter.writeTo(application, Application.class, null, new Annotation[0], v.getMediaType(), null  /* headers */, os);
+                    cachedWadl = os.toByteArray();
+                    os.close();
+                } catch (Exception e) {
+                    LOGGER.log(Level.WARNING, "Could not serialize wadl Application.", e);
+                    return Response.serverError().build();
+                }
             }
         }
 
-        return Response.ok(new ByteArrayInputStream(wadlXmlRepresentation)).header("Last-modified", lastModified).build();
+        return Response.ok(new ByteArrayInputStream(cachedWadl)).header("Last-modified", lastModified).build();
     }
 
-    @Produces({"application/xml"})
+    @Produces({"*/*"})
     @GET
     @Path("{path}")
     public synchronized Response geExternalGramar(

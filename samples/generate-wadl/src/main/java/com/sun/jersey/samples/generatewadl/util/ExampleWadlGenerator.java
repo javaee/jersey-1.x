@@ -39,6 +39,7 @@
  */
 package com.sun.jersey.samples.generatewadl.util;
 
+
 import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
@@ -58,6 +59,7 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -121,8 +123,8 @@ public class ExampleWadlGenerator implements WadlGenerator {
         }
     }
 
-    public Application createApplication() {
-        return _delegate.createApplication();
+    public Application createApplication(UriInfo info) {
+        return _delegate.createApplication(info);
     }
 
     public Method createMethod( AbstractResource r,

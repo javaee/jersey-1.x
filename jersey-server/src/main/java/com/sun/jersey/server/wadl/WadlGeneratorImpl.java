@@ -63,6 +63,7 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * This WadlGenerator creates the basic wadl artifacts.<br>
@@ -94,7 +95,7 @@ public class WadlGeneratorImpl implements WadlGenerator {
     }
 
     @Override
-    public Application createApplication() {
+    public Application createApplication(UriInfo requestInfo) {
         return new Application();
     }
 

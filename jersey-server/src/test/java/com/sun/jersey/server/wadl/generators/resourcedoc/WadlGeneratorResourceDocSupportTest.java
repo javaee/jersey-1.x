@@ -98,7 +98,7 @@ public class WadlGeneratorResourceDocSupportTest
 
         WadlBuilder wb = new WadlBuilder(wg);
         AbstractResource resource = IntrospectionModeller.createResource(TestResource.class);
-        ApplicationDescription app = wb.generate(Collections.singleton(resource));
+        ApplicationDescription app = wb.generate(null, Collections.singleton(resource));
 
 
         /* Confirm that it can be marshalled without error */

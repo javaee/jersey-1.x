@@ -72,6 +72,7 @@
         <module>jersey-non-blocking-client</module>
         <module>jersey-simple-server</module>
         <module>jersey-guice</module>
+        <module>jersey-wadl-json-schema</module>
         <module>jersey-oauth</module>
         <module>scala</module>
         <module>bill-burke-book</module>

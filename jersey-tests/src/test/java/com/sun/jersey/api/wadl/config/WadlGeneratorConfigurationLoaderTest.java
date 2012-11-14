@@ -65,6 +65,7 @@ import com.sun.research.ws.wadl.Response;
 import javax.ws.rs.core.MediaType;
 import java.net.URISyntaxException;
 import java.util.List;
+import javax.ws.rs.core.UriInfo;
 
 
 
@@ -121,7 +122,7 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
             _foo = foo;
         }
 
-        public Application createApplication() {
+        public Application createApplication(UriInfo requestInfo) {
             return null;
         }
 

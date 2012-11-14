@@ -39,25 +39,6 @@
  */
 package com.sun.jersey.wadl;
 
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
-import com.sun.jersey.server.wadl.ApplicationDescription;
-import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
-import com.sun.jersey.server.wadl.WadlBuilder;
-import com.sun.jersey.server.wadl.WadlGenerator;
-import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
-import com.sun.research.ws.wadl.Application;
-import com.sun.research.ws.wadl.Grammars;
-import com.sun.research.ws.wadl.Include;
-import com.sun.research.ws.wadl.Resources;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.XMLSerializer;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -73,6 +54,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+import com.sun.jersey.server.wadl.ApplicationDescription;
+import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
+import com.sun.jersey.server.wadl.WadlBuilder;
+import com.sun.jersey.server.wadl.WadlGenerator;
+import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
+import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Grammars;
+import com.sun.research.ws.wadl.Include;
+import com.sun.research.ws.wadl.Resources;
 
 /**
  * This mojo generates a wadl file, without the need of a running webapp.<br />
@@ -315,7 +317,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
             getLog().debug( "Adding class " + c.getName() );
             s.add( IntrospectionModeller.createResource(c) );
         }
-        return new WadlBuilder( wadlGenerator ).generate( s );
+        return new WadlBuilder( wadlGenerator ).generate( null, s );
     }
 
     /**

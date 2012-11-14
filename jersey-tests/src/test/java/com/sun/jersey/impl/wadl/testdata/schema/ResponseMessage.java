@@ -50,6 +50,8 @@ import javax.xml.namespace.QName;
 @XmlRootElement()
 public class ResponseMessage {
     public static final QName name = new QName("urn:message", "responseMessage");
+
+
     private String _text;
 
     protected ResponseMessage() {

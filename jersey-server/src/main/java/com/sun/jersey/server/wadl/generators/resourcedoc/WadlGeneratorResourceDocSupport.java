@@ -72,6 +72,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * A {@link WadlGenerator} implementation that enhances the generated wadl by
@@ -165,8 +166,8 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
      * @return the {@link Application} created by the delegate
      * @see com.sun.jersey.server.wadl.WadlGenerator#createApplication()
      */
-    public Application createApplication() {
-        return _delegate.createApplication();
+    public Application createApplication(UriInfo requestInfo) {
+        return _delegate.createApplication(requestInfo);
     }
 
     /**
