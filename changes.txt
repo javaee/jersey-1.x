@@ -1,4 +1,11 @@
-release 1.15
+release 1.16
+- Fixed issue
+  OPTIONS call to a webservice method with a "/" in path does not return method element
+- Fixed issue JERSEY-1459
+  http://java.net/jira/browse/JERSEY-1459
+  Unmarshalling error when parsing a JSON message generated from Jira 5.1.x
+
+release 1.15 (10-2012)
 - Fixed issue JERSEY-1441
   http://java.net/jira/browse/JERSEY-1441
   Jersey bookstore sample test cases need reactivation

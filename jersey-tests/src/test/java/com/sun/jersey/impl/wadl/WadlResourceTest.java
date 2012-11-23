@@ -47,6 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -78,12 +79,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import com.sun.jersey.api.JResponse;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -101,6 +96,13 @@ import com.sun.jersey.impl.entity.JAXBBean;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.WadlGeneratorImpl;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import com.sun.research.ws.wadl.Resources;
 
 /**
@@ -852,6 +854,64 @@ public class WadlResourceTest extends AbstractResourceTester {
 
             assertEquals(0, item.getChildNodes().getLength());
             assertEquals(0, item.getAttributes().getLength());
+        }
+    }
+
+    @Path("wadl6test")
+    public static class OptionsResource {
+
+        @GET
+        @Path("foo1")
+        public String foo1() {
+            return "foo1";
+        }
+
+        @GET
+        @Path("/foo2")
+        public String foo2() {
+            return "foo2";
+        }
+
+        @GET
+        @Path("foo3/")
+        public String foo3() {
+            return "foo3";
+        }
+
+        @GET
+        @Path("/foo4/")
+        public String foo4() {
+            return "foo4";
+        }
+    }
+
+    /**
+     * Tests OPTIONS method on a resource method annotated with @Path and containing a leading '/'.
+     */
+    public void testGetWithPathAndLeadingSlash() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(OptionsResource.class);
+        initiateWebApplication(rc);
+
+        for (int i = 1; i < 5; i++) {
+            final String[] paths = {
+                    "foo" + i,
+                    "/foo" + i,
+                    "foo" + i + '/',
+                    "/foo" + i + '/'
+            };
+
+            for (final String path : paths) {
+                final String document = resource("wadl6test").
+                        path(path).
+                        accept("application/vnd.sun.wadl+xml").
+                        options(String.class);
+
+                // check that the resulting document contains a method element with id="fooX"
+                assertTrue(Pattern.
+                        compile(".*<([\\w]+:)*method[^>]+id=\"foo" + i + "\"[^>]*>.*", Pattern.MULTILINE | Pattern.DOTALL).
+                        matcher(document).
+                        matches());
+            }
         }
     }
 }

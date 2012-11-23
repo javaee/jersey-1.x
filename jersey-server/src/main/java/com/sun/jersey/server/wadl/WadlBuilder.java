@@ -113,23 +113,23 @@ public class WadlBuilder {
         wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
-        
+
         // Build any external grammars
-        
+
         WadlGenerator.ExternalGrammarDefinition external =
-            _wadlGenerator.createExternalGrammar();
+                _wadlGenerator.createExternalGrammar();
 
         //
-        
+
         ApplicationDescription description = new ApplicationDescription(wadlApplication, external);
-        
+
         // Attach the data to the parts of the model
-        
+
         _wadlGenerator.attachTypes(description);
-         
+
         // Return the description of the application
-        
-        
+
+
         return description;
     }
 
@@ -150,13 +150,13 @@ public class WadlBuilder {
         wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
-        
+
         // Attach the data to the parts of the model
-        
+
         _wadlGenerator.attachTypes(description);
-        
+
         // Return the WADL
-        
+
         return wadlApplication;
     }
 
@@ -180,13 +180,13 @@ public class WadlBuilder {
         wadlApplication.getResources().add(wadlResources);
 
         addVersion(wadlApplication);
-        
+
         // Attach the data to the parts of the model
-        
+
         _wadlGenerator.attachTypes(description);
-        
+
         // Return the WADL
-        
+
         return wadlApplication;
     }
 
@@ -299,8 +299,8 @@ public class WadlBuilder {
      * @return the wadl request representation for the specified {@link MediaType}.
      */
     private Representation setRepresentationForMediaType(AbstractResource r,
-                                                             final AbstractResourceMethod m, MediaType mediaType,
-                                                             Request wadlRequest) {
+                                                         final AbstractResourceMethod m, MediaType mediaType,
+                                                         Request wadlRequest) {
         Representation wadlRepresentation = getRepresentationByMediaType(wadlRequest.getRepresentation(), mediaType);
         if (wadlRepresentation == null) {
             wadlRepresentation = _wadlGenerator.createRequestRepresentation(r, m, mediaType);
@@ -436,7 +436,8 @@ public class WadlBuilder {
         for (AbstractSubResourceMethod m : r.getSubResourceMethods()) {
             // find or create sub resource for uri template
             String template = m.getPath().getValue();
-            if (!template.equals(path)) {
+            if (!template.equals(path)
+                    && !template.equals('/' + path)) {
                 continue;
             }
             com.sun.research.ws.wadl.Method wadlMethod = generateMethod(r, wadlSubResourceParams, m);
