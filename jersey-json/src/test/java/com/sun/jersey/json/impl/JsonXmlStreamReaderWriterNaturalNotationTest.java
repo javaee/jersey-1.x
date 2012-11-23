@@ -120,6 +120,15 @@ public class JsonXmlStreamReaderWriterNaturalNotationTest extends TestCase {
         tryBean(ListEmptyBean.class, "listEmptyBean_natural.json", ListEmptyBean.createTestInstance());
     }
 
+    public void testListNullElementBean() throws Exception {
+        Map<String, Object> props = JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap());
+        Class[] classes = new Class[]{ListNullElementBean.class};
+
+        JAXBContext jaxbContext = JAXBContext.newInstance(classes, props);
+
+        tryReadingBean(ListNullElementBean.class, "listNullElementBean_natural.json", ListNullElementBean.createTestInstance(), jaxbContext, null);
+    }
+
     public void testListWrapperBean() throws Exception {
         tryBean(ListWrapperBean.class, "listWrapperBean_natural.json", ListWrapperBean.createTestInstance());
     }
