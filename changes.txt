@@ -1,4 +1,7 @@
 release 1.16
+- Fixed issue JERSEY-1601
+  http://java.net/jira/browse/JERSEY-1601
+  Avoid String type to store plain passwords when using HTTPBasicAuthFilter and HTTPDigestAuthFilter
 - Fixed issue
   OPTIONS call to a webservice method with a "/" in path does not return method element
 - Fixed issue JERSEY-1459

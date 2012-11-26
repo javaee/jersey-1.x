@@ -47,17 +47,20 @@ import com.sun.jersey.spi.HeaderDelegateProvider;
  * @author Paul.Sandoz@Sun.Com
  */
 public class StringProvider implements HeaderDelegateProvider<String> {
-    
+
+    @Override
     public boolean supports(Class<?> type) {
         return type == String.class;
     }
 
+    @Override
     public String toString(String header) {
         return header;
     }
 
+    @Override
     public String fromString(String header) {
         return header;
     }
-    
+
 }

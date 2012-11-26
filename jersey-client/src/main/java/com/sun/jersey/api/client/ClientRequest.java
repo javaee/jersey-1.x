@@ -52,14 +52,14 @@ import java.util.Map;
  * <p>
  * Instances may be created by using the static method {@link #create} and
  * methods on {@link ClientRequest.Builder}.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class ClientRequest {
 
     /**
      * Get the mutable property bag.
-     * 
+     *
      * @return the property bag.
      */
     public abstract Map<String, Object> getProperties();
@@ -79,7 +79,7 @@ public abstract class ClientRequest {
     public boolean getPropertyAsFeature(String name) {
         return getPropertyAsFeature(name, false);
     }
-    
+
     /**
      * Get a feature that is boolean property of the property bag.
      *
@@ -97,11 +97,11 @@ public abstract class ClientRequest {
     /**
      * Get the URI of the request. The URI shall contain sufficient
      * components to correctly dispatch a request
-     * 
+     *
      * @return the URI of the request.
      */
     public abstract URI getURI();
-    
+
     /**
      * Set the URI of the request. The URI shall contain sufficient
      * components to correctly dispatch a request
@@ -109,24 +109,24 @@ public abstract class ClientRequest {
      * @param uri the URI of the request.
      */
     public abstract void setURI(URI uri);
-    
+
     /**
      * Get the HTTP method of the request.
-     * 
+     *
      * @return the HTTP method.
      */
     public abstract String getMethod();
 
     /**
      * Set the HTTP method of the request.
-     * 
+     *
      * @param method the HTTP method.
      */
     public abstract void setMethod(String method);
-    
+
     /**
      * Get the entity of the request.
-     * 
+     *
      * @return the entity of the request.
      */
     public abstract Object getEntity();
@@ -138,14 +138,14 @@ public abstract class ClientRequest {
      * configuration of the client, can be passed. If generic information is
      * required then an instance of {@link javax.ws.rs.core.GenericEntity} may
      * be used.
-     * 
+     *
      * @param entity the entity of the request.
      */
     public abstract void setEntity(Object entity);
-    
+
     /**
      * Get the HTTP headers of the request.
-     * 
+     *
      * @return the HTTP headers of the request.
      */
     @Deprecated
@@ -164,21 +164,21 @@ public abstract class ClientRequest {
      * @return the client request adapter.
      */
     public abstract ClientRequestAdapter getAdapter();
-    
+
     /**
      * Set the client request adapter.
      * <p>
      * If an existing adapter is set then usually this adapter wrapped in the
-     * new adapter to be set such that the current adaption behaviour is
-     * retained and augmented with the new adpation behaviour.
+     * new adapter to be set such that the current adaption behavior is
+     * retained and augmented with the new adaptation behavior.
      *
      * @param adapter the client request adapter.
      */
     public abstract void setAdapter(ClientRequestAdapter adapter);
-    
+
     /**
      * Clone the request.
-     * 
+     *
      * @return the cloned request.
      */
     @Override
@@ -186,20 +186,20 @@ public abstract class ClientRequest {
 
     /**
      * Create a builder for building a new {@link ClientRequest} instance.
-     * 
+     *
      * @return the builder.
      */
     public static final ClientRequest.Builder create() {
         return new Builder();
     }
-            
+
     /**
      * The builder for building a {@link ClientRequest} instance.
      */
     public static final class Builder extends PartialRequestBuilder<Builder> {
         /**
          * Build the {@link ClientRequest} instance.
-         * 
+         *
          * @param uri the URI of the request.
          * @param method the HTTP method.
          * @return the client request.
@@ -211,18 +211,18 @@ public abstract class ClientRequest {
             return ro;
         }
     }
-    
+
     private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
-    
+
     /**
-     * Convert a header value, represented as a general object, to the 
+     * Convert a header value, represented as a general object, to the
      * string value.
      * <p>
      * This method defers to {@link RuntimeDelegate#createHeaderDelegate} to
      * obtain a {@link HeaderDelegate} to convert the value to a string. If
      * a {@link HeaderDelegate} is not found then the <code>toString</code>
      * is utilized.
-     * 
+     *
      * @param headerValue the header value as an object
      * @return the string value
      */

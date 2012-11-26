@@ -39,18 +39,25 @@
  */
 package com.sun.jersey.api.client.filter;
 
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientRequest;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.ClientResponse.Status;
-
-import javax.ws.rs.core.HttpHeaders;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
+
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.ClientResponse.Status;
 
 /**
  * Client filter adding HTTP Digest authentication headers in the request
@@ -68,6 +75,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
      */
     static private final int CNONCE_NB_BYTES = 4;
 
+    static private final Charset CHARACTER_SET = Charset.forName("iso-8859-1");
     /**
      * Init random generator
      */
@@ -103,7 +111,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
     // -------------------------------------------------------
 
     private final String user;
-    private final String pass;
+    private final byte[] password;
 
     // State
     private class State {
@@ -126,7 +134,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
 
 
     // -------------------------------------------------------
-    // Constructor
+    // Constructors
     // -------------------------------------------------------
 
     /**
@@ -134,18 +142,28 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
      * and password credentials.
      *
      * @param user username
-     * @param pass password
+     * @param password password
      */
     public HTTPDigestAuthFilter (
             final String user,
-            final String pass) {
-        this.user = user;
-        this.pass = pass;
+            final String password) {
+        this(user, password.getBytes(CHARACTER_SET));
     }
 
-    // -------------------------------------------------------
-    // Private utils
-    // -------------------------------------------------------
+    /**
+     * Creates a new HTTP Digest Authentication filter using provided username
+     * and password credentials. This constructor allows you to avoid storing
+     * plain password value in a String variable.
+     *
+     * @param user username
+     * @param password password
+     */
+    public HTTPDigestAuthFilter (
+            final String user,
+            final byte[] password) {
+        this.user = user;
+        this.password = password;
+    }
 
     /**
      * Append 'key="val",' to a buffer
@@ -157,8 +175,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             boolean withQuotes) {
 
         String quote = (withQuotes) ? "\"" : "";
-        buffer.append(
-                key + '=' + quote + val + quote + ',');
+        buffer.append(key).append('=').append(quote).append(val).append(quote).append(',');
     }
 
     static private void addKeyVal(
@@ -174,15 +191,16 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
      * @param data data to be converted to hex
      */
     private static String convertToHex(byte[] data) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < data.length; i++) {
             int halfbyte = (data[i] >>> 4) & 0x0F;
             int two_halfs = 0;
             do {
-                if ((0 <= halfbyte) && (halfbyte <= 9))
+                if ((0 <= halfbyte) && (halfbyte <= 9)) {
                     buf.append((char) ('0' + halfbyte));
-                else
+                } else {
                     buf.append((char) ('a' + (halfbyte - 10)));
+                }
                 halfbyte = data[i] & 0x0F;
             } while (two_halfs++ < 1);
         }
@@ -190,16 +208,16 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
     }
 
     /**
-     * Compute md5 hash of a string and returns the hexadecimal representation of it.
+     * Compute md5 hash of a byte array.
      *
-     * @param text data from which would be returned hash value computed.
-     * @return computed hash.
+     * @param data from which the hash will be computed.
+     * @return computed hash as a hexadecimal string.
      */
-    static String MD5(String text) {
+    static String MD5(final byte[] text) {
         try {
             MessageDigest md;
             md = MessageDigest.getInstance("MD5");
-            md.update(text.getBytes("iso-8859-1"), 0, text.length());
+            md.update(text, 0, text.length);
             byte[] md5hash = md.digest();
             return convertToHex(md5hash);
         } catch (Exception e) {
@@ -208,24 +226,67 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
     }
 
     /**
-     * Concatenate the strings with ':' and then pass it to md5
+     * Compute a MD5 representation for the byte arrays joined with ':'.
      *
-     * @param vals values to be concatenated.
-     * @return concatenated string.
+     * @param vals values to be joined must not be null.
+     * @return joined arrays MD5 string.
      */
-    static String concatMD5(String... vals) {
+    private static String md5ForJoined(byte[]... vals) {
+        return MD5(joined((byte)':', vals));
+    }
 
-        // Loop on vals : populate a buffer
-        StringBuilder buff = new StringBuilder();
-        for (String val : vals) {
-            buff.append(val);
-            buff.append(':');
-        } // End of loop on vals
+    /**
+     * Compute a MD5 representation for the Strings joined with ':'.
+     *
+     * @param vals values to be joined must not be null.
+     * @return joined arrays MD5 string.
+     */
+    private static String md5ForJoined(String... vals) {
+        return MD5(joined(':', vals).getBytes(CHARACTER_SET));
+    }
 
-        // Remove last separator
-        buff.deleteCharAt(buff.length() - 1);
+    /**
+     * Join parameters into a big array, use ':' as a separator.
+     * @param vals individual arrays to be joined
+     * @return joined array
+     */
+    private static byte[] joined(final byte separator, final byte[]... vals) {
+        final ByteArrayOutputStream jointArray = new ByteArrayOutputStream();
+        boolean firstItem = true;
+        for (byte[] val : vals) {
+            try {
+                if (firstItem) {
+                    firstItem = false;
+                } else {
+                    jointArray.write(separator);
+                }
+                jointArray.write(val);
+            } catch (IOException ex) {
+                Logger.getLogger(HTTPDigestAuthFilter.class.getName()).log(Level.SEVERE, null, ex);
+                throw new WebApplicationException(ex);
+            }
+        }
+        return jointArray.toByteArray();
+    }
 
-        return MD5(buff.toString());
+    /**
+     * Join parameters into one big String, use ':' as a separator.
+     * @param vals individual Strings to be joined
+     * @return joined array
+     */
+    private static String joined(final char separator, final String[] vals) {
+        final StringBuilder result = new StringBuilder();
+        boolean firstValue = true;
+
+        for(String s: vals) {
+            if (!firstValue) {
+                result.append(separator);
+            } else {
+                firstValue = false;
+            }
+            result.append(s);
+        }
+        return result.toString();
     }
 
 
@@ -266,10 +327,14 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             String[] parts = line.trim().split("\\s+", 2);
 
             // There should be 2 parts
-            if (parts.length != 2) continue;
+            if (parts.length != 2) {
+                continue;
+            }
 
             // Check the scheme
-            if (!parts[0].toLowerCase().equals("digest")) continue;
+            if (!parts[0].toLowerCase().equals("digest")) {
+                continue;
+            }
 
             // Parse the tokens
             Matcher match = TOKENS_PATTERN.matcher(parts[1]);
@@ -282,7 +347,9 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
 
                 // Defensive check, we should have 4 groups (key)=("(val)" | (val))
                 int nbGroups = match.groupCount();
-                if (nbGroups != 4) continue;
+                if (nbGroups != 4) {
+                    continue;
+                }
 
                 // Key without quotes
                 String key = match.group(1);
@@ -322,7 +389,9 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
 
             // Alias to string representation of qop
             String qopStr = null;
-            if (state.get().qop != null) qopStr = (state.get().qop == QOP.AUTH_INT) ? "auth-int" : "auth";
+            if (state.get().qop != null) {
+                qopStr = (state.get().qop == QOP.AUTH_INT) ? "auth-int" : "auth";
+            }
 
             // Init the value of the "authorized" header
             StringBuffer buff = new StringBuffer();
@@ -334,9 +403,15 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             addKeyVal(buff, "username", this.user);
             addKeyVal(buff, "realm", state.get().realm);
             addKeyVal(buff, "nonce", state.get().nextNonce);
-            if (state.get().opaque != null) addKeyVal(buff, "opaque", state.get().opaque);
-            if (state.get().algorithm != null) addKeyVal(buff, "algorithm", state.get().algorithm, false);
-            if (state.get().qop != null) addKeyVal(buff, "qop", qopStr, false);
+            if (state.get().opaque != null) {
+                addKeyVal(buff, "opaque", state.get().opaque);
+            }
+            if (state.get().algorithm != null) {
+                addKeyVal(buff, "algorithm", state.get().algorithm, false);
+            }
+            if (state.get().qop != null) {
+                addKeyVal(buff, "qop", qopStr, false);
+            }
             //if (this.domain != null) addKeyVal(buff, "domain", this.domain);
 
             // -------------------------------------------------------
@@ -344,10 +419,10 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             // -------------------------------------------------------
 
             // HA1
-            String HA1 = concatMD5(
-                    this.user,
-                    state.get().realm,
-                    this.pass);
+            String HA1 = md5ForJoined(
+                    this.user.getBytes(CHARACTER_SET),
+                    state.get().realm.getBytes(CHARACTER_SET),
+                    this.password);
 
             // Get exact requested URI
             String uri = request.getURI().getPath();
@@ -359,12 +434,12 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             // HA2 : Switch on qop
             String HA2;
             if (state.get().qop == QOP.AUTH_INT && (request.getEntity() != null)) {
-                HA2 = concatMD5(
+                HA2 = md5ForJoined(
                         request.getMethod(),
                         uri,
                         request.getEntity().toString());
             } else {
-                HA2 = concatMD5(
+                HA2 = md5ForJoined(
                         request.getMethod(),
                         uri);
             }
@@ -373,13 +448,13 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             String response;
             if (state.get().qop == null) { // Simple response
 
-                response = concatMD5(
+                response = md5ForJoined(
                         HA1,
                         state.get().nextNonce,
                         HA2);
 
             } else { // Quality of protection is set
-                
+
                 // Generate client nonce (UID)
                 String cnonce = randHexBytes(CNONCE_NB_BYTES);
 
@@ -391,7 +466,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
                 addKeyVal(buff, "cnonce", cnonce);
                 addKeyVal(buff, "nc", nc, false);
 
-                response = concatMD5(
+                response = md5ForJoined(
                         HA1,
                         state.get().nextNonce,
                         nc,
@@ -426,7 +501,9 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
                             HttpHeaders.WWW_AUTHENTICATE));
 
             // No digest authentication request found ? => We can do nothing more
-            if (map == null) return response;
+            if (map == null) {
+                return response;
+            }
 
             // Get header values
             state.get().realm = map.get("realm");
