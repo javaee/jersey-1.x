@@ -46,7 +46,7 @@
     <parent>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-contribs</artifactId>
-        <version>1.16-SNAPSHOT</version>
+        <version>1.17-SNAPSHOT</version>
     </parent>
     <artifactId>ant-wadl-task</artifactId>
     <packaging>jar</packaging>

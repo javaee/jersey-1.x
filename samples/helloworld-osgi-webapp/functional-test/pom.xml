@@ -50,7 +50,7 @@
     </parent>
     <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
     <artifactId>functional-test</artifactId>
-    <version>1.16-SNAPSHOT</version>
+    <version>1.17-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Helloworld OSGi WebApp - Jersey Sample Test</name>

@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.sun.jersey.experimental.hypermedia-action</groupId>
         <artifactId>hypermedia-action</artifactId>
-        <version>1.16-SNAPSHOT</version>
+        <version>1.17-SNAPSHOT</version>
     </parent>
     <artifactId>hypermedia-action-sample</artifactId>
     <packaging>jar</packaging>
@@ -114,9 +114,9 @@
         </plugins>
     </build>
     <properties>
-        <jersey-version>1.16-SNAPSHOT</jersey-version>
+        <jersey-version>1.17-SNAPSHOT</jersey-version>
     </properties>
-    <version>1.16-SNAPSHOT</version>
+    <version>1.17-SNAPSHOT</version>
     <description>Sample that shows the use of hypermedia annotations like @Action
         available in Jersey.</description>
 </project>
