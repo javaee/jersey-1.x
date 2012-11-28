@@ -54,22 +54,38 @@
     <packaging>jar</packaging>
     <name>jersey-wadl-json-schema</name>
 
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <configuration>
+                            <links>
+                                <link>http://jsr311.java.net/nonav/releases/1.1</link>
+                                <link>http://jersey.java.net/nonav/apidocs/${project.version}/jersey/</link>
+                            </links>
+                            <notimestamp>true</notimestamp>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
     <dependencies>
-
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-
 
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
