@@ -1,4 +1,7 @@
 release 1.17
+- Fixed issue JERSEY-1618
+  http://java.net/jira/browse/JERSEY-1618
+  Incorrect ResourceConfig initialization"
 
 release 1.16 (12-2012)
 - Fixed issue JERSEY-1601
