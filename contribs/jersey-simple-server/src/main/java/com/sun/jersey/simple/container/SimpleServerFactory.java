@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,6 +48,8 @@ import java.net.URI;
 import javax.net.ssl.SSLContext;
 
 import org.simpleframework.http.core.Container;
+import org.simpleframework.http.core.ContainerServer;
+import org.simpleframework.transport.Server;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
@@ -59,160 +61,160 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
  * Factory for creating and starting Simple server containers. This returns
  * a handle to the started server as {@link Closeable} instances, which allows
  * the server to be stopped by invoking the {@link Closeable#close} method.
- * <p>
+ * <p/>
  * To start the server in HTTPS mode an {@link SSLContext} can be provided.
- * This will be used to decrypt and encrypt information sent over the 
+ * This will be used to decrypt and encrypt information sent over the
  * connected TCP socket channel.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public final class SimpleServerFactory {
-    
-    private SimpleServerFactory() {}
-    
+
+    private SimpleServerFactory() {
+    }
+
     /**
-     * Create a {@link Closeable} that registers an {@link Container} that 
-     * in turn manages all root resource and provder classes found by searching the 
+     * Create a {@link Closeable} that registers an {@link Container} that
+     * in turn manages all root resource and provder classes found by searching the
      * classes referenced in the java classpath.
-     * <p>
-     * This implementation defers to the 
+     * <p/>
+     * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class)} method for creating
      * an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "http". The URI user information and host
-     *        are ignored If the URI port is not present then port 80 will be 
-     *        used. The URI path, query and fragment components are ignored.
+     *                equal to "http". The URI user information and host
+     *                are ignored If the URI port is not present then port 80 will be
+     *                used. The URI path, query and fragment components are ignored.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(String address) 
-          throws IOException, IllegalArgumentException {            
+    public static Closeable create(String address)
+            throws IOException, IllegalArgumentException {
         if (address == null) {
             throw new IllegalArgumentException("The URI must not be null");
         }
         return create(URI.create(address));
     }
-    
+
     /**
-     * Create a {@link Closeable} that registers an {@link Container} that 
-     * in turn manages all root resource and provder classes found by searching the 
+     * Create a {@link Closeable} that registers an {@link Container} that
+     * in turn manages all root resource and provder classes found by searching the
      * classes referenced in the java classpath.
-     * <p>
-     * This implementation defers to the 
+     * <p/>
+     * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class)} method for creating
      * an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "https". The URI user information and host
-     *        are ignored If the URI port is not present then port 143 will be 
-     *        used. The URI path, query and fragment components are ignored.
+     *                equal to "https". The URI user information and host
+     *                are ignored If the URI port is not present then port 143 will be
+     *                used. The URI path, query and fragment components are ignored.
      * @param context this is the SSL context used for SSL connections
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(String address, SSLContext context) 
-          throws IOException, IllegalArgumentException {            
+    public static Closeable create(String address, SSLContext context)
+            throws IOException, IllegalArgumentException {
         if (address == null) {
             throw new IllegalArgumentException("The URI must not be null");
         }
         return create(URI.create(address), context);
     }
-    
+
     /**
-     * Create a {@link Closeable} that registers an {@link Container} that 
-     * in turn manages all root resource and provder classes found by searching 
+     * Create a {@link Closeable} that registers an {@link Container} that
+     * in turn manages all root resource and provder classes found by searching
      * the classes referenced in the java classpath.
-     * <p>
-     * This implementation defers to the 
+     * <p/>
+     * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class)} method for creating
      * an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "http". The URI user information and host
-     *        are ignored If the URI port is not present then port 80 will be 
-     *        used. The URI path, query and fragment components are ignored.
+     *                equal to "http". The URI user information and host
+     *                are ignored If the URI port is not present then port 80 will be
+     *                used. The URI path, query and fragment components are ignored.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(URI address) 
-          throws IOException, IllegalArgumentException {            
+    public static Closeable create(URI address)
+            throws IOException, IllegalArgumentException {
         return create(address, ContainerFactory.createContainer(Container.class));
     }
-    
+
     /**
-     * Create a {@link Closeable} that registers an {@link Container} that 
-     * in turn manages all root resource and provder classes found by searching 
+     * Create a {@link Closeable} that registers an {@link Container} that
+     * in turn manages all root resource and provder classes found by searching
      * the classes referenced in the java classpath.
-     * <p>
-     * This implementation defers to the 
+     * <p/>
+     * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class)} method for creating
      * an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "https". The URI user information and host
-     *        are ignored If the URI port is not present then port 143 will be 
-     *        used. The URI path, query and fragment components are ignored.
+     *                equal to "https". The URI user information and host
+     *                are ignored If the URI port is not present then port 143 will be
+     *                used. The URI path, query and fragment components are ignored.
      * @param context this is the SSL context used for SSL connections
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(URI address, SSLContext context) 
-          throws IOException, IllegalArgumentException {            
+    public static Closeable create(URI address, SSLContext context)
+            throws IOException, IllegalArgumentException {
         return create(address, context, ContainerFactory.createContainer(Container.class));
     }
-        
+
     /**
      * Create a {@link Closeable} that registers an {@link Container} that
      * in turn manages all root resource and provder classes declared by the
      * resource configuration.
-     * <p>
+     * <p/>
      * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class, ResourceConfig)} method
      * for creating an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "http". The URI user information and host
-     *        are ignored If the URI port is not present then port 80 will be
-     *        used. The URI path, query and fragment components are ignored.
-     * @param config the resource configuration.
+     *                equal to "http". The URI user information and host
+     *                are ignored If the URI port is not present then port 80 will be
+     *                used. The URI path, query and fragment components are ignored.
+     * @param config  the resource configuration.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(String address, ResourceConfig config) 
-          throws IOException, IllegalArgumentException {
+    public static Closeable create(String address, ResourceConfig config)
+            throws IOException, IllegalArgumentException {
         if (address == null) {
             throw new IllegalArgumentException("The URI must not be null");
         }
         return create(URI.create(address), config);
     }
-    
+
     /**
      * Create a {@link Closeable} that registers an {@link Container} that
      * in turn manages all root resource and provder classes declared by the
      * resource configuration.
-     * <p>
+     * <p/>
      * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class, ResourceConfig)} method
      * for creating an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "https". The URI user information and host
-     *        are ignored If the URI port is not present then port 143 will be
-     *        used. The URI path, query and fragment components are ignored.
+     *                equal to "https". The URI user information and host
+     *                are ignored If the URI port is not present then port 143 will be
+     *                used. The URI path, query and fragment components are ignored.
      * @param context this is the SSL context used for SSL connections
-     * @return the closeable connection, with the endpoint started
      * @return the connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(String address, SSLContext context, ResourceConfig config) 
-          throws IOException, IllegalArgumentException {
+    public static Closeable create(String address, SSLContext context, ResourceConfig config)
+            throws IOException, IllegalArgumentException {
         if (address == null) {
             throw new IllegalArgumentException("The URI must not be null");
         }
@@ -224,46 +226,46 @@ public final class SimpleServerFactory {
      * Create a {@link Closeable} that registers an {@link Container} that
      * in turn manages all root resource and provder classes declared by the
      * resource configuration.
-     * <p>
+     * <p/>
      * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class, ResourceConfig)} method
      * for creating an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "http". The URI user information and host
-     *        are ignored If the URI port is not present then port 80 will be
-     *        used. The URI path, query and fragment components are ignored.
-     * @param config the resource configuration.
+     *                equal to "http". The URI user information and host
+     *                are ignored If the URI port is not present then port 80 will be
+     *                used. The URI path, query and fragment components are ignored.
+     * @param config  the resource configuration.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
     public static Closeable create(URI address, ResourceConfig config)
-          throws IOException, IllegalArgumentException {
+            throws IOException, IllegalArgumentException {
         return create(address, ContainerFactory.createContainer(Container.class, config));
     }
-    
+
     /**
      * Create a {@link Closeable} that registers an {@link Container} that
      * in turn manages all root resource and provder classes declared by the
      * resource configuration.
-     * <p>
+     * <p/>
      * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class, ResourceConfig)} method
      * for creating an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "https". The URI user information and host
-     *        are ignored If the URI port is not present then port 143 will be
-     *        used. The URI path, query and fragment components are ignored.
+     *                equal to "https". The URI user information and host
+     *                are ignored If the URI port is not present then port 143 will be
+     *                used. The URI path, query and fragment components are ignored.
      * @param context this is the SSL context used for SSL connections
-     * @param config the resource configuration.
+     * @param config  the resource configuration.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
     public static Closeable create(URI address, SSLContext context, ResourceConfig config)
-          throws IOException, IllegalArgumentException {
+            throws IOException, IllegalArgumentException {
         return create(address, context, ContainerFactory.createContainer(Container.class, config));
     }
 
@@ -271,58 +273,58 @@ public final class SimpleServerFactory {
      * Create a {@link Closeable} that registers an {@link Container} that
      * in turn manages all root resource and provder classes declared by the
      * resource configuration.
-     * <p>
+     * <p/>
      * This implementation defers to the
-     * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)} 
+     * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)}
      * method for creating an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "http". The URI user information and host
-     *        are ignored If the URI port is not present then port 80 will be
-     *        used. The URI path, query and fragment components are ignored.
-     * @param config the resource configuration.
+     *                equal to "http". The URI user information and host
+     *                are ignored If the URI port is not present then port 80 will be
+     *                used. The URI path, query and fragment components are ignored.
+     * @param config  the resource configuration.
      * @param factory the IoC component provider factory the web application
-     *        delegates to for obtaining instances of resource and provider
-     *        classes. May be null if the web application is responsible for
-     *        instantiating resource and provider classes.
+     *                delegates to for obtaining instances of resource and provider
+     *                classes. May be null if the web application is responsible for
+     *                instantiating resource and provider classes.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(String address, ResourceConfig config, 
-            IoCComponentProviderFactory factory)
+    public static Closeable create(String address, ResourceConfig config,
+                                   IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException {
         if (address == null) {
             throw new IllegalArgumentException("The URI must not be null");
         }
         return create(URI.create(address), config, factory);
     }
-    
+
     /**
      * Create a {@link Closeable} that registers an {@link Container} that
      * in turn manages all root resource and provder classes declared by the
      * resource configuration.
-     * <p>
+     * <p/>
      * This implementation defers to the
-     * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)} 
+     * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)}
      * method for creating an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "https". The URI user information and host
-     *        are ignored If the URI port is not present then port 143 will be
-     *        used. The URI path, query and fragment components are ignored.
+     *                equal to "https". The URI user information and host
+     *                are ignored If the URI port is not present then port 143 will be
+     *                used. The URI path, query and fragment components are ignored.
      * @param context this is the SSL context used for SSL connections
-     * @param config the resource configuration.
+     * @param config  the resource configuration.
      * @param factory the IoC component provider factory the web application
-     *        delegates to for obtaining instances of resource and provider
-     *        classes. May be null if the web application is responsible for
-     *        instantiating resource and provider classes.
+     *                delegates to for obtaining instances of resource and provider
+     *                classes. May be null if the web application is responsible for
+     *                instantiating resource and provider classes.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(String address, SSLContext context, ResourceConfig config, 
-            IoCComponentProviderFactory factory)
+    public static Closeable create(String address, SSLContext context, ResourceConfig config,
+                                   IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException {
         if (address == null) {
             throw new IllegalArgumentException("The URI must not be null");
@@ -334,71 +336,71 @@ public final class SimpleServerFactory {
      * Create a {@link Closeable} that registers an {@link Container} that
      * in turn manages all root resource and provder classes declared by the
      * resource configuration.
-     * <p>
+     * <p/>
      * This implementation defers to the
-     * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)} 
+     * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)}
      * method for creating an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "http". The URI user information and host
-     *        are ignored If the URI port is not present then port 80 will be
-     *        used. The URI path, query and fragment components are ignored.
-     * @param config the resource configuration.
+     *                equal to "http". The URI user information and host
+     *                are ignored If the URI port is not present then port 80 will be
+     *                used. The URI path, query and fragment components are ignored.
+     * @param config  the resource configuration.
      * @param factory the IoC component provider factory the web application
-     *        delegates to for obtaining instances of resource and provider
-     *        classes. May be null if the web application is responsible for
-     *        instantiating resource and provider classes.
+     *                delegates to for obtaining instances of resource and provider
+     *                classes. May be null if the web application is responsible for
+     *                instantiating resource and provider classes.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
     public static Closeable create(URI address, ResourceConfig config,
-            IoCComponentProviderFactory factory)
+                                   IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException {
         return create(address, ContainerFactory.createContainer(Container.class, config, factory));
     }
-    
+
     /**
      * Create a {@link Closeable} that registers an {@link Container} that
      * in turn manages all root resource and provder classes declared by the
      * resource configuration.
-     * <p>
+     * <p/>
      * This implementation defers to the
      * {@link ContainerFactory#createContainer(Class, ResourceConfig, IoCComponentProviderFactory)} method
      * for creating an Container that manages the root resources.
      *
      * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "https". The URI user information and host
-     *        are ignored If the URI port is not present then port 143 will be
-     *        used. The URI path, query and fragment components are ignored.
+     *                equal to "https". The URI user information and host
+     *                are ignored If the URI port is not present then port 143 will be
+     *                used. The URI path, query and fragment components are ignored.
      * @param context this is the SSL context used for SSL connections
-     * @param config the resource configuration.
+     * @param config  the resource configuration.
      * @param factory the IoC component provider factory the web application
-     *        delegates to for obtaining instances of resource and provider
-     *        classes. May be null if the web application is responsible for
-     *        instantiating resource and provider classes.
+     *                delegates to for obtaining instances of resource and provider
+     *                classes. May be null if the web application is responsible for
+     *                instantiating resource and provider classes.
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
     public static Closeable create(URI address, SSLContext context, ResourceConfig config,
-            IoCComponentProviderFactory factory)
+                                   IoCComponentProviderFactory factory)
             throws IOException, IllegalArgumentException {
         return create(address, context, ContainerFactory.createContainer(Container.class, config, factory));
     }
 
     /**
-     * Create a {@link Closeable} that registers an {@link Container} that 
-     * in turn manages all root resource and provder classes found by searching the 
+     * Create a {@link Closeable} that registers an {@link Container} that
+     * in turn manages all root resource and provder classes found by searching the
      * classes referenced in the java classpath.
      *
-     * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "http". The URI user information and host
-     *        are ignored If the URI port is not present then port 80 will be 
-     *        used. The URI path, query and fragment components are ignored.
+     * @param address   the URI to create the http server. The URI scheme must be
+     *                  equal to "http". The URI user information and host
+     *                  are ignored If the URI port is not present then port 80 will be
+     *                  used. The URI path, query and fragment components are ignored.
      * @param container the container that handles all HTTP requests
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
     public static Closeable create(String address, Container container)
@@ -408,20 +410,20 @@ public final class SimpleServerFactory {
         }
         return create(URI.create(address), container);
     }
-    
+
     /**
-     * Create a {@link Closeable} that registers an {@link Container} that 
-     * in turn manages all root resource and provder classes found by searching the 
+     * Create a {@link Closeable} that registers an {@link Container} that
+     * in turn manages all root resource and provder classes found by searching the
      * classes referenced in the java classpath.
      *
-     * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "https". The URI user information and host
-     *        are ignored If the URI port is not present then port 143 will be 
-     *        used. The URI path, query and fragment components are ignored.
-     * @param context this is the SSL context used for SSL connections
+     * @param address   the URI to create the http server. The URI scheme must be
+     *                  equal to "https". The URI user information and host
+     *                  are ignored If the URI port is not present then port 143 will be
+     *                  used. The URI path, query and fragment components are ignored.
+     * @param context   this is the SSL context used for SSL connections
      * @param container the container that handles all HTTP requests
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
     public static Closeable create(String address, SSLContext context, Container container)
@@ -431,72 +433,73 @@ public final class SimpleServerFactory {
         }
         return create(URI.create(address), context, container);
     }
-    
+
     /**
-     * Create a {@link Closeable} that registers an {@link Container} that 
-     * in turn manages all root resource and provder classes found by searching the 
+     * Create a {@link Closeable} that registers an {@link Container} that
+     * in turn manages all root resource and provder classes found by searching the
      * classes referenced in the java classpath.
      *
-     * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "http". The URI user information and host
-     *        are ignored If the URI port is not present then port 80 will be 
-     *        used. The URI path, query and fragment components are ignored.
+     * @param address   the URI to create the http server. The URI scheme must be
+     *                  equal to "http". The URI user information and host
+     *                  are ignored If the URI port is not present then port 80 will be
+     *                  used. The URI path, query and fragment components are ignored.
      * @param container the container that handles all HTTP requests
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(URI address, Container container) 
+    public static Closeable create(URI address, Container container)
             throws IOException, IllegalArgumentException {
         if (address == null) {
             throw new IllegalArgumentException("The URI must not be null");
         }
-        return create(address, null, container);           
+        return create(address, null, container);
     }
-    
+
     /**
-     * Create a {@link Closeable} that registers an {@link Container} that 
-     * in turn manages all root resource and provder classes found by searching the 
+     * Create a {@link Closeable} that registers an {@link Container} that
+     * in turn manages all root resource and provder classes found by searching the
      * classes referenced in the java classpath.
      *
-     * @param address the URI to create the http server. The URI scheme must be
-     *        equal to "https". The URI user information and host
-     *        are ignored If the URI port is not present then port 143 will be 
-     *        used. The URI path, query and fragment components are ignored.
-     * @param context this is the SSL context used for SSL connections
+     * @param address   the URI to create the http server. The URI scheme must be
+     *                  equal to "https". The URI user information and host
+     *                  are ignored If the URI port is not present then port 143 will be
+     *                  used. The URI path, query and fragment components are ignored.
+     * @param context   this is the SSL context used for SSL connections
      * @param container the container that handles all HTTP requests
      * @return the closeable connection, with the endpoint started
-     * @throws IOException if an error occurs creating the container.
+     * @throws IOException              if an error occurs creating the container.
      * @throws IllegalArgumentException if <code>address</code> is null
      */
-    public static Closeable create(URI address, SSLContext context, Container container) 
+    public static Closeable create(URI address, SSLContext context, Container container)
             throws IOException, IllegalArgumentException {
         if (address == null) {
             throw new IllegalArgumentException("The URI must not be null");
-        }   
+        }
         String scheme = address.getScheme();
         int defaultPort = 80;
-        
-        if(context == null) {
-          if (!scheme.equalsIgnoreCase("http")) {
-             throw new IllegalArgumentException("The URI scheme should be 'http' when not using SSL");
-          } 
+
+        if (context == null) {
+            if (!scheme.equalsIgnoreCase("http")) {
+                throw new IllegalArgumentException("The URI scheme should be 'http' when not using SSL");
+            }
         } else {
-          if (!scheme.equalsIgnoreCase("https")) {
-             throw new IllegalArgumentException("The URI scheme should be 'https' when using SSL");
-          }
-          defaultPort = 143; // default HTTPS port
-        }  
+            if (!scheme.equalsIgnoreCase("https")) {
+                throw new IllegalArgumentException("The URI scheme should be 'https' when using SSL");
+            }
+            defaultPort = 143; // default HTTPS port
+        }
         int port = address.getPort();
-        
-        if(port == -1) {
-           port = defaultPort;
-        }         
+
+        if (port == -1) {
+            port = defaultPort;
+        }
         SocketAddress listen = new InetSocketAddress(port);
-        Connection connection = new SocketConnection(container);
-        
+        Server server = new ContainerServer(container);
+        Connection connection = new SocketConnection(server);
+
         connection.connect(listen, context);
-        
+
         return connection;
-    }  
+    }
 }

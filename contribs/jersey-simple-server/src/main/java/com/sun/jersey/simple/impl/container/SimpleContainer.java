@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -65,15 +65,15 @@ import com.sun.jersey.spi.container.WebApplication;
  * This is the container that handles all HTTP requests. Requests are adapted
  * for the enclosed {@link WebApplication} instances. This container can
  * service both HTTP and HTTPS traffic transparently, when created using the
- * factory methods of {@link com.sun.jersey.api.simple.container.SimpleServerFactory} 
+ * factory methods of {@link com.sun.jersey.simple.container.SimpleServerFactory}
  * or when instantiating it and making a direct connection to the container.
- * 
+ *
  * @author Marc.Hadley@Sun.Com
  */
 public final class SimpleContainer implements Container, ContainerListener {
-    
+
     private WebApplication application;
-    
+
     public SimpleContainer(WebApplication application) throws ContainerException {
         this.application = application;
     }
@@ -81,65 +81,65 @@ public final class SimpleContainer implements Container, ContainerListener {
     private final static class Writer implements ContainerResponseWriter {
         final Response response;
         final Request request;
-        
+
         Writer(Request request, Response response) {
             this.response = response;
             this.request = request;
         }
-        
-        public OutputStream writeStatusAndHeaders(long contentLength, ContainerResponse cResponse) throws IOException {           
+
+        public OutputStream writeStatusAndHeaders(long contentLength, ContainerResponse cResponse) throws IOException {
             int code = cResponse.getStatus();
             String text = Status.getDescription(code);
             String method = request.getMethod();
 
             response.setCode(code);
-            response.setText(text);
+            response.setDescription(text);
 
             if (!method.equalsIgnoreCase("HEAD") && contentLength != -1 && contentLength < Integer.MAX_VALUE) {
-                response.setContentLength((int)contentLength);
+                response.setContentLength((int) contentLength);
             }
             for (Map.Entry<String, List<Object>> e : cResponse.getHttpHeaders().entrySet()) {
                 for (Object value : e.getValue()) {
-                    response.add(e.getKey(), ContainerResponse.getHeaderValue(value));
+                    response.setValue(e.getKey(), ContainerResponse.getHeaderValue(value));
                 }
             }
             return response.getOutputStream();
         }
-        
-        public void finish() throws IOException {           
-           response.close(); 
+
+        public void finish() throws IOException {
+            response.close();
         }
     }
-    
+
     public void handle(Request request, Response response) {
         WebApplication target = application;
-        
+
         final URI baseUri = getBaseUri(request);
         final URI requestUri = baseUri.resolve(request.getTarget());
-        
+
         try {
             final ContainerRequest cRequest = new ContainerRequest(
-                    target, 
-                    request.getMethod(), 
-                    baseUri, 
-                    requestUri, 
-                    getHeaders(request), 
+                    target,
+                    request.getMethod(),
+                    baseUri,
+                    requestUri,
+                    getHeaders(request),
                     request.getInputStream());
-           
-                target.handleRequest(cRequest, new Writer(request, response));
+
+            target.handleRequest(cRequest, new Writer(request, response));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         } finally {
-           close(response);
+            close(response);
         }
     }
-    
+
     private void close(Response response) {
-       try {
-          response.close();
-       } catch(Exception ex) {
-          throw new RuntimeException(ex);
-       }
+        try {
+            response.close();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     private URI getBaseUri(Request request) {
@@ -147,32 +147,32 @@ public final class SimpleContainer implements Container, ContainerListener {
             final Address address = request.getAddress();
 
             return new URI(
-                    address.getScheme(), 
-                    null, 
+                    address.getScheme(),
+                    null,
                     address.getDomain(),
-                    address.getPort(), 
-                    "/", 
+                    address.getPort(),
+                    "/",
                     null, null);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
-    
+
     private InBoundHeaders getHeaders(Request request) {
         InBoundHeaders header = new InBoundHeaders();
-        
+
         List<String> names = request.getNames();
         for (String name : names) {
             String value = request.getValue(name);
             header.add(name, value);
         }
-        
+
         return header;
     }
-    
+
     public void onReload() {
         WebApplication oldApplication = application;
         application = application.clone();
         oldApplication.destroy();
-    }    
+    }
 }

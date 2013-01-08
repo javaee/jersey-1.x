@@ -1,4 +1,7 @@
 release 1.17
+- Fixed issue JERSEY-1641
+  http://java.net/jira/browse/JERSEY-1641
+  Accepted contribution by Arul Dhesiaseelan - Simple Server version update (4.1.20 -> 5.0.4)
 - Fixed issue JERSEY-1618
   http://java.net/jira/browse/JERSEY-1618
   Incorrect ResourceConfig initialization"

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,21 +45,22 @@ import java.net.SocketAddress;
 
 import javax.ws.rs.core.UriBuilder;
 
-import junit.framework.TestCase;
-
 import org.simpleframework.http.core.Container;
+import org.simpleframework.http.core.ContainerServer;
+import org.simpleframework.transport.Server;
 import org.simpleframework.transport.connect.Connection;
 import org.simpleframework.transport.connect.SocketConnection;
 
 import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
 
+import junit.framework.TestCase;
+
 /**
- *
  * @author Paul.Sandoz@Sun.Com
  */
 public abstract class AbstractSimpleServerTester extends TestCase {
-   
+
     public static final String CONTEXT = "";
 
     private int port = getEnvVariable("JERSEY_HTTP_PORT", 9997);
@@ -72,7 +73,7 @@ public abstract class AbstractSimpleServerTester extends TestCase {
         if (null != varValue) {
             try {
                 return Integer.parseInt(varValue);
-            }catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 // will return default value bellow
             }
         }
@@ -80,11 +81,11 @@ public abstract class AbstractSimpleServerTester extends TestCase {
     }
 
     private Connection connection;
-    
+
     public AbstractSimpleServerTester(String name) {
         super(name);
     }
-    
+
     public UriBuilder getUri() {
         return UriBuilder.fromUri("http://localhost").port(port).path(CONTEXT);
     }
@@ -92,18 +93,19 @@ public abstract class AbstractSimpleServerTester extends TestCase {
     public void startServer(Class... resources) {
         start(ContainerFactory.createContainer(Container.class, resources));
     }
-    
+
     public void startServer(ResourceConfig config) {
         start(ContainerFactory.createContainer(Container.class, config));
     }
-    
+
     protected void start(Container container) {
         if (connection != null) {
             stopServer();
         }
         try {
             SocketAddress listen = new InetSocketAddress(port);
-            connection = new SocketConnection(container);
+            Server server = new ContainerServer(container);
+            connection = new SocketConnection(server);
             connection.connect(listen);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -123,16 +125,16 @@ public abstract class AbstractSimpleServerTester extends TestCase {
             }
         }
     }
-    
+
     public void stopServer() {
         try {
-           connection.close();
-           connection = null;
-        } catch(Exception e) {
+            connection.close();
+            connection = null;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public void tearDown() {
         stopServer();
