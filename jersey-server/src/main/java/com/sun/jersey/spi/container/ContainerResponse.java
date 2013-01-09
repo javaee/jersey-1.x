@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -78,19 +78,19 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
  * Containers instantiate, or inherit, and provide an instance to the
  * {@link WebApplication}.
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public class ContainerResponse implements HttpResponseContext {
     private static final Annotation[] EMPTY_ANNOTATIONS = new Annotation[0];
-    
+
     private static final Logger LOGGER = Logger.getLogger(ContainerResponse.class.getName());
-    
+
     private static final RuntimeDelegate rd = RuntimeDelegate.getInstance();
-    
+
     private final WebApplication wa;
-    
+
     private ContainerRequest request;
-    
+
     private ContainerResponseWriter responseWriter;
 
     private Response response;
@@ -100,57 +100,57 @@ public class ContainerResponse implements HttpResponseContext {
     private StatusType statusType;
 
     private MultivaluedMap<String, Object> headers;
-    
+
     private Object originalEntity;
 
     private Object entity;
-    
+
     private Type entityType;
-    
+
     private boolean isCommitted;
-    
+
     private CommittingOutputStream out;
-    
+
     private Annotation[] annotations = EMPTY_ANNOTATIONS;
-    
+
     private final class CommittingOutputStream extends OutputStream {
         private final long size;
-        
+
         private OutputStream o;
 
         CommittingOutputStream(long size) {
             this.size = size;
         }
-        
+
         @Override
         public void write(byte b[]) throws IOException {
             commitWrite();
             o.write(b);
         }
-        
+
         @Override
         public void write(byte b[], int off, int len) throws IOException {
             commitWrite();
             o.write(b, off, len);
         }
-        
+
         public void write(int b) throws IOException {
             commitWrite();
             o.write(b);
         }
-        
+
         @Override
         public void flush() throws IOException {
             commitWrite();
             o.flush();
         }
-        
+
         @Override
         public void close() throws IOException {
             commitClose();
             o.close();
         }
-        
+
         private void commitWrite() throws IOException {
             if (!isCommitted) {
                 if (getStatus() == 204)
@@ -159,24 +159,24 @@ public class ContainerResponse implements HttpResponseContext {
                 o = responseWriter.writeStatusAndHeaders(size, ContainerResponse.this);
             }
         }
-        
+
         private void commitClose() throws IOException {
             if (!isCommitted) {
                 isCommitted = true;
                 o = responseWriter.writeStatusAndHeaders(-1, ContainerResponse.this);
             }
         }
-    };
+    }
 
     /**
-     * Instantate a new ContainerResponse.
-     * 
+     * Instantiate a new ContainerResponse.
+     *
      * @param wa the web application.
      * @param request the container request associated with this response.
      * @param responseWriter the response writer
      */
     public ContainerResponse(
-            WebApplication wa, 
+            WebApplication wa,
             ContainerRequest request,
             ContainerResponseWriter responseWriter) {
         this.wa = wa;
@@ -184,14 +184,14 @@ public class ContainerResponse implements HttpResponseContext {
         this.responseWriter = responseWriter;
         this.statusType = Status.NO_CONTENT;
     }
-    
+
     /*package */ ContainerResponse(
             ContainerResponse acr) {
         this.wa = acr.wa;
     }
 
     // ContainerResponse
-        
+
     /**
      * Convert a header value, represented as a general object, to the 
      * string value.
@@ -203,16 +203,16 @@ public class ContainerResponse implements HttpResponseContext {
      * <p>
      * Containers may use this method to convert the header values obtained
      * from the {@link #getHttpHeaders}
-     * 
+     *
      * @param headerValue the header value as an object
      * @return the string value
      */
     public static String getHeaderValue(Object headerValue) {
         HeaderDelegate hp = rd.createHeaderDelegate(headerValue.getClass());
-        
+
         return (hp != null) ? hp.toString(headerValue) : headerValue.toString();
     }
-    
+
     /**
      * Write the response.
      * <p>
@@ -222,14 +222,14 @@ public class ContainerResponse implements HttpResponseContext {
      * returned from that method call is used to write the entity (if any)
      * to that {@link OutputStream}. An appropriate {@link MessageBodyWriter}
      * will be found to write the entity.
-     * 
-     * @throws WebApplication if {@link MessageBodyWriter} cannot be
+     *
+     * @throws WebApplicationException if {@link MessageBodyWriter} cannot be
      *         found for the entity with a 500 (Internal Server error) response.
      * @throws java.io.IOException if there is an error writing the entity
      */
     public void write() throws IOException {
         if (isCommitted)
-            return;        
+            return;
 
         if (request.isTracingEnabled()) {
             configureTrace(responseWriter);
@@ -248,23 +248,23 @@ public class ContainerResponse implements HttpResponseContext {
                 getHttpHeaders().add(HttpHeaders.VARY, varyHeader);
             }
         }
-        
+
         MediaType contentType = getMediaType();
         if (contentType == null) {
             contentType = getMessageBodyWorkers().getMessageBodyWriterMediaType(
-                        entity.getClass(),
-                        entityType,
-                        annotations,
-                        request.getAcceptableMediaTypes());
+                    entity.getClass(),
+                    entityType,
+                    annotations,
+                    request.getAcceptableMediaTypes());
             if (contentType == null ||
                     contentType.isWildcardType() || contentType.isWildcardSubtype())
                 contentType = MediaType.APPLICATION_OCTET_STREAM_TYPE;
-            
+
             getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, contentType);
         }
-        
+
         final MessageBodyWriter p = getMessageBodyWorkers().getMessageBodyWriter(
-                entity.getClass(), entityType, 
+                entity.getClass(), entityType,
                 annotations, contentType);
         if (p == null) {
             String message = "A message body writer for Java class " + entity.getClass().getName() +
@@ -275,7 +275,7 @@ public class ContainerResponse implements HttpResponseContext {
                     getWriters(contentType);
             LOGGER.severe("The registered message body writers compatible with the MIME media type are:\n" +
                     getMessageBodyWorkers().writersToString(m));
-            
+
             if (request.getMethod().equals("HEAD")) {
                 isCommitted = true;
                 responseWriter.writeStatusAndHeaders(-1, this);
@@ -286,7 +286,7 @@ public class ContainerResponse implements HttpResponseContext {
             }
         }
 
-        final long size = p.getSize(entity, entity.getClass(), entityType, 
+        final long size = p.getSize(entity, entity.getClass(), entityType,
                 annotations, contentType);
         if (request.getMethod().equals("HEAD")) {
             if (size != -1)
@@ -319,7 +319,7 @@ public class ContainerResponse implements HttpResponseContext {
                 get(TraceInformation.class.getName());
         setContainerResponseWriter(new ContainerResponseWriter() {
             public OutputStream writeStatusAndHeaders(long contentLength,
-                    ContainerResponse response) throws IOException {
+                                                      ContainerResponse response) throws IOException {
                 ti.addTraceHeaders();
                 return crw.writeStatusAndHeaders(contentLength, response);
             }
@@ -354,23 +354,23 @@ public class ContainerResponse implements HttpResponseContext {
     public void setContainerRequest(ContainerRequest request) {
         this.request = request;
     }
-    
+
     /**
      * Get the container response writer.
-     * 
+     *
      * @return the container response writer
      */
     public ContainerResponseWriter getContainerResponseWriter() {
-        return responseWriter; 
+        return responseWriter;
     }
-    
+
     /**
      * Set the container response writer.
-     * 
+     *
      * @param responseWriter the container response writer
      */
     public void setContainerResponseWriter(ContainerResponseWriter responseWriter) {
-        this.responseWriter = responseWriter; 
+        this.responseWriter = responseWriter;
     }
 
     /**
@@ -383,12 +383,12 @@ public class ContainerResponse implements HttpResponseContext {
     }
 
     /**
-     * Map the cause of a mapable container exception to a response.
+     * Map the cause of a mappable container exception to a response.
      * <p>
      * If the cause cannot be mapped and then that cause is re-thrown
-     * if a runtime exception otherwise the mappable contaner exception is
+     * if a runtime exception otherwise the mappable container exception is
      * re-thrown.
-     * 
+     *
      * @param e the mappable container exception whose cause will be mapped to
      *        a response.
      */
@@ -418,6 +418,10 @@ public class ContainerResponse implements HttpResponseContext {
      */
     public void mapWebApplicationException(WebApplicationException e) {
         if (e.getResponse().getEntity() != null) {
+            wa.getResponseListener().onError(
+                    Thread.currentThread().getId(),
+                    e
+            );
             onException(e, e.getResponse(), false);
         } else {
             if (!mapException(e)) {
@@ -434,7 +438,14 @@ public class ContainerResponse implements HttpResponseContext {
      */
     public boolean mapException(Throwable e) {
         ExceptionMapper em = wa.getExceptionMapperContext().find(e.getClass());
-        if (em == null) return false;
+        if (em == null) {
+            wa.getResponseListener().onError(
+                    Thread.currentThread().getId(),
+                    e
+            );
+
+            return false;
+        }
 
         wa.getResponseListener().onMappedException(
                 Thread.currentThread().getId(),
@@ -482,7 +493,7 @@ public class ContainerResponse implements HttpResponseContext {
                         r.getStatus()));
             }
         }
-          
+
         if (!mapped && r.getStatus() >= 500) {
             logException(e, r, Level.SEVERE);
         } else if (LOGGER.isLoggable(Level.FINE)) {
@@ -515,25 +526,25 @@ public class ContainerResponse implements HttpResponseContext {
                     e);
         }
     }
-    
+
     // HttpResponseContext
-    
+
     @Override
     public Response getResponse() {
         if (response == null) {
-            setResponse((Response)null);
+            setResponse(null);
         }
-        
+
         return response;
     }
-    
+
     @Override
     public void setResponse(Response response) {
         this.isCommitted = false;
         this.out = null;
         this.response = response = (response != null) ? response : Responses.noContent().build();
         this.mappedThrowable = null;
-        
+
         if (response instanceof ResponseImpl) {
             final ResponseImpl responseImpl = (ResponseImpl)response;
             setStatusType(responseImpl.getStatusType());
@@ -545,12 +556,12 @@ public class ContainerResponse implements HttpResponseContext {
             setEntity(response.getEntity());
         }
     }
-    
+
     @Override
     public boolean isResponseSet() {
         return response != null;
     }
-    
+
     @Override
     public Throwable getMappedThrowable() {
         return mappedThrowable;
@@ -570,22 +581,22 @@ public class ContainerResponse implements HttpResponseContext {
     public int getStatus() {
         return statusType.getStatusCode();
     }
-    
+
     @Override
     public void setStatus(int status) {
         this.statusType = ResponseImpl.toStatusType(status);
     }
-    
+
     @Override
     public Object getEntity() {
         return entity;
     }
-    
+
     @Override
     public Type getEntityType() {
         return entityType;
     }
-    
+
     @Override
     public Object getOriginalEntity() {
         return originalEntity;
@@ -595,7 +606,7 @@ public class ContainerResponse implements HttpResponseContext {
     public void setEntity(Object entity) {
         setEntity(entity, (entity == null) ? null : entity.getClass());
     }
-    
+
     public void setEntity(Object entity, Type entityType) {
         this.originalEntity = this.entity = entity;
         this.entityType = entityType;
@@ -615,14 +626,14 @@ public class ContainerResponse implements HttpResponseContext {
     public void setAnnotations(Annotation[] annotations) {
         this.annotations = (annotations != null) ? annotations : EMPTY_ANNOTATIONS;
     }
-    
+
     @Override
     public MultivaluedMap<String, Object> getHttpHeaders() {
         if (headers == null)
             headers = new OutBoundHeaders();
         return headers;
     }
-    
+
     @Override
     public MediaType getMediaType() {
         final Object mediaTypeHeader = getHttpHeaders().getFirst(HttpHeaders.CONTENT_TYPE);
@@ -634,22 +645,19 @@ public class ContainerResponse implements HttpResponseContext {
 
         return null;
     }
-    
+
     @Override
     public OutputStream getOutputStream() throws IOException {
         if (out == null)
             out = new CommittingOutputStream(-1);
-        
+
         return out;
     }
-    
+
     @Override
     public boolean isCommitted() {
         return isCommitted;
     }
-    
-    
-    //
 
     private void setHeaders(MultivaluedMap<String, Object> headers) {
         this.headers = headers;

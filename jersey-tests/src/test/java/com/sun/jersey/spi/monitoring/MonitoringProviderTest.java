@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -63,31 +63,35 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 /**
- * @author Jakub.Podlesak@Oracle.Com
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ * @author Michal Gajdos (michal.gajdos at oracle.com)
  */
 public class MonitoringProviderTest extends AbstractResourceTester {
 
-    // TODO: unmapped errors
-
     enum MH /* MonitorHit */ {
-
         SubResource, SubResourceLocator, ResourceMethod, Request, Response, Error, MappedException
-    };
+    }
 
     enum RP /* ResourcePattern */ {
-
-        ResourceMethod, SubResourceMethod, SubResourceLocatorResourceMethod, MappedErrorResourceMethod, SubResourceLocatorMappedErrorResourceMethod, MappedErrorSubResourceMethod
-    };
+        ResourceMethod, SubResourceMethod, SubResourceLocatorResourceMethod,
+        MappedErrorResourceMethod, SubResourceLocatorMappedErrorResourceMethod, MappedErrorSubResourceMethod,
+        ErrorResourceMethod, SubResourceLocatorErrorResourceMethod, ErrorSubResourceMethod
+    }
 
     static Map<RP, Set<MH>> PatternMap = new EnumMap<RP, Set<MH>>(RP.class) {
-
         {
             put(RP.ResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.Response));
             put(RP.SubResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.Response));
-            put(RP.SubResourceLocatorResourceMethod, EnumSet.of(MH.Request, MH.SubResourceLocator, MH.SubResource, MH.ResourceMethod, MH.Response));
-            put(RP.SubResourceLocatorMappedErrorResourceMethod, EnumSet.of(MH.Request, MH.SubResourceLocator, MH.SubResource, MH.ResourceMethod, MH.MappedException, MH.Response));
+            put(RP.SubResourceLocatorResourceMethod,
+                    EnumSet.of(MH.Request, MH.SubResourceLocator, MH.SubResource, MH.ResourceMethod, MH.Response));
+            put(RP.SubResourceLocatorMappedErrorResourceMethod,
+                    EnumSet.of(MH.Request, MH.SubResourceLocator, MH.SubResource, MH.ResourceMethod, MH.MappedException, MH.Response));
             put(RP.MappedErrorResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.MappedException, MH.Response));
             put(RP.MappedErrorSubResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.MappedException, MH.Response));
+            put(RP.SubResourceLocatorErrorResourceMethod,
+                    EnumSet.of(MH.Request, MH.SubResourceLocator, MH.SubResource, MH.ResourceMethod, MH.Error));
+            put(RP.ErrorResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.Error));
+            put(RP.ErrorSubResourceMethod, EnumSet.of(MH.Request, MH.ResourceMethod, MH.Error));
         }
     };
 
@@ -159,12 +163,21 @@ public class MonitoringProviderTest extends AbstractResourceTester {
         }
     }
 
-    public static class MonitoredErrorSubResource {
+    public static class MonitoredMappedErrorSubResource {
 
         @GET
         @Produces("plain/text")
         public String resourceMethod() throws MonitoringException {
             throw new MonitoringException();
+        }
+    }
+
+    public static class MonitoredErrorSubResource {
+
+        @GET
+        @Produces("plain/text")
+        public String resourceMethod() throws RuntimeException {
+            throw new RuntimeException();
         }
     }
 
@@ -189,6 +202,11 @@ public class MonitoringProviderTest extends AbstractResourceTester {
             return new MonitoredSubResource();
         }
 
+        @Path("mapped-error-sub-resource-locator")
+        public MonitoredMappedErrorSubResource mappedErrorSubResourceLocator() {
+            return new MonitoredMappedErrorSubResource();
+        }
+
         @Path("error-sub-resource-locator")
         public MonitoredErrorSubResource errorSubResourceLocator() {
             return new MonitoredErrorSubResource();
@@ -196,6 +214,23 @@ public class MonitoringProviderTest extends AbstractResourceTester {
     }
 
     @Path("error-root")
+    public static class MonitoredErrorResource {
+
+        @GET
+        @Produces("plain/text")
+        public String resourceMethod() throws RuntimeException {
+            throw new RuntimeException();
+        }
+
+        @GET
+        @Path("sub-resource-method")
+        @Produces("plain/text")
+        public String subResourceMethod() throws RuntimeException {
+            throw new RuntimeException();
+        }
+    }
+
+    @Path("mapped-error-root")
     public static class MonitoredMappedErrorResource {
 
         @GET
@@ -228,8 +263,8 @@ public class MonitoringProviderTest extends AbstractResourceTester {
     }
 
     public void testGet() throws Exception {
-
-        ResourceConfig rc = new DefaultResourceConfig(MonitoredResource.class, MonitoredMappedErrorResource.class);
+        ResourceConfig rc = new DefaultResourceConfig(MonitoredResource.class,
+                MonitoredErrorResource.class, MonitoredMappedErrorResource.class);
         final MyMonitor myMonitor = new MyMonitor();
 
         rc.getSingletons().add(myMonitor);
@@ -246,16 +281,18 @@ public class MonitoringProviderTest extends AbstractResourceTester {
         myMonitor.resetPattern();
         r.path("sub-resource-method").get(String.class);
         assertEquals(myMonitor.requestPattern, PatternMap.get(RP.SubResourceMethod));
-        
+
         myMonitor.resetPattern();
         r.path("sub-resource-locator").get(String.class);
         assertEquals(myMonitor.requestPattern, PatternMap.get(RP.SubResourceLocatorResourceMethod));
 
+        // onMappedException
+
         myMonitor.resetPattern();
-        r.path("error-sub-resource-locator").get(ClientResponse.class);
+        r.path("mapped-error-sub-resource-locator").get(ClientResponse.class);
         assertEquals(myMonitor.requestPattern, PatternMap.get(RP.SubResourceLocatorMappedErrorResourceMethod));
 
-        WebResource er = resource("/error-root", false);
+        WebResource er = resource("/mapped-error-root", false);
         myMonitor.resetPattern();
         er.get(ClientResponse.class);
         assertEquals(myMonitor.requestPattern, PatternMap.get(RP.MappedErrorResourceMethod));
@@ -263,5 +300,31 @@ public class MonitoringProviderTest extends AbstractResourceTester {
         myMonitor.resetPattern();
         er.path("sub-resource-method").get(ClientResponse.class);
         assertEquals(myMonitor.requestPattern, PatternMap.get(RP.MappedErrorSubResourceMethod));
+
+        // onError
+
+        myMonitor.resetPattern();
+        try {
+            r.path("error-sub-resource-locator").get(ClientResponse.class);
+        } catch (RuntimeException e) {
+            // OK.
+        }
+        assertEquals(myMonitor.requestPattern, PatternMap.get(RP.SubResourceLocatorErrorResourceMethod));
+
+        myMonitor.resetPattern();
+        try {
+            resource("/error-root", false).get(ClientResponse.class);
+        } catch (RuntimeException e) {
+            // OK.
+        }
+        assertEquals(myMonitor.requestPattern, PatternMap.get(RP.ErrorResourceMethod));
+
+        myMonitor.resetPattern();
+        try {
+            resource("/error-root/sub-resource-method", false).get(ClientResponse.class);
+        } catch (RuntimeException e) {
+            // OK.
+        }
+        assertEquals(myMonitor.requestPattern, PatternMap.get(RP.ErrorSubResourceMethod));
     }
 }
