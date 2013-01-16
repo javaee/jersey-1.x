@@ -47,7 +47,7 @@
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
-        <version>1.17-SNAPSHOT</version>
+        <version>1.18-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-archive</artifactId>
     <name>Jersey archive for non-maven users</name>

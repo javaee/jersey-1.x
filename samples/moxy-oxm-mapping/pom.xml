@@ -50,13 +50,13 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.17-SNAPSHOT</version>
+        <version>1.18-SNAPSHOT</version>
     </parent>
 
     <artifactId>moxy-oxm-mapping</artifactId>
     <name>MOXy OXM Mapping - Jersey Sample</name>
 
-    <version>1.17-SNAPSHOT</version>
+    <version>1.18-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>

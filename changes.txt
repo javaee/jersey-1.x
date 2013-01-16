@@ -1,4 +1,6 @@
-release 1.17
+release 1.18
+
+release 1.17 (01-2013)
 - Fixed issue JERSEY-1642
   http://java.net/jira/browse/JERSEY-1642
   ResponseListener#onError is never invoked
