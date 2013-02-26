@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 1681
+  http://java.net/jira/browse/JERSEY-1681
+  Memory Leak in the basic Jersey webapp deploying on GFv312
 
 release 1.17 (01-2013)
 - Fixed issue JERSEY-1642

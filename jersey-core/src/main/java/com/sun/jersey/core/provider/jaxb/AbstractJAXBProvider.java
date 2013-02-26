@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,6 +42,7 @@ package com.sun.jersey.core.provider.jaxb;
 
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.ref.WeakReference;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
@@ -72,8 +73,8 @@ import com.sun.jersey.core.util.FeaturesAndProperties;
  * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWriterProvider<T> {
-    private static final Map<Class, JAXBContext> jaxbContexts =
-            new WeakHashMap<Class, JAXBContext>();
+    private static final Map<Class<?>, WeakReference<JAXBContext>> jaxbContexts =
+            new WeakHashMap<Class<?>, WeakReference<JAXBContext>>();
 
     private final Providers ps;
 
@@ -189,10 +190,11 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
 
     protected JAXBContext getStoredJAXBContext(Class type) throws JAXBException {
         synchronized (jaxbContexts) {
-            JAXBContext c = jaxbContexts.get(type);
+            final WeakReference<JAXBContext> ref = jaxbContexts.get(type);
+            JAXBContext c = (ref != null) ? ref.get() : null;
             if (c == null) {
                 c = JAXBContext.newInstance(type);
-                jaxbContexts.put(type, c);
+                jaxbContexts.put(type, new WeakReference(c));
             }
             return c;
         }
