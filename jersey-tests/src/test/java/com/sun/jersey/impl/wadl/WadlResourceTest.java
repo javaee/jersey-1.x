@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,10 +43,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
@@ -913,5 +915,31 @@ public class WadlResourceTest extends AbstractResourceTester {
                         matches());
             }
         }
+    }
+
+    @Path(value = "/wadl7test")
+    public static class OptionSubResource {
+
+        @GET
+        @Path(value = "/sub")
+        @Produces(value = "text/html")
+        public Response headSub() {
+            return Response.ok().build();
+        }
+    }
+
+    /**
+     * On receipt of an OPTIONS request an implementation MUST: Generate an automatic response using the metadata provided by the
+     * JAX-RS annotations on the matching class and its methods.
+     */
+    public void testOptionSub() throws Exception {
+        final ResourceConfig resourceConfig = new DefaultResourceConfig(OptionSubResource.class);
+        initiateWebApplication(resourceConfig);
+
+        final ClientResponse response = resource("wadl7test").path("sub").accept("text/html").options(ClientResponse.class);
+        final Set<String> allow = response.getAllow();
+
+        assertEquals(204, response.getStatus());
+        assertEquals(new HashSet<String>(){{ add("GET"); add("OPTIONS"); add("HEAD"); }}, allow);
     }
 }
