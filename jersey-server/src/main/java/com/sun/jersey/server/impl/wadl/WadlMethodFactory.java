@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,17 @@
 
 package com.sun.jersey.server.impl.wadl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
+
 import com.sun.jersey.api.core.HttpContext;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.uri.UriTemplate;
@@ -47,19 +58,8 @@ import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.server.impl.model.method.ResourceHttpOptionsMethod;
 import com.sun.jersey.server.impl.model.method.ResourceMethod;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
-import com.sun.research.ws.wadl.Application;
 
-import javax.ws.rs.core.Response;
-import javax.xml.bind.Marshaller;
-import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Variant;
+import com.sun.research.ws.wadl.Application;
 
 /**
  *
@@ -112,17 +112,17 @@ import javax.ws.rs.core.Variant;
                         resource, path);
 
                 List<Variant> vl = Variant.mediaTypes(MediaTypes.WADL, MediaTypes.WADL_JSON, MediaType.APPLICATION_XML_TYPE)
-                    .add().build();
+                        .add().build();
                 Variant v = context.getRequest().selectVariant(vl);
-                if (v==null) {
+                if (v == null) {
                     context.getResponse().setResponse(
-                           Response.notAcceptable(vl).build());
+                            Response.noContent().header("Allow", allow).header("Last-modified", lastModified).build());
                 }
                 else {
                     try {
                         // TODO more gracefully detect that JAX-B -> JSON
-                        // is not avaliable
-                        
+                        // is not available
+
                         context.getResponse().setResponse(
                                 Response.ok(a, v).
                                         header("Allow", allow).header("Last-modified", lastModified).build());
