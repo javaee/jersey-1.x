@@ -54,7 +54,7 @@
     <packaging>pom</packaging>
 
     <properties>
-       <jersey.version>1.17</jersey.version>
+       <jersey.version>1.17.1</jersey.version>
     </properties>
 
     <name>Jersey QE Tests</name>
