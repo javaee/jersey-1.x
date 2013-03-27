@@ -44,6 +44,7 @@ import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.ApplicationDescription.ExternalGrammar;
 import com.sun.jersey.server.wadl.WadlGenerator;
@@ -70,6 +71,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
 
 /**
  * This {@link WadlGenerator} generates a grammar based on the referenced 
@@ -166,6 +168,10 @@ public abstract class AbstractWadlGeneratorGrammarGenerator<T> implements WadlGe
     // The uri of this WADL
     protected URI _wadl;
     
+    // Access to the providers
+    protected Providers _providers;
+    
+    protected FeaturesAndProperties _fap;
     
     // The type of the resolved element
     protected Class<T> _resolvedType;
@@ -197,6 +203,21 @@ public abstract class AbstractWadlGeneratorGrammarGenerator<T> implements WadlGe
         _hasTypeWantsName = new ArrayList<Pair>();
     }
 
+    
+    
+    /**
+     * Provides the WadlGenerator with the current generating environment.
+     * This method is used in a decorator like manner, and therefore has to 
+     * invoke <code>this.delegate.setEnvironment(env)</code>.
+     */
+    @Override
+    public void setEnvironment(Environment env)
+    {
+        _delegate.setEnvironment(env);
+        _providers = env.getProviders();
+        _fap = env.getFeaturesAndProperties();
+    }
+    
     // ================ filter actions =======================
     
     /**
@@ -217,6 +238,7 @@ public abstract class AbstractWadlGeneratorGrammarGenerator<T> implements WadlGe
      * @return application
      * @see com.sun.jersey.server.wadl.WadlGenerator#createApplication()
      */
+    @Override
     public Application createApplication(UriInfo requestInfo) {
         if (requestInfo!=null) {
             _root = requestInfo.getBaseUri();

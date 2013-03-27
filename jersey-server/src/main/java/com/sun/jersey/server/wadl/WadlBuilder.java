@@ -72,7 +72,9 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
 
+import com.sun.jersey.core.util.FeaturesAndProperties;
 /**
  * This class implements the algorithm how the wadl is built for one or more
  * {@link AbstractResource} classes. Wadl artifacts are created by a
@@ -95,13 +97,34 @@ public class WadlBuilder {
         _wadlGenerator = wadlGenerator;
     }
 
+
     /**
      * Generate WADL for a set of resources.
      * @param resources the set of resources
+     * @param info a UriInfo to provide context for the request
      * @return the JAXB WADL application bean
-     */
+     */ 
     public ApplicationDescription generate(UriInfo info, Set<AbstractResource> resources) {
+        return generate(null, null, info, resources);
+    }
         
+    
+    /**
+     * Generate WADL for a set of resources.
+     * @param resources the set of resources
+     * @param info a UriInfo to provide context for the request
+     * @param providers an instance of Providers required for some WADL generators 
+     * @param fap an instance of FeaturesAndProperties required from some WADL generators
+     * @return the JAXB WADL application bean
+     */ 
+    public ApplicationDescription generate(Providers providers, FeaturesAndProperties fap, UriInfo info, Set<AbstractResource> resources) {
+        
+        // Provide the environment
+        
+        _wadlGenerator.setEnvironment(new WadlGenerator.Environment()
+                .setProviders(providers).setFeaturesAndProperties(fap));
+        
+        //
         Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();
 
@@ -137,12 +160,25 @@ public class WadlBuilder {
      * Generate WADL for a resource.
      * @param resource the resource
      * @param description the overall application description so we can
+     * @param info a UriInfo to provide context for the request
+     * @param providers an instance of Providers required for some WADL generators 
+     * @param fap an instance of FeaturesAndProperties required from some WADL generators
      * @return the JAXB WADL application bean
      */
     public Application generate(
+            Providers providers, 
+            FeaturesAndProperties fap,
             UriInfo info,
             ApplicationDescription description,
             AbstractResource resource) {
+
+        // Provide the environment
+        
+        _wadlGenerator.setEnvironment(new WadlGenerator.Environment()
+                .setProviders(providers).setFeaturesAndProperties(fap));
+
+        //
+        
         Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateResource(resource, null);
@@ -169,9 +205,18 @@ public class WadlBuilder {
      * @return the JAXB WADL application bean
      */
     public Application generate(
+            Providers providers, 
+            FeaturesAndProperties fap,
             UriInfo info,
             ApplicationDescription description,
             AbstractResource resource, String path) {
+
+        // Provide the environment
+        
+        _wadlGenerator.setEnvironment(new WadlGenerator.Environment()
+                .setProviders(providers).setFeaturesAndProperties(fap));
+
+        //
         
         Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();

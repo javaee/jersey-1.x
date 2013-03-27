@@ -1243,7 +1243,7 @@ public final class WebApplicationImpl implements WebApplication {
         dispatchingListener = new DispatchingListenerProxy();
 
         // Initiate the WADL factory
-        this.wadlFactory = new WadlFactory(resourceConfig);
+        this.wadlFactory = new WadlFactory(resourceConfig, this.providers);
 
         WadlApplicationContextInjectionProxy wadlApplicationContextInjectionProxy = null;
 

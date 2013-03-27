@@ -42,27 +42,27 @@ package com.sun.jersey.json.impl.provider.entity;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.json.JSONMarshaller;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.provider.jaxb.AbstractRootElementProvider;
 import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.json.impl.reader.JsonFormatException;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.Providers;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.ext.Providers;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 /**
  *
@@ -83,9 +83,13 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
     @Context @Override
     public void setConfiguration(FeaturesAndProperties fp) {
         super.setConfiguration(fp);
-        jacksonEntityProviderTakesPrecedence = fp.getFeature(JSONConfiguration.FEATURE_POJO_MAPPING);
+        consumeFeaturesAndProperties(fp);
     }
 
+    protected void consumeFeaturesAndProperties(FeaturesAndProperties fp) {
+        jacksonEntityProviderTakesPrecedence = fp.getFeature(JSONConfiguration.FEATURE_POJO_MAPPING);
+    }
+    
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return !jacksonEntityProviderTakesPrecedence && super.isReadable(type, genericType, annotations, mediaType);
@@ -95,6 +99,7 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return !jacksonEntityProviderTakesPrecedence && super.isWriteable(type, genericType, annotations, mediaType);
     }
+
 
     @Produces("application/json")
     @Consumes("application/json")
@@ -119,6 +124,25 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
         }
     }
 
+    // Added to ensure that as part per bug JERSEY-1593 we don't
+    // alter the output of the WADL if we turn on POJO mapping, the format
+    // with be the default MAPPED version unless the users put in a specific
+    // JAXBContext to override.
+    //
+    @Produces(MediaTypes.WADL_JSON_STRING)
+    @Consumes(MediaTypes.WADL_JSON_STRING)
+    public static final class Wadl extends JSONRootElementProvider {
+
+        public Wadl(@Context Providers ps) {
+            super(ps, MediaTypes.WADL_JSON);
+        }
+
+        protected void consumeFeaturesAndProperties(FeaturesAndProperties fp) {
+            // GNDN, prevent the jackson entity provider from taking precenence
+        }
+    }
+    
+    
     @Override
     protected final Object readFrom(Class<Object> type, MediaType mediaType,
             Unmarshaller u, InputStream entityStream)
@@ -126,7 +150,7 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
         final Charset c = getCharset(mediaType);
 
         try {
-            return JSONJAXBContext.getJSONUnmarshaller(u, getStoredJAXBContext(type)).
+            return JSONJAXBContext.getJSONUnmarshaller(u, getJAXBContext(type)).
                     unmarshalFromJSON(new InputStreamReader(entityStream, c), type);
         } catch (JsonFormatException e) {
             throw new WebApplicationException(e, Status.BAD_REQUEST);
@@ -137,7 +161,7 @@ public class JSONRootElementProvider extends AbstractRootElementProvider {
     protected void writeTo(Object t, MediaType mediaType, Charset c,
             Marshaller m, OutputStream entityStream)
             throws JAXBException {
-        JSONMarshaller jsonMarshaller = JSONJAXBContext.getJSONMarshaller(m, getStoredJAXBContext(t.getClass()));
+        JSONMarshaller jsonMarshaller = JSONJAXBContext.getJSONMarshaller(m, getJAXBContext(t.getClass()));
         if(isFormattedOutput())
             jsonMarshaller.setProperty(JSONMarshaller.FORMATTED, true);
         jsonMarshaller.marshallToJSON(t, new OutputStreamWriter(entityStream, c));

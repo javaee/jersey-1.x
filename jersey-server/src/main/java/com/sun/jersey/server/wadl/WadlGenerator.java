@@ -44,6 +44,7 @@ import com.sun.jersey.api.model.AbstractMethod;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.model.AbstractResourceMethod;
 import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.research.ws.wadl.Application;
 import com.sun.research.ws.wadl.Param;
 import com.sun.research.ws.wadl.Representation;
@@ -52,6 +53,8 @@ import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
 
+
+import javax.ws.rs.ext.Providers;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
@@ -107,6 +110,40 @@ public interface WadlGenerator {
      *  {@link #getRequiredJaxbContextPath()} + ":" + ${yourContextPath}.
      */
     String getRequiredJaxbContextPath();
+    
+    
+    /**
+     * A method parameter to make it easier to supply more environmental
+     * information later without break the existing API.
+     */
+    public class Environment
+    {
+        private Providers providers;
+        private FeaturesAndProperties fap;
+        
+        public Environment setProviders(Providers providers)
+        {
+            this.providers = providers;
+            return this;
+        }
+        
+        public Providers getProviders() { return providers; }
+        
+        public Environment setFeaturesAndProperties(FeaturesAndProperties fap)
+        {
+            this.fap = fap;
+            return this;
+        }
+        
+        public FeaturesAndProperties getFeaturesAndProperties() { return fap; }
+    }
+
+    /**
+     * Provides the WadlGenerator with the current generating environment.
+     * This method is used in a decorator like manner, and therefore has to 
+     * invoke <code>this.delegate.setEnvironment(env)</code>.
+     */
+    public void setEnvironment(Environment env);
 
     // ================  methods for building the wadl application =============
 

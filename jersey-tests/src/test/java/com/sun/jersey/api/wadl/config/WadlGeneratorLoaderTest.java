@@ -214,6 +214,13 @@ public class WadlGeneratorLoaderTest extends AbstractResourceTester {
         public WadlGenerator getDelegate() {
             return _delegate;
         }
+        
+        @Override
+        public void setEnvironment(Environment env)
+        {
+            _delegate.setEnvironment(env);
+        }    
+        
 
         public Application createApplication(UriInfo requestInfo) {
             return null;

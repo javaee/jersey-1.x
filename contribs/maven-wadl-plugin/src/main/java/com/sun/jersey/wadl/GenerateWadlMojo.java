@@ -317,7 +317,7 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
             getLog().debug( "Adding class " + c.getName() );
             s.add( IntrospectionModeller.createResource(c) );
         }
-        return new WadlBuilder( wadlGenerator ).generate( null, s );
+        return new WadlBuilder( wadlGenerator ).generate( null, null, null, s );
     }
 
     /**

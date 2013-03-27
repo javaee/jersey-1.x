@@ -179,7 +179,7 @@ public abstract class AbstractJAXBProvider<T> extends AbstractMessageReaderWrite
         return getStoredJAXBContext(type);
     }
 
-    private JAXBContext getJAXBContext(Class type) throws JAXBException {
+    protected JAXBContext getJAXBContext(Class type) throws JAXBException {
         if (mtContext != null) {
             JAXBContext c = mtContext.getContext(type);
             if (c != null) return c;

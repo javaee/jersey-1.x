@@ -110,6 +110,16 @@ public class WadlGeneratorResourceDocSupport implements WadlGenerator {
         _delegate = delegate;
     }
     
+    
+    /**
+     * Delegates the setting of the environment
+     */
+    @Override
+    public void setEnvironment(Environment env)
+    {
+        _delegate.setEnvironment(env);
+    }    
+    
     /**
      * Set the <code>resourceDocFile</code> to the given file. Invoking this method is only allowed, as long as
      * the <code>resourceDocStream</code> is not set, otherwise an {@link IllegalStateException} will be thrown.

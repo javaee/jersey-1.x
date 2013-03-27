@@ -54,6 +54,7 @@ import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.api.model.AbstractResource;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfigLoader;
+import com.sun.jersey.core.util.FeaturesAndProperties;
 import com.sun.jersey.server.wadl.ApplicationDescription;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.server.wadl.WadlBuilder;
@@ -64,6 +65,7 @@ import com.sun.research.ws.wadl.Grammars;
 import com.sun.research.ws.wadl.Include;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
+import javax.ws.rs.ext.Providers;
 
 /**
  *
@@ -76,13 +78,18 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
     private final Set<AbstractResource> rootResources;
     private final WadlGeneratorConfig wadlGeneratorConfig;
     private JAXBContext jaxbContext;
+    private final Providers providers;
+    private final FeaturesAndProperties fap;
 
     public WadlApplicationContextImpl(
             Set<AbstractResource> rootResources,
-            ResourceConfig resourceConfig) {
+            ResourceConfig resourceConfig,
+            Providers providers) {
         this.rootResources = rootResources;
         this.wadlGeneratorConfig = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig(resourceConfig);
-
+        this.providers = providers;
+        this.fap = resourceConfig;
+        
         try {
             // TODO perhaps this should be done another way for the moment
             // create a temporary generator just to do this one task
@@ -108,7 +115,7 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 //    }
     @Override
     public ApplicationDescription getApplication(UriInfo uriInfo) {
-        ApplicationDescription a = getWadlBuilder().generate(uriInfo, rootResources);
+        ApplicationDescription a = getWadlBuilder().generate(providers,fap, uriInfo, rootResources);
         final Application application = a.getApplication();
         for (Resources resources : application.getResources()) {
             if (resources.getBase() == null) {
@@ -131,8 +138,8 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
 
         WadlGenerator wadlGenerator = wadlGeneratorConfig.createWadlGenerator();
 
-        Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(info, description,resource) :
-                new WadlBuilder( wadlGenerator ).generate(info, description, resource, path);
+        Application a = path == null ? new WadlBuilder( wadlGenerator ).generate(providers,fap,info, description,resource) :
+                new WadlBuilder( wadlGenerator ).generate(providers, fap, info, description, resource, path);
 
         for (Resources resources : a.getResources()) {
             resources.setBase(info.getBaseUri().toString());

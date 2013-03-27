@@ -1,3 +1,4 @@
+com.sun.jersey.json.impl.provider.entity.JSONRootElementProvider$Wadl
 com.sun.jersey.json.impl.provider.entity.JSONRootElementProvider$App
 com.sun.jersey.json.impl.provider.entity.JSONRootElementProvider$General
 com.sun.jersey.json.impl.provider.entity.JSONJAXBElementProvider$App

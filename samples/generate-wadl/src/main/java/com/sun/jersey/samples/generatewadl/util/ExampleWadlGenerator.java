@@ -102,6 +102,16 @@ public class ExampleWadlGenerator implements WadlGenerator {
     public void setResourceDocFile( File resourceDocFile ) {
         _resourceDocFile = resourceDocFile;
     }
+
+    /**
+     * Delegates the setting of the environment
+     */
+    @Override
+    public void setEnvironment(Environment env)
+    {
+        _delegate.setEnvironment(env);
+    }    
+    
     
     public void init() throws Exception {
         _delegate.init();

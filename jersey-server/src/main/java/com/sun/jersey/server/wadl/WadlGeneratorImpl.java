@@ -84,6 +84,12 @@ public class WadlGeneratorImpl implements WadlGenerator {
     public void init() throws Exception {
     }
 
+    
+    @Override
+    public void setEnvironment(Environment env) {
+    }
+
+    
     @Override
     public void setWadlGeneratorDelegate( WadlGenerator delegate ) {
         throw new UnsupportedOperationException( "No delegate supported." );

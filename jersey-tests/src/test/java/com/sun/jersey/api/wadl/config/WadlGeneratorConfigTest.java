@@ -187,6 +187,12 @@ public class WadlGeneratorConfigTest extends TestCase {
         public void init() throws Exception {
         }
 
+        @Override
+        public void setEnvironment(Environment env)
+        {
+        }    
+        
+        
         public void setWadlGeneratorDelegate(WadlGenerator delegate) {
         }
         

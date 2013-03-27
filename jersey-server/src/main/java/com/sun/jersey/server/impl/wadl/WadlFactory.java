@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import javax.ws.rs.ext.Providers;
 
 /**
  *
@@ -65,12 +66,15 @@ public final class WadlFactory {
 //    private final WadlGenerator wadlGenerator;
     
     private final ResourceConfig _resourceConfig;
+    private final Providers _providers;
 
     private WadlApplicationContext wadlApplicationContext;
 
-    public WadlFactory(ResourceConfig resourceConfig) {
+    public WadlFactory(ResourceConfig resourceConfig, 
+            Providers providers) {
         isWadlEnabled = isWadlEnabled(resourceConfig);
         _resourceConfig = resourceConfig;
+        _providers = providers;
 
 //        if (isWadlEnabled) {
 //            wadlGenerator = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig(resourceConfig);
@@ -87,13 +91,13 @@ public final class WadlFactory {
     public WadlApplicationContext createWadlApplicationContext(Set<AbstractResource> rootResources) {
         if (!isSupported()) return null;
 
-        return new WadlApplicationContextImpl(rootResources, _resourceConfig);
+        return new WadlApplicationContextImpl(rootResources, _resourceConfig, _providers);
     }
 
     public void init(InjectableProviderFactory ipf, Set<AbstractResource> rootResources) {
         if (!isSupported()) return;
 
-        wadlApplicationContext = new WadlApplicationContextImpl(rootResources, _resourceConfig);
+        wadlApplicationContext = new WadlApplicationContextImpl(rootResources, _resourceConfig, _providers);
     }
 
     /**

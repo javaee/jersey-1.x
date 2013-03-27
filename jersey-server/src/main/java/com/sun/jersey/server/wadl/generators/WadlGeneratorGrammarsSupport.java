@@ -107,6 +107,16 @@ public class WadlGeneratorGrammarsSupport implements WadlGenerator {
         _delegate = delegate;
     }
 
+
+    /**
+     * Delegates the setting of the environment
+     */
+    @Override
+    public void setEnvironment(Environment env)
+    {
+        _delegate.setEnvironment(env);
+    }    
+    
     public void setOverrideGrammars(Boolean overrideGrammars) {
         this.overrideGrammars = overrideGrammars;
     }

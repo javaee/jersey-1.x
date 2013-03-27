@@ -122,7 +122,10 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
             _foo = foo;
         }
 
-        public Application createApplication(UriInfo requestInfo) {
+        
+        
+        
+        public Application createApplication(javax.ws.rs.ext.Providers providers, com.sun.jersey.core.util.FeaturesAndProperties fap, UriInfo requestInfo) {
             return null;
         }
 
@@ -163,6 +166,12 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
             return null;
         }
 
+        @Override
+        public void setEnvironment(Environment env)
+        {
+
+        }    
+        
         public void init() throws Exception {
             
         }
@@ -180,6 +189,11 @@ public class WadlGeneratorConfigurationLoaderTest extends AbstractResourceTester
         public void attachTypes(ApplicationDescription egd) {
             throw new UnsupportedOperationException("Not supported yet.");
         }        
+
+        @Override
+        public Application createApplication(UriInfo requestInfo) {
+            throw new UnsupportedOperationException("Not supported yet.");
+        }
         
     }
 

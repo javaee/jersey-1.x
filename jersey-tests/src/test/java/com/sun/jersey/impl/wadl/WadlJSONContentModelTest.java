@@ -53,10 +53,15 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
 import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
 import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.impl.AbstractResourceTester;
+import com.sun.jersey.impl.entity.EmptyJSONRequestWthJAXBTest;
+import com.sun.jersey.impl.entity.JAXBBean;
+import com.sun.jersey.impl.entity.JAXBBeanType;
 import com.sun.jersey.impl.wadl.testdata.schema.MultipleContentTypesResource;
 import com.sun.jersey.impl.wadl.testdata.schema.RequestMessage;
 import com.sun.jersey.impl.wadl.testdata.schema.ResponseMessage;
@@ -67,6 +72,11 @@ import com.sun.research.ws.wadl.Include;
 import com.sun.research.ws.wadl.Method;
 import com.sun.research.ws.wadl.Representation;
 import com.sun.research.ws.wadl.Resource;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import javax.ws.rs.ext.ContextResolver;
+import javax.xml.bind.JAXBContext;
 
 /**
  * Verify the generation of JSON content model from java beans
@@ -91,14 +101,40 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         }
     }
     
+    public static class NaturalCR implements ContextResolver<JAXBContext> {
+        
+        
+        private final JAXBContext context;
+
+        private final Class[] classes = {RequestMessage.class, ResponseMessage.class};
+
+        private final Set<Class> types = new HashSet(Arrays.asList(classes));
+
+        public NaturalCR() {
+            try {
+                context = configure(classes);
+            } catch (JAXBException ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+
+        public JAXBContext getContext(Class<?> objectType) {
+            return (types.contains(objectType)) ? context : null;
+        }
+        
+        protected JAXBContext configure(Class[] classes) throws JAXBException {
+            return new JSONJAXBContext(JSONConfiguration.natural().build(), classes);
+        }
+    }
+    
+    
     /**
      * Just a simple case with directly referenced types
-     *
-     * TODO XXX FIXME
      */
     public void testMultipleContentTypesSchema() throws Exception {
-        ResourceConfig rc = new DefaultResourceConfig(MultipleContentTypesResource.class);
+        ResourceConfig rc = new DefaultResourceConfig(NaturalCR.class, MultipleContentTypesResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, new SchemaWadlGeneratorConfig());
+        
         initiateWebApplication(rc);
 
         WebResource r = resource("/application.wadl", false);
@@ -106,14 +142,36 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         ClientResponse cr = r.get(ClientResponse.class);
         assertEquals(200, cr.getStatus());
 
-        validateWadl("", cr, r);
+        validateWadl("", cr, r, true);
     }
 
+    /**
+     * Like the above but using the POJO mapping rather than the 
+     * JAX-B mapping 
+     */
+    public void testMultipleContentTypesSchemaPOJOMapping() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(MultipleContentTypesResource.class);
+        rc.getProperties().put(ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, new SchemaWadlGeneratorConfig());
+        rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
+        
+        initiateWebApplication(rc);
+
+        WebResource r = resource("/application.wadl", false);
+
+        ClientResponse cr = r.get(ClientResponse.class);
+        assertEquals(200, cr.getStatus());
+
+        String asString = r.get(String.class);
+        
+        validateWadl("", cr, r, true);
+    }
+
+    
     /**
      * Just a simple case with directly referenced types as JSON
      */
     public void testMultipleContentTypesSchemaAsJson() throws Exception {
-        ResourceConfig rc = new DefaultResourceConfig(MultipleContentTypesResource.class);
+        ResourceConfig rc = new DefaultResourceConfig(NaturalCR.class, MultipleContentTypesResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, new SchemaWadlGeneratorConfig());
         initiateWebApplication(rc);
 
@@ -138,12 +196,34 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         assertTrue(wadlAsString.contains("\"@element\":\"requestMessage\""));
         
     }
+ 
+    /**
+     * Check that even though we have POJO mapping enabled that the WADL
+     * is rendered correctly into JSON using the JAX-B Mapped notation,
+     * verifies JERSEY-1593
+     */
+    public void testMultipleContentTypesSchemaAsJsonPojoMapping() throws Exception {
+        ResourceConfig rc = new DefaultResourceConfig(NaturalCR.class, MultipleContentTypesResource.class);
+        rc.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,true);
+        rc.getProperties().put(ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, new SchemaWadlGeneratorConfig());
+        initiateWebApplication(rc);
 
+        WebResource r = resource("/application.wadl", false);
+
+        String wadlAsString = r.accept(MediaTypes.WADL_JSON).get(String.class);
+
+        // Just a couple of quick check to make sure we are not seeing the 
+        // POJO mappings
+        assertTrue(!wadlAsString.startsWith("{\"doc\":[{\"content\":null"));
+        assertTrue(!wadlAsString.contains("null"));
+        
+    }
+    
     /**
      * A more complex case using options on a resource
      */
     public void testMultipleContentTypesSchemaFromResource() throws Exception {
-        ResourceConfig rc = new DefaultResourceConfig(MultipleContentTypesResource.class);
+        ResourceConfig rc = new DefaultResourceConfig(NaturalCR.class, MultipleContentTypesResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, new SchemaWadlGeneratorConfig());
         initiateWebApplication(rc);
 
@@ -154,14 +234,14 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
 
         String wadlAsString = r.options(String.class);
         
-        validateWadl("test:/base/", cr, r);
+        validateWadl("test:/base/", cr, r, true);
     }
 
     /**
      * Just a simple case with directly referenced types as JSON
      */
     public void testMultipleContentTypesSchemaFromResourceAsJson() throws Exception {
-        ResourceConfig rc = new DefaultResourceConfig(MultipleContentTypesResource.class);
+        ResourceConfig rc = new DefaultResourceConfig(NaturalCR.class, MultipleContentTypesResource.class);
         rc.getProperties().put(ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, new SchemaWadlGeneratorConfig());
         initiateWebApplication(rc);
 
@@ -171,6 +251,8 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         assertEquals(200, cr.getStatus());
 
         String wadlAsString = r.accept(MediaTypes.WADL_JSON).options(String.class);
+
+//        Application wadlAsApp = r.accept(MediaTypes.WADL_JSON).options(Application.class);
         
         // I was seeing a null pointer desrializing the WADL back into
         // a JAX-B class, so just for the moment use simple contains 
@@ -187,7 +269,11 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         
     }
 
-    private void validateWadl(String uriPrefix, ClientResponse cr, WebResource r) throws UniformInterfaceException, JAXBException, ClientHandlerException {
+    private void validateWadl(
+            String uriPrefix, 
+            ClientResponse cr, 
+            WebResource r,
+            boolean hasXml) throws UniformInterfaceException, JAXBException, ClientHandlerException {
         // Right let check that we have a reference to the XSD, so lets cheat
         // and instantiate the Application object.
         
@@ -236,7 +322,7 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         Method post = (Method)resource.getMethodOrResource().get(0);
 
         List<Representation> requestRepresentations = post.getRequest().getRepresentation();
-        assertEquals(2, requestRepresentations.size());
+        assertEquals(hasXml ? 2 : 1, requestRepresentations.size());
         for (int counter = 0; counter < requestRepresentations.size(); counter++) {
             Representation requestRepresentation = requestRepresentations.get(counter);
             QName requestType  = requestRepresentation.getElement();
@@ -252,6 +338,7 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         
         
         List<Representation> responseRepresentations = post.getResponse().get(0).getRepresentation();
+        assertEquals(hasXml ? 2 : 1, responseRepresentations.size());
         for (int counter = 0; counter < responseRepresentations.size(); counter++) {
             Representation responseRepresentation = responseRepresentations.get(counter);
             QName responseType  = responseRepresentation.getElement();

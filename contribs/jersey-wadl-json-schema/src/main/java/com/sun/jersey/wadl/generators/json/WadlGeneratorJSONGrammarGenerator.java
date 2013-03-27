@@ -1,5 +1,7 @@
 package com.sun.jersey.wadl.generators.json;
 
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.api.json.JSONJAXBContext;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
@@ -31,6 +33,8 @@ import com.sun.jersey.server.wadl.WadlGeneratorImpl;
 import com.sun.jersey.server.wadl.generators.AbstractWadlGeneratorGrammarGenerator;
 import com.sun.research.ws.wadl.Param;
 import com.sun.research.ws.wadl.Representation;
+import javax.ws.rs.ext.ContextResolver;
+import javax.xml.bind.JAXBContext;
 
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
@@ -115,23 +119,53 @@ public class WadlGeneratorJSONGrammarGenerator
     @Override
     protected Resolver buildModelAndSchemas(Map<String, ExternalGrammar> extraFiles) {
 
+        class P
+        {
+            public P(Class clazz, MediaType mt)
+            {
+                this.clazz = clazz;
+                this.mt = mt;
+            }
+            
+            Class clazz;
+            MediaType mt;
+            
+            public String toString() {
+                if (mt!=null) {
+                    return clazz + " " + mt;
+                }
+                else {
+                    return clazz.toString();
+                }
+            }
+        }
+        
         // Lets get all candidate classes so we can create the JAX-B context
         // include any @XmlSeeAlso references.
 
-        Set<Class> classSet = new HashSet<Class>(_seeAlso);
+        Set<P> classSet = new HashSet<P>();
+        
+        // We don't know the media type for the set also classes, so
+        // we are just going to have to guess
+        //
+        for ( Class next : _seeAlso ) {
+            classSet.add(new P(next, null));
+        }
 
+        // Process input inot a list
+        //
         for ( Pair pair : _hasTypeWantsName ) {
             HasType hasType = pair.hasType; 
             Class clazz = hasType.getPrimaryClass();
  
             // Is this class itself interesting?
 
-           classSet.add( clazz );
+            classSet.add( new P(clazz, hasType.getMediaType() ));
     
-           // Make sure we do something about the parameters
-           // TODO make this actually do something useful
+            // Make sure we do something about the parameters
+            // TODO make this actually do something useful
            
-           if ( SPECIAL_GENERIC_TYPES.contains (clazz) ) {
+            if ( SPECIAL_GENERIC_TYPES.contains (clazz) ) {
  
                 Type type = hasType.getType();
                 if ( type instanceof ParameterizedType )
@@ -139,41 +173,104 @@ public class WadlGeneratorJSONGrammarGenerator
                     Type parameterType = ((ParameterizedType)type).getActualTypeArguments()[0];
                     if (parameterType instanceof Class)
                     {
-                        classSet.add( (Class) parameterType );
+                        classSet.add( new P((Class) parameterType, hasType.getMediaType() ));
                     }
                 }
             }
         }
 
-
+        // Get a list of resolved classes
+        final Set<Class> resolvedClasses = new HashSet<Class>();
+        
+        
         try {
 
             // Some usefull instances
             final List<StreamResult> results = new ArrayList<StreamResult>();
-            final ObjectMapper mapper = new ObjectMapper();
+            
+            // Lets see if we are doing straigh Jackson POJO mapping, ant or
+            // maven tasks don't have access to this yet so in future we will
+            // need to find a way to wire this in
+            
+            final boolean isPOJOMapping = _fap!=null ?
+                    _fap.getFeature(JSONConfiguration.FEATURE_POJO_MAPPING) : false;
 
             // For each entry in the classSet generate a JSON entry if possible
             //
             
-            for (Iterator<Class> it = classSet.iterator(); it.hasNext();) {
-                Class next = it.next();
+            nextPair : for (Iterator<P> it = classSet.iterator(); it.hasNext();) {
+                P next = it.next();
 
                 try {
 
-                    JsonSchema schema = mapper.generateJsonSchema(next);
-                    String jsonName = derriveName(next);
-                    ObjectNode schemaNode = schema.getSchemaNode();
-                    schemaNode.put("name", jsonName);
+                    boolean generateJsonSchema = false;
+                    if (isPOJOMapping) {
+                        // All classes get a show at JSON-Schema
+                        generateJsonSchema = true;
+                    }
+                    else if (_providers !=null) {
                     
-                    CharArrayWriter writer = new CharArrayWriter();
-                    mapper.writeTree(mapper.getJsonFactory().createJsonGenerator(writer), schemaNode);
+                        // Try to work out the mapping in this case
+                        // TODO POJO mapping case, does this mean something different?
+                        // in non POJO case reject non JAXBRootElement
+
+                        JSONConfiguration.Notation notation =
+                                JSONConfiguration.DEFAULT.getNotation();
+
+                        ContextResolver<JAXBContext> contextR = _providers.getContextResolver(JAXBContext.class, 
+                                next.mt!=null ? next.mt : MediaType.WILDCARD_TYPE);
+                        if (contextR!=null) {
+                            JAXBContext context = contextR.getContext(next.clazz);
+                            if (context instanceof JSONJAXBContext) {
+                                notation = ((JSONJAXBContext)context).getJSONConfiguration().getNotation();
+                            }
+                        }
+
+                        // This generation only supports
+                        // natural / jackson mapped JSON-Schema at the moment
+                        // others might be close, but we shouldn't generate
+                        // a schema in this case
+                        switch (notation)
+                        {
+                            // This is Jackson; but may require further configuration
+                            // based on the settings
+                            case NATURAL :
+                                generateJsonSchema = true;
+                                break;
+                            case MAPPED :
+                            case BADGERFISH :
+                            case MAPPED_JETTISON :
+                            default :
+                                LOGGER.log( Level.INFO, 
+                                        "Cannot support mapping " + notation + " for " + next);
+                                break;
+                        }
+                        
+                    }
                     
-                    StreamResult sr = new StreamResult(writer);
-                    
-                    
-                    sr.setSystemId(jsonName);
-                    
-                    results.add(sr);
+                    // If this is a valid configuration then generate
+                    //
+                    if (generateJsonSchema) {
+                        final ObjectMapper mapper = new ObjectMapper();
+                        JsonSchema schema = mapper.generateJsonSchema(next.clazz);
+                        String jsonName = derriveName(next.clazz);
+                        ObjectNode schemaNode = schema.getSchemaNode();
+                        schemaNode.put("name", jsonName);
+
+                        CharArrayWriter writer = new CharArrayWriter();
+                        mapper.writeTree(mapper.getJsonFactory().createJsonGenerator(writer), schemaNode);
+
+                        StreamResult sr = new StreamResult(writer);
+
+
+                        sr.setSystemId(jsonName);
+
+                        results.add(sr);
+                        
+                        //
+                        
+                        resolvedClasses.add(next.clazz);
+                    }
                 } catch (JsonMappingException je) {
                     LOGGER.log( Level.SEVERE, "Failed to generate the schema for the JSON class " + next, je );
                     it.remove();
@@ -200,7 +297,6 @@ public class WadlGeneratorJSONGrammarGenerator
 
         // Create introspector
 
-        final Set<Class> resolvedClasses = new HashSet(classSet);
         
         return new Resolver() {
             @Override

@@ -105,6 +105,16 @@ public class WadlGeneratorApplicationDoc implements WadlGenerator {
         return _delegate.getRequiredJaxbContextPath();
     }
 
+    /**
+     * Delegates the setting of the environment
+     */
+    @Override
+    public void setEnvironment(Environment env)
+    {
+        _delegate.setEnvironment(env);
+    }    
+    
+    
     public void setApplicationDocsFile(File applicationDocsFile) {
         if ( _applicationDocsStream != null ) {
             throw new IllegalStateException( "The applicationDocsStream property is already set," +
