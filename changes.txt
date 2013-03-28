@@ -2,6 +2,14 @@ release 1.18
 - Fixed issue 1681
   http://java.net/jira/browse/JERSEY-1681
   Memory Leak in the basic Jersey webapp deploying on GFv312
+- Fixed issue 1593
+  http://java.net/jira/browse/JERSEY-1593
+  JSON-Grammar generation format is altered by POJOMappingFeature
+- Fixed issue 1594
+  http://java.net/jira/browse/JERSEY-1594
+  JSON-Schema generation doesn't take into account notation options
+- Fixed issue
+  JAX-RS service fails to start when WADL generation disabled. (WLS)
 
 release 1.17 (01-2013)
 - Fixed issue JERSEY-1642

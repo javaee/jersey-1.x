@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -61,6 +61,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
@@ -73,7 +74,10 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
+
+import javax.xml.bind.JAXBContext;
 
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.container.ContainerException;
@@ -139,7 +143,16 @@ import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.wadl.WadlApplicationContext;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import com.sun.jersey.spi.StringReaderWorkers;
-import com.sun.jersey.spi.container.*;
+import com.sun.jersey.spi.container.ContainerRequest;
+import com.sun.jersey.spi.container.ContainerRequestFilter;
+import com.sun.jersey.spi.container.ContainerResponse;
+import com.sun.jersey.spi.container.ContainerResponseFilter;
+import com.sun.jersey.spi.container.ContainerResponseWriter;
+import com.sun.jersey.spi.container.ExceptionMapperContext;
+import com.sun.jersey.spi.container.ResourceMethodCustomInvokerDispatchFactory;
+import com.sun.jersey.spi.container.ResourceMethodDispatchProvider;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationListener;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Inject;
 import com.sun.jersey.spi.inject.Injectable;
@@ -154,10 +167,6 @@ import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.ext.Provider;
-import javax.xml.bind.JAXBContext;
 
 /**
  * A Web application that contains a set of resources, each referenced by
@@ -1249,8 +1258,8 @@ public final class WebApplicationImpl implements WebApplication {
 
         if(!resourceConfig.getFeature(ResourceConfig.FEATURE_DISABLE_WADL)) {
             wadlApplicationContextInjectionProxy = new WadlApplicationContextInjectionProxy();
-            injectableFactory.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>(
-                    WadlApplicationContext.class, wadlApplicationContextInjectionProxy) {});
+            injectableFactory.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>
+                    (WadlApplicationContext.class, wadlApplicationContextInjectionProxy) {});
 
             // In order for the application to properly marshall the Application
             // object we need to make sure that we provide a JAXBContext that
@@ -1277,6 +1286,9 @@ public final class WebApplicationImpl implements WebApplication {
             
             providerServices.update(resourceConfig.getProviderClasses(),
                     resourceConfig.getProviderSingletons(), injectableFactory);
+        } else {
+            injectableFactory.add(new SingletonTypeInjectableProvider<Context, WadlApplicationContext>
+                    (WadlApplicationContext.class, wadlApplicationContextInjectionProxy) {});
         }
 
         // Initiate filter
