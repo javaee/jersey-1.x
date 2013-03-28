@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,10 +44,12 @@ import java.net.URI;
 import java.util.HashMap;
 
 import javax.ws.rs.core.UriBuilder;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -126,4 +128,36 @@ public class UriBuilderImplTest {
         URI uri = new UriBuilderImpl().path("http://localhost/").queryParam("test", "").build();
         assertEquals("http://localhost/?test=", uri.toString());
     }
+
+    // regression test for JERSEY-1805
+    // >>>>>>>>>>>>>>>>
+    @Test
+    public void testQueryParamEncoded() {
+        final UriBuilder uriBuilder = new UriBuilderImpl().path("http://localhost:8080/path");
+        uriBuilder.queryParam("query", "%dummy23");
+        assertEquals("http://localhost:8080/path?query=%25dummy23", uriBuilder.build().toString());
+    }
+
+    @Test
+    public void testQueryParamEncoded2() {
+        final UriBuilder uriBuilder = new UriBuilderImpl().path("http://localhost:8080/path");
+        uriBuilder.queryParam("query", "{param}");
+        assertEquals("http://localhost:8080/path?query=%25dummy23", uriBuilder.build("%dummy23").toString());
+    }
+
+    @Test
+    public void testQueryParamEncoded3() {
+        final UriBuilder uriBuilder = new UriBuilderImpl().path("http://localhost:8080/path");
+        uriBuilder.queryParam("query", "{param}");
+        assertEquals("http://localhost:8080/path?query=%2525test", uriBuilder.build("%25test").toString());
+    }
+
+    @Test
+    public void testQueryParamEncoded4() {
+        final UriBuilder uriBuilder = new UriBuilderImpl().path("http://localhost:8080/path");
+        uriBuilder.queryParam("query", "{param}");
+        assertEquals("http://localhost:8080/path?query=%25test", uriBuilder.buildFromEncoded("%25test").toString());
+    }
+    // <<<<<<<<<<<<<<<<<<<
+    // end of regression test for JERSEY-1805
 }
