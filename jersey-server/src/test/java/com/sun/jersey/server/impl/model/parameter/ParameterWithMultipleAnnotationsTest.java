@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,29 +39,33 @@
  */
 package com.sun.jersey.server.impl.model.parameter;
 
-import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
-import org.junit.Test;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 
 import javax.ws.rs.PathParam;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.util.List;
 
-import static org.junit.Assert.*;
+import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Checks that Parameters work fine with multiple annotations
  */
 public class ParameterWithMultipleAnnotationsTest {
 
-    @Test
-    public void testParametersWithMultiple() throws Exception {
-        Class<?> declaring = MyResource.class;
-        Method processMethod = declaring.getMethod("process", String.class);
+    private static Method createParameterMethod;
 
+    @BeforeClass
+    public static void beforeClass() {
         // its a private method so lets use reflection to invoke it
-        Method createParameterMethod = null;
+        createParameterMethod = null;
         Method[] methods = IntrospectionModeller.class.getDeclaredMethods();
         for (Method method : methods) {
             if (method.getName().equals("createParameter")) {
@@ -69,35 +73,66 @@ public class ParameterWithMultipleAnnotationsTest {
             }
         }
         assertNotNull("Should have found the createParameter() method on IntrospectionModeller", createParameterMethod);
+    }
 
-        /*
-            private static Parameter createParameter(
-            Class concreteClass,
-            Class declaringClass,
-            boolean isEncoded,
-            Class<?> paramClass,
-            Type paramType,
-            Annotation[] annotations) {
-         */
+    @Test
+    public void testParametersWithMultiple() throws Exception {
+        checkMyResourceMethod("processTrailingUnknown");
+        checkMyResourceMethod("processLeadingUnknown");
+        checkMyResourceMethod("processLeadingAndTrailingUnknown");
+        checkMyResourceMethod("processSingleUnknown");
+        checkMyResourceMethod("processDoubleUnknown");
+    }
+
+    private void checkMyResourceMethod(final String methodName) throws Exception {
+        final Method processMethod = MyResource.class.getDeclaredMethod(methodName, String.class);
         boolean isEncoded = false;
         Class<?>[] parameterTypes = processMethod.getParameterTypes();
         Annotation[][] parameterAnnotations = processMethod.getParameterAnnotations();
         int idx = 0;
         createParameterMethod.setAccessible(true);
-        Object value = createParameterMethod.invoke(null, declaring, declaring, isEncoded, String.class, parameterTypes[idx], parameterAnnotations[idx]);
+        Object value = createParameterMethod.invoke(null, MyResource.class, MyResource.class, isEncoded, String.class,
+                parameterTypes[idx], parameterAnnotations[idx]);
         assertTrue("Should return a Parameter but found " + value, value instanceof Parameter);
         Parameter parameter = (Parameter) value;
-        assertEquals("id", parameter.getSourceName());
+        assertEquals("correct", parameter.getSourceName());
     }
 
-    @java.lang.annotation.Target({java.lang.annotation.ElementType.PARAMETER, java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.FIELD})
-    @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-    public @interface DummyAnnotation {
+    @Target({
+            java.lang.annotation.ElementType.PARAMETER, java.lang.annotation.ElementType.METHOD,
+            java.lang.annotation.ElementType.FIELD
+    })
+    @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
+    public @interface LeadAnnotation {
+
+        String value() default "lead";
+    }
+
+    @Target({
+            java.lang.annotation.ElementType.PARAMETER, java.lang.annotation.ElementType.METHOD,
+            java.lang.annotation.ElementType.FIELD
+    })
+    @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
+    public @interface TrailAnnotation {
+
+        String value() default "trail";
     }
 
     private static class MyResource {
-        public void process(@PathParam("id") @DummyAnnotation String id) {
 
+        public void processTrailingUnknown(@PathParam("correct") @TrailAnnotation String id) {
+        }
+
+        public void processLeadingUnknown(@LeadAnnotation @PathParam("correct") String id) {
+        }
+
+        public void processLeadingAndTrailingUnknown(@LeadAnnotation @PathParam("correct") @TrailAnnotation String id) {
+        }
+
+        public void processSingleUnknown(@LeadAnnotation("correct") String id) {
+        }
+
+        public void processDoubleUnknown(@LeadAnnotation @TrailAnnotation("correct") String id) {
         }
     }
 }

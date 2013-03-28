@@ -10,6 +10,9 @@ release 1.18
   JSON-Schema generation doesn't take into account notation options
 - Fixed issue
   JAX-RS service fails to start when WADL generation disabled. (WLS)
+- Fixed issue 1659
+  http://java.net/jira/browse/JERSEY-1659
+  First unknown annotation on resource method parameter is selected instead of last.
 
 release 1.17 (01-2013)
 - Fixed issue JERSEY-1642

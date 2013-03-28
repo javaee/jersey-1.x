@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,22 +39,6 @@
  */
 package com.sun.jersey.server.impl.modelapi.annotation;
 
-import com.sun.jersey.core.reflection.AnnotatedMethod;
-import com.sun.jersey.core.reflection.MethodList;
-import com.sun.jersey.core.header.MediaTypes;
-import com.sun.jersey.api.model.AbstractField;
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.api.model.AbstractResourceConstructor;
-import com.sun.jersey.api.model.AbstractResourceMethod;
-import com.sun.jersey.api.model.AbstractSetterMethod;
-import com.sun.jersey.api.model.AbstractSubResourceLocator;
-import com.sun.jersey.api.model.AbstractSubResourceMethod;
-import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.api.model.Parameter.Source;
-import com.sun.jersey.api.model.Parameterized;
-import com.sun.jersey.api.model.PathValue;
-import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.impl.ImplMessages;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -69,6 +53,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
@@ -82,6 +67,23 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+
+import com.sun.jersey.api.model.AbstractField;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceConstructor;
+import com.sun.jersey.api.model.AbstractResourceMethod;
+import com.sun.jersey.api.model.AbstractSetterMethod;
+import com.sun.jersey.api.model.AbstractSubResourceLocator;
+import com.sun.jersey.api.model.AbstractSubResourceMethod;
+import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.api.model.Parameter.Source;
+import com.sun.jersey.api.model.Parameterized;
+import com.sun.jersey.api.model.PathValue;
+import com.sun.jersey.core.header.MediaTypes;
+import com.sun.jersey.core.reflection.AnnotatedMethod;
+import com.sun.jersey.core.reflection.MethodList;
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.impl.ImplMessages;
 
 /**
  *
@@ -591,8 +593,8 @@ public class IntrospectionModeller {
             } else if (DefaultValue.class == annotation.annotationType()) {
                 paramDefault = ((DefaultValue) annotation).value();
             } else {
-                // lets only clear things down if we've not found a ANOT_HELPER_MAP annotation already
-                if (paramAnnotation == null) {
+                // Take latest unknown annotation, but don't override known annotation
+                if ((paramAnnotation == null) || (paramSource == Source.UNKNOWN)) {
                     paramAnnotation = annotation;
                     paramSource = Source.UNKNOWN;
                     paramName = getValue(annotation);
