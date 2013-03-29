@@ -1,4 +1,7 @@
 release 1.18
+- FIxed issue 1640
+  http://java.net/jira/browse/JERSEY-1640
+  Resource InputStream is not closed.
 - Fixed issue 1681
   http://java.net/jira/browse/JERSEY-1681
   Memory Leak in the basic Jersey webapp deploying on GFv312

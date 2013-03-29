@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2012-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -63,18 +63,18 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.ext.RuntimeDelegate;
 
-import com.sun.jersey.core.reflection.ReflectionHelper;
-import com.sun.jersey.core.spi.scanning.PackageNamesScanner;
-import com.sun.jersey.impl.SpiMessages;
-import com.sun.jersey.spi.service.ServiceConfigurationError;
-import com.sun.jersey.spi.service.ServiceFinder;
-
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
 import org.osgi.framework.BundleReference;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.SynchronousBundleListener;
+
+import com.sun.jersey.core.reflection.ReflectionHelper;
+import com.sun.jersey.core.spi.scanning.PackageNamesScanner;
+import com.sun.jersey.impl.SpiMessages;
+import com.sun.jersey.spi.service.ServiceConfigurationError;
+import com.sun.jersey.spi.service.ServiceFinder;
 
 /**
  * Utility class to deal with OSGi runtime specific behavior.
@@ -310,10 +310,26 @@ public final class OsgiRegistry implements SynchronousBundleListener {
                     final Enumeration<URL> jars = bundle.findEntries("/", "*.jar", true);
                     if (jars != null) {
                         while (jars.hasMoreElements()) {
+                            final URL jar = jars.nextElement();
+                            final InputStream inputStream = classLoader.getResourceAsStream(jar.getPath());
+                            if (inputStream == null) {
+                                LOGGER.config(SpiMessages.OSGI_REGISTRY_ERROR_OPENING_RESOURCE_STREAM(jar));
+                                continue;
+                            }
+                            final JarInputStream jarInputStream;
                             try {
-                                final InputStream inputStream = classLoader.getResourceAsStream(jars.nextElement().getPath());
-                                final JarInputStream jarInputStream = new JarInputStream(inputStream);
+                                jarInputStream = new JarInputStream(inputStream);
+                            } catch (IOException ex) {
+                                LOGGER.log(Level.CONFIG, SpiMessages.OSGI_REGISTRY_ERROR_PROCESSING_RESOURCE_STREAM(jar), ex);
+                                try {
+                                    inputStream.close();
+                                } catch (IOException e) {
+                                    // ignored
+                                }
+                                continue;
+                            }
 
+                            try {
                                 JarEntry jarEntry;
                                 while ((jarEntry = jarInputStream.getNextJarEntry()) != null) {
                                     final String jarEntryName = jarEntry.getName();
@@ -323,8 +339,14 @@ public final class OsgiRegistry implements SynchronousBundleListener {
                                         result.add(bundle.getResource(jarEntryName));
                                     }
                                 }
-                            } catch (Exception e) {
-                                // Ignore.
+                            } catch (Exception ex) {
+                                LOGGER.log(Level.CONFIG, SpiMessages.OSGI_REGISTRY_ERROR_PROCESSING_RESOURCE_STREAM(jar), ex);
+                            } finally {
+                                try {
+                                    jarInputStream.close();
+                                } catch (IOException e) {
+                                    // ignored
+                                }
                             }
                         }
                     }
