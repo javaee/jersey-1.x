@@ -69,6 +69,7 @@ public class WadlApplicationContextTest extends AbstractResourceTester {
         @GET
         @Produces("text/plain")
         public String wadlApplicationContextSet() {
+            System.out.println("### " + wadlApplicationContext);
             return wadlApplicationContext != null ? "ok" : "ko";
         }
     }

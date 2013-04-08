@@ -37,35 +37,32 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
 package com.sun.jersey.server.impl.model.parameter;
-
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.reflect.Method;
-
-import javax.ws.rs.PathParam;
 
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
-
-import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+
+import javax.ws.rs.PathParam;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Checks that Parameters work fine with multiple annotations
  */
 public class ParameterWithMultipleAnnotationsTest {
 
-    private static Method createParameterMethod;
+    @Test
+    public void testParametersWithMultiple() throws Exception {
+        Class<?> declaring = MyResource.class;
+        Method processMethod = declaring.getMethod("process", String.class);
 
-    @BeforeClass
-    public static void beforeClass() {
         // its a private method so lets use reflection to invoke it
-        createParameterMethod = null;
+        Method createParameterMethod = null;
         Method[] methods = IntrospectionModeller.class.getDeclaredMethods();
         for (Method method : methods) {
             if (method.getName().equals("createParameter")) {
@@ -73,66 +70,35 @@ public class ParameterWithMultipleAnnotationsTest {
             }
         }
         assertNotNull("Should have found the createParameter() method on IntrospectionModeller", createParameterMethod);
-    }
 
-    @Test
-    public void testParametersWithMultiple() throws Exception {
-        checkMyResourceMethod("processTrailingUnknown");
-        checkMyResourceMethod("processLeadingUnknown");
-        checkMyResourceMethod("processLeadingAndTrailingUnknown");
-        checkMyResourceMethod("processSingleUnknown");
-        checkMyResourceMethod("processDoubleUnknown");
-    }
-
-    private void checkMyResourceMethod(final String methodName) throws Exception {
-        final Method processMethod = MyResource.class.getDeclaredMethod(methodName, String.class);
+        /*
+            private static Parameter createParameter(
+            Class concreteClass,
+            Class declaringClass,
+            boolean isEncoded,
+            Class<?> paramClass,
+            Type paramType,
+            Annotation[] annotations) {
+         */
         boolean isEncoded = false;
         Class<?>[] parameterTypes = processMethod.getParameterTypes();
         Annotation[][] parameterAnnotations = processMethod.getParameterAnnotations();
         int idx = 0;
         createParameterMethod.setAccessible(true);
-        Object value = createParameterMethod.invoke(null, MyResource.class, MyResource.class, isEncoded, String.class,
-                parameterTypes[idx], parameterAnnotations[idx]);
+        Object value = createParameterMethod.invoke(null, declaring, declaring, isEncoded, String.class, parameterTypes[idx], parameterAnnotations[idx]);
         assertTrue("Should return a Parameter but found " + value, value instanceof Parameter);
         Parameter parameter = (Parameter) value;
-        assertEquals("correct", parameter.getSourceName());
+        assertEquals("id", parameter.getSourceName());
     }
 
-    @Target({
-            java.lang.annotation.ElementType.PARAMETER, java.lang.annotation.ElementType.METHOD,
-            java.lang.annotation.ElementType.FIELD
-    })
-    @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-    public @interface LeadAnnotation {
-
-        String value() default "lead";
-    }
-
-    @Target({
-            java.lang.annotation.ElementType.PARAMETER, java.lang.annotation.ElementType.METHOD,
-            java.lang.annotation.ElementType.FIELD
-    })
-    @Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
-    public @interface TrailAnnotation {
-
-        String value() default "trail";
+    @java.lang.annotation.Target({java.lang.annotation.ElementType.PARAMETER, java.lang.annotation.ElementType.METHOD, java.lang.annotation.ElementType.FIELD})
+    @java.lang.annotation.Retention(java.lang.annotation.RetentionPolicy.RUNTIME)
+    public @interface DummyAnnotation {
     }
 
     private static class MyResource {
+        public void process(@PathParam("id") @DummyAnnotation String id) {
 
-        public void processTrailingUnknown(@PathParam("correct") @TrailAnnotation String id) {
-        }
-
-        public void processLeadingUnknown(@LeadAnnotation @PathParam("correct") String id) {
-        }
-
-        public void processLeadingAndTrailingUnknown(@LeadAnnotation @PathParam("correct") @TrailAnnotation String id) {
-        }
-
-        public void processSingleUnknown(@LeadAnnotation("correct") String id) {
-        }
-
-        public void processDoubleUnknown(@LeadAnnotation @TrailAnnotation("correct") String id) {
         }
     }
 }

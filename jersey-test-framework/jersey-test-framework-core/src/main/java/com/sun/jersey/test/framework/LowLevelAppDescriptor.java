@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,15 +40,13 @@
 
 package com.sun.jersey.test.framework;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-//import com.sun.jersey.test.framework.spi.container.grizzly.GrizzlyTestContainerFactory;
-//import com.sun.jersey.test.framework.spi.container.http.HTTPContainerFactory;
-//import com.sun.jersey.test.framework.spi.container.inmemory.InMemoryTestContainerFactory;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A low-level application descriptor.
