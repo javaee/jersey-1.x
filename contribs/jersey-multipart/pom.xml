@@ -58,9 +58,9 @@
 
     <dependencies>
          <dependency>
-            <groupId>org.jvnet</groupId>
+            <groupId>org.jvnet.mimepull</groupId>
             <artifactId>mimepull</artifactId>
-            <version>1.6</version>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>com.sun.xml.bind</groupId>

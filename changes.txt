@@ -1,5 +1,7 @@
 release 1.18
-- FIxed issue 1640
+- Update mimepull dependency
+  org.jvnet:mimepull:1.6 -> org.jvnet.mimepull:mimepull:1.9.2
+- Fixed issue 1640
   http://java.net/jira/browse/JERSEY-1640
   Resource InputStream is not closed.
 - Fixed issue 1681
