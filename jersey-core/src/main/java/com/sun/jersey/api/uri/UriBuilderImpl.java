@@ -495,7 +495,7 @@ public class UriBuilderImpl extends UriBuilder {
         checkSsp();
 
         if (queryParams == null) {
-            queryParams = UriComponent.decodeQuery(query.toString(), false);
+            queryParams = UriComponent.decodeQuery(query.toString(), false, false);
             query.setLength(0);
         }
 

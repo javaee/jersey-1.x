@@ -40,14 +40,20 @@
 
 package com.sun.jersey.api.uri;
 
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 
 import javax.ws.rs.core.UriBuilder;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  *
@@ -64,6 +70,31 @@ public class UriBuilderImplTest {
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+    }
+
+    // Reproducer for JERSEY-2036
+    @Test
+    public void testReplaceNonAsciiQueryParam()
+            throws UnsupportedEncodingException, MalformedURLException, URISyntaxException {
+        URL url = new URL("http://example.com/getMyName?néme=t");
+        String query = url.getQuery();
+
+        UriBuilder builder = new UriBuilderImpl().path(url.getPath())
+                .scheme(url.getProtocol())
+                .host(url.getHost())
+                .port(url.getPort())
+                .replaceQuery(query)
+                .fragment(url.getRef());
+
+        // Replace QueryParam.
+        String parmName = "néme";
+        String value = "value";
+
+        builder.replaceQueryParam(parmName, value);
+
+        final URI result = builder.build();
+        final URI expected = new URI("http://example.com/getMyName?néme=value");
+        assertEquals(expected.toASCIIString(), result.toASCIIString());
     }
 
     @Test
