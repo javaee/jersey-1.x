@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 2036
+  http://java.net/jira/browse/JERSEY-2036
+  UriBuilder does not replace query parameters correctly on non-ascii parameter
 - Update mimepull dependency
   org.jvnet:mimepull:1.6 -> org.jvnet.mimepull:mimepull:1.9.2
 - Fixed issue 1640
