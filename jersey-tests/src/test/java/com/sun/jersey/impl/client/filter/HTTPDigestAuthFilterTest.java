@@ -66,6 +66,16 @@ public class HTTPDigestAuthFilterTest extends AbstractGrizzlyServerTester {
 
         @GET
         public Response get1() {
+            return verify();
+        }
+
+        @GET
+        @Path("ěščřžýáíé")
+        public Response getWithEncodedUri() {
+            return verify();
+        }
+
+        private Response verify() {
             if (context.getRequest().getHeaderValue("Authorization") == null) {
                 return
                         // return http 401 - not authorized
@@ -88,7 +98,7 @@ public class HTTPDigestAuthFilterTest extends AbstractGrizzlyServerTester {
                 // HA2 : Switch on qop
                 String HA2 = concatMD5(
                         "GET",
-                        context.getRequest().getRequestUri().getPath().toString()
+                        context.getRequest().getRequestUri().getRawPath()
                 );
 
                 String response = concatMD5(
@@ -141,11 +151,21 @@ public class HTTPDigestAuthFilterTest extends AbstractGrizzlyServerTester {
     static private final String DIGEST_TEST_DOMAIN = "/auth-digest/";
 
     public void testHTTPDigestAuthFilter() {
+        final String path = "auth-digest";
+        testRequest(path);
+    }
+
+    public void testHTTPDigestAuthFilterWithEncodedUri() {
+        final String path = "auth-digest/ěščřžýáíé";
+        testRequest(path);
+    }
+
+    private void testRequest(String path) {
         startServer(Resource.class);
 
         Client c = Client.create();
         c.addFilter(new HTTPDigestAuthFilter(DIGEST_TEST_LOGIN, DIGEST_TEST_PASS));
-        WebResource r = c.resource(getUri().path("auth-digest").build());
+        WebResource r = c.resource(getUri().path(path).build());
 
         ClientResponse response = r.get(ClientResponse.class);
         assertTrue(response.getStatus() == 200);

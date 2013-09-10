@@ -426,7 +426,7 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
                     this.password);
 
             // Get exact requested URI
-            String uri = request.getURI().getPath();
+            String uri = request.getURI().getRawPath();
 
 
             // Repeat URI in header
