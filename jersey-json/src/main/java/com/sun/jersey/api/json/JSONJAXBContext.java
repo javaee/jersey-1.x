@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -61,7 +61,7 @@ import com.sun.jersey.json.impl.JSONUnmarshallerImpl;
  * An adaption of {@link JAXBContext} that supports marshalling
  * and unmarshalling of JAXB beans using the JSON format.
  * <p>
- * The JSON format may be configured by using a {@link JSONConfiguration} object 
+ * The JSON format may be configured by using a {@link JSONConfiguration} object
  * as a constructor parameter of this class.
  */
 public final class JSONJAXBContext extends JAXBContext implements JSONConfigurated {
@@ -165,7 +165,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
      * The value is collection of string values that are
      * object names.
      * The value of an object name in the JSON document that exists in the collection
-     * of object names will be declared as non-string value, which is not surrounded 
+     * of object names will be declared as non-string value, which is not surrounded
      * by double quotes.
      * <p>
      * For example, consider that the property value is not set and the
@@ -224,10 +224,10 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
 
     /**
      * Constructs a new instance with default {@link JSONConfiguration}.
-     * 
-     * @param classesToBeBound list of java classes to be recognized by the 
+     *
+     * @param classesToBeBound list of java classes to be recognized by the
      *        new JSONJAXBContext. Can be empty, in which case a JSONJAXBContext
-     *        that only knows about spec-defined classes will be returned. 
+     *        that only knows about spec-defined classes will be returned.
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
@@ -260,13 +260,13 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     }
 
     /**
-     * Constructs a new instance with a custom set of properties. 
+     * Constructs a new instance with a custom set of properties.
      * The default {@link JSONConfiguration} is used if no (now deprecated)
      * JSON related properties are specified
-     * 
-     * @param classesToBeBound list of java classes to be recognized by the 
+     *
+     * @param classesToBeBound list of java classes to be recognized by the
      *        new JSONJAXBContext. Can be empty, in which case a JSONJAXBContext
-     *        that only knows about spec-defined classes will be returned. 
+     *        that only knows about spec-defined classes will be returned.
      * @param properties the custom set of properties. If it contains(now deprecated) JSON related properties,
      *                  then a non-default {@link JSONConfiguration} is used reflecting the JSON properties
      * @throws JAXBException if an error was encountered while creating the
@@ -312,7 +312,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     /**
      * Construct a new instance of using context class loader of the thread
      * with default {@link JSONConfiguration}.
-     * 
+     *
      * @param contextPath list of java package names that contain schema
      *        derived class and/or java to schema (JAXB-annotated) mapped
      *        classes
@@ -344,7 +344,8 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
         if (config.getNotation() == JSONConfiguration.Notation.NATURAL) {
             jaxbContext = JAXBContext.newInstance(contextPath,
                     Thread.currentThread().getContextClassLoader(),
-                    createProperties(Collections.<String, Object>emptyMap()));
+                    createProperties(JSONHelper.createPropertiesForJaxbContext(Collections.<String, Object>emptyMap()))
+            );
         } else {
             jaxbContext = JAXBContext.newInstance(contextPath, Thread.currentThread().getContextClassLoader());
         }
@@ -354,11 +355,11 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     /**
      * Construct a new instance using a specified class loader with
      * default  {@link JSONConfiguration}.
-     * 
+     *
      * @param contextPath list of java package names that contain schema
      *        derived class and/or java to schema (JAXB-annotated) mapped
      *        classes
-     * @param classLoader 
+     * @param classLoader
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
      */
@@ -369,14 +370,14 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     }
 
     /**
-     * Construct a new instance using a specified class loader and 
+     * Construct a new instance using a specified class loader and
      * a custom set of properties. {@link JSONConfiguration} is set to default,
      * if user does not specify any (now deprecated) JSON related properties
-     * 
+     *
      * @param contextPath list of java package names that contain schema
      *        derived class and/or java to schema (JAXB-annotated) mapped
      *        classes
-     * @param classLoader 
+     * @param classLoader
      * @param properties the custom set of properties.
      * @throws JAXBException if an error was encountered while creating the
      *         underlying JAXBContext.
@@ -480,7 +481,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     /**
      * Overrides underlaying createUnmarshaller method and returns
      * an unmarshaller which is capable of JSON deserialization.
-     * 
+     *
      * @return unmarshaller instance with JSON capabilities
      * @throws javax.xml.bind.JAXBException
      */
@@ -492,7 +493,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     /**
      * Overrides underlaying createMarshaller method and returns
      * a marshaller which is capable of JSON serialization.
-     * 
+     *
      * @return marshaller instance with JSON capabilities
      * @throws javax.xml.bind.JAXBException
      */
@@ -503,7 +504,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
 
     /**
      * Simply delegates to underlying JAXBContext implementation.
-     * 
+     *
      * @return what underlying JAXBContext returns
      * @throws javax.xml.bind.JAXBException
      */
@@ -567,7 +568,7 @@ public final class JSONJAXBContext extends JAXBContext implements JSONConfigurat
     }
 
     private JSONConfiguration getConfiguration(JSONConfiguration.Notation pNotation,
-            Map<String, Object> properties) {
+                                               Map<String, Object> properties) {
 
         String[] a = new String[0];
 
