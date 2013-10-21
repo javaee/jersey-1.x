@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -254,15 +254,26 @@ public final class ServiceFinder<T> implements Iterable<T> {
     }
 
     private static String getJerseyModuleVersion(final String serviceName, final URL serviceUrl) {
+        InputStream stream = null;
+
         try {
             final String url = serviceUrl.toString();
             final String resource = url.endsWith("class") ? serviceName.replace(".", "/") + ".class" : serviceName;
             final URL moduleVersionURL = new URL(url.replace(resource, MODULE_VERSION));
 
-            return new BufferedReader(new InputStreamReader(moduleVersionURL.openStream())).readLine();
+            stream = moduleVersionURL.openStream();
+            return new BufferedReader(new InputStreamReader(stream)).readLine();
         } catch (IOException ioe) {
             LOGGER.log(Level.FINE, "Error loading META-INF/jersey-module-version associated with " + ServiceFinder.class.getName());
             return null;
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException ioe) {
+                    LOGGER.log(Level.FINE, "Error closing stream associated with " + ServiceFinder.class.getName());
+                }
+            }
         }
     }
 

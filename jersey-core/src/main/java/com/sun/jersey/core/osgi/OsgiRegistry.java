@@ -206,14 +206,17 @@ public final class OsgiRegistry implements SynchronousBundleListener {
 
         @Override
         public List<Class<?>> call() throws Exception {
+            BufferedReader reader = null;
             try {
                 if (LOGGER.isLoggable(Level.FINEST)) {
                     LOGGER.log(Level.FINEST, "Loading providers for SPI: {0}", spi);
                 }
-                final BufferedReader br = new BufferedReader(new InputStreamReader(spiRegistryUrl.openStream(), "UTF-8"));
+
+                reader = new BufferedReader(new InputStreamReader(spiRegistryUrl.openStream(), "UTF-8"));
                 String providerClassName;
+
                 final List<Class<?>> providerClasses = new ArrayList<Class<?>>();
-                while ((providerClassName = br.readLine()) != null) {
+                while ((providerClassName = reader.readLine()) != null) {
                     if (providerClassName.trim().length() == 0) {
                         continue;
                     }
@@ -222,7 +225,7 @@ public final class OsgiRegistry implements SynchronousBundleListener {
                     }
                     providerClasses.add(bundle.loadClass(providerClassName));
                 }
-                br.close();
+
                 return providerClasses;
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "exception caught while creating factories: " + e);
@@ -230,6 +233,14 @@ public final class OsgiRegistry implements SynchronousBundleListener {
             } catch (Error e) {
                 LOGGER.log(Level.WARNING, "error caught while creating factories: " + e);
                 throw e;
+            } finally {
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException ioe) {
+                        LOGGER.log(Level.FINE, "Error closing SPI registry stream:" + spiRegistryUrl, ioe);
+                    }
+                }
             }
         }
 
@@ -289,8 +300,7 @@ public final class OsgiRegistry implements SynchronousBundleListener {
                     // Look for resources at the given <packagePath> and at WEB-INF/classes/<packagePath> in case a WAR is
                     // being examined.
                     for (String bundlePackagePath : new String[]{packagePath, "WEB-INF/classes/" + packagePath}) {
-                        final Enumeration<URL> enumeration = (Enumeration<URL>) bundle.findEntries(bundlePackagePath, "*",
-                                false);
+                        final Enumeration<URL> enumeration = (Enumeration<URL>) bundle.findEntries(bundlePackagePath, "*", false);
 
                         if (enumeration != null) {
                             while (enumeration.hasMoreElements()) {

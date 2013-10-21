@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 1850
+  http://java.net/jira/browse/JERSEY-1850
+  InputStream not closed
 - Fixed issue 1604
   http://java.net/jira/browse/JERSEY-1604
   IOException "connection closed" happens on calling delete without parameters
