@@ -42,7 +42,7 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey</groupId>
@@ -52,11 +52,11 @@
     <artifactId>jersey-servlet</artifactId>
     <packaging>jar</packaging>
     <name>jersey-servlet</name>
+
     <dependencies>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -89,7 +89,7 @@
             <version>1.6.5</version>
             <scope>provided</scope>
         </dependency>
-       <dependency>
+        <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi_R4_core</artifactId>
             <version>1.0</version>
@@ -195,7 +195,7 @@
                             com.sun.jersey.spi.container.servlet,
                             com.sun.jersey.spi.scanning.servlet,
                             <!-- the following is being used internally in GF REST API code! :-( -->
-			    com.sun.jersey.server.impl.container.servlet
+                            com.sun.jersey.server.impl.container.servlet
                         </Export-Package>
                         <Import-Package>
                             com.sun.jersey.core.osgi;resolution:=optional,
@@ -218,7 +218,7 @@
                     </instructions>
                     <unpackBundle>true</unpackBundle>
                 </configuration>
-             </plugin>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>

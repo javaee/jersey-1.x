@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 1901
+  http://java.net/jira/browse/JERSEY-1901
+  servlet-api included twice in classpath
 - Fixed issue 1850
   http://java.net/jira/browse/JERSEY-1850
   InputStream not closed

@@ -41,7 +41,7 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey</groupId>
@@ -131,11 +131,11 @@
                 <configuration>
                     <instructions>
                         <Export-Package>
-                com.sun.jersey.api.container.grizzly2.servlet
+                            com.sun.jersey.api.container.grizzly2.servlet
                         </Export-Package>
                         <Import-Package>
-                org.glassfish.grizzly.*;resolution:="optional",
-                *
+                            org.glassfish.grizzly.*;resolution:="optional",
+                            *
                         </Import-Package>
                     </instructions>
                     <unpackBundle>true</unpackBundle>
@@ -143,10 +143,10 @@
                 <executions>
                     <execution>
                         <id>osgi-bundle</id>
-                            <phase>package</phase>
-                            <goals>
-                                <goal>bundle</goal>
-                            </goals>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>bundle</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -165,6 +165,7 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.glassfish.grizzly</groupId>
@@ -172,14 +173,13 @@
             <version>${grizzly2.version}</version>
         </dependency>
         <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-grizzly2</artifactId>
-          <version>${project.version}</version>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-grizzly2</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>javax.servlet</artifactId>
-            <version>3.1</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
     </dependencies>
 </project>

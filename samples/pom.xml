@@ -270,7 +270,7 @@
                         <dependency>
                             <groupId>javax.servlet</groupId>
                             <artifactId>javax.servlet-api</artifactId>
-                            <version>3.0.1</version>
+                            <version>${servlet3.version}</version>
                         </dependency>
                         <dependency>
                             <groupId>org.glassfish</groupId>
