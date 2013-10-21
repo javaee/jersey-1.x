@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 1604
+  http://java.net/jira/browse/JERSEY-1604
+  IOException "connection closed" happens on calling delete without parameters
 - Fixed issue 1890
   http://java.net/jira/browse/JERSEY-1890
   LoggingFilter in Jersey 1.x leaks the connection socket (contains patch)

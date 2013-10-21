@@ -457,13 +457,24 @@ public class ClientResponse {
      */
     public boolean hasEntity() {
         try {
-            if (entity.available() > 0) {
-                return true;
-            } else if (entity.markSupported()) {
+            try {
+                if (entity.available() > 0) {
+                    return true;
+                }
+            } catch (IOException ioe) {
+                // NOOP. Try other approaches as this can fail on WLS when "chunked" transfer encoding is used.
+            }
+
+            if (entity.markSupported()) {
                 entity.mark(1);
                 int i = entity.read();
-                entity.reset();
-                return i != -1;
+
+                if (i == -1) {
+                    return false;
+                } else {
+                    entity.reset();
+                    return true;
+                }
             } else {
                 int b = entity.read();
                 if (b == -1) {
