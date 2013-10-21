@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 1890
+  http://java.net/jira/browse/JERSEY-1890
+  LoggingFilter in Jersey 1.x leaks the connection socket (contains patch)
 - Fixed issue 1537
   http://java.net/jira/browse/JERSEY-1537
   JSONConfiguration.natural() does not convert List<> as JSON array anymore

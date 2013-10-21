@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,15 +39,7 @@
  */
 package com.sun.jersey.api.client.filter;
 
-import com.sun.jersey.api.client.AbstractClientRequestAdapter;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.ClientRequest;
-import com.sun.jersey.api.client.ClientRequestAdapter;
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.core.util.ReaderWriter;
-
-import javax.ws.rs.core.MultivaluedMap;
-import java.io.ByteArrayInputStream;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,9 +49,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.MultivaluedMap;
+
+import com.sun.jersey.api.client.AbstractClientRequestAdapter;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientRequest;
+import com.sun.jersey.api.client.ClientRequestAdapter;
+import com.sun.jersey.api.client.ClientResponse;
+
 /**
  * A logging filter.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class LoggingFilter extends ClientFilter {
@@ -67,11 +67,11 @@ public class LoggingFilter extends ClientFilter {
     private static final Logger LOGGER = Logger.getLogger(LoggingFilter.class.getName());
 
     private static final String NOTIFICATION_PREFIX = "* ";
-    
+
     private static final String REQUEST_PREFIX = "> ";
-    
+
     private static final String RESPONSE_PREFIX = "< ";
-    
+
     private final class Adapter extends AbstractClientRequestAdapter {
         private final StringBuilder b;
 
@@ -83,27 +83,27 @@ public class LoggingFilter extends ClientFilter {
         public OutputStream adapt(ClientRequest request, OutputStream out) throws IOException {
             return new LoggingOutputStream(getAdapter().adapt(request, out), b);
         }
-        
+
     }
 
     private final class LoggingOutputStream extends OutputStream {
         private final OutputStream out;
-        
+
         private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         private final StringBuilder b;
 
         LoggingOutputStream(OutputStream out, StringBuilder b) {
             this.out = out;
             this.b = b;
         }
-        
+
         @Override
         public void write(byte[] b)  throws IOException {
             baos.write(b);
             out.write(b);
         }
-    
+
         @Override
         public void write(byte[] b, int off, int len)  throws IOException {
             baos.write(b, off, len);
@@ -125,8 +125,8 @@ public class LoggingFilter extends ClientFilter {
     }
 
     private final PrintStream loggingStream;
-
     private final Logger logger;
+    private final int maxEntitySize;
 
     private long _id = 0;
 
@@ -142,12 +142,11 @@ public class LoggingFilter extends ClientFilter {
     /**
      * Create a logging filter logging the request and response to
      * a JDK logger.
-     * 
+     *
      * @param logger the logger to log requests and responses.
      */
     public LoggingFilter(Logger logger) {
-        this.loggingStream = null;
-        this.logger = logger;
+        this(logger, null);
     }
 
     /**
@@ -157,8 +156,43 @@ public class LoggingFilter extends ClientFilter {
      * @param loggingStream the print stream to log requests and responses.
      */
     public LoggingFilter(PrintStream loggingStream) {
+        this(null, loggingStream);
+    }
+
+    /**
+     * Create a logging filter logging the request and response to
+     * a JDK logger.
+     *
+     * @param logger the logger to log requests and responses.
+     * @param maxEntitySize maximum number of entity bytes to be logged (and buffered) - if the entity is larger,
+     *                      logging filter will print (and buffer in memory) only the specified number of bytes
+     *                      and print "...more..." string at the end.
+     */
+    public LoggingFilter(Logger logger, int maxEntitySize) {
+        this(logger, null, maxEntitySize);
+    }
+
+    /**
+     * Create a logging filter logging the request and response to
+     * print stream.
+     *
+     * @param loggingStream the print stream to log requests and responses.
+     * @param maxEntitySize maximum number of entity bytes to be logged (and buffered) - if the entity is larger,
+     *                      logging filter will print (and buffer in memory) only the specified number of bytes
+     *                      and print "...more..." string at the end.
+     */
+    public LoggingFilter(PrintStream loggingStream, int maxEntitySize) {
+        this(null, loggingStream, maxEntitySize);
+    }
+
+    private LoggingFilter(Logger logger, PrintStream loggingStream) {
+        this(logger, loggingStream, 10 * 1024);
+    }
+
+    private LoggingFilter(Logger logger, PrintStream loggingStream, int maxEntitySize) {
         this.loggingStream = loggingStream;
-        this.logger = null;
+        this.logger = logger;
+        this.maxEntitySize = maxEntitySize;
     }
 
     private void log(StringBuilder b) {
@@ -189,7 +223,7 @@ public class LoggingFilter extends ClientFilter {
 
     private void logRequest(long id, ClientRequest request) {
         StringBuilder b = new StringBuilder();
-        
+
         printRequestLine(b, id, request);
         printRequestHeaders(b, id, request.getHeaders());
 
@@ -232,14 +266,25 @@ public class LoggingFilter extends ClientFilter {
         printResponseLine(b, id, response);
         printResponseHeaders(b, id, response.getHeaders());
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        InputStream in = response.getEntityInputStream();
+        InputStream stream = response.getEntityInputStream();
         try {
-            ReaderWriter.writeTo(in, out);
+            if (!response.getEntityInputStream().markSupported()) {
+                stream = new BufferedInputStream(stream);
+                response.setEntityInputStream(stream);
+            }
 
-            byte[] requestEntity = out.toByteArray();
-            printEntity(b, requestEntity);
-            response.setEntityInputStream(new ByteArrayInputStream(requestEntity));
+            stream.mark(maxEntitySize + 1);
+            byte[] entity = new byte[maxEntitySize + 1];
+            int entitySize = stream.read(entity);
+
+            if (entitySize > 0) {
+                b.append(new String(entity, 0, Math.min(entitySize, maxEntitySize)));
+                if (entitySize > maxEntitySize) {
+                    b.append("...more...");
+                }
+                b.append('\n');
+                stream.reset();
+            }
         } catch (IOException ex) {
             throw new ClientHandlerException(ex);
         }
@@ -253,7 +298,7 @@ public class LoggingFilter extends ClientFilter {
                 append(Integer.toString(response.getStatus())).
                 append("\n");
     }
-    
+
     private void printResponseHeaders(StringBuilder b, long id, MultivaluedMap<String, String> headers) {
         for (Map.Entry<String, List<String>> e : headers.entrySet()) {
             String header = e.getKey();
@@ -269,5 +314,5 @@ public class LoggingFilter extends ClientFilter {
         if (entity.length == 0)
             return;
         b.append(new String(entity)).append("\n");
-    }   
+    }
 }
