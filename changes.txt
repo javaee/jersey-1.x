@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 741
+  https://java.net/jira/browse/JERSEY-741
+  ContentDispositionBuilder type bound uses raw type, defeating type inference in Scala
 - Fixed issue 1901
   http://java.net/jira/browse/JERSEY-1901
   servlet-api included twice in classpath
@@ -10,7 +13,7 @@ release 1.18
   IOException "connection closed" happens on calling delete without parameters
 - Fixed issue 1890
   http://java.net/jira/browse/JERSEY-1890
-  LoggingFilter in Jersey 1.x leaks the connection socket (contains patch)
+  LoggingFilter in Jersey 1.x leaks the connection socket
 - Fixed issue 1537
   http://java.net/jira/browse/JERSEY-1537
   JSONConfiguration.natural() does not convert List<> as JSON array anymore
