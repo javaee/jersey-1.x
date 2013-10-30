@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 1931
+  https://java.net/jira/browse/JERSEY-1931
+  Issue to retrieve the body of a 3XX http response
 - Fixed issue 741
   https://java.net/jira/browse/JERSEY-741
   ContentDispositionBuilder type bound uses raw type, defeating type inference in Scala

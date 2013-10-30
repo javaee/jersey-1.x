@@ -306,7 +306,7 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
     }
 
     private InputStream getInputStream(HttpURLConnection uc) throws IOException {
-        if (uc.getResponseCode() < 300) {
+        if (uc.getResponseCode() < 400) {
             return uc.getInputStream();
         } else {
             InputStream ein = uc.getErrorStream();
