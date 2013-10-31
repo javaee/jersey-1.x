@@ -536,6 +536,8 @@ public final class HTTPDigestAuthFilter extends ClientFilter {
             // Did we send the initial request without headers ?
             // Or the server asked to retry with new nonce ?
             if (stale || !reqHadAuthHeaders) {
+                // Close previous response
+                response.close();
                 // Then try to resent same request with updated headers
                 return this.handle(request);
             } else {
