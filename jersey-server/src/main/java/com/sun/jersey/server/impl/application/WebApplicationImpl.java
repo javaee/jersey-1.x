@@ -188,6 +188,9 @@ public final class WebApplicationImpl implements WebApplication {
     private final ConcurrentMap<Class, ResourceComponentProvider> providerMap =
             new ConcurrentHashMap<Class, ResourceComponentProvider>();
 
+    private final ConcurrentMap<Class, ResourceComponentProvider> singletonMap =
+            new ConcurrentHashMap<Class, ResourceComponentProvider>();
+
     private static class ClassAnnotationKey {
         private final Class c;
 
@@ -268,11 +271,11 @@ public final class WebApplicationImpl implements WebApplication {
 
     private final AbstractResourceModelContext armContext = new AbstractResourceModelContext() {
 
-            @Override
-            public Set<AbstractResource> getAbstractRootResources() {
-                return abstractRootResources;
-            }
-        };
+        @Override
+        public Set<AbstractResource> getAbstractRootResources() {
+            return abstractRootResources;
+        }
+    };
 
     private FilterFactory filterFactory;
 
@@ -568,12 +571,19 @@ public final class WebApplicationImpl implements WebApplication {
     }
 
     /* package */ ResourceComponentProvider getResourceComponentProvider(final Class c) {
+        return getOrCreateResourceComponentProvider(c, false);
+    }
+
+    /* package */ ResourceComponentProvider getOrCreateResourceComponentProvider(final Class c, final boolean create) {
         assert c != null;
 
         // Try the non-blocking read, the most common operation
         ResourceComponentProvider rcp = providerMap.get(c);
         if (rcp != null) {
             return rcp;
+        }
+        if (!create && singletonMap.containsKey(c)) {
+            return singletonMap.get(c);
         }
 
         // Not present use a synchronized block to ensure that only one
@@ -603,8 +613,9 @@ public final class WebApplicationImpl implements WebApplication {
     /* package */ ResourceComponentProvider getResourceComponentProvider(final ComponentContext cc, final Class c) {
         assert c != null;
 
-        if (cc == null || cc.getAnnotations().length == 0)
-            return getResourceComponentProvider(c);
+        if (cc == null || cc.getAnnotations().length == 0) {
+            return getOrCreateResourceComponentProvider(c, true);
+        }
 
         if (cc.getAnnotations().length == 1) {
             final Annotation a = cc.getAnnotations()[0];
@@ -613,15 +624,17 @@ public final class WebApplicationImpl implements WebApplication {
                 final String value = (i.value() != null)
                         ? i.value().trim()
                         : "";
-                if (value.isEmpty())
-                    return getResourceComponentProvider(c);
+                if (value.isEmpty()) {
+                    return getOrCreateResourceComponentProvider(c, true);
+                }
             } else if (a.annotationType() == InjectParam.class) {
                 final InjectParam i = InjectParam.class.cast(a);
                 final String value = (i.value() != null)
                         ? i.value().trim()
                         : "";
-                if (value.isEmpty())
-                    return getResourceComponentProvider(c);
+                if (value.isEmpty()) {
+                    return getOrCreateResourceComponentProvider(c, true);
+                }
             }
         }
 
@@ -664,15 +677,15 @@ public final class WebApplicationImpl implements WebApplication {
 
     /* package */ void initiateResource(Class c) {
         getUriRules(c);
-        getResourceComponentProvider(c);
+        getOrCreateResourceComponentProvider(c, true);
     }
 
     /* package */ void initiateResource(AbstractResource ar, final Object resource) {
         final Class c = ar.getResourceClass();
         getUriRules(c);
 
-        if (!providerMap.containsKey(c)) {
-            providerMap.put(c, new ResourceComponentProvider() {
+        if (!singletonMap.containsKey(c)) {
+            singletonMap.put(c, new ResourceComponentProvider() {
                 @Override
                 public void init(AbstractResource abstractResource) {
                 }
@@ -1266,12 +1279,12 @@ public final class WebApplicationImpl implements WebApplication {
             // object we need to make sure that we provide a JAXBContext that
             // will work
             final WadlApplicationContext wac = wadlApplicationContextInjectionProxy;
-            @Provider @Produces({MediaTypes.WADL_STRING,MediaTypes.WADL_JSON_STRING, MediaType.APPLICATION_XML}) 
-            class WadlContextResolver implements ContextResolver<JAXBContext> 
+            @Provider @Produces({MediaTypes.WADL_STRING,MediaTypes.WADL_JSON_STRING, MediaType.APPLICATION_XML})
+            class WadlContextResolver implements ContextResolver<JAXBContext>
             {
                 @Override
                 public JAXBContext getContext(Class<?> type) {
-                    
+
                     if (com.sun.research.ws.wadl.Application.class.isAssignableFrom(type)) {
                         return wac.getJAXBContext();
                     }
@@ -1280,11 +1293,11 @@ public final class WebApplicationImpl implements WebApplication {
                     }
                 }
             }
-            
+
             resourceConfig.getSingletons().add(new WadlContextResolver());
-            
+
             // Update the provider services, so this is used
-            
+
             providerServices.update(resourceConfig.getProviderClasses(),
                     resourceConfig.getProviderSingletons(), injectableFactory);
         } else {
@@ -1428,6 +1441,9 @@ public final class WebApplicationImpl implements WebApplication {
         for (ResourceComponentProvider rcp : providerMap.values()) {
             rcp.destroy();
         }
+        for (ResourceComponentProvider rcp : singletonMap.values()) {
+            rcp.destroy();
+        }
 
         for (ResourceComponentProvider rcp : providerWithAnnotationKeyMap.values()) {
             rcp.destroy();
@@ -1451,7 +1467,7 @@ public final class WebApplicationImpl implements WebApplication {
     private void _handleRequest(final WebApplicationContext localContext,
                                 ContainerRequest request, ContainerResponse response) throws IOException {
         try {
-             requestListener.onRequest(Thread.currentThread().getId(), request);
+            requestListener.onRequest(Thread.currentThread().getId(), request);
             _handleRequest(localContext, request);
         } catch (WebApplicationException e) {
             response.mapWebApplicationException(e);

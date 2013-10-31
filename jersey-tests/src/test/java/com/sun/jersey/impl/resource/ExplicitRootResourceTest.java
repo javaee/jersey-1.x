@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -88,6 +88,22 @@ public class ExplicitRootResourceTest extends AbstractResourceTester {
         }
     }
 
+    @Singleton
+    @Path("singleton-custom-constructor")
+    public static class SingletonExplicitCustomConstructorResource {
+
+        private int i;
+
+        public SingletonExplicitCustomConstructorResource(final int i) {
+            this.i = i;
+        }
+
+        @GET
+        public String get() {
+            return "GET" + i++;
+        }
+    }
+
     public void testSingleton() throws IOException {
         ResourceConfig rc = new DefaultResourceConfig();
         rc.getExplicitRootResources().put("/one", SingletonExplicitResource.class);
@@ -122,6 +138,15 @@ public class ExplicitRootResourceTest extends AbstractResourceTester {
         assertEquals("GET2", resource("/two").get(String.class));
         assertEquals("GET1", resource("/three").get(String.class));
         assertEquals("GET2", resource("/four").get(String.class));
+    }
+
+    public void testSingletonCustomConstructorInstance() throws IOException {
+        ResourceConfig rc = new DefaultResourceConfig();
+        SingletonExplicitCustomConstructorResource r = new SingletonExplicitCustomConstructorResource(1);
+        rc.getExplicitRootResources().put("/one", r);
+        initiateWebApplication(rc);
+
+        assertEquals("GET1", resource("/one").get(String.class));
     }
 
     public void testSingletonResourceSingletonAndSingletonInstance() throws IOException {

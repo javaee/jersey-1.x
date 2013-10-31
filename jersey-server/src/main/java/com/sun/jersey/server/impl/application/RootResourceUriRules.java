@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -62,7 +62,7 @@ import java.util.logging.Logger;
 
 /**
  * A class that creates a rules map for root resources.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class RootResourceUriRules {
@@ -110,7 +110,7 @@ public class RootResourceUriRules {
             final AbstractResource ar = wa.getAbstractResource(o);
             // Configure meta-data
             wa.initiateResource(ar, o);
-            
+
             final ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
             ci.inject(o);
 
@@ -132,14 +132,14 @@ public class RootResourceUriRules {
             final Object o = e.getValue();
             if (o instanceof Class) {
                 final Class c = (Class)o;
-                
+
                 // Configure meta-data
                 wa.initiateResource(explicitRootResources.get(path));
 
                 addRule(path, c);
             } else {
                 // Configure meta-data
-                wa.initiateResource(explicitRootResources.get(path));
+                wa.initiateResource(explicitRootResources.get(path), o);
 
                 final ComponentInjector ci = new ComponentInjector(injectableFactory, o.getClass());
                 ci.inject(o);
@@ -193,9 +193,9 @@ public class RootResourceUriRules {
         final PathPattern p = getPattern(path, c);
         if (isPatternValid(p, c)) {
             rules.put(p, new RightHandPathRule(
-                        resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                        p.getTemplate().endsWithSlash(),
-                        new ResourceClassRule(p.getTemplate(), c)));
+                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                    p.getTemplate().endsWithSlash(),
+                    new ResourceClassRule(p.getTemplate(), c)));
         }
     }
 
@@ -203,9 +203,9 @@ public class RootResourceUriRules {
         final PathPattern p = getPattern(path, o.getClass());
         if (isPatternValid(p, o.getClass())) {
             rules.put(p, new RightHandPathRule(
-                        resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
-                        p.getTemplate().endsWithSlash(),
-                        new ResourceObjectRule(p.getTemplate(), o)));
+                    resourceConfig.getFeature(ResourceConfig.FEATURE_REDIRECT),
+                    p.getTemplate().endsWithSlash(),
+                    new ResourceObjectRule(p.getTemplate(), o)));
         }
     }
 

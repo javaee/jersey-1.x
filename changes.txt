@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 2141
+  https://java.net/jira/browse/JERSEY-2141
+  Jersey tries to invoke constructor for explicit root resource singleton
 - Fixed issue 1445
   https://java.net/jira/browse/JERSEY-1445
   Unreleased connection for Digest challenge
