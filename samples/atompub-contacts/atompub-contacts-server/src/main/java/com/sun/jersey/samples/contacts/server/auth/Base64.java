@@ -36,8 +36,8 @@
  * and therefore, elected the GPL Version 2 license, then the option applies
  * only if the new code is made subject to such option by the copyright
  * holder.
- *
- *
+ */
+/*
  * This file incorporates work covered by the following copyright and
  * permission notice:
  *

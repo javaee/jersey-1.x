@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -75,7 +75,7 @@ import java.util.logging.Logger;
  * For SSL configuration of HTTPS the {@link HTTPSProperties} may be used
  * and an instance added as a property of the {@link Client} or
  * {@link ClientRequest}.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  * @see HttpURLConnectionFactory
  */
@@ -105,7 +105,7 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
             this.method = method;
             this.uc = uc;
         }
-        
+
         @Override
         public boolean hasEntity() {
             if (method.equals("HEAD") || getEntityInputStream() == null)
@@ -166,13 +166,13 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         if (readTimeout != null) {
             uc.setReadTimeout(readTimeout);
         }
-        
+
         Integer connectTimeout = (Integer)ro.getProperties().get(
                 ClientConfig.PROPERTY_CONNECT_TIMEOUT);
         if (connectTimeout != null) {
             uc.setConnectTimeout(connectTimeout);
         }
-        
+
         Boolean followRedirects = (Boolean)ro.getProperties().get(
                 ClientConfig.PROPERTY_FOLLOW_REDIRECTS);
         if (followRedirects != null) {
@@ -244,7 +244,7 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         } else {
             writeOutBoundHeaders(ro.getHeaders(), uc);
         }
-        
+
         // Return the in-bound response
         return new URLConnectionResponse(
                 uc.getResponseCode(),
@@ -277,7 +277,7 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
             }
         }
     }
-    
+
     private void writeOutBoundHeaders(MultivaluedMap<String, Object> metadata, HttpURLConnection uc) {
         for (Map.Entry<String, List<Object>> e : metadata.entrySet()) {
             List<Object> vs = e.getValue();
