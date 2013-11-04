@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -56,23 +56,22 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
  */
 @Produces({"text/plain", "*/*"})
 @Consumes({"text/plain", "*/*"})
 public final class ReaderProvider extends AbstractMessageReaderWriterProvider<Reader> {
-    
+
     public boolean isReadable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return Reader.class == type;
     }
-    
+
     public Reader readFrom(
-            Class<Reader> type, 
-            Type genericType, 
+            Class<Reader> type,
+            Type genericType,
             Annotation annotations[],
-            MediaType mediaType, 
-            MultivaluedMap<String, String> httpHeaders, 
+            MediaType mediaType,
+            MultivaluedMap<String, String> httpHeaders,
             InputStream entityStream) throws IOException {
         return new BufferedReader(new InputStreamReader(entityStream, getCharset(mediaType)));
     }
@@ -80,18 +79,19 @@ public final class ReaderProvider extends AbstractMessageReaderWriterProvider<Re
     public boolean isWriteable(Class<?> type, Type genericType, Annotation annotations[], MediaType mediaType) {
         return Reader.class.isAssignableFrom(type);
     }
-    
+
     public void writeTo(
-            Reader t, 
-            Class<?> type, 
-            Type genericType, 
-            Annotation annotations[], 
-            MediaType mediaType, 
+            Reader t,
+            Class<?> type,
+            Type genericType,
+            Annotation annotations[],
+            MediaType mediaType,
             MultivaluedMap<String, Object> httpHeaders,
             OutputStream entityStream) throws IOException {
         try {
-            writeTo(t, new OutputStreamWriter(entityStream, 
-                    getCharset(mediaType)));
+            final OutputStreamWriter out = new OutputStreamWriter(entityStream, getCharset(mediaType));
+            writeTo(t, out);
+            out.flush();
         } finally {
             t.close();
         }
