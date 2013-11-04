@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue JERSEY-1652
+  https://java.net/jira/browse/JERSEY-1652
+  Moved taglib.tld from jersey-server to jersey-servlet module.
 - Fixed issue 1922
   https://java.net/jira/browse/JERSEY-1922
   InputStream MessageBodyWriter doesn't close stream on HEAD method
