@@ -193,7 +193,7 @@ public class ContainerResponse implements HttpResponseContext {
     // ContainerResponse
 
     /**
-     * Convert a header value, represented as a general object, to the 
+     * Convert a header value, represented as a general object, to the
      * string value.
      * <p>
      * This method defers to {@link RuntimeDelegate#createHeaderDelegate} to
@@ -269,11 +269,11 @@ public class ContainerResponse implements HttpResponseContext {
         if (p == null) {
             String message = "A message body writer for Java class " + entity.getClass().getName() +
                     ", and Java type " + entityType +
-                    ", and MIME media type " + contentType + " was not found";
-            LOGGER.severe(message);
+                    ", and MIME media type " + contentType + " was not found.\n";
+
             Map<MediaType, List<MessageBodyWriter>> m = getMessageBodyWorkers().
                     getWriters(contentType);
-            LOGGER.severe("The registered message body writers compatible with the MIME media type are:\n" +
+            LOGGER.severe(message + "The registered message body writers compatible with the MIME media type are:\n" +
                     getMessageBodyWorkers().writersToString(m));
 
             if (request.getMethod().equals("HEAD")) {

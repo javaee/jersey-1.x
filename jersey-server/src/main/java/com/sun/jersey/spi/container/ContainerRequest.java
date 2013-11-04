@@ -468,11 +468,12 @@ public class ContainerRequest implements HttpRequestContext {
             String message = "A message body reader for Java class " + type.getName() +
                     ", and Java type " + genericType +
                     ", and MIME media type " + mediaType + " was not found.\n";
+
             Map<MediaType, List<MessageBodyReader>> m = getMessageBodyWorkers().
                     getReaders(mediaType);
-            message += "The registered message body readers compatible with the MIME media type are:\n" +
-                    getMessageBodyWorkers().readersToString(m);
-            LOGGER.severe(message);
+            LOGGER.severe(message + "The registered message body readers compatible with the MIME media type are:\n" +
+                    getMessageBodyWorkers().readersToString(m));
+
             throw new WebApplicationException(
                     new MessageException(message),
                     Responses.unsupportedMediaType().build());
@@ -520,11 +521,12 @@ public class ContainerRequest implements HttpRequestContext {
             String message = "A message body writer for Java class " + type.getName() +
                     ", and Java type " + genericType +
                     ", and MIME media type " + mediaType + " was not found.\n";
+
             Map<MediaType, List<MessageBodyReader>> m = getMessageBodyWorkers().
                     getReaders(mediaType);
-            message += "The registered message body readers compatible with the MIME media type are:\n" +
-                    getMessageBodyWorkers().readersToString(m);
-            LOGGER.severe(message);
+            LOGGER.severe(message + "The registered message body readers compatible with the MIME media type are:\n" +
+                    getMessageBodyWorkers().readersToString(m));
+
             throw new WebApplicationException(
                     new MessageException(message),
                     Responses.unsupportedMediaType().build());
