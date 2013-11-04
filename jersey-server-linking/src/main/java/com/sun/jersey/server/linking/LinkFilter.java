@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,18 +40,19 @@
 
 package com.sun.jersey.server.linking;
 
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
+
 import com.sun.jersey.server.linking.impl.LinkProcessor;
 import com.sun.jersey.server.linking.impl.RefProcessor;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerResponse;
 import com.sun.jersey.spi.container.ContainerResponseFilter;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 
 /**
  * Filter that processes {@link Link} annotated fields in returned response
  * entities.
- * <p>
+ * <p/>
  * When an application is deployed as a Servlet or Filter this filter can be
  * registered using the following initialization parameters:
  * <blockquote><pre>
@@ -60,23 +61,27 @@ import javax.ws.rs.core.UriInfo;
  *         &lt;param-value&gt;com.sun.jersey.server.linking.LinkFilter&lt;/param-value&gt;
  *     &lt;/init-param&gt;
  * </pre></blockquote>
- * <p>
+ * <p/>
+ *
  * @author mh124079
  * @see Link
  */
 public class LinkFilter implements ContainerResponseFilter {
 
-    @Context UriInfo uriInfo;
+    @Context
+    private UriInfo uriInfo;
 
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        Object entity  = response.getEntity();
-        if (entity != null) {
+        final Object entity = response.getEntity();
+
+        if (entity != null && !uriInfo.getMatchedResources().isEmpty()) {
             Class<?> entityClass = entity.getClass();
             LinkProcessor lhp = new LinkProcessor(entityClass);
             lhp.processLinkHeaders(entity, uriInfo, response.getHttpHeaders());
             RefProcessor lp = new RefProcessor(entityClass);
             lp.processLinks(entity, uriInfo);
         }
+
         return response;
     }
 }

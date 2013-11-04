@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,23 +40,28 @@
 
 package com.sun.jersey.server.linking.impl;
 
-import com.sun.jersey.core.header.LinkHeader;
-import com.sun.jersey.core.header.LinkHeader.LinkHeaderBuilder;
-import com.sun.jersey.server.linking.Link;
-import com.sun.jersey.server.linking.el.LinkBuilder;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import com.sun.jersey.core.header.LinkHeader;
+import com.sun.jersey.core.header.LinkHeader.LinkHeaderBuilder;
+import com.sun.jersey.server.linking.Link;
+import com.sun.jersey.server.linking.el.LinkBuilder;
+
 /**
  * Processes @Link and @LinkHeaders annotations on entity classes and
  * adds appropriate HTTP Link headers.
+ *
  * @author mh124079
  */
 public class LinkProcessor<T> {
+
     private EntityDescriptor instanceDescriptor;
 
     public LinkProcessor(Class<T> c) {
@@ -77,15 +82,22 @@ public class LinkProcessor<T> {
     }
 
     List<String> getLinkHeaderValues(Object entity, UriInfo uriInfo) {
-        Object resource = uriInfo.getMatchedResources().get(0);
-        List<String> headerValues = new ArrayList<String>();
-        for (LinkDescriptor desc: instanceDescriptor.getLinkHeaders()) {
-            if (LinkBuilder.evaluateCondition(desc.getCondition(), entity, resource, entity)) {
-                String headerValue = getLinkHeaderValue(desc, entity, resource, uriInfo);
-                headerValues.add(headerValue);
+        final List<Object> matchedResources = uriInfo.getMatchedResources();
+
+        if (!matchedResources.isEmpty()) {
+            final Object resource = matchedResources.get(0);
+            final List<String> headerValues = new ArrayList<String>();
+
+            for (LinkDescriptor desc: instanceDescriptor.getLinkHeaders()) {
+                if (LinkBuilder.evaluateCondition(desc.getCondition(), entity, resource, entity)) {
+                    String headerValue = getLinkHeaderValue(desc, entity, resource, uriInfo);
+                    headerValues.add(headerValue);
+                }
             }
+            return headerValues;
         }
-        return headerValues;
+
+        return Collections.emptyList();
     }
 
     static String getLinkHeaderValue(LinkDescriptor desc, Object entity, Object resource, UriInfo uriInfo) {
