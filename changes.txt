@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue JERSEY-1777
+  https://java.net/jira/browse/JERSEY-1777
+  AsyncWebResource.path(String) does not copy parent resource properties
 - Fixed issue JERSEY-1652
   https://java.net/jira/browse/JERSEY-1652
   Moved taglib.tld from jersey-server to jersey-servlet module.

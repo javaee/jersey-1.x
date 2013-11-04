@@ -40,19 +40,6 @@
 
 package com.sun.jersey.api.client;
 
-import com.sun.jersey.api.client.async.AsyncClientHandler;
-import com.sun.jersey.api.client.async.FutureListener;
-import com.sun.jersey.api.client.async.ITypeListener;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.filter.Filterable;
-import com.sun.jersey.client.impl.ClientRequestImpl;
-import com.sun.jersey.client.impl.CopyOnWriteHashMap;
-import com.sun.jersey.client.impl.async.FutureClientResponseListener;
-
-import javax.ws.rs.core.Cookie;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Locale;
@@ -63,6 +50,20 @@ import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
+
+import com.sun.jersey.api.client.async.AsyncClientHandler;
+import com.sun.jersey.api.client.async.FutureListener;
+import com.sun.jersey.api.client.async.ITypeListener;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.filter.Filterable;
+import com.sun.jersey.client.impl.ClientRequestImpl;
+import com.sun.jersey.client.impl.CopyOnWriteHashMap;
+import com.sun.jersey.client.impl.async.FutureClientResponseListener;
 
 /**
  * An encapsulation of an asynchronous Web resource capable of building requests
@@ -104,6 +105,7 @@ public class AsyncWebResource extends Filterable implements
         super(that);
         this.executorService = that.executorService;
         this.u = ub.build();
+        this.properties = that.properties.clone();
     }
 
     /**
@@ -478,7 +480,7 @@ public class AsyncWebResource extends Filterable implements
     // Builder that builds client request and handles it
 
     /**
-     * The builder for building a {@link ClientRequest} instance and 
+     * The builder for building a {@link ClientRequest} instance and
      * handling the request using the {@link UniformInterface}. The methods
      * of the {@link UniformInterface} are the build methods of the builder.
      */

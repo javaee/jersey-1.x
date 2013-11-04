@@ -1,5 +1,6 @@
 # maven noise
 target/
+/jersey-bundle/src
 
 # osx noise
 .DS_Store
