@@ -1,4 +1,7 @@
 release 1.18
+- Fixed issue 1922
+  https://java.net/jira/browse/JERSEY-1922
+  InputStream MessageBodyWriter doesn't close stream on HEAD method
 - Fixed issue 1851
   https://java.net/jira/browse/JERSEY-1851
   Exception message includes sensitive information

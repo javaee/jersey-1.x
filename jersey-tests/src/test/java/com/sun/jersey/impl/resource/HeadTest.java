@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,22 +40,26 @@
 
 package com.sun.jersey.impl.resource;
 
-import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.ClientResponse;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.impl.AbstractResourceTester;
 
 /**
  *
  * @author Paul.Sandoz@Sun.Com
  */
 public class HeadTest extends AbstractResourceTester {
-    
+
     public HeadTest(String testName) {
         super(testName);
     }
@@ -74,7 +78,7 @@ public class HeadTest extends AbstractResourceTester {
         ClientResponse response = resource("/", false).
                 head();
         assertEquals(200, response.getStatus());
-        assertNull(response.getMetadata().getFirst("Content-Length"));
+        assertNull(response.getHeaders().getFirst("Content-Length"));
         assertEquals(MediaType.TEXT_PLAIN_TYPE, response.getType());
         assertFalse(response.hasEntity());
     }
@@ -99,7 +103,7 @@ public class HeadTest extends AbstractResourceTester {
                 head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
-        assertEquals("HEAD", response.getMetadata().getFirst("X-TEST"));
+        assertEquals("HEAD", response.getHeaders().getFirst("X-TEST"));
     }
 
     @Path("/")
@@ -171,14 +175,14 @@ public class HeadTest extends AbstractResourceTester {
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(foo, response.getType());
-        assertEquals("FOO-HEAD", response.getMetadata().getFirst("X-TEST").toString());
+        assertEquals("FOO-HEAD", response.getHeaders().getFirst("X-TEST"));
 
         MediaType bar = MediaType.valueOf("application/bar");
         response = r.accept(bar).head();
         assertEquals(200, response.getStatus());
         assertFalse(response.hasEntity());
         assertEquals(bar, response.getType());
-        assertEquals("BAR-HEAD", response.getMetadata().getFirst("X-TEST").toString());
+        assertEquals("BAR-HEAD", response.getHeaders().getFirst("X-TEST"));
     }
 
     @Path("/")
@@ -195,27 +199,27 @@ public class HeadTest extends AbstractResourceTester {
         ClientResponse response = resource("/", false).
                 head();
         assertEquals(200, response.getStatus());
-        String length = response.getMetadata().getFirst("Content-Length");
+        String length = response.getHeaders().getFirst("Content-Length");
         assertNotNull(length);
         assertEquals(3, Integer.parseInt(length));
         assertEquals(MediaType.APPLICATION_OCTET_STREAM_TYPE, response.getType());
         assertFalse(response.hasEntity());
     }
-    
+
 
     @Path("/")
     static public class ResourceGetWithNoProduces {
         @GET
         public Response getPlain() {
-           return Response.ok("text").header("x-value", "text").
-                   build();
+            return Response.ok("text").header("x-value", "text").
+                    build();
         }
 
         @GET
         @Produces("text/html")
         public Response getHtml() {
-           return Response.ok("html").header("x-value", "html").
-                   build();
+            return Response.ok("html").header("x-value", "html").
+                    build();
         }
     }
 
@@ -233,4 +237,41 @@ public class HeadTest extends AbstractResourceTester {
         assertEquals("html", cr.getHeaders().getFirst("x-value"));
     }
 
+    @Path("/")
+    public static class InputStreamResource {
+
+        private static boolean INPUT_STREAM_READ = false;
+        private static boolean INPUT_STREAM_CLOSED = false;
+
+        @GET
+        public InputStream testInputStream() {
+            return new InputStream() {
+
+                @Override
+                public int read() throws IOException {
+                    INPUT_STREAM_READ = true;
+                    return -1;
+                }
+
+                @Override
+                public void close() throws IOException {
+                    INPUT_STREAM_CLOSED = true;
+                }
+            };
+        }
+    }
+
+    /**
+     * Test whether an input stream returned from resource method is properly closed when the method is invoked to handle HTTP
+     * HEAD request.
+     * <p/>
+     * JERSEY-1922 reproducer.
+     */
+    public void testHeadWithInputStream() throws Exception {
+        initiateWebApplication(InputStreamResource.class);
+
+        assertEquals(200, resource("/").head().getStatus());
+        assertFalse(InputStreamResource.INPUT_STREAM_READ);
+        assertTrue(InputStreamResource.INPUT_STREAM_CLOSED);
+    }
 }

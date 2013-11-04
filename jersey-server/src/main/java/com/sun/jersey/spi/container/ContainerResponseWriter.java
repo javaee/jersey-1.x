@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,32 +45,27 @@ import java.io.OutputStream;
 /**
  * Containers implement this interface and provide an instance to the
  * {@link WebApplication} or {@link ContainerResponse}.
- * 
- * @author Paul.Sandoz@Sun.Com
+ *
+ * @author Paul Sandoz
  */
 public interface ContainerResponseWriter {
-    /**
-     * Write the status and headers of the response and return an output stream 
-     * for the web application to write the entity of the response.
-     * 
-     * @param contentLength >=0 if the content length in bytes of the
-     *        entity to be written is known, otherwise -1. Containers
-     *        may use this value to determine whether the "Content-Length"
-     *        header can be set or utilize chunked transfer encoding.
-     * @param response the container response. The status and headers are
-     *        obtained from the response.
-     * @return the output stream to write the entity (if any).
-     * @throws java.io.IOException if an error occured when writing out the
-     *         status and headers or obtaining the output stream.
-     */
-    OutputStream writeStatusAndHeaders(
-            long contentLength,
-            ContainerResponse response) throws IOException;
 
     /**
-     * Finish writing the response. This enables the container response
-     * writer to clean up any state or flush any streams.
-     * 
+     * Write the status and headers of the response and return an output stream for the web application to write the entity of
+     * the response.
+     *
+     * @param contentLength >=0 if the content length in bytes of the entity to be written is known,
+     * otherwise -1. Containers may use this value to determine whether the "Content-Length" header can be set or utilize
+     * chunked transfer encoding.
+     * @param response the container response. The status and headers are obtained from the response.
+     * @return the output stream to write the entity (if any).
+     * @throws java.io.IOException if an error occurred when writing out the status and headers or obtaining the output stream.
+     */
+    OutputStream writeStatusAndHeaders(long contentLength, ContainerResponse response) throws IOException;
+
+    /**
+     * Finish writing the response. This enables the container response writer to clean up any state or flush any streams.
+     *
      * @throws java.io.IOException
      */
     void finish() throws IOException;

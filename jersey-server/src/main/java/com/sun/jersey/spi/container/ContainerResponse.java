@@ -50,6 +50,7 @@ import com.sun.jersey.core.spi.factory.ResponseImpl;
 import com.sun.jersey.server.impl.uri.rules.HttpMethodRule;
 import com.sun.jersey.spi.MessageBodyWorkers;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -263,10 +264,11 @@ public class ContainerResponse implements HttpResponseContext {
             getHttpHeaders().putSingle(HttpHeaders.CONTENT_TYPE, contentType);
         }
 
-        final MessageBodyWriter p = getMessageBodyWorkers().getMessageBodyWriter(
+        final MessageBodyWriter writer = getMessageBodyWorkers().getMessageBodyWriter(
                 entity.getClass(), entityType,
                 annotations, contentType);
-        if (p == null) {
+
+        if (writer == null) {
             String message = "A message body writer for Java class " + entity.getClass().getName() +
                     ", and Java type " + entityType +
                     ", and MIME media type " + contentType + " was not found.\n";
@@ -277,41 +279,56 @@ public class ContainerResponse implements HttpResponseContext {
                     getMessageBodyWorkers().writersToString(m));
 
             if (request.getMethod().equals("HEAD")) {
-                isCommitted = true;
-                responseWriter.writeStatusAndHeaders(-1, this);
-                responseWriter.finish();
-                return;
+                writeHttpHead(-1);
             } else {
                 throw new WebApplicationException(new MessageException(message), 500);
             }
-        }
-
-        final long size = p.getSize(entity, entity.getClass(), entityType,
-                annotations, contentType);
-        if (request.getMethod().equals("HEAD")) {
-            if (size != -1)
-                getHttpHeaders().putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
-            isCommitted = true;
-            responseWriter.writeStatusAndHeaders(0, this);
         } else {
-            if (request.isTracingEnabled()) {
-                request.trace(String.format("matched message body writer: %s, \"%s\" -> %s",
-                        ReflectionHelper.objectToString(entity),
-                        contentType,
-                        ReflectionHelper.objectToString(p)));
-            }
+            final long size = writer.getSize(entity, entity.getClass(), entityType, annotations, contentType);
 
-            if (out == null)
-                out = new CommittingOutputStream(size);
-            p.writeTo(entity, entity.getClass(), entityType,
-                    annotations, contentType, getHttpHeaders(),
-                    out);
-            if (!isCommitted) {
-                isCommitted = true;
-                responseWriter.writeStatusAndHeaders(-1, this);
+            if (request.getMethod().equals("HEAD")) {
+                writeHttpHead(size);
+            } else {
+                if (request.isTracingEnabled()) {
+                    request.trace(String.format("matched message body writer: %s, \"%s\" -> %s",
+                            ReflectionHelper.objectToString(entity),
+                            contentType,
+                            ReflectionHelper.objectToString(writer)));
+                }
+                if (out == null) {
+                    out = new CommittingOutputStream(size);
+                }
+
+                writer.writeTo(entity, entity.getClass(), entityType, annotations, contentType, getHttpHeaders(), out);
+
+                if (!isCommitted) {
+                    isCommitted = true;
+                    responseWriter.writeStatusAndHeaders(-1, this);
+                }
             }
         }
+
         responseWriter.finish();
+    }
+
+    /**
+     * Handle HTTP HEAD method (headers, ..) during writing a response.
+     *
+     * @param size size of a response entity.
+     * @throws IOException if an error occurred when writing out the status and headers or obtaining the output stream.
+     */
+    private void writeHttpHead(final long size) throws IOException {
+        if (size != -1) {
+            getHttpHeaders().putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
+        }
+
+        isCommitted = true;
+        responseWriter.writeStatusAndHeaders(size, this);
+
+        // Close the InputStream if the entity is an instance of this type.
+        if (entity instanceof InputStream) {
+            ((InputStream)entity).close();
+        }
     }
 
     private void configureTrace(final ContainerResponseWriter crw) {
