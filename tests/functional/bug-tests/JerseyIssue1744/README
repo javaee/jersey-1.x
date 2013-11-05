@@ -1,0 +1,4 @@
+Integration test that checks that custom response code can be returned from
+resource method and it is correctly written to the response by the container
+and correctly read by the Jersey client (including a custom reason phrase).
+The associated issue is https://java.net/jira/browse/JERSEY-1744.

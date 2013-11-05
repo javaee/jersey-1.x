@@ -249,17 +249,33 @@ public class ClientResponse {
         private final String reason;
         private Family family;
 
+        /**
+         * Get the family from the response status code.
+         *
+         * @param statusCode Response status code.
+         * @return Response status code family.
+         */
+        public static Family getFamilyByStatusCode(int statusCode) {
+            switch(statusCode/100) {
+                case 1: return Family.INFORMATIONAL;
+                case 2: return Family.SUCCESSFUL;
+                case 3: return Family.REDIRECTION;
+                case 4: return Family.CLIENT_ERROR;
+                case 5: return Family.SERVER_ERROR;
+                default: return Family.OTHER;
+            }
+        }
+
+        /**
+         * Create a new status from status code and reason phrase.
+         *
+         * @param statusCode Response status code.
+         * @param reasonPhrase Reason phrase.
+         */
         Status(final int statusCode, final String reasonPhrase) {
             this.code = statusCode;
             this.reason = reasonPhrase;
-            switch(code/100) {
-                case 1: this.family = Family.INFORMATIONAL; break;
-                case 2: this.family = Family.SUCCESSFUL; break;
-                case 3: this.family = Family.REDIRECTION; break;
-                case 4: this.family = Family.CLIENT_ERROR; break;
-                case 5: this.family = Family.SERVER_ERROR; break;
-                default: this.family = Family.OTHER; break;
-            }
+            this.family = getFamilyByStatusCode(code);
         }
 
         /**
@@ -325,7 +341,7 @@ public class ClientResponse {
 
     private Map<String, Object> properties;
 
-    private int status;
+    private StatusType statusType;
 
     private InBoundHeaders headers;
 
@@ -335,11 +351,34 @@ public class ClientResponse {
 
     private MessageBodyWorkers workers;
 
-    public ClientResponse(int status, InBoundHeaders headers, InputStream entity, MessageBodyWorkers workers) {
-        this.status = status;
+    /**
+     * Create a new instance initialized form {@code statusType}, {@code headers}, {@code entity},
+     * {@code workers}.
+     *
+     * @param statusType Status type.
+     * @param headers HTTP headers.
+     * @param entity Entity input stream.
+     * @param workers Message body workers.
+     */
+    public ClientResponse(StatusType statusType, InBoundHeaders headers, InputStream entity,
+                          MessageBodyWorkers workers) {
+        this.statusType = statusType;
         this.headers = headers;
         this.entity = entity;
         this.workers = workers;
+    }
+
+    /**
+     * Create a new instance initialized form {@code statusCode}, {@code headers}, {@code entity},
+     * {@code workers}.
+     *
+     * @param headers HTTP headers.
+     * @param entity Entity input stream.
+     * @param workers Message body workers.
+     */
+    public ClientResponse(int statusCode, InBoundHeaders headers, InputStream entity,
+                          MessageBodyWorkers workers) {
+        this(Statuses.from(statusCode), headers, entity, workers);
     }
 
     /**
@@ -372,7 +411,7 @@ public class ClientResponse {
      * @return the status code.
      */
     public int getStatus() {
-        return status;
+        return statusType.getStatusCode();
     }
 
     /**
@@ -381,16 +420,16 @@ public class ClientResponse {
      * @param status the status code.
      */
     public void setStatus(int status) {
-        this.status = status;
+        this.statusType = Statuses.from(status);
     }
 
     /**
-     * Set the status code.
+     * Set the {@link StatusType status type}.
      *
-     * @param status the status code.
+     * @param statusType the status type code.
      */
-    public void setStatus(Response.StatusType status) {
-        setStatus(status.getStatusCode());
+    public void setStatus(Response.StatusType statusType) {
+        this.statusType = statusType;
     }
 
     /**
@@ -400,9 +439,25 @@ public class ClientResponse {
      *         using the method {@link #setStatus(int)} and there is no
      *         mapping between the integer value and the Response.Status
      *         enumeration value.
+     * @deprecated Deprecated since 1.18. Use {@link #getStatusInfo()} which can
+     *             return {@link StatusType status type} even for status codes which
+     *             do not have mapping defined in {@link Response.Status}.
      */
+    @Deprecated
     public Status getClientResponseStatus() {
-        return Status.fromStatusCode(status);
+        return Status.fromStatusCode(statusType.getStatusCode());
+    }
+
+    /**
+     * Get the {@link StatusType status type}. Status type can be describe a standard response status
+     * defined by the HTTP specification and defined in {@link Response.Status} enumeration
+     * but also can contain status codes which are not defined by {@code Response.Status}
+     * enumeration (for example custom status code returned from a resource method).
+     *
+     * @return Non-null value of the status type.
+     */
+    public StatusType getStatusInfo() {
+        return statusType;
     }
 
     /**
@@ -416,8 +471,10 @@ public class ClientResponse {
      */
     @Deprecated
     public Response.Status getResponseStatus() {
-        return Response.Status.fromStatusCode(status);
+        return Response.Status.fromStatusCode(statusType.getStatusCode());
     }
+
+
 
     /**
      * Set the status code.
@@ -758,6 +815,6 @@ public class ClientResponse {
 
     @Override
     public String toString() {
-        return "Client response status: " + status;
+        return "Client response status: " + statusType.getStatusCode();
     }
 }

@@ -44,12 +44,15 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.CommittingOutputStream;
+import com.sun.jersey.api.client.Statuses;
 import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.core.header.InBoundHeaders;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -100,7 +103,8 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
         private final String method;
         private final HttpURLConnection uc;
 
-        URLConnectionResponse(int status, InBoundHeaders headers, InputStream entity, String method, HttpURLConnection uc) {
+        URLConnectionResponse(Response.StatusType status, InputStream entity, String method,
+                              InBoundHeaders headers, HttpURLConnection uc) {
             super(status, headers, entity, getMessageBodyWorkers());
             this.method = method;
             this.uc = uc;
@@ -245,12 +249,19 @@ public final class URLConnectionClientHandler extends TerminatingClientHandler {
             writeOutBoundHeaders(ro.getHeaders(), uc);
         }
 
+
+        final int code = uc.getResponseCode();
+        final String reasonPhrase = uc.getResponseMessage();
+        final Response.StatusType status = reasonPhrase == null ?
+            Statuses.from(code) : Statuses.from(code, reasonPhrase);
+
+
         // Return the in-bound response
         return new URLConnectionResponse(
-                uc.getResponseCode(),
-                getInBoundHeaders(uc),
+                status,
                 getInputStream(uc),
                 ro.getMethod(),
+                getInBoundHeaders(uc),
                 uc);
     }
 
