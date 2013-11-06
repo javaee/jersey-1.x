@@ -60,11 +60,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
 import javax.naming.NamingException;
@@ -401,12 +403,12 @@ public class WebComponent implements ContainerListener {
             }
         });
 
-        // Check if any servlet filters have consumed a request entity
-        // of the media type application/x-www-form-urlencoded
-        // This can happen if a filter calls request.getParameter(...)
-        filterFormParameters(request, cRequest);
-
         try {
+            // Check if any servlet filters have consumed a request entity
+            // of the media type application/x-www-form-urlencoded
+            // This can happen if a filter calls request.getParameter(...)
+            filterFormParameters(request, cRequest);
+
             UriRuleProbeProvider.requestStart(requestUri);
 
             requestInvoker.set(request);
@@ -415,6 +417,13 @@ public class WebComponent implements ContainerListener {
             final Writer w = new Writer(useSetStatusOn404, response);
             _application.handleRequest(cRequest, w);
             return w.cResponse.getStatus();
+        } catch (WebApplicationException ex) {
+            final Response exResponse = ex.getResponse();
+            final String entity = exResponse.getEntity() != null ? exResponse.getEntity().toString() : null;
+
+            response.sendError(exResponse.getStatus(), entity);
+
+            return exResponse.getStatus();
         } catch (MappableContainerException ex) {
             traceOnException(cRequest, response);
             throw new ServletException(ex.getCause());
@@ -824,24 +833,24 @@ public class WebComponent implements ContainerListener {
         }
     }
 
-    private void filterFormParameters(HttpServletRequest hsr, ContainerRequest cr) throws IOException {
-        if (MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, cr.getMediaType())
-                && !isEntityPresent(cr)) {
+    private void filterFormParameters(HttpServletRequest servletRequest, ContainerRequest containerRequet) throws IOException {
+        if (MediaTypes.typeEquals(MediaType.APPLICATION_FORM_URLENCODED_TYPE, containerRequet.getMediaType())
+                && !isEntityPresent(containerRequet)) {
             Form f = new Form();
 
-            Enumeration e = hsr.getParameterNames();
+            Enumeration e = servletRequest.getParameterNames();
             while (e.hasMoreElements()) {
                 String name = (String) e.nextElement();
-                String[] values = hsr.getParameterValues(name);
+                String[] values = servletRequest.getParameterValues(name);
 
                 f.put(name, Arrays.asList(values));
             }
 
             if (!f.isEmpty()) {
-                cr.getProperties().put(FormDispatchProvider.FORM_PROPERTY, f);
+                containerRequet.getProperties().put(FormDispatchProvider.FORM_PROPERTY, f);
                 if (LOGGER.isLoggable(Level.WARNING)) {
                     LOGGER.log(Level.WARNING,
-                            "A servlet request, to the URI " + cr.getRequestUri() + ", " +
+                            "A servlet request, to the URI " + containerRequet.getRequestUri() + ", " +
                                     "contains form parameters in " +
                                     "the request body but the request body has been consumed " +
                                     "by the servlet or a servlet filter accessing the request " +
