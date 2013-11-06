@@ -247,6 +247,8 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <inherited>true</inherited>
                         <configuration>
+                            <forkCount>1</forkCount>
+                            <reuseForks>false</reuseForks>
                             <systemPropertyVariables>
                                 <javax.xml.bind.JAXBContext>org.eclipse.persistence.jaxb.JAXBContextFactory</javax.xml.bind.JAXBContext>
                             </systemPropertyVariables>

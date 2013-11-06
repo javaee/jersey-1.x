@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,9 +42,12 @@ package com.sun.jersey.core.spi.component;
 
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.factory.InjectableProviderFactory;
+import com.sun.jersey.impl.SpiMessages;
 import com.sun.jersey.spi.inject.ConstrainedTo;
 import com.sun.jersey.spi.inject.ConstrainedToType;
 import com.sun.jersey.spi.service.ServiceFinder;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,18 +59,18 @@ import java.util.logging.Logger;
 /**
  * Combines access to provider instances given a set of provider classes,
  * a set of provider instances and providers registered in META-INF/services.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class ProviderServices {
     private static final Logger LOGGER = Logger.getLogger(ProviderServices.class.getName());
 
     private final Class<? extends ConstrainedToType> constraintToType;
-    
+
     private final ProviderFactory componentProviderFactory;
-    
+
     private final Set<Class<?>> providers;
-    
+
     private final Set providerInstances;
 
     /**
@@ -87,7 +90,7 @@ public class ProviderServices {
     /**
      * Create the provider services.
      *
-     * @param constraintToType 
+     * @param constraintToType
      * @param componentProviderFactory
      * @param providers
      * @param providerInstances
@@ -140,7 +143,7 @@ public class ProviderServices {
     public ProviderFactory getComponentProviderFactory() {
         return componentProviderFactory;
     }
-    
+
     public <T> Set<T> getProviders(Class<T> provider) {
         Set<T> ps = new LinkedHashSet<T>();
         ps.addAll(getProviderInstances(provider));
@@ -182,7 +185,7 @@ public class ProviderServices {
     public static interface ProviderListener<T> {
         void onAdd(T t);
     }
-    
+
     public <T> void getProviders(Class<T> provider, ProviderListener listener) {
         for (T t : getProviderInstances(provider)) {
             listener.onAdd(t);
@@ -212,30 +215,54 @@ public class ProviderServices {
     public <T> List<T> getInstances(Class<T> provider, String[] classNames) {
         List<T> ps = new LinkedList<T>();
         for (String className : classNames) {
+
             try {
-               Class<?> c = ReflectionHelper.classForNameWithException(className);
+
+                Class<T> c = AccessController.doPrivileged(ReflectionHelper.<T>classForNameWithExceptionPEA(className));
+
                if (provider.isAssignableFrom(c)) {
                    Object o = getComponent(c);
                    if (o != null)
                        ps.add(provider.cast(o));
                } else {
-                   LOGGER.severe("The class " + 
+                   LOGGER.severe("The class " +
                            className +
                            " is not assignable to the class " +
-                           provider.getName() + 
+                           provider.getName() +
                            ". This class is ignored.");
                }
-            } catch (ClassNotFoundException e) {
-               LOGGER.severe("The class " + 
+
+            } catch (ClassNotFoundException ex) {
+               LOGGER.severe("The class " +
                        className +
                        " could not be found" +
-                       ". This class is ignored.");                
+                       ". This class is ignored.");
+            } catch (PrivilegedActionException pae) {
+
+                final Throwable thrown = pae.getCause();
+
+                if (thrown instanceof ClassNotFoundException) {
+                   LOGGER.severe("The class " +
+                           className +
+                           " could not be found" +
+                           ". This class is ignored.");
+                } else if (thrown instanceof NoClassDefFoundError) {
+                    LOGGER.severe(
+                            SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_NOT_FOUND(
+                            thrown.getLocalizedMessage(), className, provider));
+                } else if (thrown instanceof ClassFormatError) {
+                    LOGGER.severe(
+                            SpiMessages.DEPENDENT_CLASS_OF_PROVIDER_FORMAT_ERROR(
+                            thrown.getLocalizedMessage(), className, provider));
+                } else {
+                    LOGGER.severe(SpiMessages.PROVIDER_CLASS_COULD_NOT_BE_LOADED(className, provider.getName(), thrown.getLocalizedMessage()));
+                }
             }
         }
-        
+
         return ps;
     }
-        
+
     public <T> List<T> getInstances(Class<T> provider, Class<? extends T>[] classes) {
         List<T> ps = new LinkedList<T>();
         for (Class<? extends T> c : classes) {
@@ -251,7 +278,7 @@ public class ProviderServices {
         ComponentProvider cp = componentProviderFactory.getComponentProvider(provider);
         return (cp != null) ? cp.getInstance() : null;
     }
-    
+
     private Object getComponent(ProviderClass provider) {
         ComponentProvider cp = componentProviderFactory.getComponentProvider(provider);
         return (cp != null) ? cp.getInstance() : null;
@@ -273,14 +300,14 @@ public class ProviderServices {
             if (service.isAssignableFrom(p) && constrainedTo(p))
                 sp.add(p);
         }
-        
+
         return sp;
     }
 
     public class ProviderClass {
         final boolean isServiceClass;
         final Class c;
-        
+
         ProviderClass(Class c) {
             this.c = c;
             this.isServiceClass = false;
@@ -296,8 +323,8 @@ public class ProviderServices {
         Set<ProviderClass> sp = getProviderOnlyClasses(service);
         getServiceClasses(service, sp);
         return sp;
-    }    
-    
+    }
+
     private Set<ProviderClass> getProviderOnlyClasses(Class<?> service) {
         Set<ProviderClass> sp = new LinkedHashSet<ProviderClass>();
         for(Class c : getProviderClasses(service)) {
@@ -310,8 +337,8 @@ public class ProviderServices {
         Set<ProviderClass> sp = new LinkedHashSet<ProviderClass>();
         getServiceClasses(service, sp);
         return sp;
-    }    
-    
+    }
+
     private void getServiceClasses(Class<?> service, Set<ProviderClass> sp) {
         // Get the service-defined provider classes that implement serviceClass
         LOGGER.log(Level.CONFIG, "Searching for providers that implement: " + service);

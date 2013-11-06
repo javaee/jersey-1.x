@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -53,6 +53,7 @@ import java.lang.reflect.ReflectPermission;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -100,7 +101,7 @@ public class PackageNamesScanner implements Scanner {
      * @param packages an array of package names.
      */
     public PackageNamesScanner(final String[] packages) {
-        this(ReflectionHelper.getContextClassLoader(), packages);
+        this(AccessController.doPrivileged(ReflectionHelper.getContextClassLoaderPA()), packages);
     }
 
     /**

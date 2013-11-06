@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,19 +54,21 @@ import com.sun.jersey.test.framework.spi.client.ClientFactory;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 import org.junit.After;
 import org.junit.Before;
 
 /**
- * An abstract JUnit 4.x-based unit test class for testing JAX-RS and 
+ * An abstract JUnit 4.x-based unit test class for testing JAX-RS and
  * Jersey-based applications.
  * <p>
  * At construction this class will obtain a test container factory, of type
  * {@link TestContainerFactory}, and use that to obtain a configured test
  * container, of type {@link TestContainer}.
  * <p>
- * Before a test method, in an extending class, is run the 
+ * Before a test method, in an extending class, is run the
  * {@link TestContainer#start() } method is invoked. After the test method has
  * run the {@link TestContainer#stop() } method is invoked.
  * The test method can invoke the {@link #resource() } to obtain a
@@ -82,14 +84,14 @@ import org.junit.Before;
  * be an instance of that class. The exception {@link TestContainerException}
  * will be thrown if the class cannot be loaded or instantiated.
  * If the system property {@literal jersey.test.containerFactory} is not set then
- * the default test container factory will be an instance of 
+ * the default test container factory will be an instance of
  * {@value JerseyTest#DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME}.
- * The exception {@link TestContainerException} will be thrown if this class 
+ * The exception {@link TestContainerException} will be thrown if this class
  * cannot be loaded or instantiated.
  * <p>
  * The test container is configured from an application descriptor, of type
  * {@link AppDescriptor}. The exception {@link TestContainerException}
- * will be thrown if the test container cannot support the application 
+ * will be thrown if the test container cannot support the application
  * descriptor.
  * An application descriptor is built from an application descriptor builder.
  * Two application descriptor builders are provided:
@@ -105,7 +107,7 @@ import org.junit.Before;
  * <p>
  * The following low-level test container factories are provided:
  * <ul>
- *  <li>{@link GrizzlyTestContainerFactory} for testing with the low-level 
+ *  <li>{@link GrizzlyTestContainerFactory} for testing with the low-level
  *      Grizzly HTTP container.</li>
  *  <li>{@link HTTPContainerFactory} for testing with the Light Weight HTTP
  *      server distributed with Java SE 6.</li>
@@ -156,7 +158,7 @@ public abstract class JerseyTest {
     private final Client client;
 
     /**
-     * An extending class must implement the {@link #configure()} method to 
+     * An extending class must implement the {@link #configure()} method to
      * provide an application descriptor.
      *
      * @throws TestContainerException if the default test container factory
@@ -172,7 +174,7 @@ public abstract class JerseyTest {
     /**
      * Construct a new instance with a test container factory.
      * <p>
-     * An extending class must implement the {@link #configure()} method to 
+     * An extending class must implement the {@link #configure()} method to
      * provide an application descriptor.
      *
      * @param testContainerFactory the test container factory to use for testing.
@@ -210,7 +212,7 @@ public abstract class JerseyTest {
      * Construct a new instance with an application descriptor that defines
      * how the test container is configured.
      *
-     * @param ad an application descriptor describing how to configure the 
+     * @param ad an application descriptor describing how to configure the
      *        test container.
      * @throws TestContainerException if the default test container factory
      *         cannot be obtained, or the application descriptor is not
@@ -251,7 +253,7 @@ public abstract class JerseyTest {
     /**
      * Get the test container factory.
      * <p>
-     * If the test container factory has not been explicit set with 
+     * If the test container factory has not been explicit set with
      * {@link #setTestContainerFactory(TestContainerFactory) } then
      * the default test container factory will be obtained.
      * <p>
@@ -383,25 +385,30 @@ public abstract class JerseyTest {
                     return resultArray[0];
                 }
             } else {
-                String tcfClassName = System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME);
+                final String tcfNameProperty = System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME);
 
-                if(tcfClassName == null)
-                    tcfClassName = System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY,
+                final String tcfName = (tcfNameProperty != null) ? tcfNameProperty : System.getProperty(TEST_CONTAINER_FACTORY_PROPERTY_NAME_LEGACY,
                             DEFAULT_TEST_CONTAINER_FACTORY_CLASS_NAME);
 
-                try {
-                    defaultTestContainerFactoryClass = Class.forName(tcfClassName).asSubclass(TestContainerFactory.class);
-                } catch (ClassNotFoundException ex) {
-                    throw new TestContainerException(
-                            "The default test container factory class name, " +
-                                    tcfClassName +
-                                    ", cannot be loaded", ex);
-                } catch (ClassCastException ex) {
-                    throw new TestContainerException(
-                            "The default test container factory class, " +
-                                    tcfClassName +
-                                    ", is not an instance of TestContainerFactory", ex);
-                }
+                defaultTestContainerFactoryClass =
+                        AccessController.doPrivileged(new PrivilegedAction<Class<? extends TestContainerFactory>>() {
+                    @Override
+                    public Class<? extends TestContainerFactory> run() {
+                        try {
+                            return Class.forName(tcfName).asSubclass(TestContainerFactory.class);
+                        } catch (ClassNotFoundException ex) {
+                            throw new TestContainerException(
+                                    "The default test container factory class name, "
+                                    + tcfName
+                                    + ", cannot be loaded", ex);
+                        } catch (ClassCastException ex) {
+                            throw new TestContainerException(
+                                    "The default test container factory class, "
+                                    + tcfName
+                                    + ", is not an instance of TestContainerFactory", ex);
+                        }
+                    }
+                });
             }
         }
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -51,6 +51,8 @@ import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.impl.resource.PerRequestFactory;
 import com.sun.jersey.spi.inject.Errors;
 import java.lang.annotation.Annotation;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,7 +66,7 @@ public class ResourceFactory {
     private final ServerInjectableProviderContext ipc;
 
     private final Map<Class, ResourceComponentProviderFactory> factories;
-    
+
     public ResourceFactory(ResourceConfig config, ServerInjectableProviderContext ipc) {
         this.config = config;
         this.ipc = ipc;
@@ -111,9 +113,11 @@ public class ResourceFactory {
                 providerFactoryClass = PerRequestFactory.class;
             } else if (v instanceof String) {
                 try {
-                    providerFactoryClass = getSubclass(ReflectionHelper.classForNameWithException((String)v));
+                    providerFactoryClass = getSubclass(AccessController.doPrivileged(ReflectionHelper.classForNameWithExceptionPEA((String)v)));
                 } catch (ClassNotFoundException ex) {
                     throw new ContainerException(ex);
+                } catch (PrivilegedActionException pae) {
+                    throw new ContainerException(pae.getCause());
                 }
             } else if (v instanceof Class) {
                 providerFactoryClass = getSubclass((Class)v);

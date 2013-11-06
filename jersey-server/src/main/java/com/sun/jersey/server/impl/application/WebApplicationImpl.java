@@ -168,6 +168,8 @@ import com.sun.jersey.spi.service.ServiceFinder;
 import com.sun.jersey.spi.template.TemplateContext;
 import com.sun.jersey.spi.uri.rules.UriRule;
 import com.sun.jersey.spi.uri.rules.UriRules;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  * A Web application that contains a set of resources, each referenced by
@@ -1617,11 +1619,15 @@ public final class WebApplicationImpl implements WebApplication {
         }
     }
 
-    private <T> T createProxy(Class<T> c, InvocationHandler i) {
-        return c.cast(Proxy.newProxyInstance(
-                this.getClass().getClassLoader(),
-                new Class[]{c},
-                i));
+    private <T> T createProxy(final Class<T> c, final InvocationHandler i) {
+        return AccessController.doPrivileged(new PrivilegedAction<T>() {
+            @Override
+            public T run() {
+                return c.cast(Proxy.newProxyInstance(
+                        WebApplicationImpl.this.getClass().getClassLoader(), new Class[]{c}, i));
+
+            }
+        });
     }
 
     private class DispatchingListenerProxy implements DispatchingListener {

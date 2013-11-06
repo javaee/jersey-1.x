@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,6 +45,7 @@ import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.resource.Singleton;
 import java.net.URI;
+import java.security.AccessController;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -54,7 +55,7 @@ import javax.ws.rs.core.Context;
 /**
  * Test {@link ResourceContext}: resource context must provide access to
  * subresources that can be provided by a custom component provider.<br>
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @author Paul.Sandoz@Sun.Com
  */
@@ -66,14 +67,14 @@ public class ResourceContextTest extends AbstractResourceTester {
 
     @Path("/")
     public static class MyRootResource {
-        
+
         @Context ResourceContext resourceContext;
-        
+
         @Path("singleton")
         public SingletonResource getSingletonResource() {
             return resourceContext.getResource(SingletonResource.class);
-        }      
-        
+        }
+
         @Path("perrequest")
         public PerRequestResource getPerRequestSubResource() {
             return resourceContext.getResource(PerRequestResource.class);
@@ -127,7 +128,7 @@ public class ResourceContextTest extends AbstractResourceTester {
         @GET
         @Path("/class/{class}/{uri: .+}")
         public String get(@PathParam("uri") URI uri, @PathParam("class") String className) {
-            Class c = ReflectionHelper.classForName(className);
+            Class c = AccessController.doPrivileged(ReflectionHelper.classForNamePA(className));
             Object r = resourceContext.matchResource(uri, c);
             return (r != null) ? r.toString() : "null";
         }
@@ -184,7 +185,7 @@ public class ResourceContextTest extends AbstractResourceTester {
         assertEquals(r1.substring(0, r1.indexOf('@')),
                 r2.substring(0, r2.indexOf('@')));
     }
-    
+
     public void testMatchNotFound() {
         initiateWebApplication(MatchResource.class, MyRootResource.class);
 

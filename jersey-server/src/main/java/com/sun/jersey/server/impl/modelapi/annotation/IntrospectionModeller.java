@@ -64,6 +64,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.security.AccessController;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class IntrospectionModeller {
         final Path rPathAnnotation = annotatedResourceClass.getAnnotation(Path.class);
         final boolean isRootResourceClass = (null != rPathAnnotation);
 
-        final boolean isEncodedAnotOnClass = 
+        final boolean isEncodedAnotOnClass =
                 (null != annotatedResourceClass.getAnnotation(Encoded.class));
 
         AbstractResource resource;
@@ -109,22 +110,22 @@ public class IntrospectionModeller {
             resource = new AbstractResource(resourceClass);
         }
 
-        workOutConstructorsList(resource, resourceClass.getConstructors(), 
+        workOutConstructorsList(resource, resourceClass.getConstructors(),
                 isEncodedAnotOnClass);
 
         workOutFieldsList(resource, isEncodedAnotOnClass);
-        
+
         final MethodList methodList = new MethodList(resourceClass);
 
         workOutSetterMethodsList(resource, methodList, isEncodedAnotOnClass);
-        
-        final Consumes classScopeConsumesAnnotation = 
+
+        final Consumes classScopeConsumesAnnotation =
                 annotatedResourceClass.getAnnotation(Consumes.class);
-        final Produces classScopeProducesAnnotation = 
+        final Produces classScopeProducesAnnotation =
                 annotatedResourceClass.getAnnotation(Produces.class);
-        workOutResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
+        workOutResourceMethodsList(resource, methodList, isEncodedAnotOnClass,
                 classScopeConsumesAnnotation, classScopeProducesAnnotation);
-        workOutSubResourceMethodsList(resource, methodList, isEncodedAnotOnClass, 
+        workOutSubResourceMethodsList(resource, methodList, isEncodedAnotOnClass,
                 classScopeConsumesAnnotation, classScopeProducesAnnotation);
         workOutSubResourceLocatorsList(resource, methodList, isEncodedAnotOnClass);
 
@@ -137,7 +138,7 @@ public class IntrospectionModeller {
 
         return resource;
     }
-    
+
     private static Class getAnnotatedResourceClass(Class rc) {
         if (rc.isAnnotationPresent(Path.class)) return rc;
 
@@ -146,15 +147,15 @@ public class IntrospectionModeller {
 
         return rc;
     }
-    
+
     private static void addConsumes(
-            AnnotatedMethod am,            
-            AbstractResourceMethod resourceMethod, 
+            AnnotatedMethod am,
+            AbstractResourceMethod resourceMethod,
             Consumes consumeMimeAnnotation) {
         // Override annotation is present in method
         if (am.isAnnotationPresent(Consumes.class))
             consumeMimeAnnotation = am.getAnnotation(Consumes.class);
-        
+
         resourceMethod.setAreInputTypesDeclared(consumeMimeAnnotation != null);
         resourceMethod.getSupportedInputTypes().addAll(
                 MediaTypes.createMediaTypes(consumeMimeAnnotation));
@@ -162,24 +163,24 @@ public class IntrospectionModeller {
 
     private static void addProduces(
             AnnotatedMethod am,
-            AbstractResourceMethod resourceMethod, 
+            AbstractResourceMethod resourceMethod,
             Produces produceMimeAnnotation) {
         // Override annotation is present in method
         if (am.isAnnotationPresent(Produces.class))
             produceMimeAnnotation = am.getAnnotation(Produces.class);
-        
+
         resourceMethod.setAreOutputTypesDeclared(produceMimeAnnotation != null);
         resourceMethod.getSupportedOutputTypes().addAll(
                 MediaTypes.createQualitySourceMediaTypes(produceMimeAnnotation));
     }
 
     private static void workOutConstructorsList(
-            AbstractResource resource, 
-            Constructor[] ctorArray, 
+            AbstractResource resource,
+            Constructor[] ctorArray,
             boolean isEncoded) {
         if (null != ctorArray) {
             for (Constructor ctor : ctorArray) {
-                final AbstractResourceConstructor aCtor = 
+                final AbstractResourceConstructor aCtor =
                         new AbstractResourceConstructor(ctor);
                 processParameters(
                         resource.getResourceClass(),
@@ -193,12 +194,12 @@ public class IntrospectionModeller {
     }
 
     private static void workOutFieldsList(
-            AbstractResource resource, 
-            boolean isEncoded) {        
+            AbstractResource resource,
+            boolean isEncoded) {
         Class c = resource.getResourceClass();
         if (c.isInterface())
             return;
-        
+
         while (c != Object.class) {
              for (final Field f : c.getDeclaredFields()) {
                 if (f.getDeclaredAnnotations().length > 0) {
@@ -221,11 +222,11 @@ public class IntrospectionModeller {
     }
 
     private static void workOutPostConstructPreDestroy(AbstractResource resource) {
-        Class postConstruct = ReflectionHelper.classForName("javax.annotation.PostConstruct");
+        Class postConstruct = AccessController.doPrivileged(ReflectionHelper.classForNamePA("javax.annotation.PostConstruct"));
         if (postConstruct == null)
             return;
 
-        Class preDestroy = ReflectionHelper.classForName("javax.annotation.PreDestroy");
+        Class preDestroy = AccessController.doPrivileged(ReflectionHelper.classForNamePA("javax.annotation.PreDestroy"));
 
         final MethodList methodList = new MethodList(resource.getResourceClass(), true);
         HashSet<String> names = new HashSet<String>();
@@ -236,7 +237,7 @@ public class IntrospectionModeller {
             Method method = m.getMethod();
             // only add method if not hidden/overridden
             if (names.add(method.getName())) {
-                ReflectionHelper.setAccessibleMethod(method);
+                AccessController.doPrivileged(ReflectionHelper.setAccessibleMethodPA(method));
                 resource.getPostConstructMethods().add(0, method);
             }
         }
@@ -249,14 +250,14 @@ public class IntrospectionModeller {
             Method method = m.getMethod();
             // only add method if not hidden/overridden
             if (names.add(method.getName())) {
-                ReflectionHelper.setAccessibleMethod(method);
+                AccessController.doPrivileged(ReflectionHelper.setAccessibleMethodPA(method));
                 resource.getPreDestroyMethods().add(method);
             }
         }
     }
 
     private static void workOutSetterMethodsList(
-            AbstractResource resource, 
+            AbstractResource resource,
             MethodList methodList,
             boolean isEncoded) {
         for (AnnotatedMethod m : methodList.
@@ -265,7 +266,7 @@ public class IntrospectionModeller {
                 hasNumParams(1).
                 hasReturnType(void.class).
                 nameStartsWith("set")) {
-            
+
             final AbstractSetterMethod asm = new AbstractSetterMethod(resource, m.getMethod(), m.getAnnotations());
             Parameter p = createParameter(
                     resource.getResourceClass(),
@@ -278,14 +279,14 @@ public class IntrospectionModeller {
                 asm.getParameters().add(p);
                 resource.getSetterMethods().add(asm);
             }
-        }        
+        }
     }
-    
+
     private static void workOutResourceMethodsList(
-            AbstractResource resource, 
-            MethodList methodList, 
+            AbstractResource resource,
+            MethodList methodList,
             boolean isEncoded,
-            Consumes classScopeConsumesAnnotation, 
+            Consumes classScopeConsumesAnnotation,
             Produces classScopeProducesAnnotation) {
         for (AnnotatedMethod m : methodList.hasMetaAnnotation(HttpMethod.class).
                 hasNotAnnotation(Path.class)) {
@@ -314,12 +315,12 @@ public class IntrospectionModeller {
             Method m) {
         return getGenericType(concreteClass, m.getDeclaringClass(), m.getReturnType(), m.getGenericReturnType());
     }
-    
+
     private static void workOutSubResourceMethodsList(
-            AbstractResource resource, 
-            MethodList methodList, 
+            AbstractResource resource,
+            MethodList methodList,
             boolean isEncoded,
-            Consumes classScopeConsumesAnnotation, 
+            Consumes classScopeConsumesAnnotation,
             Produces classScopeProducesAnnotation) {
 
         for (AnnotatedMethod m : methodList.hasMetaAnnotation(HttpMethod.class).hasAnnotation(Path.class)) {
@@ -328,7 +329,7 @@ public class IntrospectionModeller {
             final PathValue pv = new PathValue(mPathAnnotation.value());
 
             final boolean emptySegmentCase =  "/".equals(pv.getValue()) || "".equals(pv.getValue());
-            
+
             if (!emptySegmentCase) {
                 final ReflectionHelper.ClassTypePair ct = getGenericReturnType(resource.getResourceClass(), m.getMethod());
                 final AbstractSubResourceMethod abstractSubResourceMethod = new AbstractSubResourceMethod(
@@ -368,10 +369,10 @@ public class IntrospectionModeller {
             }
         }
     }
-    
+
     private static void workOutSubResourceLocatorsList(
-            AbstractResource resource, 
-            MethodList methodList, 
+            AbstractResource resource,
+            MethodList methodList,
             boolean isEncoded) {
 
         for (AnnotatedMethod m : methodList.hasNotMetaAnnotation(HttpMethod.class).
@@ -396,8 +397,8 @@ public class IntrospectionModeller {
     private static void processParameters(
             Class concreteClass,
             Class declaringClass,
-            Parameterized parametrized, 
-            Constructor ctor, 
+            Parameterized parametrized,
+            Constructor ctor,
             boolean isEncoded) {
         Class[] parameterTypes = ctor.getParameterTypes();
         Type[] genericParameterTypes = ctor.getGenericParameterTypes();
@@ -421,15 +422,15 @@ public class IntrospectionModeller {
     private static void processParameters(
             Class concreteClass,
             Class declaringClass,
-            Parameterized parametrized, 
-            AnnotatedMethod method, 
+            Parameterized parametrized,
+            AnnotatedMethod method,
             boolean isEncoded) {
         processParameters(
                 concreteClass, declaringClass,
                 parametrized,
                 ((null != method.getAnnotation(Encoded.class)) || isEncoded),
-                method.getParameterTypes(), 
-                method.getGenericParameterTypes(), 
+                method.getParameterTypes(),
+                method.getGenericParameterTypes(),
                 method.getParameterAnnotations());
     }
 
@@ -445,8 +446,8 @@ public class IntrospectionModeller {
         for (int i = 0; i < parameterTypes.length; i++) {
             Parameter parameter = createParameter(
                     concreteClass, declaringClass,
-                    isEncoded, parameterTypes[i], 
-                    genericParameterTypes[i], 
+                    isEncoded, parameterTypes[i],
+                    genericParameterTypes[i],
                     parameterAnnotations[i]);
             if (null != parameter) {
                 parametrized.getParameters().add(parameter);
@@ -553,16 +554,16 @@ public class IntrospectionModeller {
         });
         return Collections.unmodifiableMap(m);
     }
-    private final static Map<Class, ParamAnnotationHelper> ANOT_HELPER_MAP = 
+    private final static Map<Class, ParamAnnotationHelper> ANOT_HELPER_MAP =
             createParamAnotHelperMap();
 
     @SuppressWarnings("unchecked")
     private static Parameter createParameter(
             Class concreteClass,
             Class declaringClass,
-            boolean isEncoded, 
-            Class<?> paramClass, 
-            Type paramType, 
+            boolean isEncoded,
+            Class<?> paramClass,
+            Type paramType,
             Annotation[] annotations) {
 
         if (null == annotations) {
@@ -574,7 +575,7 @@ public class IntrospectionModeller {
         String paramName = null;
         boolean paramEncoded = isEncoded;
         String paramDefault = null;
-        
+
         /**
          * Create a parameter from the list of annotations.
          * Unknown annotated parameters are also supported, and in such a

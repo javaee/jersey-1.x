@@ -65,13 +65,16 @@ import com.sun.jersey.server.wadl.generators.resourcedoc.model.NamedValueType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.ParamDocType;
 import com.sun.jersey.server.wadl.generators.resourcedoc.model.ResourceDocType;
 import com.sun.research.ws.wadl.Application;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 
 import org.junit.Test;
 
 public class WadlGeneratorResourceDocSupportTest
 {
     @Test
-    public void wadlIsGeneratedWithUnknownCustomParameterAnnotation() throws JAXBException
+    public void wadlIsGeneratedWithUnknownCustomParameterAnnotation() throws JAXBException, PrivilegedActionException
     {
         /* Set up a ClassDocType that has something for a custom-annotated parameter */
         ClassDocType cdt = new ClassDocType();
@@ -105,7 +108,15 @@ public class WadlGeneratorResourceDocSupportTest
         /* Confirm that it can be marshalled without error */
         StringWriter sw = new StringWriter();
 
-        JAXBContext context = JAXBContext.newInstance(Application.class);
+        JAXBContext context =
+                AccessController.doPrivileged(new PrivilegedExceptionAction<JAXBContext>(){
+
+                    @Override
+                    public JAXBContext run() throws JAXBException {
+                        return JAXBContext.newInstance(Application.class);
+                    }
+                });
+
         Marshaller m = context.createMarshaller();
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 

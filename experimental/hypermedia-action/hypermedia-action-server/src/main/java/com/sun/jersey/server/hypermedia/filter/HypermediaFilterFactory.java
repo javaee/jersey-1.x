@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -63,6 +63,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.lang.reflect.Method;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +84,7 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
         this.uriInfo = uriInfo;
     }
 
-    private class HypermediaFilter 
+    private class HypermediaFilter
             implements ResourceFilter, ContainerResponseFilter, ContainerRequestFilter {
 
         private AbstractMethod abstractMethod;
@@ -121,7 +122,7 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
                     hasAnnotation(ContextualActionSet.class).
                     hasNumParams(0).
                     hasReturnType(Set.class)) {
-                ReflectionHelper.setAccessibleMethod(m.getMethod());
+                AccessController.doPrivileged(ReflectionHelper.setAccessibleMethodPA(m.getMethod()));
                 contextualActionSetMethods.add(m.getMethod());
             }
             return contextualActionSetMethods;
@@ -138,7 +139,7 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
         }
 
         // ContainerResponseFilter
-        
+
         public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
             Object resourceInstance = uriInfo.getMatchedResources().get(0);
             if (request.isTracingEnabled()) {
@@ -202,7 +203,7 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
             Action action = abstractMethod.getAnnotation(Action.class);
             if (action == null) {
                 return request;
-            }            
+            }
 
             // If contract is contextual
             Set<String> actionSet = null;
@@ -226,7 +227,7 @@ public class HypermediaFilterFactory implements ResourceFilterFactory {
             return request;
         }
     }
-    
+
     public List<ResourceFilter> create(AbstractMethod am) {
         // Check if method belongs to controller class
         AbstractResource ar = am.getResource();

@@ -45,6 +45,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.AccessController;
 import java.text.ParseException;
 import java.util.Date;
 
@@ -89,7 +90,7 @@ public class StringReaderProviders {
     public static class StringConstructor implements StringReaderProvider {
 
         public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
-            final Constructor constructor = ReflectionHelper.getStringConstructor(type);
+            final Constructor constructor = AccessController.doPrivileged(ReflectionHelper.getStringConstructorPA(type));
             if (constructor == null)
                 return null;
 
@@ -104,7 +105,7 @@ public class StringReaderProviders {
     public static class TypeValueOf implements StringReaderProvider {
 
         public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
-            final Method valueOf = ReflectionHelper.getValueOfStringMethod(type);
+            final Method valueOf = AccessController.doPrivileged(ReflectionHelper.getValueOfStringMethodPA(type));
             if (valueOf == null)
                 return null;
 
@@ -119,7 +120,7 @@ public class StringReaderProviders {
     public static class TypeFromString implements StringReaderProvider {
 
         public StringReader getStringReader(Class type, Type genericType, Annotation[] annotations) {
-            final Method fromString = ReflectionHelper.getFromStringStringMethod(type);
+            final Method fromString = AccessController.doPrivileged(ReflectionHelper.getFromStringStringMethodPA(type));
             if (fromString == null)
                 return null;
 

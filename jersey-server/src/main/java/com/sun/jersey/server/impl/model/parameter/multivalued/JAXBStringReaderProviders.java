@@ -65,6 +65,8 @@ import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.spi.StringReader;
 import com.sun.jersey.spi.StringReaderProvider;
 import com.sun.jersey.spi.inject.Injectable;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 
 /**
  *
@@ -135,25 +137,32 @@ public class JAXBStringReaderProviders {
             }
 
             return new StringReader() {
-                public Object fromString(String value) {
-                    try {
-                        final SAXSource source = new SAXSource(
-                                spf.getValue().newSAXParser().getXMLReader(),
-                                new InputSource(new java.io.StringReader(value)));
+                @Override
+                public Object fromString(final String value) {
+                    return AccessController.doPrivileged(new PrivilegedAction<Object>() {
 
-                        final Unmarshaller u = getUnmarshaller(type);
-                        if (type.isAnnotationPresent(XmlRootElement.class)) {
-                            return u.unmarshal(source);
-                        } else {
-                            return u.unmarshal(source, type).getValue();
+                        @Override
+                        public Object run() {
+                            try {
+                                final SAXSource source = new SAXSource(
+                                        spf.getValue().newSAXParser().getXMLReader(),
+                                        new InputSource(new java.io.StringReader(value)));
+
+                                final Unmarshaller u = getUnmarshaller(type);
+                                if (type.isAnnotationPresent(XmlRootElement.class)) {
+                                    return u.unmarshal(source);
+                                } else {
+                                    return u.unmarshal(source, type).getValue();
+                                }
+                            } catch (UnmarshalException ex) {
+                                throw new ExtractorContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
+                            } catch (JAXBException ex) {
+                                throw new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
+                            } catch (Exception ex) {
+                                throw new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
+                            }
                         }
-                    } catch (UnmarshalException ex) {
-                        throw new ExtractorContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
-                    } catch (JAXBException ex) {
-                        throw new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
-                    } catch (Exception ex) {
-                        throw new ContainerException(ImplMessages.ERROR_UNMARSHALLING_JAXB(type), ex);
-                    }
+                    });
                 }
             };
         }

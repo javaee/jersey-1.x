@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,6 +42,7 @@ package com.sun.jersey.api.wadl.config;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.server.wadl.WadlGenerator;
+import java.security.AccessController;
 import java.util.Collections;
 import java.util.List;
 
@@ -50,7 +51,7 @@ import java.util.List;
  * provided by the loaded {@link WadlGeneratorConfig}.<br/>
  * If no {@link WadlGeneratorConfig} is provided, the default {@link WadlGenerator}
  * will be loaded.<br />
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  */
@@ -59,13 +60,13 @@ public class WadlGeneratorConfigLoader {
     /**
      * Load the {@link WadlGeneratorConfig} from the provided {@link ResourceConfig} using the
      * property {@link ResourceConfig#PROPERTY_WADL_GENERATOR_CONFIG}.
-     * 
+     *
      * <p>
      * The type of this property must be a subclass or an instance of a subclass of
      * {@link WadlGeneratorConfig}.<br/>
      * If it's not set, the default {@link com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator} will be used.
      * </p>
-     * 
+     *
      * @param resourceConfig
      * @return a configure {@link WadlGeneratorConfig}.
      */
@@ -84,7 +85,7 @@ public class WadlGeneratorConfigLoader {
         else {
 
             try {
-                
+
                 if ( wadlGeneratorConfigProperty instanceof WadlGeneratorConfig ) {
                     return ( (WadlGeneratorConfig)wadlGeneratorConfigProperty );
                 }
@@ -95,20 +96,20 @@ public class WadlGeneratorConfigLoader {
                             asSubclass( WadlGeneratorConfig.class );
                 }
                 else if ( wadlGeneratorConfigProperty instanceof String ) {
-                    configClazz = ReflectionHelper.classForNameWithException( (String) wadlGeneratorConfigProperty ).
+                    configClazz = AccessController.doPrivileged(ReflectionHelper.classForNameWithExceptionPEA((String)wadlGeneratorConfigProperty)).
                             asSubclass( WadlGeneratorConfig.class );
                 }
                 else {
-                    throw new RuntimeException( "The property " + ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG + 
+                    throw new RuntimeException( "The property " + ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG +
                             " is an invalid type: " + wadlGeneratorConfigProperty.getClass().getName() +
                             " (supported: String, Class<? extends WadlGeneratorConfiguration>," +
                             " WadlGeneratorConfiguration)" );
                 }
-                
+
                 final WadlGeneratorConfig config = configClazz.newInstance();
-                
+
                 return config;
-                
+
             } catch ( Exception e ) {
                 throw new RuntimeException( "Could not load WadlGeneratorConfiguration," +
                         " check the configuration of " + ResourceConfig.PROPERTY_WADL_GENERATOR_CONFIG, e );

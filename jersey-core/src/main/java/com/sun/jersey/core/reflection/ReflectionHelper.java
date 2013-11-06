@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -57,6 +57,9 @@ import java.util.Map;
 
 import com.sun.jersey.core.osgi.OsgiRegistry;
 import com.sun.jersey.impl.ImplMessages;
+import java.security.PrivilegedExceptionAction;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Utility methods for Java reflection.
@@ -64,6 +67,14 @@ import com.sun.jersey.impl.ImplMessages;
  * @author Paul.Sandoz@Sun.Com
  */
 public class ReflectionHelper {
+
+    private static final Logger LOGGER = Logger.getLogger(ReflectionHelper.class.getName());
+    private static final PrivilegedAction NoOpPrivilegedACTION = new PrivilegedAction() {
+        @Override
+        public Object run() {
+            return null;
+        }
+    };
 
     /**
      *
@@ -170,115 +181,169 @@ public class ReflectionHelper {
     }
 
     /**
-     * Get the Class from the class name.
-     * <p>
+     * Get privileged action to obtain Class from given class name.
+     * If run using security manager, the returned privileged action
+     * must be invoked within a doPrivileged block.
+     * <p/>
      * The context class loader will be utilized if accessible and non-null.
      * Otherwise the defining class loader of this class will
      * be utilized.
      *
-     * @param name the class name.
-     * @return the Class, otherwise null if the class cannot be found.
+     * @param name class name.
+     * @return privileged action to obtain desired Class.
+     *         The action could return {@code null} if the class cannot be found.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedAction)
      */
-    public static Class classForName(String name) {
-        return classForName(name, getContextClassLoader());
+    public static PrivilegedAction<Class<?>> classForNamePA(final String name) {
+        return classForNamePA(name, getContextClassLoader());
     }
 
     /**
-     * Get the Class from the class name.
+     * Get privileged action to obtain Class from given class name.
+     * If run using security manager, the returned privileged action
+     * must be invoked within a doPrivileged block.
      *
-     * @param name the class name.
-     * @param cl the class loader to use, if null then the defining class loader
-     * of this class will be utilized.
-     * @return the Class, otherwise null if the class cannot be found.
+     * @param name class name.
+     * @param cl class loader to use, if null then the defining class loader
+     *        of this class will be utilized.
+     * @return privileged action to obtain desired Class.
+     *         The action could return {@code null} if the class cannot be found.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedAction)
      */
-    public static Class classForName(String name, ClassLoader cl) {
-        if (cl != null) {
-            try {
-                return Class.forName(name, false, cl);
-            } catch (ClassNotFoundException ex) {
+    public static PrivilegedAction<Class<?>> classForNamePA(final String name, final ClassLoader cl) {
+        return new PrivilegedAction<Class<?>>() {
+            @Override
+            public Class<?> run() {
+                if (cl != null) {
+                    try {
+                        return Class.forName(name, false, cl);
+                    } catch (ClassNotFoundException ex) {
+                        if (LOGGER.isLoggable(Level.FINE)) {
+                            LOGGER.log(Level.FINE,
+                                    "Unable to load class " + name + " using the supplied class loader "
+                                    + cl.getClass().getName() + ".", ex);
+                        }
+                    }
+                }
+                try {
+                    return Class.forName(name);
+                } catch (ClassNotFoundException ex) {
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.log(Level.FINE, "Unable to load class " + name + " using the current class loader.", ex);
+                    }
+                }
+
+                return null;
             }
-        }
-        try {
-            return Class.forName(name);
-        } catch (ClassNotFoundException ex) {
-        }
-
-        return null;
+        };
     }
 
     /**
-     * Get the Class from the class name.
-     * <p>
-     * The context class loader will be utilized if accessible and non-null.
-     * Otherwise the defining class loader of this class will
-     * be utilized.
+     * Get privileged exception action to obtain Class from given class name.
+     * If run using security manager, the returned privileged exception action
+     * must be invoked within a doPrivileged block.
+     * <p/>
+     * The actual context class loader will be utilized if accessible and non-null.
+     * Otherwise the defining class loader of the calling class will be utilized.
      *
-     * @param name the class name.
-     * @return the Class, otherwise null if the class cannot be found.
-     * @throws ClassNotFoundException if the class cannot be found.
+     * @param <T>  class type.
+     * @param name class name.
+     * @return privileged exception action to obtain the Class.
+     *         The action could throw {@link ClassNotFoundException} or return {@code null} if the class cannot be found.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedExceptionAction)
      */
-    public static Class classForNameWithException(String name)
-            throws ClassNotFoundException {
-        return classForNameWithException(name, getContextClassLoader());
+    public static <T> PrivilegedExceptionAction<Class<T>> classForNameWithExceptionPEA(final String name) throws ClassNotFoundException {
+        return classForNameWithExceptionPEA(name, getContextClassLoader());
     }
 
     /**
-     * Get the Class from the class name.
+     * Get privileged exception action to obtain Class from given class name.
+     * If run using security manager, the returned privileged exception action
+     * must be invoked within a doPrivileged block.
      *
-     * @param name the class name.
-     * @param cl the class loader to use, if null then the defining class loader
-     * of this class will be utilized.
-     * @return the Class, otherwise null if the class cannot be found.
-     * @throws ClassNotFoundException if the class cannot be found.
+     * @param <T>  class type.
+     * @param name class name.
+     * @param cl   class loader to use, if {@code null} then the defining class loader
+     *             of the calling class will be utilized.
+     * @return privileged exception action to obtain the Class.
+     *         The action throws {@link ClassNotFoundException}
+     *         or returns {@code null} if the class cannot be found.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedExceptionAction)
      */
-    public static Class classForNameWithException(String name, ClassLoader cl)
-            throws ClassNotFoundException {
-        if (cl != null) {
-            try {
-                return Class.forName(name, false, cl);
-            } catch (ClassNotFoundException ex) {
+    @SuppressWarnings("unchecked")
+    public static <T> PrivilegedExceptionAction<Class<T>> classForNameWithExceptionPEA(final String name, final ClassLoader cl) throws ClassNotFoundException {
+            return new PrivilegedExceptionAction<Class<T>>() {
+                @Override
+                public Class<T> run() throws ClassNotFoundException {
+                    if (cl != null) {
+                        try {
+                            return (Class<T>) Class.forName(name, false, cl);
+                        } catch (ClassNotFoundException ex) {
+                            // ignored on purpose
+                        }
+                    }
+                    return (Class<T>) Class.forName(name);
+                }
+            };
+    }
+
+    /**
+     * Get privileged action to obtain context class loader.
+     * If run using security manager, the returned privileged action
+     * must be invoked within a doPrivileged block.
+     *
+     * @return privileged action to obtain the actual context class loader.
+     *         The action could return {@code null} if context class loader has not been set.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedAction)
+     */
+    public static PrivilegedAction<ClassLoader> getContextClassLoaderPA() {
+        return new PrivilegedAction<ClassLoader>() {
+            @Override
+            public ClassLoader run() {
+                return Thread.currentThread().getContextClassLoader();
             }
-        }
-        return Class.forName(name);
+        };
     }
 
     /**
      * Get the context class loader.
      *
-     * @return the context class loader, otherwise null security privilages
-     *         are not set.
+     * @return the context class loader, otherwise {@code null} if not set.
      */
-    public static ClassLoader getContextClassLoader() {
-        return AccessController.doPrivileged(
-                new PrivilegedAction<ClassLoader>() {
-                    public ClassLoader run() {
-                        ClassLoader cl = null;
-                        try {
-                            cl = Thread.currentThread().getContextClassLoader();
-                        } catch (SecurityException ex) {
-                        }
-                        return cl;
-                    }
-                });
+    private static ClassLoader getContextClassLoader() {
+        return AccessController.doPrivileged(getContextClassLoaderPA());
     }
 
     /**
-     * Set a method to be accessible.
+     * Get privileged action to set a method to be accessible.
+     * If run using security manager, the returned privileged action
+     * must be invoked within a doPrivileged block.
      *
-     * @param m the method to be set as accessible
+     * @param m method to be set as accessible.
+     * @return privileged action to set the method to be accessible.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedAction)
      */
-    public static void setAccessibleMethod(final Method m) {
-        if (Modifier.isPublic(m.getModifiers()))
-            return;
+    public static PrivilegedAction setAccessibleMethodPA(final Method m) {
+        if (Modifier.isPublic(m.getModifiers())) {
+            return NoOpPrivilegedACTION;
+        }
 
-        AccessController.doPrivileged(new PrivilegedAction<Object>() {
+        return new PrivilegedAction<Object>() {
+
+            @Override
             public Object run() {
                 if (!m.isAccessible()) {
                     m.setAccessible(true);
                 }
                 return m;
             }
-        });
+        };
     }
 
     /**
@@ -381,56 +446,87 @@ public class ReflectionHelper {
     }
 
     /**
-     * Get the static valueOf(String ) method.
+     * Get privileged action to obtain the static valueOf(String ) method.
+     * If run using security manager, the returned privileged action
+     * must be invoked within a doPrivileged block.
      *
      * @param c The class to obtain the method.
-     * @return the method, otherwise null if the method is not present.
+     * @return privileged action to get the method.
+     *         The action could return {@code null} if the method is not present.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedAction)
      */
     @SuppressWarnings("unchecked")
-    public static Method getValueOfStringMethod(Class c) {
-        try {
-            Method m = c.getDeclaredMethod("valueOf", String.class);
-            if (!Modifier.isStatic(m.getModifiers()) && m.getReturnType() == c) {
-                return null;
+    public static PrivilegedAction<Method> getValueOfStringMethodPA(final Class<?> c) {
+        return new PrivilegedAction<Method>() {
+            @Override
+            public Method run() {
+                try {
+                    final Method m = c.getDeclaredMethod("valueOf", String.class);
+                    if (!Modifier.isStatic(m.getModifiers()) && m.getReturnType() == c) {
+                        return null;
+                    }
+                    return m;
+                } catch (NoSuchMethodException nsme) {
+                    return null;
+                }
             }
-            return m;
-        } catch (Exception e) {
-            return null;
-        }
+        };
     }
 
     /**
-     * Get the static fromString(String ) method.
+     * Get privileged action to get the static fromString(String ) method.
+     * If run using security manager, the returned privileged action
+     * must be invoked within a doPrivileged block.
      *
-     * @param c The class to obtain the method.
-     * @return the method, otherwise null if the method is not present.
+     * @param c class for which to get the method.
+     * @return privileged action to obtain the method.
+     *         The action could return {@code null} if the method is not present.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedAction)
      */
     @SuppressWarnings("unchecked")
-    public static Method getFromStringStringMethod(Class c) {
-        try {
-            Method m = c.getDeclaredMethod("fromString", String.class);
-            if (!Modifier.isStatic(m.getModifiers()) && m.getReturnType() == c) {
-                return null;
+    public static PrivilegedAction<Method> getFromStringStringMethodPA(final Class<?> c) {
+        return new PrivilegedAction<Method>() {
+            @Override
+            public Method run() {
+                try {
+                    final Method m = c.getDeclaredMethod("fromString", String.class);
+                    if (!Modifier.isStatic(m.getModifiers()) && m.getReturnType() == c) {
+                        return null;
+                    }
+                    return m;
+                } catch (NoSuchMethodException nsme) {
+                    return null;
+                }
             }
-            return m;
-        } catch (Exception e) {
-            return null;
-        }
+        };
     }
 
     /**
-     * Get the constructor that has a single parameter of String.
+     * Get privileged action to obtain constructor that has a single parameter of String.
+     * If run using security manager, the returned privileged action
+     * must be invoked within a doPrivileged block.
      *
-     * @param c The class to obtain the constructor.
-     * @return the constructor, otherwise null if the constructor is not present.
+     * @param c The class for which to obtain the constructor.
+     * @return privileged action to obtain the constructor.
+     *         The action could return {@code null} if the constructor is not present.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedAction)
      */
-    @SuppressWarnings("unchecked")
-    public static Constructor getStringConstructor(Class c) {
-        try {
-            return c.getConstructor(String.class);
-        } catch (Exception e) {
-            return null;
-        }
+    public static PrivilegedAction<Constructor> getStringConstructorPA(final Class<?> c) {
+        return new PrivilegedAction<Constructor>() {
+            @Override
+            public Constructor run() {
+                try {
+                    return c.getConstructor(String.class);
+                } catch (SecurityException e) {
+                    throw e;
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        };
     }
 
 
@@ -690,38 +786,47 @@ public class ReflectionHelper {
     }
 
     /**
-     * Find a method on a class given an existing method.
-     * <p>
+     * Get privileged action to find a method on a class given an existing method.
+     * If run using security manager, the returned privileged action
+     * must be invoked within a doPrivileged block.
+     * <p/>
      * If there exists a public method on the class that has the same name
      * and parameters as the existing method then that public method is
-     * returned.
-     * <p>
+     * returned from the action.
+     * <p/>
      * Otherwise, if there exists a public method on the class that has
      * the same name and the same number of parameters as the existing method,
      * and each generic parameter type, in order, of the public method is equal
      * to the generic parameter type, in the same order, of the existing method
      * or is an instance of {@link TypeVariable} then that public method is
-     * returned.
+     * returned from the action.
      *
      * @param c the class to search for a public method
      * @param m the method to find
-     * @return the found public method.
+     * @return privileged action to return public method found.
+     *
+     * @see AccessController#doPrivileged(java.security.PrivilegedAction)
      */
-    public static Method findMethodOnClass(Class c, Method m) {
-        try {
-            return c.getMethod(m.getName(), m.getParameterTypes());
-        } catch (NoSuchMethodException ex) {
-            for (Method _m : c.getMethods()) {
-                if (_m.getName().equals(m.getName()) &&
-                        _m.getParameterTypes().length == m.getParameterTypes().length) {
-                    if (compareParameterTypes(m.getGenericParameterTypes(),
-                            _m.getGenericParameterTypes())) {
-                        return _m;
+    public static PrivilegedAction<Method> findMethodOnClassPA(final Class<?> c, final Method m) {
+            return new PrivilegedAction<Method>() {
+                @Override
+                public Method run() {
+                    try {
+                        return c.getMethod(m.getName(), m.getParameterTypes());
+                    } catch (NoSuchMethodException nsme) {
+                            for (final Method _m : c.getMethods()) {
+                                if (_m.getName().equals(m.getName())
+                                        && _m.getParameterTypes().length == m.getParameterTypes().length) {
+                                    if (compareParameterTypes(m.getGenericParameterTypes(),
+                                            _m.getGenericParameterTypes())) {
+                                        return _m;
+                                    }
+                            }
+                        }
+                        return null;
                     }
                 }
-            }
-        }
-        return null;
+            };
     }
 
     /**

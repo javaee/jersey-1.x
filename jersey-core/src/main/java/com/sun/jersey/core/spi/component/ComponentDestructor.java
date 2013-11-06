@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,10 +44,10 @@ import com.sun.jersey.core.reflection.MethodList;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.AccessController;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A destructor of a component.
@@ -67,7 +67,7 @@ public class ComponentDestructor {
     }
 
     private static List<Method> getPreDestroyMethods(Class c) {
-        Class preDestroyClass = ReflectionHelper.classForName("javax.annotation.PreDestroy");
+        Class preDestroyClass = AccessController.doPrivileged(ReflectionHelper.classForNamePA("javax.annotation.PreDestroy"));
         List<Method> list = new ArrayList<Method>();
         HashSet<String> names = new HashSet<String>();
         if (preDestroyClass != null) {
@@ -79,7 +79,7 @@ public class ComponentDestructor {
                 Method method = m.getMethod();
                 // only add method if not hidden/overridden
                 if (names.add(method.getName())) {
-                    ReflectionHelper.setAccessibleMethod(method);
+                    AccessController.doPrivileged(ReflectionHelper.setAccessibleMethodPA(method));
                     list.add(method);
                 }
             }

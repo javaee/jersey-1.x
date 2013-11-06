@@ -107,6 +107,8 @@ import com.sun.jersey.spi.container.ReloadListener;
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
 
 /**
  * An abstract Web component that may be extended a Servlet and/or
@@ -702,8 +704,8 @@ public class WebComponent implements ContainerListener {
         }
 
         try {
-            Class<?> resourceConfigClass = ReflectionHelper.
-                    classForNameWithException(resourceConfigClassName);
+            Class<?> resourceConfigClass = AccessController.doPrivileged(ReflectionHelper.
+                    classForNameWithExceptionPEA(resourceConfigClassName));
 
             // TODO add support for WebAppResourceConfig
             if (resourceConfigClass == ClasspathResourceConfig.class) {
@@ -738,6 +740,10 @@ public class WebComponent implements ContainerListener {
             String message = "Resource configuration class, " + resourceConfigClassName +
                     ", could not be loaded";
             throw new ServletException(message, e);
+        } catch (PrivilegedActionException e) {
+            String message = "Resource configuration class, " + resourceConfigClassName +
+                    ", could not be loaded";
+            throw new ServletException(message, e.getCause());
         }
     }
 

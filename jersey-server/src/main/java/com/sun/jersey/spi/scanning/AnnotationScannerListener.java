@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -49,6 +49,8 @@ import java.util.Set;
 import com.sun.jersey.core.osgi.OsgiRegistry;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.scanning.ScannerListener;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
@@ -89,7 +91,7 @@ public class AnnotationScannerListener implements ScannerListener {
      *        files.
      */
     public AnnotationScannerListener(Class<? extends Annotation>... annotations) {
-        this(ReflectionHelper.getContextClassLoader(), annotations);
+        this(AccessController.doPrivileged(ReflectionHelper.getContextClassLoaderPA()), annotations);
     }
 
     /**
@@ -219,9 +221,14 @@ public class AnnotationScannerListener implements ScannerListener {
                 if (osgiRegistry != null) {
                     return osgiRegistry.classForNameWithException(className);
                 } else {
-                    return ReflectionHelper.classForNameWithException(className, classloader);
+                    return AccessController.doPrivileged(ReflectionHelper.classForNameWithExceptionPEA(className, classloader));
                 }
             } catch (ClassNotFoundException ex) {
+                String s = "A class file of the class name, " +
+                        className +
+                        "is identified but the class could not be found";
+                throw new RuntimeException(s, ex);
+            } catch (PrivilegedActionException ex) {
                 String s = "A class file of the class name, " +
                         className +
                         "is identified but the class could not be found";

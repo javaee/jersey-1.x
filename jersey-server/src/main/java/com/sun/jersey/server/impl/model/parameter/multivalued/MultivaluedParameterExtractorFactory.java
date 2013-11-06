@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -49,6 +49,7 @@ import com.sun.jersey.spi.StringReaderWorkers;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.security.AccessController;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -127,7 +128,7 @@ public final class MultivaluedParameterExtractorFactory implements MultivaluedPa
             }
 
             // Check for static valueOf(String )
-            Method valueOf = ReflectionHelper.getValueOfStringMethod(parameter);
+            Method valueOf = AccessController.doPrivileged(ReflectionHelper.getValueOfStringMethodPA(parameter));
             if (valueOf != null) {
                 try {
                     Object defaultDefaultValue = PrimitiveMapper.primitiveToDefaultValueMap.get(parameter);
