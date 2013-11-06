@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,10 +39,6 @@
  */
 package com.sun.jersey.multipart.impl;
 
-import com.sun.jersey.multipart.Boundary;
-import com.sun.jersey.multipart.BodyPart;
-import com.sun.jersey.multipart.BodyPartEntity;
-import com.sun.jersey.multipart.MultiPart;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,6 +49,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
+
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -62,6 +59,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
+
+import com.sun.jersey.multipart.BodyPart;
+import com.sun.jersey.multipart.BodyPartEntity;
+import com.sun.jersey.multipart.Boundary;
+import com.sun.jersey.multipart.MultiPart;
 
 /**
  * <p>{@link Provider} {@link MessageBodyWriter} implementation for

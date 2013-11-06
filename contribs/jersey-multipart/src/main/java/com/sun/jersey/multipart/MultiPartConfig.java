@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -45,38 +45,26 @@ import java.io.InputStream;
 import java.util.Properties;
 
 /**
- * <p>Injectable JavaBean containing the configuration parameters for
- * <code>jersey-multipart</code> as used in this particular application.</p>
+ * Injectable JavaBean containing the configuration parameters for {@code jersey-multipart} as used in this particular
+ * application.
  */
 public class MultiPartConfig {
 
-
-    // ------------------------------------------------------------- Constructor
-
-
     /**
-     * <p>Load and customize (if necessary) the configuration values for the
-     * <code>jersey-multipart</code> module.</p>
+     * Load and customize (if necessary) the configuration values for the <code>jersey-multipart</code> module.
      *
-     * @exception IllegalArgumentException if the configuration resource
-     *  exists, but there are problems reading it
+     * @throws IllegalArgumentException if the configuration resource exists, but there are problems reading it.
      */
     public MultiPartConfig() {
         configure();
     }
-
-
-    // ------------------------------------------------------ Manifest Constants
-
 
     /**
      * <p>Name of a properties resource that (if found in the classpath
      * for this application) will be used to configure the settings returned
      * by our getter methods.</p>
      */
-    public static final String MULTI_PART_CONFIG_RESOURCE =
-            "jersey-multipart-config.properties";
-
+    public static final String MULTI_PART_CONFIG_RESOURCE = "jersey-multipart-config.properties";
 
     /**
      * <p>Name of the resource property for the <code>bufferThreshold</code>
@@ -84,43 +72,27 @@ public class MultiPartConfig {
      */
     public static final String BUFFER_THRESHOLD_NAME = "bufferThreshold";
 
-
-    // ------------------------------------------------------ Instance Variables
-
-
     /**
-     * <p>The threshold size (in bytes) above which a body part entity will be
-     * buffered to disk instead of being held in memory.</p>
+     * The threshold size (in bytes) above which a body part entity will be buffered to disk instead of being held in memory.
      */
     private int bufferThreshold = 4096;
 
-
-    // ---------------------------------------------------------- Public Methods
-
-
     /**
-     * <p>Return the size (in bytes) of the entity of an incoming
-     * {@link BodyPart} before it will be buffered to disk.  If not
-     * customized, the default value is 4096.</p>
+     * Return the size (in bytes) of the entity of an incoming {@link BodyPart} before it will be buffered to disk.
+     * <p/>
+     * The default value is {@code 4096}.
      */
     public int getBufferThreshold() {
         return bufferThreshold;
     }
 
-
-    // --------------------------------------------------------- Private Methods
-
-
     /**
-     * <p>Configure the values returned by this instance's getters based on
-     * the contents of a properties resource, if it exists on the classpath
-     * for this application.</p>
+     * Configure the values returned by this instance's getters based on the contents of a properties resource,
+     * if it exists on the classpath for this application.
      *
-     * @exception IllegalArgumentException if the configuration resource
-     *  exists, but there are problems reading it
+     * @throws IllegalArgumentException if the configuration resource exists, but there are problems reading it.
      */
     private void configure() {
-
         // Identify the class loader we will use
         ClassLoader loader = Thread.currentThread().getContextClassLoader();
         if (loader == null) {
@@ -136,11 +108,9 @@ public class MultiPartConfig {
             }
             Properties props = new Properties();
             props.load(stream);
-            String value = null;
-            value = props.getProperty(BUFFER_THRESHOLD_NAME);
-            if (value != null) {
-                System.out.println("Setting bufferThreshold to " + value);
-                this.bufferThreshold = Integer.valueOf(value);
+
+            if (props.containsKey(BUFFER_THRESHOLD_NAME)) {
+                this.bufferThreshold = Integer.valueOf(props.getProperty(BUFFER_THRESHOLD_NAME));
             }
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
@@ -155,6 +125,5 @@ public class MultiPartConfig {
         }
 
     }
-
 
 }

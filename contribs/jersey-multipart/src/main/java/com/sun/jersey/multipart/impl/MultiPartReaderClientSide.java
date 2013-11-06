@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,7 @@
 
 package com.sun.jersey.multipart.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -47,6 +48,8 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -59,12 +62,6 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 
-import org.jvnet.mimepull.Header;
-import org.jvnet.mimepull.MIMEConfig;
-import org.jvnet.mimepull.MIMEMessage;
-import org.jvnet.mimepull.MIMEParsingException;
-import org.jvnet.mimepull.MIMEPart;
-
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.multipart.BodyPart;
 import com.sun.jersey.multipart.BodyPartEntity;
@@ -75,6 +72,12 @@ import com.sun.jersey.multipart.MultiPartConfig;
 import com.sun.jersey.spi.inject.ClientSide;
 import com.sun.jersey.spi.inject.ConstrainedTo;
 
+import org.jvnet.mimepull.Header;
+import org.jvnet.mimepull.MIMEConfig;
+import org.jvnet.mimepull.MIMEMessage;
+import org.jvnet.mimepull.MIMEParsingException;
+import org.jvnet.mimepull.MIMEPart;
+
 /**
  * <p>{@link Provider} {@link MessageBodyReader} implementation for
  * {@link MultiPart} entities.</p>
@@ -83,16 +86,13 @@ import com.sun.jersey.spi.inject.ConstrainedTo;
 @Consumes("multipart/*")
 public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
 
+    private static final Logger LOGGER = Logger.getLogger(MultiPartReaderClientSide.class.getName());
+
     /**
      * <P>Injectable helper to look up appropriate {@link Provider}s
      * for our body parts.</p>
      */
     private final Providers providers;
-
-    /**
-     * <p>Injected configuration parameters for this application.</p>
-     */
-    private final MultiPartConfig config;
 
     private final MIMEConfig mimeConfig;
 
@@ -104,14 +104,28 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
         this.providers = providers;
 
         if (config == null) {
-            throw new IllegalArgumentException("The MultiPartConfig instance we expected is not present.  Have you registered the MultiPartConfigProvider class?");
+            throw new IllegalArgumentException("The MultiPartConfig instance we expected is not present. Have you registered the MultiPartConfigProvider class?");
         }
-        this.config = config;
-
-        mimeConfig = new MIMEConfig();
-        mimeConfig.setMemoryThreshold(config.getBufferThreshold());
+        this.mimeConfig = createMimeConfig(config);
     }
 
+    private MIMEConfig createMimeConfig(final MultiPartConfig config) {
+        final MIMEConfig mimeConfig = new MIMEConfig();
+
+        // Set values defined by user.
+        mimeConfig.setMemoryThreshold(config.getBufferThreshold());
+
+        // Validate - this checks whether it's possible to create temp files in currently set temp directory.
+        try {
+            File.createTempFile("MIME", null);
+        } catch (final IOException ioe) {
+            LOGGER.log(Level.WARNING,
+                    "Cannot create temporary files. Multipart attachments will be limited to " + config.getBufferThreshold() + " bytes.",
+                    ioe);
+        }
+
+        return mimeConfig;
+    }
 
     public boolean isReadable(Class<?> type, Type genericType,
                               Annotation[] annotations, MediaType mediaType) {
@@ -139,11 +153,14 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
                               Annotation[] annotations, MediaType mediaType,
                               MultivaluedMap<String, String> headers,
                               InputStream stream) throws IOException, WebApplicationException {
-
         try {
             return readMultiPart(type, genericType, annotations, mediaType, headers, stream);
-        } catch (MIMEParsingException ex) {
-            throw new WebApplicationException(ex, Status.BAD_REQUEST);
+        } catch (final MIMEParsingException mpe) {
+            if (mpe.getCause() instanceof IOException) {
+                throw (IOException) mpe.getCause();
+            } else {
+                throw new WebApplicationException(mpe, Status.BAD_REQUEST);
+            }
         }
     }
 
