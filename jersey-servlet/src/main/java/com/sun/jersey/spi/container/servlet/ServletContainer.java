@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,33 @@
 
 package com.sun.jersey.spi.container.servlet;
 
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.Servlet;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import com.sun.jersey.api.container.ContainerException;
 import com.sun.jersey.api.core.ClasspathResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -54,31 +81,6 @@ import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationFactory;
 import com.sun.jersey.spi.inject.SingletonTypeInjectableProvider;
 import com.sun.jersey.spi.service.ServiceFinder;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.Servlet;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 
 /**
@@ -321,7 +323,7 @@ public class ServletContainer extends HttpServlet implements Filter {
 
         @Override
         protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
-                WebConfig wc) throws ServletException  {
+                                                          WebConfig wc) throws ServletException  {
             return ServletContainer.this.getDefaultResourceConfig(props, wc);
         }
     }
@@ -411,7 +413,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @throws javax.servlet.ServletException in case there was an error while retrieving the default resource config
      */
     protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
-            WebConfig wc) throws ServletException  {
+                                                      WebConfig wc) throws ServletException  {
         return webComponent.getWebAppResourceConfig(props, wc);
     }
 
@@ -533,7 +535,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @exception ServletException if the HTTP request cannot
      *            be handled.
      */
-	public int service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
+    public int service(URI baseUri, URI requestUri, final HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         return webComponent.service(baseUri, requestUri, request, response);
     }
@@ -577,8 +579,8 @@ public class ServletContainer extends HttpServlet implements Filter {
      * @deprecated methods should implement {@link #getDefaultResourceConfig(java.util.Map, com.sun.jersey.spi.container.servlet.WebConfig) }.
      */
     @Deprecated
-	protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
-            ServletConfig servletConfig) throws ServletException  {
+    protected ResourceConfig getDefaultResourceConfig(Map<String, Object> props,
+                                                      ServletConfig servletConfig) throws ServletException  {
         return getDefaultResourceConfig(props, getWebConfig());
     }
 
@@ -644,7 +646,7 @@ public class ServletContainer extends HttpServlet implements Filter {
          * The HttpServletRequest.getRequestURL() contains the complete URI
          * minus the query and fragment components.
          */
-        UriBuilder absoluteUriBuilder = null;
+        UriBuilder absoluteUriBuilder;
         try {
             absoluteUriBuilder = UriBuilder.fromUri(requestURL.toString());
         } catch (IllegalArgumentException iae) {
@@ -672,7 +674,6 @@ public class ServletContainer extends HttpServlet implements Filter {
                     response.setHeader("Location", l.toASCIIString());
                     return;
                 } else {
-                    pathInfo = "/";
                     requestURL.append("/");
                     requestURI += "/";
                 }
@@ -689,9 +690,7 @@ public class ServletContainer extends HttpServlet implements Filter {
          * We need to work around this and not use getPathInfo
          * for the decodedPath.
          */
-        final String decodedBasePath = (pathInfo != null)
-                ? request.getContextPath() + servletPath + "/"
-                : request.getContextPath() + "/";
+        final String decodedBasePath = request.getContextPath() + servletPath + "/";
 
         final String encodedBasePath = UriComponent.encode(decodedBasePath,
                 UriComponent.Type.PATH);
@@ -772,7 +771,7 @@ public class ServletContainer extends HttpServlet implements Filter {
             } catch (PatternSyntaxException ex) {
                 throw new ContainerException(
                         "The syntax is invalid for the regular expression, " + regex +
-                        ", associated with the initialization parameter " + PROPERTY_WEB_PAGE_CONTENT_REGEX, ex);
+                                ", associated with the initialization parameter " + PROPERTY_WEB_PAGE_CONTENT_REGEX, ex);
             }
         }
 
@@ -799,7 +798,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      *
      * @param request the {@link HttpServletRequest} object that
      *        contains the request the client made to
-     *	      the servlet.
+     *        the servlet.
      * @param response the {@link HttpServletResponse} object that
      *        contains the response the servlet returns
      *        to the client.
@@ -827,7 +826,7 @@ public class ServletContainer extends HttpServlet implements Filter {
      *
      * @param request the {@link HttpServletRequest} object that
      *        contains the request the client made to
-     *	      the servlet.
+     *        the servlet.
      * @param response the {@link HttpServletResponse} object that
      *        contains the response the servlet returns
      *        to the client.
@@ -862,7 +861,7 @@ public class ServletContainer extends HttpServlet implements Filter {
     }
 
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-            String requestURI, String servletPath, String queryString) throws IOException, ServletException {
+                          String requestURI, String servletPath, String queryString) throws IOException, ServletException {
         // if we match the static content regular expression lets delegate to
         // the filter chain to use the default container servlets & handlers
         final Pattern p = getStaticContentPattern();
@@ -896,12 +895,12 @@ public class ServletContainer extends HttpServlet implements Filter {
 
         final URI baseUri = (filterContextPath == null)
                 ? absoluteUriBuilder.replacePath(request.getContextPath()).
-                        path("/").
-                        build()
+                path("/").
+                build()
                 : absoluteUriBuilder.replacePath(request.getContextPath()).
-                        path(filterContextPath).
-                        path("/").
-                        build();
+                path(filterContextPath).
+                path("/").
+                build();
 
         final URI requestUri = absoluteUriBuilder.replacePath(requestURI).
                 replaceQuery(queryString).
