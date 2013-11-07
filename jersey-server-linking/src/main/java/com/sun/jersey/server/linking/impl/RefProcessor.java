@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,28 +40,34 @@
 
 package com.sun.jersey.server.linking.impl;
 
-import com.sun.jersey.server.linking.el.LinkBuilder;
 import java.net.URI;
 import java.util.Collection;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.HashSet;
 import java.util.Set;
+
 import javax.ws.rs.core.UriInfo;
 
+import com.sun.jersey.impl.ImplMessages;
+import com.sun.jersey.server.linking.el.LinkBuilder;
+
 /**
- * Utility class that can inject links into {@link Link} annotated fields in
+ * Utility class that can inject links into {@link com.sun.jersey.server.linking.Link} annotated fields in
  * an entity.
  * @author mh124079
  */
 public class RefProcessor<T> {
 
     private EntityDescriptor instanceDescriptor;
+    private static final Logger log = Logger.getLogger(RefProcessor.class.getName());
 
     public RefProcessor(Class<T> c) {
         instanceDescriptor = EntityDescriptor.getInstance(c);
     }
 
     /**
-     * Inject any {@link Link} annotated fields in the supplied entity and
+     * Inject any {@link com.sun.jersey.server.linking.Link} annotated fields in the supplied entity and
      * recursively process its fields.
      * @param entity the entity object returned by the resource method
      * @param uriInfo the uriInfo for the request
@@ -73,21 +79,27 @@ public class RefProcessor<T> {
     }
 
     /**
-     * Inject any {@link Link} annotated fields in the supplied instance. Called
+     * Inject any {@link com.sun.jersey.server.linking.Link} annotated fields in the supplied instance. Called
      * once for the entity and then recursively for each member and field.
      * @param entity
      * @param processed a list of already processed objects, used to break
      * recursion when processing circular references.
      * @param uriInfo
      */
-    private void processLinks(Object entity, Object resource, Object instance, 
-            Set<Object> processed, UriInfo uriInfo) {
-        if (instance==null || processed.contains(instance))
-            return; // ignore null properties and defeat circular references
-        processed.add(instance);
+    private void processLinks(Object entity, Object resource, Object instance,
+                              Set<Object> processed, UriInfo uriInfo) {
+
+        try {
+            if (instance == null || processed.contains(instance))
+                return; // ignore null properties and defeat circular references
+            processed.add(instance);
+        } catch (RuntimeException e) {
+            // fix for JERSEY-1656
+            log.log(Level.INFO, ImplMessages.WARNING_LINKFILTER_PROCESSING(instance.getClass().getName()), e);
+        }
 
         // Process any @Link annotated fields in entity
-        for (RefFieldDescriptor linkField: instanceDescriptor.getLinkFields()) {
+        for (RefFieldDescriptor linkField : instanceDescriptor.getLinkFields()) {
             if (LinkBuilder.evaluateCondition(linkField.getCondition(), entity, resource, instance)) {
                 URI uri = LinkBuilder.buildURI(linkField, entity, resource, instance, uriInfo);
                 linkField.setPropertyValue(instance, uri);
@@ -97,21 +109,22 @@ public class RefProcessor<T> {
         // If entity is an array or collection then process members
         Class<?> instanceClass = instance.getClass();
         if (instanceClass.isArray() && Object[].class.isAssignableFrom(instanceClass)) {
-            Object array[] = (Object[])instance;
-            for (Object member: array) {
+            Object array[] = (Object[]) instance;
+            for (Object member : array) {
                 processMember(entity, resource, member, processed, uriInfo);
             }
         } else if (instance instanceof Collection) {
-            Collection collection = (Collection)instance;
-            for (Object member: collection) {
+            Collection collection = (Collection) instance;
+            for (Object member : collection) {
                 processMember(entity, resource, member, processed, uriInfo);
             }
         }
 
         // Recursively process all member fields
-        for (FieldDescriptor member: instanceDescriptor.getNonLinkFields()) {
+        for (FieldDescriptor member : instanceDescriptor.getNonLinkFields()) {
             processMember(entity, resource, member.getFieldValue(instance), processed, uriInfo);
         }
+
     }
 
     private void processMember(Object entity, Object resource, Object member, Set<Object> processed, UriInfo uriInfo) {

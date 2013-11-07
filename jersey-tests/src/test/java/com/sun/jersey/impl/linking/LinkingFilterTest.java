@@ -39,20 +39,32 @@
  */
 package com.sun.jersey.impl.linking;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.WebApplicationException;
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.ParsePosition;
+
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+
+import org.junit.Test;
 
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.container.filter.LoggingFilter;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.server.linking.LinkFilter;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 
-import org.junit.Test;
 
 /**
  * E2E tests for linking module.
@@ -71,6 +83,36 @@ public class LinkingFilterTest extends AbstractResourceTester {
         @GET
         public String get() {
             return "KO";
+        }
+    }
+
+    public static abstract class A {
+        public abstract String getText();
+    }
+
+    @Path("/failing")
+    public static final class FailingResource {
+        private DateFormat format1 = new DateFormat() {
+            @Override
+            public StringBuffer format(final Date date, final StringBuffer stringBuffer, final FieldPosition fieldPosition) {
+                return null;
+            }
+
+            @Override
+            public Date parse(final String s, final ParsePosition parsePosition) {
+                return null;
+            }
+        };
+
+        @GET
+        @Produces(MediaType.APPLICATION_JSON)
+        public A getA() {
+            return new A() {
+                @Override
+                public String getText() {
+                    return "A";
+                }
+            };
         }
     }
 
@@ -101,5 +143,26 @@ public class LinkingFilterTest extends AbstractResourceTester {
 
         assertEquals(200, response.getStatus());
         assertEquals("OK", response.getEntity(String.class));
+    }
+
+    /**
+     * JERSEY-1656 reproducer; NPE is thrown when classes used in response have invalid hashCode()
+     */
+    @Test
+    public void testLinkFilterWithFailingHashCode() {
+        final ClassNamesResourceConfig resourceConfig = new ClassNamesResourceConfig(FailingResource.class);
+
+        resourceConfig.getContainerResponseFilters().add(LoggingFilter.class);
+        resourceConfig.getContainerResponseFilters().add(LinkFilter.class);
+        resourceConfig.getFeatures().put("com.sun.jersey.api.json.POJOMappingFeature", true);
+
+        initiateWebApplication(resourceConfig);
+
+        ClientConfig clientConfig = new DefaultClientConfig();
+        clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
+
+        final ClientResponse response = resource("/failing", clientConfig).get(ClientResponse.class);
+
+        assertEquals(200, response.getStatus());
     }
 }
