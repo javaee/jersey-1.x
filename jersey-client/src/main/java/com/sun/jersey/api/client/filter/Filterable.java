@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,24 +42,22 @@ package com.sun.jersey.api.client.filter;
 
 import com.sun.jersey.api.client.ClientHandler;
 
-
 /**
- * An abstract class providing support for registering and managing a chain
- * of {@link ClientFilter} instances.
- * <p>
- * A {@link ClientFilter} instance MUST be occur at most once in any
- * {@link Filterable} instance, otherwise unexpected results may occur.
- * If it is necessary to add the same type of {@link ClientFilter} more than once
- * to the same {@link Filterable} instance or to more than one {@link Filterable}
- * instance then a new instance of that {@link ClientFilter} MUST be added.
- * 
- * @author Paul.Sandoz@Sun.Com
+ * An abstract class providing support for registering and managing a chain of {@link ClientFilter} instances.
+ * <p/>
+ * A {@link ClientFilter} instance MUST be occur at most once in any {@link Filterable} instance,
+ * otherwise unexpected results may occur. If it is necessary to add the same type of {@link ClientFilter} more than once to
+ * the same {@link Filterable} instance or to more than one {@link Filterable} instance then a new instance of that {@link
+ * ClientFilter} MUST be added.
+ *
+ * @author Paul Sandoz
  */
 public abstract class Filterable {
+
     private final ClientHandler root;
-    
+
     private ClientHandler head;
-   
+
     /**
      * Construct with a root client handler.
      *
@@ -68,20 +66,20 @@ public abstract class Filterable {
     protected Filterable(ClientHandler root) {
         this.root = this.head = root;
     }
-    
+
     /**
      * Construct from an existing filterable instance.
-     * 
+     *
      * @param that the filter to copy.
      */
     protected Filterable(Filterable that) {
         this.root = that.root;
         this.head = that.head;
     }
-    
+
     /**
      * Add a filter to the filter chain.
-     * 
+     *
      * @param f the filter to add.
      */
     public void addFilter(ClientFilter f) {
@@ -91,7 +89,7 @@ public abstract class Filterable {
 
     /**
      * Remove a filter from the chain.
-     * 
+     *
      * @param f the filter to remove.
      */
     public void removeFilter(ClientFilter f) {
@@ -106,36 +104,52 @@ public abstract class Filterable {
             return;
         }
 
-        ClientFilter e = (ClientFilter)head;
+        ClientFilter e = (ClientFilter) head;
         while (e.getNext() != f) {
-            if (e.getNext() == root) return;
-            
-            e = (ClientFilter)e.getNext();
+            if (e.getNext() == root) {
+                return;
+            }
+
+            e = (ClientFilter) e.getNext();
         }
-        
+
         e.setNext(f.getNext());
     }
 
     /**
      * Check if a filter is present in the chain.
      *
-     * @param f the filter to remove.
-     * @return return true if the filter is present, otherwise false.
+     * @param filter the filter to remove.
+     * @return return {@code true} if the filter is present, otherwise {@code false}.
+     * @deprecated use {@link #isFilterPresent(ClientFilter)} instead.
      */
-    public boolean isFilterPreset(ClientFilter f) {
+    @Deprecated
+    public boolean isFilterPreset(final ClientFilter filter) {
+        return isFilterPresent(filter);
+    }
+
+    /**
+     * Check if a filter is present in the chain.
+     *
+     * @param filter the filter to remove.
+     * @return return {@code true} if the filter is present, otherwise {@code false}.
+     */
+    public boolean isFilterPresent(final ClientFilter filter) {
         if (head == root) {
             return false;
         }
 
-        if (head == f) {
+        if (head == filter) {
             return true;
         }
 
-        ClientFilter e = (ClientFilter)head;
-        while (e.getNext() != f) {
-            if (e.getNext() == root) return false;
+        ClientFilter e = (ClientFilter) head;
+        while (e.getNext() != filter) {
+            if (e.getNext() == root) {
+                return false;
+            }
 
-            e = (ClientFilter)e.getNext();
+            e = (ClientFilter) e.getNext();
         }
 
         return true;
@@ -147,10 +161,10 @@ public abstract class Filterable {
     public void removeAllFilters() {
         this.head = root;
     }
-    
+
     /**
      * Get the head client handler of the filter chain.
-     * 
+     *
      * @return the head client handler of the filter chain.
      */
     public ClientHandler getHeadHandler() {
