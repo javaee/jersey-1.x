@@ -156,8 +156,6 @@ public class WebComponent implements ContainerListener {
 
     private ResourceConfig resourceConfig;
 
-    private boolean useSetStatusOn404 = false;
-
     private WebApplication application;
 
     public WebComponent() {
@@ -204,11 +202,6 @@ public class WebComponent implements ContainerListener {
         if (resourceConfig == null)
             resourceConfig = createResourceConfig(config);
 
-        if (config.getConfigType() == WebConfig.ConfigType.FilterConfig &&
-                resourceConfig.getFeature(ServletContainer.FEATURE_FILTER_FORWARD_ON_404)) {
-            useSetStatusOn404 = true;
-        }
-
         load();
 
         Object o = resourceConfig.getProperties().get(
@@ -240,8 +233,6 @@ public class WebComponent implements ContainerListener {
     private final static class Writer extends OutputStream implements ContainerResponseWriter {
         final HttpServletResponse response;
 
-        final boolean useSetStatusOn404;
-
         ContainerResponse cResponse;
 
         long contentLength;
@@ -250,8 +241,7 @@ public class WebComponent implements ContainerListener {
 
         boolean statusAndHeadersWritten = false;
 
-        Writer(boolean useSetStatusOn404, HttpServletResponse response) {
-            this.useSetStatusOn404 = useSetStatusOn404;
+        Writer(HttpServletResponse response) {
             this.response = response;
         }
 
@@ -273,19 +263,18 @@ public class WebComponent implements ContainerListener {
             // after the invocation of sendError.
             writeHeaders();
 
-            if (cResponse.getStatus() >= 400) {
-                if (useSetStatusOn404 && cResponse.getStatus() == 404) {
-                    response.setStatus(cResponse.getStatus());
-                } else {
-                    final String reason = cResponse.getStatusType().getReasonPhrase();
-                    if (reason == null || reason.isEmpty()) {
-                        response.sendError(cResponse.getStatus());
-                    } else {
-                        response.sendError(cResponse.getStatus(), reason);
-                    }
-                }
+
+            writeStatus();
+        }
+
+        private void writeStatus() {
+            Response.StatusType statusType = cResponse.getStatusType();
+            final String reasonPhrase = statusType.getReasonPhrase();
+
+            if (reasonPhrase != null) {
+                response.setStatus(statusType.getStatusCode(), reasonPhrase);
             } else {
-                response.setStatus(cResponse.getStatus());
+                response.setStatus(statusType.getStatusCode());
             }
         }
 
@@ -335,7 +324,7 @@ public class WebComponent implements ContainerListener {
                 return;
 
             writeHeaders();
-            response.setStatus(cResponse.getStatus());
+            writeStatus();
             statusAndHeadersWritten = true;
         }
 
@@ -414,7 +403,7 @@ public class WebComponent implements ContainerListener {
             requestInvoker.set(request);
             responseInvoker.set(response);
 
-            final Writer w = new Writer(useSetStatusOn404, response);
+            final Writer w = new Writer(response);
             _application.handleRequest(cRequest, w);
             return w.cResponse.getStatus();
         } catch (WebApplicationException ex) {

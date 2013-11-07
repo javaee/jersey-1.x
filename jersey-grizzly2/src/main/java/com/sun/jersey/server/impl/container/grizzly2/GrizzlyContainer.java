@@ -97,7 +97,13 @@ public final class GrizzlyContainer extends HttpHandler implements
         @Override
         public OutputStream writeStatusAndHeaders(final long contentLength,
                 final ContainerResponse cResponse) throws IOException {
-            response.setStatus(cResponse.getStatus());
+
+            final javax.ws.rs.core.Response.StatusType statusInfo = cResponse.getStatusType();
+            if (statusInfo.getReasonPhrase() == null) {
+                response.setStatus(statusInfo.getStatusCode());
+            } else {
+                response.setStatus(statusInfo.getStatusCode(), statusInfo.getReasonPhrase());
+            }
 
             if (contentLength != -1 && contentLength < Integer.MAX_VALUE) {
                 response.setContentLength((int) contentLength);
