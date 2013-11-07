@@ -196,11 +196,13 @@ public final class OsgiRegistry implements SynchronousBundleListener {
 
         private final String spi;
         private final URL spiRegistryUrl;
+        private final String spiRegistryUrlString;
         private final Bundle bundle;
 
         BundleSpiProvidersLoader(final String spi, final URL spiRegistryUrl, final Bundle bundle) {
             this.spi = spi;
             this.spiRegistryUrl = spiRegistryUrl;
+            this.spiRegistryUrlString = spiRegistryUrl.toExternalForm();
             this.bundle = bundle;
         }
 
@@ -246,18 +248,18 @@ public final class OsgiRegistry implements SynchronousBundleListener {
 
         @Override
         public String toString() {
-            return spiRegistryUrl.toString();
+            return spiRegistryUrlString;
         }
 
         @Override
         public int hashCode() {
-            return spiRegistryUrl.hashCode();
+            return spiRegistryUrlString.hashCode();
         }
 
         @Override
         public boolean equals(Object obj) {
             if (obj instanceof BundleSpiProvidersLoader) {
-                return spiRegistryUrl.equals(((BundleSpiProvidersLoader) obj).spiRegistryUrl);
+                return spiRegistryUrlString.equals(((BundleSpiProvidersLoader) obj).spiRegistryUrlString);
             } else {
                 return false;
             }
