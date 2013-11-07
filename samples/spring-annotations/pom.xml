@@ -84,79 +84,40 @@
                     <name>cobertura</name>
                 </property>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-servlet</artifactId>
-                    <version>${project.version}</version>
-                    <classifier>cobertura</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.contribs</groupId>
-                    <artifactId>jersey-spring</artifactId>
-                    <version>${project.version}</version>
-                    <classifier>cobertura</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-grizzly2</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                    <classifier>cobertura</classifier>
-                </dependency>
-                <!-- for external testing -->
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-external</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                    <classifier>cobertura</classifier>
-                </dependency>
-            </dependencies>
+            <properties>
+              <cobertura.classifier>cobertura</cobertura.classifier>
+            </properties>
         </profile>
         <profile>
-            <id>default</id>
+            <id>aspectjrt-jdk6</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <jdk>1.6</jdk>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-servlet</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.contribs</groupId>
-                    <artifactId>jersey-spring</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-grizzly2</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <!-- for external testing -->
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-external</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
+            <properties>
+               <aspectjrt.version>1.5.4</aspectjrt.version>
+            </properties>
+       </profile>
+         <profile>
+            <id>aspectjrt-jdk7</id>
+            <activation>
+                <jdk>1.7</jdk>
+            </activation>
+            <properties>
+               <aspectjrt.version>1.7.0</aspectjrt.version>
+            </properties>
+       </profile>
+   </profiles>
     <dependencies>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.5.4</version>
+            <version>${aspectjrt.version}</version>
             <scope>compile</scope>
-        </dependency>
-        <dependency>
+         </dependency>
+         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.5.4</version>
+            <version>${aspectjrt.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -165,7 +126,34 @@
             <version>2.2</version>
             <scope>runtime</scope>
        </dependency>
-    </dependencies>
+       <dependency>
+           <groupId>com.sun.jersey</groupId>
+           <artifactId>jersey-servlet</artifactId>
+           <version>${project.version}</version>
+           <classifier>${cobertura.classifier}</classifier>
+       </dependency>
+       <dependency>
+           <groupId>com.sun.jersey.contribs</groupId>
+           <artifactId>jersey-spring</artifactId>
+           <version>${project.version}</version>
+           <classifier>${cobertura.classifier}</classifier>
+       </dependency>
+       <dependency>
+           <groupId>com.sun.jersey.jersey-test-framework</groupId>
+           <artifactId>jersey-test-framework-grizzly2</artifactId>
+           <version>${project.version}</version>
+           <scope>test</scope>
+           <classifier>${cobertura.classifier}</classifier>
+       </dependency>
+       <!-- for external testing -->
+       <dependency>
+           <groupId>com.sun.jersey.jersey-test-framework</groupId>
+           <artifactId>jersey-test-framework-external</artifactId>
+           <version>${project.version}</version>
+           <scope>test</scope>
+           <classifier>${cobertura.classifier}</classifier>
+       </dependency>
+     </dependencies>
     <build>
         <finalName>spring-annotations</finalName>
         <resources>
@@ -224,6 +212,7 @@
     <properties>
         <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
         <spring-release-version>[2.5.5,)</spring-release-version>
+        <cobertura.classifier></cobertura.classifier>
     </properties>
 </project>
 
