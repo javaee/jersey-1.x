@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,6 +39,14 @@
  */
 package com.sun.jersey.impl.inject;
 
+import java.io.IOException;
+import java.util.List;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
@@ -49,12 +57,10 @@ import com.sun.jersey.impl.AbstractResourceTester;
 import com.sun.jersey.spi.inject.Errors;
 import com.sun.jersey.spi.inject.Injectable;
 import com.sun.jersey.spi.resource.Singleton;
-import java.io.IOException;
-import java.util.List;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 
+import static junit.framework.Assert.assertEquals;
 /**
+ * Set of tests for {@link InjectParam} feature.
  *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  */
@@ -251,5 +257,43 @@ public class InjectParamAnnotationInjectableTest extends AbstractResourceTester 
         public IoCComponentProvider getComponentProvider(ComponentContext cc, Class c) {
             return getComponentProvider(c);
         }
+    }
+
+    /**
+     * Reproducer for JERSEY-1596. The injectable bean has a non-public constructor,
+     * which broke it's instantiation until the improvement has been implemented.
+     */
+    public static class NonPublicCtorBean {
+
+        protected NonPublicCtorBean() {}
+
+        @QueryParam("a") String a;
+    }
+
+    /**
+     * Reproducer resource for JERSEY-1596. The resource method bellow
+     * has {@link NonPublicCtorBean} injected using {@link InjectParam} annotation.
+     */
+    @Path("/")
+    public static class NonPublicCtorBeanResource {
+        @GET
+        public String get(
+                @InjectParam NonPublicCtorBean npcb,
+                @QueryParam("a") String a) {
+            assertEquals(npcb.a, a);
+            return npcb.a;
+        }
+    }
+
+    /**
+     * Reproducible test for JERSEY-1596. Uses the two types above.
+     */
+    public void testNonPublicCtorBean() {
+        initiateWebApplication(NonPublicCtorBeanResource.class);
+
+        WebResource r = resource("/");
+
+        String s = r.queryParam("a", "one").get(String.class);
+        assertEquals("one", s);
     }
 }

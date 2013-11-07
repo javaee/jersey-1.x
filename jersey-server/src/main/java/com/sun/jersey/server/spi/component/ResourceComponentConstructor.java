@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,18 +39,14 @@
  */
 package com.sun.jersey.server.spi.component;
 
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.model.AbstractResource;
-import com.sun.jersey.api.model.AbstractResourceConstructor;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
-import com.sun.jersey.spi.inject.Injectable;
-import com.sun.jersey.spi.inject.Errors;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -58,20 +54,32 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.ws.rs.WebApplicationException;
+
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.model.AbstractResource;
+import com.sun.jersey.api.model.AbstractResourceConstructor;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
+import com.sun.jersey.spi.inject.Errors;
+import com.sun.jersey.spi.inject.Injectable;
+
 /**
  * A constructor of a resource class.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class ResourceComponentConstructor {
-    private final Class c;
+    private final Class clazz;
 
-    private final ResourceComponentInjector rci;
-    
+    private final ResourceComponentInjector resourceComponentInjector;
+
     private final Constructor constructor;
+    private final Constructor nonPublicConstructor;
 
     private final List<Method> postConstructs = new ArrayList<Method>();
-    
+
     private final List<AbstractHttpContextInjectable> injectables;
 
     /**
@@ -84,116 +92,163 @@ public class ResourceComponentConstructor {
         /**
          * The constructor.
          */
-        private final Constructor con;
+        private final Constructor constructor;
 
         /**
          * The list of injectables associated with the parameters of the
          * constructor;
          */
-        private final List<Injectable> is;
+        private final List<Injectable> injectables;
 
         /**
          * Create a new tuple of a constructor and list of injectables.
          *
-         * @param con the constructor
-         * @param is the list of injectables.
+         * @param constructor the constructor
+         * @param injectables the list of injectables.
          */
-        private ConstructorInjectablePair(Constructor con, List<Injectable> is) {
-            this.con = con;
-            this.is = is;
+        private ConstructorInjectablePair(Constructor constructor, List<Injectable> injectables) {
+            this.constructor = constructor;
+            this.injectables = injectables;
         }
     }
 
     private static class ConstructorComparator<T> implements Comparator<ConstructorInjectablePair> {
+        @Override
         public int compare(ConstructorInjectablePair o1, ConstructorInjectablePair o2) {
-            int p = Collections.frequency(o1.is, null) - Collections.frequency(o2.is, null);
-            if (p != 0)
-                return p;
 
-            return o2.con.getParameterTypes().length - o1.con.getParameterTypes().length;
+            int p = Collections.frequency(o1.injectables, null) - Collections.frequency(o2.injectables, null);
+            if (p != 0) {
+                return p;
+            }
+
+            return o2.constructor.getParameterTypes().length - o1.constructor.getParameterTypes().length;
         }
     }
 
-    public ResourceComponentConstructor(ServerInjectableProviderContext sipc,
-            ComponentScope scope, AbstractResource ar) {
-        this.c = ar.getResourceClass();
+    public ResourceComponentConstructor(ServerInjectableProviderContext serverInjectableProviderCtx,
+            ComponentScope scope, AbstractResource abstractResource) {
 
-        final int modifiers = c.getModifiers();
+        this.clazz = abstractResource.getResourceClass();
+
+        final int modifiers = clazz.getModifiers();
         if (!Modifier.isPublic(modifiers)) {
-            Errors.nonPublicClass(c);
+            Errors.nonPublicClass(clazz);
         }
 
         if (Modifier.isAbstract(modifiers)) {
             if (Modifier.isInterface(modifiers)) {
-                Errors.interfaceClass(c);
+                Errors.interfaceClass(clazz);
             } else {
-                Errors.abstractClass(c);
+                Errors.abstractClass(clazz);
             }
         }
 
-        if (c.getEnclosingClass() != null && !Modifier.isStatic(modifiers)) {
-            Errors.innerClass(c);
+        if (clazz.getEnclosingClass() != null && !Modifier.isStatic(modifiers)) {
+            Errors.innerClass(clazz);
         }
 
         if (Modifier.isPublic(modifiers) && !Modifier.isAbstract(modifiers)) {
-            if (c.getConstructors().length == 0) {
-                Errors.nonPublicConstructor(c);
+            if (clazz.getConstructors().length == 0) {
+                Errors.nonPublicConstructor(clazz);
             }
         }
 
-        this.rci = new ResourceComponentInjector(
-                sipc,
+        this.resourceComponentInjector = new ResourceComponentInjector(
+                serverInjectableProviderCtx,
                 scope,
-                ar);
+                abstractResource);
 
-        this.postConstructs.addAll(ar.getPostConstructMethods());
-        
-        ConstructorInjectablePair cip = getConstructor(sipc, scope, ar);
-        if (cip == null) {
+        this.postConstructs.addAll(abstractResource.getPostConstructMethods());
+
+        ConstructorInjectablePair ctorInjectablePair = getConstructor(serverInjectableProviderCtx, scope, abstractResource);
+
+        if (ctorInjectablePair == null) {
             this.constructor = null;
+            this.nonPublicConstructor = getNonPublicConstructor();
             this.injectables = null;
-        } else if (cip.is.isEmpty()) {
-            this.constructor = cip.con;
+        } else if (ctorInjectablePair.injectables.isEmpty()) {
+            this.constructor = ctorInjectablePair.constructor;
+            this.nonPublicConstructor = null;
             this.injectables = null;
         } else {
-            if (cip.is.contains(null)) {
+            if (ctorInjectablePair.injectables.contains(null)) {
                 // Missing dependency
-                for (int i = 0; i < cip.is.size(); i++) {
-                    if (cip.is.get(i) == null) {
-                        Errors.missingDependency(cip.con, i);
+                for (int i = 0; i < ctorInjectablePair.injectables.size(); i++) {
+                    if (ctorInjectablePair.injectables.get(i) == null) {
+                        Errors.missingDependency(ctorInjectablePair.constructor, i);
                     }
                 }
             }
-            this.constructor = cip.con;
-            this.injectables = AbstractHttpContextInjectable.transform(cip.is);
+
+            this.constructor = ctorInjectablePair.constructor;
+            this.injectables = AbstractHttpContextInjectable.transform(ctorInjectablePair.injectables);
+
+            if (constructor != null){
+                setAccessible(constructor);
+                nonPublicConstructor = null;
+            } else {
+                nonPublicConstructor = (injectables == null) ? getNonPublicConstructor() : null;
+            }
         }
     }
 
-    public Class getResourceClass() {
-        return c;
+    private Constructor getNonPublicConstructor() {
+        try {
+            Constructor result = AccessController.doPrivileged(new PrivilegedExceptionAction<Constructor>(){
+
+                @Override
+                public Constructor run() throws NoSuchMethodException {
+                    return clazz.getDeclaredConstructor();
+                }
+            });
+            setAccessible(result);
+            return result;
+        } catch (PrivilegedActionException ex) {
+            final Throwable cause = ex.getCause();
+            if (cause instanceof NoSuchMethodException) {
+                return null;
+            }
+            throw new WebApplicationException(cause);
+        }
     }
-    
+
+    private void setAccessible(final Constructor constructor) {
+        AccessController.doPrivileged(new PrivilegedAction(){
+
+            @Override
+            public Object run() {
+                constructor.setAccessible(true);
+                return null;
+            }
+        });
+    }
+
+    public Class getResourceClass() {
+        return clazz;
+    }
+
     public Object construct(HttpContext hc)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         final Object o = _construct(hc);
-        rci.inject(hc, o);
+        resourceComponentInjector.inject(hc, o);
         for (Method postConstruct : postConstructs) {
             postConstruct.invoke(o);
         }
         return o;
     }
-    
-    private Object _construct(HttpContext hc)
+
+    private Object _construct(HttpContext httpContext)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, InvocationTargetException {
         if (injectables == null) {
-            return (constructor != null) ? constructor.newInstance() : c.newInstance();
+            return constructor != null ? constructor.newInstance() :
+                    nonPublicConstructor != null ? nonPublicConstructor.newInstance() : clazz.newInstance();
         } else {
             Object[] params = new Object[injectables.size()];
             int i = 0;
             for (AbstractHttpContextInjectable injectable : injectables) {
-                params[i++] = (injectable != null) ? injectable.getValue(hc) : null;
+                params[i++] = (injectable != null) ? injectable.getValue(httpContext) : null;
             }
             return constructor.newInstance(params);
         }
@@ -201,9 +256,9 @@ public class ResourceComponentConstructor {
 
     /**
      * Get the most suitable constructor. The constructor with the most
-     * parameters and that has the most parameters associated with 
+     * parameters and that has the most parameters associated with
      * Injectable instances will be chosen.
-     * 
+     *
      * @param <T> the type of the resource.
      * @param c the class to instantiate.
      * @param ar the abstract resource.
@@ -220,12 +275,12 @@ public class ResourceComponentConstructor {
             return null;
 
         SortedSet<ConstructorInjectablePair> cs = new TreeSet<ConstructorInjectablePair>(
-                new ConstructorComparator());        
+                new ConstructorComparator());
         for (AbstractResourceConstructor arc : ar.getConstructors()) {
             List<Injectable> is = sipc.getInjectable(arc.getCtor(), arc.getParameters(), scope);
             cs.add(new ConstructorInjectablePair(arc.getCtor(), is));
         }
 
-        return cs.first();        
+        return cs.first();
     }
  }
