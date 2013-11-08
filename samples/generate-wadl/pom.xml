@@ -55,7 +55,7 @@
     <packaging>jar</packaging>
 
     <profiles>
-        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" --> 
+        <!-- To use this profile, must first build Jersey source with "mvn clean install -Dcobertura" -->
         <profile>
             <id>cobertura</id>
             <activation>
@@ -327,6 +327,10 @@
                                 <property>
                                     <name>grammarsFile</name>
                                     <value>${basedir}/src/main/doc/application-grammars.xml</value>
+                                </property>
+                                <property>
+                                    <name>overrideGrammars</name>
+                                    <value>true</value>
                                 </property>
                             </properties>
                         </wadlGeneratorDescription>

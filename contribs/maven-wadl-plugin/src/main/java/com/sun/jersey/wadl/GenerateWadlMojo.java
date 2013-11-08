@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
@@ -73,6 +74,7 @@ import com.sun.jersey.server.wadl.WadlBuilder;
 import com.sun.jersey.server.wadl.WadlGenerator;
 import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
 import com.sun.research.ws.wadl.Application;
+import com.sun.research.ws.wadl.Doc;
 import com.sun.research.ws.wadl.Grammars;
 import com.sun.research.ws.wadl.Include;
 import com.sun.research.ws.wadl.Resources;
@@ -80,14 +82,16 @@ import com.sun.research.ws.wadl.Resources;
 /**
  * This mojo generates a wadl file, without the need of a running webapp.<br />
  * Created on: Jun 18, 2008<br />
- * 
+ *
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
- * 
+ *
  * @goal generate
  * @phase compile
  */
 public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
+
+    private static final Logger LOG = Logger.getLogger(GenerateWadlMojo.class.getName());
 
     /**
      * Location of the wadl file to create.
@@ -186,11 +190,22 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
         File wadlParent = this._wadlFile.getParentFile();
         Set<String> externalMetadataKeys = ad.getExternalMetadataKeys();
 
-        List<String> hrefs = new ArrayList<String>();
-        for (String key : externalMetadataKeys) {
-            ExternalGrammar externalGrammar = ad.getExternalGrammar(key);
 
-            File externalFile = new File(wadlParent, key);
+        Grammars grammars;
+        if (ad.getApplication().getGrammars() != null) {
+            LOG.info("The wadl application already contains a grammars element,"
+                    + " we're adding elements of the provided grammars file.");
+
+            grammars = ad.getApplication().getGrammars();
+        } else {
+            grammars = new Grammars();
+            ad.getApplication().setGrammars(grammars);
+        }
+
+        for (String path : externalMetadataKeys) {
+            ExternalGrammar externalGrammar = ad.getExternalGrammar(path);
+
+            File externalFile = new File(wadlParent, path);
             OutputStream externalGrammarOutputStream = new BufferedOutputStream(new FileOutputStream(externalFile));
             try {
                 externalGrammarOutputStream.write(externalGrammar.getContent());
@@ -198,12 +213,14 @@ public class GenerateWadlMojo extends AbstractMojoProjectClasspathSupport {
             } finally {
                 externalGrammarOutputStream.close();
             }
-            hrefs.add(key);
-        }
 
-        JAXBGrammars grammars = new JAXBGrammars(hrefs);
-        Application application = ad.getApplication();
-        application.setGrammars(grammars);
+            Include include = new Include();
+            include.setHref(path);
+            Doc doc = new Doc();
+            include.getDoc().add(doc);
+
+            grammars.getInclude().add(include);
+        }
     }
 
     private XMLSerializer getXMLSerializer(OutputStream out) throws FileNotFoundException {
