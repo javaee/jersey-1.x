@@ -173,7 +173,9 @@ public class WebResource extends Filterable implements
     
     @Override
     public ClientResponse head() throws ClientHandlerException{
-        return getHeadHandler().handle(new ClientRequestImpl(getURI(), "HEAD"));
+        ClientRequestImpl ro = new ClientRequestImpl(getURI(), "HEAD");
+        setProperties(ro);
+        return getHeadHandler().handle(ro);
     }
         
     @Override

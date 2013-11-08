@@ -82,6 +82,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -642,8 +643,11 @@ public class Client extends Filterable implements ClientHandler {
 
     @Override
     public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
-        request.getProperties().putAll(properties);
-        request.getProperties().put(Client.class.getName(), this);
+        Map<String, Object> effectiveProperties = 
+                new HashMap<String, Object>(properties);
+        effectiveProperties.put(Client.class.getName(), this);
+        effectiveProperties.putAll(request.getProperties());
+        request.setProperties(effectiveProperties);
 
         final ClientResponse response = getHeadHandler().handle(request);
         
