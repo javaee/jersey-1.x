@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -127,7 +127,7 @@ public class Client extends Filterable implements ClientHandler {
     private boolean destroyed = false;
 
     private LazyVal<ExecutorService> executorService;
-    
+
     private CopyOnWriteHashMap<String, Object> properties;
 
     private Set<ViewProxyProvider> vpps;
@@ -210,7 +210,7 @@ public class Client extends Filterable implements ClientHandler {
                     }
                 }
             };
-        
+
         Class<?>[] components = ServiceFinder.find("jersey-client-components").toClassArray();
         if (components.length > 0) {
             if (LOGGER.isLoggable(Level.INFO)) {
@@ -494,7 +494,7 @@ public class Client extends Filterable implements ClientHandler {
         ViewResource vr = viewResource(u);
         return vr.get(t);
     }
-    
+
     public <T> T view(URI uri, T t) {
         ViewResource vr = viewResource(uri);
         return vr.get(t);
@@ -514,12 +514,12 @@ public class Client extends Filterable implements ClientHandler {
         AsyncViewResource vr = asyncViewResource(u);
         return vr.get(t);
     }
-    
+
     public <T> Future<T> asyncView(URI uri, T t) {
         AsyncViewResource vr = asyncViewResource(uri);
         return vr.get(t);
     }
-    
+
     public <T> T view(Class<T> c, ClientResponse response) {
         return getViewProxy(c).view(c, response);
     }
@@ -643,14 +643,14 @@ public class Client extends Filterable implements ClientHandler {
 
     @Override
     public ClientResponse handle(final ClientRequest request) throws ClientHandlerException {
-        Map<String, Object> effectiveProperties = 
+        Map<String, Object> effectiveProperties =
                 new HashMap<String, Object>(properties);
         effectiveProperties.put(Client.class.getName(), this);
         effectiveProperties.putAll(request.getProperties());
         request.setProperties(effectiveProperties);
 
         final ClientResponse response = getHeadHandler().handle(request);
-        
+
         response.getProperties().put(Client.class.getName(), this);
         return response;
     }
