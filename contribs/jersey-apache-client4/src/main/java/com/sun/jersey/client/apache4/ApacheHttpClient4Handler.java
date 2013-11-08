@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,6 +44,7 @@ import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.TerminatingClientHandler;
 import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.core.header.InBoundHeaders;
 import com.sun.jersey.core.util.ReaderWriter;
 import org.apache.http.Header;
@@ -61,11 +62,14 @@ import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -99,7 +103,7 @@ import java.util.Map;
  * and OPTIONS.
  * <p>
  * Chunked transfer encoding can be enabled or disabled but configuration of
- * the chunked encoding size is not possible. If the 
+ * the chunked encoding size is not possible. If the
  * {@link ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE} property is set
  * to a non-null value then chunked transfer encoding is enabled.
  *
@@ -157,6 +161,12 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         try {
 
             HttpResponse response;
+
+            // Set the read timeout
+            final Integer readTimeout = (Integer) cr.getProperties().get(ApacheHttpClient4Config.PROPERTY_READ_TIMEOUT);
+            if (readTimeout != null) {
+                getHttpClient().getParams().setIntParameter(HttpConnectionParams.SO_TIMEOUT, readTimeout);
+            }
 
             if(preemptiveBasicAuth) {
                 AuthCache authCache = new BasicAuthCache();
