@@ -161,6 +161,12 @@ public class HeadTest extends AbstractGrizzlyServerTester {
         return r.path("redirect").head();
     }
 
+    private ClientResponse _headUsingProperty(Client client, boolean followRedirect) {
+        WebResource r = client.resource(getUri().path("/").build());
+        r.setProperty(ClientConfig.PROPERTY_FOLLOW_REDIRECTS, followRedirect);
+        return r.path("redirect").head();
+    }
+
     private ClientResponse _get(Client client) {
         WebResource r = client.resource(getUri().path("/").build());
         return r.path("redirect").get(ClientResponse.class);
@@ -171,6 +177,15 @@ public class HeadTest extends AbstractGrizzlyServerTester {
         Client client = configureClientUsingProperty(false);
 
         ClientResponse response = _head(client);
+        Assert.assertEquals(303, response.getStatus());
+        Assert.assertTrue(response.getLocation().toString().endsWith("/final"));
+    }
+
+    public void testDontFollowRedirect3Head() throws Exception {
+        _startServer();
+        Client client = configureClientUsingProperty(true);
+
+        ClientResponse response = _headUsingProperty(client, false);
         Assert.assertEquals(303, response.getStatus());
         Assert.assertTrue(response.getLocation().toString().endsWith("/final"));
     }
