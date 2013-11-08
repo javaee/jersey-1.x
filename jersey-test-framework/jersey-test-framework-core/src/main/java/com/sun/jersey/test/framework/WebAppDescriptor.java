@@ -54,10 +54,12 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.DispatcherType;
 
 /**
  * A Web-based application descriptor.
@@ -220,9 +222,7 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
-         * Set the filter class.
-         *
-         * <p> Setting a filter class resets the servlet class to null
+         * Equivalent to {@code filterClass(filterClass, "jerseyfilter", Collections.emptyMap(), EnumSet.allOf(DispatcherType.class))}.
          *
          * @param filterClass the filter class to serve the application.
          * @return this builder.
@@ -230,20 +230,37 @@ public class WebAppDescriptor extends AppDescriptor {
          */
         public Builder filterClass(Class<? extends Filter> filterClass)
                 throws IllegalArgumentException {
-            if (filterClass == null)
-                throw new IllegalArgumentException("The filter class must not be null");
-
-            this.filters = new ArrayList<FilterDescriptor>();
-            this.filters.add(new FilterDescriptor(filterClass, "jerseyfilter", null));
-            this.servletClass = null;
+            filterClass(filterClass, "jerseyfilter",
+                    Collections.<String, String>emptyMap(),
+                    EnumSet.allOf(DispatcherType.class));
             return this;
         }
+        
+        /**
+         * Set the filter class.
+         *
+         * <p> Setting a filter class resets the servlet class to null
+         *
+         * @param filterClass filter class.
+         * @param filterName filter name.
+         * @param initParams filter init parameters.
+         * @param dispatches indicates what kind of operations this filter should be applied to.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>filterClass</code>, <code>filterName</code>, <code>initParams</code> or <code>dispatches</code> are null.
+         */
+        public Builder filterClass(Class<? extends Filter> filterClass, String filterName,
+                Map<String, String> initParams, EnumSet<DispatcherType> dispatches)
+                throws IllegalArgumentException {
+             this.servletClass = null;
+            addFilter(filterClass, filterName, initParams, dispatches);
+             return this;
+         }
 
         /**
          * Adds filter class.
          *
          * <p> Adding a filter class DOES NOT reset the servlet or filter classes.
-         * Filter will be instanciated without initialization parameters.
+         * Filter will be instantiated without initialization parameters.
          *
          * @param filterClass filter class. Must not be null.
          * @param filterName filter name. Must not be null or empty string.
@@ -254,6 +271,19 @@ public class WebAppDescriptor extends AppDescriptor {
             return addFilter(filterClass, filterName, Collections.<String, String>emptyMap());
         }
 
+        /**
+         * Equivalent to {@code addFilter(filterClass, filterName, initParams, EnumSet.allOf(DispatcherType.class)}.
+         *
+         * @param filterClass filter class. Must not be null.
+         * @param filterName filter name. Must not be null or empty string.
+         * @param initParams filter init parameters. Must not be null.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>filterClass</code>, <code>filterName</code> or <code>initParams</code> is null.
+         */
+        public Builder addFilter(Class<? extends Filter> filterClass, String filterName,
+                Map<String, String> initParams) throws IllegalArgumentException {
+            return addFilter(filterClass, filterName, initParams, EnumSet.allOf(DispatcherType.class));
+        }
 
         /**
          * Adds filter class.
@@ -263,11 +293,12 @@ public class WebAppDescriptor extends AppDescriptor {
          * @param filterClass filter class. Must not be null.
          * @param filterName filter name. Must not be null or empty string.
          * @param initParams filter init parameters. Must not be null.
+         * @param dispatches indicates what kind of operations this filter should be applied to
          * @return this builder.
          * @throws IllegalArgumentException if <code>filterClass</code>, <code>filterName</code> or <code>initParams</code> is null.
          */
         public Builder addFilter(Class<? extends Filter> filterClass, String filterName,
-                                 Map<String, String> initParams) throws IllegalArgumentException {
+                                 Map<String, String> initParams, EnumSet<DispatcherType> dispatches) throws IllegalArgumentException {
             if(this.filters == null)
                 this.filters = new ArrayList<FilterDescriptor>();
 
@@ -280,7 +311,7 @@ public class WebAppDescriptor extends AppDescriptor {
             if(initParams == null)
                 throw new IllegalArgumentException("Provided initParams are invalid; initParams must not be null");
 
-            this.filters.add(new FilterDescriptor(filterClass, filterName, initParams));
+            this.filters.add(new FilterDescriptor(filterClass, filterName, initParams, dispatches));
             return this;
         }
 
@@ -481,11 +512,13 @@ public class WebAppDescriptor extends AppDescriptor {
         private Class<? extends Filter> filterClass;
         private String filterName;
         private Map<String, String> initParams;
+        private EnumSet<DispatcherType> dispatches;
 
-        FilterDescriptor(Class<? extends Filter> filterClass, String filterName, Map<String, String> initParams) {
+        FilterDescriptor(Class<? extends Filter> filterClass, String filterName, Map<String, String> initParams, EnumSet<DispatcherType> dispatches) {
             this.filterClass = filterClass;
             this.filterName = filterName;
             this.initParams = initParams;
+            this.dispatches = dispatches;
         }
 
         public Class<? extends Filter> getFilterClass() {
@@ -499,6 +532,10 @@ public class WebAppDescriptor extends AppDescriptor {
         public Map<String, String> getInitParams() {
             return initParams;
         }
+
+        public EnumSet<DispatcherType> getDispatches() {
+            return dispatches;
+        }    
     }
 
     private final Map<String, String> initParams;
