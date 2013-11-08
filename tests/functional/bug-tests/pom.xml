@@ -64,6 +64,7 @@
         <module>JerseyIssue1604</module>
         <module>JerseyIssue1744</module>
         <module>JerseyIssue1928</module>
+        <module>JerseyIssue1964</module>
     </modules>
 
 </project>

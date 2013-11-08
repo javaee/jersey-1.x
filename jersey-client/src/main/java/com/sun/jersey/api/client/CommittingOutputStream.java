@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,22 +43,21 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * A commiting output stream that commits before
- * the first byte is written to the adapted {@link OutputStream}.
- * <p>
+ * A committing output stream that commits before the first byte is written to the adapted {@link OutputStream}.
+ * <p/>
  * This class may be overridden to provide the commit functionality.
- * 
- * @author Paul.Sandoz@Sun.Com
+ *
+ * @author Paul Sandoz
  */
 public abstract class CommittingOutputStream extends OutputStream {
 
-    private OutputStream o;
+    private OutputStream adaptedOutput;
 
     private boolean isCommitted;
 
     /**
      * Construct a new instance.
-     * <p>
+     * <p/>
      * The method {@link #getOutputStream() } MUST be overridden
      * to return an output stream.
      */
@@ -68,64 +67,72 @@ public abstract class CommittingOutputStream extends OutputStream {
     /**
      * Construct a new instance with an output stream to adapt.
      *
-     * @param o the adapted output stream.
-     * @throws IllegalArgumentException if <code>o</code> is null.
+     * @param adaptedOutput the adapted output stream.
+     * @throws IllegalArgumentException if <code>adaptedOutput</code> is null.
      */
-    public CommittingOutputStream(OutputStream o) {
-        if (o == null)
+    public CommittingOutputStream(OutputStream adaptedOutput) {
+        if (adaptedOutput == null) {
             throw new IllegalArgumentException();
-        
-        this.o = o;
+        }
+
+        this.adaptedOutput = adaptedOutput;
     }
 
     @Override
     public void write(byte b[]) throws IOException {
-        commitWrite();
-        o.write(b);
+        commitStream();
+        adaptedOutput.write(b);
     }
 
     @Override
     public void write(byte b[], int off, int len) throws IOException {
-        commitWrite();
-        o.write(b, off, len);
+        commitStream();
+        adaptedOutput.write(b, off, len);
     }
 
     public void write(int b) throws IOException {
-        commitWrite();
-        o.write(b);
+        commitStream();
+        adaptedOutput.write(b);
     }
 
     @Override
     public void flush() throws IOException {
-        commitWrite();
-        o.flush();
+        if (isCommitted) {
+            adaptedOutput.flush();
+        }
     }
 
     @Override
     public void close() throws IOException {
-        commitWrite();
-        o.close();
+        if (isCommitted) {
+            adaptedOutput.close();
+        }
     }
 
-    private void commitWrite() throws IOException {
+    private void commitStream() throws IOException {
         if (!isCommitted) {
-            isCommitted = true;
-
             commit();
 
-            if (o == null)
-                o = getOutputStream();
+            if (adaptedOutput == null) {
+                adaptedOutput = getOutputStream();
+
+                // Fail if the returned OutputStream is null.
+                if (adaptedOutput == null) {
+                    throw new NullPointerException();
+                }
+            }
+
+            isCommitted = true;
         }
     }
 
     /**
      * Get the adapted output stream.
-     * <p>
-     * This method MUST be overriden if the empty constructor is
-     * utilized to construct an instance of this class.
-     * 
+     * <p/>
+     * This method MUST be overridden if the empty constructor is utilized to construct an instance of this class.
+     *
      * @return the adapted output stream.
-     * @throws java.io.IOException
+     * @throws java.io.IOException if obtaining of an output stream fails (e.g. connection problem).
      */
     protected OutputStream getOutputStream() throws IOException {
         throw new IllegalStateException();
@@ -133,8 +140,8 @@ public abstract class CommittingOutputStream extends OutputStream {
 
     /**
      * Perform the commit functionality.
-     * 
+     *
      * @throws java.io.IOException
      */
     protected abstract void commit() throws IOException;
-};
+}
