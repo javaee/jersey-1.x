@@ -50,7 +50,8 @@ import java.util.Set;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.core.MediaType;
-
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
 import javax.xml.namespace.QName;
 
 import com.sun.jersey.api.model.AbstractMethod;
@@ -60,6 +61,8 @@ import com.sun.jersey.api.model.AbstractSubResourceLocator;
 import com.sun.jersey.api.model.AbstractSubResourceMethod;
 import com.sun.jersey.api.model.Parameter;
 import com.sun.jersey.api.model.Parameterized;
+import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.server.impl.BuildId;
 import com.sun.jersey.server.impl.modelapi.annotation.IntrospectionModeller;
 import com.sun.jersey.server.wadl.generators.WadlGeneratorJAXBGrammarGenerator;
@@ -72,28 +75,31 @@ import com.sun.research.ws.wadl.Request;
 import com.sun.research.ws.wadl.Resource;
 import com.sun.research.ws.wadl.Resources;
 import com.sun.research.ws.wadl.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Providers;
-
-import com.sun.jersey.core.util.FeaturesAndProperties;
 /**
- * This class implements the algorithm how the wadl is built for one or more
- * {@link AbstractResource} classes. Wadl artifacts are created by a
+ * This class implements the algorithm how the WADL is built for one or more
+ * {@link AbstractResource} classes. WADL artifacts are created by a
  * {@link WadlGenerator}.
- * Created on: Jun 18, 2008<br>
  *
  * @author Marc Hadley
- * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
- * @version $Id$
+ * @author Martin Grotzke (martin.grotzke at freiheit.com)
  */
 public class WadlBuilder {
 
     private WadlGenerator _wadlGenerator;
 
+    /**
+     * Create default WADL builder.
+     */
     public WadlBuilder() {
-        this(new WadlGeneratorJAXBGrammarGenerator());
+        this(createDefaultGenerator());
     }
 
+    /**
+     * Create WADL builder that utilizes given WADL generator.
+     * The generator is expected to by initialized.
+     *
+     * @param wadlGenerator initialized WADL generator.
+     */
     public WadlBuilder(WadlGenerator wadlGenerator) {
         _wadlGenerator = wadlGenerator;
     }
@@ -104,27 +110,27 @@ public class WadlBuilder {
      * @param resources the set of resources
      * @param info a UriInfo to provide context for the request
      * @return the JAXB WADL application bean
-     */ 
+     */
     public ApplicationDescription generate(UriInfo info, Set<AbstractResource> resources) {
         return generate(null, null, info, resources);
     }
-        
-    
+
+
     /**
      * Generate WADL for a set of resources.
      * @param resources the set of resources
      * @param info a UriInfo to provide context for the request
-     * @param providers an instance of Providers required for some WADL generators 
+     * @param providers an instance of Providers required for some WADL generators
      * @param fap an instance of FeaturesAndProperties required from some WADL generators
      * @return the JAXB WADL application bean
-     */ 
+     */
     public ApplicationDescription generate(Providers providers, FeaturesAndProperties fap, UriInfo info, Set<AbstractResource> resources) {
-        
+
         // Provide the environment
-        
+
         _wadlGenerator.setEnvironment(new WadlGenerator.Environment()
                 .setProviders(providers).setFeaturesAndProperties(fap));
-        
+
         //
         Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();
@@ -162,24 +168,24 @@ public class WadlBuilder {
      * @param resource the resource
      * @param description the overall application description so we can
      * @param info a UriInfo to provide context for the request
-     * @param providers an instance of Providers required for some WADL generators 
+     * @param providers an instance of Providers required for some WADL generators
      * @param fap an instance of FeaturesAndProperties required from some WADL generators
      * @return the JAXB WADL application bean
      */
     public Application generate(
-            Providers providers, 
+            Providers providers,
             FeaturesAndProperties fap,
             UriInfo info,
             ApplicationDescription description,
             AbstractResource resource) {
 
         // Provide the environment
-        
+
         _wadlGenerator.setEnvironment(new WadlGenerator.Environment()
                 .setProviders(providers).setFeaturesAndProperties(fap));
 
         //
-        
+
         Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateResource(resource, null);
@@ -206,19 +212,19 @@ public class WadlBuilder {
      * @return the JAXB WADL application bean
      */
     public Application generate(
-            Providers providers, 
+            Providers providers,
             FeaturesAndProperties fap,
             UriInfo info,
             ApplicationDescription description,
             AbstractResource resource, String path) {
 
         // Provide the environment
-        
+
         _wadlGenerator.setEnvironment(new WadlGenerator.Environment()
                 .setProviders(providers).setFeaturesAndProperties(fap));
 
         //
-        
+
         Application wadlApplication = _wadlGenerator.createApplication(info);
         Resources wadlResources = _wadlGenerator.createResources();
         Resource wadlResource = generateSubResource(resource, path);
@@ -502,5 +508,23 @@ public class WadlBuilder {
             return null;
         }
         return _wadlGenerator.createResponses(r, m);
+    }
+
+    /**
+     * Create and initialize the default WADL generator.
+     *
+     * @return initialized default WADL generator.
+     *
+     * @throws RuntimeException in case that the generator initialization fails.
+     */
+    private static WadlGeneratorJAXBGrammarGenerator createDefaultGenerator() throws RuntimeException {
+
+        final WadlGeneratorJAXBGrammarGenerator wadlGeneratorJAXBGrammarGenerator = new WadlGeneratorJAXBGrammarGenerator();
+        try {
+            wadlGeneratorJAXBGrammarGenerator.init();
+        } catch (Exception ex) {
+            throw new RuntimeException(ImplMessages.ERROR_CREATING_DEFAULT_WADL_GENERATOR(), ex);
+        }
+        return wadlGeneratorJAXBGrammarGenerator;
     }
 }
