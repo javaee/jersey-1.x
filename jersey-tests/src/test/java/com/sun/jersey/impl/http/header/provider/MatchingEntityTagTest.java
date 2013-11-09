@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,14 +40,26 @@
 
 package com.sun.jersey.impl.http.header.provider;
 
-import com.sun.jersey.core.header.MatchingEntityTag;
-import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import junit.framework.*;
+import java.text.ParseException;
 import java.util.Set;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+
+import junit.framework.TestCase;
+
 import javax.ws.rs.core.EntityTag;
 
+import com.sun.jersey.core.header.MatchingEntityTag;
+import com.sun.jersey.core.header.reader.HttpHeaderReader;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.equalTo;
+
 public class MatchingEntityTagTest extends TestCase {
-    
+
     public MatchingEntityTagTest(String testName) {
         super(testName);
     }
@@ -55,7 +67,7 @@ public class MatchingEntityTagTest extends TestCase {
     public void testOneEntityTag() throws Exception {
         String header = "\"1\"";
         Set<MatchingEntityTag> s = HttpHeaderReader.readMatchingEntityTag(header);
-        
+
         assertEquals(1, s.size());
 
         assertTrue(s.contains(new EntityTag("1")));
@@ -78,7 +90,22 @@ public class MatchingEntityTagTest extends TestCase {
         String header = "*";
         Set<MatchingEntityTag> s = HttpHeaderReader.readMatchingEntityTag(header);
 
-        assertEquals(0, s.size());
-        assertTrue(MatchingEntityTag.ANY_MATCH == s);
+        assertThat(s.size(), is(equalTo(0)));
+        assertThat(MatchingEntityTag.ANY_MATCH, is(s));
+    }
+
+    /**
+     * Reproducer for JERSEY-1278.
+     *
+     * @throws Exception
+     */
+    public void testBadEntityTag() {
+        String header = "1\"";
+        try {
+            HttpHeaderReader.readMatchingEntityTag(header);
+            fail("ParseException expected");
+        } catch (ParseException pe) {
+            assertThat(pe.getMessage(), containsString(header));
+        }
     }
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,6 +42,7 @@ package com.sun.jersey.core.header;
 
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
 import com.sun.jersey.core.header.reader.HttpHeaderReader.Event;
+import com.sun.jersey.impl.ImplMessages;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Set;
@@ -65,15 +66,37 @@ public class MatchingEntityTag extends EntityTag {
      */
     public static final Set<MatchingEntityTag> ANY_MATCH = Collections.emptySet();
 
+    /**
+     * Create new strongly validating entity tag.
+     *
+     * @param value ETag header value.
+     */
     public MatchingEntityTag(String value) {
         super(value, false);
     }
 
+    /**
+     * Create new matching entity tag.
+     *
+     * @param value ETag header value.
+     * @param weak should be set to false, if strong validation is required,
+     *            otherwise should be set to true.
+     */
     public MatchingEntityTag(String value, boolean weak) {
         super(value, weak);
     }
-    
+
+    /**
+     * Create new matching entity tag out of provided header reader.
+     *
+     * @param reader HTTP header content reader.
+     * @return a new matching entity tag.
+     * @throws ParseException in case the header could not be parsed.
+     */
     public static MatchingEntityTag valueOf(HttpHeaderReader reader) throws ParseException {
+
+        final String originalHeader = reader.getRemainder();
+
         Event e = reader.next(false);
         if (e == Event.QuotedString) {
             return new MatchingEntityTag(reader.getEventValue());
@@ -85,6 +108,6 @@ public class MatchingEntityTag extends EntityTag {
             }
         }
 
-        throw new ParseException("Error parsing entity tag", reader.getIndex());
+        throw new ParseException(ImplMessages.ERROR_PARSING_ENTITY_TAG(originalHeader), reader.getIndex());
     }
 }
