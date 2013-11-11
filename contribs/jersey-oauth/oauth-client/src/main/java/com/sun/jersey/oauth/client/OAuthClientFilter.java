@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,7 +40,12 @@
 
 package com.sun.jersey.oauth.client;
 
+import java.net.URI;
+
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.ext.Providers;
+
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
@@ -52,9 +57,6 @@ import com.sun.jersey.oauth.signature.OAuthParameters;
 import com.sun.jersey.oauth.signature.OAuthSecrets;
 import com.sun.jersey.oauth.signature.OAuthSignature;
 import com.sun.jersey.oauth.signature.OAuthSignatureException;
-import java.net.URI;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.UriBuilder;
 
 /**
  * Client filter adding OAuth authorization header to the HTTP request, if no
@@ -152,7 +154,7 @@ public final class OAuthClientFilter extends ClientFilter {
     private final AuthHandler handler;
 
     private enum State {
-        UNMANAGED, MANAGED, REQUEST_TOKEN;
+        UNMANAGED, MANAGED, REQUEST_TOKEN
     }
 
     private State state;
@@ -165,7 +167,7 @@ public final class OAuthClientFilter extends ClientFilter {
      * @param secrets the OAuth secrets to be used in signing requests.
      */
     public OAuthClientFilter(final Providers providers,
-    final OAuthParameters parameters, final OAuthSecrets secrets) {
+                             final OAuthParameters parameters, final OAuthSecrets secrets) {
         this(providers, parameters, secrets, null, null, null, null);
     }
 
@@ -186,8 +188,8 @@ public final class OAuthClientFilter extends ClientFilter {
      *          {@link UnauthorizedRequestException} is thrown by the filter.
      */
     public OAuthClientFilter(Providers providers, OAuthParameters parameters,
-            OAuthSecrets secrets, String requestTokenUri, String accessTokenUri,
-            String authorizationUri, AuthHandler handler) {
+                             OAuthSecrets secrets, String requestTokenUri, String accessTokenUri,
+                             String authorizationUri, AuthHandler handler) {
         if (providers == null || parameters == null || secrets == null) {
             throw new NullPointerException();
         }
@@ -243,12 +245,13 @@ public final class OAuthClientFilter extends ClientFilter {
                         // put together a request token request
                         state = State.UNMANAGED;
                         try {
-                            ClientResponse cr = handle(ClientRequest.create().build(requestTokenUri, HttpMethod.POST));
+                            ClientResponse clientResponse = handle(createTokenClientRequest(request, requestTokenUri));
+
                             // requestToken request failed
-                            if (cr.getStatus() >= 400) {
-                                return cr;
+                            if (clientResponse.getStatus() >= 400) {
+                                return clientResponse;
                             }
-                            Form response = cr.getEntity(Form.class);
+                            Form response = clientResponse.getEntity(Form.class);
                             String token = response.getFirst(OAuthParameters.TOKEN);
                             parameters.token(token);
                             secrets.tokenSecret(response.getFirst(OAuthParameters.TOKEN_SECRET));
@@ -272,12 +275,13 @@ public final class OAuthClientFilter extends ClientFilter {
                     }
                     state = State.UNMANAGED;
                     try {
-                        ClientResponse cr = handle(ClientRequest.create().build(accessTokenUri, HttpMethod.POST));
+                        ClientResponse clientResponse = handle(createTokenClientRequest(request, accessTokenUri));
+
                         // accessToken request failed
-                        if (cr.getStatus() >= 400) {
-                            return cr;
+                        if (clientResponse.getStatus() >= 400) {
+                            return clientResponse;
                         }
-                        Form response = cr.getEntity(Form.class);
+                        Form response = clientResponse.getEntity(Form.class);
                         String token = response.getFirst(OAuthParameters.TOKEN);
                         String secret = response.getFirst(OAuthParameters.TOKEN_SECRET);
                         if (token == null) {
@@ -325,11 +329,11 @@ public final class OAuthClientFilter extends ClientFilter {
             uie = e;
         }
 
-        if (state == State.MANAGED && response.getClientResponseStatus() == ClientResponse.Status.UNAUTHORIZED) {
+        if (state == State.MANAGED
+                && response.getStatusInfo().getStatusCode() == ClientResponse.Status.UNAUTHORIZED.getStatusCode()) {
             request.getHeaders().remove("Authorization");
             parameters.token(null);
             secrets.tokenSecret(null);
-            uie = null;
             return handle(request);
         }
 
@@ -338,6 +342,20 @@ public final class OAuthClientFilter extends ClientFilter {
         }
 
         return response;
+    }
+
+    /**
+     * Create POST client request to given (request/access) token uri. Request properties from {@code originalRequest} are
+     * copied to the new request.
+     *
+     * @param originalRequest client request to copy properties from.
+     * @param tokenUri token uri endpoint.
+     * @return new client request to the token uri endpoint.
+     */
+    private ClientRequest createTokenClientRequest(final ClientRequest originalRequest, final URI tokenUri) {
+        final ClientRequest request = ClientRequest.create().build(tokenUri, HttpMethod.POST);
+        request.getProperties().putAll(originalRequest.getProperties());
+        return request;
     }
 
     private URI getAuthorizationUri() {
