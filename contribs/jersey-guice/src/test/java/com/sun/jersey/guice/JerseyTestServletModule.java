@@ -38,10 +38,6 @@
  * holder.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.sun.jersey.guice;
 
 import com.google.inject.servlet.ServletModule;
@@ -53,7 +49,7 @@ import java.util.Set;
 
 /**
  *
- * @author paulsandoz
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public class JerseyTestServletModule extends ServletModule {
     private Set<Class<?>> clazzes = new HashSet<Class<?>>();
@@ -63,7 +59,7 @@ public class JerseyTestServletModule extends ServletModule {
     private Map<String, String> initParams = new HashMap<String, String>();
 
     private Class<? extends GuiceContainer> servletClass = GuiceContainer.class;
-    
+
     public JerseyTestServletModule servlet(Class<? extends GuiceContainer> servletClass) {
         this.servletClass = servletClass;
         return this;
@@ -95,7 +91,7 @@ public class JerseyTestServletModule extends ServletModule {
             bind(clazz);
         }
     }
-    
+
     protected void configureServe() {
         serve(path).with(servletClass, initParams);
     }
