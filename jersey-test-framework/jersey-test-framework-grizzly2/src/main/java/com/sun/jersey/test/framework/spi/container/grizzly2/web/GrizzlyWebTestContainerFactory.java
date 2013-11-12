@@ -68,6 +68,9 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import javax.servlet.DispatcherType;
 
 /**
  * A Web-based test container factory for creating test container instances
@@ -233,7 +236,13 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
                 for (WebAppDescriptor.FilterDescriptor d : this.filters) {
                     FilterRegistration freg = context.addFilter(d.getFilterName(), d.getFilterClass());
                     freg.setInitParameters(d.getInitParams());
-                    freg.addMappingForUrlPatterns(null, servletPathLocal);
+                    
+                    // Convert from Servlet API enum to Grizzly enum
+                    List<org.glassfish.grizzly.servlet.DispatcherType> grizzlyDispatches =
+                            new ArrayList<org.glassfish.grizzly.servlet.DispatcherType>();
+                    for (DispatcherType dispatcher: d.getDispatches())
+                        grizzlyDispatches.add(org.glassfish.grizzly.servlet.DispatcherType.valueOf(dispatcher.name()));
+                    freg.addMappingForUrlPatterns(EnumSet.copyOf(grizzlyDispatches), servletPathLocal);
                 }
             }
 
