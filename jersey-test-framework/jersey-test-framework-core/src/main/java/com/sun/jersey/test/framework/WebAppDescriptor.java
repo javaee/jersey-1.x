@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,9 +40,16 @@
 
 package com.sun.jersey.test.framework;
 
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.EventListener;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
 import javax.servlet.ServletContextAttributeListener;
 import javax.servlet.ServletContextListener;
@@ -52,18 +59,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpSessionActivationListener;
 import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EventListener;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 
 /**
  * A Web-based application descriptor.
  * <p>
  * An instance of this class is created by creating an instance of
- * {@link Builder}, invoking methods to add/modify state, and finally invoking 
+ * {@link Builder}, invoking methods to add/modify state, and finally invoking
  * the {@link Builder#build() } method.
  * <p>
  * This application descriptor is compatible with web-based test containers
@@ -79,8 +83,8 @@ import java.util.Map;
  *      tests. For example, the application may be deployed to the
  *      Glassfish v2 or v3 application server.</li>
  * </ul>
- * 
- * @author Paul.Sandoz@Sun.COM
+ *
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public class WebAppDescriptor extends AppDescriptor {
 
@@ -115,6 +119,8 @@ public class WebAppDescriptor extends AppDescriptor {
         protected String contextPath = "";
 
         protected String servletPath = "";
+
+        private final EnumSet<DispatcherType> DefaultDispatcherTYPES = EnumSet.<DispatcherType>of(DispatcherType.REQUEST);
 
         /**
          * Create a builder.
@@ -220,7 +226,8 @@ public class WebAppDescriptor extends AppDescriptor {
         }
 
         /**
-         * Set the filter class.
+         * Set the filter class. The registered servlet filter will be active for {@link DispatcherType#REQUEST}
+         * dispatch types only.
          *
          * <p> Setting a filter class resets the servlet class to null
          *
@@ -230,11 +237,26 @@ public class WebAppDescriptor extends AppDescriptor {
          */
         public Builder filterClass(Class<? extends Filter> filterClass)
                 throws IllegalArgumentException {
+            return this.filterClass(filterClass, DefaultDispatcherTYPES);
+        }
+
+        /**
+         * Set the filter class.
+         *
+         * <p> Setting a filter class resets the servlet class to null
+         *
+         * @param filterClass the filter class to serve the application.
+         * @param dispatcherTypes dispatcher types for which the filter should be registered.
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>filterClass</code> is null.
+         */
+        public Builder filterClass(Class<? extends Filter> filterClass, Set<DispatcherType> dispatcherTypes)
+                throws IllegalArgumentException {
             if (filterClass == null)
                 throw new IllegalArgumentException("The filter class must not be null");
 
             this.filters = new ArrayList<FilterDescriptor>();
-            this.filters.add(new FilterDescriptor(filterClass, "jerseyfilter", null));
+            this.filters.add(new FilterDescriptor(filterClass, "jerseyfilter", Collections.<String, String>emptyMap(), dispatcherTypes));
             this.servletClass = null;
             return this;
         }
@@ -268,6 +290,39 @@ public class WebAppDescriptor extends AppDescriptor {
          */
         public Builder addFilter(Class<? extends Filter> filterClass, String filterName,
                                  Map<String, String> initParams) throws IllegalArgumentException {
+            return this.addFilter(filterClass, filterName, initParams, DefaultDispatcherTYPES);
+        }
+
+        /**
+         * Adds filter class.
+         *
+         * <p> Adding a filter class DOES NOT reset the servlet or filter classes
+         *
+         * @param filterClass filter class. Must not be null.
+         * @param filterName filter name. Must not be null or empty string.
+         * @param dispatcherTypes filter will be registered for these dispatcher types
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>filterClass</code>, <code>filterName</code> or <code>initParams</code> is null.
+         */
+        public Builder addFilter(Class<? extends Filter> filterClass, String filterName,
+                                 Set<DispatcherType> dispatcherTypes) throws IllegalArgumentException {
+            return this.addFilter(filterClass, filterName, Collections.<String, String>emptyMap(), dispatcherTypes);
+        }
+
+        /**
+         * Adds filter class.
+         *
+         * <p> Adding a filter class DOES NOT reset the servlet or filter classes
+         *
+         * @param filterClass filter class. Must not be null.
+         * @param filterName filter name. Must not be null or empty string.
+         * @param initParams filter init parameters. Must not be null.
+         * @param dispatcherTypes filter will be registered for these dispatcher types
+         * @return this builder.
+         * @throws IllegalArgumentException if <code>filterClass</code>, <code>filterName</code> or <code>initParams</code> is null.
+         */
+        public Builder addFilter(Class<? extends Filter> filterClass, String filterName,
+                                 Map<String, String> initParams, Set<DispatcherType> dispatcherTypes) throws IllegalArgumentException {
             if(this.filters == null)
                 this.filters = new ArrayList<FilterDescriptor>();
 
@@ -280,13 +335,13 @@ public class WebAppDescriptor extends AppDescriptor {
             if(initParams == null)
                 throw new IllegalArgumentException("Provided initParams are invalid; initParams must not be null");
 
-            this.filters.add(new FilterDescriptor(filterClass, filterName, initParams));
+            this.filters.add(new FilterDescriptor(filterClass, filterName, initParams, dispatcherTypes));
             return this;
         }
 
         /**
          * Set the context path.
-         * 
+         *
          * @param contextPath the context path to the application. (See Servlet specification for definition of contextPath)
          * @return this builder.
          * @throws IllegalArgumentException if <code>contextPath</code> is null.
@@ -450,12 +505,13 @@ public class WebAppDescriptor extends AppDescriptor {
             this.listeners.add(httpSessionAttributeListenerClass);
             return this;
         }
-        
+
         /**
          * Build the Web-based application descriptor.
          * .
          * @return the Web-based application descriptor.
          */
+        @Override
         public WebAppDescriptor build() {
             WebAppDescriptor wd = new WebAppDescriptor(this);
             reset();
@@ -466,7 +522,7 @@ public class WebAppDescriptor extends AppDescriptor {
         @Override
         protected void reset() {
             super.reset();
-            
+
             this.initParams = null;
             this.contextParams = null;
             this.servletClass = ServletContainer.class;
@@ -477,15 +533,29 @@ public class WebAppDescriptor extends AppDescriptor {
         }
     }
 
+    /**
+     * Helper class to keep a single filter configuration info.
+     */
     public static class FilterDescriptor {
-        private Class<? extends Filter> filterClass;
-        private String filterName;
-        private Map<String, String> initParams;
 
-        FilterDescriptor(Class<? extends Filter> filterClass, String filterName, Map<String, String> initParams) {
+        private final Class<? extends Filter> filterClass;
+        private final String filterName;
+        private final Map<String, String> initParams;
+        private final Set<DispatcherType> dispatcherTypes;
+
+        /**
+         * Create a new descriptor.
+         *
+         * @param filterClass Servlet filter class.
+         * @param filterName Name for the filter registration.
+         * @param initParams Servlet filter init parameters.
+         * @param dispatcherTypes dispatcher types for which the filter should be registered.
+         */
+        FilterDescriptor(Class<? extends Filter> filterClass, String filterName, Map<String, String> initParams, Set<DispatcherType> dispatcherTypes) {
             this.filterClass = filterClass;
             this.filterName = filterName;
             this.initParams = initParams;
+            this.dispatcherTypes = dispatcherTypes;
         }
 
         public Class<? extends Filter> getFilterClass() {
@@ -499,6 +569,10 @@ public class WebAppDescriptor extends AppDescriptor {
         public Map<String, String> getInitParams() {
             return initParams;
         }
+
+        public Set<DispatcherType> getDispatcherTypes() {
+            return dispatcherTypes;
+        }
     }
 
     private final Map<String, String> initParams;
@@ -510,7 +584,7 @@ public class WebAppDescriptor extends AppDescriptor {
     private final List<FilterDescriptor> filters;
 
     private final List<Class<? extends EventListener>> listeners;
-    
+
     private final String contextPath;
 
     private final String servletPath;
@@ -538,7 +612,7 @@ public class WebAppDescriptor extends AppDescriptor {
         } else {
                 this.listeners = Collections.unmodifiableList(b.listeners);
         }
-        
+
     }
 
     /**
@@ -552,7 +626,7 @@ public class WebAppDescriptor extends AppDescriptor {
 
     /**
      * Get the context parameters.
-     * 
+     *
      * @return the context parameters.
      */
     public Map<String, String> getContextParams() {
@@ -561,7 +635,7 @@ public class WebAppDescriptor extends AppDescriptor {
 
     /**
      * Get the servlet class.
-     * 
+     *
      * @return the servlet class.
      */
     public Class<? extends HttpServlet> getServletClass() {
@@ -579,7 +653,7 @@ public class WebAppDescriptor extends AppDescriptor {
 
     /**
      * Get the context path.
-     * 
+     *
      * @return the context path.
      */
     public String getContextPath() {
@@ -603,5 +677,5 @@ public class WebAppDescriptor extends AppDescriptor {
     public List<Class<? extends EventListener>> getListeners() {
         return listeners;
     }
-    
+
 }

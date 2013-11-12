@@ -42,21 +42,23 @@ package com.sun.jersey.test.framework.spi.container.grizzly2.web;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.EnumSet;
 import java.util.EventListener;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
-
-import javax.ws.rs.core.UriBuilder;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.UriBuilder;
 
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.servlet.DispatcherType;
 import org.glassfish.grizzly.servlet.FilterRegistration;
 import org.glassfish.grizzly.servlet.ServletRegistration;
 import org.glassfish.grizzly.servlet.WebappContext;
@@ -68,20 +70,23 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainer;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
+import java.util.HashSet;
 
 /**
  * A Web-based test container factory for creating test container instances
  * using Grizzly 2.
  *
- * @author Srinivas.Bhimisetty@Sun.COM
- * @author pavel.bucek@oracle.com
+ * @author Srinivas Bhimisetty
+ * @author Pavel Bucek (pavel.bucek at oracle.com)
  */
 public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
+    @Override
     public Class<WebAppDescriptor> supports() {
         return WebAppDescriptor.class;
     }
 
+    @Override
     public TestContainer create(URI baseUri, AppDescriptor ad) {
         if (!(ad instanceof WebAppDescriptor))
             throw new IllegalArgumentException(
@@ -141,14 +146,17 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         }
 
+        @Override
         public Client getClient() {
             return null;
         }
 
+        @Override
         public URI getBaseUri() {
             return baseUri;
         }
 
+        @Override
         public void start() {
             LOGGER.info("Starting the Grizzly2 Web Container...");
 
@@ -160,10 +168,11 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
         }
 
+        @Override
         public void stop() {
             LOGGER.info("Stopping the Grizzly2 Web Container...");
             httpServer.stop();
-            // webServer.getSelectorThread().stopEndpoint(); TODO
+            // TODO: webServer.getSelectorThread().stopEndpoint();
         }
 
         /**
@@ -230,10 +239,14 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
 
             // Filter support
             if ( filters!=null ) {
-                for (WebAppDescriptor.FilterDescriptor d : this.filters) {
-                    FilterRegistration freg = context.addFilter(d.getFilterName(), d.getFilterClass());
-                    freg.setInitParameters(d.getInitParams());
-                    freg.addMappingForUrlPatterns(null, servletPathLocal);
+                for (WebAppDescriptor.FilterDescriptor filterDescriptor : this.filters) {
+
+                    FilterRegistration filterRegistration =
+                            context.addFilter(filterDescriptor.getFilterName(), filterDescriptor.getFilterClass());
+
+                    filterRegistration.setInitParameters(filterDescriptor.getInitParams());
+                    filterRegistration.addMappingForUrlPatterns(
+                            grizzlyDispatcherTypes(filterDescriptor.getDispatcherTypes()), servletPathLocal);
                 }
             }
 
@@ -243,6 +256,14 @@ public class GrizzlyWebTestContainerFactory implements TestContainerFactory {
             } catch(IOException ioe) {
                 throw new TestContainerException(ioe);
             }
+        }
+
+        private EnumSet<DispatcherType> grizzlyDispatcherTypes(final Set<javax.servlet.DispatcherType> dispatcherTypes) {
+            Set<DispatcherType> grizzlyDispatcherTypes = new HashSet<DispatcherType>();
+            for (javax.servlet.DispatcherType servletDispatchType : dispatcherTypes) {
+                grizzlyDispatcherTypes.add(DispatcherType.valueOf(servletDispatchType.name()));
+            }
+            return EnumSet.<DispatcherType>copyOf(grizzlyDispatcherTypes);
         }
     }
 }
