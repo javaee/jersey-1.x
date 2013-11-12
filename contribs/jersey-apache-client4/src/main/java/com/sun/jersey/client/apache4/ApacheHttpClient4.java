@@ -56,6 +56,8 @@ import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreConnectionPNames;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
 import com.sun.jersey.api.client.Client;
@@ -79,19 +81,21 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
  * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PROXY_PASSWORD}}<br>
  * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION}}<br>
  * <p>
- * By default a request entity is buffered and repeatable such that
- * authorization may be performed automatically in response to a 401 response.
+ * The default behaviour of the client is different than what it described in the
+ * the property {@link ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE}. By default, the apache client
+ * uses chunked encoding to write the entity. In order to buffer the entity the property
+ * {@link ApacheHttpClient4Config#PROPERTY_ENABLE_BUFFERING} must be set to true.
  * <p>
- * If the property {@link ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE} size
- * is set to a value greater than 0 then chunked encoding will be enabled
- * and the request entity (if present) will not be buffered and is not
- * repeatable. For authorization to work in such scenarios the property
- * {@link com.sun.jersey.client.apache4.config.ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION} must
- * be set to true.
- * <p>
+ * Using of authorization is dependent on the chunk encoding setting. If the entity
+ * buffering is enabled, the entity is buffered and authorization can be performed
+ * automatically in response to a 401 by sending the request again. When entity buffering
+ * is disabled (chunked encoding is used) then the property
+ * {@link ApacheHttpClient4Config#PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION} must
+ * be set to {@code true}.
+ * <p/>
  * If a {@link com.sun.jersey.api.client.ClientResponse} is obtained and an
  * entity is not read from the response then
- * {@link com.sun.jersey.api.client.ClientResponse#close() } MUST be called 
+ * {@link com.sun.jersey.api.client.ClientResponse#close() } MUST be called
  * after processing the response to release connection-based resources.
  *
  * @see ApacheHttpClient4Config#PROPERTY_CONNECTION_MANAGER

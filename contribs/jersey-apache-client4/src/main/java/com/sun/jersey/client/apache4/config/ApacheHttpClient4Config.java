@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -136,5 +136,25 @@ public interface ApacheHttpClient4Config extends ClientConfig {
      */
     public static final String PROPERTY_PROXY_PASSWORD =
             "com.sun.jersey.impl.client.httpclient.proxyPassword";
+
+    /**
+     * If {@code true} then chunk encoding will be disabled and entity will be buffered
+     * in the client in order to calculate the size of the entity. When property
+     * is {@code false} then chunk encoding will be enabled. In that case the
+     * property {@link ClientConfig#PROPERTY_CHUNKED_ENCODING_SIZE} can be
+     * used to control the size of the chunk.
+     * <p>
+     * Note that the behaviour of the http client differs from the default client
+     * configuration in the way that the chunk encoding is enabled by default and must
+     * be disabled if needed. When entity buffering is enabled then the whole entity is
+     * buffered and might cause out of memory errors if the entity is too large.
+     * <p/>
+     * <p>
+     * Property must be of a {@link Boolean} type. Default value is {@code false}.
+     * </p>
+     *
+     */
+    public static final String PROPERTY_ENABLE_BUFFERING =
+            "com.sun.jersey.impl.client.httpclient.enableBuffering";
 
 }
