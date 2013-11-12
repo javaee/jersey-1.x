@@ -80,7 +80,7 @@
 
      <modules>
         <module>grizzly2</module>
-        <!--<module>functional</module>-->
+        <module>functional</module>
     </modules>
 
     <dependencyManagement>
