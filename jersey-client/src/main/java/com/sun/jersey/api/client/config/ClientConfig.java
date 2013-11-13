@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -66,55 +66,61 @@ import java.util.Set;
  * </pre></blockquote>
  * Alternatively an implementation of ClientConfig could perform such
  * registration.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface ClientConfig extends FeaturesAndProperties {
     /**
-     * Redirection property. A value of "true" declares that the client will 
+     * Redirection property. A value of "true" declares that the client will
      * automatically redirect to the URI declared in 3xx responses.
-     * 
+     *
      * The value MUST be an instance of {@link java.lang.Boolean}.
      * If the property is absent then the default value is "true".
      */
-    public static final String PROPERTY_FOLLOW_REDIRECTS = 
+    public static final String PROPERTY_FOLLOW_REDIRECTS =
             "com.sun.jersey.client.property.followRedirects";
-    
+
     /**
      * Read timeout interval property, in milliseconds.
-     * 
+     *
      * The value MUST be an instance of {@link java.lang.Integer}.
-     * 
+     *
      * If the property is absent then the default value is an interval of
      * infinity. A value of zero 0 is equivalent to an interval of
      * infinity
      */
-    public static final String PROPERTY_READ_TIMEOUT = 
+    public static final String PROPERTY_READ_TIMEOUT =
             "com.sun.jersey.client.property.readTimeout";
-    
+
     /**
      * Connect timeout interval property, in milliseconds.
-     * 
+     *
      * The value MUST be an instance of {@link java.lang.Integer}.
-     * 
+     *
      * If the property is absent then the default value is an interval of
      * infinity. A value of  0 is equivalent to an interval of
      * infinity
      */
-    public static final String PROPERTY_CONNECT_TIMEOUT = 
+    public static final String PROPERTY_CONNECT_TIMEOUT =
             "com.sun.jersey.client.property.connectTimeout";
-    
+
     /**
      * Chunked encoding property.
-     * 
+     * <p>
      * The value MUST be an instance of {@link java.lang.Integer}.
-     * 
+     * </p>
+     * <p>
      * If the property is absent then chunked encoding will not be used.
-     * A value &lt = 0 declares that chunked encoding will be used with 
+     * A value &lt = 0 declares that chunked encoding will be used with
      * the default chunk size. A value &gt 0 declares that chunked encoding
      * will be used with the value as the declared chunk size.
+     * </p>
+     * Note, that this is the default behaviour for the client which does not have
+     * to be implemented by all {@link Client client} implementations. A client can define
+     * different default behaviour if it is not capable of supporting buffering
+     * for example.
      */
-    public static final String PROPERTY_CHUNKED_ENCODING_SIZE = 
+    public static final String PROPERTY_CHUNKED_ENCODING_SIZE =
             "com.sun.jersey.client.property.chunkedEncodingSize";
 
     /**
@@ -146,29 +152,29 @@ public interface ClientConfig extends FeaturesAndProperties {
      * Get the set of provider classes to be instantiated in the scope
      * of the Client
      * <p>
-     * A provider class is a Java class with a {@link javax.ws.rs.ext.Provider} 
-     * annotation declared on the class that implements a specific service 
+     * A provider class is a Java class with a {@link javax.ws.rs.ext.Provider}
+     * annotation declared on the class that implements a specific service
      * interface.
-     * 
+     *
      * @return the mutable set of provider classes. After initialization of
      *         the client modification of this value will have no effect.
      *         The returned value shall never be null.
      */
     Set<Class<?>> getClasses();
-    
+
     /**
      * Get the singleton provider instances to be utilized by the client.
      * <p>
      * When the client is initialized the set of provider instances
      * will be combined and take precedence over the instances of provider
-     * classes. 
-     * 
+     * classes.
+     *
      * @return the mutable set of provider instances. After initialization of
      *         the client modification of this value will have no effect.
      *         The returned value shall never be null.
      */
     public Set<Object> getSingletons();
-        
+
     /**
      * Get a feature that is boolean property of the property bag.
      *

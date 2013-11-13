@@ -62,19 +62,19 @@ import org.apache.http.client.methods.HttpOptions;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicAuthCache;
+import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 
 import javax.ws.rs.core.MultivaluedMap;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.FilterInputStream;
 import java.io.IOException;
@@ -159,14 +159,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         writeOutBoundHeaders(cr.getHeaders(), request);
 
         try {
-
             HttpResponse response;
-
-            // Set the read timeout
-            final Integer readTimeout = (Integer) cr.getProperties().get(ApacheHttpClient4Config.PROPERTY_READ_TIMEOUT);
-            if (readTimeout != null) {
-                getHttpClient().getParams().setIntParameter(HttpConnectionParams.SO_TIMEOUT, readTimeout);
-            }
 
             if(preemptiveBasicAuth) {
                 AuthCache authCache = new BasicAuthCache();
@@ -196,6 +189,11 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
     }
 
+    private Boolean isBufferingEnabled(ClientRequest cr) {
+        Boolean enabled = (Boolean) cr.getProperties().get(ApacheHttpClient4Config.PROPERTY_ENABLE_BUFFERING);
+        return enabled != null && enabled;
+    }
+
     private HttpHost getHost(final HttpUriRequest request) {
         return new HttpHost(request.getURI().getHost(), request.getURI().getPort(), request.getURI().getScheme());
     }
@@ -204,7 +202,8 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         final String strMethod = cr.getMethod();
         final URI uri = cr.getURI();
 
-        final HttpEntity entity = getHttpEntity(cr);
+        final Boolean bufferingEnabled = isBufferingEnabled(cr);
+        final HttpEntity entity = getHttpEntity(cr, bufferingEnabled);
         final HttpUriRequest request;
 
         if (strMethod.equals("GET")) {
@@ -239,10 +238,22 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
             throw new ClientHandlerException("Adding entity to http method " + cr.getMethod() + " is not supported.");
         }
 
+        // Set the read timeout
+        final Integer readTimeout = (Integer) cr.getProperties().get(ApacheHttpClient4Config.PROPERTY_READ_TIMEOUT);
+        if (readTimeout != null) {
+            request.getParams().setIntParameter(HttpConnectionParams.SO_TIMEOUT, readTimeout);
+        }
+
+        // Set chunk size
+        final Integer chunkSize = (Integer) cr.getProperties().get(ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE);
+        if (chunkSize != null && !bufferingEnabled) {
+            client.getParams().setIntParameter(CoreConnectionPNames.MIN_CHUNK_LIMIT, chunkSize);
+        }
+
         return request;
     }
 
-    private HttpEntity getHttpEntity(final ClientRequest cr) {
+    private HttpEntity getHttpEntity(final ClientRequest cr, final boolean isBufferingEnabled) {
         final Object entity = cr.getEntity();
 
         if(entity == null)
@@ -264,7 +275,13 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
 
                     @Override
                     public InputStream getContent() throws IOException, IllegalStateException {
-                        return null;
+                        if (isBufferingEnabled) {
+                            ByteArrayOutputStream buffer = new ByteArrayOutputStream(512);
+                            writeTo(buffer);
+                            return new ByteArrayInputStream(buffer.toByteArray());
+                        } else {
+                            return null;
+                        }
                     }
 
                     @Override
@@ -278,7 +295,7 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
                     }
                 };
 
-            if(cr.getProperties().get(ClientConfig.PROPERTY_CHUNKED_ENCODING_SIZE) != null) {
+            if(!isBufferingEnabled) {
                 // TODO return InputStreamEntity
                 return httpEntity;
             } else {
