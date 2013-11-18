@@ -50,6 +50,7 @@ import com.sun.jersey.test.framework.spi.container.TestContainerException;
 import com.sun.jersey.test.framework.spi.container.TestContainerFactory;
 import com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;

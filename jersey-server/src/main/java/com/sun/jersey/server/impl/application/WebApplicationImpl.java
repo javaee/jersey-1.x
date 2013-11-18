@@ -1281,7 +1281,7 @@ public final class WebApplicationImpl implements WebApplication {
             // object we need to make sure that we provide a JAXBContext that
             // will work
             final WadlApplicationContext wac = wadlApplicationContextInjectionProxy;
-            @Provider @Produces({MediaTypes.WADL_STRING,MediaTypes.WADL_JSON_STRING, MediaType.APPLICATION_XML})
+            @Produces({MediaTypes.WADL_STRING,MediaTypes.WADL_JSON_STRING, MediaType.APPLICATION_XML})
             class WadlContextResolver implements ContextResolver<JAXBContext>
             {
                 @Override
