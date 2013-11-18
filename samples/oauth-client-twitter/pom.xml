@@ -42,33 +42,38 @@
 -->
 
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <artifactId>jersey-samples</artifactId>
-    <groupId>com.sun.jersey.samples</groupId>
-    <version>1.18-SNAPSHOT</version>
-  </parent>
-  <artifactId>oauth-client-twitter</artifactId>
-  <name>Twitter Client using OAuth</name>
-  <packaging>jar</packaging>
-  <dependencies>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-        <artifactId>oauth-client</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-        <artifactId>oauth-signature</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>jersey-samples</artifactId>
+        <groupId>com.sun.jersey.samples</groupId>
+        <version>1.18-SNAPSHOT</version>
+    </parent>
+    <artifactId>oauth-client-twitter</artifactId>
+    <name>Twitter Client using OAuth</name>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+            <artifactId>oauth-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
+            <artifactId>oauth-signature</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
     <profiles>
         <profile>
             <id>release</id>
@@ -89,7 +94,7 @@
     </profiles>
     <build>
         <plugins>
-           <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
+            <!--  Maven Exec Plug-In: http://mojo.codehaus.org/exec-maven-plugin/  -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,11 +43,23 @@ package com.sun.jersey.samples.oauth.twitterclient;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+
+/**
+ * Entity into which the Twitter status (tweet) is deserialized
+ *
+ *  @author Martin Matula
+ */
 @XmlRootElement
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Status {
-    @XmlElement(name = "created_at") String createdAt;
-    @XmlElement(name = "text") String text;
-    @XmlElement(name = "user") User user;
+
+    @XmlElement(name = "created_at")
+    private String createdAt;
+    @XmlElement(name = "text")
+    private String text;
+    @XmlElement(name = "user")
+    private User user;
 
     public String getCreatedAt() {
         return createdAt;

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,11 +40,6 @@
 
 package com.sun.jersey.samples.oauth.twitterclient;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.oauth.client.OAuthClientFilter;
-import com.sun.jersey.oauth.signature.OAuthParameters;
-import com.sun.jersey.oauth.signature.OAuthSecrets;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -54,14 +49,24 @@ import java.net.URI;
 import java.util.List;
 import java.util.Properties;
 
-/** Simple command-line application that uses Jersey OAuth client library to authenticate
- * with Twitter.
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.config.DefaultClientConfig;
+import com.sun.jersey.api.json.JSONConfiguration;
+import com.sun.jersey.oauth.client.OAuthClientFilter;
+import com.sun.jersey.oauth.signature.OAuthParameters;
+import com.sun.jersey.oauth.signature.OAuthSecrets;
+
+/**
+ * Simple command-line application that uses Jersey OAuth client library to authenticate with Twitter.
  *
- * @author martin.matula@oracle.com
+ * @author Martin Matula
  */
 public class App {
+
     private static final BufferedReader IN = new BufferedReader(new InputStreamReader(System.in));
-    private static final String FRIENDS_TIMELINE_URI = "http://api.twitter.com/1/statuses/friends_timeline.xml";
+    private static final String FRIENDS_TIMELINE_URI = "http://api.twitter.com/1.1/statuses/home_timeline.json";
     private static final Properties PROPERTIES = new Properties();
     private static final String PROPERTIES_FILE_NAME = "twitterclient.properties";
     private static final String PROPERTY_CONSUMER_KEY = "consumerKey";
@@ -74,8 +79,11 @@ public class App {
         // or system properties
         loadSettings();
 
+        final ClientConfig config = new DefaultClientConfig();
+        config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, true);
+
         // create a new Jersey client
-        Client client = Client.create();
+        Client client = Client.create(config);
 
         // create a new auth handler
         OAuthClientFilter.AuthHandler authHandler = new OAuthClientFilter.AuthHandler() {
@@ -109,9 +117,9 @@ public class App {
                     .token(PROPERTIES.getProperty(PROPERTY_TOKEN)),
                 new OAuthSecrets().consumerSecret(PROPERTIES.getProperty(PROPERTY_CONSUMER_SECRET))
                     .tokenSecret(PROPERTIES.getProperty(PROPERTY_TOKEN_SECRET)),
-                "http://twitter.com/oauth/request_token",
-                "http://twitter.com/oauth/access_token",
-                "http://twitter.com/oauth/authorize",
+                "https://api.twitter.com/oauth/request_token",
+                "https://api.twitter.com/oauth/access_token",
+                "https://api.twitter.com/oauth/authorize",
                 authHandler);
 
         // Add filter to the client
