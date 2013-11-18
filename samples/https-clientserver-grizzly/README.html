@@ -80,7 +80,7 @@
 
 <h3>Certificates setup</h3>
 <p><b>These steps are not required to run this example. Pregenerated keystore and
-truststore files are already present.</b></p>
+truststore files are already present. Password used was "asdfgh".</b></p>
 <p>We needed set up few things to get this example working:
 <ul>
     <li>generate client and server keys</li>
@@ -94,14 +94,14 @@ want to use them both).
 
 <p>
     Generate client key and store it into keystore:<br />
-<pre>keytool -genkey -keystore ./keystore_client -alias clientKey -dname "CN=Client, OU=Jersey, O=Sun Microsystem, L=Prague, ST=Czech Republic, C=CZ"</pre>
+<pre>keytool -genkey -keystore ./keystore_client -alias clientKey -dname "CN=Client, OU=Jersey, O=Oracle, L=Prague, ST=Czech Republic, C=CZ"</pre>
 Generate client certificate (this will generate self-signed certificate; if you have certification authority and want generate certificate request, use keytool -certreq):<br />
 <pre>keytool -export -alias clientKey -rfc -keystore ./keystore_client > ./client.cert</pre>
 Import client certificate to servers truststore:<br />
 <pre>keytool -import -alias clientCert -file ./client.cert -keystore ./truststore_server</pre>
 
 These steps are similar for server side:
-<pre>keytool -genkey -keystore ./keystore_server -alias serverKey -dname "CN=localhost, OU=Jersey, O=Sun Microsystem, L=Prague, ST=Czech Republic, C=CZ"
+<pre>keytool -genkey -keystore ./keystore_server -alias serverKey -dname "CN=localhost, OU=Jersey, O=Oracle, L=Prague, ST=Czech Republic, C=CZ"
 keytool -export -alias serverKey -rfc -keystore ./keystore_server > ./server.cert
 keytool -import -alias serverCert -file ./server.cert -keystore ./truststore_client</pre>
 
