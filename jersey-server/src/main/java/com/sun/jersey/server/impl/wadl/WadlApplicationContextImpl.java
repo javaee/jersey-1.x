@@ -90,7 +90,7 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
         this.wadlGeneratorConfig = WadlGeneratorConfigLoader.loadWadlGeneratorsFromConfig(resourceConfig);
         this.providers = providers;
         this.fap = resourceConfig;
-        
+
         try {
             // TODO perhaps this should be done another way for the moment
             // create a temporary generator just to do this one task
@@ -103,7 +103,7 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
                 this.jaxbContext = JAXBContext.newInstance(requiredJaxbContextPath, wadlGenerator.getClass().getClassLoader());
             } catch (JAXBException ex) {
                 // fallback for GF
-                LOG.log(Level.WARNING, ex.getMessage(), ex);
+                LOG.log(Level.FINE, ex.getMessage(), ex);
                 this.jaxbContext = JAXBContext.newInstance(requiredJaxbContextPath);
             }
         } catch (JAXBException ex) {
@@ -233,11 +233,11 @@ public class WadlApplicationContextImpl implements WadlApplicationContext {
         for (String path : applicationDescription.getExternalMetadataKeys()) {
             ApplicationDescription.ExternalGrammar eg =
                     applicationDescription.getExternalGrammar(path);
-            
+
             if (!eg.isIncludedInGrammar()) {
                 continue;
             }
-            
+
             URI schemaURI =
                     extendedPath.clone().path(path).build();
 
