@@ -142,15 +142,6 @@
                                         </artifactItem>
                                         <artifactItem>
                                             <groupId>com.sun.jersey.samples</groupId>
-                                            <artifactId>jmaki-backend</artifactId>
-                                            <version>${project.version}</version>
-                                            <type>zip</type>
-                                            <classifier>gf-project</classifier>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>com.sun.jersey.samples</groupId>
                                             <artifactId>scala-helloworld-webapp</artifactId>
                                             <version>${project.version}</version>
                                             <type>zip</type>
@@ -270,15 +261,6 @@
                                         <artifactItem>
                                             <groupId>com.sun.jersey.samples</groupId>
                                             <artifactId>helloworld-webapp</artifactId>
-                                            <version>${project.version}</version>
-                                            <type>zip</type>
-                                            <classifier>gf-project</classifier>
-                                            <overWrite>false</overWrite>
-                                            <outputDirectory>${assembly.directory}/samples</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>com.sun.jersey.samples</groupId>
-                                            <artifactId>jmaki-backend</artifactId>
                                             <version>${project.version}</version>
                                             <type>zip</type>
                                             <classifier>gf-project</classifier>

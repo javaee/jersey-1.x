@@ -70,7 +70,7 @@
         <module>jersey-servlet3_0-integration</module>
         <module>end-to-end-tests</module>
         <module>bug-tests</module>
+        <module>jmaki-backend</module>
     </modules>
-
 
 </project>
