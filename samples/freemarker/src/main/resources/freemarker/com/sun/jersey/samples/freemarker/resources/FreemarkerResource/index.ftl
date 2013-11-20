@@ -45,5 +45,15 @@
 </head>
 <body>
   <h1>Welcome ${user}!</h1>
+  <h2>Tip of the day</h2>
+    <p>Add <code>user</code> query parameter to the request URI in order to change the user name in the title above.</p>
+  <h3>Examples</h2>
+    <p>
+        <ul>
+            <li><a href="?user=Barry">?user=Barry</a></li>
+            <li><a href="?user=Robin">?user=Robin</a></li>
+            <li><a href="?user=Maurice">?user=Maurice</a></li>
+       </ul>
+    </p>
 </body>
 </html>

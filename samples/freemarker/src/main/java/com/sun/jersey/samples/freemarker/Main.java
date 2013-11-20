@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,69 +37,66 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
 package com.sun.jersey.samples.freemarker;
 
+import java.io.IOException;
+import java.net.URI;
 
-import static org.junit.Assert.assertTrue;
+import javax.ws.rs.core.UriBuilder;
 
-import org.junit.Test;
+import org.glassfish.grizzly.http.server.HttpServer;
 
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.filter.LoggingFilter;
+import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.freemarker.FreemarkerViewProcessor;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.samples.freemarker.resources.FreemarkerResource;
 
 /**
- * Check that both implicit and explicit viewables return expected content.
+ * Main class to start standalone application from the console.
  *
- * @author Pavel Bucek (pavel.bucek at oracle.com)
  * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
-public class FreemarkerTest extends JerseyTest {
+public class Main {
 
-    /**
-     * Setup the server side.
-     */
-    public FreemarkerTest() {
-        super(new WebAppDescriptor.Builder("com.sun.jersey.samples.freemarker.resources")
-                .initParam(FreemarkerViewProcessor.FREEMARKER_TEMPLATES_BASE_PATH, "freemarker")
-                .initParam(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, "true")
-                .build());
+    private static int getPort(int defaultPort) {
+        String port = System.getProperty("jersey.test.port");
+        if (null != port) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+            }
+        }
+        return defaultPort;
+    }
+
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri("http://localhost/").port(getPort(9998)).build();
+    }
+
+    public static final URI BASE_URI = getBaseURI();
+
+    protected static HttpServer startServer() throws IOException {
+        System.out.println("Starting grizzly...");
+        ResourceConfig rc = new PackagesResourceConfig(FreemarkerResource.class.getPackage().getName());
+        rc.getProperties().put(FreemarkerViewProcessor.FREEMARKER_TEMPLATES_BASE_PATH, "freemarker");
+        rc.getFeatures().put(ResourceConfig.FEATURE_IMPLICIT_VIEWABLES, true);
+        return GrizzlyServerFactory.createHttpServer(BASE_URI, rc);
     }
 
     /**
-     * Explicit resource should contain Bee Gees string literal.
+     * Start the Jersey FreeMarker application.
+     *
+     * @param args does not matter.
+     * @throws IOException in case the application could not be started.
      */
-    @Test
-    public void testExplicit() {
-        WebResource r = resource().path("explicit");
-        r.addFilter(new LoggingFilter());
-
-        assertTrue(r.get(String.class).contains("Bee Gees"));
+    public static void main(String[] args) throws IOException {
+        HttpServer httpServer = startServer();
+        System.out.println(String.format("Jersey app started with WADL available at "
+                + "%sapplication.wadl\nTry out %s\nHit enter to stop it...",
+                BASE_URI, BASE_URI));
+        System.in.read();
+        httpServer.stop();
     }
-
-    /**
-     * Implicit resource should contain "Anonymous" string literal by default.
-     */
-    @Test
-    public void testAutoTemplateNoParam() {
-        WebResource r = resource();
-        r.addFilter(new LoggingFilter());
-
-        assertTrue(r.get(String.class).contains("Anonymous"));
-    }
-
-    /**
-     * Implicit resource content should include provided query parameter value.
-     */
-    @Test
-    public void testAutoTemplateWithParam() {
-        WebResource r = resource().queryParam("user", "Paul");
-        r.addFilter(new LoggingFilter());
-
-        assertTrue(r.get(String.class).contains("Paul"));
-    }
-
 }
