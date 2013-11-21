@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,65 +39,69 @@
  */
 package com.sun.jersey.samples.freemarker.resources;
 
-import com.sun.jersey.api.view.Viewable;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import com.sun.jersey.api.view.Viewable;
+
+/**
+ * Sample resource to demonstrate how to work with explicit
+ * and implicit FreeMarker templates.
+ *
+ * @author Pavel Bucek (pavel.bucek at oracle.com)
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ */
 @Path("/")
+@Produces(MediaType.TEXT_HTML)
 public class FreemarkerResource {
 
+    /**
+     * This is to populate the actual MVC model (FreemarkerResource instance)
+     * with a request related content.
+     */
+    @QueryParam("user")
+    @DefaultValue("Anonymous")
+    String user;
+
+    /**
+     * Actual resource instance acts as the implicit view model.
+     * User field is required by the implicit, index.ftl, template.
+     *
+     * @return actual user
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     * We need to create a {@link Viewable} instance manually here.
+     *
+     * @return Viewable mapped to the hello.ftl template.
+     */
     @GET
-    @Path("1")
-    @Produces(MediaType.TEXT_HTML)
+    @Path("explicit")
     public Viewable getHello() {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("user", "Pavel");
-        List<String> l = new ArrayList<String>();
-        l.add("item1");
-        l.add("item2");
-        l.add("item3");
-        map.put("items", l);
-
-        return
-                new Viewable(
-                        "/hello.ftl", map
-                );
+        // "/hello.ftl" would work the same way bellow
+        return new Viewable("/hello", createModel());
     }
 
-    @GET
-    @Path("2")
-    @Produces(MediaType.TEXT_HTML)
-    public Viewable getAutoTemplate() {
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("user", "Pavel");
-
-        // template name  is derived from resource class name;
-        // com.sun.jersey.samples.freemarker.resources.FreemarkerResource -> com/sun/jersey/samples/freemarker/resources/FreemarkerResource.ftl
-        return new Viewable("/com/sun/jersey/samples/freemarker/resources/FreemarkerResource.ftl", map, FreemarkerResource.class);
-    }
-
-    @GET
-    @Path("3")
-    @Produces(MediaType.TEXT_HTML)
-    public Viewable getHelloWithoutSuffix() {
+    private Map<String, Object> createModel() {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("user", "Pavel");
+        map.put("user", "Bee Gees");
         List<String> l = new ArrayList<String>();
-        l.add("item1");
-        l.add("item2");
-        l.add("item3");
+        l.add("to remember me");
+        l.add("and the love that used to be");
+        l.add("...");
         map.put("items", l);
-
-        return
-                new Viewable(
-                        "/hello", map
-                );
+        return map;
     }
 }

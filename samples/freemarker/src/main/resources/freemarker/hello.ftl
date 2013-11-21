@@ -46,9 +46,9 @@
 </head>
 <body>
   <h1>Welcome ${user}!</h1>
-  <p>items:<br />
+  <p>Do not forget:<br/>
         <#list items as item>
-            ${item}<br />
+            ${item}<br/>
         </#list>
   </p>
 </body>
