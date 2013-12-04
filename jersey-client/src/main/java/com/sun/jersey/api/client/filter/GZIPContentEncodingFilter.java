@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,16 +39,19 @@
  */
 package com.sun.jersey.api.client.filter;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+import javax.ws.rs.core.HttpHeaders;
+
 import com.sun.jersey.api.client.AbstractClientRequestAdapter;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientRequestAdapter;
 import com.sun.jersey.api.client.ClientResponse;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-import javax.ws.rs.core.HttpHeaders;
 
 /**
  * A GZIP content encoding filter.
@@ -64,7 +67,7 @@ import javax.ws.rs.core.HttpHeaders;
  * <p>
  * If the response has a Content-Encoding header of "gzip" then
  * then the response entity will be uncompressed using gzip.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public class GZIPContentEncodingFilter extends ClientFilter {
@@ -78,7 +81,7 @@ public class GZIPContentEncodingFilter extends ClientFilter {
             return new GZIPOutputStream(getAdapter().adapt(request, out));
         }
     }
-    
+
     private final boolean compressRequestEntity;
 
     /**
@@ -91,11 +94,11 @@ public class GZIPContentEncodingFilter extends ClientFilter {
 
     /**
      * Create a GZIP Content-Encoding filter.
-     * 
+     *
      * @param compressRequestEntity if true the request entity (if any)
-     *        is always compressed, otherwise the request entity is compressed
-     *        only if there exists a Content-Encoding header whose
-     *        value is "gzip".
+     *                              is always compressed, otherwise the request entity is compressed
+     *                              only if there exists a Content-Encoding header whose
+     *                              value is "gzip".
      */
     public GZIPContentEncodingFilter(boolean compressRequestEntity) {
         this.compressRequestEntity = compressRequestEntity;
@@ -125,9 +128,15 @@ public class GZIPContentEncodingFilter extends ClientFilter {
 
             if (encodings.equals("gzip")) {
                 response.getHeaders().remove(HttpHeaders.CONTENT_ENCODING);
+                final InputStream entityStream = response.getEntityInputStream();
                 try {
-                    response.setEntityInputStream(new GZIPInputStream(response.getEntityInputStream()));
+                    response.setEntityInputStream(new GZIPInputStream(entityStream));
                 } catch (IOException ex) {
+                    if (entityStream != null) try {
+                        entityStream.close();
+                    } catch (IOException ioe) {
+                        // ignore
+                    }
                     throw new ClientHandlerException(ex);
                 }
             }
