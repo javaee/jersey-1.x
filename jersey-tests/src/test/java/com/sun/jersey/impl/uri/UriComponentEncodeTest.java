@@ -61,6 +61,8 @@ public class UriComponentEncodeTest extends TestCase {
                 UriComponent.encode("/copyright\u00a9", UriComponent.Type.PATH_SEGMENT));
         assertEquals("%2Fa%3Bx%2Fb%3Bx%2Fc%3Bx",
                 UriComponent.encode("/a;x/b;x/c;x", UriComponent.Type.PATH_SEGMENT));
+        assertEquals("%2Fthumbsup%F0%9F%91%8D",
+                UriComponent.encode("/thumbsup\ud83d\udc4d", UriComponent.Type.PATH_SEGMENT));
     }
 
     public void testEncodePath() {
@@ -72,6 +74,8 @@ public class UriComponentEncodeTest extends TestCase {
                 UriComponent.encode("/copyright\u00a9", UriComponent.Type.PATH));
         assertEquals("/a;x/b;x/c;x",
                 UriComponent.encode("/a;x/b;x/c;x", UriComponent.Type.PATH));
+        assertEquals("/thumbsup%F0%9F%91%8D",
+                UriComponent.encode("/thumbsup\ud83d\udc4d", UriComponent.Type.PATH));
     }
     
     public void testContextualEncodePath() {
@@ -81,11 +85,16 @@ public class UriComponentEncodeTest extends TestCase {
                 UriComponent.contextualEncode("/a /b /c ", UriComponent.Type.PATH));
         assertEquals("/copyright%C2%A9", 
                 UriComponent.contextualEncode("/copyright\u00a9", UriComponent.Type.PATH));
+        assertEquals("/thumbsup%F0%9F%91%8D",
+                UriComponent.contextualEncode("/thumbsup\ud83d\udc4d", UriComponent.Type.PATH));
         
         assertEquals("/a%20/b%20/c%20", 
                 UriComponent.contextualEncode("/a%20/b%20/c%20", UriComponent.Type.PATH));
         assertEquals("/copyright%C2%A9", 
-                UriComponent.contextualEncode("/copyright%C2%A9", UriComponent.Type.PATH));        
+                UriComponent.contextualEncode("/copyright%C2%A9", UriComponent.Type.PATH));
+        assertEquals("/thumbsup%F0%9F%91%8D",
+                UriComponent.contextualEncode("/thumbsup%F0%9F%91%8D", UriComponent.Type.PATH));
+
     }
     
     public void testEncodeQuery() {
@@ -93,6 +102,11 @@ public class UriComponentEncodeTest extends TestCase {
                 UriComponent.encode("a b c.-*_=+&%xx%20", UriComponent.Type.QUERY));
         assertEquals("a+b+c.-*_%3D%2B%26%25xx%2520",
                 UriComponent.encode("a b c.-*_=+&%xx%20", UriComponent.Type.QUERY_PARAM));
+
+        assertEquals("thumbsup%F0%9F%91%8D",
+                UriComponent.encode("thumbsup\ud83d\udc4d", UriComponent.Type.QUERY));
+        assertEquals("thumbsup%F0%9F%91%8D",
+                UriComponent.encode("thumbsup\ud83d\udc4d", UriComponent.Type.QUERY_PARAM));
     }
     
     public void testContextualEncodeQuery() {
@@ -100,11 +114,19 @@ public class UriComponentEncodeTest extends TestCase {
                 UriComponent.contextualEncode("a b c.-*_=+&%xx%20", UriComponent.Type.QUERY));
         assertEquals("a+b+c.-*_%3D%2B%26%25xx%20",
                 UriComponent.contextualEncode("a b c.-*_=+&%xx%20", UriComponent.Type.QUERY_PARAM));
+
+        assertEquals("thumbsup%F0%9F%91%8Dthumbsup%F0%9F%91%8D",
+                UriComponent.contextualEncode("thumbsup%F0%9F%91%8Dthumbsup\ud83d\udc4d", UriComponent.Type.QUERY));
+        assertEquals("thumbsup%F0%9F%91%8Dthumbsup%F0%9F%91%8D",
+                UriComponent.contextualEncode("thumbsup%F0%9F%91%8Dthumbsup\ud83d\udc4d", UriComponent.Type.QUERY_PARAM));
     }
 
     public void testContextualEncodeMatrixParam() {
         assertEquals("a%3Db%20c%3Bx",
                 UriComponent.contextualEncode("a=b c;x", UriComponent.Type.MATRIX_PARAM));
+
+        assertEquals("a%3Db%20c%3Bx%3Dthumbsup%F0%9F%91%8D",
+                UriComponent.contextualEncode("a=b c;x=thumbsup\ud83d\udc4d", UriComponent.Type.MATRIX_PARAM));
     }    
     
     public void testContextualEncodePercent() {
