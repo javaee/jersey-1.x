@@ -282,10 +282,12 @@ public class UriComponent {
         boolean insideTemplateParam = false;
 
         StringBuilder sb = null;
-        for (int offset = 0, codePoint = s.codePointAt(0);
+        for (int offset = 0, codePoint;
              offset < s.length();
-             codePoint = s.codePointAt(offset), offset += Character.charCount(codePoint))
+             offset += Character.charCount(codePoint))
         {
+            codePoint = s.codePointAt(offset);
+
             if (codePoint < 0x80 && table[codePoint]) {
                 if (sb != null) {
                     sb.append((char)codePoint);
