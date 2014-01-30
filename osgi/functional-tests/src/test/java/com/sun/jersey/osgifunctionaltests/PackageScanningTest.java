@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -96,9 +96,6 @@ public class PackageScanningTest {
                         "http://repository.springsource.com/maven/bundles/release",
                         "http://repository.springsource.com/maven/bundles/external",
                         "http://maven.java.net/content/repositories/snapshots"),
-
-                // asm bundle
-                mavenBundle().groupId("asm").artifactId("asm-all").versionAsInProject(),
 
                 mavenBundle("org.apache.geronimo.specs", "geronimo-servlet_2.5_spec", "1.1.2"),
 

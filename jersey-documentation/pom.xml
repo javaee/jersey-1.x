@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -78,7 +78,6 @@
                                 <replace file="${src.dir}/jersey.ent" token="$jsr311-api-jar-version" value="1.1.1"/>
                                 <replace file="${src.dir}/jersey.ent" token="$jackson.version" value="${jackson.version}"/>
                                 <replace file="${src.dir}/jersey.ent" token="$grizzly2.version" value="${grizzly2.version}"/>
-                                <replace file="${src.dir}/jersey.ent" token="$asm-version" value="3.3.1"/>
                             </tasks>
                         </configuration>
                         <id>process-entities</id>
@@ -89,7 +88,7 @@
                     </execution>
                 </executions>
             </plugin>
-            
+
             <plugin>
                 <groupId>com.agilejava.docbkx</groupId>
                 <artifactId>docbkx-maven-plugin</artifactId>
@@ -105,7 +104,7 @@
                 <configuration>
                     <xincludeSupported>true</xincludeSupported>
                     <sourceDirectory>${src.dir}</sourceDirectory>
-                    <targetDirectory>${project.build.directory}/docbook</targetDirectory>                    
+                    <targetDirectory>${project.build.directory}/docbook</targetDirectory>
                     <htmlStylesheet>http://jersey.java.net/documentation.css</htmlStylesheet>
                     <htmlCustomization>${src.dir}/customizations.xsl</htmlCustomization>
                     <partAutolabel>true</partAutolabel>
@@ -142,7 +141,7 @@
                             <chunkedOutput>true</chunkedOutput>
                             <chunkSectionDepth>0</chunkSectionDepth>
                             <useIdAsFilename>true</useIdAsFilename>
-                        </configuration>    
+                        </configuration>
                         <phase>package</phase>
                     </execution>
                 </executions>
@@ -191,7 +190,7 @@
             </plugin>
         </plugins>
     </build>
-    
+
     <properties>
         <assembly.directory>${project.build.directory}/assembly</assembly.directory>
         <src.dir>${basedir}/target/gen-src</src.dir>
