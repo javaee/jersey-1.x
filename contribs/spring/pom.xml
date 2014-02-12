@@ -2,7 +2,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -496,6 +496,87 @@
                                     <value>applicationContext-spring25.xml</value>
                                 </property>
                             </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>xdk</id>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-servlet</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-grizzly2-servlet</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>com.sun.jersey</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${project.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                    <version>${spring25-release-version}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.aspectj</groupId>
+                    <artifactId>aspectjrt</artifactId>
+                    <version>1.5.4</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.aspectj</groupId>
+                    <artifactId>aspectjweaver</artifactId>
+                    <version>1.5.4</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib</artifactId>
+                    <version>2.2</version>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
                         </configuration>
                     </plugin>
                 </plugins>
