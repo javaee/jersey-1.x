@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -43,12 +43,12 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-      <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
-      <artifactId>osgi-modules</artifactId>
-      <version>1.18</version>
+        <groupId>com.sun.jersey.glassfish.v3.osgi</groupId>
+        <artifactId>osgi-modules</artifactId>
+        <version>1.18.1</version>
     </parent>
     <artifactId>jersey-gf-servlet</artifactId>
     <packaging>jar</packaging>
@@ -78,13 +78,13 @@
                             com.sun.jersey.spi.container.servlet,
                             com.sun.jersey.spi.scanning.servlet,
                             <!-- the following is being used internally in GF REST API code! :-( -->
-			    com.sun.jersey.server.impl.container.servlet,
+                            com.sun.jersey.server.impl.container.servlet,
                             <!-- the following must be visible by the jersey-gf-server module
                                so that the EJB resource method dispatcher takes precedence over the other dispatchers
                                registered by the jersey-gf-server module -->
                             com.sun.jersey.server.impl.ejb
                         </Export-Package>
-                       <Import-Package>
+                        <Import-Package>
                             com.sun.jersey.core.osgi;resolution:=optional,
                             com.sun.net.httpserver;resolution:="optional",
                             javax.annotation.*;resolution:=optional,
@@ -98,7 +98,6 @@
                             javax.xml.bind.*;resolution:="optional",
                             javax.xml.namespace;resolution:="optional",
                             javax.xml.transform.*;resolution:="optional",
-                            org.objectweb.asm.*;password=GlassFish;version="3.1",
                             *
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -47,14 +47,15 @@ import java.security.PrivilegedExceptionAction;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
+
+import jersey.repackaged.org.objectweb.asm.ClassWriter;
+import jersey.repackaged.org.objectweb.asm.MethodVisitor;
+import jersey.repackaged.org.objectweb.asm.Opcodes;
 
 /**
  * Generates any number of plain bean classes on the fly, loading them with
  * the thread context class loader.
- *
+ * <p/>
  * Generated bean classes have a single, public, no-arg constructor.
  *
  * @author robc
@@ -70,19 +71,16 @@ public class BeanGenerator {
         this.prefix = prefix;
 
         try {
-            defineClassMethod =
-                    AccessController.doPrivileged(new PrivilegedExceptionAction<Method>(){
-                        public Method run() throws Exception{
-                            Class classLoaderClass = Class.forName("java.lang.ClassLoader");
-                            Method method = classLoaderClass.getDeclaredMethod(
-                                    "defineClass",
-                                    new Class[] { String.class, byte[].class, int.class, int.class });
-                            method.setAccessible(true);
-                            return method;
-                        }
-                    });
-        }
-        catch (PrivilegedActionException e) {
+            defineClassMethod = AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
+                public Method run() throws Exception {
+                    Class classLoaderClass = Class.forName("java.lang.ClassLoader");
+                    Method method = classLoaderClass.getDeclaredMethod("defineClass", new Class[]{String.class, byte[].class,
+                            int.class, int.class});
+                    method.setAccessible(true);
+                    return method;
+                }
+            });
+        } catch (PrivilegedActionException e) {
             LOGGER.log(Level.SEVERE, "failed to access method ClassLoader.defineClass", e);
             // TODO - wrapping and rethrowing for now
             throw new RuntimeException(e);
@@ -98,17 +96,17 @@ public class BeanGenerator {
         methodVisitor.visitVarInsn(Opcodes.ALOAD, 0);
         methodVisitor.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V");
         methodVisitor.visitInsn(Opcodes.RETURN);
-        methodVisitor.visitMaxs(1,1);
+        methodVisitor.visitMaxs(1, 1);
         methodVisitor.visitEnd();
         writer.visitEnd();
         byte[] bytecode = writer.toByteArray();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try {
-            Class<?> result = (Class<?>) defineClassMethod.invoke(classLoader, name.replace("/","."), bytecode, 0, bytecode.length);
+            Class<?> result = (Class<?>) defineClassMethod.invoke(classLoader, name.replace("/", "."), bytecode, 0,
+                    bytecode.length);
             LOGGER.fine("Created class " + result.getName());
             return result;
-        }
-        catch (Throwable t) {
+        } catch (Throwable t) {
             LOGGER.log(Level.SEVERE, "error calling ClassLoader.defineClass", t);
             return null;
         }

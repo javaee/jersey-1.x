@@ -53,3 +53,4 @@ jaxrs-components
 archive/src/main/resources/Jersey-LICENSE.txt
 ri/jax-rs-ri-source-licensee/src/main/resources/TLDA_SCSL_Licensees_License_Notice.txt
 contribs/bill-burke-book
+jersey-server/src/main/java/jersey/repackaged/org/objectweb/asm

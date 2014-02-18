@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,25 +37,9 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
- 
+
 package com.sun.jersey.server.impl.cdi;
- 
-import com.sun.jersey.api.core.ExtendedUriInfo;
-import com.sun.jersey.api.core.HttpContext;
-import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.api.core.HttpResponseContext;
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.api.core.ResourceContext;
-import com.sun.jersey.api.model.Parameter;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.core.util.FeaturesAndProperties;
-import com.sun.jersey.server.impl.InitialContextHelper;
-import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
-import com.sun.jersey.spi.MessageBodyWorkers;
-import com.sun.jersey.spi.container.ExceptionMapperContext;
-import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.inject.Errors;
-import com.sun.jersey.spi.inject.Injectable;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.GenericArrayType;
@@ -71,6 +55,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
+
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -93,23 +94,25 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.naming.InitialContext;
 import javax.naming.Name;
-import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Encoded;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Providers;
+
+import com.sun.jersey.api.core.ExtendedUriInfo;
+import com.sun.jersey.api.core.HttpContext;
+import com.sun.jersey.api.core.HttpRequestContext;
+import com.sun.jersey.api.core.HttpResponseContext;
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.api.core.ResourceContext;
+import com.sun.jersey.api.model.Parameter;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.util.FeaturesAndProperties;
+import com.sun.jersey.server.impl.InitialContextHelper;
+import com.sun.jersey.server.impl.inject.AbstractHttpContextInjectable;
+import com.sun.jersey.spi.MessageBodyWorkers;
+import com.sun.jersey.spi.container.ExceptionMapperContext;
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.inject.Errors;
+import com.sun.jersey.spi.inject.Injectable;
+
 /**
  *
  * @author robc
@@ -145,7 +148,7 @@ public class CDIExtension implements Extension {
     private Map<Class<? extends Annotation>, Set<DiscoveredParameter>> discoveredParameterMap;
     private Map<DiscoveredParameter, SyntheticQualifier> syntheticQualifierMap;
     private int nextSyntheticQualifierValue = 0;
-    
+
     private List<InitializedLater> toBeInitializedLater;
 
     private static String JNDI_CDIEXTENSION_NAME = "CDIExtension";
@@ -156,9 +159,9 @@ public class CDIExtension implements Extension {
      * rather than going through a thread local.
      */
     private static final String LOOKUP_EXTENSION_IN_BEAN_MANAGER_SYSTEM_PROPERTY = "com.sun.jersey.server.impl.cdi.lookupExtensionInBeanManager";
-    
+
     public static final boolean lookupExtensionInBeanManager = getLookupExtensionInBeanManager();
-    
+
     private static boolean getLookupExtensionInBeanManager() {
         return Boolean.parseBoolean(System.getProperty(LOOKUP_EXTENSION_IN_BEAN_MANAGER_SYSTEM_PROPERTY, "false"));
     }
@@ -179,7 +182,7 @@ public class CDIExtension implements Extension {
     }
 
     public CDIExtension() {}
-    
+
     private void initialize(BeanManager manager) {
         // initialize in a separate method because Weld creates a proxy for the extension
         // and we don't want to waste time initializing it
@@ -196,7 +199,7 @@ public class CDIExtension implements Extension {
                 throw new RuntimeException(ex);
             }
         }
-        
+
         // annotations to be turned into qualifiers
         Set<Class<? extends Annotation>> set = new HashSet<Class<? extends Annotation>>();
         set.add(CookieParam.class);
@@ -218,7 +221,7 @@ public class CDIExtension implements Extension {
         map.put(QueryParam.class,Parameter.Source.QUERY);
         map.put(Context.class,Parameter.Source.CONTEXT);
         paramQualifiersMap = Collections.unmodifiableMap(map);
-        
+
         // pre-defined contextual types
         Set<Class<?>> set3 = new HashSet<Class<?>>();
         // standard types
@@ -287,7 +290,7 @@ public class CDIExtension implements Extension {
         return diveIntoJNDIContext(initialContext, new JNDIContextDiver() {
             @Override
             public javax.naming.Context stepInto(javax.naming.Context ctx, String name) throws NamingException {
-                    return (javax.naming.Context) ctx.lookup(name);
+                return (javax.naming.Context) ctx.lookup(name);
             }
         });
     }
@@ -302,9 +305,9 @@ public class CDIExtension implements Extension {
         }
     }
 
-   /*
-    *  Holds information on one site (constructor/method argument or field) to be patched.
-    */
+    /*
+     *  Holds information on one site (constructor/method argument or field) to be patched.
+     */
     private static class PatchInformation {
         private DiscoveredParameter parameter;
         private SyntheticQualifier syntheticQualifier;
@@ -333,7 +336,7 @@ public class CDIExtension implements Extension {
         public Annotation getAnnotation() {
             return annotation;
         }
-        
+
         public boolean mustAddInject() {
             return mustAddInject;
         }
@@ -417,16 +420,16 @@ public class CDIExtension implements Extension {
                     PatchInformation patchInfo = fieldToPatchInfoMap.get(field);
                     Set<Annotation> annotations = new HashSet<Annotation>();
                     if (patchInfo.mustAddInject()) {
-                       annotations.add(injectAnnotationLiteral);
+                        annotations.add(injectAnnotationLiteral);
                     }
                     if (patchInfo.getSyntheticQualifier() != null) {
-                       annotations.add(patchInfo.getSyntheticQualifier());
-                       Annotation skippedQualifier = patchInfo.getParameter().getAnnotation();
-                       for (Annotation annotation : field.getAnnotations()) {
-                           if (annotation != skippedQualifier) {
-                               annotations.add(annotation);
-                           }
-                       }
+                        annotations.add(patchInfo.getSyntheticQualifier());
+                        Annotation skippedQualifier = patchInfo.getParameter().getAnnotation();
+                        for (Annotation annotation : field.getAnnotations()) {
+                            if (annotation != skippedQualifier) {
+                                annotations.add(annotation);
+                            }
+                        }
                     }
                     else {
                         annotations.addAll(field.getAnnotations());
@@ -441,7 +444,7 @@ public class CDIExtension implements Extension {
                     newFields.add(new AnnotatedFieldImpl<T>(field, newType));
                 }
             }
-            
+
             Set<AnnotatedMethod<? super T>> newMethods = new HashSet<AnnotatedMethod<? super T>>();
             for (AnnotatedMethod<? super T> method : type.getMethods()) {
                 if (mustPatchMethods.contains((AnnotatedMethod<T>)method)) {
@@ -457,7 +460,7 @@ public class CDIExtension implements Extension {
                         patchAnnotatedCallable(method, newMethod, parameterToPatchInfoMap);
                         newMethods.add(newMethod);
                     }
-                     else {
+                    else {
                         AnnotatedMethodImpl<T> newMethod = new AnnotatedMethodImpl<T>(method, newType);
                         patchAnnotatedCallable(method, newMethod, parameterToPatchInfoMap);
                         newMethods.add(newMethod);
@@ -474,14 +477,14 @@ public class CDIExtension implements Extension {
             newType.setFields(newFields);
             newType.setMethods(newMethods);
             event.setAnnotatedType(newType);
-            
+
             LOGGER.fine("  replaced annotated type for " + type.getJavaClass());
         }
     }
 
     private <T> boolean processAnnotatedConstructor(AnnotatedConstructor<T> constructor,
-                                                 boolean classHasEncodedAnnotation,
-                                                 Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap) {
+                                                    boolean classHasEncodedAnnotation,
+                                                    Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap) {
         boolean mustPatch = false;
 
         if (constructor.getAnnotation(Inject.class) != null) {
@@ -492,8 +495,8 @@ public class CDIExtension implements Extension {
                     if (discovered != null) {
                         if (knownParameterQualifiers.contains(annotation.annotationType())) {
                             if (methodHasEncodedAnnotation ||
-                                classHasEncodedAnnotation ||
-                                parameter.isAnnotationPresent(DefaultValue.class)) {
+                                    classHasEncodedAnnotation ||
+                                    parameter.isAnnotationPresent(DefaultValue.class)) {
                                 mustPatch = true;
                             }
 
@@ -511,15 +514,15 @@ public class CDIExtension implements Extension {
                 }
             }
         }
-        
+
         return mustPatch;
     }
 
     private <T> boolean processAnnotatedMethod(AnnotatedMethod<? super T> method,
-												 Class<T> token,
-                                                 boolean classHasEncodedAnnotation,
-                                                 Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap,
-                                                 Set<AnnotatedMethod<? super T>> setterMethodsWithoutInject) {
+                                               Class<T> token,
+                                               boolean classHasEncodedAnnotation,
+                                               Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap,
+                                               Set<AnnotatedMethod<? super T>> setterMethodsWithoutInject) {
         boolean mustPatch = false;
 
         if (method.getAnnotation(Inject.class) != null) {
@@ -534,8 +537,8 @@ public class CDIExtension implements Extension {
                     if (discovered != null) {
                         if (knownParameterQualifiers.contains(annotation.annotationType())) {
                             if (methodHasEncodedAnnotation ||
-                                classHasEncodedAnnotation ||
-                                parameter.isAnnotationPresent(DefaultValue.class)) {
+                                    classHasEncodedAnnotation ||
+                                    parameter.isAnnotationPresent(DefaultValue.class)) {
                                 mustPatch = true;
                             }
 
@@ -592,8 +595,8 @@ public class CDIExtension implements Extension {
     private <T> boolean isSetterMethod(AnnotatedMethod<T> method) {
         Method javaMethod = method.getJavaMember();
         if ((javaMethod.getModifiers() & Modifier.PUBLIC) != 0 &&
-            (javaMethod.getReturnType() == Void.TYPE) &&
-            (javaMethod.getName().startsWith("set"))) {
+                (javaMethod.getReturnType() == Void.TYPE) &&
+                (javaMethod.getName().startsWith("set"))) {
             List<AnnotatedParameter<T>> parameters = method.getParameters();
             if (parameters.size() == 1) {
                 return true;
@@ -604,7 +607,7 @@ public class CDIExtension implements Extension {
     }
 
     private <T> boolean processAnnotatedField(AnnotatedField<? super T> field,
-		 			                          Class<T> token,
+                                              Class<T> token,
                                               boolean classHasEncodedAnnotation,
                                               Map<AnnotatedField<? super T>, PatchInformation> fieldToPatchInfoMap) {
         boolean mustPatch = false;
@@ -613,9 +616,9 @@ public class CDIExtension implements Extension {
                 boolean mustAddInjectAnnotation = !field.isAnnotationPresent(Inject.class);
 
                 if (field.isAnnotationPresent(Encoded.class) ||
-                    classHasEncodedAnnotation ||
-                    mustAddInjectAnnotation ||
-                    field.isAnnotationPresent(DefaultValue.class)) {
+                        classHasEncodedAnnotation ||
+                        mustAddInjectAnnotation ||
+                        field.isAnnotationPresent(DefaultValue.class)) {
                     mustPatch = true;
                 }
 
@@ -630,13 +633,13 @@ public class CDIExtension implements Extension {
                 }
             }
         }
-        
+
         return mustPatch;
     }
 
     private <T> void patchAnnotatedCallable(AnnotatedCallable<? super T> callable,
                                             AnnotatedCallableImpl<T> newCallable,
-		 			                        Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap) {
+                                            Map<AnnotatedParameter<? super T>, PatchInformation> parameterToPatchInfoMap) {
         List<AnnotatedParameter<T>> newParams = new ArrayList<AnnotatedParameter<T>>();
         for (AnnotatedParameter<? super T> parameter : callable.getParameters()) {
             PatchInformation patchInfo = parameterToPatchInfoMap.get(parameter);
@@ -644,17 +647,17 @@ public class CDIExtension implements Extension {
                 Set<Annotation> annotations = new HashSet<Annotation>();
                 // in reality, this cannot happen
                 if (patchInfo.mustAddInject()) {
-                   annotations.add(injectAnnotationLiteral);
+                    annotations.add(injectAnnotationLiteral);
                 }
-                
+
                 if (patchInfo.getSyntheticQualifier() != null) {
-                   annotations.add(patchInfo.getSyntheticQualifier());
-                   Annotation skippedQualifier = patchInfo.getParameter().getAnnotation();
-                   for (Annotation annotation : parameter.getAnnotations()) {
-                       if (annotation != skippedQualifier) {
-                           annotations.add(annotation);
-                       }
-                   }
+                    annotations.add(patchInfo.getSyntheticQualifier());
+                    Annotation skippedQualifier = patchInfo.getParameter().getAnnotation();
+                    for (Annotation annotation : parameter.getAnnotations()) {
+                        if (annotation != skippedQualifier) {
+                            annotations.add(annotation);
+                        }
+                    }
                 }
                 else {
                     annotations.addAll(parameter.getAnnotations());
@@ -694,7 +697,7 @@ public class CDIExtension implements Extension {
         }
         return result;
     }
-    
+
     // taken from ReflectionHelper
     private static Class getClassOfType(Type type) {
         if (type instanceof Class) {
@@ -726,7 +729,7 @@ public class CDIExtension implements Extension {
     <T> void processInjectionTarget(@Observes ProcessInjectionTarget<T> event) {
         LOGGER.fine("Handling ProcessInjectionTarget event for " + event.getAnnotatedType().getJavaClass().getName());
     }
-    
+
     /*
     void processBean(@Observes ProcessBean<?> event) {
         LOGGER.fine("Handling ProcessBean event for " + event.getBean().getBeanClass().getName());
@@ -738,7 +741,7 @@ public class CDIExtension implements Extension {
 
         // TODO - here we should check that all the rules have been followed
         // and call addDefinitionError for each problem we encountered
-        
+
         Bean<?> bean = event.getBean();
         for (InjectionPoint injectionPoint : bean.getInjectionPoints()) {
             StringBuilder sb = new StringBuilder();
@@ -756,9 +759,9 @@ public class CDIExtension implements Extension {
         LOGGER.fine("Handling AfterBeanDiscovery event");
 
         addPredefinedContextBeans(event);
-        
+
         // finally define beans for all qualifiers we discovered
-        
+
         BeanGenerator beanGenerator = new BeanGenerator("com/sun/jersey/server/impl/cdi/generated/Bean");
 
         for (Map.Entry<Class<? extends Annotation>, Set<DiscoveredParameter>> entry  : discoveredParameterMap.entrySet()) {
@@ -787,16 +790,16 @@ public class CDIExtension implements Extension {
                 // The problem here is that (1) we don't have the original program
                 // element any more and (2) a single DiscoveredParameter may have
                 // been encountered in multiple places with different annotations
-                
+
                 Parameter jerseyParameter = new Parameter(
-                                                    new Annotation[]{ annotation },
-                                                    annotation,
-                                                    paramQualifiersMap.get(annotation.annotationType()),
-                                                    parameter.getValue(),
-                                                    parameter.getType(),
-                                                    klass,
-                                                    parameter.isEncoded(),
-                                                    (parameter.getDefaultValue() == null ? null : parameter.getDefaultValue().value()));
+                        new Annotation[]{ annotation },
+                        annotation,
+                        paramQualifiersMap.get(annotation.annotationType()),
+                        parameter.getValue(),
+                        parameter.getType(),
+                        klass,
+                        parameter.isEncoded(),
+                        (parameter.getDefaultValue() == null ? null : parameter.getDefaultValue().value()));
                 Class<?> beanClass = beanGenerator.createBeanClass();
                 ParameterBean bean = new ParameterBean(beanClass, parameter.getType(), annotations, parameter, jerseyParameter);
                 toBeInitializedLater.add(bean);
@@ -830,7 +833,7 @@ public class CDIExtension implements Extension {
 
         // @Context UriInfo
         event.addBean(new PredefinedBean<UriInfo>(UriInfo.class, contextAnnotationLiteral));
-        
+
         // now the Jersey extensions
 
         // @Context ExceptionMapperContext
@@ -838,7 +841,7 @@ public class CDIExtension implements Extension {
 
         // @Context ExtendedUriInfo
         event.addBean(new PredefinedBean<ExtendedUriInfo>(ExtendedUriInfo.class, contextAnnotationLiteral));
-        
+
         // @Context FeaturesAndProperties
         event.addBean(new PredefinedBean<FeaturesAndProperties>(FeaturesAndProperties.class, contextAnnotationLiteral));
 
@@ -865,19 +868,19 @@ public class CDIExtension implements Extension {
         }, contextAnnotationLiteral));
 
     }
-    
+
     void setWebApplication(WebApplication wa) {
         webApplication = wa;
     }
-    
+
     WebApplication getWebApplication() {
         return webApplication;
     }
-    
+
     void setResourceConfig(ResourceConfig rc) {
         resourceConfig = rc;
     }
-    
+
     ResourceConfig getResourceConfig() {
         return resourceConfig;
     }
@@ -885,7 +888,7 @@ public class CDIExtension implements Extension {
     /*
      * Called after the WebApplication and ResourceConfig have been set,
      * i.e. when Jersey is in a somewhat initialized state.
-     * 
+     *
      * By contrast, all the CDI driven code earlier in this source file
      * runs before Jersey gets a chance to initialize itself.
      */
@@ -909,7 +912,7 @@ public class CDIExtension implements Extension {
             }
         }
     }
-    
+
     /*
      * Constructs an object by delegating to the ServerInjectableProviderFactory of the WebApplication
      */
@@ -944,7 +947,7 @@ public class CDIExtension implements Extension {
         private boolean processed = false;
 
         public ParameterBean(Class<?> klass, Type type, Set<Annotation> qualifiers,
-                DiscoveredParameter discoveredParameter, Parameter parameter) {
+                             DiscoveredParameter discoveredParameter, Parameter parameter) {
             super(klass, type, qualifiers);
             this.discoveredParameter = discoveredParameter;
             this.parameter = parameter;
@@ -956,7 +959,7 @@ public class CDIExtension implements Extension {
             }
             if (processed)
                 return;
-            
+
             processed = true;
             boolean registered = webApplication.getServerInjectableProviderFactory().
                     isParameterTypeRegistered(parameter);

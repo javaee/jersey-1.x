@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -67,7 +67,7 @@
   the set of jars that Jersey depends on. Jersey has a pluggable component
   architecture so the set of jars required to be include in the class path can
   be different for each application.</para>
-  
+
   <para>
   All Jersey components are built using Java SE 6 compiler. It means, you will also need at least Java SE 6
   to be able to compile and run your application.
@@ -153,7 +153,7 @@
     &lt;name&gt;Java.net Snapshot Repository for Maven&lt;/name&gt;
     &lt;url&gt;https://maven.java.net/content/repositories/snapshots/&lt;/url&gt;
     &lt;layout&gt;default&lt;/layout&gt;
-&lt;/repository&gt;</programlisting></para> 
+&lt;/repository&gt;</programlisting></para>
 
     <para>Non-maven developers require: <itemizedlist>
         <listitem>
@@ -170,21 +170,12 @@
           ,
         </listitem>
 
-        <listitem>
-          <ulink
-          url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink>
-        </listitem>
       </itemizedlist> or, if using the jersey-bundle: <itemizedlist>
         <listitem>
           <ulink
           url="http://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-bundle&amp;v=&version;&amp;e=jar">jersey-bundle.jar</ulink>
 
           ,
-        </listitem>
-
-        <listitem>
-          <ulink
-          url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink>
         </listitem>
       </itemizedlist> For Ant developers the <ulink
     url="http://maven.apache.org/ant-tasks/index.html">Ant Tasks for Maven</ulink>
@@ -200,29 +191,11 @@
                              layout="legacy" /&gt;
 &lt;/artifact:dependencies&gt;</programlisting> The path id
     “dependency.classpath” may then be referenced as the classpath to be used
-    for compiling or executing. Specifically the <ulink
-    url="http://search.maven.org/remotecontent?filepath=asm/asm/&asm.version;/asm-&asm.version;.jar">asm.jar</ulink>
-    dependency is required when either of the following <ulink
-    url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ResourceConfig.html">com.sun.jersey.api.core.ResourceConfig</ulink>
-    implementations are utilized: <itemizedlist>
-        <listitem>
-          <ulink
-          url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html">com.sun.jersey.api.core.ClasspathResourceConfig</ulink>
-
-          ; or
-        </listitem>
-
-        <listitem>
-          <ulink
-          url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/PackagesResourceConfig.html">com.sun.jersey.api.core.PackagesResourceConfig</ulink>
-        </listitem>
-      </itemizedlist></para>
+    for compiling or executing.</para>
 
     <para>By default Jersey will utilize the <ulink
     url="http://jersey.java.net/nonav/apidocs/&version;/jersey/com/sun/jersey/api/core/ClasspathResourceConfig.html">ClasspathResourceConfig</ulink>
-    if an alternative is not specified. If an alternative is specified that
-    does not depend on the asm.jar then it is no longer necessary to include
-    the asm.jar in the minimum set of required jars.</para>
+    if an alternative is not specified.</para>
   </section>
 
   <section id="core_client">
@@ -276,7 +249,7 @@
 
       <para>Maven developers, deploying an application using the Grizzly2 HTTP
       Web server, require a dependency on the <ulink
-      url="http://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-grizzly2&amp;v=&version;&amp;e=pom">jersey-grizzly2</ulink>      
+      url="http://maven.java.net/service/local/artifact/maven/redirect?r=&repository;&amp;g=com.sun.jersey&amp;a=jersey-grizzly2&amp;v=&version;&amp;e=pom">jersey-grizzly2</ulink>
       module.</para>
 
       <para>Non-maven developers require: <ulink
@@ -554,13 +527,6 @@
                 <listitem>
                     <ulink
                             url="http://download.eclipse.org/rt/eclipselink/maven.repo/org/eclipse/persistence/org.eclipse.persistence.core/2.3.2/org.eclipse.persistence.core-2.3.2.jar">org.eclipse.persistence.core.jar</ulink>
-
-                    ,
-                </listitem>
-
-                <listitem>
-                    <ulink
-                            url="http://download.eclipse.org/rt/eclipselink/maven.repo/org/eclipse/persistence/org.eclipse.persistence.asm/2.3.2/org.eclipse.persistence.asm-2.3.2.jar">org.eclipse.persistence.asm.jar</ulink>
 
                     ,
                 </listitem>
@@ -857,7 +823,7 @@
         <listitem>
           <code>com.sun.jersey.test.framework.spi.container.external.ExternalTestContainerFactory</code>
 
-           for testing with application deployed externally, for example to GlassFish or Tomcat. 
+           for testing with application deployed externally, for example to GlassFish or Tomcat.
         </listitem>
       </itemizedlist></para>
 

@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -50,7 +50,7 @@
     </parent>
     <groupId>com.sun.jersey.samples.helloworld-osgi-webapp</groupId>
     <artifactId>functional-test</artifactId>
-    <version>1.18</version>
+    <version>1.18.1</version>
     <packaging>pom</packaging>
 
     <name>Helloworld OSGi WebApp - Jersey Sample Test</name>
@@ -205,12 +205,6 @@
             <groupId>org.ops4j.pax.web</groupId>
             <artifactId>pax-web-extender-war</artifactId>
             <version>${jetty-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm-all</artifactId>
-            <version>3.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

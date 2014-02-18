@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -47,17 +47,12 @@
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
-        <version>1.18</version>
+        <version>1.18.1</version>
     </parent>
     <artifactId>jersey-server</artifactId>
     <packaging>jar</packaging>
     <name>jersey-server</name>
     <dependencies>
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-            <version>3.1</version>
-        </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -159,10 +154,10 @@
         </resources>
 
         <testResources>
-          <testResource>
-            <directory>${basedir}/src/test/resources</directory>
-            <filtering>true</filtering>
-          </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
         </testResources>
 
         <plugins>
@@ -191,7 +186,6 @@
                     </includeSchemas>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
@@ -214,7 +208,8 @@
                             com.sun.jersey.spi.scanning,
                             com.sun.jersey.spi.template,
                             com.sun.jersey.spi.uri.*,
-                            com.sun.research.ws.wadl
+                            com.sun.research.ws.wadl,
+                            jersey.repackaged.org.objectweb.asm.*
                         </Export-Package>
                         <Import-Package>
                             com.sun.jersey.core.osgi;resolution:=optional,
@@ -225,7 +220,6 @@
                             javax.xml.bind.*;resolution:="optional",
                             javax.xml.namespace;resolution:="optional",
                             javax.xml.transform.*;resolution:="optional",
-                            org.objectweb.asm.*;resolution:="optional",
                             *
                         </Import-Package>
                         <DynamicImport-Package>*</DynamicImport-Package>
@@ -255,7 +249,7 @@
                     <argLine>-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/server.policy</argLine>
                 </configuration>
             </plugin>
-         </plugins>
+        </plugins>
     </build>
 
 </project>
