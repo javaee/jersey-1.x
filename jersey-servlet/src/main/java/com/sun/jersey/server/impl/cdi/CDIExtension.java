@@ -149,7 +149,7 @@ public class CDIExtension implements Extension {
     private Map<DiscoveredParameter, SyntheticQualifier> syntheticQualifierMap;
     private int nextSyntheticQualifierValue = 0;
 
-    private List<InitializedLater> toBeInitializedLater;
+    /* package */ List<InitializedLater> toBeInitializedLater;
 
     private static String JNDI_CDIEXTENSION_NAME = "CDIExtension";
     private static String JNDI_CDIEXTENSION_CTX = "com/sun/jersey/config";

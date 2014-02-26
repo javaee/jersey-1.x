@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -37,11 +37,13 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
- 
+
 package com.sun.jersey.server.impl.cdi;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.spi.Bean;
@@ -50,61 +52,116 @@ import javax.enterprise.inject.spi.BeanManager;
 /**
   * Utility methods for CDI BeanManager and Bean classes.
   *
-  * @author robc
-  * @author Paul.Sandoz@Sun.Com
+  * @author Roberto Chinnici
+  * @author Paul Sandoz (paul.sandoz at oracle.com)
+  * @author Jakub Podlesak (jakub.podlesak at oracle.com)
   */
 public class Utils {
 
+    private static final Logger LOGGER = Logger.getLogger(Utils.class.getName());
+
+    /**
+     * To prevent instantiation.
+     */
     private Utils() {}
-    
-    public static Bean<?> getBean(BeanManager bm, Class<?> c) {
-        final Set<Bean<?>> bs = bm.getBeans(c);
-        if (bs.isEmpty()) {
+
+    /**
+     * Gets you a CDI bean that corresponds to the type provided as parameter.
+     *
+     * @param beanManager bean manager to get the bean from
+     * @param clazz type for which a corresponding bean should be found
+     * @return CDI bean for given type, or null if no such bean have been found
+     *
+     */
+    public static Bean<?> getBean(BeanManager beanManager, Class<?> clazz) {
+
+        final Set<Bean<?>> beans = beanManager.getBeans(clazz);
+        if (beans.isEmpty()) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine(String.format("No CDI beans found in bean manager, %s, for type %s", beanManager, clazz));
+            }
             return null;
         }
 
         try {
-            return bm.resolve(bs);
+            return beanManager.resolve(beans);
         } catch(AmbiguousResolutionException ex) {
             // Check if there is a shared base class of c
             // If so reduce the set of beans whose class equals c and resolve
-            if (isSharedBaseClass(c, bs)) {
+            if (isSharedBaseClass(clazz, beans)) {
                 try {
-                    return bm.resolve(getBaseClassSubSet(c, bs));
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        LOGGER.fine(String.format("Ambiguous resolution exception caught when resolving bean %s. Trying to resolve by the type %s", beans, clazz));
+                    }
+                    return beanManager.resolve(getBaseClassSubSet(clazz, beans));
                 } catch (AmbiguousResolutionException ex2) {
                     return null;
                 }
+            }
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine(String.format("Failed to resolve bean %s.", beans));
             }
             return null;
         }
     }
 
-    public static <T> T getInstance(BeanManager bm, Class<T> c) {
-        Bean<?> b = getBean(bm, c);
-        if (b == null) {
+    public static <T> T getInstance(BeanManager beanManager, Class<T> c) {
+
+        Bean<?> bean = getBean(beanManager, c);
+        if (bean == null) {
             return null;
         }
-        
-        CreationalContext<?> cc = bm.createCreationalContext(b);
-        return c.cast(bm.getReference(b, c, cc));
+
+        final CreationalContext<?> creationalContext = beanManager.createCreationalContext(bean);
+        final Object result = beanManager.getReference(bean, c, creationalContext);
+
+        return c.cast(result);
     }
-    
-    private static boolean isSharedBaseClass(Class<?> c, Set<Bean<?>> bs) {
-        for (Bean<?> b : bs) {
-            if (!c.isAssignableFrom(b.getBeanClass())) {
+
+    public static CDIExtension getCdiExtensionInstance(BeanManager beanManager) {
+
+        final Set<Bean<?>> beans = beanManager.getBeans(CDIExtension.class);
+
+        if (beans.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return getCdiExtensionReference(beanManager.resolve(beans), beanManager);
+        } catch(AmbiguousResolutionException ex) {
+            // try to resolve the instance directly by looking at which one has already been initialized
+            for (Bean<?> b : beans) {
+                final CDIExtension cdiExtension = getCdiExtensionReference(b, beanManager);
+                if (cdiExtension.toBeInitializedLater != null) {
+                    return cdiExtension;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static CDIExtension getCdiExtensionReference(final Bean extensionBean, final BeanManager beanManager) {
+        final CreationalContext<?> creationalContext = beanManager.createCreationalContext(extensionBean);
+        final Object result = beanManager.getReference(extensionBean, CDIExtension.class, creationalContext);
+        return (CDIExtension)result;
+    }
+
+    private static boolean isSharedBaseClass(final Class<?> clazz, final Set<Bean<?>> beans) {
+        for (Bean<?> bean : beans) {
+            if (!clazz.isAssignableFrom(bean.getBeanClass())) {
                 return false;
             }
         }
         return true;
     }
 
-    private static Set<Bean<?>> getBaseClassSubSet(Class<?> c, Set<Bean<?>> bs) {
-        for (Bean<?> b : bs) {
-            if (c == b.getBeanClass()) {
-                return Collections.<Bean<?>>singleton(b);
+    private static Set<Bean<?>> getBaseClassSubSet(final Class<?> clazz, final Set<Bean<?>> beans) {
+        for (Bean<?> bean : beans) {
+            if (clazz == bean.getBeanClass()) {
+                return Collections.<Bean<?>>singleton(bean);
             }
         }
-        return bs;
+        return beans;
     }
-
 }

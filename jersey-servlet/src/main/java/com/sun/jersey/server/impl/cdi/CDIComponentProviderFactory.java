@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,21 +39,12 @@
  */
 package com.sun.jersey.server.impl.cdi;
 
-import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.core.spi.component.ComponentContext;
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
-import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
-import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
-import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
-import com.sun.jersey.spi.container.WebApplication;
-import com.sun.jersey.spi.container.WebApplicationListener;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
@@ -62,7 +53,19 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
+import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.spi.component.ComponentContext;
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
+import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
+import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
+import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
+
 import static com.sun.jersey.server.impl.cdi.Utils.getBean;
+
+import com.sun.jersey.spi.container.WebApplication;
+import com.sun.jersey.spi.container.WebApplicationListener;
 
 /**
  * Factory for IoCComponentProvider for CDI beans.
@@ -78,7 +81,7 @@ public class CDIComponentProviderFactory implements
 
     private static final Logger LOGGER = Logger.getLogger(
             CDIComponentProviderFactory.class.getName());
-    
+
     private final BeanManager beanManager;
     private final CDIExtension extension;
 
@@ -86,7 +89,7 @@ public class CDIComponentProviderFactory implements
         beanManager = (BeanManager)bm;
         // work around proxying bug in Weld
         if (CDIExtension.lookupExtensionInBeanManager) {
-            extension = Utils.getInstance(beanManager, CDIExtension.class);
+            extension = Utils.getCdiExtensionInstance(beanManager);
         }
         else {
             extension = CDIExtension.getInitializedExtension();
@@ -94,7 +97,7 @@ public class CDIComponentProviderFactory implements
         extension.setWebApplication(wa);
         extension.setResourceConfig(rc);
     }
-    
+
     public void onWebApplicationReady() {
         extension.lateInitialize();
     }
@@ -159,7 +162,7 @@ public class CDIComponentProviderFactory implements
             };
         }
     }
-    
+
     private interface ComponentProviderDestroyable extends IoCInstantiatedComponentProvider, IoCDestroyable {
     };
 
@@ -171,7 +174,7 @@ public class CDIComponentProviderFactory implements
     private final Map<Class<? extends Annotation>, ComponentScope> scopeMap = createScopeMap();
 
     private Map<Class<? extends Annotation>, ComponentScope> createScopeMap() {
-        Map<Class<? extends Annotation>, ComponentScope> m = 
+        Map<Class<? extends Annotation>, ComponentScope> m =
                 new HashMap<Class<? extends Annotation>, ComponentScope>();
         m.put(ApplicationScoped.class, ComponentScope.Singleton);
         m.put(RequestScoped.class, ComponentScope.PerRequest);
