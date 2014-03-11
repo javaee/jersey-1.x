@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -87,6 +87,9 @@ public class UriComponentDecodeTest extends TestCase {
     public void testPercentUnicodeEscapedOctets() {
         assertEquals("copyright\u00a9", UriComponent.decode("copyright%c2%a9", null));
         assertEquals("copyright\u00a9", UriComponent.decode("copyright%C2%A9", null));
+
+        assertEquals("thumbsup\ud83d\udc4d", UriComponent.decode("thumbsup%f0%9f%91%8d", null));
+        assertEquals("thumbsup\ud83d\udc4d", UriComponent.decode("thumbsup%F0%9F%91%8D", null));
     }
 
     public void testHost() {
@@ -131,6 +134,10 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodePath("///a///b///c///", "", "", "", "a", "", "", "b", "", "", "c", "", "", "");
     }
 
+    public void testDecodeUnicodePath() {
+        _testDecodePath("/%F0%9F%91%8D/thumbsup", "", "\ud83d\udc4d", "thumbsup");
+    }
+
     private void _testDecodePath(String path, String... segments) {
         List<PathSegment> ps = UriComponent.decodePath(path, true);
         assertEquals(segments.length, ps.size());
@@ -166,11 +173,23 @@ public class UriComponentDecodeTest extends TestCase {
         _testDecodeQuery("%20a%20=%20x%20", false, " a ", "%20x%20");
     }
 
+    public void testDecodeUnicodeQuery() {
+        _testDecodeQuery("+thumbsup%F0%9F%91%8D+=+chicken%F0%9F%90%94+", true, " thumbsup\ud83d\udc4d ", " chicken\ud83d\udc14 ");
+        _testDecodeQuery("%20thumbsup%F0%9F%91%8D%20=%20chicken%F0%9F%90%94%20", true, " thumbsup\ud83d\udc4d ", " chicken\ud83d\udc14 ");
+        _testDecodeQuery("+thumbsup%F0%9F%91%8D+=+chicken%F0%9F%90%94+", false, " thumbsup\ud83d\udc4d ", "+chicken%F0%9F%90%94+");
+        _testDecodeQuery("%20thumbsup%F0%9F%91%8D%20=%20chicken%F0%9F%90%94%20", false, " thumbsup\ud83d\udc4d ", "%20chicken%F0%9F%90%94%20");
+    }
+
     public void testDecodeQueryParam() {
         assertEquals(" ",
                 UriComponent.decode("+", UriComponent.Type.QUERY_PARAM));
         assertEquals("a b c ",
                 UriComponent.decode("a+b+c+", UriComponent.Type.QUERY_PARAM));
+    }
+
+    public void testDecodeUnicodeQueryParam() {
+        assertEquals("thumbsup \ud83d\udc4d chicken \ud83d\udc14",
+                UriComponent.decode("thumbsup+%F0%9F%91%8D+chicken+%F0%9F%90%94", UriComponent.Type.QUERY_PARAM));
     }
 
     private void _testDecodeQuery(String q, String... query) {
@@ -227,7 +246,11 @@ public class UriComponentDecodeTest extends TestCase {
 
         _testDecodeMatrix(";%20a%20=%20x%20", "", true, " a ", " x ");
         _testDecodeMatrix(";%20a%20=%20x%20", "", false, " a ", "%20x%20");
+    }
 
+    public void testDecodeUnicodeMatrix() {
+        _testDecodeMatrix(";thumbsup%F0%9F%91%8D=chicken%F0%9F%90%94", "", true, "thumbsup\ud83d\udc4d", "chicken\ud83d\udc14");
+        _testDecodeMatrix(";thumbsup%F0%9F%91%8D=chicken%F0%9F%90%94", "", false, "thumbsup\ud83d\udc4d", "chicken%F0%9F%90%94");
     }
 
     private void _testDecodeMatrix(String path, String pathSegment, String... matrix) {
