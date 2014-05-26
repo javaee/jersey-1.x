@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -59,7 +59,91 @@
             <artifactId>jersey-bundle</artifactId>
             <version>${project.version}</version>
         </dependency>
-    </dependencies>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>bookmark</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>bookmark-em</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>bookstore</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>jersey-ejb</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>helloworld-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>scala-helloworld-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>simple-servlet</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>spring-annotations</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>extended-wadl-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>managed-beans-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>jersey-cdi</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.samples</groupId>
+            <artifactId>wadl-json-schema-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>gf-project</classifier>
+        </dependency>
+     </dependencies>
     <profiles>
         <profile>
             <id>release</id>
@@ -194,6 +278,15 @@
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${assembly.directory}/samples</outputDirectory>
                                         </artifactItem>
+                                        <artifactItem>
+                                            <groupId>com.sun.jersey.samples</groupId>
+                                            <artifactId>wadl-json-schema-webapp</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>zip</type>
+                                            <classifier>gf-project</classifier>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${assembly.directory}/samples</outputDirectory>
+                                        </artifactItem>
                                     </artifactItems>
                                 </configuration>
                             </execution>
@@ -315,6 +408,15 @@
                                         <artifactItem>
                                             <groupId>com.sun.jersey.samples</groupId>
                                             <artifactId>jersey-cdi</artifactId>
+                                            <version>${project.version}</version>
+                                            <type>zip</type>
+                                            <classifier>gf-project</classifier>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${assembly.directory}/samples</outputDirectory>
+                                        </artifactItem>
+                                        <artifactItem>
+                                            <groupId>com.sun.jersey.samples</groupId>
+                                            <artifactId>wadl-json-schema-webapp</artifactId>
                                             <version>${project.version}</version>
                                             <type>zip</type>
                                             <classifier>gf-project</classifier>
