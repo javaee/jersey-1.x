@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,15 +39,18 @@
  */
 package com.sun.jersey.server.impl.ejb;
 
-import com.sun.jersey.core.spi.component.ComponentScope;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
-import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
 import javax.interceptor.InvocationContext;
 import javax.ws.rs.ext.Provider;
+
+import com.sun.jersey.core.spi.component.ComponentScope;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
+import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 
 final class EJBInjectionInterceptor {
 
@@ -60,6 +63,8 @@ final class EJBInjectionInterceptor {
         this.cpf = cpf;
     }
 
+	private final AtomicBoolean initializing = new AtomicBoolean(false);
+
     @PostConstruct
     private void init(final InvocationContext context) throws Exception {
         if (cpf == null) {
@@ -67,11 +72,16 @@ final class EJBInjectionInterceptor {
             return;
         }
 
+        boolean setInitializing = initializing.compareAndSet(false, true);
+        if (!setInitializing) {
+            return;
+        }
         final Object beanInstance = context.getTarget();
         final IoCComponentProcessor icp = get(beanInstance.getClass());
-        if (icp != null)
+        if (icp != null) {
             icp.postConstruct(beanInstance);
-        
+        }
+
         // Invoke next interceptor in chain
         context.proceed();
     }
