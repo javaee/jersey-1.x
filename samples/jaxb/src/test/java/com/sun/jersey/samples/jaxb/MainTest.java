@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -85,18 +85,6 @@ public class MainTest extends JerseyTest {
                 post(JAXBXmlRootElement.class, e1);
 
         assertEquals(e1, e2);
-    }
-
-    @Test
-    public void testRootElementWithHeader() {
-        WebResource webResource = resource();
-        String e1 = webResource.path("jaxb/XmlRootElement").
-                get(String.class);
-
-        String e2 = webResource.path("jaxb/XmlRootElementWithHeader").
-                get(String.class);
-        assertTrue(e2.contains("<?xml-stylesheet type='text/xsl' href='foobar.xsl' ?>")
-                && e2.contains(e1.substring(e1.indexOf("?>") + 2).trim()));
     }
 
     @Test

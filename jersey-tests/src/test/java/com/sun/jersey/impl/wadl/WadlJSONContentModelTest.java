@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -60,9 +60,6 @@ import com.sun.jersey.api.wadl.config.WadlGeneratorConfig;
 import com.sun.jersey.api.wadl.config.WadlGeneratorDescription;
 import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.impl.AbstractResourceTester;
-import com.sun.jersey.impl.entity.EmptyJSONRequestWthJAXBTest;
-import com.sun.jersey.impl.entity.JAXBBean;
-import com.sun.jersey.impl.entity.JAXBBeanType;
 import com.sun.jersey.impl.wadl.testdata.schema.MultipleContentTypesResource;
 import com.sun.jersey.impl.wadl.testdata.schema.RequestMessage;
 import com.sun.jersey.impl.wadl.testdata.schema.ResponseMessage;
@@ -188,11 +185,14 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         // to validate that what we are expecting is appearing in the 
         // WADL
         //validateWadl("", cr, r);
-        
-        
+
         assertTrue(wadlAsString.contains("\"@describedby\":\"application.wadl/responseMessage\""));
         assertTrue(wadlAsString.contains("\"@describedby\":\"application.wadl/requestMessage\""));
         
+        // eventually remove "nsX:" namespaces from the compared result
+        wadlAsString = wadlAsString.replaceAll("\"@element\":\"ns\\d:responseMessage\"", "\"@element\":\"responseMessage\"")
+                    .replaceAll("\"@element\":\"ns\\d:requestMessage\"", "\"@element\":\"requestMessage\"");
+
         assertTrue(wadlAsString.contains("\"@element\":\"responseMessage\""));
         assertTrue(wadlAsString.contains("\"@element\":\"requestMessage\""));
         
@@ -260,11 +260,14 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         // to validate that what we are expecting is appearing in the 
         // WADL
         //validateWadl("", cr, r);
-        
-        
+
         assertTrue(wadlAsString.contains("\"@describedby\":\"test:/base/application.wadl/responseMessage\""));
         assertTrue(wadlAsString.contains("\"@describedby\":\"test:/base/application.wadl/requestMessage\""));
-        
+
+        // eventually replace "nsX:" namespaces from the compared result
+        wadlAsString = wadlAsString.replaceAll("\"@element\":\"ns\\d:responseMessage\"", "\"@element\":\"responseMessage\"")
+                                    .replaceAll("\"@element\":\"ns\\d:requestMessage\"", "\"@element\":\"requestMessage\"");
+
         assertTrue(wadlAsString.contains("\"@element\":\"responseMessage\""));
         assertTrue(wadlAsString.contains("\"@element\":\"requestMessage\""));
         
@@ -296,12 +299,11 @@ public class WadlJSONContentModelTest extends AbstractResourceTester {
         for (Include i : includes) {
             includeRefs.add(i.getHref());
         }
-        
+
         assertTrue(includeRefs.contains(uriPrefix  + "application.wadl/xsd0.xsd"));
 
         assertTrue(!includeRefs.contains("test:/base/application.wadl/requestMessage"));
         assertTrue(!includeRefs.contains("application.wadl/requestMessage"));
-
         assertTrue(!includeRefs.contains("test:/base/application.wadl/responseMessage"));
         assertTrue(!includeRefs.contains("application.wadl/responseMessage"));
         
