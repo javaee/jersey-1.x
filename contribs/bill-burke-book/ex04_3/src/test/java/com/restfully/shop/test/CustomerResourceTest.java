@@ -159,11 +159,13 @@ public class CustomerResourceTest {
         ClientResponse response = wr.type(MediaType.APPLICATION_XML).post(ClientResponse.class, newCustomer);
 
         Assert.assertEquals(201, response.getStatus()); // 201 = created
-        System.out.println("Location: " + response.getHeaders().get("Location"));
+
+        String location = response.getHeaders().get("Location").get(0);
+        String path = location.substring(location.lastIndexOf("/") + 1);
 
         // Get the new customer
         System.out.println("*** GET Created Customer **");
-        wr1 = wr.path("2"); // second customer
+        wr1 = wr.path(path); // second customer
         response = wr1.get(ClientResponse.class);
         System.out.println("Content-Type: " + response.getHeaders().get("Content-Type"));
 

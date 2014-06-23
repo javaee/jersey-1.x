@@ -67,13 +67,13 @@ public class CustomerResourceTest {
         os.write(newCustomer.getBytes());
         os.flush();
         Assert.assertEquals(HttpURLConnection.HTTP_CREATED, connection.getResponseCode());
-        System.out.println("Location: " + connection.getHeaderField("Location"));
+        String location = connection.getHeaderField("Location");
         connection.disconnect();
 
-
         // Get the new customer
+        String path = location.substring(location.lastIndexOf("/") + 1);
         System.out.println("*** GET Created Customer **");
-        URL getUrl = new URL("http://localhost:" + getJettyPort() + "/customers/1");
+        URL getUrl = new URL("http://localhost:" + getJettyPort() + "/customers/" + path);
         connection = (HttpURLConnection) getUrl.openConnection();
         connection.setRequestMethod("GET");
         System.out.println("Content-Type: " + connection.getContentType());
@@ -133,11 +133,13 @@ public class CustomerResourceTest {
         ClientResponse response = wr.type(MediaType.APPLICATION_XML).post(ClientResponse.class, newCustomer);
 
         Assert.assertEquals(201, response.getStatus()); // 201 = created
-        System.out.println("Location: " + response.getHeaders().get("Location"));
+
+        String location = response.getHeaders().get("Location").get(0);
+        String path = location.substring(location.lastIndexOf("/") + 1);
 
         // Get the new customer
         System.out.println("*** GET Created Customer **");
-        wr1 = wr.path("2"); // second customer
+        wr1 = wr.path(path); // second customer
         response = wr1.get(ClientResponse.class);
         System.out.println("Content-Type: " + response.getHeaders().get("Content-Type"));
 
