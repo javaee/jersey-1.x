@@ -1,7 +1,6 @@
-#
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 #
-# Copyright (c) 2013 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2013-2014 Oracle and/or its affiliates. All rights reserved.
 #
 # The contents of this file are subject to the terms of either the GNU
 # General Public License Version 2 only ("GPL") or the Common Development
@@ -38,9 +37,10 @@
 # holder.
 #
 
+
 pkg = {
     "name"          : "jersey-docs-and-examples",
-    "version"       : "1.18,1-1.0",
+    "version"       : "1.18,2-0.1",
     "attributes"    : { "pkg.summary" : "Jersey Examples And Documentation, RESTful Web services for GlassFish",
                         "pkg.description" : 
 "This package contains Jersey API javadocs and examples. Once installed, \
@@ -53,7 +53,7 @@ pkg = {
                      "info.classification" : "Web Services"  },
     "dirtrees" : [ "glassfish" ],
     "depends" : { 
-                  "pkg:/jersey@1.18,1-1.0" : {"type" : "require" }
+                  "pkg:/jersey@1.18,2-0.1" : {"type" : "require" }
                 },
     "licenses" : { "glassfish/jersey/LICENSE.txt" : { "license" : "CDDL+GPL" }}
 }
