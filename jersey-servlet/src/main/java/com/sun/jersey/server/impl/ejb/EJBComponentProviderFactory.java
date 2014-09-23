@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -47,6 +47,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactoryInitial
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
+import com.sun.jersey.core.util.Priority;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.Singleton;
@@ -55,13 +56,16 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 /**
+ * Component provider factory that implements EJB support
+ * for GlassFish container.
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
+@Priority(300)
 final class EJBComponentProviderFactory implements
         IoCComponentProviderFactory,
         IoCComponentProcessorFactoryInitializer {
-    
+
     private static final Logger LOGGER = Logger.getLogger(
             EJBComponentProviderFactory.class.getName());
 
@@ -72,7 +76,7 @@ final class EJBComponentProviderFactory implements
     }
 
     // IoCComponentProviderFactory
-    
+
     public IoCComponentProvider getComponentProvider(Class<?> c) {
         return getComponentProvider(null, c);
     }
@@ -154,9 +158,9 @@ final class EJBComponentProviderFactory implements
             return o;
         }
     }
-    
+
     // IoCComponentProcessorFactoryInitializer
-    
+
     public void init(IoCComponentProcessorFactory cpf) {
         interceptor.setFactory(cpf);
     }
