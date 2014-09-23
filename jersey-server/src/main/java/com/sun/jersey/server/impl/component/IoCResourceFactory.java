@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -48,25 +48,33 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
+import com.sun.jersey.core.util.PriorityUtil;
 import com.sun.jersey.server.impl.inject.ServerInjectableProviderContext;
 import com.sun.jersey.server.spi.component.ResourceComponentInjector;
 import com.sun.jersey.server.spi.component.ResourceComponentProvider;
 import com.sun.jersey.server.spi.component.ResourceComponentProviderFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
+ * Factory for individual JAX-RS resources.
  *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public class IoCResourceFactory extends ResourceFactory {
+
     private final List<IoCComponentProviderFactory> factories;
-    
+
     public IoCResourceFactory(
             ResourceConfig config,
             ServerInjectableProviderContext ipc,
             List<IoCComponentProviderFactory> factories) {
         super(config, ipc);
-        this.factories = factories;
+        List<IoCComponentProviderFactory> myFactories = new ArrayList<IoCComponentProviderFactory>(factories);
+        Collections.sort(myFactories, PriorityUtil.INSTANCE_COMPARATOR);
+        this.factories = Collections.unmodifiableList(myFactories);
     }
 
     @Override
@@ -124,12 +132,12 @@ public class IoCResourceFactory extends ResourceFactory {
         public void destroy() {
         }
     }
-    
+
     private static class PerRequestWrapper implements ResourceComponentProvider {
         private final ServerInjectableProviderContext ipc;
         private final IoCManagedComponentProvider imcp;
         private ResourceComponentInjector rci;
-        
+
         PerRequestWrapper(ServerInjectableProviderContext ipc, IoCManagedComponentProvider imcp) {
             this.ipc = ipc;
             this.imcp = imcp;

@@ -61,11 +61,11 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
 import com.sun.jersey.core.spi.component.ioc.IoCDestroyable;
 import com.sun.jersey.core.spi.component.ioc.IoCFullyManagedComponentProvider;
 import com.sun.jersey.core.spi.component.ioc.IoCInstantiatedComponentProvider;
-
-import static com.sun.jersey.server.impl.cdi.Utils.getBean;
-
 import com.sun.jersey.spi.container.WebApplication;
 import com.sun.jersey.spi.container.WebApplicationListener;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
+
+import static com.sun.jersey.server.impl.cdi.Utils.getBean;
 
 /**
  * Factory for IoCComponentProvider for CDI beans.
@@ -89,7 +89,7 @@ public class CDIComponentProviderFactory implements
         beanManager = (BeanManager)bm;
         // work around proxying bug in Weld
         if (CDIExtension.lookupExtensionInBeanManager) {
-            extension = Utils.getCdiExtensionInstance(beanManager);
+            extension = Utils.getInstance(beanManager, CDIExtension.class);
         }
         else {
             extension = CDIExtension.getInitializedExtension();
@@ -116,7 +116,8 @@ public class CDIComponentProviderFactory implements
         final ComponentScope cs = getComponentScope(b);
 
         if (s == Dependent.class) {
-            if (!c.isAnnotationPresent(ManagedBean.class)) {
+            if (!extension.getResourceConfig().getFeature(ServletContainer.FEATURE_ALLOW_RAW_MANAGED_BEANS)
+                    && !c.isAnnotationPresent(ManagedBean.class)) {
                 return null;
             }
 

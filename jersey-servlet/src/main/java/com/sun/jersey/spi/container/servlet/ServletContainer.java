@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -266,6 +266,24 @@ public class ServletContainer extends HttpServlet implements Filter {
      */
     public static final String PROPERTY_FILTER_CONTEXT_PATH
             = "com.sun.jersey.config.feature.FilterContextPath";
+
+    /**
+     * If set to true then the internal Jersey CDI component provider
+     * will be used for managed bean types,
+     * that are not annotated with {@link ManagedBean} annotation (neither with any other
+     * bean defining annotation) and CDI bean manager
+     * evaluates them as dependent scoped beans.
+     * <p/>
+     * This feature is only applicable when CDI processing is enabled,
+     * i.e. when <code>beans.xml</code> file is present.
+     * <p/>
+     * This feature is an alternative to adding {@link ManagedBean} annotation
+     * to managed bean types directly.
+     * <p/>
+     * The default value is false.
+     */
+    public static final String FEATURE_ALLOW_RAW_MANAGED_BEANS
+            = "com.sun.jersey.config.feature.AllowRawManagedBeans";
 
     /**
      * A helper class for creating an injectable provider that supports

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,8 +44,12 @@ import com.sun.jersey.core.spi.component.ComponentInjector;
 import com.sun.jersey.core.spi.component.ComponentProvider;
 import com.sun.jersey.core.spi.component.ComponentScope;
 import com.sun.jersey.core.spi.component.ProviderFactory;
+import com.sun.jersey.core.util.PriorityUtil;
 import com.sun.jersey.spi.inject.InjectableProviderContext;
+
 import java.lang.reflect.InvocationTargetException;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
@@ -53,13 +57,29 @@ import java.util.logging.Level;
 /**
  * An extension of {@link ProviderFactory} that defers to an
  * {@link IoCComponentProviderFactory}.
- * 
- * @author Paul.Sandoz@Sun.Com
+ *
+ * All registered provider factory implementations are being polled
+ * so that a single {@link IoCComponentProvider} instance could be selected
+ * for each component.
+ *
+ * @author Paul Sandoz (paul.sandoz at oracle.com)
  */
 public class IoCProviderFactory extends ProviderFactory {
+
+    /*
+      The following would be added to the class javadoc if the priority annotation
+      was part of public API:
+
+      Polling order is specified by priority value
+      set on individual provider factories. The factory that has the highest
+      priority value is polled first. Priority value is set using
+      {@link Priority} annotation.
+    */
     private final List<IoCComponentProviderFactory> factories;
 
     /**
+     * Create a new provider factory based
+     * on given context and factory.
      *
      * @param ipc the injectable provider context.
      * @param icpf the IoC component provider factory.
@@ -71,6 +91,7 @@ public class IoCProviderFactory extends ProviderFactory {
     }
 
     /**
+     * Create a new provider factory based on given context and factories.
      *
      * @param ipc the injectable provider context.
      * @param factories the list of IoC component provider factory.
@@ -79,7 +100,9 @@ public class IoCProviderFactory extends ProviderFactory {
             InjectableProviderContext ipc,
             List<IoCComponentProviderFactory> factories) {
         super(ipc);
-        this.factories = factories;
+        List<IoCComponentProviderFactory> myFactories = new ArrayList<IoCComponentProviderFactory>(factories);
+        Collections.sort(myFactories, PriorityUtil.INSTANCE_COMPARATOR);
+        this.factories = Collections.unmodifiableList(myFactories);
     }
 
     @Override
@@ -123,7 +146,7 @@ public class IoCProviderFactory extends ProviderFactory {
         private final Object o;
 
         private final IoCDestroyable destroyable;
-        
+
         private final ComponentDestructor cd;
 
         InstantiatedSingleton(InjectableProviderContext ipc,
@@ -131,7 +154,7 @@ public class IoCProviderFactory extends ProviderFactory {
                 Class c) {
             this.destroyable = (iicp instanceof IoCDestroyable)
                     ? (IoCDestroyable) iicp : null;
-            
+
             o = iicp.getInstance();
 
             this.cd = (destroyable == null) ? new ComponentDestructor(c) : null;
@@ -210,7 +233,7 @@ public class IoCProviderFactory extends ProviderFactory {
 
             this.destroyable = (cp instanceof Destroyable)
                     ? (Destroyable) cp : null;
-            
+
             Object o = cp.getInstance();
             this.proxy = ipcp.proxy(o);
             if (!this.proxy.getClass().isAssignableFrom(o.getClass()))
