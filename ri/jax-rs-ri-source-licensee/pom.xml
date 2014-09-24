@@ -48,7 +48,7 @@
     <parent>
         <groupId>com.sun.jersey.ri</groupId>
         <artifactId>ri-archives</artifactId>
-        <version>1.18.2</version>
+        <version>1.18.3-SNAPSHOT</version>
     </parent>
     <artifactId>jax-rs-ri-source-licensee</artifactId>
     <name>JAX-RS RI source licensee archive</name>
