@@ -47,7 +47,7 @@
     <parent>
         <artifactId>jersey-samples</artifactId>
         <groupId>com.sun.jersey.samples</groupId>
-        <version>1.18.3-SNAPSHOT</version>
+        <version>1.18.3</version>
     </parent>
     <artifactId>oauth-client-twitter</artifactId>
     <name>Twitter Client using OAuth</name>
