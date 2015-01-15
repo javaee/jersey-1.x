@@ -86,6 +86,8 @@ import com.sun.research.ws.wadl.Resources;
  * @author <a href="mailto:martin.grotzke@freiheit.com">Martin Grotzke</a>
  * @version $Id$
  *
+ * @requiresDependencyResolution compile+runtime
+ *
  * @goal generate
  * @phase compile
  */
