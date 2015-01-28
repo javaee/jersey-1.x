@@ -153,7 +153,7 @@
         </dependency>
         <dependency>
             <groupId>net.liftweb</groupId>
-            <artifactId>lift-webkit</artifactId>
+            <artifactId>lift-mapper_2.11</artifactId>
             <version>${lift.version}</version>
         </dependency>
     </dependencies>
