@@ -55,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
@@ -134,12 +135,13 @@ public class CDIExtension implements Extension {
             this.value = value;
         }
 
+        @Override
         public int value() {
             return value;
         }
     }
 
-    private WebApplication webApplication;
+    private Map<ClassLoader, WebApplication> webApplications = new HashMap<ClassLoader, WebApplication>();
     private ResourceConfig resourceConfig;
     private Set<Class<? extends Annotation>> knownParameterQualifiers;
     private Set<Class<?>> staticallyDefinedContextBeans;
@@ -764,9 +766,8 @@ public class CDIExtension implements Extension {
 
         BeanGenerator beanGenerator = new BeanGenerator("com/sun/jersey/server/impl/cdi/generated/Bean");
 
-        for (Map.Entry<Class<? extends Annotation>, Set<DiscoveredParameter>> entry  : discoveredParameterMap.entrySet()) {
-            Class<? extends Annotation> qualifier = entry.getKey();
-            for (DiscoveredParameter parameter : entry.getValue()) {
+        for (Set<DiscoveredParameter> parameters  : discoveredParameterMap.values()) {
+            for (DiscoveredParameter parameter : parameters) {
                 Annotation annotation = parameter.getAnnotation();
                 Class<?> klass = getClassOfType(parameter.getType());
 
@@ -863,18 +864,26 @@ public class CDIExtension implements Extension {
         // @Context WebApplication
         event.addBean(new ProviderBasedBean<WebApplication>(WebApplication.class, new Provider<WebApplication>() {
             public WebApplication get() {
-                return webApplication;
+                return lookupWebApplication();
             }
         }, contextAnnotationLiteral));
 
     }
 
+    private WebApplication lookupWebApplication() {
+        return lookupWebApplication(Thread.currentThread().getContextClassLoader());
+    }
+
+    private WebApplication lookupWebApplication(final ClassLoader cl) {
+        return webApplications.get(cl);
+    }
+
     void setWebApplication(WebApplication wa) {
-        webApplication = wa;
+        webApplications.put(Thread.currentThread().getContextClassLoader(), wa);
     }
 
     WebApplication getWebApplication() {
-        return webApplication;
+        return lookupWebApplication();
     }
 
     void setResourceConfig(ResourceConfig rc) {
@@ -927,7 +936,7 @@ public class CDIExtension implements Extension {
 
         @Override
         public T create(CreationalContext<T> creationalContext) {
-            Injectable<T> injectable = webApplication.getServerInjectableProviderFactory().
+            Injectable<T> injectable = lookupWebApplication().getServerInjectableProviderFactory().
                     getInjectable(qualifier.annotationType(), null, qualifier, getBeanClass(), ComponentScope.Singleton);
             if (injectable == null) {
                 Errors.error("No injectable for " + getBeanClass().getName());
@@ -941,10 +950,10 @@ public class CDIExtension implements Extension {
      * Constructs an object by delegating to the Injectable for a Jersey parameter
      */
     class ParameterBean<T> extends AbstractBean<T> implements InitializedLater {
-        private DiscoveredParameter discoveredParameter;
-        private Parameter parameter;
-        private Injectable<T> injectable;
-        private boolean processed = false;
+        private final DiscoveredParameter discoveredParameter;
+        private final Parameter parameter;
+        private final Map<ClassLoader, Injectable<T>> injectables = new ConcurrentHashMap<ClassLoader, Injectable<T>>();
+        private final Map<ClassLoader, Boolean> processed = new ConcurrentHashMap<ClassLoader, Boolean>();
 
         public ParameterBean(Class<?> klass, Type type, Set<Annotation> qualifiers,
                              DiscoveredParameter discoveredParameter, Parameter parameter) {
@@ -953,41 +962,46 @@ public class CDIExtension implements Extension {
             this.parameter = parameter;
         }
 
+        @Override
         public void later() {
-            if (injectable != null) {
+            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            if (injectables.containsKey(contextClassLoader)) {
                 return;
             }
-            if (processed)
+            if (processed.containsKey(contextClassLoader))
                 return;
+            processed.put(contextClassLoader, true);
 
-            processed = true;
-            boolean registered = webApplication.getServerInjectableProviderFactory().
+            boolean registered = lookupWebApplication(contextClassLoader).getServerInjectableProviderFactory().
                     isParameterTypeRegistered(parameter);
             if (!registered) {
                 Errors.error("Parameter type not registered " + discoveredParameter);
             }
-            // TODO - here it just doesn't seem possible to remove the cast
-            injectable = (Injectable<T>) webApplication.getServerInjectableProviderFactory().
+            Injectable<T> injectable = lookupWebApplication(contextClassLoader).getServerInjectableProviderFactory().
                     getInjectable(parameter, ComponentScope.PerRequest);
             if (injectable == null) {
                 Errors.error("No injectable for parameter " + discoveredParameter);
+            } else {
+                injectables.put(contextClassLoader, injectable);
             }
         }
 
         @Override
         public T create(CreationalContext<T> creationalContext) {
-            if (injectable == null) {
+            final ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            if (!injectables.containsKey(contextClassLoader)) {
                 later();
-                if (injectable == null) {
+                if (!injectables.containsKey(contextClassLoader)) {
                     return null;
                 }
             }
+            final Injectable<T> injectable = injectables.get(contextClassLoader);
 
             try {
                 return injectable.getValue();
             } catch (IllegalStateException e) {
                 if (injectable instanceof AbstractHttpContextInjectable) {
-                    return (T)((AbstractHttpContextInjectable)injectable).getValue(webApplication.getThreadLocalHttpContext());
+                    return (T)((AbstractHttpContextInjectable)injectables).getValue(lookupWebApplication(contextClassLoader).getThreadLocalHttpContext());
                 }
                 else {
                     throw e;

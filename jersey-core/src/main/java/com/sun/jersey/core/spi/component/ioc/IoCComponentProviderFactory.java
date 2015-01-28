@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -58,7 +58,7 @@ import java.lang.reflect.Field;
  * If the component is not supported then a null value may be returned and the
  * runtime will manage the component.
  * <p>
- * Specializations of {@link IoCComponentProvider} must be returned by the 
+ * Specializations of {@link IoCComponentProvider} must be returned by the
  * <code>getComponentProvider</code> methods that declare the boundary of
  * responsibility, between the runtime and the underlying IoC framework,
  * for management of a component.
@@ -77,7 +77,7 @@ import java.lang.reflect.Field;
  * component is fully managed by the runtime but when an instance is created
  * the underlying IoC framework is deferred to for creating a proxy of the
  * component instance.
- * 
+ *
  * @author Paul.Sandoz@Sun.Com
  */
 public interface IoCComponentProviderFactory extends ComponentProviderFactory<IoCComponentProvider> {

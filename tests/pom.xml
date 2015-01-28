@@ -48,11 +48,11 @@
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
-        <version>1.18.1</version>
+        <version>1.18.4-SNAPSHOT</version>
     </parent>
     <groupId>com.sun.jersey.test</groupId>
     <artifactId>functional-tests</artifactId>
-    <version>1.18.1</version>
+    <version>1.18.4-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Project Jersey tests</name>
     <description>
