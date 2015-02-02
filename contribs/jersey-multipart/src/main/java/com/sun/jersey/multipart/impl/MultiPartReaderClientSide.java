@@ -118,7 +118,7 @@ public class MultiPartReaderClientSide implements MessageBodyReader<MultiPart> {
         if (config.getBufferThreshold() != -1) { // -1 means "is only memory"
             // Validate - this checks whether it's possible to create temp files in currently set temp directory.
             try {
-                File.createTempFile("MIME", null);
+                File.createTempFile("MIME", null).delete();
             } catch (final IOException ioe) {
                 LOGGER.log(Level.WARNING, "Cannot create temporary files. Multipart attachments will be limited to " +
                         config.getBufferThreshold() + " bytes.", ioe);
