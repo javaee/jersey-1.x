@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -42,6 +42,7 @@ package com.sun.jersey.multipart.impl;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -399,12 +400,44 @@ public class MultiPartReaderWriterTest extends AbstractGrizzlyServerTester {
         assertEquals("part", bodyPart.getContentDisposition().getParameters().get("name"));
     }
 
-    /*
-        public void testListen() throws Exception {
-            System.out.println("Running for 30 seconds");
-            Thread.sleep(30000);
+    /**
+     * Test for JERSEY-2632 - Jersey should not leave any temporary files after verifying that it is possible
+     * to create files in java.io.tmpdir.
+     */
+    @SuppressWarnings("ConstantConditions")
+    public void testShouldNotBeAnyTemporaryFiles() throws Exception {
+        final String originalTmpDir = System.getProperty("java.io.tmpdir");
+        File tmpDir = null;
+
+        try {
+            tmpDir = createTempDirectory(MultiPartReaderWriterTest.class.getSimpleName());
+            System.setProperty("java.io.tmpdir", tmpDir.toString());
+
+            // Make sure the MBR is initialized on the client-side as well.
+            client.resource(getUri()).get(ClientResponse.class);
+            assertEquals(0, tmpDir.listFiles().length);
+        } finally {
+            try {
+                tmpDir.delete();
+            } finally {
+                System.setProperty("java.io.tmpdir", originalTmpDir);
+            }
         }
-    */
+    }
+
+    private static File createTempDirectory(final String name) throws IOException {
+        final File temp = File.createTempFile(name, null);
+
+        if (!temp.delete()) {
+            throw new IOException("Could not delete temp file: " + temp.getAbsolutePath());
+        }
+
+        if (!temp.mkdir()) {
+            throw new IOException("Could not create temp directory: " + temp.getAbsolutePath());
+        }
+
+        return temp;
+    }
 
     private void checkEntity(String expected, BodyPartEntity entity) throws IOException {
         // Convert the raw bytes into a String
