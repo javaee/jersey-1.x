@@ -58,8 +58,8 @@
 
   <properties>
     <jetty.version>6.1.19</jetty.version>
-    <lift.version>1.1-M7</lift.version>
-    <scala.version>2.7.5</scala.version>
+    <lift.version>2.6</lift.version>
+    <scala.version>2.11.5</scala.version>
   </properties>
 
   <modules>
@@ -77,7 +77,7 @@
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
-        <version>2.10.1</version>
+        <version>2.15.2</version>
         <executions>
           <execution>
             <goals>
@@ -93,7 +93,6 @@
           <args>
             <!-- arg>-unchecked</arg -->
             <arg>-deprecation</arg>
-            <arg>-Xno-varargs-conversion</arg>
           </args>
           <scalaVersion>${scala.version}</scalaVersion>
         </configuration>
