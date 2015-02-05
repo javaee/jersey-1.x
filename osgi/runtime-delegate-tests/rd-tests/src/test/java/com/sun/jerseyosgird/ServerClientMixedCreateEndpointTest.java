@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -73,6 +73,9 @@ import com.sun.grizzly.http.SelectorThread;
 import com.sun.grizzly.tcp.Adapter;
 import com.sun.jerseyosgird.util.Helper;
 
+/**
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ */
 @RunWith(JUnit4TestRunner.class)
 public class ServerClientMixedCreateEndpointTest {
 
@@ -153,6 +156,8 @@ public class ServerClientMixedCreateEndpointTest {
 
                 // load PAX url war
                 mavenBundle("org.ops4j.pax.url","pax-url-war","1.1.2"),
+
+                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
 
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-server").versionAsInProject(),

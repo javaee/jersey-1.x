@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,44 +40,40 @@
 
 package com.sun.jersey.osgi.tests.jetty;
 
-
-
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
-import com.sun.jersey.osgi.tests.util.Helper;
-import com.sun.jersey.spi.container.servlet.ServletContainer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-import javax.servlet.Servlet;
+
 import javax.ws.rs.core.UriBuilder;
+
+import javax.servlet.Servlet;
+
+import com.sun.jersey.api.core.ClassNamesResourceConfig;
+import com.sun.jersey.osgi.tests.util.Helper;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
-
+import org.mortbay.jetty.Server;
+import org.mortbay.jetty.servlet.Context;
+import org.mortbay.jetty.servlet.ServletHolder;
 import org.ops4j.pax.exam.Customizer;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-
+import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
 import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.felix;
-import static org.ops4j.pax.exam.CoreOptions.options;
-
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
-
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
-
 import static org.ops4j.pax.swissbox.tinybundles.core.TinyBundles.*;
 
 /**
- *
- * @author japod
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
  */
 @RunWith(JUnit4TestRunner.class)
 public abstract class AbstractJettyWebContainerTester {
@@ -86,7 +82,7 @@ public abstract class AbstractJettyWebContainerTester {
     private Server server;
 
     private static int port = Helper.getEnvVariable("JERSEY_HTTP_PORT", 9997);
-    
+
     private String contextPath;
 
     private Class<? extends Servlet> sc;
@@ -114,6 +110,8 @@ public abstract class AbstractJettyWebContainerTester {
                 mavenBundle().groupId("org.mortbay.jetty").artifactId("jetty").versionAsInProject(),
                 mavenBundle().groupId("org.mortbay.jetty").artifactId("jetty-util").versionAsInProject(),
                 mavenBundle().groupId("org.mortbay.jetty").artifactId("servlet-api-2.5").versionAsInProject(),
+
+                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
 
                 // load Jersey bundles
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
@@ -150,49 +148,49 @@ public abstract class AbstractJettyWebContainerTester {
     public UriBuilder getUri() {
         return UriBuilder.fromUri("http://localhost").port(port).path(contextPath);
     }
-    
+
     public void setServletClass(Class<? extends Servlet> sc) {
         this.sc = sc;
     }
-    
+
     public void startServer(Class... resources) {
         Map<String, String> initParams = getInitParams(resources);
         start(initParams);
     }
-    
+
     public void startServer(Map<String, String> initParams) {
         start(initParams);
     }
-    
+
     public void startServer(Map<String, String> params, Class... resources) {
         Map<String, String> initParams = getInitParams(resources);
         initParams.putAll(params);
         start(initParams);
     }
-    
+
     private Map<String, String> getInitParams(Class... resources) {
         Map<String, String> initParams = new HashMap<String, String>();
-        
+
         StringBuilder sb = new StringBuilder();
-        for (Class r : resources) {            
+        for (Class r : resources) {
             if (sb.length() > 0)
                 sb.append(';');
             sb.append(r.getName());
         }
-        
-        initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS, 
+
+        initParams.put(ServletContainer.RESOURCE_CONFIG_CLASS,
                 ClassNamesResourceConfig.class.getName());
                         initParams.put(ClassNamesResourceConfig.PROPERTY_CLASSNAMES, sb.toString());
         return initParams;
     }
-    
+
     private void start(Map<String, String> initParams) {
         if (server != null && server.isRunning()){
             stopServer();
         }
 
         System.out.println("Starting Jetty, port number = " + port);
-        
+
         URI u = getUri().path("/").build();
         server = new Server(port);
         Context root = new Context(server, contextPath);
@@ -225,7 +223,7 @@ public abstract class AbstractJettyWebContainerTester {
             }
         }
     }
-    
+
     public void stopServer() {
         if (server.isRunning()) {
             try {

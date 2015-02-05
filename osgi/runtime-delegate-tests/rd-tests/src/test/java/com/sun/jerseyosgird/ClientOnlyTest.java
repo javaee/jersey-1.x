@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,22 +40,12 @@
 
 package com.sun.jerseyosgird;
 
-import com.sun.grizzly.http.embed.GrizzlyWebServer;
-import com.sun.grizzly.http.servlet.ServletAdapter;
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.WebResource;
-import com.sun.jerseyosgird.util.Helper;
+import java.net.URI;
 
 import javax.ws.rs.core.UriBuilder;
 
-import java.net.URI;
-import static org.ops4j.pax.exam.CoreOptions.felix;
-import static org.ops4j.pax.exam.CoreOptions.options;
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
-import static org.ops4j.pax.exam.CoreOptions.systemPackage;
-
-import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
+import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.WebResource;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -64,9 +54,21 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
 import org.osgi.framework.BundleContext;
-
 import static org.junit.Assert.assertEquals;
+import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.ops4j.pax.exam.CoreOptions.options;
+import static org.ops4j.pax.exam.CoreOptions.systemPackage;
+import static org.ops4j.pax.exam.CoreOptions.systemProperty;
+import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
+import com.sun.grizzly.http.embed.GrizzlyWebServer;
+import com.sun.grizzly.http.servlet.ServletAdapter;
+import com.sun.jerseyosgird.util.Helper;
+
+/**
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ */
 @RunWith(JUnit4TestRunner.class)
 public class ClientOnlyTest {
 
@@ -125,17 +127,17 @@ public class ClientOnlyTest {
 
                 // felix config admin
                 mavenBundle("org.apache.felix", "org.apache.felix.configadmin", "1.2.4"),
-                
+
                 // felix preference service
                 mavenBundle("org.apache.felix", "org.apache.felix.prefs","1.0.2"),
-                
+
                 // blueprint
                 mavenBundle("org.apache.geronimo.blueprint", "geronimo-blueprint", "1.0.0"),
-                
+
                 // bundles
                 mavenBundle("org.apache.mina", "mina-core", "2.0.0-RC1"),
                 mavenBundle("org.apache.sshd", "sshd-core", "0.3.0"),
-                
+
                 // HTTP SPEC
                 mavenBundle("org.apache.geronimo.specs","geronimo-servlet_2.5_spec","1.1.2"),
 
@@ -143,8 +145,10 @@ public class ClientOnlyTest {
                 // load PAX url war
                 mavenBundle("org.ops4j.pax.url","pax-url-war","1.1.2"),
 
+                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
+
                 mavenBundle().groupId("com.sun.jersey").artifactId("jersey-core").versionAsInProject(),
-        	mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
+                mavenBundle().groupId("com.sun.jersey").artifactId("jersey-client").versionAsInProject(),
 
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-http").versionAsInProject(),

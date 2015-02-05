@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -58,6 +58,9 @@ import static org.ops4j.pax.exam.CoreOptions.systemProperty;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 import static org.ops4j.pax.swissbox.tinybundles.core.TinyBundles.modifyBundle;
 
+/**
+ * @author Jakub Podlesak (jakub.podlesak at oracle.com)
+ */
 @RunWith(JUnit4TestRunner.class)
 public class OsgiIntegrationTest {
 
@@ -85,6 +88,8 @@ public class OsgiIntegrationTest {
                         "http://repository.springsource.com/maven/bundles/release",
                         "http://repository.springsource.com/maven/bundles/external",
                         "http://maven.java.net/content/repositories/snapshots"),
+
+                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
 
                 // load grizzly bundle
                 mavenBundle().groupId("com.sun.grizzly").artifactId("grizzly-servlet-webserver").versionAsInProject(),

@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,11 +43,11 @@ package com.sun.jersey.impl;
 import java.net.URI;
 
 import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.client.ClientRequest;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
+import com.sun.jersey.api.client.filter.ClientFilter;
 import com.sun.jersey.api.core.DefaultResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
@@ -55,24 +55,20 @@ import com.sun.jersey.server.impl.application.WebApplicationImpl;
 import com.sun.jersey.spi.container.ContainerListener;
 import com.sun.jersey.spi.container.ContainerNotifier;
 import com.sun.jersey.spi.container.WebApplication;
+
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.Configuration;
 import org.ops4j.pax.exam.junit.JUnit4TestRunner;
-
-import static org.ops4j.pax.exam.CoreOptions.systemProperty;
-import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
-import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
+import static org.junit.Assert.*;
 import static org.ops4j.pax.exam.CoreOptions.felix;
+import static org.ops4j.pax.exam.CoreOptions.mavenBundle;
 import static org.ops4j.pax.exam.CoreOptions.options;
-
+import static org.ops4j.pax.exam.CoreOptions.wrappedBundle;
 import static org.ops4j.pax.exam.container.def.PaxRunnerOptions.repositories;
 
-import static org.junit.Assert.*;
-
 /**
- *
- * @author Paul.Sandoz@Sun.Com
+ * @author Paul Sandoz
  */
 @RunWith(JUnit4TestRunner.class)
 public abstract class AbstractResourceTester implements ContainerListener {
@@ -96,7 +92,9 @@ public abstract class AbstractResourceTester implements ContainerListener {
                 "http://maven.java.net/content/repositories/snapshots"),
 
                 // load jsr250-api jar
-//                wrappedBundle(mavenBundle().groupId("javax.annotation").artifactId("jsr250-api").versionAsInProject()),
+                // wrappedBundle(mavenBundle().groupId("javax.annotation").artifactId("jsr250-api").versionAsInProject()),
+
+                mavenBundle().groupId("javax.ws.rs").artifactId("jsr311-api").versionAsInProject(),
 
                 wrappedBundle(mavenBundle().groupId("javax.mail").artifactId("mail").versionAsInProject()),
 
@@ -128,7 +126,7 @@ public abstract class AbstractResourceTester implements ContainerListener {
         return options;
     }
 
-    
+
     protected void initiateWebApplication(IoCComponentProviderFactory provider, ResourceConfig c) {
         w = createWebApplication(c, provider);
     }
@@ -136,29 +134,29 @@ public abstract class AbstractResourceTester implements ContainerListener {
     protected void initiateWebApplication(IoCComponentProviderFactory provider, Class... classes) {
         w = createWebApplication(provider, classes);
     }
-    
+
     protected void initiateWebApplication(Class... classes) {
         w = createWebApplication(classes);
     }
-    
+
     protected void initiateWebApplication(ResourceConfig c) {
         w = createWebApplication(c);
     }
-    
+
     private WebApplication createWebApplication(Class... classes) {
         return createWebApplication(null, classes);
     }
-    
+
     private WebApplication createWebApplication(IoCComponentProviderFactory provider, Class... classes) {
         ResourceConfig rc = new DefaultResourceConfig(classes);
-        
+
         return createWebApplication(rc, provider);
     }
-    
+
     private WebApplication createWebApplication(ResourceConfig c) {
         return createWebApplication(c, null);
     }
-    
+
     private WebApplication createWebApplication(ResourceConfig c, IoCComponentProviderFactory provider) {
         Object o = c.getProperties().get(
                 ResourceConfig.PROPERTY_CONTAINER_NOTIFIER);
@@ -174,22 +172,22 @@ public abstract class AbstractResourceTester implements ContainerListener {
     }
 
     protected void initiate(ResourceConfig c, WebApplication a) {}
-    
+
     protected WebResource resource(String relativeUri) {
         return resource(relativeUri, true);
     }
-    
+
     protected WebResource resource(String relativeUri, ClientConfig clientConfig) {
         return resource(relativeUri, true, clientConfig);
     }
-    
+
     protected WebResource resource(String relativeUri, boolean checkStatus) {
-        return resource(relativeUri, checkStatus, null);        
+        return resource(relativeUri, checkStatus, null);
     }
-    
-    protected WebResource resource(String relativeUri, boolean checkStatus, 
+
+    protected WebResource resource(String relativeUri, boolean checkStatus,
             ClientConfig clientConfig) {
-        Client c = (clientConfig == null) 
+        Client c = (clientConfig == null)
             ? new Client(new TstResourceClientHandler(BASE_URI, w))
             : new Client(new TstResourceClientHandler(BASE_URI, w), clientConfig);
 
@@ -203,7 +201,7 @@ public abstract class AbstractResourceTester implements ContainerListener {
             });
         }
         WebResource r = c.resource(createCompleteUri(BASE_URI, relativeUri));
-        
+
         return r;
     }
 
@@ -228,7 +226,7 @@ public abstract class AbstractResourceTester implements ContainerListener {
     private URI createCompleteUri(URI baseUri, String relativeUri) {
         if (relativeUri.startsWith("/"))
             relativeUri = relativeUri.substring(1);
-        
+
         return URI.create(baseUri.toString() + relativeUri);
     }
 

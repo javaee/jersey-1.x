@@ -40,25 +40,26 @@
     holder.
 
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
         <version>1.19-SNAPSHOT</version>
     </parent>
+
     <artifactId>jersey-core</artifactId>
     <packaging>jar</packaging>
     <name>jersey-core</name>
+
     <dependencies>
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
-            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>javax.mail</groupId>
             <artifactId>mail</artifactId>
@@ -77,6 +78,7 @@
             <version>4.2.0</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -110,7 +112,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <configuration>
-                            <argLine></argLine>
+                            <argLine/>
                             <excludes>
                                 <exclude>**/SecurityTest.java</exclude>
                             </excludes>
@@ -122,7 +124,6 @@
     </profiles>
 
     <build>
-
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
@@ -136,14 +137,13 @@
         </resources>
 
         <testResources>
-          <testResource>
-            <directory>${basedir}/src/test/resources</directory>
-            <filtering>true</filtering>
-          </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
         </testResources>
 
         <plugins>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -162,50 +162,11 @@
                         <configuration>
                             <sources>
                                 <source>${project.build.directory}/generated-sources/rsrc-gen</source>
-                                <source>${project.build.directory}/generated-sources/jsr311</source>
                             </sources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin> <!-- unpack sources from jsr311-api.jar -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>javax.ws.rs</groupId>
-                                    <artifactId>jsr311-api</artifactId>
-                                    <version>1.1.1</version>
-                                    <type>jar</type>
-                                    <classifier>sources</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/generated-sources/jsr311</outputDirectory>
-                                    <!--excludes>
-                                        **/CacheControl.java,
-                                        **/Cookie.java,
-                                        **/EntityTag.java,
-                                        **/MediaType.java,
-                                        **/NewCookie.java,
-                                        **/Variant.java,
-                                        **/Response.java,
-                                        **/UriBuilder.java
-                                    </excludes-->
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
 
             <plugin>
                 <groupId>com.sun.istack</groupId>
@@ -237,8 +198,10 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Export-Package>javax.ws.rs.*;-split-package:=merge-first,com.sun.jersey.*;-split-package:=merge-first</Export-Package>
-                        <Import-Package>!javax.ws.rs.*,javax.mail.*;resolution:=optional, *</Import-Package>
+                        <Export-Package>
+                            com.sun.jersey.*;-split-package:=merge-first
+                        </Export-Package>
+                        <Import-Package>javax.mail.*;resolution:=optional,*</Import-Package>
                         <Bundle-Activator>com.sun.jersey.core.osgi.Activator</Bundle-Activator>
                         <DynamicImport-Package>*</DynamicImport-Package>
                         <Private-Package>com.sun.jersey.core.osgi;-split-package:=merge-first</Private-Package>
@@ -267,13 +230,14 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
-                     <forkCount>1</forkCount>
-                     <reuseForks>true</reuseForks>
-                     <argLine>-Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/core.policy</argLine>
+                    <forkCount>1</forkCount>
+                    <reuseForks>true</reuseForks>
+                    <argLine>
+                        -Djava.security.manager -Djava.security.policy=${project.build.directory}/test-classes/core.policy
+                    </argLine>
                 </configuration>
             </plugin>
-         </plugins>
-
+        </plugins>
     </build>
 
 </project>
