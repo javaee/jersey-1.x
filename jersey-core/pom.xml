@@ -57,7 +57,6 @@
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
             <version>1.1.1</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -168,44 +167,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin> <!-- unpack sources from jsr311-api.jar -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>javax.ws.rs</groupId>
-                                    <artifactId>jsr311-api</artifactId>
-                                    <version>1.1.1</version>
-                                    <type>jar</type>
-                                    <classifier>sources</classifier>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/generated-sources/jsr311</outputDirectory>
-                                    <!--excludes>
-                                        **/CacheControl.java,
-                                        **/Cookie.java,
-                                        **/EntityTag.java,
-                                        **/MediaType.java,
-                                        **/NewCookie.java,
-                                        **/Variant.java,
-                                        **/Response.java,
-                                        **/UriBuilder.java
-                                    </excludes-->
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
 
             <plugin>
                 <groupId>com.sun.istack</groupId>
