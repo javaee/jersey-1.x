@@ -45,15 +45,23 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <artifactId>glassfish-packages</artifactId>
         <groupId>com.sun.jersey.glassfish.v3</groupId>
         <version>1.19-SNAPSHOT</version>
     </parent>
+
     <artifactId>jersey-gfv3-core</artifactId>
     <name>Jersey GFv3 UC Core Package Image</name>
     <packaging>pom</packaging>
+
     <dependencies>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
@@ -121,6 +129,7 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -136,6 +145,14 @@
                         <configuration>
                             <stripVersion>true</stripVersion>
                             <artifactItems>
+                                <artifactItem>
+                                    <groupId>javax.ws.rs</groupId>
+                                    <artifactId>jsr311-api</artifactId>
+                                    <version>${jaxrs.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${assembly.directory}</outputDirectory>
+                                </artifactItem>
                                 <artifactItem>
                                     <groupId>com.sun.jersey</groupId>
                                     <artifactId>jersey-core</artifactId>
