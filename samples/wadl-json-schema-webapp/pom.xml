@@ -47,7 +47,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.19-SNAPSHOT</version>
+        <version>1.19</version>
     </parent>
     <artifactId>wadl-json-schema-webapp</artifactId>
     <name>WADL JSON Schema WebApp - Jersey sample</name>

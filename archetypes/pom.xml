@@ -47,11 +47,11 @@
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
-        <version>1.19-SNAPSHOT</version>
+        <version>1.19</version>
     </parent>
 
     <groupId>com.sun.jersey.archetypes</groupId>
-    <version>1.19-SNAPSHOT</version>
+    <version>1.19</version>
     <artifactId>jersey-archetypes</artifactId>
     <packaging>pom</packaging>
     <name>All Jersey Archetypes</name>

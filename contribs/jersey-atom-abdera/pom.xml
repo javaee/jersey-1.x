@@ -49,7 +49,7 @@
     <parent>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-contribs</artifactId>
-        <version>1.19-SNAPSHOT</version>
+        <version>1.19</version>
     </parent>
 
     <artifactId>jersey-atom-abdera</artifactId>

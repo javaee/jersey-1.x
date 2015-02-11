@@ -54,7 +54,7 @@
 
     <groupId>com.sun.jersey</groupId>
     <artifactId>jersey-project</artifactId>
-    <version>1.19-SNAPSHOT</version>
+    <version>1.19</version>
     <packaging>pom</packaging>
     <name>jersey-project</name>
 

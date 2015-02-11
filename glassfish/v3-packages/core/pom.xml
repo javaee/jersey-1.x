@@ -49,7 +49,7 @@
     <parent>
         <artifactId>glassfish-packages</artifactId>
         <groupId>com.sun.jersey.glassfish.v3</groupId>
-        <version>1.19-SNAPSHOT</version>
+        <version>1.19</version>
     </parent>
 
     <artifactId>jersey-gfv3-core</artifactId>
