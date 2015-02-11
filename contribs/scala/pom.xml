@@ -41,86 +41,85 @@
 
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>com.sun.jersey.contribs</groupId>
-    <artifactId>jersey-contribs</artifactId>
-    <version>1.19</version>
-  </parent>
+    <parent>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-contribs</artifactId>
+        <version>1.20-SNAPSHOT</version>
+    </parent>
 
-  <artifactId>scala</artifactId>
-  <name>Scala modules</name>
-  <packaging>pom</packaging>
+    <artifactId>scala</artifactId>
+    <name>Scala modules</name>
+    <packaging>pom</packaging>
 
-  <properties>
-    <jetty.version>6.1.19</jetty.version>
-    <lift.version>1.1-M7</lift.version>
-    <scala.version>2.7.5</scala.version>
-  </properties>
+    <properties>
+        <jetty.version>6.1.20</jetty.version>
+        <lift.version>1.1-M7</lift.version>
+        <scala.version>2.7.5</scala.version>
+    </properties>
 
-  <modules>
-    <module>jersey-lift</module>
-    <module>jersey-lift-test</module>
-    <module>jersey-scala</module>
-  </modules>
+    <modules>
+        <module>jersey-lift</module>
+        <module>jersey-lift-test</module>
+        <module>jersey-scala</module>
+    </modules>
 
-  <build>
-    <sourceDirectory>src/main/scala</sourceDirectory>
-    <testSourceDirectory>src/test/scala</testSourceDirectory>
+    <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
 
-    <plugins>
+        <plugins>
 
-      <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <version>2.10.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <jvmArgs>
-            <jvmArg>-Xmx1024m</jvmArg>
-          </jvmArgs>
-          <args>
-            <!-- arg>-unchecked</arg -->
-            <arg>-deprecation</arg>
-            <arg>-Xno-varargs-conversion</arg>
-          </args>
-          <scalaVersion>${scala.version}</scalaVersion>
-        </configuration>
-      </plugin>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.10.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <jvmArgs>
+                        <jvmArg>-Xmx1024m</jvmArg>
+                    </jvmArgs>
+                    <args>
+                        <!-- arg>-unchecked</arg -->
+                        <arg>-deprecation</arg>
+                        <arg>-Xno-varargs-conversion</arg>
+                    </args>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                </configuration>
+            </plugin>
 
-      <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>maven-jetty-plugin</artifactId>
-        <version>${jetty.version}</version>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>${jetty.version}</version>
 
-        <configuration>
-          <webAppConfig>
-            <contextPath>/</contextPath>
-          </webAppConfig>
+                <configuration>
+                    <webAppConfig>
+                        <contextPath>/</contextPath>
+                    </webAppConfig>
 
-          <systemProperties>
-            <!-- enable easy JMX connection to JConsole -->
-            <systemProperty>
-              <name>com.sun.management.jmxremote</name>
-              <value/>
-            </systemProperty>
-          </systemProperties>
+                    <systemProperties>
+                        <!-- enable easy JMX connection to JConsole -->
+                        <systemProperty>
+                            <name>com.sun.management.jmxremote</name>
+                            <value/>
+                        </systemProperty>
+                    </systemProperties>
 
-          <!-- lets make it easy to run with JavaRebel and Lift -->
-          <scanIntervalSeconds>0</scanIntervalSeconds>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+                    <!-- lets make it easy to run with JavaRebel and Lift -->
+                    <scanIntervalSeconds>0</scanIntervalSeconds>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
