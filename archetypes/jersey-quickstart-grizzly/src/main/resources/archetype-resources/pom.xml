@@ -87,6 +87,6 @@
         </plugins>
     </build>
     <properties>
-        <jersey-version>1.17.1</jersey-version>
+        <jersey-version>1.17.2-SNAPSHOT</jersey-version>
     </properties>
 </project>
