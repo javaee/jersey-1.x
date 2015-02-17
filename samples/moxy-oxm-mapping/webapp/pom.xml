@@ -47,7 +47,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>moxy-oxm-mapping</artifactId>
-        <version>1.17.2</version>
+        <version>1.17.3-SNAPSHOT</version>
     </parent>
     <groupId>com.sun.jersey.samples.moxy-oxm-mapping</groupId>
     <artifactId>moxy-oxm-mapping-webapp</artifactId>
@@ -172,6 +172,6 @@
         </profile>
     </profiles>
    <properties>
-        <jersey-version>1.17.2</jersey-version>
+        <jersey-version>1.17.3-SNAPSHOT</jersey-version>
     </properties>
 </project>
