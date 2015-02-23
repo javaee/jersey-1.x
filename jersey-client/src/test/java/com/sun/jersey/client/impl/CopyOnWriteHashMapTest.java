@@ -45,6 +45,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -66,11 +67,11 @@ public class CopyOnWriteHashMapTest extends TestCase {
     }
 
     private Map<Integer, Object> getView() throws Exception {
-      return instance.view;
+        return instance.view;
     }
 
     private void assertViewsEqual(Map<Integer, Object> oldView, Map<Integer, Object> newView) {
-        assertEquals(oldView, newView);
+        Assert.assertEquals(oldView, newView);
     }
 
     private void assertViewsNotEqual(Map<Integer, Object> oldView, Map<Integer, Object> newView) {
@@ -91,61 +92,68 @@ public class CopyOnWriteHashMapTest extends TestCase {
 
     public void testSizeKeepsView() throws Exception {
         Map<Integer, Object> oldView = getView();
-        instance.size();
-        Map<Integer, Object> newView = getView();
+        int actual = instance.size();
+        assertEquals(1, actual);
 
+        Map<Integer, Object> newView = getView();
         assertViewsEqual(oldView, newView);
     }
 
     public void testIsEmptyKeepsView() throws Exception {
         Map<Integer, Object> oldView = getView();
-        instance.isEmpty();
-        Map<Integer, Object> newView = getView();
+        boolean actual = instance.isEmpty();
+        assertFalse(actual);
 
+        Map<Integer, Object> newView = getView();
         assertViewsEqual(oldView, newView);
     }
 
     public void testContainsKeyKeepsView() throws Exception {
         Map<Integer, Object> oldView = getView();
-        instance.containsKey("hunh");
-        Map<Integer, Object> newView = getView();
+        boolean actual = instance.containsKey("hunh");
+        assertFalse(actual);
 
+        Map<Integer, Object> newView = getView();
         assertViewsEqual(oldView, newView);
     }
 
     public void testContainsValueKeepsView() throws Exception {
         Map<Integer, Object> oldView = getView();
-        instance.containsValue("whoa, Neo");
-        Map<Integer, Object> newView = getView();
+        boolean actual = instance.containsValue("whoa, Neo");
+        assertFalse(actual);
 
+        Map<Integer, Object> newView = getView();
         assertViewsEqual(oldView, newView);
     }
 
     public void testGetKeepsView() throws Exception {
         Map<Integer, Object> oldView = getView();
-        instance.get("peanut butter sandwich");
-        Map<Integer, Object> newView = getView();
+        Object actual = instance.get("peanut butter sandwich");
+        assertNull(actual);
 
+        Map<Integer, Object> newView = getView();
         assertViewsEqual(oldView, newView);
     }
 
     public void testKeySetKeepsView() throws Exception {
-        Map<Integer, Object> oldView = getView();
-        Set<Integer> actual = instance.keySet();
-        Map<Integer, Object> newView = getView();
-
         Set<Integer> expected = new HashSet<Integer>();
         expected.add(-1);
+
+        Map<Integer, Object> oldView = getView();
+        Set<Integer> actual = instance.keySet();
+        assertEquals(1, actual.size());
+
         assertEquals(expected, actual);
+        Map<Integer, Object> newView = getView();
         assertViewsEqual(oldView, newView);
     }
 
     public void testValuesKeepsView() throws Exception {
         Map<Integer, Object> oldView = getView();
-        instance.values();
-        Map<Integer, Object> newView = getView();
+        Collection<Object> actual = instance.values();
+        assertEquals(1, actual.size());
 
-        assertEquals(1, instance.size());
+        Map<Integer, Object> newView = getView();
         assertViewsEqual(oldView, newView);
     }
 
@@ -159,7 +167,9 @@ public class CopyOnWriteHashMapTest extends TestCase {
 
     public void testPutChangesView() throws Exception {
         Map<Integer, Object> oldView = getView();
-        instance.put(-2, "heyya");
+        Object actual = instance.put(-2, "heyya");
+        assertNull(actual);
+
         Map<Integer, Object> newView = getView();
 
         assertEquals(2, instance.size());
@@ -168,9 +178,10 @@ public class CopyOnWriteHashMapTest extends TestCase {
 
     public void testRemoveChangesView() throws Exception {
         Map<Integer, Object> oldView = getView();
-        instance.remove(-1);
-        Map<Integer, Object> newView = getView();
+        Object actual = instance.remove(-1);
+        assertEquals("something", actual);
 
+        Map<Integer, Object> newView = getView();
         assertTrue(instance.isEmpty());
         assertViewsNotEqual(oldView, newView);
     }
@@ -220,11 +231,13 @@ public class CopyOnWriteHashMapTest extends TestCase {
                 System.out.println("Updater starting at " + first + " has started");
                 for (i = first; i <= last; i ++) {
                     count = i; // volatile write
-                    instance.put(i, i);
-                    if (doClears) {
-                        instance.clear();
+                    synchronized (instance) {
+                        instance.put(i, i);
+                        if (doClears) {
+                            instance.clear();
+                        }
+                        instance.entrySet();
                     }
-                    instance.entrySet();
                 }
                 System.out.println("Updater starting at " + first + " is done");
             } catch (Exception e) {

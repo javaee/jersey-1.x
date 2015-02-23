@@ -141,46 +141,34 @@ public class CopyOnWriteHashMap<K,V> implements Map<K,V> {
      * 1. Create a copy of the existing view.
      * 2. Update the copy.
      * 3. Perform a volatile write to replace the existing view.
-     *
-     * Note that if you are not concerned about lost updates, you could dispense with the synchronization
-     * entirely.
      * **********************/
 
     @Override
     public V put(K key, V value) {
-        synchronized (this) {
             Map<K, V> newCore = duplicate(view);
             V result = newCore.put(key, value);
             view = newCore; // volatile write
             return result;
-        }
     }
 
     @Override
     public V remove(Object key) {
-        synchronized (this) {
             Map<K, V> newCore = duplicate(view);
             V result = newCore.remove(key);
             view = newCore; // volatile write
             return result;
-
-        }
     }
 
     @Override
     public void putAll(Map<? extends K, ? extends V> t) {
-        synchronized (this) {
             Map<K, V> newCore = duplicate(view);
             newCore.putAll(t);
             view = newCore; // volatile write
-        }
     }
 
     @Override
     public void clear() {
-        synchronized (this) {
             Map<K, V> newCore = new HashMap<K, V>();
             view = newCore; // volatile write
-        }
     }
 }
