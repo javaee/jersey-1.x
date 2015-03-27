@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -43,6 +43,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.annotation.ManagedBean;
@@ -89,9 +90,8 @@ public class CDIComponentProviderFactory implements
         beanManager = (BeanManager)bm;
         // work around proxying bug in Weld
         if (CDIExtension.lookupExtensionInBeanManager) {
-            extension = Utils.getInstance(beanManager, CDIExtension.class);
-        }
-        else {
+            extension = CDIExtension.getInitializedExtensionFromBeanManager(beanManager);
+        } else {
             extension = CDIExtension.getInitializedExtension();
         }
         extension.setWebApplication(wa);
