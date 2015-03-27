@@ -81,6 +81,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -197,8 +198,20 @@ public class CDIExtension implements Extension {
         }
     }
 
+    public static CDIExtension getInitializedExtensionFromBeanManager(BeanManager bm) {
+        Set<Bean<?>> beans = bm.getBeans(CDIExtension.class);
+        for (Bean<?> b : beans) {
+            final CreationalContext<?> cc = bm.createCreationalContext(b);
+            CDIExtension extensionInstance = (CDIExtension) bm.getReference(b, CDIExtension.class, cc);
+            if (extensionInstance.toBeInitializedLater != null) {
+                return extensionInstance;
+            }
+        }
+        throw new RuntimeException("Initialized Extension not found");
+    }
+
     public CDIExtension() {}
-    
+
     private void initialize(BeanManager manager) {
         // initialize in a separate method because Weld creates a proxy for the extension
         // and we don't want to waste time initializing it
