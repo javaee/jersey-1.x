@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -65,6 +65,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -181,6 +182,18 @@ public class CDIExtension implements Extension {
         } catch (NamingException ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    public static CDIExtension getInitializedExtensionFromBeanManager(BeanManager bm) {
+        Set<Bean<?>> beans = bm.getBeans(CDIExtension.class);
+        for (Bean<?> b : beans) {
+            final CreationalContext<?> cc = bm.createCreationalContext(b);
+            CDIExtension extensionInstance = (CDIExtension) bm.getReference(b, CDIExtension.class, cc);
+            if (extensionInstance.toBeInitializedLater != null) {
+                return extensionInstance;
+            }
+        }
+        throw new RuntimeException("Initialized Extension not found");
     }
 
     public CDIExtension() {}
