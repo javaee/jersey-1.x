@@ -146,7 +146,7 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
         response.getHttpHeaders().add(HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING); // add vary header
 
         String acceptEncoding = request.getRequestHeaders().getFirst(HttpHeaders.ACCEPT_ENCODING);
-        String contentEncoding = (String) response.getHttpHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
+        Object contentEncoding = response.getHttpHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
 
         if (acceptEncoding != null && contentEncoding == null && acceptEncoding.contains("gzip")) {
             // Check EntityTag header
