@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * A basic copy on write HashMap.
  * <p>
  * If an instance is cloned then any methods invoked on the instance or clone
- * that result in state modification will result in copying of the state 
+ * that result in state modification will result in copying of the state
  * before modification.
  *
  * @author Paul.Sandoz@Oracle.Com
@@ -60,7 +60,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class CopyOnWriteHashMap<K,V> implements Map<K,V> {
     private volatile Map<K,V> core;
 
-    private volatile Map<K,V> view;
+    volatile Map<K,V> view;
 
     private final AtomicBoolean requiresCopyOnWrite;
 
@@ -118,7 +118,7 @@ public class CopyOnWriteHashMap<K,V> implements Map<K,V> {
     @Override
     public V put(K key, V value) {
         copy();
-        return core.put(key,value);
+        return core.put(key, value);
     }
 
     @Override
@@ -161,9 +161,11 @@ public class CopyOnWriteHashMap<K,V> implements Map<K,V> {
     }
 
     private Map<K, V> getView() {
-        if (view == null) {
-            view = Collections.unmodifiableMap(core);
+        Map<K, V> result = view; // volatile read
+        if (result == null) {
+            result = Collections.unmodifiableMap(core);
+            view = result; // volatile write
         }
-        return view;
+        return result;
     }
 }
