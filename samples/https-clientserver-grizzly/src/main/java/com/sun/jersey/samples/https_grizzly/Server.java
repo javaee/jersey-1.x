@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -39,34 +39,38 @@
  */
 
 package com.sun.jersey.samples.https_grizzly;
-        
+
+import java.io.IOException;
+import java.net.URI;
+
+import javax.ws.rs.core.UriBuilder;
+
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.samples.https_grizzly.auth.SecurityFilter;
 import com.sun.jersey.spi.container.servlet.ServletContainer;
+
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.servlet.ServletRegistration;
 import org.glassfish.grizzly.servlet.WebappContext;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 
-import javax.ws.rs.core.UriBuilder;
-import java.io.IOException;
-import java.net.URI;
-
 /**
+ * A simple SSL-secured HTTP server for testing purposes.
  *
- * @author pavel.bucek@sun.com
+ * @author Pavel Bucek (pavel.bucek at oracle.com)
  */
 public class Server {
 
+    private static final Object serverGuard = new Object();
     private static HttpServer webServer;
 
     public static final URI BASE_URI = getBaseURI();
     public static final String CONTENT = "JERSEY HTTPS EXAMPLE\n";
 
     private static URI getBaseURI() {
-        return UriBuilder.fromUri("https://localhost/").port(getPort(4463)).build();
+        return UriBuilder.fromUri("https://localhost/").port(getPort(8463)).build();
     }
 
     private static int getPort(int defaultPort) {
@@ -84,7 +88,7 @@ public class Server {
 
         // add Jersey resource servlet
         WebappContext context = new WebappContext("context");
-        ServletRegistration registration = 
+        ServletRegistration registration =
                 context.addServlet("ServletContainer", ServletContainer.class);
         registration.setInitParameter("com.sun.jersey.config.property.packages",
                 "com.sun.jersey.samples.https_grizzly.resource;com.sun.jersey.samples.https_grizzly.auth");
@@ -95,7 +99,7 @@ public class Server {
 
         // Grizzly ssl configuration
         SSLContextConfigurator sslContext = new SSLContextConfigurator();
-        
+
         // set up security context
         sslContext.setKeyStoreFile("./keystore_server"); // contains server keypair
         sslContext.setKeyStorePass("asdfgh");
@@ -103,18 +107,23 @@ public class Server {
         sslContext.setTrustStorePass("asdfgh");
 
         try {
+            synchronized (serverGuard) {
+                if (webServer != null) {
+                    throw new IllegalStateException(
+                            "Another instance of the SSL-secured HTTP test server has been already started.");
+                }
 
-            webServer = GrizzlyServerFactory.createHttpServer(
-                    getBaseURI(),
-                    null,
-                    true,
-                    new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(true)
-            );
+                webServer = GrizzlyServerFactory.createHttpServer(
+                        getBaseURI(),
+                        null,
+                        true,
+                        new SSLEngineConfigurator(sslContext).setClientMode(false).setNeedClientAuth(true));
 
-            // start Grizzly embedded server //
-            System.out.println("Jersey app started. Try out " + BASE_URI + "\nHit CTRL + C to stop it...");
-            context.deploy(webServer);
-            webServer.start();
+                // start Grizzly embedded server //
+                System.out.println("Jersey app started. Try out " + BASE_URI + "\nHit CTRL + C to stop it...");
+                context.deploy(webServer);
+                webServer.start();
+            }
 
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
@@ -122,7 +131,13 @@ public class Server {
     }
 
     protected static void stopServer() {
-        webServer.stop();
+        synchronized (serverGuard) {
+            if (webServer == null) {
+                throw new IllegalStateException("Test run sync issue: There is no SSL-secured HTTP test server to stop.");
+            }
+            webServer.stop();
+            webServer = null;
+        }
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
