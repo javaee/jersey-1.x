@@ -50,13 +50,13 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.18.4</version>
+        <version>1.18.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>atompub-contacts</artifactId>
     <name>AtomPub Contacts - jersey sample</name>
 
-    <version>1.18.4</version>
+    <version>1.18.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
