@@ -106,6 +106,15 @@
                 <aspectjrt.version>1.7.0</aspectjrt.version>
             </properties>
         </profile>
+         <profile>
+            <id>aspectjrt-jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <aspectjrt.version>1.8.7</aspectjrt.version>
+            </properties>
+        </profile>
         <profile>
             <id>xdk</id>
             <build>

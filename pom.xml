@@ -455,6 +455,27 @@
                         <templateFile>etc/config/copyright.txt</templateFile>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.4</version>
+                    <!--
+                        mvn release:prepare -DreleaseVersion=<release-version> -DdevelopmentVersion=<next-dev-version> -Dtag=<release-version> \
+                            -Prelease
+
+                        mvn release:perform -DconnectionUrl="scm:git:file://<path-to-local-repo>" \
+                            -Prelease,testsSkip
+                    -->
+                    <configuration>
+                        <mavenExecutorId>forked-path</mavenExecutorId>
+                        <autoVersionSubmodules>true</autoVersionSubmodules>
+                        <preparationGoals>clean install</preparationGoals>
+                        <pushChanges>false</pushChanges>
+                        <useReleaseProfile>false</useReleaseProfile>
+                        <arguments>${release.tests.args} ${release.arguments}</arguments>
+                    </configuration>
+                </plugin>
+
             </plugins>
         </pluginManagement>
 
@@ -601,6 +622,7 @@
         <jaxrs.version>1.1.1</jaxrs.version>
         <moxy.version>2.3.2</moxy.version>
         <servlet3.version>3.0.1</servlet3.version>
+        <release.tests.args>-Dmaven.test.skip=false</release.tests.args>
     </properties>
 
 </project>
