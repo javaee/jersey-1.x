@@ -26,10 +26,11 @@
 jaxb.index
 /MANIFEST.MF
 /META-INF/services/
+META-INF/jersey-module-version
 /README
 /etc/config/copyright-exclude
 /etc/config/copyright.txt
-/LICENSE.html
+/license.html
 /LICENSE.txt
 /third-party-license-readme.txt
 nb-configuration.xml
@@ -43,8 +44,13 @@ truststore_server
 /examples/reload/resources
 /jersey-server/etc
 bootstrap
+changes.txt
 build.readme
+archive/src/main/resources/Jersey-LICENSE.txt
+ri/jax-rs-ri-source-licensee/src/main/resources/TLDA_SCSL_Licensees_License_Notice.txt
 /jersey-tests/src/test/resources/com/sun/jersey/impl/entity/multipart-testcase.txt
 /samples/freemarker/src/main/resources/freemarker/com/sun/jersey/samples/freemarker/resources/FreemarkerResource.ftl
 /jersey-tests/src/test/resources/com/sun/jersey/impl/container/config/jaxrs-components
 /jersey-tests/src/test/resources/com/sun/jersey/impl/entity/xxe.txt
+contribs/bill-burke-book
+jersey-server/src/main/java/jersey/repackaged/org/objectweb/asm

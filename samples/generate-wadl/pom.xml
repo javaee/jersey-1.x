@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -40,6 +40,7 @@
     holder.
 
 -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -66,13 +67,13 @@
                 <dependency>
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>maven-wadl-plugin</artifactId>
-                    <version>${jersey-release-version}</version>
+                    <version>${project.version}</version>
                     <classifier>cobertura</classifier>
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>wadl-resourcedoc-doclet</artifactId>
-                    <version>${jersey-release-version}</version>
+                    <version>${project.version}</version>
                     <classifier>cobertura</classifier>
                 </dependency>
             </dependencies>
@@ -86,12 +87,12 @@
                 <dependency>
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>maven-wadl-plugin</artifactId>
-                    <version>${jersey-release-version}</version>
+                    <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>wadl-resourcedoc-doclet</artifactId>
-                    <version>${jersey-release-version}</version>
+                    <version>${project.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -167,12 +168,12 @@
                 <dependency>
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>maven-wadl-plugin</artifactId>
-                    <version>${jersey-release-version}</version>
+                    <version>${project.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>com.sun.jersey.contribs</groupId>
                     <artifactId>wadl-resourcedoc-doclet</artifactId>
-                    <version>${jersey-release-version}</version>
+                    <version>${project.version}</version>
                 </dependency>
             </dependencies>
         </profile>
@@ -268,7 +269,7 @@
                         <docletArtifact>
                             <groupId>com.sun.jersey.contribs</groupId>
                             <artifactId>wadl-resourcedoc-doclet</artifactId>
-                            <version>${jersey-release-version}</version>
+                            <version>${project.version}</version>
                         </docletArtifact>
                         <!--
                             Also specify jersey and xerces as doclet artifacts as the ResourceDoclet
@@ -277,7 +278,7 @@
                         <docletArtifact>
                             <groupId>com.sun.jersey</groupId>
                             <artifactId>jersey-server</artifactId>
-                            <version>${jersey-release-version}</version>
+                            <version>${project.version}</version>
                         </docletArtifact>
                         <docletArtifact>
                             <groupId>xerces</groupId>
@@ -293,7 +294,7 @@
             <plugin>
                 <groupId>com.sun.jersey.contribs</groupId>
                 <artifactId>maven-wadl-plugin</artifactId>
-                <version>${jersey-release-version}</version>
+                <version>${project.version}</version>
                 <executions>
                     <execution>
                         <id>generate</id>
@@ -353,9 +354,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <properties>
-        <jersey-release-version>${project.version}</jersey-release-version>
-    </properties>
 
 </project>

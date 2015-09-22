@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -40,14 +40,15 @@
     holder.
 
 -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.17.3-SNAPSHOT</version>
+        <version>1.20-SNAPSHOT</version>
     </parent>
     <artifactId>spring-annotations</artifactId>
     <name>Spring Annotations WebApp - Jersey sample</name>
@@ -83,79 +84,63 @@
                     <name>cobertura</name>
                 </property>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-servlet</artifactId>
-                    <version>${project.version}</version>
-                    <classifier>cobertura</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.contribs</groupId>
-                    <artifactId>jersey-spring</artifactId>
-                    <version>${project.version}</version>
-                    <classifier>cobertura</classifier>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-grizzly2</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                    <classifier>cobertura</classifier>
-                </dependency>
-                <!-- for external testing -->
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-external</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                    <classifier>cobertura</classifier>
-                </dependency>
-            </dependencies>
+            <properties>
+                <cobertura.classifier>cobertura</cobertura.classifier>
+            </properties>
         </profile>
         <profile>
-            <id>default</id>
+            <id>aspectjrt-jdk6</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <jdk>1.6</jdk>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sun.jersey</groupId>
-                    <artifactId>jersey-servlet</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.contribs</groupId>
-                    <artifactId>jersey-spring</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-grizzly2</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                </dependency>
-                <!-- for external testing -->
-                <dependency>
-                    <groupId>com.sun.jersey.jersey-test-framework</groupId>
-                    <artifactId>jersey-test-framework-external</artifactId>
-                    <version>${project.version}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
+            <properties>
+                <aspectjrt.version>1.5.4</aspectjrt.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>aspectjrt-jdk7</id>
+            <activation>
+                <jdk>1.7</jdk>
+            </activation>
+            <properties>
+                <aspectjrt.version>1.7.0</aspectjrt.version>
+            </properties>
+        </profile>
+         <profile>
+            <id>aspectjrt-jdk8</id>
+            <activation>
+                <jdk>1.8</jdk>
+            </activation>
+            <properties>
+                <aspectjrt.version>1.8.7</aspectjrt.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>xdk</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <skipTests>true</skipTests>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
     <dependencies>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
-            <version>1.5.4</version>
+            <version>${aspectjrt.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.5.4</version>
+            <version>${aspectjrt.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -163,7 +148,34 @@
             <artifactId>cglib</artifactId>
             <version>2.2</version>
             <scope>runtime</scope>
-       </dependency>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-servlet</artifactId>
+            <version>${project.version}</version>
+            <classifier>${cobertura.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-spring</artifactId>
+            <version>${project.version}</version>
+            <classifier>${cobertura.classifier}</classifier>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-grizzly2</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>${cobertura.classifier}</classifier>
+        </dependency>
+        <!-- for external testing -->
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-external</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+            <classifier>${cobertura.classifier}</classifier>
+        </dependency>
     </dependencies>
     <build>
         <finalName>spring-annotations</finalName>
@@ -183,13 +195,13 @@
                 </configuration>
             </plugin>
             <plugin>
-              <groupId>org.mortbay.jetty</groupId>
-              <artifactId>maven-jetty-plugin</artifactId>
-              <version>6.1.24</version>
-              <configuration>
-                <webApp>${basedir}/target/spring-annotations.war</webApp>
-                <contextPath>spring</contextPath>
-              </configuration>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>maven-jetty-plugin</artifactId>
+                <version>6.1.24</version>
+                <configuration>
+                    <webApp>${basedir}/target/spring-annotations.war</webApp>
+                    <contextPath>spring</contextPath>
+                </configuration>
             </plugin>
             <!-- Run the application using "mvn embedded-glassfish:run" -->
             <plugin>
@@ -200,7 +212,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xslt-maven-plugin</artifactId>
             </plugin>
-             <plugin>
+            <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
@@ -223,6 +235,6 @@
     <properties>
         <netbeans.hint.deploy.server>gfv3</netbeans.hint.deploy.server>
         <spring-release-version>[2.5.5,)</spring-release-version>
+        <cobertura.classifier></cobertura.classifier>
     </properties>
 </project>
-
