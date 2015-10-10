@@ -44,6 +44,7 @@ import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessor;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProcessorFactory;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.annotation.ManagedBean;
 import javax.annotation.PostConstruct;
 import javax.interceptor.InvocationContext;
@@ -60,6 +61,8 @@ final class EJBInjectionInterceptor {
         this.cpf = cpf;
     }
 
+	private final AtomicBoolean initializing = new AtomicBoolean(false);
+
     @PostConstruct
     private void init(final InvocationContext context) throws Exception {
         if (cpf == null) {
@@ -67,6 +70,10 @@ final class EJBInjectionInterceptor {
             return;
         }
 
+		boolean setInitializing = initializing.compareAndSet(false, true);
+		if (!setInitializing) {
+			return;
+		}
         final Object beanInstance = context.getTarget();
         final IoCComponentProcessor icp = get(beanInstance.getClass());
         if (icp != null)
