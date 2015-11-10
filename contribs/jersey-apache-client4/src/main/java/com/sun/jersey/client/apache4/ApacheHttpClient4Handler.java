@@ -54,14 +54,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.AuthCache;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpOptions;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.BufferedHttpEntity;
@@ -207,17 +200,17 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
         final HttpUriRequest request;
 
         if (strMethod.equals("GET")) {
-            request = new HttpGet(uri);
+            request = createRequest("GET", uri, entity, new HttpGet(uri));
         } else if (strMethod.equals("POST")) {
             request = new HttpPost(uri);
         } else if (strMethod.equals("PUT")) {
             request = new HttpPut(uri);
         } else if (strMethod.equals("DELETE")) {
-            request = new HttpDelete(uri);
+            request = createRequest("DELETE", uri, entity, new HttpDelete(uri));
         } else if (strMethod.equals("HEAD")) {
             request = new HttpHead(uri);
         } else if (strMethod.equals("OPTIONS")) {
-            request = new HttpOptions(uri);
+            request = createRequest("OPTIONS", uri, entity, new HttpOptions(uri));
         } else {
             request = new HttpEntityEnclosingRequestBase() {
                 @Override
@@ -362,6 +355,27 @@ public final class ApacheHttpClient4Handler extends TerminatingClientHandler {
             if(i.markSupported())
                 return i;
             return new BufferedInputStream(i, ReaderWriter.BUFFER_SIZE);
+        }
+    }
+
+    private static HttpRequestBase createRequest(final String method,
+                                                 final URI uri,
+                                                 final HttpEntity entity,
+                                                 final HttpRequestBase fallback) {
+        if (entity != null) {
+            return new HttpEntityEnclosingRequestBase() {
+                @Override
+                public String getMethod() {
+                    return method;
+                }
+
+                @Override
+                public URI getURI() {
+                    return uri;
+                }
+            };
+        } else {
+            return fallback;
         }
     }
 }
