@@ -12,18 +12,18 @@
  Boston, MA 02110-1301 USA
 -->
 <!-- This file is used to build and run all the examples -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project>
     <name>OReilly Workbook Examples</name>
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-contribs</artifactId>
-        <version>1.19.1</version>
+        <version>1.20-SNAPSHOT</version>
     </parent>
 
     <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
     <artifactId>bill-burke-book-examples</artifactId>
-    <version>1.19.1</version>
+    <version>1.20-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <dependencyManagement>
