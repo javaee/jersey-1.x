@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -54,25 +54,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.Encoded;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.MatrixParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.SecurityContext;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Providers;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
@@ -97,6 +80,21 @@ import javax.inject.Provider;
 import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.NamingException;
+import javax.ws.rs.CookieParam;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.Encoded;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.MatrixParam;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Application;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Request;
+import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.Providers;
 
 import com.sun.jersey.api.core.ExtendedUriInfo;
 import com.sun.jersey.api.core.HttpContext;
@@ -123,13 +121,16 @@ public class CDIExtension implements Extension {
 
     private static final Logger LOGGER = Logger.getLogger(CDIExtension.class.getName());
 
-    private static class ContextAnnotationLiteral extends AnnotationLiteral<Context> implements Context {};
+    private static class ContextAnnotationLiteral extends AnnotationLiteral<Context> implements Context { }
+
     private final Context contextAnnotationLiteral = new ContextAnnotationLiteral();
 
-    private static class InjectAnnotationLiteral extends AnnotationLiteral<Inject> implements Inject {};
+    private static class InjectAnnotationLiteral extends AnnotationLiteral<Inject> implements Inject { }
+
     private final Inject injectAnnotationLiteral = new InjectAnnotationLiteral();
 
-    private static class SyntheticQualifierAnnotationImpl extends AnnotationLiteral<SyntheticQualifier> implements SyntheticQualifier {
+    private static class SyntheticQualifierAnnotationImpl extends AnnotationLiteral<SyntheticQualifier>
+            implements SyntheticQualifier {
         private int value;
 
         public SyntheticQualifierAnnotationImpl(int value) {
@@ -142,20 +143,69 @@ public class CDIExtension implements Extension {
         }
     }
 
-    private Map<ClassLoader, WebApplication> webApplications = new HashMap<ClassLoader, WebApplication>();
-    private ResourceConfig resourceConfig;
-    private Set<Class<? extends Annotation>> knownParameterQualifiers;
-    private Set<Class<?>> staticallyDefinedContextBeans;
-    private Map<Class<? extends Annotation>, Parameter.Source> paramQualifiersMap;
+    // annotations to be turned into qualifiers
+    private static final Set<Class<? extends Annotation>> knownParameterQualifiers = initializeKnownParamQualifiers();
+    private static Set<Class<? extends Annotation>> initializeKnownParamQualifiers() {
+        Set<Class<? extends Annotation>> classes = new HashSet<Class<? extends Annotation>>();
+        classes.add(CookieParam.class);
+        classes.add(FormParam.class);
+        classes.add(HeaderParam.class);
+        classes.add(MatrixParam.class);
+        classes.add(PathParam.class);
+        classes.add(QueryParam.class);
+        classes.add(Context.class);
+        return Collections.unmodifiableSet(classes);
+    }
 
-    private Map<Class<? extends Annotation>, Set<DiscoveredParameter>> discoveredParameterMap;
-    private Map<DiscoveredParameter, SyntheticQualifier> syntheticQualifierMap;
+    // used to map a qualifier to a Parameter.Source
+    private static final Map<Class<? extends Annotation>, Parameter.Source> paramQualifiersMap = initializeKnownParamQualifiersMap();
+    private static Map<Class<? extends Annotation>, Parameter.Source> initializeKnownParamQualifiersMap() {
+        Map<Class<? extends Annotation>, Parameter.Source> map = new HashMap<Class<? extends Annotation>, Parameter.Source>();
+        map.put(CookieParam.class, Parameter.Source.COOKIE);
+        map.put(FormParam.class, Parameter.Source.FORM);
+        map.put(HeaderParam.class, Parameter.Source.HEADER);
+        map.put(MatrixParam.class, Parameter.Source.MATRIX);
+        map.put(PathParam.class, Parameter.Source.PATH);
+        map.put(QueryParam.class, Parameter.Source.QUERY);
+        map.put(Context.class, Parameter.Source.CONTEXT);
+        return Collections.unmodifiableMap(map);
+    }
+
+    // pre-defined contextual types
+    private static final Set<Class<?>> staticallyDefinedContextBeans = initializeStaticallyDefinedContextBeans();
+    private static Set<Class<?>> initializeStaticallyDefinedContextBeans() {
+        Set<Class<?>> classes = new HashSet<Class<?>>();
+        // standard JAX-RS types
+        classes.add(Application.class);
+        classes.add(HttpHeaders.class);
+        classes.add(Providers.class);
+        classes.add(Request.class);
+        classes.add(SecurityContext.class);
+        classes.add(UriInfo.class);
+        // Jersey extensions
+        classes.add(ExceptionMapperContext.class);
+        classes.add(ExtendedUriInfo.class);
+        classes.add(FeaturesAndProperties.class);
+        classes.add(HttpContext.class);
+        classes.add(HttpRequestContext.class);
+        classes.add(HttpResponseContext.class);
+        classes.add(MessageBodyWorkers.class);
+        classes.add(ResourceContext.class);
+        classes.add(WebApplication.class);
+        return Collections.unmodifiableSet(classes);
+    }
+
+    private final Map<ClassLoader, WebApplication> webApplications = new HashMap<ClassLoader, WebApplication>();
+    private volatile ResourceConfig resourceConfig;
+
+    private volatile Map<Class<? extends Annotation>, Set<DiscoveredParameter>> discoveredParameterMap;
+    private volatile Map<DiscoveredParameter, SyntheticQualifier> syntheticQualifierMap;
     private int nextSyntheticQualifierValue = 0;
 
-    private List<InitializedLater> toBeInitializedLater;
+    /* package */ volatile List<InitializedLater> toBeInitializedLater;
 
-    private static String JNDI_CDIEXTENSION_NAME = "CDIExtension";
-    private static String JNDI_CDIEXTENSION_CTX = "com/sun/jersey/config";
+    private static final String JNDI_CDIEXTENSION_NAME = "CDIExtension";
+    private static final String JNDI_CDIEXTENSION_CTX = "com/sun/jersey/config";
 
     /*
      * Setting this system property to "true" will force use of the BeanManager to look up the bean for the active CDIExtension,
@@ -185,15 +235,11 @@ public class CDIExtension implements Extension {
     }
 
     public static CDIExtension getInitializedExtensionFromBeanManager(BeanManager bm) {
-        Set<Bean<?>> beans = bm.getBeans(CDIExtension.class);
-        for (Bean<?> b : beans) {
-            final CreationalContext<?> cc = bm.createCreationalContext(b);
-            CDIExtension extensionInstance = (CDIExtension) bm.getReference(b, CDIExtension.class, cc);
-            if (extensionInstance.toBeInitializedLater != null) {
-                return extensionInstance;
-            }
+        CDIExtension bean = Utils.getCdiExtensionInstance(bm);
+        if (bean == null) {
+            throw new RuntimeException("Initialized Extension not found.");
         }
-        throw new RuntimeException("Initialized Extension not found");
+        return bean;
     }
 
     public CDIExtension() {}
@@ -214,49 +260,6 @@ public class CDIExtension implements Extension {
                 throw new RuntimeException(ex);
             }
         }
-
-        // annotations to be turned into qualifiers
-        Set<Class<? extends Annotation>> set = new HashSet<Class<? extends Annotation>>();
-        set.add(CookieParam.class);
-        set.add(FormParam.class);
-        set.add(HeaderParam.class);
-        set.add(MatrixParam.class);
-        set.add(PathParam.class);
-        set.add(QueryParam.class);
-        set.add(Context.class);
-        knownParameterQualifiers = Collections.unmodifiableSet(set);
-
-        // used to map a qualifier to a Parameter.Source
-        Map<Class<? extends Annotation>, Parameter.Source> map = new HashMap<Class<? extends Annotation>, Parameter.Source>();
-        map.put(CookieParam.class,Parameter.Source.COOKIE);
-        map.put(FormParam.class,Parameter.Source.FORM);
-        map.put(HeaderParam.class,Parameter.Source.HEADER);
-        map.put(MatrixParam.class,Parameter.Source.MATRIX);
-        map.put(PathParam.class,Parameter.Source.PATH);
-        map.put(QueryParam.class,Parameter.Source.QUERY);
-        map.put(Context.class,Parameter.Source.CONTEXT);
-        paramQualifiersMap = Collections.unmodifiableMap(map);
-
-        // pre-defined contextual types
-        Set<Class<?>> set3 = new HashSet<Class<?>>();
-        // standard types
-        set3.add(Application.class);
-        set3.add(HttpHeaders.class);
-        set3.add(Providers.class);
-        set3.add(Request.class);
-        set3.add(SecurityContext.class);
-        set3.add(UriInfo.class);
-        // Jersey extensions
-        set3.add(ExceptionMapperContext.class);
-        set3.add(ExtendedUriInfo.class);
-        set3.add(FeaturesAndProperties.class);
-        set3.add(HttpContext.class);
-        set3.add(HttpRequestContext.class);
-        set3.add(HttpResponseContext.class);
-        set3.add(MessageBodyWorkers.class);
-        set3.add(ResourceContext.class);
-        set3.add(WebApplication.class);
-        staticallyDefinedContextBeans = Collections.unmodifiableSet(set3);
 
         // tracks all discovered parameters
         Map<Class<? extends Annotation>, Set<DiscoveredParameter>> map2 = new HashMap<Class<? extends Annotation>, Set<DiscoveredParameter>>();
