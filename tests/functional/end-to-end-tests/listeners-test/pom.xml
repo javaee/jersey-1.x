@@ -126,6 +126,6 @@
     </dependencies>
 
     <properties>
-        <jersey.version>1.18.5-SNAPSHOT</jersey.version>
+        <jersey.version>1.18.5</jersey.version>
     </properties>
 </project>
