@@ -54,3 +54,7 @@ archive/src/main/resources/Jersey-LICENSE.txt
 ri/jax-rs-ri-source-licensee/src/main/resources/TLDA_SCSL_Licensees_License_Notice.txt
 contribs/bill-burke-book
 jersey-server/src/main/java/jersey/repackaged/org/objectweb/asm
+contribs/scala/jersey-lift-test/src/main/webapp/templates-hidden/default.html
+glassfish/v2-package/main/src/main/resources/Info/info.xml
+samples/atompub-contacts/atompub-contacts-server/src/main/java/com/sun/jersey/samples/contacts/server/auth/Base64.java
+jersey-core/src/main/java/com/sun/jersey/core/util/Base64.java

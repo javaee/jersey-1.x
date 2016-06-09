@@ -37,6 +37,7 @@
  * only if the new code is made subject to such option by the copyright
  * holder.
  */
+
 package com.sun.jersey.server.impl.ejb;
 
 import java.util.concurrent.ConcurrentHashMap;

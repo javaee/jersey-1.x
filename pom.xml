@@ -437,7 +437,7 @@
                 <plugin>
                     <groupId>org.glassfish.copyright</groupId>
                     <artifactId>glassfish-copyright-maven-plugin</artifactId>
-                    <version>1.28</version>
+                    <version>1.40</version>
                     <configuration>
                         <excludeFile>etc/config/copyright-exclude</excludeFile>
                         <!--svn|mercurial|git - defaults to svn-->
@@ -518,7 +518,7 @@
             <plugin>
                 <groupId>org.glassfish.copyright</groupId>
                 <artifactId>glassfish-copyright-maven-plugin</artifactId>
-                <version>1.28</version>
+                <version>1.40</version>
                 <configuration>
                     <excludeFile>etc/config/copyright-exclude</excludeFile>
                     <!--svn|mercurial|git - defaults to svn-->
