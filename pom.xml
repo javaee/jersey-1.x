@@ -78,10 +78,9 @@
         <url>http://hudson.glassfish.org/job/Jersey-trunk-multiplatform/</url>
     </ciManagement>
     <scm>
-        <connection>scm:svn:https://svn.java.net/svn/jersey~svn/trunk/jersey/</connection>
-        <developerConnection>scm:svn:https://svn.java.net/svn/jersey~svn/trunk/jersey/</developerConnection>
+        <connection>scm:git:git://java.net/jersey~code-1_x</connection>
+        <developerConnection>scm:git:ssh://git.java.net/jersey~code-1_x</developerConnection>
         <tag>HEAD</tag>
-        <url>http://java.net/projects/jersey/sources/svn/show/trunk/jersey</url>
     </scm>
 
     <mailingLists>
@@ -122,11 +121,24 @@
             </modules>
 
             <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.sonatype.plugins</groupId>
+                            <artifactId>nexus-staging-maven-plugin</artifactId>
+                            <version>1.6.7</version>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-gpg-plugin</artifactId>
+                            <version>1.1</version>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.1</version>
                         <executions>
                             <execution>
                                 <id>sign-artifact</id>
@@ -136,6 +148,38 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <configuration>
+                            <skip>true</skip>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>nexus-staging-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>default-deploy</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <serverId>jvnet-nexus-staging</serverId>
+                            <nexusUrl>https://maven.java.net/</nexusUrl>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
@@ -328,7 +372,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.0-beta-4</version>
+                    <version>1.4</version>
                     <configuration>
                         <format>{0,date,MM/dd/yyyy hh:mm aa}</format>
                         <items>
@@ -469,7 +513,7 @@
                     <configuration>
                         <mavenExecutorId>forked-path</mavenExecutorId>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
-                        <preparationGoals>clean install</preparationGoals>
+                        <preparationGoals>${release.preparationGoals}</preparationGoals>
                         <pushChanges>false</pushChanges>
                         <useReleaseProfile>false</useReleaseProfile>
                         <arguments>${release.tests.args} ${release.arguments}</arguments>
@@ -617,6 +661,7 @@
         <moxy.version>2.3.2</moxy.version>
         <servlet3.version>3.0.1</servlet3.version>
         <release.tests.args>-Dmaven.test.skip=false</release.tests.args>
+        <release.preparationGoals>clean install</release.preparationGoals>
     </properties>
 
 </project>
