@@ -41,11 +41,11 @@
 
 -->
 
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <artifactId>jersey-contribs</artifactId>
         <groupId>com.sun.jersey.contribs</groupId>
-        <version>1.20-SNAPSHOT</version>
+        <version>1.19.2</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -147,7 +147,7 @@
                 <!-- configuration>
                     <goalPrefix>plugin</goalPrefix>
                     <outputDirectory>${basedir}/target/dir</outputDirectory>
-                    <extractors/>
+                    <extractors />
                 </configuration -->
             </plugin>
         </plugins>

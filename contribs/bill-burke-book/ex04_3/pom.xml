@@ -12,19 +12,17 @@
  library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
  Boston, MA 02110-1301 USA
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.sun.jersey.contribs.bill-burke-book</groupId>
         <artifactId>bill-burke-book-examples</artifactId>
-        <version>1.20-SNAPSHOT</version>
+        <version>1.19.2</version>
     </parent>
     <artifactId>ex04_3</artifactId>
     <packaging>war</packaging>
     <name>ex04_3</name>
-    <description/>
+    <description />
 
     <profiles>
         <profile>
@@ -111,8 +109,7 @@
                     <stopKey>foo</stopKey>
                     <stopPort>${my.jetty.stop.port}</stopPort>
                     <connectors>
-                        <connector
-                                implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                        <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
                             <port>${my.jetty.port}</port>
                             <maxIdleTime>60000</maxIdleTime>
                         </connector>

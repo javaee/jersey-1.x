@@ -41,9 +41,7 @@
 
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -54,7 +52,7 @@
 
     <groupId>com.sun.jersey</groupId>
     <artifactId>jersey-project</artifactId>
-    <version>1.20-SNAPSHOT</version>
+    <version>1.19.2</version>
     <packaging>pom</packaging>
     <name>jersey-project</name>
 
@@ -80,7 +78,7 @@
     <scm>
         <connection>scm:git:git://java.net/jersey~code-1_x</connection>
         <developerConnection>scm:git:ssh://git.java.net/jersey~code-1_x</developerConnection>
-        <tag>HEAD</tag>
+        <tag>1.19.2</tag>
     </scm>
 
     <mailingLists>
@@ -650,7 +648,7 @@
     </dependencyManagement>
 
     <properties>
-        <xdk.absolute.path></xdk.absolute.path>
+        <xdk.absolute.path />
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <gf.embedded.version>3.1.1</gf.embedded.version>
