@@ -82,7 +82,10 @@
                             <!-- the following must be visible by the jersey-gf-server module
                                so that the EJB resource method dispatcher takes precedence over the other dispatchers
                                registered by the jersey-gf-server module -->
-                            com.sun.jersey.server.impl.ejb
+                            com.sun.jersey.server.impl.ejb,
+                            <!-- https://java.net/jira/browse/JERSEY-3158;
+                                 used by jersey-gf-server -->
+                            com.sun.jersey.server.impl.cdi
                         </Export-Package>
                         <Import-Package>
                             com.sun.jersey.core.osgi;resolution:=optional,

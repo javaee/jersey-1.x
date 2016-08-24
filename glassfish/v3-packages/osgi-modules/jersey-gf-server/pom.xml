@@ -89,6 +89,7 @@
                         <Import-Package>
                             com.sun.grizzly.*;resolution:="optional",
                             com.sun.jersey.core.osgi;resolution:=optional,
+                            com.sun.jersey.server.impl.cdi;resolution:=optional,
                             com.sun.net.httpserver;resolution:="optional",
                             javax.annotation.*;resolution:=optional,
                             javax.mail.*;resolution:="optional",
