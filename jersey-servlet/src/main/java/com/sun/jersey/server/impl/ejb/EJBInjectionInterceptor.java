@@ -75,6 +75,7 @@ final class EJBInjectionInterceptor {
 
         boolean setInitializing = initializing.compareAndSet(false, true);
         if (!setInitializing) {
+            context.proceed();
             return;
         }
         final Object beanInstance = context.getTarget();
