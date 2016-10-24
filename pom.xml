@@ -52,7 +52,7 @@
 
     <groupId>com.sun.jersey</groupId>
     <artifactId>jersey-project</artifactId>
-    <version>1.20-SNAPSHOT</version>
+    <version>1.19.3</version>
     <packaging>pom</packaging>
     <name>jersey-project</name>
 
@@ -78,7 +78,7 @@
     <scm>
         <connection>scm:git:git://java.net/jersey~code-1_x</connection>
         <developerConnection>scm:git:ssh://git.java.net/jersey~code-1_x</developerConnection>
-        <tag>HEAD</tag>
+        <tag>1.19.3</tag>
     </scm>
 
     <mailingLists>

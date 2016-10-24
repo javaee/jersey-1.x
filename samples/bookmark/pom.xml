@@ -46,7 +46,7 @@
     <parent>
         <groupId>com.sun.jersey.samples</groupId>
         <artifactId>jersey-samples</artifactId>
-        <version>1.20-SNAPSHOT</version>
+        <version>1.19.3</version>
     </parent>
     <artifactId>bookmark</artifactId>
     <name>Bookmark WebApp - Jersey sample</name>
