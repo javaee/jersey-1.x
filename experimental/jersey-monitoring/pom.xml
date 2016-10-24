@@ -47,7 +47,7 @@
     <parent>
         <artifactId>jersey-experimental</artifactId>
         <groupId>com.sun.jersey.experimental</groupId>
-        <version>1.19.3</version>
+        <version>1.20-SNAPSHOT</version>
     </parent>
     <artifactId>jersey-monitoring</artifactId>
     <packaging>jar</packaging>
