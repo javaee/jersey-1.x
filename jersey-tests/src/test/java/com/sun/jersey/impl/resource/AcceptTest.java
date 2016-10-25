@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2013 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,15 +40,17 @@
 
 package com.sun.jersey.impl.resource;
 
+import java.io.IOException;
+
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.impl.AbstractResourceTester;
-import java.io.IOException;
-import javax.ws.rs.Produces;
-import javax.ws.rs.Path;
-import javax.ws.rs.GET;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 /**
  *
@@ -126,6 +128,7 @@ public class AcceptTest extends AbstractResourceTester {
 
         ClientResponse response = r.accept("application/foo;q=1.1").get(ClientResponse.class);
         assertEquals(400, response.getStatus());
+        assertTrue(response.getEntity(String.class).isEmpty());
     }
 
     public void testQualityErrorMoreThanThreeDigits() {
@@ -134,6 +137,7 @@ public class AcceptTest extends AbstractResourceTester {
 
         ClientResponse response = r.accept("application/foo;q=0.1234").get(ClientResponse.class);
         assertEquals(400, response.getStatus());
+        assertTrue(response.getEntity(String.class).isEmpty());
     }
 
     @Path("/")

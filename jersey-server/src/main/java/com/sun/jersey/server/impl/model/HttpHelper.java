@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2016 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -40,24 +40,28 @@
 
 package com.sun.jersey.server.impl.model;
 
-import com.sun.jersey.core.header.MediaTypes;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
 import com.sun.jersey.api.core.HttpRequestContext;
-import com.sun.jersey.impl.ImplMessages;
 import com.sun.jersey.core.header.AcceptableLanguageTag;
 import com.sun.jersey.core.header.AcceptableMediaType;
 import com.sun.jersey.core.header.AcceptableToken;
 import com.sun.jersey.core.header.LanguageTag;
 import com.sun.jersey.core.header.MatchingEntityTag;
+import com.sun.jersey.core.header.MediaTypes;
 import com.sun.jersey.core.header.QualitySourceMediaType;
 import com.sun.jersey.core.header.reader.HttpHeaderReader;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
+import com.sun.jersey.impl.ImplMessages;
 
 /**
  * Helper classes for HTTP.
@@ -65,6 +69,8 @@ import javax.ws.rs.core.MediaType;
  * @author Paul.Sandoz@Sun.Com
  */
 public final class HttpHelper {
+
+    private final static Logger LOGGER = Logger.getLogger(HttpHelper.class.getName());
 
     /**
      * Get the content type from the "Content-Type" of an HTTP request.
@@ -261,9 +267,11 @@ public final class HttpHelper {
         }
     }
     
-    private static WebApplicationException clientError(String message, Exception e) {        
-        return new WebApplicationException(e, Response.status(Response.Status.BAD_REQUEST).
-                entity(message).type("text/plain").build());
+    private static WebApplicationException clientError(String message, Exception e) {
+        LOGGER.log(Level.FINEST, "Bad request: " + message, e);
+
+        return new WebApplicationException(e, Response.status(Response.Status.BAD_REQUEST)
+                                                      .type("text/plain").build());
     }
     
     /**
