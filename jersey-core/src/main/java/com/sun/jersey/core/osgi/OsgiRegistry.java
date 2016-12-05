@@ -279,6 +279,7 @@ public final class OsgiRegistry implements SynchronousBundleListener {
             lock.writeLock().lock();
             try {
                 factories.remove(unregisteredBundle.getBundleId());
+                classToBundleMapping.values().removeAll(Collections.singleton(unregisteredBundle));
 
                 if (unregisteredBundle.getSymbolicName().equals(CoreBundleSymbolicNAME)) {
                     bundleContext.removeBundleListener(this);
@@ -296,7 +297,6 @@ public final class OsgiRegistry implements SynchronousBundleListener {
             @Override
             public Enumeration<URL> getResources(String packagePath, ClassLoader classLoader) throws IOException {
                 List<URL> result = new LinkedList<URL>();
-                classToBundleMapping.clear();
 
                 for (Bundle bundle : bundleContext.getBundles()) {
                     // Look for resources at the given <packagePath> and at WEB-INF/classes/<packagePath> in case a WAR is
