@@ -86,7 +86,7 @@ public class CDIComponentProviderFactory implements
         beanManager = (BeanManager)bm;
         // work around proxying bug in Weld
         if (CDIExtension.lookupExtensionInBeanManager) {
-            extension = Utils.getExtension( beanManager, CDIExtension.class );
+            extension = Utils.getExtension(beanManager, CDIExtension.class);
         }
         else {
             extension = CDIExtension.getInitializedExtension();
