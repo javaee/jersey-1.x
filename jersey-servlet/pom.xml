@@ -46,7 +46,7 @@
     <parent>
         <groupId>com.sun.jersey</groupId>
         <artifactId>jersey-project</artifactId>
-        <version>1.12-SNAPSHOT</version>
+        <version>1.11</version>
     </parent>
     <artifactId>jersey-servlet</artifactId>
     <packaging>bundle</packaging>
@@ -184,7 +184,6 @@
                 <configuration>
                     <instructions>
                         <Private-Package>
-                            com.sun.jersey.server.impl.cdi,
                             com.sun.jersey.server.impl.ejb,
                             com.sun.jersey.server.impl.managedbeans
                         </Private-Package>
@@ -193,6 +192,7 @@
                             com.sun.jersey.spi.container.servlet,
                             com.sun.jersey.api.core.servlet,
                             com.sun.jersey.api.container.servlet,
+                            com.sun.jersey.server.impl.cdi,
                             <!-- the following is being used internally in GF REST API code! :-( -->
 			    com.sun.jersey.server.impl.container.servlet
                         </Export-Package>

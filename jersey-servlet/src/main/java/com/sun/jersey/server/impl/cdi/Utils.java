@@ -42,6 +42,7 @@ package com.sun.jersey.server.impl.cdi;
 
 import java.util.Collections;
 import java.util.Set;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.spi.Bean;
@@ -87,6 +88,15 @@ public class Utils {
         
         CreationalContext<?> cc = bm.createCreationalContext(b);
         return c.cast(bm.getReference(b, c, cc));
+    }
+
+    public static <T> T getExtension( BeanManager bm, Class<T> clazz ) {
+        Bean<?> bean = getBean(bm, clazz);
+        if (bean == null) {
+            return null;
+        }
+
+        return clazz.cast( bm.getContext( ApplicationScoped.class ).get( bean ) );
     }
     
     private static boolean isSharedBaseClass(Class<?> c, Set<Bean<?>> bs) {
