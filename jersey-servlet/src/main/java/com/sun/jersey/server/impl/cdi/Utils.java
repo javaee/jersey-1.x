@@ -90,13 +90,13 @@ public class Utils {
         return c.cast(bm.getReference(b, c, cc));
     }
 
-    public static <T> T getExtension( BeanManager bm, Class<T> clazz ) {
+    public static <T> T getExtension(BeanManager bm, Class<T> clazz) {
         Bean<?> bean = getBean(bm, clazz);
         if (bean == null) {
             return null;
         }
 
-        return clazz.cast( bm.getContext( ApplicationScoped.class ).get( bean ) );
+        return clazz.cast(bm.getContext(ApplicationScoped.class).get(bean));
     }
     
     private static boolean isSharedBaseClass(Class<?> c, Set<Bean<?>> bs) {
