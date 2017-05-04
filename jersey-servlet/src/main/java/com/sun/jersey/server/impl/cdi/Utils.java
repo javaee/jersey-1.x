@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2014 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2010-2017 Oracle and/or its affiliates. All rights reserved.
  *
  * The contents of this file are subject to the terms of either the GNU
  * General Public License Version 2 only ("GPL") or the Common Development
@@ -44,6 +44,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.AmbiguousResolutionException;
 import javax.enterprise.inject.spi.Bean;
@@ -119,32 +120,12 @@ public class Utils {
     }
 
     public static CDIExtension getCdiExtensionInstance(BeanManager beanManager) {
-
-        final Set<Bean<?>> beans = beanManager.getBeans(CDIExtension.class);
-
-        if (beans.isEmpty()) {
+        Bean<?> bean = getBean(beanManager, CDIExtension.class);
+        if  (bean == null) {
             return null;
         }
 
-        try {
-            return getCdiExtensionReference(beanManager.resolve(beans), beanManager);
-        } catch(AmbiguousResolutionException ex) {
-            // try to resolve the instance directly by looking at which one has already been initialized
-            for (Bean<?> b : beans) {
-                final CDIExtension cdiExtension = getCdiExtensionReference(b, beanManager);
-                if (cdiExtension.toBeInitializedLater != null) {
-                    return cdiExtension;
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private static CDIExtension getCdiExtensionReference(final Bean extensionBean, final BeanManager beanManager) {
-        final CreationalContext<?> creationalContext = beanManager.createCreationalContext(extensionBean);
-        final Object result = beanManager.getReference(extensionBean, CDIExtension.class, creationalContext);
-        return (CDIExtension)result;
+        return ( CDIExtension ) beanManager.getContext( ApplicationScoped.class ).get( bean );
     }
 
     private static boolean isSharedBaseClass(final Class<?> clazz, final Set<Bean<?>> beans) {

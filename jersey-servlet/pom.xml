@@ -3,7 +3,7 @@
 
     DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-    Copyright (c) 2010-2016 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2010-2017 Oracle and/or its affiliates. All rights reserved.
 
     The contents of this file are subject to the terms of either the GNU
     General Public License Version 2 only ("GPL") or the Common Development
@@ -73,7 +73,7 @@
         <dependency>
             <groupId>org.jboss.weld</groupId>
             <artifactId>weld-osgi-bundle</artifactId>
-            <version>1.1.4.Final</version>
+            <version>1.1.32.Final</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -184,7 +184,6 @@
                 <configuration>
                     <instructions>
                         <Private-Package>
-                            com.sun.jersey.server.impl.cdi,
                             com.sun.jersey.server.impl.ejb,
                             com.sun.jersey.server.impl.managedbeans
                         </Private-Package>
@@ -192,6 +191,7 @@
                             com.sun.jersey.api.container.servlet,
                             com.sun.jersey.api.core.servlet,
                             com.sun.jersey.spi.container.servlet,
+                            com.sun.jersey.server.impl.cdi,
                             com.sun.jersey.spi.scanning.servlet,
                             <!-- the following is being used internally in GF REST API code! :-( -->
                             com.sun.jersey.server.impl.container.servlet
