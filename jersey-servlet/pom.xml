@@ -184,7 +184,6 @@
                 <configuration>
                     <instructions>
                         <Private-Package>
-                            com.sun.jersey.server.impl.cdi,
                             com.sun.jersey.server.impl.ejb,
                             com.sun.jersey.server.impl.managedbeans
                         </Private-Package>
@@ -192,6 +191,7 @@
                             com.sun.jersey.api.container.servlet,
                             com.sun.jersey.api.core.servlet,
                             com.sun.jersey.spi.container.servlet,
+                            com.sun.jersey.server.impl.cdi,
                             com.sun.jersey.spi.scanning.servlet,
                             <!-- the following is being used internally in GF REST API code! :-( -->
                             com.sun.jersey.server.impl.container.servlet
