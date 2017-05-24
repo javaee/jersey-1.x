@@ -40,6 +40,8 @@
 
 package com.sun.jersey.server.wadl;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -165,9 +167,14 @@ public class WadlGeneratorImpl implements WadlGenerator {
         if (p.hasDefaultValue())
             wadlParam.setDefault(p.getDefaultValue());
         Class<?> pClass = p.getParameterClass();
-        if (pClass.isArray()) {
+        if (Iterable.class.isAssignableFrom(pClass)) {
             wadlParam.setRepeating(true);
-            pClass = pClass.getComponentType();
+            if (p.getParameterType() instanceof ParameterizedType) {
+                final Type[] actualTypeArguments = ((ParameterizedType) p.getParameterType()).getActualTypeArguments();
+                if (actualTypeArguments.length == 1) {
+                    pClass = (Class<?>) actualTypeArguments[0];
+                }
+            }
         }
         if (pClass.equals(int.class) || pClass.equals(Integer.class))
             wadlParam.setType(new QName("http://www.w3.org/2001/XMLSchema", "int", "xs"));
