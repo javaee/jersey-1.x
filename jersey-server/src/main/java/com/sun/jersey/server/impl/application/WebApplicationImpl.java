@@ -504,7 +504,7 @@ public final class WebApplicationImpl implements WebApplication {
                 return (cp == NULL_COMPONENT_PROCESSOR) ? null : cp;
             }
 
-            synchronized (abstractResourceMap) {
+            synchronized (componentProcessorMap) {
                 cp = componentProcessorMap.get(c);
                 if (cp != null) {
                     return (cp == NULL_COMPONENT_PROCESSOR) ? null : cp;
