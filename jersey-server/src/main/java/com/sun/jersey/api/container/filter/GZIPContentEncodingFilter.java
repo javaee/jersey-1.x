@@ -143,7 +143,10 @@ public class GZIPContentEncodingFilter implements ContainerRequestFilter, Contai
     }
 
     public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        response.getHttpHeaders().add(HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING); // add vary header
+
+        if (!response.getHttpHeaders().containsKey(HttpHeaders.VARY) || response.getHttpHeaders().containsKey(HttpHeaders.VARY) && !response.getHttpHeaders().get(HttpHeaders.VARY).contains(HttpHeaders.ACCEPT_ENCODING)) {
+            response.getHttpHeaders().add(HttpHeaders.VARY, HttpHeaders.ACCEPT_ENCODING); // add vary header
+        }
 
         String acceptEncoding = request.getRequestHeaders().getFirst(HttpHeaders.ACCEPT_ENCODING);
         String contentEncoding = (String) response.getHttpHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
