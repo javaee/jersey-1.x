@@ -51,8 +51,8 @@ public class JsonEncoder {
         if ((null == text) || (text.length() == 0)) {
             return text;
         }
-        Formatter formatter = new java.util.Formatter();
         StringBuffer result = new StringBuffer();
+        Formatter formatter = new java.util.Formatter(result);
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
             switch (c) {
@@ -79,12 +79,13 @@ public class JsonEncoder {
                     break;
                 default:
                     if (c < ' ') { // TODO: what about c > 255 ???
-                        result.append(formatter.format("\\u%04X", (int)c));
+                        formatter.format("\\u%04X", (int)c);
                     } else {
                         result.append(c);
                     }
             }
         }
+        formatter.close();
         return result.toString();
     }
 }
