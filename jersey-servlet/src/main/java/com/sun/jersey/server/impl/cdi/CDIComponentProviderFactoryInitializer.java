@@ -78,7 +78,7 @@ public class CDIComponentProviderFactoryInitializer {
         try{
           rc.getSingletons().add(new CDIComponentProviderFactory(beanManager, rc, wa));
           LOGGER.info("CDI support is enabled");
-        }catch(Exception ex)
+        }catch(ClassCastException ex)
         {
           LOGGER.log(Level.CONFIG, "The CDIComponentProviderFactory failed to initialize", ex);
         }
