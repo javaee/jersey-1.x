@@ -73,8 +73,8 @@ public class CDIComponentProviderFactoryInitializer {
             return;
         }
 
-        // Captures CDI bean errors on WebSphere Application Server 8.5.5.12 fixpack APR
-        // PI66630	UnsatisfiedResolutionException thrown in non-CDI environment
+        // Captures CDI bean errors on WebSphere Application Server 8.5.5.12 fixpack
+        // See: APR PI66630	UnsatisfiedResolutionException thrown in non-CDI environment
         try{
           rc.getSingletons().add(new CDIComponentProviderFactory(beanManager, rc, wa));
           LOGGER.info("CDI support is enabled");
