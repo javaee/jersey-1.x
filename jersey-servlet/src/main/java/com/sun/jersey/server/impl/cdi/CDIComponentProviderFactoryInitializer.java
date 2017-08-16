@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  * @author robc
  */
 public class CDIComponentProviderFactoryInitializer {
-    
+
     private static final Logger LOGGER = Logger.getLogger(CDIComponentProviderFactoryInitializer.class.getName());
 
     private static final String BEAN_MANAGER_CLASS = "javax.enterprise.inject.spi.BeanManager";
@@ -73,8 +73,15 @@ public class CDIComponentProviderFactoryInitializer {
             return;
         }
 
-        rc.getSingletons().add(new CDIComponentProviderFactory(beanManager, rc, wa));
-        LOGGER.info("CDI support is enabled");
+        // Captures CDI bean errors on WebSphere Application Server 8.5.5.12 fixpack
+        // See: APR PI66630	UnsatisfiedResolutionException thrown in non-CDI environment
+        try{
+          rc.getSingletons().add(new CDIComponentProviderFactory(beanManager, rc, wa));
+          LOGGER.info("CDI support is enabled");
+        }catch(ClassCastException ex)
+        {
+          LOGGER.log(Level.CONFIG, "The CDIComponentProviderFactory failed to initialize", ex);
+        }
     }
 
     private static Object lookup(ServletContext sc) {
@@ -118,7 +125,7 @@ public class CDIComponentProviderFactoryInitializer {
 
             LOGGER.config("The CDI BeanManager is at " + name);
             return beanManager;
-            
+
         } catch (NamingException ex) {
             LOGGER.log(Level.CONFIG, "The CDI BeanManager is not available at " + name, ex);
         }
