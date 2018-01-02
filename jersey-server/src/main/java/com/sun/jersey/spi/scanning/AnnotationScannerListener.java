@@ -39,19 +39,9 @@
  */
 package com.sun.jersey.spi.scanning;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import com.sun.jersey.core.osgi.OsgiRegistry;
 import com.sun.jersey.core.reflection.ReflectionHelper;
 import com.sun.jersey.core.spi.scanning.ScannerListener;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-
 import jersey.repackaged.org.objectweb.asm.AnnotationVisitor;
 import jersey.repackaged.org.objectweb.asm.Attribute;
 import jersey.repackaged.org.objectweb.asm.ClassReader;
@@ -59,6 +49,15 @@ import jersey.repackaged.org.objectweb.asm.ClassVisitor;
 import jersey.repackaged.org.objectweb.asm.FieldVisitor;
 import jersey.repackaged.org.objectweb.asm.MethodVisitor;
 import jersey.repackaged.org.objectweb.asm.Opcodes;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.annotation.Annotation;
+import java.security.AccessController;
+import java.security.PrivilegedActionException;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * A scanner listener that processes Java class files (resource names
@@ -156,7 +155,7 @@ public class AnnotationScannerListener implements ScannerListener {
         private boolean isAnnotated;
 
         private AnnotatedClassVisitor() {
-            super(Opcodes.ASM5);
+            super(Opcodes.ASM6);
         }
         
         public void visit(int version, int access, String name,
